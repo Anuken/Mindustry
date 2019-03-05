@@ -1018,7 +1018,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
-            launchTime = 60f * 6;
+            launchTime = 60f * 8;
             hasPower = true;
             consumes.power(1f);
         }};

@@ -66,8 +66,7 @@ public class Renderer implements ApplicationListener{
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = rect.setSize(camera.width, camera.height)
-                        .setCenter(camera.position.x, camera.position.y);
+                Rectangle view = camera.bounds(rect);
                 Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
                 if(view.overlaps(pos)){
@@ -289,7 +288,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 5));
+        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 4));
     }
 
     public void takeMapScreenshot(){
