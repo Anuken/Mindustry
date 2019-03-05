@@ -2,13 +2,10 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.PixmapIO;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
@@ -16,7 +13,9 @@ import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.ScreenRecorder;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -288,54 +287,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 4));
-    }
-
-    public void takeMapScreenshot(){
-        //TODO implement properly
-
-        float vpW = camera.width, vpH = camera.height;
-        int w = world.width()*tilesize, h =  world.height()*tilesize;
-
-        disableUI = true;
-
-        FrameBuffer buffer = new FrameBuffer(w, h);
-        Vector2 prev = camera.position.cpy();
-
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w/2f + tilesize/2f;
-        camera.position.y = h/2f + tilesize/2f;
-
-        buffer.begin();
-
-        draw();
-        blocks.drawShadows();
-
-        buffer.end();
-
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-
-        buffer.begin();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i+= 4){
-            lines[i + 3] = (byte)255;
-        }
-        buffer.end();
-
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-
-        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-        PixmapIO.writePNG(file, fullPixmap);
-        fullPixmap.dispose();
-
-        buffer.dispose();
-        camera.position.set(prev);
-
-        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
+        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 5));
     }
 
 }

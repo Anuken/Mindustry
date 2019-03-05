@@ -48,6 +48,13 @@ public class DeployDialog extends FloatingDialog{
         titleTable.remove();
         margin(0f).marginBottom(8);
 
+        if(!Core.settings.getBool("zone-info", false)){
+            Core.app.post(() -> ui.showInfoText("TEMPORARY GUIDE ON HOW TO PLAY ZONES", "- deploy to zones by selecting them here\n- most zones require items to deploy\n- once you survive a set amount of waves, you can launch all the resources in your core\n- use these items to research in the tech tree or uncover new zones"));
+
+            Core.settings.put("zone-info", true);
+            Core.settings.save();
+        }
+
         cont.stack(control.saves.getZoneSlot() == null ? new View() : new Table(){{
             SaveSlot slot = control.saves.getZoneSlot();
 
@@ -64,7 +71,7 @@ public class DeployDialog extends FloatingDialog{
                     }catch(SaveException e){ //make sure to handle any save load errors!
                         e.printStackTrace();
                         if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
-                        ui.showInfo("$save.corrupted");
+                        Core.app.post(() -> ui.showInfo("$save.corrupted"));
                         show();
                     }
                 });

@@ -20,7 +20,7 @@ allprojects{
 
     ext{
         versionNumber = '4'
-        versionModifier = 'alpha'
+        versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.9'

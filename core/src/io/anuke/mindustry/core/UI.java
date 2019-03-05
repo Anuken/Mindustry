@@ -250,17 +250,6 @@ public class UI implements ApplicationListener{
         }}.show();
     }
 
-    public void showInfo(String info, Runnable clicked){
-        new Dialog("", "dialog"){{
-            getCell(cont).growX();
-            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.addButton("$ok", () -> {
-                clicked.run();
-                hide();
-            }).size(90, 50).pad(4);
-        }}.show();
-    }
-
     public void showError(String text){
         new Dialog("$error.title", "dialog"){{
             cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
@@ -271,6 +260,13 @@ public class UI implements ApplicationListener{
     public void showText(String titleText, String text){
         new Dialog(titleText, "dialog"){{
             cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+        }}.show();
+    }
+
+    public void showInfoText(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
             buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
