@@ -40,7 +40,7 @@ public class HudFragment extends Fragment{
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private boolean shown = true;
-    private float dsize = 58;
+    private float dsize = 59;
     private float isize = 40;
 
     private float coreAttackTime;
@@ -58,7 +58,7 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    ImageButton menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
+                    select.addImageButton("icon-menu", "clear", isize, ui.paused::show);
                     flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
 
                     select.addImageButton("icon-pause", "clear", isize, () -> {
@@ -96,11 +96,11 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImage("blank").color(Pal.accent).width(6f).fillY();
-                });
+                    select.addImage("blank").color(Pal.accent).width(3f).fillY();
+                }).left();
 
                 cont.row();
-                cont.addImage("blank").height(6f).color(Pal.accent).fillX();
+                cont.addImage("blank").height(3f).color(Pal.accent).fillX();
                 cont.row();
             }
 
@@ -121,7 +121,7 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                stuff.add(stack).width(dsize * 4 + 6f);
+                stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                     .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
@@ -147,9 +147,7 @@ public class HudFragment extends Fragment{
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
-            .margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f);
-            }).get().color.a = 0f;
+            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
         //out of bounds warning

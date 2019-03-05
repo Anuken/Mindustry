@@ -1,9 +1,11 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -11,8 +13,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import java.io.DataInput;
 import java.io.DataOutput;
