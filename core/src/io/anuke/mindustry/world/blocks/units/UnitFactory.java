@@ -89,6 +89,7 @@ public class UnitFactory extends Block{
     public void setBars(){
         super.setBars();
         bars.add("progress", entity -> new Bar("blocks.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
+        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("blocks.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
     }
 
     @Override
@@ -101,6 +102,7 @@ public class UnitFactory extends Block{
         super.setStats();
 
         stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
 
     @Override
@@ -149,8 +151,6 @@ public class UnitFactory extends Block{
     public void update(Tile tile){
         UnitFactoryEntity entity = tile.entity();
 
-        entity.time += entity.delta() * entity.speedScl;
-
         if(entity.spawned >= maxSpawn){
             return;
         }
@@ -163,7 +163,7 @@ public class UnitFactory extends Block{
             //player-made spawners have default behavior
 
             if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
-
+                entity.time += entity.delta() * entity.speedScl;
                 entity.buildTime += entity.delta() * entity.power.satisfaction;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
@@ -172,6 +172,7 @@ public class UnitFactory extends Block{
             //check if grace period had passed
         }else if(entity.warmup > produceTime*gracePeriodMultiplier){
             float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, maxSpeedup);
+            entity.time += entity.delta() * entity.speedScl;
             //otherwise, it's an enemy, cheat by not requiring resources
             entity.buildTime += entity.delta() * speedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
