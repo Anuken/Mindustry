@@ -89,7 +89,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         assertTrue(generator.acceptLiquid(tile, null, liquid, availableLiquidAmount), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         entity.liquids.add(liquid, availableLiquidAmount);
-        entity.cons.update(tile.entity);
+        entity.cons.update();
         assertTrue(entity.cons.valid());
 
         // Perform an update on the generator once - This should use up any resource up to the maximum liquid usage
@@ -116,7 +116,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
             tests.add(dynamicTest("03", () -> simulateItemConsumption(inputType, Items.coal, 10, "Excess coal provided")));
             tests.add(dynamicTest("04", () -> simulateItemConsumption(inputType, Items.blastCompound, 1, "Blast compound provided")));
             //dynamicTest("03", () -> simulateItemConsumption(inputType, Items.plastanium, 1, "Plastanium provided")), // Not accepted by generator due to low flammability
-            tests.add(dynamicTest("05", () -> simulateItemConsumption(inputType, Items.biomatter, 1, "Biomatter provided")));
+            tests.add(dynamicTest("05", () -> simulateItemConsumption(inputType, Items.sporePod, 1, "Biomatter provided")));
             tests.add(dynamicTest("06", () -> simulateItemConsumption(inputType, Items.pyratite, 1, "Pyratite provided")));
         }
         DynamicTest[] testArray = new DynamicTest[tests.size()];
@@ -134,7 +134,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         if(amount > 0){
             entity.items.add(item, amount);
         }
-        entity.cons.update(tile.entity);
+        entity.cons.update();
         assertTrue(entity.cons.valid());
 
         // Perform an update on the generator once - This should use up one or zero items - dependent on if the item is accepted and available or not.
@@ -161,7 +161,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         // Burn a single coal and test for the duration
         entity.items.add(Items.coal, 1);
-        entity.cons.update(tile.entity);
+        entity.cons.update();
         generator.update(tile);
 
         float expectedEfficiency = entity.productionEfficiency;

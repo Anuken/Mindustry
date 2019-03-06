@@ -49,6 +49,7 @@ public class ContentLoader{
         new Mechs(),
         new UnitTypes(),
         new Blocks(),
+        new Loadouts(),
         new TechTree(),
         new Zones(),
 
@@ -80,7 +81,7 @@ public class ContentLoader{
 
             for(Content c : contentMap[type.ordinal()]){
                 if(c instanceof MappableContent){
-                    String name = ((MappableContent) c).getContentName();
+                    String name = ((MappableContent) c).name;
                     if(contentNameMap[type.ordinal()].containsKey(name)){
                         throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + name + "')");
                     }

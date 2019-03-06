@@ -18,6 +18,15 @@ public class EventType{
         }
     }
 
+    /**Called when a zone's requirements are met.*/
+    public static class ZoneConfigureCompleteEvent implements Event{
+        public final Zone zone;
+
+        public ZoneConfigureCompleteEvent(Zone zone){
+            this.zone = zone;
+        }
+    }
+
     /**Called when the game is first loaded.*/
     public static class GameLoadEvent implements Event{
 

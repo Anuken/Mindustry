@@ -10,6 +10,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
@@ -218,6 +219,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
+    //TODO optimize
     public void avoidOthers(float scaling){
         hitbox(queryRect);
         queryRect.setSize(queryRect.getWidth() * scaling);
@@ -263,6 +265,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
 
         if(isFlying()){
+            drownTime = 0f;
             move(velocity.x * Time.delta(), velocity.y * Time.delta());
         }else{
             boolean onLiquid = floor.isLiquid;
@@ -332,7 +335,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public int maxAccepted(Item item){
-        return this.item.item != item ? 0 : getItemCapacity() - this.item.amount;
+        return this.item.item != item && this.item.amount > 0 ? 0 : getItemCapacity() - this.item.amount;
     }
 
     public void applyEffect(StatusEffect effect, float duration){
@@ -362,7 +365,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf()*5f, 1f - healthf()));
-        Draw.alpha(hitTime);
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
     }
@@ -382,6 +384,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Draw.rect(getIconRegion(), x + offsetX, y + offsetY, rotation - 90);
     }
 
+    public float getSize(){
+        hitbox(Tmp.r1);
+        return Math.max(Tmp.r1.width, Tmp.r1.height) * 2f;
+    }
+
     public abstract TextureRegion getIconRegion();
 
     public abstract Weapon getWeapon();
@@ -391,6 +398,4 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public abstract float mass();
 
     public abstract boolean isFlying();
-
-    public abstract float getSize();
 }

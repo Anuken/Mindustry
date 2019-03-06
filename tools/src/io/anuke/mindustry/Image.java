@@ -101,21 +101,11 @@ class Image {
 
         int ofx = 0, ofy = 0;
 
-        if(x < 0){
-            ofx = x;
-            x = 0;
-        }
-
-        if(y < 0){
-            ofy = y;
-            y = 0;
-        }
-
         graphics.drawImage(ImagePacker.get(region).image,
                 x, y,
                 x + region.getWidth(),
                 y + region.getHeight(),
-                (flipx ?  region.getWidth() : 0) + ofx,
+                (flipx ? region.getWidth() : 0) + ofx,
                 (flipy ? region.getHeight() : 0) + ofy,
                 (flipx ? 0 : region.getWidth()) + ofx,
                 (flipy ? 0 : region.getHeight()) + ofy,

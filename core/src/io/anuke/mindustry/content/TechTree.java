@@ -127,7 +127,7 @@ public class TechTree implements ContentList{
 
                     node(siliconSmelter, () -> {
 
-                        node(biomatterCompressor, () -> {
+                        node(sporePress, () -> {
                             node(multiPress, () -> {
 
                             });
@@ -234,25 +234,19 @@ public class TechTree implements ContentList{
 
                 node(alphaDartPad, () -> {
                     node(deltaPad, () -> {
-                        node(javelinPad);
-                        node(tauPad, () -> {
-                            node(tridentPad);
-                            node(omegaPad, () -> {
+                        node(spiritFactory, () -> {
+                            node(phantomFactory);
+                        });
+
+                        node(javelinPad, () -> {
+                            node(tridentPad, () -> {
                                 node(glaivePad);
                             });
                         });
-                    });
 
-                    node(spiritFactory, () -> {
-                        node(daggerFactory, () -> {
-                            node(titanFactory, () -> {
-                                node(fortressFactory);
-                            });
-                            node(wraithFactory, () -> {
-                                node(phantomFactory);
-                                node(ghoulFactory, () -> {
-                                    node(revenantFactory);
-                                });
+                        node(tauPad, () -> {
+                            node(omegaPad, () -> {
+
                             });
                         });
                     });
@@ -264,7 +258,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 40);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 30);
         }
         
         return new TechNode(block, requirements, children);

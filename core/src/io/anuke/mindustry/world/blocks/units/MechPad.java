@@ -57,7 +57,7 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null || !checkValidTap(tile, player) || !(tile.block() instanceof MechPad)) return;
+        if(player == null  || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         MechPad pad = (MechPad)tile.block();
@@ -148,16 +148,15 @@ public class MechPad extends Block{
             TextureRegion region = mech.iconRegion;
 
             if(entity.player.mech == mech){
-                region = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
+                region = (entity.player.mech == Mechs.starterDesktop ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
             }
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.time = -entity.time / 4f;
+            Shaders.build.time = -entity.time / 5f;
             Shaders.build.color.set(Pal.accent);
 
-            Draw.shader(Shaders.build, false);
-            Shaders.build.apply();
+            Draw.shader(Shaders.build);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 
@@ -223,7 +222,7 @@ public class MechPad extends Block{
 
                 player.rotation = 90f;
                 player.baseRotation = 90f;
-                player.set(x, y);
+                player.setNet(x, y);
                 player.beginRespawning(this);
             }
         }

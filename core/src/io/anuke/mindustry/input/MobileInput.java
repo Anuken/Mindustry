@@ -29,7 +29,6 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -175,7 +174,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             float offset = request.block.offset();
             TextureRegion region = request.block.icon(Icon.full);
 
-            Draw.alpha(Mathf.clamp((1f - request.scale) / 0.5f));
+            Draw.mixcol(Pal.accent, Mathf.clamp((1f - request.scale) / 0.5f));
             Draw.tint(Color.WHITE, Pal.breakInvalid, request.redness);
 
             Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
@@ -183,7 +182,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             region.getHeight() * request.scale * Draw.scl,
             request.block.rotate ? request.rotation * 90 : 0);
 
-            Draw.alpha(1f);
+            Draw.mixcol(Pal.accent, 1f);
             for(int i = 0; i < 4; i++){
                 Point2 p = Geometry.d8edge[i];
                 float poffset = -Math.max(request.block.size-1, 0)/2f * tilesize;
@@ -194,7 +193,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             Draw.color();
         }else{
             float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
-            Draw.alpha(0f);
+            Draw.mixcol();
             //draw removing request
             Draw.tint(Pal.removeBack);
             Lines.square(tile.drawx(), tile.drawy()-1, rad);
@@ -289,9 +288,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void drawOutlined(){
         Lines.stroke(1f);
 
-        Shaders.mix.color.set(Pal.accent);
-        Draw.shader(Shaders.mix);
-
         //draw removals
         for(PlaceRequest request : removals){
             Tile tile = request.tile();
@@ -319,17 +315,16 @@ public class MobileInput extends InputHandler implements GestureListener{
                 request.redness = Mathf.lerpDelta(request.redness, 1f, 0.2f);
             }
 
-
             drawRequest(request);
 
             //draw last placed request
             if(!request.remove && request == lastPlaced && request.block != null){
+                Draw.mixcol();
                 request.block.drawPlace(tile.x, tile.y, rotation, validPlace(tile.x, tile.y, request.block, rotation));
             }
         }
 
-        Draw.shader();
-
+        Draw.mixcol();
         Draw.color(Pal.accent);
 
         //Draw lines

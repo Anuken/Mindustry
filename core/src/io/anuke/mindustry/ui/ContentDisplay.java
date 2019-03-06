@@ -25,7 +25,7 @@ public class ContentDisplay{
             int size = 8 * 6;
 
             title.addImage(block.icon(Icon.large)).size(size);
-            title.add("[accent]" + block.formalName).padLeft(5);
+            title.add("[accent]" + block.localizedName).padLeft(5);
         });
 
         table.row();
@@ -34,8 +34,8 @@ public class ContentDisplay{
 
         table.row();
 
-        if(block.fullDescription != null){
-            table.add(block.fullDescription).padLeft(5).padRight(5).width(400f).wrap().fillX();
+        if(block.description != null){
+            table.add(block.description).padLeft(5).padRight(5).width(400f).wrap().fillX();
             table.row();
 
             table.addImage("white").height(3).color(Color.LIGHT_GRAY).pad(8).padLeft(0).padRight(0).fillX();

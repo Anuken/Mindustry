@@ -53,7 +53,7 @@ public class Consumers{
      * @param powerCapacity The maximum capacity in power units.
      */
     public ConsumePower powerBuffered(float powerCapacity){
-        return powerBuffered(powerCapacity, 1f);
+        return powerBuffered(powerCapacity, 60f * 3);
     }
 
     /**
@@ -97,6 +97,10 @@ public class Consumers{
 
     public Liquid liquid(){
         return get(ConsumeLiquid.class).get();
+    }
+
+    public float liquidAmount(){
+        return get(ConsumeLiquid.class).use;
     }
 
     public Consume add(Consume consume){

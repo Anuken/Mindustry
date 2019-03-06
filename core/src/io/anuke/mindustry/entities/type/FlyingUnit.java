@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -38,7 +37,6 @@ public abstract class FlyingUnit extends BaseUnit{
                 retarget(() -> {
                     targetClosest();
 
-                    if(target == null) targetClosestEnemyFlag(BlockFlag.target);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                     if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 
@@ -114,13 +112,13 @@ public abstract class FlyingUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
+        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
         Draw.rect(type.region, x, y, rotation - 90);
 
         drawWeapons();
         drawItems();
 
-        Draw.alpha(1f);
+        Draw.mixcol();
     }
 
     public void drawWeapons(){

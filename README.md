@@ -25,9 +25,9 @@ _Building:_ `gradlew desktop:dist`
 _Running:_ `./gradlew desktop:run`  
 _Building:_ `./gradlew desktop:dist`
 
-#### For Server Builds...
+#### Server
 
-Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server' i.e. `gradlew server:dist`.
+Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server', e.g. `gradlew server:dist`.
 
 ---
 

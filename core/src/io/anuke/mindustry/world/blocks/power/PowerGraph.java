@@ -6,6 +6,8 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.WindowedMean;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
@@ -22,6 +24,8 @@ public class PowerGraph{
     private final ObjectSet<Tile> batteries = new ObjectSet<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
+    private final WindowedMean powerBalance = new WindowedMean(60);
+
     private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
@@ -32,6 +36,10 @@ public class PowerGraph{
 
     public int getID(){
         return graphID;
+    }
+
+    public float getPowerBalance(){
+        return powerBalance.getMean();
     }
 
     public float getPowerProduced(){
@@ -80,7 +88,7 @@ public class PowerGraph{
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
-        if(Mathf.isEqual(stored, 0f)){ return 0f; }
+        if(Mathf.isEqual(stored, 0f)) return 0f;
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
@@ -114,23 +122,19 @@ public class PowerGraph{
     }
 
     public void distributePower(float needed, float produced){
-        if(Mathf.isEqual(needed, 0f)){ return; }
-
+        //distribute even if not needed. this is because some might be requiring power but not requesting it; it updates consumers
         float coverage = Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
                 ConsumePower consumePower = consumes.get(ConsumePower.class);
-                if(!otherConsumersAreValid(consumer, consumePower)){
-                    consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
+                //currently satisfies power even if it's not required yet
+                if(consumePower.isBuffered){
+                    // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
+                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
+                    consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
                 }else{
-                    if(consumePower.isBuffered){
-                        // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
-                        float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
-                        consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
-                    }else{
-                        consumer.entity.power.satisfaction = coverage;
-                    }
+                    consumer.entity.power.satisfaction = coverage;
                 }
             }
         }
@@ -145,6 +149,8 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
+
+        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
         if(!Mathf.isEqual(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
@@ -237,14 +243,12 @@ public class PowerGraph{
         }
     }
 
-    //currently ignores all other consumers and consumes power anyway.
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
-        /*
         for(Consume cons : tile.block().consumes.all()){
             if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.block(), tile.entity())){
                 return false;
             }
-        }*/
+        }
         return true;
     }
 

@@ -1,6 +1,7 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -16,12 +17,14 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -178,6 +181,7 @@ public class ApplicationTests{
     @Test
     void save(){
         world.loadMap(testMap);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
         SaveIO.saveToSlot(0);
     }
 
@@ -192,6 +196,7 @@ public class ApplicationTests{
 
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
     }
 
     @Test
@@ -233,6 +238,39 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertEquals(Blocks.part, world.tile(1, 1).block());
+    }
+
+    @Test
+    void zoneEmptyWaves(){
+        for(Zone zone : content.zones()){
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
+            for(int i = 1; i <= 100; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
+
+                assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
+            }
+        }
+    }
+
+    @Test
+    void zoneOverflowWaves(){
+        for(Zone zone : content.zones()){
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
+
+            for(int i = 1; i <= 40; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
+
+                if(total >= 140){
+                    fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
+                }
+            }
+        }
     }
 
     @Test

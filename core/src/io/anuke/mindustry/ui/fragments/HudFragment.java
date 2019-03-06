@@ -15,35 +15,32 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-
-import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
     public final PlacementFragment blockfrag = new PlacementFragment();
 
-    private ImageButton menu, flip;
-    private Stack wavetable;
-    private Table infolabel;
+    private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private boolean shown = true;
-    private float dsize = 58;
+    private float dsize = 59;
     private float isize = 40;
 
     private float coreAttackTime;
@@ -61,7 +58,7 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    menu = select.addImageButton("icon-menu", "clear", isize, ui.paused::show).get();
+                    select.addImageButton("icon-menu", "clear", isize, ui.paused::show);
                     flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
 
                     select.addImageButton("icon-pause", "clear", isize, () -> {
@@ -86,6 +83,8 @@ public class HudFragment extends Fragment{
                             }else{
                                 ui.chatfrag.toggle();
                             }
+                        }else if(world.isZone()){
+                            ui.tech.show();
                         }else{
                             ui.database.show();
                         }
@@ -93,15 +92,15 @@ public class HudFragment extends Fragment{
                         if(Net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-unlocks");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database-small");
                         }
                     }).get();
 
-                    select.addImage("blank").color(Pal.accent).width(6f).fillY();
-                });
+                    select.addImage("blank").color(Pal.accent).width(3f).fillY();
+                }).left();
 
                 cont.row();
-                cont.addImage("blank").height(6f).color(Pal.accent).fillX();
+                cont.addImage("blank").height(3f).color(Pal.accent).fillX();
                 cont.row();
             }
 
@@ -111,40 +110,35 @@ public class HudFragment extends Fragment{
                 }
             });
 
-            Stack stack = new Stack();
-            TextButton waves = new TextButton("", "wave");
-            Table btable = new Table().margin(0);
+            cont.table(stuff -> {
+                stuff.left();
+                Stack stack = new Stack();
+                TextButton waves = new TextButton("", "wave");
+                Table btable = new Table().margin(0);
 
-            stack.add(waves);
-            stack.add(btable);
+                stack.add(waves);
+                stack.add(btable);
 
-            wavetable = stack;
-
-            addWaveTable(waves);
-            addPlayButton(btable);
-            cont.add(stack).width(dsize * 4 + 6f);
-
-            cont.row();
-
-            //fps display
-            infolabel = cont.table(t -> {
-                IntFormat fps = new IntFormat("fps");
-                IntFormat ping = new IntFormat("ping");
-                t.label(() -> fps.get(Core.graphics.getFramesPerSecond())).padRight(10);
-                t.row();
-                if(Net.hasClient()){
-                    t.label(() -> ping.get(Net.getPing())).visible(Net::client).colspan(2);
-                }
-            }).size(-1).visible(() -> Core.settings.getBool("fps")).update(t -> t.setTranslation(0, (!waves.isVisible() ? wavetable.getHeight() : Math.min(wavetable.getTranslation().y, wavetable.getHeight())))).get();
-
-            //make wave box appear below rest of menu
-            if(mobile){
-                cont.swapActor(wavetable, menu.getParent());
-            }
+                addWaveTable(waves);
+                addPlayButton(btable);
+                stuff.add(stack).width(dsize * 4 + 3f);
+                stuff.row();
+                stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                    .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
+                stuff.row();
+            }).visible(() -> shown);
         });
 
-        //minimap
-        //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
+
+        //fps display
+        parent.fill(info -> {
+            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps"));
+            IntFormat fps = new IntFormat("fps");
+            IntFormat ping = new IntFormat("ping");
+            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
+            info.row();
+            info.label(() -> ping.get(Net.getPing())).visible(Net::client).right();
+        });
 
         //spawner warning
         parent.fill(t -> {
@@ -153,9 +147,7 @@ public class HudFragment extends Fragment{
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
-            .margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f);
-            }).get().color.a = 0f;
+            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
         //out of bounds warning
@@ -227,7 +219,7 @@ public class HudFragment extends Fragment{
                 world.getZone().metCondition() &&
                 !Net.client() &&
                 state.wave % world.getZone().launchPeriod == 0 &&
-                state.wavetime < state.rules.waveSpacing - 70);
+                state.wavetime < state.rules.waveSpacing * launchWaveMultiplier - 70);
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -235,7 +227,7 @@ public class HudFragment extends Fragment{
                     return;
                 }
 
-                button.setText(Core.bundle.get(state.enemies() > 0 ? "launch.unable" : "launch") + "\n" +
+                button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
                     Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
                 button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
@@ -283,6 +275,10 @@ public class HudFragment extends Fragment{
         container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
         //nesting actions() calls is necessary so the right prefHeight() is used
         Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
+    }
+
+    public boolean shown(){
+        return shown;
     }
 
     /** Show unlock notification for a new recipe. */
@@ -370,38 +366,25 @@ public class HudFragment extends Fragment{
         }
     }
 
-    public void showTextDialog(String str){
-        new FloatingDialog("$mission.info"){{
-            shouldPause = true;
-            setFillParent(false);
-            getCell(cont).growX();
-            cont.margin(15).add(str).width(400f).wrap().get().setAlignment(Align.left, Align.left);
-            buttons.addButton("$continue", this::hide).size(140, 60).pad(4);
-        }}.show();
+    public void showLaunch(){
+        Image image = new Image("white");
+        image.getColor().a = 0f;
+        image.setFillParent(true);
+        image.actions(Actions.fadeIn(40f / 60f));
+        image.update(() -> {
+            if(state.is(State.menu)){
+                image.remove();
+            }
+        });
+        Core.scene.add(image);
     }
 
     private void toggleMenus(){
-        wavetable.clearActions();
-        infolabel.clearActions();
-
-        float dur = 0.3f;
-        Interpolation in = Interpolation.pow3Out;
-
         if(flip != null){
             flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
         }
 
-        if(shown){
-            shown = false;
-            blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, (wavetable.getHeight() + Unit.dp.scl(dsize) + Unit.dp.scl(6)) - wavetable.getTranslation().y, dur, in));
-            infolabel.actions(Actions.translateBy(0, (wavetable.getHeight()) - wavetable.getTranslation().y, dur, in));
-        }else{
-            shown = true;
-            blockfrag.toggle(dur, in);
-            wavetable.actions(Actions.translateBy(0, -wavetable.getTranslation().y, dur, in));
-            infolabel.actions(Actions.translateBy(0, -infolabel.getTranslation().y, dur, in));
-        }
+        shown = !shown;
     }
 
     private void addWaveTable(TextButton table){
@@ -447,12 +430,8 @@ public class HudFragment extends Fragment{
             }else{
                 state.wavetime = 0f;
             }
-        }).growY().fillX().right().width(40f).update(l -> {
-            boolean vis = !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active());
-            boolean paused = state.is(State.paused) || !vis;
-
-            l.getStyle().imageUp = Core.scene.skin.getDrawable(vis ? "icon-play" : "clear");
-            l.touchable(!paused ? Touchable.enabled : Touchable.disabled);
-        }).visible(() -> !state.rules.waveTimer && ((Net.server() || players[0].isAdmin) || !Net.active()) && unitGroups[Team.red.ordinal()].size() == 0);
+        }).growY().fillX().right().width(40f)
+        .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
+        && (state.wavetime < state.rules.waveSpacing - 60 || !state.rules.waveTimer));
     }
 }

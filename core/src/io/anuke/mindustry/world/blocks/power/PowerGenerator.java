@@ -1,8 +1,13 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -26,6 +31,19 @@ public class PowerGenerator extends PowerDistributor{
     public void setStats(){
         super.setStats();
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        if(hasPower && outputsPower && !consumes.has(ConsumePower.class)){
+            bars.add("power", entity -> new Bar(() ->
+            Core.bundle.format("blocks.poweroutput",
+            Strings.toFixed(entity.tile.block().getPowerProduction(entity.tile)*60 * entity.timeScale, 1)),
+            () -> Pal.powerBar,
+            () -> ((GeneratorEntity)entity).productionEfficiency));
+        }
     }
 
     @Override

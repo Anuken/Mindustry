@@ -10,9 +10,6 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Mech extends UnlockableContent{
-    public final String name;
-    public final String description;
-
     public boolean flying;
     public float speed = 1.1f;
     public float maxSpeed = 10f;
@@ -38,8 +35,8 @@ public class Mech extends UnlockableContent{
     public TextureRegion baseRegion, legRegion, region, iconRegion;
 
     public Mech(String name, boolean flying){
+        super(name);
         this.flying = flying;
-        this.name = name;
         this.description = Core.bundle.get("mech." + name + ".description");
     }
 
@@ -75,11 +72,6 @@ public class Mech extends UnlockableContent{
     @Override
     public TextureRegion getContentIcon(){
         return iconRegion;
-    }
-
-    @Override
-    public String getContentName(){
-        return name;
     }
 
     @Override

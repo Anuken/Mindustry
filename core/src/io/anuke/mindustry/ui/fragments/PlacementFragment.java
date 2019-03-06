@@ -5,11 +5,10 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
@@ -42,7 +41,6 @@ public class PlacementFragment extends Fragment{
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
-    boolean shown = true;
     boolean lastGround;
 
     //TODO make this configurable
@@ -122,7 +120,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> !state.is(State.menu));
+            full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
 
             full.table(frame -> {
                 InputHandler input = control.input(0);
@@ -153,7 +151,7 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).get();
 
-                        button.replaceImage(new Image(block.icon(Icon.medium)));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = players[0].getClosestCore();
@@ -178,7 +176,7 @@ public class PlacementFragment extends Fragment{
                     top.add(new Table()).growX().update(topTable -> {
                         //don't refresh unnecessarily
                         if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround)
-                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastGround))
+                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastDisplay == tileDisplayBlock() && lastGround))
                             return;
 
                         topTable.clear();
@@ -194,7 +192,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
@@ -343,17 +341,5 @@ public class PlacementFragment extends Fragment{
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
-    }
-
-    /** Show or hide the placement menu. */
-    void toggle(float t, Interpolation ip){
-        toggler.clearActions();
-        if(shown){
-            shown = false;
-            toggler.actions(Actions.translateBy(toggler.getTranslation().x + toggler.getWidth(), 0, t, ip));
-        }else{
-            shown = true;
-            toggler.actions(Actions.translateBy(-toggler.getTranslation().x, 0, t, ip));
-        }
     }
 }

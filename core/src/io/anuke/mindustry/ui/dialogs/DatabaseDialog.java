@@ -1,24 +1,23 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.Tooltip;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.utils.UIUtils;
-
-import static io.anuke.mindustry.Vars.*;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.ContentType;
 
 public class DatabaseDialog extends FloatingDialog{
 
     public DatabaseDialog(){
-        super("database");
+        super("$database");
 
         shouldPause = true;
         addCloseButton();
@@ -56,11 +55,11 @@ public class DatabaseDialog extends FloatingDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent) array.get(i);
 
-                    Image image = data.isUnlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
+                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
-                    if(data.isUnlocked(unlock)){
+                    if(unlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
                         image.addListener(new Tooltip<>(new Table("button"){{
                             add(unlock.localizedName());
@@ -76,5 +75,9 @@ public class DatabaseDialog extends FloatingDialog{
         }
 
         cont.add(pane);
+    }
+
+    boolean unlocked(UnlockableContent content){
+        return (!Vars.world.isZone() && !Vars.state.is(State.menu)) || content.unlocked();
     }
 }

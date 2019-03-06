@@ -3,7 +3,6 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.InputProcessor;
 import io.anuke.arc.math.Angles;
@@ -13,10 +12,10 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.ValidateException;
@@ -157,7 +156,7 @@ public abstract class InputHandler implements InputProcessor{
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
-        if(tile.block().configurable && tile.getTeam() == player.getTeam()){
+        if(tile.block().configurable && tile.interactable(player.getTeam())){
             consumed = true;
             if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
                     //alternatively, the current selected block can 'agree' to switch config tiles
@@ -178,14 +177,14 @@ public abstract class InputHandler implements InputProcessor{
         }
 
         //call tapped event
-        if(!consumed && tile.getTeam() == player.getTeam()){
+        if(!consumed && tile.interactable(player.getTeam())){
             Call.onTileTapped(player, tile);
         }
 
         //consume tap event if necessary
-        if(tile.getTeam() == player.getTeam() && tile.block().consumesTap){
+        if(tile.interactable(player.getTeam()) && tile.block().consumesTap){
             consumed = true;
-        }else if((tile.getTeam() == player.getTeam() || tile.getTeam() == Team.none) && tile.block().synthetic() && !consumed){
+        }else if(tile.interactable(player.getTeam()) && tile.block().synthetic() && !consumed){
             if(tile.block().hasItems && tile.entity.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
@@ -288,7 +287,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y)){
+        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused()){
             droppingItem = false;
             return;
         }
@@ -297,7 +296,7 @@ public abstract class InputHandler implements InputProcessor{
 
         ItemStack stack = player.item();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.getTeam() == player.getTeam() && tile.block().hasItems){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));

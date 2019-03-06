@@ -19,10 +19,8 @@ public class Pump extends LiquidBlock{
 
     protected final int timerContentCheck = timers++;
 
-    /**Pump amount per tile this block is on.*/
+    /**Pump amount, total.*/
     protected float pumpAmount = 1f;
-    /**Maximum liquid tier this pump can use.*/
-    protected int tier = 0;
 
     public Pump(String name){
         super(name);
@@ -95,7 +93,7 @@ public class Pump extends LiquidBlock{
         }
 
         if(tile.entity.cons.valid() && liquidDrop != null){
-            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta());
+            float maxPump = Math.min(liquidCapacity - tile.entity.liquids.total(), tiles * pumpAmount * tile.entity.delta() / size / size);
             if(hasPower){
                 maxPump *= tile.entity.power.satisfaction; // Produce slower if not at full power
             }
@@ -115,7 +113,7 @@ public class Pump extends LiquidBlock{
     }
 
     protected boolean isValid(Tile tile){
-        return tile != null && tile.floor().liquidDrop != null && tier >= tile.floor().liquidDrop.tier;
+        return tile != null && tile.floor().liquidDrop != null;
     }
 
 }

@@ -4,17 +4,17 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
@@ -35,7 +35,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
     }
 
     @Remote(called = Loc.server)
@@ -74,7 +74,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        return state.teams.get(tile.getTeam()).cores.size > 1;
+        return false;
     }
 
     @Override
@@ -105,9 +105,11 @@ public class CoreBlock extends StorageBlock{
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.alpha(entity.heat);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.color();
+        if(Core.atlas.isFound(topRegion)){
+            Draw.alpha(entity.heat);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.color();
+        }
 
         if(entity.currentUnit != null){
             Unit player = entity.currentUnit;

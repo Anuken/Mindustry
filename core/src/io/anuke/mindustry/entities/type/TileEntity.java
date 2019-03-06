@@ -195,7 +195,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
             if(other == null) continue;
             other = other.target();
-            if(other.entity == null || other.getTeamID() != tile.getTeamID()) continue;
+            if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
 
             other.block().onProximityUpdate(other);
 

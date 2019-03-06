@@ -1,9 +1,11 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -11,8 +13,6 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.SelectionTrait;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -20,13 +20,13 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class SortedUnloader extends Block implements SelectionTrait{
+public class Unloader extends Block implements SelectionTrait{
     protected float speed = 1f;
     protected final int timerUnload = timers++;
 
     private static Item lastItem;
 
-    public SortedUnloader(String name){
+    public Unloader(String name){
         super(name);
         update = true;
         solid = true;
@@ -59,7 +59,7 @@ public class SortedUnloader extends Block implements SelectionTrait{
 
         if(tile.entity.timer.get(timerUnload, speed) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.getTeam() == tile.getTeam() && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
+                if(other.interactable(tile.getTeam()) && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
                     offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
                 }

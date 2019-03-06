@@ -39,7 +39,7 @@ public class BuildBlock extends Block{
         super(name);
         update = true;
         size = Integer.parseInt(name.charAt(name.length() - 1) + "");
-        health = 10;
+        health = 20;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
@@ -71,9 +71,14 @@ public class BuildBlock extends Block{
     }
 
     @Override
+    public boolean isHidden(){
+        return true;
+    }
+
+    @Override
     public String getDisplayName(Tile tile){
         BuildEntity entity = tile.entity();
-        return Core.bundle.format("block.constructing", entity.block == null ? entity.previous.formalName : entity.block.formalName);
+        return Core.bundle.format("block.constructing", entity.block == null ? entity.previous.localizedName : entity.block.localizedName);
     }
 
     @Override

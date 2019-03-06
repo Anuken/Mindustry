@@ -15,6 +15,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -48,7 +49,6 @@ public class Renderer implements ApplicationListener{
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-    private Vector2 avgPosition = new Vector2();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -65,8 +65,7 @@ public class Renderer implements ApplicationListener{
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = rect.setSize(camera.width, camera.height)
-                        .setCenter(camera.position.x, camera.position.y);
+                Rectangle view = camera.bounds(rect);
                 Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
                 if(view.overlaps(pos)){
@@ -115,7 +114,7 @@ public class Renderer implements ApplicationListener{
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
         }else{
-            Vector2 position = averagePosition();
+            Vector2 position = Tmp.v3.set(players[0]);
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
@@ -256,16 +255,9 @@ public class Renderer implements ApplicationListener{
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            Shaders.outline.color.set(team.color);
-            Shaders.mix.color.set(Color.WHITE);
-
-            //Graphics.beginShaders(Shaders.outline);
-            Draw.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            Draw.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
-            //Graphics.endShaders();
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
@@ -288,15 +280,6 @@ public class Renderer implements ApplicationListener{
         return camerascale;
     }
 
-    public Vector2 averagePosition(){
-        avgPosition.setZero();
-
-        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> avgPosition.add(p.x, p.y));
-
-        avgPosition.scl(1f / players.length);
-        return avgPosition;
-    }
-
     public void scaleCamera(float amount){
         targetscale += amount;
         clampScale();
@@ -304,47 +287,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 7));
-    }
-
-    public void takeMapScreenshot(){
-        //TODO fix/implement
-        /*
-        float vpW = camera.width, vpH = camera.height;
-        int w = world.width()*tilesize, h =  world.height()*tilesize;
-        int pw = pixelSurface.width(), ph = pixelSurface.height();
-        disableUI = true;
-        pixelSurface.setSize(w, h, true);
-        Graphics.getEffectSurface().setSize(w, h, true);
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w/2f + tilesize/2f;
-        camera.position.y = h/2f + tilesize/2f;
-
-        draw();
-
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-
-        pixelSurface.getBuffer().begin();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i+= 4){
-            lines[i + 3] = (byte)255;
-        }
-        pixelSurface.getBuffer().end();
-
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-
-        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-        PixmapIO.writePNG(file, fullPixmap);
-        fullPixmap.dispose();
-
-        pixelSurface.setSize(pw, ph, false);
-        Graphics.getEffectSurface().setSize(pw, ph, false);
-
-        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));*/
+        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 5));
     }
 
 }

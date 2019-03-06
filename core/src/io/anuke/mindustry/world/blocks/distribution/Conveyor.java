@@ -28,7 +28,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
     private static final float itemSpace = 0.135f * 3f;
-    private static final float offsetScl = 128f * 3f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
@@ -156,7 +155,7 @@ public class Conveyor extends Block{
 
         entity.noSleep();
 
-        float speed = this.speed * tilesize / 2.3f;
+        float speed = this.speed * tilesize / 2.4f;
         float centerSpeed = 0.1f;
         float centerDstScl = 3f;
         float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
@@ -172,7 +171,7 @@ public class Conveyor extends Block{
         }
 
         if(entity.convey.size * itemSpace < 0.9f){
-            unit.velocity().add((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
+            unit.applyImpulse((tx * speed + centerx) * entity.delta(), (ty * speed + centery) * entity.delta());
         }
     }
 

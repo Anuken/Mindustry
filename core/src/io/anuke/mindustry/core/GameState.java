@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.Events;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Stats;
@@ -32,13 +33,17 @@ public class GameState{
         return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].size();
     }
 
+    public BaseUnit boss(){
+        return unitGroups[waveTeam.ordinal()].find(BaseUnit::isBoss);
+    }
+
     public void set(State astate){
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !Net.active()) || gameOver;
+        return (is(State.paused) && !Net.active()) || (gameOver && !Net.active());
     }
 
     public boolean is(State astate){

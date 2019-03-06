@@ -1,11 +1,11 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Pack;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.arc.util.Pack;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.Content;
@@ -16,13 +16,13 @@ import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class SaveFileVersion{
     public final int version;
@@ -110,8 +110,6 @@ public abstract class SaveFileVersion{
                 byte team = Pack.leftByte(tr);
                 byte rotation = Pack.rightByte(tr);
 
-                Team t = Team.all[team];
-
                 tile.setTeam(Team.all[team]);
                 tile.entity.health = health;
                 tile.setRotation(rotation);
@@ -123,10 +121,6 @@ public abstract class SaveFileVersion{
 
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
-
-                if(tile.block() instanceof CoreBlock){
-                    state.teams.get(t).cores.add(tile);
-                }
             }else if(wallid == 0){
                 int consecutives = stream.readUnsignedByte();
 
@@ -217,7 +211,7 @@ public abstract class SaveFileVersion{
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    stream.writeUTF(((MappableContent) c).getContentName());
+                    stream.writeUTF(((MappableContent) c).name);
                 }
             }
         }

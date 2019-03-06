@@ -11,10 +11,10 @@ import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.maps.MapTileData.TileDataMarker;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public enum EditorTool{
     pick{
@@ -107,7 +107,7 @@ public enum EditorTool{
             dest = floor ? bf : bw;
             byte draw = editor.getDrawBlock().id;
 
-            if(dest == draw){
+            if(dest == draw || content.block(bw) instanceof BlockPart || content.block(bw).isMultiblock()){
                 return;
             }
 
@@ -135,6 +135,17 @@ public enum EditorTool{
                     for(int cy = 0; cy < height; cy++){
                         if(eq(cx, cy)){
                             writer.accept(cx, cy);
+                        }
+                    }
+                }
+            }else if(isAlt2()){
+                for(int cx = 0; cx < width; cx++){
+                    for(int cy = 0; cy < height; cy++){
+                        byte w = data.read(cx, cy, DataPosition.wall);
+                        if(content.block(w).synthetic()){
+                            TileDataMarker prev = editor.getPrev(cx, cy, false);
+                            data.write(cx, cy, DataPosition.rotationTeam, (byte)editor.getDrawTeam().ordinal());
+                            editor.onWrite(cx, cy, prev);
                         }
                     }
                 }
@@ -199,6 +210,10 @@ public enum EditorTool{
 
     public static boolean isAlt(){
         return Core.input.keyDown(KeyCode.TAB);
+    }
+
+    public static boolean isAlt2(){
+        return Core.input.keyDown(KeyCode.GRAVE);
     }
 
     public void touched(MapEditor editor, int x, int y){

@@ -7,10 +7,6 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.EntityQuery;
-import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.math.Mathf;
@@ -19,14 +15,19 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.io.ByteBufferOutput;
 import io.anuke.arc.util.io.CountableByteArrayOutputStream;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -51,12 +52,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 430;
-
-    public final static boolean debugSnapshots = false;
-    public final static float maxSnapshotDelay = 200;
-    public final static float snapshotDropchance = 0.01f;
-
-    private final static byte[] reusableSnapArray = new byte[maxSnapshotSize];
     private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     private final static Rectangle viewport = new Rectangle();
@@ -475,7 +470,7 @@ public class NetServer implements ApplicationListener{
             returnArray.clear();
             if(represent.isClipped()){
                 EntityQuery.getNearby(group, viewport, entity -> {
-                    if(((SyncTrait) entity).isSyncing() && viewport.contains(entity.getX(), entity.getY())){
+                    if(((SyncTrait) entity).isSyncing() && viewport.overlaps(Tmp.r3.setSize(((SyncTrait)entity).clipSize(), ((SyncTrait)entity).clipSize()).setCenter(entity.getX(), entity.getY()))){
                         returnArray.add(entity);
                     }
                 });

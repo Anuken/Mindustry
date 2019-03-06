@@ -11,6 +11,7 @@ public class DifferentialGenerator extends TurbineGenerator{
     public DifferentialGenerator(String name){
         super(name);
 
+        hasLiquids = true;
         consumes.require(ConsumeItem.class);
         consumes.require(ConsumeLiquid.class);
     }

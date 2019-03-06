@@ -14,14 +14,12 @@ import io.anuke.arc.util.CommandHandler.ResponseType;
 import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.RulePreset;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -29,6 +27,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -47,7 +46,7 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-
+    private RulePreset lastPreset;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -213,7 +212,7 @@ public class ServerControl implements ApplicationListener{
                 try{
                     preset = RulePreset.valueOf(arg[1]);
                 }catch(IllegalArgumentException e){
-                    err("No gamemode '{0}' found.");
+                    err("No gamemode '{0}' found.", arg[1]);
                     return;
                 }
             }
@@ -222,12 +221,16 @@ public class ServerControl implements ApplicationListener{
 
             logic.reset();
             state.rules = preset.get();
-            world.loadMap(result);
-            logic.play();
+            try{
+                world.loadMap(result);
+                logic.play();
 
-            info("Map loaded.");
+                info("Map loaded.");
 
-            host();
+                host();
+            }catch(MapException e){
+                Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+            }
         });
 
         handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
@@ -642,7 +645,9 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.setDead(true);
             }
+            Rules rules = state.rules;
             logic.reset();
+            state.rules = rules;
             Call.onWorldDataBegin();
             run.run();
             logic.play();
@@ -657,7 +662,12 @@ public class ServerControl implements ApplicationListener{
             lastTask = new Task(){
                 @Override
                 public void run(){
-                    r.run();
+                    try{
+                        r.run();
+                    }catch(MapException e){
+                        Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                        Net.closeServer();
+                    }
                 }
             };
 
@@ -671,6 +681,8 @@ public class ServerControl implements ApplicationListener{
         try{
             Net.host(Core.settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
         }catch(IOException e){
             err(e);
             state.set(State.menu);

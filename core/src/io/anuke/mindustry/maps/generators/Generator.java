@@ -1,5 +1,6 @@
 package io.anuke.mindustry.maps.generators;
 
+import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Tile;
 
 public abstract class Generator{
@@ -12,7 +13,7 @@ public abstract class Generator{
 
     public Generator(){}
 
-    public void init(){
+    public void init(Loadout loadout){
 
     }
 

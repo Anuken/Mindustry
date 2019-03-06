@@ -8,13 +8,13 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class OreBlock extends Floor{
-    private static final ObjectMap<Item, ObjectMap<Block, Block>> oreBlockMap = new ObjectMap<>();
+    private static final ObjectMap<Item, ObjectMap<Block, Floor>> oreBlockMap = new ObjectMap<>();
 
     public Floor base;
 
     public OreBlock(Item ore, Floor base){
         super("ore-" + ore.name + "-" + base.name);
-        this.formalName = ore.localizedName() + " " + base.formalName;
+        this.localizedName = ore.localizedName() + " " + base.localizedName;
         this.itemDrop = ore;
         this.base = base;
         this.variants = 3;
@@ -52,9 +52,8 @@ public class OreBlock extends Floor{
         return other != base;
     }
 
-    public static Block get(Block floor, Item item){
-        if(!oreBlockMap.containsKey(item)) throw new IllegalArgumentException("Item '" + item + "' is not an ore!");
-        if(!oreBlockMap.get(item).containsKey(floor)) throw new IllegalArgumentException("Block '" + floor.name + "' does not support ores!");
+    public static Floor get(Block floor, Item item){
+        if(!oreBlockMap.containsKey(item) || !oreBlockMap.get(item).containsKey(floor)) return null;
         return oreBlockMap.get(item).get(floor);
     }
 }

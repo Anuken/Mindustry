@@ -4,6 +4,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -11,7 +12,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
-    protected final float powerPerTick;
+    public final float powerPerTick;
     /** The maximum power capacity in power units. */
     public final float powerCapacity;
     /** True if the module can store power. */
@@ -24,8 +25,8 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void buildTooltip(Table table){
-        // No tooltip for power
+    public void build(Tile tile, Table table){
+        //No tooltip for power, for now
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
@@ -22,12 +23,7 @@ public class Teams{
     /**Returns team data by type.*/
     public TeamData get(Team team){
         if(map[team.ordinal()] == null){
-            //By default, a non-defined team will be enemies of everything.
-            Team[] others = new Team[Team.all.length-1];
-            for(int i = 0, j = 0; i < Team.all.length; i++){
-                if(Team.all[i] != team) others[j++] = Team.all[i];
-            }
-            add(team, others);
+            add(team, Array.with(Team.all).select(t -> t != team).toArray(Team.class));
         }
         return map[team.ordinal()];
     }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Stats.RankResult;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
@@ -66,6 +67,12 @@ public class GameOverDialog extends FloatingDialog{
                             cont.row();
                         }
                     }
+                }
+
+                if(world.isZone()){
+                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                    cont.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
+                    cont.row();
                 }
             }).pad(12);
 

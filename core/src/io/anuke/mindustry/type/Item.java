@@ -13,8 +13,6 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
-    public final String name;
-    public final String description;
     public final Color color;
     private TextureRegion[] regions;
 
@@ -41,7 +39,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public boolean alwaysUnlocked = false;
 
     public Item(String name, Color color){
-        this.name = name;
+        super(name);
         this.color = color;
         this.description = Core.bundle.getOrNull("item." + this.name + ".description");
 
@@ -91,11 +89,6 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     @Override
     public int compareTo(Item item){
         return Integer.compare(id, item.id);
-    }
-
-    @Override
-    public String getContentName(){
-        return name;
     }
 
     @Override

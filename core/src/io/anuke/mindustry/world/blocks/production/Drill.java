@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Blending;
@@ -15,7 +16,9 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
@@ -72,7 +75,18 @@ public class Drill extends Block{
         liquidCapacity = 5f;
         hasItems = true;
 
-        consumes.add(new ConsumeLiquid(Liquids.water, 0.05f)).optional(true);
+        consumes.liquid(Liquids.water, 0.05f).optional(true);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("drillspeed", e -> {
+            DrillEntity entity = (DrillEntity)e;
+
+            return new Bar(() -> Core.bundle.format("blocks.outputspeed", Strings.toFixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
+        });
     }
 
     @Override
@@ -146,12 +160,15 @@ public class Drill extends Block{
             }
         });
 
-        stats.add(BlockStat.drillSpeed, 60f / drillTime, StatUnit.itemsSecond);
+        stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
     }
 
     @Override
     public void update(Tile tile){
         DrillEntity entity = tile.entity();
+
+        if(Float.isNaN(entity.drillTime)) entity.drillTime = 0f;
+        if(Float.isNaN(entity.warmup)) entity.warmup = 0f;
 
         if(entity.dominantItem == null){
             oreCount.clear();
@@ -197,6 +214,7 @@ public class Drill extends Block{
                 speed *= entity.power.satisfaction; // Drill slower when not at full power
             }
 
+            entity.lastDrillSpeed = (speed * entity.dominantItems * entity.warmup) / (drillTime + hardnessDrillMultiplier * Math.max(totalHardness, 1f) / entity.dominantItems);
             entity.warmup = Mathf.lerpDelta(entity.warmup, speed, warmupSpeed);
             entity.progress += entity.delta()
             * entity.dominantItems * speed * entity.warmup;
@@ -204,6 +222,7 @@ public class Drill extends Block{
             if(Mathf.chance(Time.delta() * updateEffectChance * entity.warmup))
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 2f), entity.y + Mathf.range(size * 2f));
         }else{
+            entity.lastDrillSpeed = 0f;
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, warmupSpeed);
             return;
         }
@@ -257,6 +276,7 @@ public class Drill extends Block{
         public int index;
         public float warmup;
         public float drillTime;
+        public float lastDrillSpeed;
 
         public int dominantItems;
         public Item dominantItem;

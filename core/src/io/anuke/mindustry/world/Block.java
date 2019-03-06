@@ -30,6 +30,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockFlag;
@@ -42,12 +43,6 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
-    /** internal name */
-    public final String name;
-    /** display name */
-    public String formalName;
-    /** Detailed description of the block. Can be as long as necesary. */
-    public final String fullDescription;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -121,9 +116,8 @@ public class Block extends BlockStorage{
     protected TextureRegion region;
 
     public Block(String name){
-        this.name = name;
-        this.formalName = Core.bundle.get("block." + name + ".name", name);
-        this.fullDescription = Core.bundle.getOrNull("block." + name + ".description");
+        super(name);
+        this.description = Core.bundle.getOrNull("block." + name + ".description");
         this.solid = false;
     }
 
@@ -255,7 +249,7 @@ public class Block extends BlockStorage{
 
     @Override
     public String localizedName(){
-        return formalName;
+        return localizedName;
     }
 
     @Override
@@ -271,11 +265,6 @@ public class Block extends BlockStorage{
     @Override
     public ContentType getContentType(){
         return ContentType.block;
-    }
-
-    @Override
-    public String getContentName() {
-        return name;
     }
 
     /** Called after all blocks are created. */
@@ -378,7 +367,7 @@ public class Block extends BlockStorage{
         }
 
         if(hasPower && consumes.has(ConsumePower.class)){
-            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.power, () -> entity.power.satisfaction));
+            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.powerBar, () -> entity.power.satisfaction));
         }
     }
 
@@ -478,7 +467,7 @@ public class Block extends BlockStorage{
     }
 
     public String getDisplayName(Tile tile){
-        return formalName;
+        return localizedName;
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -494,8 +483,19 @@ public class Block extends BlockStorage{
 
                 displayBars(tile, bars);
             }).growX();
+            table.row();
+            table.table(ctable -> {
+                displayConsumption(tile, ctable);
+            }).growX();
 
             table.marginBottom(-5);
+        }
+    }
+
+    public void displayConsumption(Tile tile, Table table){
+        table.left();
+        for(Consume cons : consumes.all()){
+            cons.build(tile, table);
         }
     }
 
@@ -504,7 +504,6 @@ public class Block extends BlockStorage{
             table.add(bar.get(tile.entity)).growX();
             table.row();
         }
-
     }
 
     public TextureRegion icon(Icon icon){
@@ -551,6 +550,11 @@ public class Block extends BlockStorage{
 
     public boolean isVisible(){
         return buildVisibility.get() && !isHidden();
+    }
+
+    @Override
+    public boolean isHidden(){
+        return !buildVisibility.get();
     }
 
     @Override

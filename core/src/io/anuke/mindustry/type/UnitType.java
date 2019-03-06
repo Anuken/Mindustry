@@ -16,9 +16,6 @@ import io.anuke.mindustry.ui.ContentDisplay;
 
 public class UnitType extends UnlockableContent{
     protected final Supplier<? extends BaseUnit> constructor;
-
-    public final String name;
-    public final String description;
     public float health = 60;
     public float hitsize = 7f;
     public float hitsizeTile = 4f;
@@ -44,7 +41,7 @@ public class UnitType extends UnlockableContent{
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 
     public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
-        this.name = name;
+        super(name);
         this.constructor = mainConstructor;
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
 
@@ -86,11 +83,6 @@ public class UnitType extends UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.unit;
-    }
-
-    @Override
-    public String getContentName(){
-        return name;
     }
 
     public BaseUnit create(Team team){

@@ -23,7 +23,6 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -214,11 +213,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
-    public float getSize(){
-        return 8;
-    }
-
-    @Override
     public void damage(float amount){
         hitTime = hitDuration;
         if(!Net.client()){
@@ -290,11 +284,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
+        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
+                Draw.color(Color.WHITE, floor.liquidColor, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -314,9 +308,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, drownTime);
+            Draw.color(Color.WHITE, floor.liquidColor, drownTime);
         }else{
-            Draw.tint(Color.WHITE);
+            Draw.color(Color.WHITE);
         }
 
         Draw.rect(mech.region, x, y, rotation - 90);
@@ -349,13 +343,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             }
         }
 
-        Draw.alpha(1f);
+        Draw.reset();
     }
 
     @Override
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
-        Draw.alpha(hitTime / hitDuration);
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.color();
     }
@@ -369,8 +362,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void drawUnder(){
-        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
+        if(dead) return;
 
+        float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
         size + Mathf.absin(Time.time(), 2f, size/4f));
@@ -449,7 +443,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
                 Draw.rect(request.block.icon(Icon.full),
                         request.x * tilesize + request.block.offset(),
-                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.rotation * 90);
+                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.block.rotate ? request.rotation * 90 : 0);
 
 
                 Draw.color(Pal.accent);
@@ -470,6 +464,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void update(){
+
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
@@ -687,7 +682,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range());
+                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
@@ -749,6 +744,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         dead = true;
         target = null;
         moveTarget = null;
+        spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
@@ -769,6 +765,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             }else if(getClosestCore() != null){
                 this.spawner = (SpawnerTrait)getClosestCore();
             }
+        }else if(getClosestCore() != null){
+            set(getClosestCore().getX(), getClosestCore().getY());
         }
     }
 
@@ -844,7 +842,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void read(DataInput buffer) throws IOException{
-        float lastx = x, lasty = y, lastrot = rotation;
+        float lastx = x, lasty = y, lastrot = rotation, lastvx = velocity.x, lastvy = velocity.y;
         super.readSave(buffer);
         name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
@@ -865,6 +863,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isLocal){
             x = lastx;
             y = lasty;
+            velocity.x = lastvx;
+            velocity.y = lastvy;
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;

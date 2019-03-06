@@ -34,7 +34,7 @@ public class Logic implements ApplicationListener{
     public Logic(){
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
-                data.updateWaveScore(world.getZone(), state.wave);
+                world.getZone().updateWave(state.wave);
             }
         });
     }
@@ -68,7 +68,6 @@ public class Logic implements ApplicationListener{
         state.gameOver = state.launched = false;
         state.teams = new Teams();
         state.rules = new Rules();
-        state.rules.spawns = Waves.getDefaultSpawns();
         state.stats = new Stats();
 
         Time.clear();
@@ -81,7 +80,8 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
+                         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -111,7 +111,9 @@ public class Logic implements ApplicationListener{
 
     @Remote(called = Loc.both)
     public static void launchZone(){
-        Effects.effect(Fx.launchFull, 0, 0);
+        if(!headless){
+            ui.hudfrag.showLaunch();
+        }
 
         for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
             Effects.effect(Fx.launch, tile);
@@ -120,7 +122,7 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
                 for(Item item : content.items()){
-                    data.addItem(item, tile.entity.items.get(item) / playerGroup.size());
+                    data.addItem(item, tile.entity.items.get(item));
                 }
                 world.removeBlock(tile);
             }

@@ -17,8 +17,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class Cultivator extends GenericCrafter{
-    protected static final Color plantColor = Color.valueOf("648b55");
-    protected static final Color plantColorLight = Color.valueOf("73a75f");
+    protected static final Color plantColor = Color.valueOf("5541b1");
+    protected static final Color plantColorLight = Color.valueOf("7457ce");
     protected static final Color bottomColor = Color.valueOf("474747");
 
     protected TextureRegion middleRegion, topRegion;

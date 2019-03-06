@@ -47,6 +47,11 @@ public class TechTreeDialog extends FloatingDialog{
         shown(() -> checkNodes(root));
         hidden(ui.deploy::setup);
         addCloseButton();
+
+        buttons.addImageTextButton("$database", "icon-database", 14*2, () -> {
+            hide();
+            ui.database.show();
+        }).size(210f, 64f);
     }
 
     @Override
@@ -166,7 +171,7 @@ public class TechTreeDialog extends FloatingDialog{
         void unlock(TechNode node){
             data.unlockContent(node.block);
             data.removeItems(node.requirements);
-            showToast(Core.bundle.format("researched", node.block.formalName));
+            showToast(Core.bundle.format("researched", node.block.localizedName));
             checkNodes(root);
             hoverNode = null;
             rebuild();
@@ -201,7 +206,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             infoTable.table(desc -> {
                 desc.left().defaults().left();
-                desc.add(node.block.formalName);
+                desc.add(node.block.localizedName);
                 desc.row();
                 if(locked(node)){
                     desc.table(t -> {

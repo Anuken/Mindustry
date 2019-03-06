@@ -12,7 +12,6 @@ import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Weapon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -35,9 +34,15 @@ public abstract class GroundUnit extends BaseUnit{
 
         public void update(){
             TileEntity core = getClosestEnemyCore();
-            float dst = core == null ? 0 : dst(core);
 
-            if(core != null && dst < getWeapon().bullet.range() / 1.1f){
+            if(core == null){
+                setState(patrol);
+                return;
+            }
+
+            float dst = dst(core);
+
+            if(dst < getWeapon().bullet.range() / 1.1f){
                 target = core;
             }
 
@@ -103,14 +108,14 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.alpha(Draw.getShader() != Shaders.mix ? 1f : hitTime / hitDuration);
+        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
 
         float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f + type.hitsize/15f);
 
         Floor floor = getFloorOn();
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, 0.5f);
+            Draw.color(Color.WHITE, floor.liquidColor, 0.5f);
         }
 
         for(int i : Mathf.signs){
@@ -121,9 +126,9 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(floor.isLiquid){
-            Draw.tint(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
+            Draw.color(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
         }else{
-            Draw.tint(Color.WHITE);
+            Draw.color(Color.WHITE);
         }
 
         Draw.rect(type.baseRegion, x, y, baseRotation - 90);
@@ -140,7 +145,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         drawItems();
 
-        Draw.alpha(1f);
+        Draw.mixcol();
     }
 
     @Override
@@ -173,7 +178,7 @@ public abstract class GroundUnit extends BaseUnit{
     }
 
     protected void patrol(){
-        vec.trns(baseRotation, type.speed * Time.delta());
+        vec.trns(baseRotation, type.speed * Time.delta() * 2);
         velocity.add(vec.x, vec.y);
         vec.trns(baseRotation, type.hitsizeTile);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
