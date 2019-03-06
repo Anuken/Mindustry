@@ -54,6 +54,8 @@ public class HudFragment extends Fragment{
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
+                cont.table(t -> {});
+                cont.row();
                 cont.table(select -> {
                     select.left();
                     select.defaults().size(dsize).left();
@@ -132,7 +134,7 @@ public class HudFragment extends Fragment{
 
         //fps display
         parent.fill(info -> {
-            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps"));
+            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
             info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
