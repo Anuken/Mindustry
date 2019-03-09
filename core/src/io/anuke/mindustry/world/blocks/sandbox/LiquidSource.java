@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.control;
 
 public class LiquidSource extends Block{
 
@@ -71,8 +72,10 @@ public class LiquidSource extends Block{
 
         for(int i = 0; i < items.size; i++){
             final int f = i;
-            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24,
-                    () -> Call.setLiquidSourceLiquid(null, tile, items.get(f))).size(38).group(group).get();
+            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> {
+                Call.setLiquidSourceLiquid(null, tile, items.get(f));
+                control.input(0).frag.config.hideConfig();
+            }).size(38).group(group).get();
             button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
             button.setChecked(entity.source.id == f);
 

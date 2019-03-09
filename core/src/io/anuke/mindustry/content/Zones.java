@@ -12,8 +12,8 @@ import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
-    public static Zone groundZero, craters, frozenForest, ruinousShores, crags, stainedMountains,
-    impact, desolateRift, arcticDesert, dryWastes, nuclearComplex, moltenFault;
+    public static Zone groundZero, craters, frozenForest, ruinousShores, stainedMountains,
+    desolateRift, nuclearComplex;
 
     @Override
     public void load(){
@@ -78,7 +78,7 @@ public class Zones implements ContentList{
                 waveSpacing = 60 * 60 * 1f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 1.5f;
+                        unitScaling = 2f;
                     }},
 
                     new SpawnGroup(UnitTypes.crawler){{
@@ -90,7 +90,7 @@ public class Zones implements ContentList{
 
                     new SpawnGroup(UnitTypes.dagger){{
                         begin = 3;
-                        unitScaling = 1.5f;
+                        unitScaling = 2f;
                     }},
 
                     new SpawnGroup(UnitTypes.crawler){{
@@ -353,91 +353,6 @@ public class Zones implements ContentList{
             }};
         }};
 
-        impact = new Zone("impact0079", new MapGenerator("impact0079", 2)
-        .dist(2.2f, true)
-        .decor(
-            new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01),
-            new Decoration(Blocks.metalFloor, Blocks.metalFloorDamaged, 0.02)
-        ).drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 2000, Items.pyratite, 2000, Items.titanium, 2000, Items.metaglass, 1000, Items.coal, 2000))){{
-            loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.lead, 500, Items.silicon, 100);
-            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 500, Items.silicon, 200, Items.titanium, 400, Items.graphite, 200);
-            itemRequirements = ItemStack.with(Items.silicon, 8000, Items.titanium, 6000, Items.graphite, 4000);
-            conditionWave = 20;
-            zoneRequirements = new Zone[]{stainedMountains};
-            blockRequirements = new Block[]{Blocks.launchPad, Blocks.unloader, Blocks.melter, Blocks.separator};
-            resources = new Item[]{Items.scrap};
-            rules = () -> new Rules(){{
-                waves = true;
-                waveTimer = true;
-                waveSpacing = 60 * 60;
-
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.titan){{
-                        unitScaling = 2;
-                        spacing = 2;
-                        end = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 1;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 10;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.ghoul){{
-                        begin = 5;
-                        unitScaling = 0.5f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 10;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 23;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 20;
-                        unitScaling = 1;
-                        spacing = 10;
-                        unitScaling = 0.5f;
-                        unitAmount = 10;
-                    }},
-
-                    bossGroup(UnitTypes.lich)
-                );
-            }};
-        }};
-
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with(Items.copper, 500);
@@ -511,34 +426,6 @@ public class Zones implements ContentList{
             }};
         }};
 
-        /*
-        arcticDesert = new Zone("arcticDesert", new MapGenerator("groundZero", 1)){{ //TODO implement
-            baseLaunchCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
-            rules = () -> new Rules(){{
-                waves = true;
-                waveTimer = true;
-                waveSpacing = 60 * 80;
-            }};
-        }};
-
-        dryWastes = new Zone("dryWastes", new MapGenerator("groundZero", 1)){{ //TODO implement
-            baseLaunchCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
-            rules = () -> new Rules(){{
-                waves = true;
-                waveTimer = true;
-                waveSpacing = 60 * 80;
-            }};
-        }};
-
-        */
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
@@ -548,7 +435,7 @@ public class Zones implements ContentList{
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
             conditionWave = 30;
             launchPeriod = 15;
-            zoneRequirements = new Zone[]{impact};
+            zoneRequirements = new Zone[]{desolateRift};
             blockRequirements = new Block[]{Blocks.blastDrill, Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
             rules = () -> new Rules(){{
@@ -628,19 +515,5 @@ public class Zones implements ContentList{
                 );
             }};
         }};
-
-        /*
-        moltenFault = new Zone("moltenFault", new MapGenerator("groundZero", 1)){{ //TODO implement
-            baseLaunchCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
-            rules = () -> new Rules(){{
-                waves = true;
-                waveTimer = true;
-                waveSpacing = 60 * 80;
-            }};
-        }};*/
     }
 }

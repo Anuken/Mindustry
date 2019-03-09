@@ -17,7 +17,7 @@ public class Mindustry extends ApplicationCore{
     public void setup(){
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
-            return Float.isNaN(result) || Float.isInfinite(result) ? 1f : Math.min(result, 60f / 10f);
+            return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Math.min(result, 60f / 10f);
         });
 
         Time.mark();

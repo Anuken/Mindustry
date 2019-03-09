@@ -280,7 +280,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
                 for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
-                    Tile result = world.tile(x, y);
+                    Tile result = world.tile(x, y).target();
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
                         structQuadrants[data.team.ordinal()].set(index);

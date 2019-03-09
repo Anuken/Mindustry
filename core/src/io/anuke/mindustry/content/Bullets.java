@@ -684,28 +684,16 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.pulverize;
                 lifetime = 23f;
                 speed = 1f;
-                splashDamageRadius = 60f;
+                splashDamageRadius = 50f;
                 splashDamage = 30f;
             }
 
             @Override
             public void init(Bullet b){
                 if(b.getOwner() instanceof Unit){
-                    Unit unit = (Unit)b.getOwner();
-
-                    unit.damage(unit.maxHealth() + 1);
+                    ((Unit)b.getOwner()).kill();
                 }
                 b.time(b.lifetime());
-            }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-
-                for(int i = 0; i < 3; i++){
-                    Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    Puddle.deposit(tile, Liquids.oil, 5f);
-                }
             }
         };
     }

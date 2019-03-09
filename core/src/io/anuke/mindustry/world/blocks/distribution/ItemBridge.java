@@ -91,7 +91,7 @@ public class ItemBridge extends Block{
     }
 
     public Tile findLink(int x, int y){
-        if(linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
+        if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
             return world.tile(lastPlaced);
         }
 
@@ -312,7 +312,7 @@ public class ItemBridge extends Block{
     }
 
     public boolean linkValid(Tile tile, Tile other, boolean checkDouble){
-        if(other == null) return false;
+        if(other == null || tile == null) return false;
         if(tile.x == other.x){
             if(Math.abs(tile.y - other.y) > range) return false;
         }else if(tile.y == other.y){

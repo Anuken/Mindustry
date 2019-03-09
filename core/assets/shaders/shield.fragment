@@ -18,10 +18,6 @@ uniform vec2 u_offset;
 varying vec4 v_color;
 varying vec2 v_texCoord;
 
-float round(float f){
-    return float(int(f));
-}
-
 void main() {
 
     vec2 T = v_texCoord.xy;
@@ -41,7 +37,7 @@ void main() {
 	}else{
 
 	    if(color.a > 0.1){
-	        if(mod(coords.x / u_dp + coords.y / u_dp + sin(round(coords.x / u_dp) / 5.0) * 3.0 + sin(round(coords.y / u_dp) / 5.0) * 3.0  + u_time / 4.0, 10.0) < 2.0){
+	        if(mod(coords.x / u_dp + coords.y / u_dp + sin(floor(coords.x / u_dp) / 5.0) * 3.0 + sin(floor(coords.y / u_dp) / 5.0) * 3.0  + u_time / 4.0, 10.0) < 2.0){
 	            color *= 1.65;
 	        }
 	        

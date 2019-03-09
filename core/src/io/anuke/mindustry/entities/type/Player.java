@@ -797,6 +797,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isLocal){
             stream.writeByte(mech.id);
             stream.writeByte(playerIndex);
+            stream.writeInt(lastSpawner == null ? noSpawner : lastSpawner.getTile().pos());
             super.writeSave(stream, false);
         }
     }
@@ -808,12 +809,17 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(local && !headless){
             byte mechid = stream.readByte();
             int index = stream.readByte();
+            int spawner = stream.readInt();
+            if(world.tile(spawner) != null && world.tile(spawner).entity != null && world.tile(spawner).entity instanceof SpawnerTrait){
+                lastSpawner = (SpawnerTrait)(world.tile(spawner).entity);
+            }
             players[index].readSaveSuper(stream);
             players[index].mech = content.getByID(ContentType.mech, mechid);
             players[index].dead = false;
         }else if(local){
             byte mechid = stream.readByte();
             stream.readByte();
+            stream.readInt();
             readSaveSuper(stream);
             mech = content.getByID(ContentType.mech, mechid);
             dead = false;
@@ -833,7 +839,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
-        buffer.writeInt(mining == null ? -1 : mining.pos());
+        buffer.writeInt(mining == null ? noSpawner : mining.pos());
         buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
         buffer.writeShort((short) (baseRotation * 2));
 

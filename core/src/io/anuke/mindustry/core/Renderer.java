@@ -230,7 +230,7 @@ public class Renderer implements ApplicationListener{
 
     private void drawFlyerShadows(){
         float trnsX = -12, trnsY = -13;
-        Draw.color(0, 0, 0, 0.15f);
+        Draw.color(0, 0, 0, 0.22f);
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
@@ -287,7 +287,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 5));
+        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 5));
     }
 
 }

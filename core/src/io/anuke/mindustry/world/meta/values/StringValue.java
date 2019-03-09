@@ -8,7 +8,7 @@ public class StringValue implements StatValue{
     private final String value;
 
     public StringValue(String value, Object... args){
-        this.value = Strings.formatArgs(value, args);
+        this.value = Strings.format(value, args);
     }
 
     @Override

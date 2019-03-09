@@ -131,7 +131,7 @@ public class ImagePacker{
     }
 
     static void err(String message, Object... args){
-        throw new IllegalArgumentException(Strings.formatArgs(message, args));
+        throw new IllegalArgumentException(Strings.format(message, args));
     }
 
     static class GenRegion extends AtlasRegion{

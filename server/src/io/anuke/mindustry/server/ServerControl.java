@@ -306,7 +306,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("fillitems", "[team]", "Fill the core with 2000 items.", arg -> {
+        handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
             if(!state.is(State.playing)){
                 err("Not playing. Host first.");
                 return;
@@ -322,7 +322,7 @@ public class ServerControl implements ApplicationListener{
                 
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
+                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
                     }
                 }
                 

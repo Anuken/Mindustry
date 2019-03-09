@@ -114,22 +114,23 @@ public class UI implements ApplicationListener{
     }
 
     void loadCursors(){
-        int cursorScaling = 3;
+        int cursorScaling = 1, outlineThickness = 3;
         Color outlineColor = Color.valueOf("444444");
 
-        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor);
-        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor);
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor));
+        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
+        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
 
         Core.graphics.restoreCursor();
     }
     
     void generateFonts(Skin skin){
-        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/pixel.ttf"));
+        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.size = (int)(8*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        //param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;

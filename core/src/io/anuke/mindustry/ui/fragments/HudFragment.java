@@ -54,8 +54,6 @@ public class HudFragment extends Fragment{
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
-                cont.table(t -> {});
-                cont.row();
                 cont.table(select -> {
                     select.left();
                     select.defaults().size(dsize).left();

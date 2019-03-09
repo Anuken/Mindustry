@@ -71,7 +71,7 @@ public class Blocks implements ContentList{
     duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, titanFactory,
+    spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -732,7 +732,7 @@ public class Blocks implements ContentList{
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, ItemStack.with(Items.copper, 140, Items.lead, 100, Items.silicon, 40, Items.titanium, 70));
             pumpAmount = 0.8f;
-            consumes.power(1.50f);
+            consumes.power(0.15f);
             liquidCapacity = 30f;
             hasPower = true;
             size = 2;
@@ -1320,6 +1320,15 @@ public class Blocks implements ContentList{
             size = 2;
             consumes.power(0.50f);
             consumes.items(new ItemStack(Items.silicon, 10));
+        }};
+
+        crawlerFactory = new UnitFactory("crawler-factory"){{
+            requirements(Category.units, ItemStack.with(Items.lead, 100, Items.silicon, 80));
+            type = UnitTypes.crawler;
+            produceTime = 1200;
+            size = 2;
+            consumes.power(0.4f);
+            consumes.items(new ItemStack(Items.blastCompound, 10));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{

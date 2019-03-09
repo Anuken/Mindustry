@@ -2,21 +2,21 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Application.ApplicationType;
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -24,11 +24,14 @@ import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /**global charset*/
+    public static final Charset charset = Charset.forName("UTF-8");
     /**main application name, capitalized*/
     public static final String appName = "Mindustry";
     /**URL for discord invite.*/

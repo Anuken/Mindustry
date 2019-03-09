@@ -13,8 +13,6 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
@@ -157,6 +155,8 @@ public class Block extends BlockStorage{
 
     public Array<Tile> getPowerConnections(Tile tile, Array<Tile> out){
         out.clear();
+        if(tile == null || tile.entity == null || tile.entity.power == null) return out;
+
         for(Tile other : tile.entity.proximity()){
             if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
                     && !tile.entity.power.links.contains(other.pos())){
@@ -284,10 +284,6 @@ public class Block extends BlockStorage{
         setBars();
 
         consumes.checkRequired(this);
-
-        if(buildRequirements.length > 0 && !Core.bundle.has("block." + name + ".name")){
-            Log.warn("No name for block '{0}' found. Add the following to bundle.properties:\nblock.{0}.name = {1}", name, Strings.capitalize(name));
-        }
     }
 
     @Override

@@ -146,6 +146,7 @@ public class Pathfinder{
 
         while(path.frontier.size > 0 && (nsToRun < 0 || Time.timeSinceNanos(start) <= nsToRun)){
             Tile tile = world.tile(path.frontier.removeLast());
+            if(tile == null || path.weights == null) return; //something went horribly wrong, bail
             float cost = path.weights[tile.x][tile.y];
 
             //pathfinding overflowed for some reason, time to bail. the next block update will handle this, hopefully

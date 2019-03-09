@@ -167,9 +167,6 @@ public class Drill extends Block{
     public void update(Tile tile){
         DrillEntity entity = tile.entity();
 
-        if(Float.isNaN(entity.drillTime)) entity.drillTime = 0f;
-        if(Float.isNaN(entity.warmup)) entity.warmup = 0f;
-
         if(entity.dominantItem == null){
             oreCount.clear();
             itemArray.clear();
