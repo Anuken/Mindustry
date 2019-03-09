@@ -363,7 +363,11 @@ public class Block extends BlockStorage{
         }
 
         if(hasPower && consumes.has(ConsumePower.class)){
-            bars.add("power", entity -> new Bar(consumes.get(ConsumePower.class).isBuffered ? "blocks.power" : "blocks.power.satisfaction", Pal.powerBar, () -> entity.power.satisfaction));
+            boolean buffered = consumes.get(ConsumePower.class).isBuffered;
+            float capacity = consumes.get(ConsumePower.class).powerCapacity;
+
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<BUGGED>" : (int)(entity.power.satisfaction * capacity)) :
+                Core.bundle.get("blocks.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
     }
 

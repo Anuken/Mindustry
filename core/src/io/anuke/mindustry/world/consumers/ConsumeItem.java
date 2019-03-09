@@ -4,6 +4,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
@@ -60,6 +61,6 @@ public class ConsumeItem extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItem, item);
+        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItem, new ItemStack(item, amount));
     }
 }

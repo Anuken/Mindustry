@@ -77,7 +77,7 @@ public class Unloader extends Block implements SelectionTrait{
 
         SortedUnloaderEntity entity = tile.entity();
 
-        Draw.color(entity.sortItem == null ? Color.WHITE : entity.sortItem.color);
+        Draw.color(entity.sortItem == null ? Color.CLEAR : entity.sortItem.color);
         Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
         Draw.color();
     }

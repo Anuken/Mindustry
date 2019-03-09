@@ -123,7 +123,7 @@ public class PowerGraph{
 
     public void distributePower(float needed, float produced){
         //distribute even if not needed. this is because some might be requiring power but not requesting it; it updates consumers
-        float coverage = Math.min(1, produced / needed);
+        float coverage = Math.min(1, produced / (Mathf.isZero(needed) ? 1f : needed));
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
