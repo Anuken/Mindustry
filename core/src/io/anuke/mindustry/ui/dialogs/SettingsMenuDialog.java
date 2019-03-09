@@ -120,6 +120,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     void addSettings(){
         //TODO add when sound works again
         //sound.volumePrefs();
+        sound.add("[LIGHT_GRAY]there is no sound implemented in v4 yet");
 
         game.screenshakePref();
         game.checkPref("effects", true);

@@ -89,7 +89,7 @@ public class Items implements ContentList{
             flammability = 1.05f;
         }};
 
-        sand = new Item("sand", Color.valueOf("e3d39e")){{
+        sand = new Item("sand", Color.valueOf("f7cba4")){{
 
         }};
 

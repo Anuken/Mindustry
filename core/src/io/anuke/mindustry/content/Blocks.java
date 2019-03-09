@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
+    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
 
     //crafting
@@ -213,6 +213,10 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        sandRocks = new StaticWall("sandrocks"){{
+            variants = 2;
+        }};
+
         pine = new StaticWall("pine"){{
             //fillsTile = false;
             variants = 0;
@@ -283,18 +287,18 @@ public class Blocks implements ContentList{
         }};
 
         ignarock = new Floor("ignarock"){{
-            blendGroup = sand;
+
         }};
 
         hotrock = new Floor("hotrock"){{
             heat = 0.5f;
-            blendGroup = sand;
+            blendGroup = ignarock;
         }};
 
         magmarock = new Floor("magmarock"){{
             heat = 0.75f;
             updateEffect = Fx.magmasmoke;
-            blendGroup = sand;
+            blendGroup = ignarock;
         }};
 
         //endregion
@@ -717,7 +721,8 @@ public class Blocks implements ContentList{
         massDriver = new MassDriver("mass-driver"){{
             requirements(Category.distribution, ItemStack.with(Items.titanium, 250, Items.silicon, 150, Items.lead, 250, Items.thorium, 100));
             size = 3;
-            itemCapacity = 60;
+            itemCapacity = 120;
+            reloadTime = 200f;
             range = 440f;
         }};
 

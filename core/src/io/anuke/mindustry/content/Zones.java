@@ -186,7 +186,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
+        ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1).dist(3f, true)){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 200, Items.graphite, 50);
             startingItems = ItemStack.list(Items.copper, 400);
