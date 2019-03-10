@@ -195,6 +195,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
+        graphics.checkPref("animatedwater", !mobile);
         graphics.checkPref("lasers", true);
     }
 

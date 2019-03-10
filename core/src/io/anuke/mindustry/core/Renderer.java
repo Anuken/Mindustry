@@ -44,7 +44,7 @@ public class Renderer implements ApplicationListener{
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
 
-    private FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
@@ -159,6 +159,10 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
+        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+            shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        }
+
         Draw.proj(camera.projection());
 
         blocks.floor.drawFloor();
@@ -200,10 +204,6 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
-                shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
-            }
-
             Draw.flush();
             shieldBuffer.begin();
             graphics.clear(Color.CLEAR);

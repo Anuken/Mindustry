@@ -114,13 +114,24 @@ public class Floor extends Block{
         drawEdges(tile);
     }
 
+
+    public void drawNonLayer(Tile tile){
+        Mathf.random.setSeed(tile.pos());
+
+        drawEdges(tile, true);
+    }
+
     protected void drawEdges(Tile tile){
+        drawEdges(tile, false);
+    }
+
+    protected void drawEdges(Tile tile, boolean sameLayer){
         eq = 0;
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && doEdge(other.floor()) && other.floor().edges() != null){
+            if(other != null && doEdge(other.floor(), sameLayer) && other.floor().edges() != null){
                 eq |= (1 << i);
             }
         }
@@ -140,8 +151,8 @@ public class Floor extends Block{
         return ((Floor)blendGroup).edges;
     }
 
-    protected boolean doEdge(Floor other){
-        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this);
+    protected boolean doEdge(Floor other, boolean sameLayer){
+        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
     }
 
     protected boolean edgeOnto(Floor other){

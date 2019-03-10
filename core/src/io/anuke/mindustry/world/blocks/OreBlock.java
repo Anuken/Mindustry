@@ -43,8 +43,8 @@ public class OreBlock extends Floor{
     }
 
     @Override
-    public boolean doEdge(Floor floor){
-        return floor != base && super.doEdge(floor);
+    public boolean doEdge(Floor floor, boolean f){
+        return floor != base && super.doEdge(floor, f);
     }
 
     @Override
