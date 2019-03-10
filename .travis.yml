@@ -2,6 +2,7 @@
 jdk:
 - openjdk8
 script:
+- "git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc"
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
