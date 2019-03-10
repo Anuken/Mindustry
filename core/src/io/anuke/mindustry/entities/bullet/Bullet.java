@@ -91,6 +91,12 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         create(type, null, Team.none, x, y, angle);
     }
 
+    /**ok*/
+    @Remote(called = Loc.server)
+    public static void createBullet(BulletType type, Team team, float x, float y, float angle){
+        create(type, null, team, x, y, angle);
+    }
+
     public Entity getOwner(){
         return owner;
     }
