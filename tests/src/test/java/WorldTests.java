@@ -18,6 +18,8 @@ public class WorldTests {
     @BeforeAll
     static void launchApplication(){
     	ApplicationTests.launchApplication();
+        world.createTiles(10,10);
+        tiles = world.getTiles();
     }
 
     @BeforeEach
