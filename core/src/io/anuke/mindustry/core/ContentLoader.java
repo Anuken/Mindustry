@@ -34,7 +34,7 @@ import static io.anuke.arc.Core.files;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private boolean loaded = false;
-    private boolean verbose = true;
+    private boolean verbose = false;
 
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
@@ -56,6 +56,10 @@ public class ContentLoader{
         //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),
     };
+
+    public void setVerbose(){
+        verbose = true;
+    }
 
     /**Creates all content types.*/
     public void load(){

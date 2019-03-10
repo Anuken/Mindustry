@@ -159,6 +159,9 @@ public class Vars{
         Version.init();
 
         content = new ContentLoader();
+        if(!headless){
+            content.setVerbose();
+        }
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);
