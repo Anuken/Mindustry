@@ -19,6 +19,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
@@ -218,6 +219,23 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
     }
 
+    void drawPlaceArrow(Block block, int x, int y, int rotation){
+        if(!block.rotate) return;
+        Draw.color(!validPlace(x, y, block, rotation) ? Pal.removeBack : Pal.accentBack);
+        Draw.rect(Core.atlas.find("place-arrow"),
+        x * tilesize + block.offset(),
+        y * tilesize + block.offset() - 1,
+        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+
+        Draw.color(!validPlace(x, y, block, rotation) ? Pal.remove : Pal.accent);
+        Draw.rect(Core.atlas.find("place-arrow"),
+        x * tilesize + block.offset(),
+        y * tilesize + block.offset(),
+        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+    }
+
     //endregion
 
     //region UI and drawing
@@ -311,10 +329,18 @@ public class MobileInput extends InputHandler implements GestureListener{
                 request.scale = Mathf.lerpDelta(request.scale, 1f, 0.2f);
                 request.redness = Mathf.lerpDelta(request.redness, 0f, 0.2f);
             }else{
-                request.scale = Mathf.lerpDelta(request.scale, 0.5f, 0.1f);
-                request.redness = Mathf.lerpDelta(request.redness, 1f, 0.2f);
+                request.scale = Mathf.lerpDelta(request.scale, 0.6f, 0.1f);
+                request.redness = Mathf.lerpDelta(request.redness, 0.9f, 0.2f);
             }
 
+            Tmp.c1.set(Draw.getMixColor());
+
+            if(!request.remove && request == lastPlaced && request.block != null){
+                Draw.mixcol();
+                drawPlaceArrow(request.block, tile.x, tile.y, request.rotation);
+            }
+
+            Draw.mixcol(Tmp.c1, 1f);
             drawRequest(request);
 
             //draw last placed request
@@ -334,11 +360,18 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //draw placing
             if(mode == placing && block != null){
+
                 NormalizeDrawResult dresult = PlaceUtils.normalizeDrawArea(block, lineStartX, lineStartY, tileX, tileY, true, maxLength, lineScale);
 
                 Lines.rect(dresult.x, dresult.y, dresult.x2 - dresult.x, dresult.y2 - dresult.y);
 
                 NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, true, maxLength);
+
+                {
+                    int x = lineStartX + result.getLength() * Mathf.sign(tileX - lineStartX) * Mathf.num(result.isX());
+                    int y = lineStartY + result.getLength() * Mathf.sign(tileY - lineStartY) * Mathf.num(!result.isX());
+                    drawPlaceArrow(block, x, y, result.rotation);
+                }
 
                 //go through each cell and draw the block to place if valid
                 for(int i = 0; i <= result.getLength(); i += block.size){

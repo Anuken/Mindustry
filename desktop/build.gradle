@@ -69,12 +69,6 @@ task dist(type: Jar){
     }
 }
 
-task clearOut(type: Delete){
-    doLast{
-        delete "packr-out/"
-    }
-}
-
 //note: call desktop:dist beforehand
 task packrCmd(){
 
@@ -102,35 +96,41 @@ task packrCmd(){
     }
 }
 
-task fixMac(type: Copy){
-    dependsOn "packrCmd"
-
-    into "packr-out/" + appName + ".app/Contents/"
-    from "packr-out/Contents/"
-
-    doLast{
-        delete{
-            delete "packr-out/Contents/"
-        }
-    }
-}
-
-task fixWindows32(type: Copy){
-    dependsOn "packrCmd"
-
-    into "packr-out/jre/bin/"
-    from JDK_DIR + "zip.dll"
-    rename("zip.dll", "ojdkbuild_zlib.dll")
-
-    doLast{
-        copy{
-            into "packr-out/jre/bin/"
-            from JDK_DIR + "zip.dll"
-        }
-    }
-}
-
 task packrZip(){
+    task clearOut(type: Delete){
+        doLast{
+            delete "packr-out/"
+        }
+    }
+
+    task fixMac(type: Copy){
+        dependsOn "packrCmd"
+
+        into "packr-out/" + appName + ".app/Contents/"
+        from "packr-out/Contents/"
+
+        doLast{
+            delete{
+                delete "packr-out/Contents/"
+            }
+        }
+    }
+
+    task fixWindows32(type: Copy){
+        dependsOn "packrCmd"
+
+        into "packr-out/jre/bin/"
+        from JDK_DIR + "zip.dll"
+        rename("zip.dll", "ojdkbuild_zlib.dll")
+
+        doLast{
+            copy{
+                into "packr-out/jre/bin/"
+                from JDK_DIR + "zip.dll"
+            }
+        }
+    }
+    
     dependsOn "packrCmd"
     finalizedBy "clearOut"
 
@@ -144,12 +144,12 @@ task packrZip(){
             dependsOn "fixWindows32"
         }
 
-        task zip(type: Zip){
+        task rzip(type: Zip){
             from "packr-out/"
             archiveName "$appName-${getPlatform()}-${getVersionString()}.zip"
             destinationDir(file("packr-export"))
         }
 
-        finalizedBy 'zip'
+        finalizedBy 'rzip'
     }
 }
