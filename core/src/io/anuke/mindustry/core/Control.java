@@ -63,10 +63,11 @@ public class Control implements ApplicationListener{
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
 
+        /*
         if(Core.atlas.getTextures().size != 1){
             throw new IllegalStateException("Atlas must be exactly one texture. " +
             "If more textures are used, the map editor will not display them correctly.");
-        }
+        }*/
 
         data.load();
 

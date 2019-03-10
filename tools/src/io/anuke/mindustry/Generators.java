@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.blocks.OreBlock;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -26,10 +27,23 @@ public class Generators {
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(256, 1);
-            Color outlineColor = new Color(0, 0, 0, 0.2f);
+            Color outlineColor = new Color(0, 0, 0, 0.3f);
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
+
+                try{
+                    if(block instanceof Floor){
+                        block.load();
+                        for(TextureRegion region : block.variantRegions()){
+                            GenRegion gen = (GenRegion)region;
+                            if(gen.path == null) continue;
+                            Files.copy(gen.path, Paths.get("../editor/editor-" + gen.path.getFileName()));
+                        }
+                    }
+                }catch(IOException e){
+                    throw new RuntimeException(e);
+                }
 
                 if(regions.length == 0){
                     continue;
@@ -90,6 +104,8 @@ public class Generators {
                     if(regions.length > 1){
                         image.save(block.name + "-icon-full");
                     }
+
+                    image.save("../editor/" + block.name + "-icon-editor");
 
                     for(Icon icon : Icon.values()){
                         if(icon.size == 0 || (icon.size == image.width() && icon.size == image.height())) continue;
@@ -212,7 +228,7 @@ public class Generators {
                     }
 
                     image.draw(ImagePacker.get(item.name + (i+1)));
-                    image.save("ore-" + item.name + "-" + base.name + (i+1));
+                    image.save("../blocks/environment/ore-" + item.name + "-" + base.name + (i+1));
 
                     //save icons
                     image.save(block.name + "-icon-full");
@@ -247,7 +263,7 @@ public class Generators {
                         }
                     }
 
-                    result.save(floor.name + "-edge");
+                    result.save("../blocks/environment/" + floor.name + "-edge");
 
                 }catch(Exception ignored){}
             }

@@ -14,7 +14,7 @@ public class Shaders{
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;
-    public static SurfaceShader water;
+    public static SurfaceShader water, tar;
 
     public static void init(){
         shadow = new Shadow();
@@ -24,6 +24,7 @@ public class Shaders{
         fog = new FogShader();
         menu = new MenuShader();
         water = new SurfaceShader("water");
+        tar = new SurfaceShader("tar");
     }
 
     public static class MenuShader extends LoadShader{

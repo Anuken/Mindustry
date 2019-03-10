@@ -10,6 +10,7 @@ import io.anuke.arc.function.Function;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -110,8 +111,8 @@ public class Block extends BlockStorage{
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] variantRegions;
-    protected TextureRegion region;
+    protected TextureRegion[] variantRegions, editorVariantRegions;
+    protected TextureRegion region, editorIcon;
 
     public Block(String name){
         super(name);
@@ -511,6 +512,24 @@ public class Block extends BlockStorage{
             icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
+    }
+
+    /**Never use outside of the editor!*/
+    public TextureRegion editorIcon(){
+        if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
+        return editorIcon;
+    }
+
+    /**Never use outside of the editor!*/
+    public TextureRegion[] editorVariantRegions(){
+        if(editorVariantRegions == null){
+            editorVariantRegions = new TextureRegion[variantRegions.length];
+            for(int i = 0; i < variantRegions.length; i ++){
+                AtlasRegion region = (AtlasRegion)variantRegions[i];
+                editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
+            }
+        }
+        return editorVariantRegions;
     }
 
     protected TextureRegion[] generateIcons(){

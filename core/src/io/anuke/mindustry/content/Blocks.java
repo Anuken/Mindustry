@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
+    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,  grass,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
 
     //crafting
@@ -141,7 +141,7 @@ public class Blocks implements ContentList{
             variants = 0;
             liquidDrop = Liquids.oil;
             isLiquid = true;
-            cacheLayer = CacheLayer.oil;
+            cacheLayer = CacheLayer.tar;
         }};
 
         stone = new Floor("stone"){{
@@ -177,6 +177,10 @@ public class Blocks implements ContentList{
         holostone = new Floor("holostone"){{
             hasOres = true;
             edgeStyle = "blocky";
+        }};
+
+        grass = new Floor("grass"){{
+
         }};
 
         iceSnow = new Floor("ice-snow"){{
