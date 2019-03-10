@@ -130,9 +130,11 @@ public class PowerGraph{
                 ConsumePower consumePower = consumes.get(ConsumePower.class);
                 //currently satisfies power even if it's not required yet
                 if(consumePower.isBuffered){
-                    // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
-                    float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
-                    consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
+                    if(!Mathf.isZero(consumePower.powerCapacity)){
+                        // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
+                        float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
+                        consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
+                    }
                 }else{
                     consumer.entity.power.satisfaction = coverage;
                 }
