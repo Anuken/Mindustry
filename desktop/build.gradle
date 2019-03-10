@@ -6,25 +6,24 @@ sourceSets.main.java.srcDirs = ["src/"]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-def PACKR_DIR = "$System.env.PACKR_DIR"
+import com.badlogicgames.packr.PackrConfig
+import com.badlogicgames.packr.Packr
+
+def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
 
 ext.getPlatform = {
-    if(project.hasProperty("platform")){
-        def lc = platform.toLowerCase()
-        if(lc == "windows64"){
-            return "windows64"
-        }else if(lc == "windows32"){
-            return "windows32"
-        }else if(lc == "linux"){
-            return "linux64"
-        }else if(lc == "mac"){
-            return "mac"
-        }else{
-            throw new InvalidUserDataException("Invalid platform. Set platform with -Pplatform=windows/linux/mac")
-        }
+    def lc = project.hasProperty("platform") ? platform.toLowerCase() : ""
+    if(lc == "windows64"){
+        return PackrConfig.Platform.Windows64
+    }else if(lc == "windows32"){
+        return PackrConfig.Platform.Windows32
+    }else if(lc == "linux"){
+        return PackrConfig.Platform.Linux64
+    }else if(lc == "mac"){
+        return PackrConfig.Platform.MacOS
     }else{
-        throw new InvalidUserDataException("No platform defined. Set platform with -Pplatform=windows/linux/mac")
+        throw new InvalidUserDataException("Invalid platform. Set platform with -Pplatform=windows64/windows32/linux/mac")
     }
 }
 
@@ -80,27 +79,26 @@ task clearOut(type: Delete){
 task packrCmd(){
 
     doLast{
+        def config = new PackrConfig()
+        config.with{
+            config.executable = appName
+            verbose = true
+            platform = getPlatform()
+            bundleIdentifier = getPackage() + ".mac"
+            iconResource = ICON_DIR
+            outDir = file("packr-out/")
+            mainClass = project.ext.mainClassName
+            classpath = ["desktop/build/libs/desktop-release.jar"]
+            vmArgs = ["Djava.net.preferIPv4Stack=true"]
+            minimizeJre = "desktop/packr_minimize.json"
+            jdk = JDK_DIR + "jdk-${getPlatform().toString().toLowerCase()}.zip"
 
-        copy{
-            into PACKR_DIR
-            from "build/libs/desktop-release.jar"
+            if(getPlatform() == PackrConfig.Platform.MacOS){
+                vmArgs += "XstartOnFirstThread"
+            }
         }
 
-        exec{
-
-            commandLine("java", "-jar", PACKR_DIR + "packr.jar",
-                    "--verbose",
-                    "--bundle", getPackage() + ".mac",
-                    "--platform", getPlatform(),
-                    "--executable", appName,
-                    "--output", "packr-out/",
-                    "--mainclass", project.ext.mainClassName,
-                    "--jdk", PACKR_DIR + "jdk-" + getPlatform() + ".zip",
-                    "--icon", ICON_DIR.getAbsolutePath(),
-                    "--vmargs", (getPlatform() == "mac" ? "XstartOnFirstThread" : "Xms256m"),
-                    "Djava.net.preferIPv4Stack=true",
-                    "--classpath", "--", PACKR_DIR + "config.json")
-        }
+        new Packr().pack(config)
     }
 }
 
@@ -121,13 +119,13 @@ task fixWindows32(type: Copy){
     dependsOn "packrCmd"
 
     into "packr-out/jre/bin/"
-    from PACKR_DIR + "zip.dll"
+    from JDK_DIR + "zip.dll"
     rename("zip.dll", "ojdkbuild_zlib.dll")
 
     doLast{
         copy{
             into "packr-out/jre/bin/"
-            from PACKR_DIR + "zip.dll"
+            from JDK_DIR + "zip.dll"
         }
     }
 }

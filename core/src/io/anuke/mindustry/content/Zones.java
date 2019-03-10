@@ -19,8 +19,8 @@ public class Zones implements ContentList{
     public void load(){
 
         groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
-            baseLaunchCost = ItemStack.with(Items.copper, -50);
-            startingItems = ItemStack.list(Items.copper, 50);
+            baseLaunchCost = ItemStack.with(Items.copper, -100);
+            startingItems = ItemStack.list(Items.copper, 100);
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;

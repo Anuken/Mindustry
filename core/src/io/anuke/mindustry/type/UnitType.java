@@ -5,8 +5,6 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.BaseUnit;
@@ -46,11 +44,6 @@ public class UnitType extends UnlockableContent{
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
 
         TypeTrait.registerType(type, mainConstructor);
-
-        if(!Core.bundle.has("unit." + this.name + ".name")){
-            Log.err("Warning: unit '" + name + "' is missing a localized name. Add the follow to bundle.properties:");
-            Log.err("unit." + this.name + ".name=" + Strings.capitalize(name.replace('-', '_')));
-        }
     }
 
     @Override
