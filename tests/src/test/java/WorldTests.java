@@ -1,87 +1,23 @@
+import static io.anuke.mindustry.Vars.logic;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.anuke.arc.ApplicationCore;
-import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
-import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Logic;
-import io.anuke.mindustry.core.NetServer;
-import io.anuke.mindustry.core.World;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.world.Tile;
-
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.headless;
-import static io.anuke.mindustry.Vars.logic;
-import static io.anuke.mindustry.Vars.netServer;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class WorldTests {
     static Tile[][] tiles;
 
     @BeforeAll
     static void launchApplication(){
-        try{
-            boolean[] begins = {false};
-            Throwable[] exceptionThrown = {null};
-            Log.setUseColors(false);
-
-            ApplicationCore core = new ApplicationCore(){
-                @Override
-                public void setup(){
-                    Vars.init();
-
-                    headless = true;
-
-                    BundleLoader.load();
-                    content.load();
-
-                    add(logic = new Logic());
-                    add(world = new World());
-                    add(netServer = new NetServer());
-
-                    content.initialize(Content::init);
-                }
-
-                @Override
-                public void init(){
-                    super.init();
-                    begins[0] = true;
-                    world.createTiles(10,10);
-                    tiles = world.getTiles();
-                }
-            };
-
-            HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-
-            new HeadlessApplication(core, config);
-
-            for(Thread thread : Thread.getAllStackTraces().keySet()){
-                if(thread.getName().equals("HeadlessApplication")){
-                    thread.setUncaughtExceptionHandler((t, throwable) -> exceptionThrown[0] = throwable);
-                    break;
-                }
-            }
-
-            while(!begins[0]){
-                if(exceptionThrown[0] != null){
-                    fail(exceptionThrown[0]);
-                }
-                Thread.sleep(10);
-            }
-        }catch(Throwable r){
-            fail(r);
-        }
+    	ApplicationTests.launchApplication();
     }
 
     @BeforeEach
