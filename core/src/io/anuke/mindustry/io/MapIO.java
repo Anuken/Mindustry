@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
@@ -20,19 +21,31 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.LegacyColorMapper;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 
 /**
  * Reads and writes map files.
  */
+//TODO name mapping
 public class MapIO{
+    private static final int[] pngHeader = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
     private static final int version = 0;
     private static IntIntMap defaultBlockMap = new IntIntMap();
+
+    public static boolean isImage(FileHandle file){
+        try(InputStream stream = file.read()){
+            for(int i1 : pngHeader){
+                if(stream.read() != i1){
+                    return false;
+                }
+            }
+            return true;
+        }catch(IOException e){
+            return false;
+        }
+    }
 
     private static void loadDefaultBlocks(){
         for(Block block : content.blocks()){

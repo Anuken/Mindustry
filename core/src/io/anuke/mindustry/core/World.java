@@ -432,7 +432,6 @@ public class World implements ApplicationListener{
     }
 
     public void addDarkness(Tile[][] tiles){
-
         byte[][] dark = new byte[tiles.length][tiles[0].length];
         byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
 

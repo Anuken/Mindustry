@@ -523,6 +523,7 @@ public class Block extends BlockStorage{
     /**Never use outside of the editor!*/
     public TextureRegion[] editorVariantRegions(){
         if(editorVariantRegions == null){
+            variantRegions();
             editorVariantRegions = new TextureRegion[variantRegions.length];
             for(int i = 0; i < variantRegions.length; i ++){
                 AtlasRegion region = (AtlasRegion)variantRegions[i];

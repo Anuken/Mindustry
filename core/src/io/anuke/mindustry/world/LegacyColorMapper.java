@@ -20,12 +20,12 @@ public class LegacyColorMapper implements ContentList{
     public void load(){
         defaultValue = new LegacyBlock(Blocks.stone, Blocks.air);
 
-        map("ff0000", Blocks.stainedStone, Blocks.spawn);
+        map("ff0000", Blocks.stone, Blocks.spawn);
         map("00ff00", Blocks.stone);
         map("323232", Blocks.stone);
         map("646464", Blocks.stone, Blocks.rocks);
-        map("50965a", Blocks.stainedStone);
-        map("5ab464", Blocks.stainedStone, Blocks.stainedRocks);
+        map("50965a", Blocks.grass);
+        map("5ab464", Blocks.grass, Blocks.stainedRocks);
         map("506eb4", Blocks.water);
         map("465a96", Blocks.deepwater);
         map("252525", Blocks.ignarock);
@@ -35,7 +35,7 @@ public class LegacyColorMapper implements ContentList{
         map("c2d1d2", Blocks.snow);
         map("c4e3e7", Blocks.ice);
         map("f7feff", Blocks.snow, Blocks.snowrocks);
-        map("6e501e", Blocks.stainedStone);
+        map("6e501e", Blocks.stainedStoneRed);
         map("ed5334", Blocks.stainedStoneRed);
         map("292929", Blocks.tar);
         map("c3a490", OreBlock.get(Blocks.stone, Items.copper));

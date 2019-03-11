@@ -610,6 +610,11 @@ public class Bullets implements ContentList{
             }
 
             @Override
+            public float range(){
+                return 70f;
+            }
+
+            @Override
             public void draw(Bullet b){
             }
 

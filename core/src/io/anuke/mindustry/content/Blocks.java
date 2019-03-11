@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,  grass,
+    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, moss, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,  grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
 
     //crafting
@@ -183,6 +183,10 @@ public class Blocks implements ContentList{
 
         }};
 
+        salt = new Floor("salt"){{
+            variants = 0;
+        }};
+
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
         }};
@@ -240,9 +244,8 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        stainedStone = new Floor("stained-stone"){{
-            edgeStyle = "blocky";
-            hasOres = true;
+        moss = new Floor("moss"){{
+            variants = 3;
         }};
 
         stainedRocksRed = new StaticWall("stained-rocks-red"){{
@@ -250,8 +253,8 @@ public class Blocks implements ContentList{
         }};
 
         stainedStoneRed = new Floor("stained-stone-red"){{
-            edgeStyle = "blocky";
             hasOres = true;
+            variants = 1;
         }};
 
         stainedRocksYellow = new StaticWall("stained-rocks-yellow"){{
@@ -259,7 +262,7 @@ public class Blocks implements ContentList{
         }};
 
         stainedStoneYellow = new Floor("stained-stone-yellow"){{
-            edgeStyle = "blocky";
+            variants = 1;
         }};
 
         stainedBoulder = new Rock("stained-boulder"){{
