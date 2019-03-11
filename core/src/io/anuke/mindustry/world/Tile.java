@@ -39,6 +39,8 @@ public class Tile implements Position, TargetTrait{
     private byte rotation;
     /** Team ordinal. */
     private byte team;
+    /**Ore that is on top of this (floor) block.*/
+    private byte ore;
 
     public Tile(int x, int y){
         this.x = (short) x;
@@ -314,6 +316,14 @@ public class Tile implements Position, TargetTrait{
 
     public boolean interactable(Team team){
         return getTeam() == Team.none || team == getTeam();
+    }
+
+    public byte getOre(){
+        return ore;
+    }
+
+    public void setOre(byte ore){
+        this.ore = ore;
     }
 
     public void updateOcclusion(){

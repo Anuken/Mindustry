@@ -42,6 +42,7 @@ public abstract class SaveFileVersion{
         return new SaveMeta(version, time, playtime, build, map, wave, rules);
     }
 
+    //TODO 2-phase rle
     public void writeMap(DataOutputStream stream) throws IOException{
 
         //write world size
@@ -86,6 +87,7 @@ public abstract class SaveFileVersion{
         }
     }
 
+    //TODO 2-phase rle
     public void readMap(DataInputStream stream) throws IOException{
         short width = stream.readShort();
         short height = stream.readShort();

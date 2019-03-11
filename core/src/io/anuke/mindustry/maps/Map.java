@@ -16,18 +16,22 @@ public class Map{
     public final ObjectMap<String, String> tags;
     /** Supplies a new input stream with the data of this map.*/
     public final Supplier<InputStream> stream;
+    /**Map width/height, shorts.*/
+    public int width, height;
     /** Preview texture.*/
     public Texture texture;
 
-    public Map(String name, ObjectMap<String, String> tags, boolean custom, Supplier<InputStream> streamSupplier){
+    public Map(String name, int width, int height, ObjectMap<String, String> tags, boolean custom, Supplier<InputStream> streamSupplier){
         this.name = name;
         this.custom = custom;
         this.tags = tags;
         this.stream = streamSupplier;
+        this.width = width;
+        this.height = height;
     }
 
-    public Map(String name){
-        this(name, new ObjectMap<>(), true, () -> null);
+    public Map(String name, int width, int height){
+        this(name, width, height, new ObjectMap<>(), true, () -> null);
     }
 
     public String getDisplayName(){
@@ -48,10 +52,6 @@ public class Map{
 
     public String tag(String name){
         return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
-    }
-
-    public boolean hasOreGen(){
-        return !tags.get("oregen", "0").equals("0");
     }
 
     @Override

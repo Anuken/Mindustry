@@ -6,7 +6,6 @@ import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.DrawOperation.TileOperation;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;

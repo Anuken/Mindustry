@@ -22,6 +22,7 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.type.ContentType;
@@ -232,12 +233,10 @@ public class World implements ApplicationListener{
         beginMapLoad();
         this.currentMap = map;
 
-        int width = map.meta.width, height = map.meta.height;
-
-        createTiles(width, height);
-
         try{
-            loadTileData(tiles, MapIO.readTileData(map, true));
+            createTiles(map.width, map.height);
+            tiles = MapIO.readTiles(map, tiles);
+            prepareTiles(tiles);
         }catch(Exception e){
             Log.err(e);
             if(!headless){
@@ -257,7 +256,7 @@ public class World implements ApplicationListener{
             if(state.teams.get(players[0].getTeam()).cores.size == 0){
                 ui.showError("$map.nospawn");
                 invalidMap = true;
-            }else if(state.rules.pvp){ //pvp maps need two cores to  be valid
+            }else if(state.rules.pvp){ //pvp maps need two cores to be valid
                 invalidMap = true;
                 for(Team team : Team.all){
                     if(state.teams.get(team).cores.size != 0 && team != players[0].getTeam()){
@@ -413,18 +412,7 @@ public class World implements ApplicationListener{
     }
 
     /**Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
-    void loadTileData(Tile[][] tiles, MapTileData data){
-        data.position(0, 0);
-        TileDataMarker marker = data.newDataMarker();
-
-        for(int y = 0; y < data.height(); y++){
-            for(int x = 0; x < data.width(); x++){
-                data.read(marker);
-
-                tiles[x][y] = new Tile(x, y, marker.floor, marker.wall == Blocks.part.id ? 0 : marker.wall, marker.rotation, marker.team);
-            }
-        }
-
+    void loadTileData(Tile[][] tiles){
         prepareTiles(tiles);
     }
 
