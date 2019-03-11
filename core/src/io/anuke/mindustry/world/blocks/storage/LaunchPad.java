@@ -34,7 +34,7 @@ public class LaunchPad extends StorageBlock{
 
         if(entity.cons.valid() && world.isZone()){
             for(Item item : Vars.content.items()){
-                if(entity.items.get(item) >= itemCapacity && entity.timer.get(timerLaunch, launchTime)){
+                if(entity.items.get(item) >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
                     //TODO play animation of some sort
                     Effects.effect(Fx.dooropenlarge, tile);
                     data.addItem(item, entity.items.get(item));
