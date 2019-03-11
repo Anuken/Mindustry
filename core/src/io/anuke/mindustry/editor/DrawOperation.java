@@ -30,6 +30,11 @@ public class DrawOperation{
     class TileOpStruct{
         short x;
         short y;
+        /**
+         * 0: floor
+         * 1: block
+         * 2: rotation
+         */
         byte type;
         byte from;
         byte to;

@@ -235,6 +235,12 @@ public class MapEditor{
         renderer.resize(width, height);
     }
 
+    public void changeFloor(int x, int y, Block to){
+        Block from = tiles[x][y].floor();
+        tiles[x][y].setFloor((Floor)to);
+        addTileOp(TileOp.get((short)x, (short)y, (byte)0, from.id, to.id));
+    }
+
     public void undo(){
         if(stack.canUndo()){
             stack.undo(this);
