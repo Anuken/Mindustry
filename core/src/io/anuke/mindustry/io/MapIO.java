@@ -5,6 +5,7 @@ import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
@@ -41,8 +42,19 @@ public class MapIO{
     }
 
     //TODO implement
-    public static Pixmap unfinished_generatePreview(Map map){
+    public static Pixmap generatePreview(Map map){
         return null;
+    }
+
+    public static Pixmap generatePreview(Tile[][] tiles){
+        Pixmap pixmap = new Pixmap(tiles.length, tiles[0].length, Format.RGBA8888);
+        for(int x = 0; x < pixmap.getWidth(); x++){
+            for(int y = 0; y < pixmap.getHeight(); y++){
+                Tile tile = tiles[x][y];
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.getTeam()));
+            }
+        }
+        return pixmap;
     }
 
     //TODO implement
@@ -64,7 +76,7 @@ public class MapIO{
         return Color.rgba8888(wall.solid ? wall.color : floor.color);
     }
 
-    public static void writeMap(Map map, Tile[][] tiles, OutputStream output) throws IOException{
+    public static void writeMap(OutputStream output, Map map, Tile[][] tiles) throws IOException{
         try(DataOutputStream stream = new DataOutputStream(output)){
             stream.writeInt(version);
             stream.writeInt(Version.build);
@@ -103,7 +115,7 @@ public class MapIO{
                 i += consecutives;
             }
 
-            //blocks
+            //then blocks
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = world.tile(i % world.width(), i / world.width());
                 stream.writeByte(tile.getBlockID());
@@ -135,8 +147,8 @@ public class MapIO{
         }
     }
 
-    public static Map readMap(String useName, InputStream input) throws IOException{
-        try(DataInputStream stream = new DataInputStream(input)){
+    public static Map readMap(FileHandle file, boolean custom) throws IOException{
+        try(DataInputStream stream = new DataInputStream(file.read())){
             ObjectMap<String, String> tags = new ObjectMap<>();
 
             //meta is uncompressed
@@ -151,34 +163,53 @@ public class MapIO{
                 tags.put(name, value);
             }
 
-            return new Map(useName, width, height);
+            return new Map(file, width, height, tags, custom);
         }
     }
 
     public static Tile[][] readTiles(Map map, Tile[][] tiles) throws IOException{
-        return readTiles(map.stream.get(), map.width, map.height, tiles);
+        return readTiles(map.file, map.width, map.height, tiles);
     }
 
-    public static Tile[][] readTiles(InputStream input, int width, int height, Tile[][] tiles) throws IOException{
-        readMap("this map name is utterly irrelevant", input);
+    public static Tile[][] readTiles(FileHandle file, int width, int height, Tile[][] tiles) throws IOException{
+        readMap(file, false);
 
-        try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
+        try(DataInputStream stream = new DataInputStream(new InflaterInputStream(file.read()))){
 
             MappableContent[][] c = SaveIO.getSaveWriter().readContentHeader(stream);
 
             try{
                 content.setTemporaryMapper(c);
-                //TODO 2-phase rle
 
+                //read floor and create tiles first
                 for(int i = 0; i < width * height; i++){
                     int x = i % width, y = i / width;
                     byte floorid = stream.readByte();
-                    byte wallid = stream.readByte();
                     byte oreid = stream.readByte();
+                    int consecutives = stream.readUnsignedByte();
 
-                    Tile tile = new Tile(x, y, floorid, wallid);
+                    tiles[x][y] = new Tile(x, y, floorid, (byte)0);
+                    tiles[x][y].setOre(oreid);
 
-                    if(wallid == Blocks.part.id){
+                    for(int j = i + 1; j < i + 1 + consecutives; j++){
+                        int newx = j % width, newy = j / width;
+                        Tile newTile = new Tile(newx, newy, floorid, (byte)0);
+                        newTile.setOre(oreid);
+                        tiles[newx][newy] = newTile;
+                    }
+
+                    i += consecutives;
+                }
+
+                //read blocks
+                for(int i = 0; i < width * height; i++){
+                    int x = i % width, y = i / width;
+                    Block block = content.block(stream.readByte());
+
+                    Tile tile = tiles[x][y];
+                    tile.setBlock(block);
+
+                    if(block == Blocks.part){
                         tile.link = stream.readByte();
                     }else if(tile.entity != null){
                         byte tr = stream.readByte();
@@ -192,20 +223,16 @@ public class MapIO{
                         tile.setRotation(rotation);
 
                         tile.entity.readConfig(stream);
-                    }else if(wallid == 0){
+                    }else{ //no entity/part, read consecutives
                         int consecutives = stream.readUnsignedByte();
 
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
                             int newx = j % width, newy = j / width;
-                            Tile newTile = new Tile(newx, newy, floorid, wallid);
-                            newTile.setOre(oreid);
-                            tiles[newx][newy] = newTile;
+                            tiles[newx][newy].setBlock(block);
                         }
 
                         i += consecutives;
                     }
-
-                    tiles[x][y] = tile;
                 }
 
                 return tiles;

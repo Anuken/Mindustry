@@ -19,6 +19,7 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Tmp;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.ui.GridImage;
 import io.anuke.mindustry.world.Pos;
@@ -28,8 +29,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
     private EditorTool tool = EditorTool.pencil;
-    private OperationStack stack = new OperationStack();
-    private DrawOperation op;
+    //private OperationStack stack = new OperationStack();
+    //private DrawOperation op;
     private GridBits used;
     private Bresenham2 br = new Bresenham2();
     private boolean updated = false;

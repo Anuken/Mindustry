@@ -17,8 +17,6 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 
-import java.io.DataInputStream;
-
 import static io.anuke.mindustry.Vars.*;
 
 public class MapsDialog extends FloatingDialog{
@@ -31,22 +29,18 @@ public class MapsDialog extends FloatingDialog{
         buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
-                    DataInputStream stream = new DataInputStream(file.read());
-                    MapMeta meta = MapIO.readMapMeta(stream);
-                    MapTileData data = MapIO.readTileData(stream, meta, true);
-                    stream.close();
-
-                    String name = meta.tags.get("name", file.nameWithoutExtension());
+                    Map map = MapIO.readMap(file.read(), file.name(), true, file::read);
+                    String name = map.tags.get("name", file.nameWithoutExtension());
 
                     if(world.maps.getByName(name) != null && !world.maps.getByName(name).custom){
                         ui.showError(Core.bundle.format("editor.import.exists", name));
                     }else if(world.maps.getByName(name) != null){
                         ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                            world.maps.saveMap(name, data, meta.tags);
+                            world.maps.importMap(file, map);
                             setup();
                         });
                     }else{
-                        world.maps.saveMap(name, data, meta.tags);
+                        world.maps.importMap(file, map);
                         setup();
                     }
 
@@ -87,7 +81,7 @@ public class MapsDialog extends FloatingDialog{
             TextButton button = maps.addButton("", "clear", () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
-            button.add(map.meta.tags.get("name", map.name)).width(mapsize - 18f).center().get().setEllipsis(true);
+            button.add(map.getDisplayName()).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
             button.addImage("white").growX().pad(4).color(Color.GRAY);
             button.row();
@@ -127,15 +121,15 @@ public class MapsDialog extends FloatingDialog{
 
             t.add("$editor.name").padRight(10).color(Color.GRAY).padTop(0);
             t.row();
-            t.add(map.meta.tags.get("name", map.name)).growX().wrap().padTop(2);
+            t.add(map.getDisplayName()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();
-            t.add(map.meta.author()).growX().wrap().padTop(2);
+            t.add(map.author()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();
-            t.add(map.meta.description()).growX().wrap().padTop(2);
+            t.add(map.description()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.oregen.info").padRight(10).color(Color.GRAY);
         }).height(mapsize).width(mapsize);

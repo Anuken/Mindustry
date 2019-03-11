@@ -291,14 +291,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.renderer().dispose();
     }
 
-    public void beginEditMap(InputStream is){
+    public void beginEditMap(FileHandle file){
         ui.loadAnd(() -> {
             try{
                 shownWithMap = true;
-                DataInputStream stream = new DataInputStream(is);
-                MapMeta meta = MapIO.readMapMeta(stream);
-                editor.beginEdit(MapIO.readTileData(stream, meta, false), meta.tags, false);
-                is.close();
+                editor.beginEdit(MapIO.readTiles(file));
                 show();
             }catch(Exception e){
                 Log.err(e);
@@ -316,9 +313,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void updateSelectedBlock(){
-        Block block = editor.getDrawBlock();
         for(int j = 0; j < Vars.content.blocks().size; j++){
-            if(block.id == j && j < blockgroup.getButtons().size){
+            if(editor.drawBlock.id == j && j < blockgroup.getButtons().size){
                 blockgroup.getButtons().get(j).setChecked(true);
                 break;
             }

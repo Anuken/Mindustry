@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
@@ -7,6 +8,7 @@ import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.TileOp;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -19,11 +21,16 @@ public class MapEditor{
 
     private ObjectMap<String, String> tags = new ObjectMap<>();
     private MapRenderer renderer = new MapRenderer(this);
+    private Tile[][] tiles;
 
-    private int brushSize = 1;
-    private int rotation;
-    private Block drawBlock = Blocks.stone;
-    private Team drawTeam = Team.blue;
+    private OperationStack stack = new OperationStack();
+    private DrawOperation op;
+    private GridBits used;
+
+    public int brushSize = 1;
+    public int rotation;
+    public Block drawBlock = Blocks.stone;
+    public Team drawTeam = Team.blue;
 
     public ObjectMap<String, String> getTags(){
         return tags;
@@ -46,36 +53,16 @@ public class MapEditor{
         renderer.resize(map.length, map[0].length);
     }
 
-    public int getDrawRotation(){
-        return rotation;
+    public Tile[][] tiles(){
+        return tiles;
     }
 
-    public void setDrawRotation(int rotation){
-        this.rotation = rotation;
+    public int width(){
+        return tiles.length;
     }
 
-    public Team getDrawTeam(){
-        return drawTeam;
-    }
-
-    public void setDrawTeam(Team team){
-        this.drawTeam = team;
-    }
-
-    public Block getDrawBlock(){
-        return drawBlock;
-    }
-
-    public void setDrawBlock(Block block){
-        this.drawBlock = block;
-    }
-
-    public int getBrushSize(){
-        return brushSize;
-    }
-
-    public void setBrushSize(int size){
-        this.brushSize = size;
+    public int height(){
+        return tiles[0].length;
     }
 
     public void draw(int x, int y, boolean paint){
@@ -229,23 +216,47 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
-        MapTileData previous = map;
-        int offsetX = -(width - previous.width())/2, offsetY = -(height - previous.height())/2;
+        Tile[][] previous = tiles;
+        int offsetX = -(width - width())/2, offsetY = -(height - height())/2;
 
-        map = new MapTileData(width, height);
-        for(int x = 0; x < map.width(); x++){
-            for(int y = 0; y < map.height(); y++){
+        tiles = new Tile[width][height];
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;
-                if(Structs.inBounds(px, py, previous.width(), previous.height())){
-                    map.write(x, y, DataPosition.floor, previous.read(px, py, DataPosition.floor));
-                    map.write(x, y, DataPosition.wall, previous.read(px, py, DataPosition.wall));
-                    map.write(x, y, DataPosition.link, previous.read(px, py, DataPosition.link));
-                    map.write(x, y, DataPosition.rotationTeam, previous.read(px, py, DataPosition.rotationTeam));
+                if(Structs.inBounds(px, py, previous.length, previous[0].length)){
+                    tiles[x][y] = previous[px][py];
+                    tiles[x][y].x = (short)x;
+                    tiles[x][y].y = (short)y;
                 }else{
-                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                    tiles[x][y] = new Tile(x, y, Blocks.stone.id, (byte)0);
                 }
             }
         }
         renderer.resize(width, height);
+    }
+
+    public void undo(){
+        if(stack.canUndo()){
+            stack.undo(this);
+        }
+    }
+
+    public void redo(){
+        if(stack.canRedo()){
+            stack.redo(this);
+        }
+    }
+
+    public void addTileOp(long data){
+        used.set(TileOp.x(data), TileOp.y(data));
+        op.addOperation(data);
+    }
+
+    public boolean checkUsed(short x, short y){
+        if(used == null || used.width() != width() || used.height() != height()){
+            used = new GridBits(world.width(), world.height());
+        }
+
+        return used.get(x, y);
     }
 }

@@ -2,40 +2,35 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 
-import java.io.InputStream;
-
 public class Map{
-    /** Internal map name. This is the filename, without any extensions.*/
-    public final String name;
     /** Whether this is a custom map.*/
     public final boolean custom;
     /** Metadata. Author description, display name, etc.*/
     public final ObjectMap<String, String> tags;
-    /** Supplies a new input stream with the data of this map.*/
-    public final Supplier<InputStream> stream;
+    /** Base file of this map.*/
+    public final FileHandle file;
     /**Map width/height, shorts.*/
     public int width, height;
     /** Preview texture.*/
     public Texture texture;
 
-    public Map(String name, int width, int height, ObjectMap<String, String> tags, boolean custom, Supplier<InputStream> streamSupplier){
-        this.name = name;
+    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
         this.custom = custom;
         this.tags = tags;
-        this.stream = streamSupplier;
+        this.file = file;
         this.width = width;
         this.height = height;
     }
 
-    public Map(String name, int width, int height){
-        this(name, width, height, new ObjectMap<>(), true, () -> null);
+    public String fileName(){
+        return file.nameWithoutExtension();
     }
 
     public String getDisplayName(){
-        return tags.get("name", name);
+        return tags.get("name", fileName());
     }
 
     public String author(){
@@ -57,7 +52,7 @@ public class Map{
     @Override
     public String toString(){
         return "Map{" +
-                "name='" + name + '\'' +
+                "file='" + file + '\'' +
                 ", custom=" + custom +
                 ", tags=" + tags +
                 '}';
