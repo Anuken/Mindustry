@@ -7,6 +7,7 @@ import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -41,6 +42,7 @@ public class MapIO{
 
     public static void writeMap(Map map, Tile[][] tiles, DataOutputStream stream) throws IOException{
         stream.writeInt(version);
+        stream.writeInt(Version.build);
         stream.writeByte((byte) map.tags.size);
 
         for(Entry<String, String> entry : map.tags.entries()){
@@ -87,7 +89,8 @@ public class MapIO{
     public static Map readMap(String useName, DataInputStream stream) throws IOException{
         ObjectMap<String, String> tags = new ObjectMap<>();
 
-        stream.readInt(); //version
+        int version = stream.readInt(); //version
+        int build = stream.readInt();
         byte tagAmount = stream.readByte();
 
         for(int i = 0; i < tagAmount; i++){
@@ -120,7 +123,7 @@ public class MapIO{
 
                 Tile tile = new Tile(x, y, floorid, wallid);
 
-                if(wallid == Blocks.blockpart.id){
+                if(wallid == Blocks.part.id){
                     tile.link = stream.readByte();
                 }else if(tile.entity != null){
                     byte tr = stream.readByte();
