@@ -82,16 +82,31 @@ public class MapIO{
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
 
-            stream.writeShort(tiles.length);
-            stream.writeShort(tiles[0].length);
-
-            //TODO 2-phase rle
+            //floor first
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = world.tile(i % world.width(), i / world.width());
-
                 stream.writeByte(tile.getFloorID());
-                stream.writeByte(tile.getBlockID());
                 stream.writeByte(tile.getOre());
+                int consecutives = 0;
+
+                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
+                    Tile nextTile = world.tile(j % world.width(), j / world.width());
+
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOre() != tile.getOre()){
+                        break;
+                    }
+
+                    consecutives++;
+                }
+
+                stream.writeByte(consecutives);
+                i += consecutives;
+            }
+
+            //blocks
+            for(int i = 0; i < tiles.length * tiles[0].length; i++){
+                Tile tile = world.tile(i % world.width(), i / world.width());
+                stream.writeByte(tile.getBlockID());
 
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.link);
@@ -99,13 +114,14 @@ public class MapIO{
                     stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                     stream.writeShort((short)tile.entity.health); //health
                     tile.entity.writeConfig(stream);
-                }else if(tile.block() == Blocks.air){
+                }else{
+                    //write consecutive non-entity blocks
                     int consecutives = 0;
 
                     for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                         Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                        if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOre() != tile.getOre()){
+                        if(nextTile.block() != tile.block()){
                             break;
                         }
 
