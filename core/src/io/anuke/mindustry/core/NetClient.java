@@ -98,16 +98,15 @@ public class NetClient implements ApplicationListener{
         });
 
         Net.handleClient(Disconnect.class, packet -> {
+            state.set(State.menu);
+            connecting = false;
+            Platform.instance.updateRPC();
+
             if(quiet) return;
 
             Time.runTask(3f, ui.loadfrag::hide);
 
-            state.set(State.menu);
-
             ui.showError("$disconnect");
-            connecting = false;
-
-            Platform.instance.updateRPC();
         });
 
         Net.handleClient(WorldStream.class, data -> {

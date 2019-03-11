@@ -162,7 +162,7 @@ public class Fx implements ContentList{
         heal = new Effect(11, e -> {
             Draw.color(Pal.heal);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 10, 2f + e.finpow() * 7f);
+            Lines.poly(e.x, e.y, 24, 2f + e.finpow() * 7f);
             Draw.color();
         });
 

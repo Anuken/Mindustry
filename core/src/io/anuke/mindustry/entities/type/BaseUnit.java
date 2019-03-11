@@ -337,6 +337,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void write(DataOutput data) throws IOException{
         super.writeSave(data);
         data.writeByte(type.id);
+        data.writeInt(spawner);
     }
 
     @Override
@@ -344,6 +345,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(data);
         this.type = content.getByID(ContentType.unit, data.readByte());
+        this.spawner = data.readInt();
 
         interpolator.read(lastx, lasty, x, y, rotation);
         rotation = lastrot;

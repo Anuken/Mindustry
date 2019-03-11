@@ -360,6 +360,7 @@ public class Bullets implements ContentList{
 
             {
                 shootEffect = Fx.shootHeal;
+                smokeEffect = Fx.hitLaser;
                 hitEffect = Fx.hitLaser;
                 despawnEffect = Fx.hitLaser;
                 collidesTeam = true;
