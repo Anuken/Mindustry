@@ -3,8 +3,6 @@ precision highp float;
 precision mediump int;
 #endif
 
-#define s1 vec4(63.0, 63.0, 63.0, 255.0) / 255.0
-
 uniform sampler2D u_texture;
 
 uniform vec2 camerapos;
@@ -56,24 +54,20 @@ void main() {
 	float mscl = 30.0;
 	float mth = 5.0;
 
-    vec4 old = color;
-    color = texture2D(u_texture, c + vec2(sin(stime/3.0 + coords.y/0.75) * v.x, 0.0)) * vec4(0.9, 0.9, 1, 1.0);
-    color.a = 1.0;
-
-    if(color.r < 0.01){
-        color = old;
-    }
-
-    float n1 = snoise(coords / 22.0 + vec2(-time) / 540.0);
-    float n2 = snoise((coords + vec2(632.0)) / 8.0 + vec2(0.0, time) / 510.0);
-
-    float r = (n1 + n2) / 2.0;
-
-    if(r < -0.3 && r > -0.6){
-        color *= 1.4;
+    if(color.r > 0.01){
+        color = texture2D(u_texture, c + vec2(sin(stime/3.0 + coords.y/0.75) * v.x, 0.0)) * vec4(0.9, 0.9, 1, 1.0);
         color.a = 1.0;
-    }
 
+        float n1 = snoise(coords / 22.0 + vec2(-time) / 540.0);
+        float n2 = snoise((coords + vec2(632.0)) / 8.0 + vec2(0.0, time) / 510.0);
+
+        float r = (n1 + n2) / 2.0;
+
+        if(r < -0.3 && r > -0.6){
+            color *= 1.4;
+            color.a = 1.0;
+        }
+    }
 
 	gl_FragColor = color;
 }
