@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 
 /**
@@ -24,6 +25,8 @@ public class Predict{
      * @return the intercept location
      */
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v){
+        dstvx /= Time.delta();
+        dstvy /= Time.delta();
         float tx = dstx - srcx,
                 ty = dsty - srcy;
 
