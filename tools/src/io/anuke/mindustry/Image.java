@@ -52,6 +52,7 @@ class Image {
     }
 
     Color getColor(int x, int y){
+        if(!Structs.inBounds(x, y, width(), height())) return color.set(0, 0, 0, 0);
         int i = image.getRGB(x, y);
         Color.argb8888ToColor(color, i);
         return color;
@@ -100,21 +101,11 @@ class Image {
 
         int ofx = 0, ofy = 0;
 
-        if(x < 0){
-            ofx = x;
-            x = 0;
-        }
-
-        if(y < 0){
-            ofy = y;
-            y = 0;
-        }
-
         graphics.drawImage(ImagePacker.get(region).image,
                 x, y,
                 x + region.getWidth(),
                 y + region.getHeight(),
-                (flipx ?  region.getWidth() : 0) + ofx,
+                (flipx ? region.getWidth() : 0) + ofx,
                 (flipy ? region.getHeight() : 0) + ofy,
                 (flipx ? 0 : region.getWidth()) + ofx,
                 (flipy ? 0 : region.getHeight()) + ofy,
@@ -127,6 +118,13 @@ class Image {
             ImageIO.write(image, "png", new File(name + ".png"));
         }catch (IOException e){
             throw new RuntimeException(e);
+        }
+    }
+
+    void save(String name, boolean antialias){
+        save(name);
+        if(!antialias){
+            new File(name + ".png").setLastModified(0);
         }
     }
 

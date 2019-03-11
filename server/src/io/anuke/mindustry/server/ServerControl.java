@@ -5,7 +5,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.CommandHandler.Command;
@@ -13,14 +13,13 @@ import io.anuke.arc.util.CommandHandler.Response;
 import io.anuke.arc.util.CommandHandler.ResponseType;
 import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -28,6 +27,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -46,7 +46,7 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-
+    private RulePreset lastPreset;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -61,6 +61,11 @@ public class ServerControl implements ApplicationListener{
 
         Log.setLogger(new LogHandler(){
             DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
+
+            @Override
+            public void debug(String text, Object... args){
+                print("&lc&fb" + "[DEBUG] " + text, args);
+            }
 
             @Override
             public void info(String text, Object... args){
@@ -111,6 +116,8 @@ public class ServerControl implements ApplicationListener{
                 }
             }
         });
+
+        customMapDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -184,7 +191,7 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "[mapname]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -192,36 +199,38 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = null;
+            Map result = world.maps.all().find(map -> map.name.equalsIgnoreCase(arg[0]));
 
-            if(arg.length > 0){
+            if(result == null){
+                err("No map with name &y'{0}'&lr found.", arg[0]);
+                return;
+            }
 
-                String search = arg[0];
-                for(Map map : world.maps.all()){
-                    if(map.name.equalsIgnoreCase(search)) result = map;
-                }
+            RulePreset preset = RulePreset.survival;
 
-                if(result == null){
-                    err("No map with name &y'{0}'&lr found.", search);
+            if(arg.length > 1){
+                try{
+                    preset = RulePreset.valueOf(arg[1]);
+                }catch(IllegalArgumentException e){
+                    err("No gamemode '{0}' found.", arg[1]);
                     return;
                 }
+            }
 
+            info("Loading map...");
 
-                info("Loading map...");
-                err("TODO select gamemode");
-
-                logic.reset();
+            logic.reset();
+            state.rules = preset.get();
+            try{
                 world.loadMap(result);
                 logic.play();
 
-            }else{
-                //TODO
-                err("TODO play generated map");
+                info("Map loaded.");
+
+                host();
+            }catch(MapException e){
+                Log.err(e.map.getDisplayName() + ": " + e.getMessage());
             }
-
-            info("Map loaded.");
-
-            host();
         });
 
         handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
@@ -240,10 +249,15 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("maps", "Display all available maps.", arg -> {
-            info("Maps:");
-            for(Map map : world.maps.all()){
-                info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+            if(!world.maps.all().isEmpty()){
+                info("Maps:");
+                for(Map map : world.maps.all()){
+                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+                }
+            }else{
+                info("No maps found.");
             }
+            info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
         handler.register("status", "Display server status.", arg -> {
@@ -251,16 +265,15 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1} &lb/&ly {2} &lb/&ly {3}", Strings.capitalize(world.getMap().name), state.wave);
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name), state.wave);
 
-                if(!state.rules.waves){
+                if(state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS.", (int) (60f / Time.delta()));
-                info("  &ly{0} MB used.", Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS, {1} MB used.", (int)(60f/Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
@@ -293,7 +306,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("fillitems", "[team]", "Fill the core with 2000 items.", arg -> {
+        handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
             if(!state.is(State.playing)){
                 err("Not playing. Host first.");
                 return;
@@ -309,7 +322,7 @@ public class ServerControl implements ApplicationListener{
                 
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
+                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
                     }
                 }
                 
@@ -632,7 +645,9 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.setDead(true);
             }
+            Rules rules = state.rules;
             logic.reset();
+            state.rules = rules;
             Call.onWorldDataBegin();
             run.run();
             logic.play();
@@ -647,7 +662,12 @@ public class ServerControl implements ApplicationListener{
             lastTask = new Task(){
                 @Override
                 public void run(){
-                    r.run();
+                    try{
+                        r.run();
+                    }catch(MapException e){
+                        Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                        Net.closeServer();
+                    }
                 }
             };
 
@@ -661,6 +681,8 @@ public class ServerControl implements ApplicationListener{
         try{
             Net.host(Core.settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
         }catch(IOException e){
             err(e);
             state.set(State.menu);

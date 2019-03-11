@@ -79,15 +79,15 @@ public class MapEditor{
         this.brushSize = size;
     }
 
-    public void draw(int x, int y){
-        draw(x, y, drawBlock);
+    public void draw(int x, int y, boolean paint){
+        draw(x, y, paint, drawBlock);
     }
 
-    public void draw(int x, int y, Block drawBlock){
-        draw(x, y, drawBlock, 1.0);
+    public void draw(int x, int y, boolean paint, Block drawBlock){
+        draw(x, y, paint, drawBlock, 1.0);
     }
 
-    public void draw(int x, int y, Block drawBlock, double chance){
+    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
         byte writeID = drawBlock.id;
         byte partID = Blocks.part.id;
         byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
@@ -144,7 +144,7 @@ public class MapEditor{
                     if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
                         int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height()){
+                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height() || (paint && !isfloor && content.block(map.read(wx, wy, DataPosition.wall)) == Blocks.air)){
                             continue;
                         }
 
@@ -230,10 +230,21 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
+        MapTileData previous = map;
+        int offsetX = -(width - previous.width())/2, offsetY = -(height - previous.height())/2;
+
         map = new MapTileData(width, height);
         for(int x = 0; x < map.width(); x++){
             for(int y = 0; y < map.height(); y++){
-                map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                int px = offsetX + x, py = offsetY + y;
+                if(Structs.inBounds(px, py, previous.width(), previous.height())){
+                    map.write(x, y, DataPosition.floor, previous.read(px, py, DataPosition.floor));
+                    map.write(x, y, DataPosition.wall, previous.read(px, py, DataPosition.wall));
+                    map.write(x, y, DataPosition.link, previous.read(px, py, DataPosition.link));
+                    map.write(x, y, DataPosition.rotationTeam, previous.read(px, py, DataPosition.rotationTeam));
+                }else{
+                    map.write(x, y, DataPosition.floor, Blocks.stone.id);
+                }
             }
         }
         renderer.resize(width, height);

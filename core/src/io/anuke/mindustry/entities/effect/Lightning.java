@@ -4,13 +4,14 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.TimedEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.TimeTrait;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.TimeTrait;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.RandomXS128;
@@ -20,13 +21,13 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,7 +46,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     private static int lastSeed = 0;
 
     private Array<Position> lines = new Array<>();
-    private Color color = Palette.lancerLaser;
+    private Color color = Pal.lancerLaser;
 
     /**For pooling use only. Do not call directly!*/
     public Lightning(){
@@ -118,7 +119,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
     @Override
     public void reset(){
         super.reset();
-        color = Palette.lancerLaser;
+        color = Pal.lancerLaser;
         lines.clear();
     }
 
@@ -130,31 +131,22 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
 
     @Override
     public void draw(){
-        float lx = x, ly = y;
+        Lines.stroke(3f * fout());
         Draw.color(color, Color.WHITE, fin());
-        //TODO this is really, really bad rendering
-        /*
-        for(int i = 0; i < lines.size; i++){
-            Position v = lines.get(i);
+        Lines.beginLine();
 
-            float f = (float) i / lines.size;
+        Lines.linePoint(x, y);
+        for(Position p : lines){
+            Lines.linePoint(p.getX(), p.getY());
+        }
+        Lines.endLine();
 
-            Lines.stroke(fout() * 3f * (1.5f - f));
+        int i = 0;
 
-            Lines.stroke(Lines.getStroke() * 4f);
-            Draw.alpha(0.3f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(Lines.getStroke()/4f);
-            Draw.alpha(1f);
-            Lines.line(lx, ly, v.getX(), v.getY());
-
-            Lines.stroke(3f * fout() * (1f - f));
-
-            lx = v.getX();
-            ly = v.getY();
-        }*/
-        Draw.color();
+        for(Position p : lines){
+            Fill.square(p.getX(), p.getY(), (5f - (float)i++/lines.size*2f) * fout(), 45);
+        }
+        Draw.reset();
     }
 
     @Override

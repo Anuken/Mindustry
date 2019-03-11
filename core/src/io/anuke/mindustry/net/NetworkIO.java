@@ -3,9 +3,9 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectMap.Entry;
-import io.anuke.arc.entities.Entities;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams;
 import io.anuke.mindustry.game.Teams.TeamData;
@@ -17,7 +17,6 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -44,6 +43,7 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(stream);
 
+            world.spawner.write(stream);
             SaveIO.getSaveWriter().writeMap(stream);
 
             stream.write(Team.all.length);
@@ -102,9 +102,8 @@ public class NetworkIO{
             player.resetID(id);
             player.add();
 
-            world.beginMapLoad();
-
             //map
+            world.spawner.read(stream);
             SaveIO.getSaveWriter().readMap(stream);
             world.setMap(new Map(map, 0, 0));
 
@@ -133,8 +132,6 @@ public class NetworkIO{
                 }
             }
 
-            world.endMapLoad();
-
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -151,17 +148,17 @@ public class NetworkIO{
 
         ByteBuffer buffer = ByteBuffer.allocate(128);
 
-        buffer.put((byte) host.getBytes(StandardCharsets.UTF_8).length);
-        buffer.put(host.getBytes(StandardCharsets.UTF_8));
+        buffer.put((byte) host.getBytes(charset).length);
+        buffer.put(host.getBytes(charset));
 
-        buffer.put((byte) map.getBytes(StandardCharsets.UTF_8).length);
-        buffer.put(map.getBytes(StandardCharsets.UTF_8));
+        buffer.put((byte) map.getBytes(charset).length);
+        buffer.put(map.getBytes(charset));
 
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
-        buffer.put((byte)Version.type.getBytes(StandardCharsets.UTF_8).length);
-        buffer.put(Version.type.getBytes(StandardCharsets.UTF_8));
+        buffer.put((byte)Version.type.getBytes(charset).length);
+        buffer.put(Version.type.getBytes(charset));
         return buffer;
     }
 
@@ -174,8 +171,8 @@ public class NetworkIO{
         byte[] mb = new byte[mlength];
         buffer.get(mb);
 
-        String host = new String(hb, StandardCharsets.UTF_8);
-        String map = new String(mb, StandardCharsets.UTF_8);
+        String host = new String(hb, charset);
+        String map = new String(mb, charset);
 
         int players = buffer.getInt();
         int wave = buffer.getInt();
@@ -183,7 +180,7 @@ public class NetworkIO{
         byte tlength = buffer.get();
         byte[] tb = new byte[tlength];
         buffer.get(tb);
-        String vertype = new String(tb, StandardCharsets.UTF_8);
+        String vertype = new String(tb, charset);
 
         return new Host(host, hostAddress, map, wave, players, version, vertype);
     }

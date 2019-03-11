@@ -1,7 +1,6 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -9,11 +8,14 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -32,29 +34,43 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    launchFull;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion;
 
     @Override
     public void load(){
 
         none = new Effect(0, 0f, e -> {});
 
+        unitSpawn = new Effect(30f, e -> {
+            if(!(e.data instanceof BaseUnit)) return;
+
+            Draw.alpha(e.fin());
+
+            float scl = 1f + e.fout()*2f;
+
+            BaseUnit unit = (BaseUnit)e.data;
+            Draw.rect(unit.getIconRegion(), e.x, e.y,
+                unit.getIconRegion().getWidth() * Draw.scl * scl, unit.getIconRegion().getWidth() * Draw.scl * scl, 180f);
+
+            Draw.reset();
+        });
+
         placeBlock = new Effect(16, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Lines.stroke(3f - e.fin() * 2f);
             Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
             Draw.reset();
         });
 
         tapBlock = new Effect(12, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Lines.stroke(3f - e.fin() * 2f);
             Lines.circle(e.x, e.y, 4f + (tilesize / 1.5f * e.rotation) * e.fin());
             Draw.reset();
         });
 
         breakBlock = new Effect(12, e -> {
-            Draw.color(Palette.remove);
+            Draw.color(Pal.remove);
             Lines.stroke(3f - e.fin() * 2f);
             Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
 
@@ -65,36 +81,42 @@ public class Fx implements ContentList{
         });
 
         select = new Effect(23, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Lines.stroke(e.fout() * 3f);
             Lines.circle(e.x, e.y, 3f + e.fin() * 14f);
             Draw.reset();
         });
 
         smoke = new Effect(100, e -> {
-            Draw.color(Color.GRAY, Palette.darkishGray, e.fin());
+            Draw.color(Color.GRAY, Pal.darkishGray, e.fin());
             float size = 7f - e.fin() * 7f;
             Draw.rect("circle", e.x, e.y, size, size);
             Draw.reset();
         });
 
-        spawn = new Effect(23, e -> {
+        magmasmoke = new Effect(110, e -> {
+            Draw.color(Color.GRAY);
+            Fill.circle(e.x, e.y, e.fslope() * 6f);
+            Draw.reset();
+        });
+
+        spawn = new Effect(30, e -> {
             Lines.stroke(2f * e.fout());
-            Draw.color(Palette.accent);
-            Lines.poly(e.x, e.y, 4, 3f + e.fin() * 8f);
+            Draw.color(Pal.accent);
+            Lines.poly(e.x, e.y, 4, 5f + e.fin() * 12f);
             Draw.reset();
         });
         
         vtolHover = new Effect(40f, e -> {
             float len = e.finpow() * 10f;
             float ang = e.rotation + Mathf.randomSeedRange(e.id, 30f);
-            Draw.color(Palette.lightFlame, Palette.lightOrange, e.fin());
+            Draw.color(Pal.lightFlame, Pal.lightOrange, e.fin());
             Fill.circle(e.x + Angles.trnsx(ang, len), e.y + Angles.trnsy(ang, len), 2f * e.fout());
             Draw.reset();
         });
 
         unitDrop = new GroundEffect(30, e -> {
-            Draw.color(Palette.lightishGray);
+            Draw.color(Pal.lightishGray);
             Angles.randLenVectors(e.id, 9, 3 + 20f * e.finpow(), (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.4f);
             });
@@ -102,7 +124,7 @@ public class Fx implements ContentList{
         });
 
         unitLand = new GroundEffect(30, e -> {
-            Draw.color(Palette.lightishGray, e.color, e.rotation);
+            Draw.color(Tmp.c1.set(e.color).mul(1.1f));
             Angles.randLenVectors(e.id, 6, 17f * e.finpow(), (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.3f);
             });
@@ -110,35 +132,35 @@ public class Fx implements ContentList{
         });
 
         unitPickup = new GroundEffect(18, e -> {
-            Draw.color(Palette.lightishGray);
+            Draw.color(Pal.lightishGray);
             Lines.stroke(e.fin() * 2f);
             Lines.poly(e.x, e.y, 4, 13f * e.fout());
             Draw.reset();
         });
 
         landShock = new GroundEffect(12, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
             Lines.stroke(e.fout() * 3f);
             Lines.poly(e.x, e.y, 12, 20f * e.fout());
             Draw.reset();
         });
 
         pickup = new Effect(18, e -> {
-            Draw.color(Palette.lightishGray);
+            Draw.color(Pal.lightishGray);
             Lines.stroke(e.fout() * 2f);
             Lines.spikes(e.x, e.y, 1f + e.fin() * 6f, e.fout() * 4f, 6);
             Draw.reset();
         });
 
         healWave = new Effect(22, e -> {
-            Draw.color(Palette.heal);
+            Draw.color(Pal.heal);
             Lines.stroke(e.fout() * 2f);
             Lines.poly(e.x, e.y, 30, 4f + e.finpow() * 60f);
             Draw.color();
         });
 
         heal = new Effect(11, e -> {
-            Draw.color(Palette.heal);
+            Draw.color(Pal.heal);
             Lines.stroke(e.fout() * 2f);
             Lines.poly(e.x, e.y, 10, 2f + e.finpow() * 7f);
             Draw.color();
@@ -146,7 +168,7 @@ public class Fx implements ContentList{
 
 
         hitBulletSmall = new Effect(14, e -> {
-            Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
+            Draw.color(Color.WHITE, Pal.lightOrange, e.fin());
 
             e.scaled(7f, s -> {
                 Lines.stroke(0.5f + s.fout());
@@ -165,7 +187,7 @@ public class Fx implements ContentList{
         });
 
         hitFuse = new Effect(14, e -> {
-            Draw.color(Color.WHITE, Palette.surge, e.fin());
+            Draw.color(Color.WHITE, Pal.surge, e.fin());
 
             e.scaled(7f, s -> {
                 Lines.stroke(0.5f + s.fout());
@@ -184,7 +206,7 @@ public class Fx implements ContentList{
         });
 
         hitBulletBig = new Effect(13, e -> {
-            Draw.color(Color.WHITE, Palette.lightOrange, e.fin());
+            Draw.color(Color.WHITE, Pal.lightOrange, e.fin());
             Lines.stroke(0.5f + e.fout() * 1.5f);
 
             Angles.randLenVectors(e.id, 8, e.finpow() * 30f, e.rotation, 50f, (x, y) -> {
@@ -196,7 +218,7 @@ public class Fx implements ContentList{
         });
 
         hitFlameSmall = new Effect(14, e -> {
-            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
             Lines.stroke(0.5f + e.fout());
 
             Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
@@ -230,7 +252,7 @@ public class Fx implements ContentList{
         });
 
         hitMeltdown = new Effect(12, e -> {
-            Draw.color(Palette.meltdownHit);
+            Draw.color(Pal.meltdownHit);
             Lines.stroke(e.fout() * 2f);
 
             Angles.randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
@@ -242,14 +264,14 @@ public class Fx implements ContentList{
         });
 
         hitLaser = new Effect(8, e -> {
-            Draw.color(Color.WHITE, Palette.heal, e.fin());
+            Draw.color(Color.WHITE, Pal.heal, e.fin());
             Lines.stroke(0.5f + e.fout());
             Lines.circle(e.x, e.y, e.fin()*5f);
             Draw.reset();
         });
 
         despawn = new Effect(12, e -> {
-            Draw.color(Palette.lighterOrange, Color.GRAY, e.fin());
+            Draw.color(Pal.lighterOrange, Color.GRAY, e.fin());
             Lines.stroke(e.fout());
 
             Angles.randLenVectors(e.id, 7, e.fin() * 7f, e.rotation, 40f, (x, y) -> {
@@ -262,7 +284,7 @@ public class Fx implements ContentList{
 
         flakExplosion = new Effect(20, e -> {
 
-            Draw.color(Palette.bulletYellow);
+            Draw.color(Pal.bulletYellow);
             e.scaled(6, i -> {
                 Lines.stroke(3f * i.fout());
                 Lines.circle(e.x, e.y, 3f + i.fin() * 10f);
@@ -274,7 +296,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
             });
 
-            Draw.color(Palette.lighterOrange);
+            Draw.color(Pal.lighterOrange);
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
@@ -286,7 +308,7 @@ public class Fx implements ContentList{
 
         plasticExplosion = new Effect(24, e -> {
 
-            Draw.color(Palette.plastaniumFront);
+            Draw.color(Pal.plastaniumFront);
             e.scaled(7, i -> {
                 Lines.stroke(3f * i.fout());
                 Lines.circle(e.x, e.y, 3f + i.fin() * 24f);
@@ -298,7 +320,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
             });
 
-            Draw.color(Palette.plastaniumBack);
+            Draw.color(Pal.plastaniumBack);
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 25f * e.finpow(), (x, y) -> {
@@ -310,7 +332,7 @@ public class Fx implements ContentList{
 
         plasticExplosionFlak = new Effect(28, e -> {
 
-            Draw.color(Palette.plastaniumFront);
+            Draw.color(Pal.plastaniumFront);
             e.scaled(7, i -> {
                 Lines.stroke(3f * i.fout());
                 Lines.circle(e.x, e.y, 3f + i.fin() * 34f);
@@ -322,7 +344,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
             });
 
-            Draw.color(Palette.plastaniumBack);
+            Draw.color(Pal.plastaniumBack);
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 30f * e.finpow(), (x, y) -> {
@@ -334,7 +356,7 @@ public class Fx implements ContentList{
 
         blastExplosion = new Effect(22, e -> {
 
-            Draw.color(Palette.missileYellow);
+            Draw.color(Pal.missileYellow);
             e.scaled(6, i -> {
                 Lines.stroke(3f * i.fout());
                 Lines.circle(e.x, e.y, 3f + i.fin() * 15f);
@@ -346,7 +368,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
             });
 
-            Draw.color(Palette.missileYellowBack);
+            Draw.color(Pal.missileYellowBack);
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
@@ -363,7 +385,7 @@ public class Fx implements ContentList{
         });
 
         incendTrail = new Effect(50, e -> {
-            Draw.color(Palette.lightOrange);
+            Draw.color(Pal.lightOrange);
             Fill.circle(e.x, e.y, e.rotation * e.fout());
             Draw.reset();
         });
@@ -375,7 +397,7 @@ public class Fx implements ContentList{
         });
 
         absorb = new Effect(12, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Lines.stroke(2f * e.fout());
             Lines.circle(e.x, e.y, 5f * e.fout());
             Draw.reset();
@@ -383,7 +405,7 @@ public class Fx implements ContentList{
 
         flakExplosionBig = new Effect(30, e -> {
 
-            Draw.color(Palette.bulletYellowBack);
+            Draw.color(Pal.bulletYellowBack);
             e.scaled(6, i -> {
                 Lines.stroke(3f * i.fout());
                 Lines.circle(e.x, e.y, 3f + i.fin() * 25f);
@@ -395,7 +417,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
             });
 
-            Draw.color(Palette.bulletYellow);
+            Draw.color(Pal.bulletYellow);
             Lines.stroke(1f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
@@ -407,7 +429,7 @@ public class Fx implements ContentList{
 
 
         burning = new Effect(35f, e -> {
-            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
 
             Angles.randLenVectors(e.id, 3, 2f + e.fin() * 7f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
@@ -417,7 +439,7 @@ public class Fx implements ContentList{
         });
 
         fire = new Effect(35f, e -> {
-            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
 
             Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
@@ -457,7 +479,7 @@ public class Fx implements ContentList{
         });
 
         ballfire = new Effect(25f, e -> {
-            Draw.color(Palette.lightFlame, Palette.darkFlame, e.fin());
+            Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
 
             Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.5f);
@@ -507,7 +529,7 @@ public class Fx implements ContentList{
         });
 
         overdriven = new Effect(20f, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
 
             Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
                 Fill.square(e.x + x, e.y + y, e.fout() * 2.3f+0.5f);
@@ -520,7 +542,7 @@ public class Fx implements ContentList{
             float length = 20f * e.finpow();
             float size = 7f * e.fout();
 
-            Draw.rect(((Item) e.data).region, e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
+            Draw.rect(((Item) e.data).icon(Icon.large), e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
         });
 
 
@@ -545,6 +567,20 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
+        impactShockwave = new Effect(13f, 300f, e -> {
+            Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, e.fin());
+            Lines.stroke(e.fout() * 4f + 0.2f);
+            Lines.poly(e.x, e.y, 60, e.fin() * 200f);
+            Draw.reset();
+        });
+
+        spawnShockwave = new Effect(20f, 400f, e -> {
+            Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
+            Lines.stroke(e.fout() * 3f + 0.5f);
+            Lines.poly(e.x, e.y, 60, e.fin() * 450f);
+            Draw.reset();
+        });
+
         explosion = new Effect(30, e -> {
             e.scaled(7, i -> {
                 Lines.stroke(3f * i.fout());
@@ -558,11 +594,36 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 1f);
             });
 
-            Draw.color(Palette.lighterOrange, Palette.lightOrange, Color.GRAY, e.fin());
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.GRAY, e.fin());
             Lines.stroke(1.5f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+            });
+
+            Draw.reset();
+        });
+
+        dynamicExplosion = new Effect(30, e -> {
+            float intensity = e.rotation;
+
+            e.scaled(5 + intensity*2, i -> {
+                Lines.stroke(3.1f * i.fout());
+                Lines.poly(e.x, e.y, (int)(20 * intensity), (3f + i.fin() * 14f) * intensity);
+            });
+
+            Draw.color(Color.GRAY);
+
+            Angles.randLenVectors(e.id, e.finpow(), (int)(6 * intensity), 21f*intensity, (x, y, in, out) -> {
+                Fill.circle(e.x + x, e.y + y, out * (2f+intensity) * 3 + 0.5f);
+                Fill.circle(e.x + x / 2f, e.y + y / 2f, out * (intensity) * 3);
+            });
+
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.GRAY, e.fin());
+            Lines.stroke((1.7f * e.fout()) * (1f + (intensity - 1f) / 2f));
+
+            Angles.randLenVectors(e.id + 1, e.finpow(), (int)(9*intensity), 40f*intensity, (x, y, in, out) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (3f+intensity));
             });
 
             Draw.reset();
@@ -581,7 +642,7 @@ public class Fx implements ContentList{
                 Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 1f);
             });
 
-            Draw.color(Palette.lighterOrange, Palette.lightOrange, Color.GRAY, e.fin());
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.GRAY, e.fin());
             Lines.stroke(1.7f * e.fout());
 
             Angles.randLenVectors(e.id + 1, 9, 1f + 23f * e.finpow(), (x, y) -> {
@@ -604,7 +665,7 @@ public class Fx implements ContentList{
 
 
         shootSmall = new Effect(8, e -> {
-            Draw.color(Palette.lighterOrange, Palette.lightOrange, e.fin());
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
             float w = 1f + 5 * e.fout();
             Shapes.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
             Shapes.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
@@ -612,7 +673,7 @@ public class Fx implements ContentList{
         });
 
         shootHeal = new Effect(8, e -> {
-            Draw.color(Palette.heal);
+            Draw.color(Pal.heal);
             float w = 1f + 5 * e.fout();
             Shapes.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
             Shapes.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
@@ -620,7 +681,7 @@ public class Fx implements ContentList{
         });
 
         shootSmallSmoke = new Effect(20f, e -> {
-            Draw.color(Palette.lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
+            Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
             Angles.randLenVectors(e.id, 5, e.finpow() * 6f, e.rotation, 20f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
@@ -630,7 +691,7 @@ public class Fx implements ContentList{
         });
 
         shootBig = new Effect(9, e -> {
-            Draw.color(Palette.lighterOrange, Palette.lightOrange, e.fin());
+            Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
             float w = 1.2f + 7 * e.fout();
             Shapes.tri(e.x, e.y, w, 25f * e.fout(), e.rotation);
             Shapes.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
@@ -638,7 +699,7 @@ public class Fx implements ContentList{
         });
 
         shootBig2 = new Effect(10, e -> {
-            Draw.color(Palette.lightOrange, Color.GRAY, e.fin());
+            Draw.color(Pal.lightOrange, Color.GRAY, e.fin());
             float w = 1.2f + 8 * e.fout();
             Shapes.tri(e.x, e.y, w, 29f * e.fout(), e.rotation);
             Shapes.tri(e.x, e.y, w, 5f * e.fout(), e.rotation + 180f);
@@ -646,7 +707,7 @@ public class Fx implements ContentList{
         });
 
         shootBigSmoke = new Effect(17f, e -> {
-            Draw.color(Palette.lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
+            Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
             Angles.randLenVectors(e.id, 8, e.finpow() * 19f, e.rotation, 10f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 2f + 0.2f);
@@ -656,7 +717,7 @@ public class Fx implements ContentList{
         });
 
         shootBigSmoke2 = new Effect(18f, e -> {
-            Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
+            Draw.color(Pal.lightOrange, Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
             Angles.randLenVectors(e.id, 9, e.finpow() * 23f, e.rotation, 20f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, e.fout() * 2.4f + 0.2f);
@@ -665,10 +726,10 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
-        shootSmallFlame = new Effect(30f, e -> {
-            Draw.color(Palette.lightFlame, Palette.darkFlame, Color.GRAY, e.fin());
+        shootSmallFlame = new Effect(32f, e -> {
+            Draw.color(Pal.lightFlame, Pal.darkFlame, Color.GRAY, e.fin());
 
-            Angles.randLenVectors(e.id, 8, e.finpow() * 36f, e.rotation, 10f, (x, y) -> {
+            Angles.randLenVectors(e.id, 8, e.finpow() * 44f, e.rotation, 10f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
             });
 
@@ -686,7 +747,7 @@ public class Fx implements ContentList{
         });
 
         shellEjectSmall = new GroundEffect(30f, 400f, e -> {
-            Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
+            Draw.color(Pal.lightOrange, Color.LIGHT_GRAY, Pal.lightishGray, e.fin());
             float rot = Math.abs(e.rotation) + 90f;
 
             int i = Mathf.sign(e.rotation);
@@ -701,7 +762,7 @@ public class Fx implements ContentList{
         });
 
         shellEjectMedium = new GroundEffect(34f, 400f, e -> {
-            Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
+            Draw.color(Pal.lightOrange, Color.LIGHT_GRAY, Pal.lightishGray, e.fin());
             float rot = e.rotation + 90f;
             for(int i : Mathf.signs){
                 float len = (2f + e.finpow() * 10f) * i;
@@ -724,7 +785,7 @@ public class Fx implements ContentList{
         });
 
         shellEjectBig = new GroundEffect(22f, 400f, e -> {
-            Draw.color(Palette.lightOrange, Color.LIGHT_GRAY, Palette.lightishGray, e.fin());
+            Draw.color(Pal.lightOrange, Color.LIGHT_GRAY, Pal.lightishGray, e.fin());
             float rot = e.rotation + 90f;
             for(int i : Mathf.signs){
                 float len = (4f + e.finpow() * 8f) * i;
@@ -748,7 +809,7 @@ public class Fx implements ContentList{
         });
 
         lancerLaserShoot = new Effect(21f, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
 
             for(int i : Mathf.signs){
                 Shapes.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i);
@@ -758,7 +819,7 @@ public class Fx implements ContentList{
         });
 
         lancerLaserShootSmoke = new Effect(26f, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
 
             Angles.randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
@@ -768,7 +829,7 @@ public class Fx implements ContentList{
         });
 
         lancerLaserCharge = new Effect(38f, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
 
             Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
@@ -778,7 +839,7 @@ public class Fx implements ContentList{
         });
 
         lancerLaserChargeBegin = new Effect(71f, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
             Fill.circle(e.x, e.y, e.fin() * 3f);
 
             Draw.color();
@@ -786,7 +847,7 @@ public class Fx implements ContentList{
         });
 
         lightningCharge = new Effect(38f, e -> {
-            Draw.color(Palette.lancerLaser);
+            Draw.color(Pal.lancerLaser);
 
             Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
                 Shapes.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.angle(x, y));
@@ -796,7 +857,7 @@ public class Fx implements ContentList{
         });
 
         lightningShoot = new Effect(12f, e -> {
-            Draw.color(Color.WHITE, Palette.lancerLaser, e.fin());
+            Draw.color(Color.WHITE, Pal.lancerLaser, e.fin());
             Lines.stroke(e.fout() * 1.2f + 0.5f);
 
             Angles.randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
@@ -831,11 +892,26 @@ public class Fx implements ContentList{
                 Draw.reset();
             });
         });
+        impactsmoke = new Effect(60, e -> {
+            Angles.randLenVectors(e.id, 7, e.fin() * 20f, (x, y) -> {
+                float size = e.fslope() * 4f;
+                Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
+                Draw.rect("circle", e.x + x, e.y + y, size, size);
+                Draw.reset();
+            });
+        });
+        impactcloud = new Effect(140, 400f, e -> {
+            Angles.randLenVectors(e.id, 20, e.finpow() * 160f, (x, y) -> {
+                float size = e.fout() * 15f;
+                Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, e.fin());
+                Draw.rect("circle", e.x + x, e.y + y, size, size);
+                Draw.reset();
+            });
+        });
         redgeneratespark = new Effect(18, e -> {
             Angles.randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
                 float len = e.fout() * 4f;
-                Draw.color(Palette.redSpark, Color.GRAY, e.fin());
-                //Draw.alpha(e.fout());
+                Draw.color(Pal.redSpark, Color.GRAY, e.fin());
                 Draw.rect("circle", e.x + x, e.y + y, len, len);
                 Draw.reset();
             });
@@ -843,7 +919,7 @@ public class Fx implements ContentList{
         generatespark = new Effect(18, e -> {
             Angles.randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
                 float len = e.fout() * 4f;
-                Draw.color(Palette.orangeSpark, Color.GRAY, e.fin());
+                Draw.color(Pal.orangeSpark, Color.GRAY, e.fin());
                 Draw.rect("circle", e.x + x, e.y + y, len, len);
                 Draw.reset();
             });
@@ -865,42 +941,42 @@ public class Fx implements ContentList{
         });
         pulverize = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Palette.stoneGray);
+                Draw.color(Pal.stoneGray);
                 Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
                 Draw.reset();
             });
         });
         pulverizeRed = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Palette.redDust, Palette.stoneGray, e.fin());
+                Draw.color(Pal.redDust, Pal.stoneGray, e.fin());
                 Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
                 Draw.reset();
             });
         });
         pulverizeRedder = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 9f, (x, y) -> {
-                Draw.color(Palette.redderDust, Palette.stoneGray, e.fin());
+                Draw.color(Pal.redderDust, Pal.stoneGray, e.fin());
                 Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45);
                 Draw.reset();
             });
         });
         pulverizeSmall = new Effect(30, e -> {
             Angles.randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
-                Draw.color(Palette.stoneGray);
+                Draw.color(Pal.stoneGray);
                 Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.5f, 45);
                 Draw.reset();
             });
         });
         pulverizeMedium = new Effect(30, e -> {
             Angles.randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Palette.stoneGray);
+                Draw.color(Pal.stoneGray);
                 Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.5f, 45);
                 Draw.reset();
             });
         });
         producesmoke = new Effect(12, e -> {
             Angles.randLenVectors(e.id, 8, 4f + e.fin() * 18f, (x, y) -> {
-                Draw.color(Color.WHITE, Palette.accent, e.fin());
+                Draw.color(Color.WHITE, Pal.accent, e.fin());
                 Fill.square(e.x + x, e.y + y, 1f + e.fout() * 3f, 45);
                 Draw.reset();
             });
@@ -914,7 +990,7 @@ public class Fx implements ContentList{
         });
         formsmoke = new Effect(40, e -> {
             Angles.randLenVectors(e.id, 6, 5f + e.fin() * 8f, (x, y) -> {
-                Draw.color(Palette.plasticSmoke, Color.LIGHT_GRAY, e.fin());
+                Draw.color(Pal.plasticSmoke, Color.LIGHT_GRAY, e.fin());
                 Fill.square(e.x + x, e.y + y, 0.2f + e.fout() * 2f, 45);
                 Draw.reset();
             });
@@ -1046,7 +1122,7 @@ public class Fx implements ContentList{
             Draw.reset();
         });
         ripple = new GroundEffect(false, 30, e -> {
-            Draw.color(Tmp.c1.set(e.color).shiftValue(0.1f));
+            Draw.color(Tmp.c1.set(e.color).mul(1.2f));
             Lines.stroke(e.fout() + 0.4f);
             Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
             Draw.reset();
@@ -1062,7 +1138,7 @@ public class Fx implements ContentList{
         });
 
         launch = new Effect(28, e -> {
-            Draw.color(Palette.command);
+            Draw.color(Pal.command);
             Lines.stroke(e.fout() * 2f);
             Lines.poly(e.x, e.y, 40, 4f + e.finpow() * 120f);
             Draw.color();
@@ -1083,7 +1159,7 @@ public class Fx implements ContentList{
         });
 
         healBlock = new Effect(20, e -> {
-            Draw.color(Palette.heal);
+            Draw.color(Pal.heal);
             Lines.stroke(2f * e.fout() + 0.5f);
             Lines.square(e.x, e.y, 1f + (e.fin() * e.rotation * tilesize/2f-1f));
             Draw.color();
@@ -1104,16 +1180,9 @@ public class Fx implements ContentList{
         });
 
         shieldBreak = new Effect(40, e -> {
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
             Lines.stroke(3f * e.fout());
             Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
-            Draw.reset();
-        });
-
-        launchFull = new Effect(60, 9999999999f, e -> {
-            Draw.color();
-            Draw.alpha(e.fslope());
-            Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width + 10, Core.camera.height + 10);
             Draw.reset();
         });
     }

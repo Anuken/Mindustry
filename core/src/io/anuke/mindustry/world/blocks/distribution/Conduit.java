@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;

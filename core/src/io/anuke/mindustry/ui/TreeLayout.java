@@ -292,12 +292,12 @@ public class TreeLayout{
         center, towardsRoot, awayFromRoot
     }
 
-    public static class TreeNode{
+    public static class TreeNode<T extends TreeNode>{
         public float width, height, x, y;
 
         //should be initialized by user
-        public TreeNode[] children;
-        public TreeNode parent;
+        public T[] children;
+        public T parent;
 
         private float mode, prelim, change, shift;
         private int number = -1;

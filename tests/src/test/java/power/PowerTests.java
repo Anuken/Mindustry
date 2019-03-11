@@ -1,5 +1,6 @@
 package power;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
@@ -21,8 +22,9 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  */
 public class PowerTests extends PowerTestFixture{
 
-    @BeforeEach
-    void initTest(){
+    @BeforeAll
+    static void init(){
+        Core.graphics = new FakeGraphics();
     }
 
     @Nested
@@ -39,8 +41,8 @@ public class PowerTests extends PowerTestFixture{
                 // That's why we inject the description into the test method for now.
                 // Additional Note: If you don't see any labels in front of the values supplied as function parameters, use a better IDE like IntelliJ IDEA.
                 dynamicTest("01", () -> simulateDirectConsumption(0.0f, 1.0f, 0.0f, "0.0 produced, 1.0 consumed (no power available)")),
-                dynamicTest("02", () -> simulateDirectConsumption(0.0f, 0.0f, 0.0f, "0.0 produced, 0.0 consumed (no power anywhere)")),
-                dynamicTest("03", () -> simulateDirectConsumption(1.0f, 0.0f, 0.0f, "1.0 produced, 0.0 consumed (no power requested)")),
+                dynamicTest("02", () -> simulateDirectConsumption(0.0f, 0.0f, 1.0f, "0.0 produced, 0.0 consumed (no power anywhere)")),
+                dynamicTest("03", () -> simulateDirectConsumption(1.0f, 0.0f, 1.0f, "1.0 produced, 0.0 consumed (no power requested)")),
                 dynamicTest("04", () -> simulateDirectConsumption(1.0f, 1.0f, 1.0f, "1.0 produced, 1.0 consumed (stable consumption)")),
                 dynamicTest("05", () -> simulateDirectConsumption(0.5f, 1.0f, 0.5f, "0.5 produced, 1.0 consumed (power shortage)")),
                 dynamicTest("06", () -> simulateDirectConsumption(1.0f, 0.5f, 1.0f, "1.0 produced, 0.5 consumed (power excess)")),
@@ -49,8 +51,8 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateDirectConsumption(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5f = 100%
-            Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower, 0.6f));
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
+            Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower));
 
             PowerGraph powerGraph = new PowerGraph();
             powerGraph.add(producerTile);
@@ -89,7 +91,7 @@ public class PowerTests extends PowerTestFixture{
         }
         void simulateBufferedConsumption(float producedPower, float maxBuffer, float powerConsumedPerTick, float initialSatisfaction, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f; // Currently, 0.5 = 100%
+            producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
             Tile bufferedConsumerTile = createFakeTile(0, 1, createFakeBufferedConsumer(maxBuffer, maxBuffer > 0.0f ? maxBuffer/powerConsumedPerTick : 1.0f));
             bufferedConsumerTile.entity.power.satisfaction = initialSatisfaction;
 
@@ -134,12 +136,12 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 0.5f;
+                producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1f;
                 powerGraph.add(producerTile);
             }
             Tile directConsumerTile = null;
             if(requestedPower > 0.0f){
-                directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requestedPower, 0.6f));
+                directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requestedPower));
                 powerGraph.add(directConsumerTile);
             }
             float maxCapacity = 100f;
@@ -160,7 +162,7 @@ public class PowerTests extends PowerTestFixture{
         void directConsumptionStopsWithNoPower(){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));
             producerTile.<PowerGenerator.GeneratorEntity>entity().productionEfficiency = 1.0f;
-            Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f, 0.6f));
+            Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f));
 
             PowerGraph powerGraph = new PowerGraph();
             powerGraph.add(producerTile);

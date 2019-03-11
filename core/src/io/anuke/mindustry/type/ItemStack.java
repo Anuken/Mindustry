@@ -1,6 +1,8 @@
 package io.anuke.mindustry.type;
 
-public class ItemStack{
+import io.anuke.arc.collection.Array;
+
+public class ItemStack implements Comparable<ItemStack>{
     public Item item;
     public int amount;
 
@@ -19,5 +21,26 @@ public class ItemStack{
             stacks[i/2] = new ItemStack((Item)items[i], (Integer)items[i + 1]);
         }
         return stacks;
+    }
+
+    public static Array<ItemStack> list(Object... items){
+        Array<ItemStack> stacks = new Array<>(items.length/2);
+        for(int i = 0; i < items.length; i+= 2){
+            stacks.add(new ItemStack((Item)items[i], (Integer)items[i + 1]));
+        }
+        return stacks;
+    }
+
+    @Override
+    public int compareTo(ItemStack itemStack){
+        return item.compareTo(itemStack.item);
+    }
+
+    @Override
+    public String toString(){
+        return "ItemStack{" +
+        "item=" + item +
+        ", amount=" + amount +
+        '}';
     }
 }

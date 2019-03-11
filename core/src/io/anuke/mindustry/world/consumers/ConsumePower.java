@@ -2,8 +2,9 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -11,43 +12,21 @@ import io.anuke.mindustry.world.meta.StatUnit;
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
-    protected final float powerPerTick;
-    /** The minimum power satisfaction (fraction of powerPerTick) which must be achieved before the module may work. */
-    public final float minimumSatisfaction;
+    public final float powerPerTick;
     /** The maximum power capacity in power units. */
     public final float powerCapacity;
     /** True if the module can store power. */
     public final boolean isBuffered;
 
-    protected ConsumePower(float powerPerTick, float minimumSatisfaction, float powerCapacity, boolean isBuffered){
+    public ConsumePower(float powerPerTick, float powerCapacity, boolean isBuffered){
         this.powerPerTick = powerPerTick;
-        this.minimumSatisfaction = minimumSatisfaction;
         this.powerCapacity = powerCapacity;
         this.isBuffered = isBuffered;
     }
 
-    /**
-     * Makes the owner consume powerPerTick each tick and disables it unless minimumSatisfaction (1.0 = 100%) of that power is being supplied.
-     * @param powerPerTick The maximum amount of power which is required per tick for 100% efficiency.
-     * @param minimumSatisfaction The percentage of powerPerTick which must be available for the module to work.
-     */
-    public static ConsumePower consumePowerDirect(float powerPerTick, float minimumSatisfaction){
-        return new ConsumePower(powerPerTick, minimumSatisfaction, 0.0f, false);
-    }
-
-    /**
-     * Adds a power buffer to the owner which takes ticksToFill number of ticks to be filled.
-     * Note that this object does not remove power from the buffer.
-     * @param powerCapacity The maximum capacity in power units.
-     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
-     */
-    public static ConsumePower consumePowerBuffered(float powerCapacity, float ticksToFill){
-        return new ConsumePower(powerCapacity / ticksToFill, 0.0f, powerCapacity, true);
-    }
-
     @Override
-    public void buildTooltip(Table table){
-        // No tooltip for power
+    public void build(Tile tile, Table table){
+        //No tooltip for power, for now
     }
 
     @Override
@@ -65,14 +44,14 @@ public class ConsumePower extends Consume{
         if(isBuffered){
             return true;
         }else{
-            return entity.power.satisfaction >= minimumSatisfaction;
+            return entity.power.satisfaction >= 0.9999f;
         }
     }
 
     @Override
     public void display(BlockStats stats){
         if(isBuffered){
-            stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.powerSecond);
+            stats.add(BlockStat.powerCapacity, powerCapacity, StatUnit.none);
         }else{
             stats.add(BlockStat.powerUse, powerPerTick * 60f, StatUnit.powerSecond);
         }

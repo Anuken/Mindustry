@@ -37,21 +37,12 @@ public class Consumers{
     }
 
     /**
-     * Creates a consumer which directly uses power without buffering it. The module will work while at least 50% of power is supplied.
-     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
-     * @return the created consumer object.
-     */
-    public ConsumePower power(float powerPerTick){
-        return power(powerPerTick, 0.5f);
-    }
-
-    /**
      * Creates a consumer which directly uses power without buffering it. The module will work while the available power is greater than or equal to the minimumSatisfaction percentage (0..1).
      * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
      * @return the created consumer object.
      */
-    public ConsumePower power(float powerPerTick, float minimumSatisfaction){
-        ConsumePower c = ConsumePower.consumePowerDirect(powerPerTick, minimumSatisfaction);
+    public ConsumePower power(float powerPerTick){
+        ConsumePower c = new ConsumePower(powerPerTick, 0.0f, false);
         add(c);
         return c;
     }
@@ -62,7 +53,7 @@ public class Consumers{
      * @param powerCapacity The maximum capacity in power units.
      */
     public ConsumePower powerBuffered(float powerCapacity){
-        return powerBuffered(powerCapacity, 1f);
+        return powerBuffered(powerCapacity, 60f * 3);
     }
 
     /**
@@ -71,7 +62,7 @@ public class Consumers{
      * @param ticksToFill   The number of ticks it shall take to fill the buffer.
      */
     public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
-        ConsumePower c = ConsumePower.consumePowerBuffered(powerCapacity, ticksToFill);
+        ConsumePower c = new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true);
         add(c);
         return c;
     }
@@ -106,6 +97,10 @@ public class Consumers{
 
     public Liquid liquid(){
         return get(ConsumeLiquid.class).get();
+    }
+
+    public float liquidAmount(){
+        return get(ConsumeLiquid.class).use;
     }
 
     public Consume add(Consume consume){

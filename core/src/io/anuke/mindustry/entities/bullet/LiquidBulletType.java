@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -20,16 +20,22 @@ public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
     public LiquidBulletType(Liquid liquid){
-        super(2.5f, 0);
+        super(2.8f, 0);
         this.liquid = liquid;
 
-        lifetime = 70f;
+        lifetime = 74f;
         status = liquid.effect;
         statusDuration = 90f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
-        drag = 0.01f;
-        knockback = 0.5f;
+        shootEffect = Fx.none;
+        drag = 0.009f;
+        knockback = 0.55f;
+    }
+
+    @Override
+    public float range(){
+        return speed * lifetime /2f;
     }
 
     @Override

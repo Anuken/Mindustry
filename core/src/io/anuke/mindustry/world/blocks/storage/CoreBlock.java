@@ -4,31 +4,30 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class CoreBlock extends LaunchPad{
+public class CoreBlock extends StorageBlock{
     protected TextureRegion topRegion;
-    protected int launchThreshold;
-    protected int launchChunkSize;
 
     public CoreBlock(String name){
         super(name);
@@ -36,19 +35,18 @@ public class CoreBlock extends LaunchPad{
         solid = true;
         update = true;
         hasItems = true;
-        size = 3;
-        flags = EnumSet.of(BlockFlag.resupplyPoint, BlockFlag.target);
+        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitRespawn(Tile tile, Unit player){
+    public static void onUnitRespawn(Tile tile, Player player){
         if(player == null || tile.entity == null) return;
 
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.progress = 0;
-        entity.currentUnit.onRespawn(tile);
         entity.currentUnit = player;
+        entity.currentUnit.onRespawn(tile);
         entity.currentUnit.heal();
         entity.currentUnit.rotation = 90f;
         entity.currentUnit.applyImpulse(0, 8f);
@@ -56,14 +54,12 @@ public class CoreBlock extends LaunchPad{
         entity.currentUnit.add();
         entity.currentUnit = null;
 
-        if(player instanceof Player){
-            ((Player) player).endRespawning();
-        }
+        player.endRespawning();
     }
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        return itemCapacity * state.teams.get(tile.getTeam()).cores.size;
+        return item.type == ItemType.material ? itemCapacity * state.teams.get(tile.getTeam()).cores.size : 0;
     }
 
     @Override
@@ -78,7 +74,7 @@ public class CoreBlock extends LaunchPad{
 
     @Override
     public boolean canBreak(Tile tile){
-        return state.teams.get(tile.getTeam()).cores.size > 1;
+        return false;
     }
 
     @Override
@@ -109,9 +105,11 @@ public class CoreBlock extends LaunchPad{
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.alpha(entity.heat);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.color();
+        if(Core.atlas.isFound(topRegion)){
+            Draw.alpha(entity.heat);
+            Draw.rect(topRegion, tile.drawx(), tile.drawy());
+            Draw.color();
+        }
 
         if(entity.currentUnit != null){
             Unit player = entity.currentUnit;
@@ -120,14 +118,14 @@ public class CoreBlock extends LaunchPad{
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
-            Shaders.build.color.set(Palette.accent);
+            Shaders.build.color.set(Pal.accent);
             Shaders.build.time = -entity.time / 10f;
 
             Draw.shader(Shaders.build, true);
             Draw.rect(region, tile.drawx(), tile.drawy());
             Draw.shader();
 
-            Draw.color(Palette.accent);
+            Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
                     tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
@@ -148,20 +146,12 @@ public class CoreBlock extends LaunchPad{
     public void update(Tile tile){
         CoreEntity entity = tile.entity();
 
-        for(Item item : Vars.content.items()){
-            if(entity.items.get(item) >= launchThreshold + launchChunkSize && entity.timer.get(timerLaunch, launchTime)){
-                //TODO play animation of some sort
-                Effects.effect(Fx.dooropenlarge, tile);
-                data.addItem(item, launchChunkSize);
-                entity.items.remove(item, launchChunkSize);
-            }
-        }
-
         if(entity.currentUnit != null){
-            if(!entity.currentUnit.isDead()){
+            if(!entity.currentUnit.isDead() || !entity.currentUnit.isAdded()){
                 entity.currentUnit = null;
                 return;
             }
+
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / state.rules.respawnTime * entity.delta();
@@ -169,6 +159,8 @@ public class CoreBlock extends LaunchPad{
             if(entity.progress >= 1f){
                 Call.onUnitRespawn(tile, entity.currentUnit);
             }
+        }else{
+            entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
     }
 
@@ -178,23 +170,18 @@ public class CoreBlock extends LaunchPad{
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
-        public Unit currentUnit;
+        public Player currentUnit;
         float progress;
         float time;
         float heat;
 
         @Override
-        public void updateSpawning(Unit unit){
+        public void updateSpawning(Player unit){
             if(!netServer.isWaitingForPlayers() && currentUnit == null){
                 currentUnit = unit;
                 progress = 0f;
                 unit.set(tile.drawx(), tile.drawy());
             }
-        }
-
-        @Override
-        public float getSpawnProgress(){
-            return progress;
         }
     }
 }

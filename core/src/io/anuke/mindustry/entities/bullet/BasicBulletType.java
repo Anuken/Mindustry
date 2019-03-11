@@ -1,22 +1,21 @@
 package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 
 /**An extended BulletType for most ammo-based bullets shot from turrets and units.*/
 public class BasicBulletType extends BulletType{
-    public Color backColor = Palette.bulletYellowBack, frontColor = Palette.bulletYellow;
+    public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;
     public float bulletShrink = 0.5f;
     public String bulletSprite;
@@ -72,7 +71,7 @@ public class BasicBulletType extends BulletType{
         if(homingPower > 0.0001f){
             TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
-                b.velocity().setAngle(Angles.moveToward(b.velocity().angle(), b.angleTo(target), homingPower * Time.delta()));
+                b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
             }
         }
     }
@@ -108,7 +107,7 @@ public class BasicBulletType extends BulletType{
         }
 
         for (int i = 0; i < lightining; i++) {
-            Lightning.create(b.getTeam(), Palette.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 }

@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.type.Liquid;

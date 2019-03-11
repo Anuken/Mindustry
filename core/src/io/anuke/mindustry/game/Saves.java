@@ -197,7 +197,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return false;
+            return getZone() != null;
         }
 
         public String getPlayTime(){

@@ -7,38 +7,24 @@ import io.anuke.arc.graphics.glutils.Shader;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Time;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
-
 public class Shaders{
-    public static Outline outline;
+    public static Shadow shadow;
     public static BlockBuild blockbuild;
-    public static BlockPreview blockpreview;
     public static Shield shield;
-    public static SurfaceShader water;
-    public static SurfaceShader lava;
-    public static SurfaceShader oil;
-    public static Space space;
     public static UnitBuild build;
-    public static MixShader mix;
-    public static Shader fullMix;
     public static FogShader fog;
     public static MenuShader menu;
+    public static SurfaceShader water, tar;
 
     public static void init(){
-        outline = new Outline();
+        shadow = new Shadow();
         blockbuild = new BlockBuild();
-        blockpreview = new BlockPreview();
         shield = new Shield();
-        water = new SurfaceShader("water");
-        lava = new SurfaceShader("lava");
-        oil = new SurfaceShader("oil");
-        space = new Space();
         build = new UnitBuild();
-        mix = new MixShader();
         fog = new FogShader();
-        fullMix = new LoadShader("fullmix", "default");
         menu = new MenuShader();
+        water = new SurfaceShader("water");
+        tar = new SurfaceShader("tar");
     }
 
     public static class MenuShader extends LoadShader{
@@ -66,40 +52,13 @@ public class Shaders{
         }
     }
 
-    public static class MixShader extends LoadShader{
-        public Color color = new Color(Color.WHITE);
-
-        public MixShader(){
-            super("mix", "default");
-        }
-
-        @Override
-        public void apply(){
-            super.apply();
-            setUniformf("u_color", color);
-        }
-    }
-
-    public static class Space extends SurfaceShader{
-
-        public Space(){
-            super("space2");
-        }
-
-        @Override
-        public void apply(){
-            super.apply();
-            setUniformf("u_center", world.width() * tilesize / 2f, world.height() * tilesize / 2f);
-        }
-    }
-
     public static class UnitBuild extends LoadShader{
         public float progress, time;
         public Color color = new Color();
         public TextureRegion region;
 
         public UnitBuild(){
-            super("build", "default");
+            super("unitbuild", "default");
         }
 
         @Override
@@ -113,13 +72,13 @@ public class Shaders{
         }
     }
 
-    public static class Outline extends LoadShader{
+    public static class Shadow extends LoadShader{
         public Color color = new Color();
         public TextureRegion region = new TextureRegion();
         public float scl;
 
-        public Outline(){
-            super("outline", "default");
+        public Shadow(){
+            super("shadow", "default");
         }
 
         @Override
@@ -150,23 +109,6 @@ public class Shaders{
         }
     }
 
-    public static class BlockPreview extends LoadShader{
-        public Color color = new Color();
-        public TextureRegion region = new TextureRegion();
-
-        public BlockPreview(){
-            super("blockpreview", "default");
-        }
-
-        @Override
-        public void apply(){
-            setUniformf("u_color", color);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
-        }
-    }
-
     public static class Shield extends LoadShader{
 
         public Shield(){
@@ -193,11 +135,8 @@ public class Shaders{
 
         @Override
         public void apply(){
-            setUniformf("camerapos",
-                    Core.camera.position.x - Core.camera.width / 2 ,
-                    Core.camera.position.y - Core.camera.height / 2 );
-            setUniformf("screensize", Core.camera.width,
-            Core.camera.height );
+            setUniformf("camerapos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("screensize", Core.camera.width, Core.camera.height);
             setUniformf("time", Time.time());
         }
     }

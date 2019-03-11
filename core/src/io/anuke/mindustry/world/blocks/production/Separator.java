@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -31,8 +31,6 @@ public class Separator extends Block{
 
     protected Color color = Color.valueOf("858585");
     protected TextureRegion liquidRegion;
-
-    protected boolean offloading = false;
 
     public Separator(String name){
         super(name);
@@ -113,20 +111,13 @@ public class Separator extends Block{
             }
 
             if(item != null && entity.items.get(item) < itemCapacity){
-                offloading = true;
                 offloadNear(tile, item);
-                offloading = false;
             }
         }
 
         if(entity.timer.get(timerDump, 5)){
             tryDump(tile);
         }
-    }
-
-    @Override
-    public boolean canDump(Tile tile, Tile to, Item item){
-        return offloading || item != consumes.item();
     }
 
     @Override

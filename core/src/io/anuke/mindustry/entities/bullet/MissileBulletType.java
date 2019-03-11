@@ -2,21 +2,21 @@ package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.graphics.Palette;
-import io.anuke.arc.entities.Effects;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 
 public class MissileBulletType extends BasicBulletType{
-    protected Color trailColor = Palette.missileYellowBack;
+    protected Color trailColor = Pal.missileYellowBack;
 
     protected float weaveScale = 0f;
     protected float weaveMag = -1f;
 
     public MissileBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
-        backColor = Palette.missileYellowBack;
-        frontColor = Palette.missileYellow;
+        backColor = Pal.missileYellowBack;
+        frontColor = Pal.missileYellow;
         homingPower = 7f;
     }
 

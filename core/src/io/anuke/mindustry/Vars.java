@@ -2,21 +2,21 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Application.ApplicationType;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
+import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.GlobalData;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
@@ -24,11 +24,14 @@ import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /**global charset*/
+    public static final Charset charset = Charset.forName("UTF-8");
     /**main application name, capitalized*/
     public static final String appName = "Mindustry";
     /**URL for discord invite.*/
@@ -45,12 +48,22 @@ public class Vars{
     public static final Team defaultTeam = Team.blue;
     /**team of the enemy in waves/sectors*/
     public static final Team waveTeam = Team.red;
+    /**how many times longer a boss wave takes*/
+    public static final float bossWaveMultiplier = 3f;
+    /**how many times longer a launch wave takes*/
+    public static final float launchWaveMultiplier = 2f;
     /**max chat message length*/
     public static final int maxTextLength = 150;
     /**max player name length in bytes*/
     public static final int maxNameLength = 40;
     /**displayed item size when ingame, TODO remove.*/
     public static final float itemSize = 5f;
+    /**extra padding around the world; units outside this bound will begin to self-destruct.*/
+    public static final float worldBounds = 100f;
+    /**units outside of this bound will simply die instantly*/
+    public static final float finalWorldBounds = worldBounds + 500;
+    /**ticks spent out of bound until self destruct.*/
+    public static final float boundsCountdown = 60*7;
     /**size of tiles in units*/
     public static final int tilesize = 8;
     /**all choosable player colors in join/host dialog*/
@@ -146,6 +159,9 @@ public class Vars{
         Version.init();
 
         content = new ContentLoader();
+        if(!headless){
+            content.setVerbose();
+        }
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);

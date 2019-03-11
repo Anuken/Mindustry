@@ -10,32 +10,28 @@ public class Liquids implements ContentList{
     @Override
     public void load(){
 
-        water = new Liquid("water", Color.valueOf("486acd")){{
+        water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;
-            tier = 0;
             effect = StatusEffects.wet;
         }};
 
-        slag = new Liquid("slag", Color.valueOf("ffcd66")){{
+        slag = new Liquid("slag", Color.valueOf("ffa166")){{
             temperature = 1f;
             viscosity = 0.8f;
-            tier = 2;
             effect = StatusEffects.melting;
         }};
 
         oil = new Liquid("oil", Color.valueOf("313131")){{
             viscosity = 0.7f;
-            flammability = 0.6f;
-            explosiveness = 0.6f;
+            flammability = 1.2f;
+            explosiveness = 1.2f;
             heatCapacity = 0.7f;
-            tier = 1;
             effect = StatusEffects.tarred;
         }};
 
         cryofluid = new Liquid("cryofluid", Color.valueOf("6ecdec")){{
             heatCapacity = 0.9f;
             temperature = 0.25f;
-            tier = 1;
             effect = StatusEffects.freezing;
         }};
     }

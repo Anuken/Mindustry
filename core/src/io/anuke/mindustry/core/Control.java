@@ -3,22 +3,22 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.GlobalData;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
@@ -27,7 +27,9 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.input.MobileInput;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 
@@ -61,10 +63,11 @@ public class Control implements ApplicationListener{
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
 
+        /*
         if(Core.atlas.getTextures().size != 1){
             throw new IllegalStateException("Atlas must be exactly one texture. " +
             "If more textures are used, the map editor will not display them correctly.");
-        }
+        }*/
 
         data.load();
 
@@ -98,9 +101,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(mobile){
-                Core.app.post(() -> Core.camera.position.set(players[0]));
-            }
+            Core.app.post(() -> Core.camera.position.set(players[0]));
         });
 
         Events.on(ResetEvent.class, event -> {
@@ -163,6 +164,14 @@ public class Control implements ApplicationListener{
             if(e.unit.getTeam() != players[0].getTeam()){
                 state.stats.enemyUnitsDestroyed ++;
             }
+        });
+
+        Events.on(ZoneCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.complete", e.zone.conditionWave));
+        });
+
+        Events.on(ZoneConfigureCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
     }
 
@@ -227,9 +236,10 @@ public class Control implements ApplicationListener{
         return inputs[index];
     }
 
-    public void playMap(Map map){
+    public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
+            state.rules = rules;
             world.loadMap(map);
             logic.play();
         });
@@ -270,16 +280,16 @@ public class Control implements ApplicationListener{
         if(!Core.settings.getBool("4.0-warning-2", false)){
 
             Time.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("WARNING!");
+                FloatingDialog dialog = new FloatingDialog("VERY IMPORTANT");
                 dialog.buttons.addButton("$ok", () -> {
                     dialog.hide();
                     Core.settings.put("4.0-warning-2", true);
                     Core.settings.save();
                 }).size(100f, 60f);
-                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final 4.0 release.[]\n\n " +
+                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final v4 release.[]\n\n " +
                         "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
-                        "All current art and UI is temporary, and will be re-drawn before release. " +
-                        "\n\n[accent]Saves and maps may be corrupted without warning between updates.").wrap().width(400f);
+                        "All current art and UI is unfinished, and will be changed before release. " +
+                        "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
         }
@@ -287,25 +297,32 @@ public class Control implements ApplicationListener{
 
     @Override
     public void update(){
-
         saves.update();
 
         for(InputHandler inputHandler : inputs){
             inputHandler.updateController();
         }
 
+        //autosave global data if it's modified
+        data.checkSave();
+
         if(!state.is(State.menu)){
             for(InputHandler input : inputs){
                 input.update();
             }
 
-            //autosave global data every second if it's modified
-            if(timer.get(1, 60)){
-                data.checkSave();
+            if(world.isZone()){
+                for(Tile tile : state.teams.get(players[0].getTeam()).cores){
+                    for(Item item : content.items()){
+                        if(tile.entity.items.has(item)){
+                            data.unlockContent(item);
+                        }
+                    }
+                }
             }
 
             //auto-update rpc every 5 seconds
-            if(timer.get(60 * 5)){
+            if(timer.get(0, 60 * 5)){
                 Platform.instance.updateRPC();
             }
 
@@ -320,10 +337,6 @@ public class Control implements ApplicationListener{
                     ui.paused.show();
                     state.set(State.paused);
                 }
-            }
-
-            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
-                renderer.takeMapScreenshot();
             }
 
         }else{

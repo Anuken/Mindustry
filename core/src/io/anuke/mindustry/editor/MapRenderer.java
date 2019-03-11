@@ -4,15 +4,16 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -24,9 +25,11 @@ public class MapRenderer implements Disposable{
     private IntSet delayedUpdates = new IntSet();
     private MapEditor editor;
     private int width, height;
+    private Texture texture;
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
+        texture = Core.atlas.find("clear-editor").getTexture();
     }
 
     public void resize(int width, int height){
@@ -49,7 +52,6 @@ public class MapRenderer implements Disposable{
         this.height = height;
         updateAll();
     }
-
 
     public void draw(float tx, float ty, float tw, float th){
         Draw.flush();
@@ -78,7 +80,7 @@ public class MapRenderer implements Disposable{
                 mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
                 mesh.setProjectionMatrix(Draw.proj());
 
-                mesh.render(Core.atlas.getTextures().first());
+                mesh.render(texture);
             }
         }
     }
@@ -114,7 +116,7 @@ public class MapRenderer implements Disposable{
         int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
 
         if(bw != 0 && (wall.synthetic() || wall == Blocks.part)){
-            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
+            region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
             if(wall.rotate){
                 mesh.draw(idxWall, region,
@@ -127,22 +129,26 @@ public class MapRenderer implements Disposable{
                         region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.icon(Icon.full);
+            region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length-1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
+        float offsetX = -(wall.size/3)*tilesize, offsetY = -(wall.size/3) * tilesize;
+
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
-            region = Core.atlas.find("block-border");
+            region = Core.atlas.find("block-border-editor");
         }else if(!wall.synthetic() && bw != 0){
-            region = wall.icon(Icon.full) == Core.atlas.find("____") ? Core.atlas.find("clear") : wall.icon(Icon.full);
+            region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
+            offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
+            offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
         }else{
-            region = Core.atlas.find("clear");
+            region = Core.atlas.find("clear-editor");
         }
 
         mesh.draw(idxDecal, region,
-                wx * tilesize - (wall.size/3) * tilesize, wy * tilesize - (wall.size/3) * tilesize,
+                wx * tilesize + offsetX, wy * tilesize + offsetY,
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }

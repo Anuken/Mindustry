@@ -6,7 +6,7 @@ import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -17,8 +17,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
-//TODO consider using quadtrees for finding specific types of blocks within an area
-
 /**Class used for indexing special target blocks for AI.*/
 @SuppressWarnings("unchecked")
 public class BlockIndexer{
@@ -28,7 +26,7 @@ public class BlockIndexer{
     private final static int structQuadrantSize = 12;
 
     /**Set of all ores that are being scanned.*/
-    private final ObjectSet<Item> scanOres = new ObjectSet<Item>(){{addAll(Item.getAllOres());}};
+    private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /**Stores all ore quadtrants on the map.*/
     private ObjectMap<Item, ObjectSet<Tile>> ores;
@@ -215,7 +213,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags != null &&
+        if(tile.block().flags.size() > 0 &&
                 tile.getTeam() != Team.none){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
@@ -282,7 +280,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
                 for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
-                    Tile result = world.tile(x, y);
+                    Tile result = world.tile(x, y).target();
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
                         structQuadrants[data.team.ordinal()].set(index);

@@ -40,7 +40,11 @@ public class PausedDialog extends FloatingDialog{
             cont.addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
 
             cont.row();
-            cont.addButton("database", ui.database::show);
+            if(world.isZone()){
+                cont.addButton("$techtree", ui.tech::show);
+            }else{
+                cont.addButton("$database", ui.database::show);
+            }
             cont.addButton("$settings", ui.settings::show);
 
             if(!world.isZone()){
@@ -76,6 +80,8 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
 
                 cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            }else{
+                cont.row();
             }
 
             cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());

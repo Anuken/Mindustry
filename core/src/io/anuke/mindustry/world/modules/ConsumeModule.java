@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.consumers.Consume;
 
 import java.io.DataInput;
@@ -9,10 +9,13 @@ import java.io.IOException;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid;
-    private TileEntity entity;
+    private final TileEntity entity;
 
-    public void update(TileEntity entity){
+    public ConsumeModule(TileEntity entity){
         this.entity = entity;
+    }
+
+    public void update(){
         boolean prevValid = valid();
         valid = true;
 
@@ -27,8 +30,14 @@ public class ConsumeModule extends BlockModule{
         }
     }
 
+    public void trigger(){
+        for(Consume cons : entity.tile.block().consumes.all()){
+            cons.trigger(entity.tile.block(), entity);
+        }
+    }
+
     public boolean valid(){
-        return valid && (entity == null || entity.tile.block().canProduce(entity.tile));
+        return valid && entity.tile.block().canProduce(entity.tile);
     }
 
     @Override

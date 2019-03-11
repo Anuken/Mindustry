@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class IOTests{
 
@@ -28,7 +29,7 @@ public class IOTests{
         ByteBuffer buffer = ByteBuffer.allocate(500);
         TypeIO.writeString(buffer, null);
         buffer.position(0);
-        assertEquals(TypeIO.readString(buffer), null);
+        assertNull(TypeIO.readString(buffer));
     }
 
 }

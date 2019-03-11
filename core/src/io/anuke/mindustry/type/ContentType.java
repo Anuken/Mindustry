@@ -7,10 +7,10 @@ public enum ContentType {
     mech,
     bullet,
     liquid,
-    weapon,
     status,
     unit,
     weather,
     effect,
-    zone
+    zone,
+    loadout
 }

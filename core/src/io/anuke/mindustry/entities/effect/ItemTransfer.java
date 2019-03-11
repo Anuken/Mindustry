@@ -2,9 +2,9 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.TimedEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -14,8 +14,8 @@ import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.Unit;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
@@ -43,7 +43,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemToUnit(Item item, float x, float y, Unit to){
         if(to == null) return;
-        create(item, x, y, to, () -> to.inventory.addItem(item, 1));
+        create(item, x, y, to, () -> to.addItem(item));
     }
 
     @Remote(called = Loc.server)
@@ -105,7 +105,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
 
     @Override
     public void draw(){
-        Lines.stroke(fslope() * 2f, Palette.accent);
+        Lines.stroke(fslope() * 2f, Pal.accent);
 
         Lines.circle(x, y, fslope() * 2f);
 

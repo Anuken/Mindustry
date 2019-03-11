@@ -2,8 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Stats.RankResult;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Item.Icon;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -60,11 +62,17 @@ public class GameOverDialog extends FloatingDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             cont.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.region).size(8 *3).pad(4);
+                                items.addImage(item.icon(Icon.medium)).size(8 *3).pad(4);
                             }).left();
                             cont.row();
                         }
                     }
+                }
+
+                if(world.isZone()){
+                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                    cont.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
+                    cont.row();
                 }
             }).pad(12);
 

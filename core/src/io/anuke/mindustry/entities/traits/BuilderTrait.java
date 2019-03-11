@@ -4,8 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Queue;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -17,12 +15,13 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -43,7 +42,7 @@ import static io.anuke.mindustry.Vars.*;
 /**
  * Interface for units that build, break or mine things.
  */
-public interface BuilderTrait extends Entity{
+public interface BuilderTrait extends Entity, TeamTrait{
     //these are not instance variables!
     Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     float placeDistance = 150f;
@@ -125,22 +124,6 @@ public interface BuilderTrait extends Entity{
         return getPlaceQueue().size != 0;
     }
 
-    /**
-     * If a place request matching this signature is present, it is removed.
-     * Otherwise, a new place request is added to the queue.
-     */
-    default void replaceBuilding(int x, int y, int rotation, Block block){
-        for(BuildRequest request : getPlaceQueue()){
-            if(request.x == x && request.y == y){
-                clearBuilding();
-                addBuildRequest(request);
-                return;
-            }
-        }
-
-        addBuildRequest(new BuildRequest(x, y, rotation, block));
-    }
-
     /**Clears the placement queue.*/
     default void clearBuilding(){
         getPlaceQueue().clear();
@@ -172,7 +155,8 @@ public interface BuilderTrait extends Entity{
      * Update building mechanism for this unit.
      * This includes mining.
      */
-    default void updateBuilding(Unit unit){
+    default void updateBuilding(){
+        Unit unit = (Unit)this;
         //remove already completed build requests
         removal.clear();
         for(BuildRequest req : getPlaceQueue()){
@@ -183,8 +167,7 @@ public interface BuilderTrait extends Entity{
 
         for(BuildRequest request : removal){
             if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
-                (!request.breaking &&
-                (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
+                (!request.breaking && (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
                 && world.tile(request.x, request.y).block() == request.block))){
                 getPlaceQueue().addLast(request);
             }
@@ -195,7 +178,7 @@ public interface BuilderTrait extends Entity{
         //update mining here
         if(current == null){
             if(getMineTile() != null){
-                updateMining(unit);
+                updateMining();
             }
             return;
         }else{
@@ -204,15 +187,19 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(unit.dst(tile) > placeDistance){
+        if(dst(tile) > placeDistance){
+            if(getPlaceQueue().size > 1){
+                getPlaceQueue().removeFirst();
+                getPlaceQueue().addLast(current);
+            }
             return;
         }
 
         if(!(tile.block() instanceof BuildBlock)){
-            if(canCreateBlocks() && !current.breaking && Build.validPlace(unit.getTeam(), current.x, current.y, current.block, current.rotation)){
-                Build.beginPlace(unit.getTeam(), current.x, current.y, current.block, current.rotation);
-            }else if(canCreateBlocks() && current.breaking && Build.validBreak(unit.getTeam(), current.x, current.y)){
-                Build.beginBreak(unit.getTeam(), current.x, current.y);
+            if(canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
+                Build.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
+            }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
+                Build.beginBreak(getTeam(), current.x, current.y);
             }else{
                 getPlaceQueue().removeFirst();
                 return;
@@ -259,12 +246,13 @@ public interface BuilderTrait extends Entity{
     }
 
     /**Do not call directly.*/
-    default void updateMining(Unit unit){
+    default void updateMining(){
+        Unit unit = (Unit)this;
         Tile tile = getMineTile();
         TileEntity core = unit.getClosestCore();
 
-        if(core == null || tile.block() != Blocks.air || unit.dst(tile.worldx(), tile.worldy()) > mineDistance
-                || tile.floor().itemDrop == null || !unit.inventory.canAcceptItem(tile.floor().itemDrop) || !canMine(tile.floor().itemDrop)){
+        if(core == null || tile.block() != Blocks.air || dst(tile.worldx(), tile.worldy()) > mineDistance
+                || tile.floor().itemDrop == null || !unit.acceptsItem(tile.floor().itemDrop) || !canMine(tile.floor().itemDrop)){
             setMineTile(null);
         }else{
             Item item = tile.floor().itemDrop;
@@ -276,7 +264,7 @@ public interface BuilderTrait extends Entity{
                     Call.transferItemTo(item, 1,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f), core.tile);
-                }else if(unit.inventory.canAcceptItem(item)){
+                }else if(unit.acceptsItem(item)){
                     Call.transferItemToUnit(item,
                         tile.worldx() + Mathf.range(tilesize / 2f),
                         tile.worldy() + Mathf.range(tilesize / 2f),
@@ -293,11 +281,12 @@ public interface BuilderTrait extends Entity{
     }
 
     /**Draw placement effects for an entity. This includes mining*/
-    default void drawBuilding(Unit unit){
+    default void drawBuilding(){
+        Unit unit = (Unit)this;
         BuildRequest request;
         if(!isBuilding()){
             if(getMineTile() != null){
-                drawMining(unit);
+                drawMining();
             }
             return;
         }
@@ -306,11 +295,11 @@ public interface BuilderTrait extends Entity{
 
         Tile tile = world.tile(request.x, request.y);
 
-        if(unit.dst(tile) > placeDistance){
+        if(dst(tile) > placeDistance){
             return;
         }
 
-        Lines.stroke(1f, Palette.accent);
+        Lines.stroke(1f, Pal.accent);
         float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
@@ -340,7 +329,8 @@ public interface BuilderTrait extends Entity{
     }
 
     /**Internal use only.*/
-    default void drawMining(Unit unit){
+    default void drawMining(){
+        Unit unit = (Unit)this;
         Tile tile = getMineTile();
 
         if(tile == null) return;
@@ -357,10 +347,10 @@ public interface BuilderTrait extends Entity{
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
-        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey);
+        Shapes.laser("minelaser", "minelaser-end", px, py, ex, ey, 0.75f);
 
         if(unit instanceof Player && ((Player) unit).isLocal){
-            Lines.stroke(1f, Palette.accent);
+            Lines.stroke(1f, Pal.accent);
             Lines.poly(tile.worldx(), tile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
         }
 

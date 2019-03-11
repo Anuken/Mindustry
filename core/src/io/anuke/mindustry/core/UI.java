@@ -28,7 +28,7 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
@@ -48,7 +48,7 @@ public class UI implements ApplicationListener{
 
     public AboutDialog about;
     public GameOverDialog restart;
-    public CustomGameDialog levels;
+    public CustomGameDialog custom;
     public MapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -108,28 +108,28 @@ public class UI implements ApplicationListener{
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        Colors.put("accent", Palette.accent);
+        Colors.put("accent", Pal.accent);
 
         loadCursors();
     }
 
     void loadCursors(){
-        int cursorScaling = 3;
+        int cursorScaling = 1, outlineThickness = 3;
         Color outlineColor = Color.valueOf("444444");
 
-        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor);
-        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor);
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor));
+        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
+        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
 
         Core.graphics.restoreCursor();
     }
     
     void generateFonts(Skin skin){
-        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/pixel.ttf"));
+        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.size = (int)(9*2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;
@@ -163,7 +163,7 @@ public class UI implements ApplicationListener{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        levels = new CustomGameDialog();
+        custom = new CustomGameDialog();
         language = new LanguageDialog();
         database = new DatabaseDialog();
         settings = new SettingsMenuDialog();
@@ -238,7 +238,7 @@ public class UI implements ApplicationListener{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
-        table.top().add(info).padTop(40);
+        table.top().add(info).padTop(10);
         Core.scene.add(table);
     }
 
@@ -247,17 +247,6 @@ public class UI implements ApplicationListener{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
             buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
-        }}.show();
-    }
-
-    public void showInfo(String info, Runnable clicked){
-        new Dialog("", "dialog"){{
-            getCell(cont).growX();
-            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.addButton("$ok", () -> {
-                clicked.run();
-                hide();
-            }).size(90, 50).pad(4);
         }}.show();
     }
 
@@ -275,9 +264,16 @@ public class UI implements ApplicationListener{
         }}.show();
     }
 
+    public void showInfoText(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+        }}.show();
+    }
+
     public void showConfirm(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
-        dialog.cont.add(text).width(400f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
         dialog.buttons.addButton("$cancel", dialog::hide);

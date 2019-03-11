@@ -1,6 +1,7 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -13,15 +14,17 @@ import io.anuke.mindustry.core.Logic;
 import io.anuke.mindustry.core.NetServer;
 import io.anuke.mindustry.core.World;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.units.BaseUnit;
-import io.anuke.mindustry.entities.units.types.Spirit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.base.Spirit;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
@@ -105,8 +108,6 @@ public class ApplicationTests{
 
     @Test
     void playMap(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
     }
 
@@ -114,14 +115,17 @@ public class ApplicationTests{
     void spawnWaves(){
         world.loadMap(testMap);
         logic.runWave();
+        //force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
         assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
     }
 
     @Test
     void createMap(){
-        assertTrue(world.maps.all().size > 0);
-
         Tile[][] tiles = world.createTiles(8, 8);
 
         world.beginMapLoad();
@@ -138,12 +142,12 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.core, Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
         for(int x = bx-1; x <= bx + 1; x++){
             for(int y = by-1; y <= by + 1; y++){
                 if(x == bx && by == y){
-                    assertEquals(world.tile(x, y).block(), Blocks.core);
+                    assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
                     assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
                 }
@@ -176,16 +180,13 @@ public class ApplicationTests{
 
     @Test
     void save(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
         SaveIO.saveToSlot(0);
     }
 
     @Test
     void load(){
-        assertTrue(world.maps.all().size > 0);
-
         world.loadMap(testMap);
         Map map = world.getMap();
 
@@ -193,9 +194,9 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertEquals(world.getMap().name, map.name);
         assertEquals(world.width(), map.meta.width);
         assertEquals(world.height(), map.meta.height);
+        assertTrue(state.teams.get(defaultTeam).cores.size > 0);
     }
 
     @Test
@@ -231,12 +232,45 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
 
         Time.setDeltaProvider(() -> 9999999f);
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertEquals(Blocks.part, world.tile(1, 1).block());
+    }
+
+    @Test
+    void zoneEmptyWaves(){
+        for(Zone zone : content.zones()){
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
+            for(int i = 1; i <= 100; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
+
+                assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
+            }
+        }
+    }
+
+    @Test
+    void zoneOverflowWaves(){
+        for(Zone zone : content.zones()){
+            Array<SpawnGroup> spawns = zone.rules.get().spawns;
+
+            for(int i = 1; i <= 40; i++){
+                int total = 0;
+                for(SpawnGroup spawn : spawns){
+                    total += spawn.getUnitsSpawned(i);
+                }
+
+                if(total >= 140){
+                    fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
+                }
+            }
+        }
     }
 
     @Test
@@ -253,16 +287,16 @@ public class ApplicationTests{
         d2.addBuildRequest(new BuildRequest(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
-        d1.updateBuilding(d1);
+        d1.updateBuilding();
         Time.setDeltaProvider(() -> 1f);
-        d2.updateBuilding(d2);
+        d2.updateBuilding();
 
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
 
         Time.setDeltaProvider(() -> 9999f);
 
-        d1.updateBuilding(d1);
-        d2.updateBuilding(d2);
+        d1.updateBuilding();
+        d2.updateBuilding();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -273,7 +307,7 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.core, Team.blue);
+        world.setBlock(core, Blocks.coreShard, Team.blue);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }

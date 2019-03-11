@@ -2,6 +2,7 @@ package io.anuke.mindustry.world;
 
 /**Methods for a packed position 'struct', contained in an int.*/
 public class Pos{
+    public static final int invalid = get(-1, -1);
 
     /**Returns packed position from an x/y position. The values must be within short limits.*/
     public static int get(int x, int y){

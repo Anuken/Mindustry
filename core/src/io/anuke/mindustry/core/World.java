@@ -5,22 +5,18 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityQuery;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.ai.BlockIndexer;
 import io.anuke.mindustry.ai.Pathfinder;
 import io.anuke.mindustry.ai.WaveSpawner;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -29,7 +25,6 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.Maps;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Block;
@@ -188,7 +183,7 @@ public class World implements ApplicationListener{
 
         addDarkness(tiles);
 
-        EntityQuery.resizeTree(0, 0, tiles.length * tilesize, tiles[0].length * tilesize);
+        EntityQuery.resizeTree(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds, tiles[0].length * tilesize + finalWorldBounds);
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -196,24 +191,6 @@ public class World implements ApplicationListener{
 
     public boolean isGenerating(){
         return generating;
-    }
-
-    public void launchZone(){
-        Effects.effect(Fx.launchFull, 0, 0);
-
-        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
-            Effects.effect(Fx.launch, tile);
-        }
-
-        Time.runTask(30f, () -> {
-            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
-                for(Item item : content.items()){
-                    data.addItem(item, tile.entity.items.get(item));
-                }
-                world.removeBlock(tile);
-            }
-            state.launched = true;
-        });
     }
 
     public boolean isZone(){
@@ -228,13 +205,14 @@ public class World implements ApplicationListener{
         ui.loadAnd(() -> {
             logic.reset();
             state.rules = zone.rules.get();
+            state.rules.zone = zone.id;
             loadGenerator(zone.generator);
             for(Tile core : state.teams.get(defaultTeam).cores){
-                for(ItemStack stack : zone.startingItems){
+                for(ItemStack stack : zone.getStartingItems()){
                     core.entity.items.add(stack.item, stack.amount);
                 }
             }
-            state.rules.zone = zone.id;
+            state.set(State.playing);
             control.saves.zoneSave();
             logic.play();
         });
@@ -289,6 +267,17 @@ public class World implements ApplicationListener{
                 if(invalidMap){
                     ui.showError("$map.nospawn.pvp");
                 }
+            }
+        }else{
+            invalidMap = true;
+            for(Team team : Team.all){
+                if(state.teams.get(team).cores.size != 0){
+                    invalidMap = false;
+                }
+            }
+
+            if(invalidMap){
+                throw new MapException(map, "Map has no cores!");
             }
         }
 
@@ -440,7 +429,6 @@ public class World implements ApplicationListener{
     }
 
     public void addDarkness(Tile[][] tiles){
-
         byte[][] dark = new byte[tiles.length][tiles[0].length];
         byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
 
@@ -448,7 +436,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().update){
+                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
                     dark[x][y] = darkIterations;
                 }
             }
@@ -479,7 +467,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().update){
+                if(tile.block().solid && !tile.block().synthetic()){
                     tiles[x][y].setRotation(dark[x][y]);
                 }
             }

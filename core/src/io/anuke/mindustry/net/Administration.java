@@ -196,9 +196,9 @@ public class Administration{
         return getCreateInfo(uuid).banned;
     }
 
-    public boolean isAdmin(String id, String usip){
+    public boolean isAdmin(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
-        return info.admin && usip.equals(info.adminUsid);
+        return info.admin && usid.equals(info.adminUsid);
     }
 
     /**Finds player info by IP, UUID and name.*/

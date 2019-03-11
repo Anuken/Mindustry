@@ -3,7 +3,6 @@ package io.anuke.mindustry.entities.traits;
 import io.anuke.mindustry.core.NetClient;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.util.Tmp;
 
 import java.io.DataInput;
@@ -61,6 +60,10 @@ public interface SyncTrait extends Entity, TypeTrait{
     /**Whether this entity is clipped and not synced when out of viewport.*/
     default boolean isClipped(){
         return true;
+    }
+
+    default float clipSize(){
+        return (this instanceof DrawTrait ? ((DrawTrait)this).drawSize() : 8f);
     }
 
     //Read and write sync data, usually position

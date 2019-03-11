@@ -27,6 +27,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -165,7 +166,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.beginEdit(data, meta.tags, false);
                     view.clearStack();
                 }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errormapload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }));
@@ -200,7 +201,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             view.clearStack();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
-                editor.beginEdit(new MapTileData(256, 256), new ObjectMap<>(), true);
+                editor.beginEdit(new MapTileData(200, 200), new ObjectMap<>(), true);
             }
             shownWithMap = false;
 
@@ -501,14 +502,20 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         blocksOut.clear();
         blocksOut.addAll(Vars.content.blocks());
-        blocksOut.sort((b1, b2) -> b1.synthetic() && !b2.synthetic() ? 1 : b2.synthetic() && !b1.synthetic() ? -1 :
-            b1 instanceof OreBlock && !(b2 instanceof OreBlock) ? 1 : !(b1 instanceof OreBlock) && b2 instanceof OreBlock ? -1 :
-            Integer.compare(b1.id, b2.id));
+        blocksOut.sort((b1, b2) -> {
+            int core = -Boolean.compare(b1 instanceof CoreBlock, b2 instanceof CoreBlock);
+            if(core != 0) return core;
+            int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
+            if(synth != 0) return synth;
+            int ore = Boolean.compare(b1 instanceof OreBlock, b2 instanceof OreBlock);
+            if(ore != 0) return ore;
+            return Integer.compare(b1.id, b2.id);
+        });
 
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Icon.medium);
 
-            if(region == Core.atlas.find("jjfgj")) continue;
+            if(!Core.atlas.isFound(region)) continue;
 
             ImageButton button = new ImageButton("white", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
@@ -525,7 +532,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         group.getButtons().get(2).setChecked(true);
 
-        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().formalName).width(200f).center()).growX();
+        table.table("underline", extra -> extra.labelWrap(() -> editor.getDrawBlock().localizedName).width(200f).center()).growX();
         table.row();
         table.add(pane).growY().fillX();
     }

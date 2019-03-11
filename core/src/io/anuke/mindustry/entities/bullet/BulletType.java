@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.game.Content;
@@ -66,7 +66,7 @@ public abstract class BulletType extends Content{
 
     /**Returns maximum distance the bullet this bullet type has can travel.*/
     public float range(){
-        return speed * lifetime;
+        return speed * lifetime * (1f - drag);
     }
 
     public boolean collides(Bullet bullet, Tile tile){

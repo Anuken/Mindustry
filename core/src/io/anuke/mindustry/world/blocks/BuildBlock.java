@@ -6,21 +6,21 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.entities.Effects;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -39,7 +39,7 @@ public class BuildBlock extends Block{
         super(name);
         update = true;
         size = Integer.parseInt(name.charAt(name.length() - 1) + "");
-        health = 10;
+        health = 20;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
@@ -71,9 +71,14 @@ public class BuildBlock extends Block{
     }
 
     @Override
+    public boolean isHidden(){
+        return true;
+    }
+
+    @Override
     public String getDisplayName(Tile tile){
         BuildEntity entity = tile.entity();
-        return Core.bundle.format("block.constructing", entity.block == null ? entity.previous.formalName : entity.block.formalName);
+        return Core.bundle.format("block.constructing", entity.block == null ? entity.previous.localizedName : entity.block.localizedName);
     }
 
     @Override
@@ -124,7 +129,9 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+        if(Core.atlas.isFound(entity.previous.icon(Icon.full))){
+            Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+        }
     }
 
     @Override
@@ -132,7 +139,7 @@ public class BuildBlock extends Block{
 
         BuildEntity entity = tile.entity();
 
-        Shaders.blockbuild.color = Palette.accent;
+        Shaders.blockbuild.color = Pal.accent;
 
         Block target = entity.block == null ? entity.previous : entity.block;
 
@@ -278,7 +285,7 @@ public class BuildBlock extends Block{
         public void setDeconstruct(Block previous){
             this.previous = previous;
             this.progress = 1f;
-            if(previous.buildCost > 1f){
+            if(previous.buildCost >= 0.01f){
                 this.block = previous;
                 this.accumulator = new float[previous.buildRequirements.length];
                 this.totalAccumulator = new float[previous.buildRequirements.length];

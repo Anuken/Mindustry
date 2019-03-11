@@ -1,7 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.arc.entities.trait.SolidTrait;
-import io.anuke.arc.entities.trait.VelocityTrait;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.mindustry.game.Team;
 

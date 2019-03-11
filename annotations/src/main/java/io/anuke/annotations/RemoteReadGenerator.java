@@ -2,8 +2,6 @@ package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
 import io.anuke.annotations.IOFinder.ClassSerializer;
-import io.anuke.annotations.MethodEntry;
-import io.anuke.annotations.Utils;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -52,7 +50,7 @@ public class RemoteReadGenerator{
             Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
 
-            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.Player");
+            TypeName playerType = cons.newInstance("io.anuke.mindustry.entities.type.Player");
             //add player parameter
             readMethod.addParameter(playerType, "player");
         }

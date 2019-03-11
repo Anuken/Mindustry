@@ -87,7 +87,7 @@ public class MapsDialog extends FloatingDialog{
             TextButton button = maps.addButton("", "clear", () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
-            button.add(map.meta.tags.get("name", map.name)).growX().center().get().setEllipsis(true);
+            button.add(map.meta.tags.get("name", map.name)).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
             button.addImage("white").growX().pad(4).color(Color.GRAY);
             button.row();
@@ -138,8 +138,6 @@ public class MapsDialog extends FloatingDialog{
             t.add(map.meta.description()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.oregen.info").padRight(10).color(Color.GRAY);
-            t.row();
-            t.add(map.meta.hasOreGen() ? "$on" : "$off").padTop(2);
         }).height(mapsize).width(mapsize);
 
         table.row();

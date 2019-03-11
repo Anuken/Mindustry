@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
@@ -34,7 +35,7 @@ public class Save16 extends SaveFileVersion{
         }
         String mapname = stream.readUTF();
         Map map = world.maps.getByName(mapname);
-        if(map == null) map = new Map("unknown", 1, 1);
+        if(map == null) map = new Map(Strings.capitalize(mapname), 1, 1);
         world.setMap(map);
 
         int wave = stream.readInt();
@@ -43,6 +44,7 @@ public class Save16 extends SaveFileVersion{
         state.wave = wave;
         state.wavetime = wavetime;
         state.stats = Serialization.readStats(stream);
+        world.spawner.read(stream);
 
         content.setTemporaryMapper(readContentHeader(stream));
 
@@ -66,6 +68,7 @@ public class Save16 extends SaveFileVersion{
         stream.writeFloat(state.wavetime); //wave countdown
 
         Serialization.writeStats(stream, state.stats);
+        world.spawner.write(stream);
 
         writeContentHeader(stream);
 

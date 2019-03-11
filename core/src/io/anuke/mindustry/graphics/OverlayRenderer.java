@@ -10,9 +10,10 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -28,13 +29,7 @@ public class OverlayRenderer{
 
             if(!input.isDrawing() || player.isDead()) continue;
 
-            Shaders.outline.color.set(Palette.accent);
-            //TODO draw outlined version
-            //Graphics.beginShaders(Shaders.outline);
-
             input.drawOutlined();
-
-            //Graphics.endShaders();
         }
     }
 
@@ -79,7 +74,7 @@ public class OverlayRenderer{
                         if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
                             Draw.color(Color.DARK_GRAY);
                             Lines.poly(core.drawx(), core.drawy() - 2, 200, state.rules.enemyCoreBuildRadius);
-                            Draw.color(Palette.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                            Draw.color(Pal.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
                             Lines.poly(core.drawx(), core.drawy(), 200, state.rules.enemyCoreBuildRadius);
                         }
                     }
@@ -102,15 +97,15 @@ public class OverlayRenderer{
             if(input.isDroppingItem()){
                 Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
                 float size = 8;
-                Draw.rect(player.inventory.getItem().item.region, v.x, v.y, size, size);
-                Draw.color(Palette.accent);
+                Draw.rect(player.item().item.icon(Item.Icon.large), v.x, v.y, size, size);
+                Draw.color(Pal.accent);
                 Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
                 Draw.reset();
 
                 Tile tile = world.tileWorld(v.x, v.y);
                 if(tile != null) tile = tile.target();
-                if(tile != null && tile.getTeam() == player.getTeam() && tile.block().acceptStack(player.inventory.getItem().item, player.inventory.getItem().amount, tile, player) > 0){
-                    Draw.color(Palette.place);
+                if(tile != null && tile.interactable(player.getTeam()) && tile.block().acceptStack(player.item().item, player.item().amount, tile, player) > 0){
+                    Draw.color(Pal.place);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Time.time(), 5f, 1f));
                     Draw.color();
                 }

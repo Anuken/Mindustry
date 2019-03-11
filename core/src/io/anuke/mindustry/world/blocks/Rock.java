@@ -8,7 +8,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 
 public class Rock extends Block{
-    protected TextureRegion[] shadowRegions, regions;
     protected int variants;
 
     public Rock(String name){
@@ -19,18 +18,16 @@ public class Rock extends Block{
 
     @Override
     public void draw(Tile tile){
-        Draw.colorl(1f - tile.getRotation() / 4f);
         if(variants > 0){
-            Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
+            Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }
-        Draw.color();
     }
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "1")};
+        return variants == 0 ? super.generateIcons() : new TextureRegion[]{Core.atlas.find(name + "1")};
     }
 
     @Override
@@ -38,12 +35,10 @@ public class Rock extends Block{
         super.load();
 
         if(variants > 0){
-            shadowRegions = new TextureRegion[variants];
-            regions = new TextureRegion[variants];
+            variantRegions = new TextureRegion[variants];
 
             for(int i = 0; i < variants; i++){
-                shadowRegions[i] = Core.atlas.find(name + "shadow" + (i + 1));
-                regions[i] = Core.atlas.find(name + (i + 1));
+                variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
         }
     }

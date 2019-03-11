@@ -8,43 +8,26 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class Cultivator extends Drill{
-    protected Color plantColor = Color.valueOf("648b55");
-    protected Color plantColorLight = Color.valueOf("73a75f");
-    protected Color bottomColor = Color.valueOf("474747");
+public class Cultivator extends GenericCrafter{
+    protected static final Color plantColor = Color.valueOf("5541b1");
+    protected static final Color plantColorLight = Color.valueOf("7457ce");
+    protected static final Color bottomColor = Color.valueOf("474747");
+
     protected TextureRegion middleRegion, topRegion;
-
-    protected Item result;
-
     protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
 
     public Cultivator(String name){
         super(name);
-        drillEffect = Fx.none;
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.remove(BlockStat.drillTier);
-        stats.add(BlockStat.drillTier, table -> {
-            table.addImage("grass1").size(8 * 3).padBottom(3).padTop(3);
-            table.add(Blocks.grass.formalName).padLeft(3);
-        });
+        craftEffect = Fx.none;
     }
 
     @Override
@@ -101,17 +84,7 @@ public class Cultivator extends Drill{
         return new CultivatorEntity();
     }
 
-    @Override
-    public boolean isValid(Tile tile){
-        return tile != null && tile.floor() == Blocks.grass;
-    }
-
-    @Override
-    public Item getDrop(Tile tile){
-        return Items.biomatter;
-    }
-
-    public static class CultivatorEntity extends DrillEntity{
+    public static class CultivatorEntity extends GenericCrafterEntity{
         public float warmup;
 
         @Override

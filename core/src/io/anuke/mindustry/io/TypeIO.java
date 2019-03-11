@@ -2,23 +2,24 @@ package io.anuke.mindustry.io;
 
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
-import io.anuke.arc.entities.Entities;
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.traits.CarriableTrait;
-import io.anuke.mindustry.entities.traits.CarryTrait;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
@@ -27,7 +28,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -90,46 +90,6 @@ public class TypeIO{
     public static Bullet readBullet(ByteBuffer buffer){
         int id = buffer.getInt();
         return bulletGroup.getByID(id);
-    }
-
-    @WriteClass(CarriableTrait.class)
-    public static void writeCarriable(ByteBuffer buffer, CarriableTrait unit){
-        if(unit == null){
-            buffer.put((byte) -1);
-            return;
-        }
-        buffer.put((byte) unit.getGroup().getID());
-        buffer.putInt(unit.getID());
-    }
-
-    @ReadClass(CarriableTrait.class)
-    public static CarriableTrait readCarriable(ByteBuffer buffer){
-        byte gid = buffer.get();
-        if(gid == -1){
-            return null;
-        }
-        int id = buffer.getInt();
-        return (CarriableTrait) Entities.getGroup(gid).getByID(id);
-    }
-
-    @WriteClass(CarryTrait.class)
-    public static void writeCarry(ByteBuffer buffer, CarryTrait unit){
-        if(unit == null || unit.getGroup() == null){
-            buffer.put((byte) -1);
-            return;
-        }
-        buffer.put((byte) unit.getGroup().getID());
-        buffer.putInt(unit.getID());
-    }
-
-    @ReadClass(CarryTrait.class)
-    public static CarryTrait readCarry(ByteBuffer buffer){
-        byte gid = buffer.get();
-        if(gid == -1){
-            return null;
-        }
-        int id = buffer.getInt();
-        return (CarryTrait) Entities.getGroup(gid).getByID(id);
     }
 
     @WriteClass(BaseUnit.class)
@@ -251,16 +211,6 @@ public class TypeIO{
         return new Color(buffer.getInt());
     }
 
-    @WriteClass(Weapon.class)
-    public static void writeWeapon(ByteBuffer buffer, Weapon weapon){
-        buffer.put(weapon.id);
-    }
-
-    @ReadClass(Weapon.class)
-    public static Weapon readWeapon(ByteBuffer buffer){
-        return content.getByID(ContentType.weapon, buffer.get());
-    }
-
     @WriteClass(Mech.class)
     public static void writeMech(ByteBuffer buffer, Mech mech){
         buffer.put(mech.id);
@@ -305,7 +255,7 @@ public class TypeIO{
     @WriteClass(String.class)
     public static void writeString(ByteBuffer buffer, String string){
         if(string != null){
-            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = string.getBytes(charset);
             buffer.putShort((short) bytes.length);
             buffer.put(bytes);
         }else{
@@ -319,7 +269,7 @@ public class TypeIO{
         if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.get(bytes);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return new String(bytes, charset);
         }else{
             return null;
         }
@@ -341,7 +291,7 @@ public class TypeIO{
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
         if(string != null){
-            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = string.getBytes(charset);
             buffer.writeShort((short) bytes.length);
             buffer.write(bytes);
         }else{
@@ -354,7 +304,7 @@ public class TypeIO{
         if(slength != -1){
             byte[] bytes = new byte[slength];
             buffer.readFully(bytes);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return new String(bytes, charset);
         }else{
             return null;
         }

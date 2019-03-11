@@ -95,6 +95,14 @@ public class FloorRenderer{
         endDraw();
     }
 
+    public void beginc(){
+        cbatch.beginDraw();
+    }
+
+    public void endc(){
+        cbatch.endDraw();
+    }
+
     public void beginDraw(){
         if(cache == null){
             return;
@@ -112,10 +120,6 @@ public class FloorRenderer{
         }
 
         cbatch.endDraw();
-    }
-
-    public void updateFloor(Tile tile){
-        //TODO: implement
     }
 
     public void drawLayer(CacheLayer layer){
@@ -190,8 +194,10 @@ public class FloorRenderer{
 
                 if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
                     tile.block().draw(tile);
-                }else if(floor.cacheLayer == layer && tile.block().cacheLayer != CacheLayer.walls){
+                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x,tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
+                }else if(floor.cacheLayer.ordinal() < layer.ordinal() && layer != CacheLayer.walls){
+                    floor.drawNonLayer(tile);
                 }
             }
         }
@@ -205,7 +211,7 @@ public class FloorRenderer{
         int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
         chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
         cache = new Chunk[chunksx][chunksy];
-        SpriteCache sprites = new SpriteCache(world.width() * world.height(), (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
+        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 5, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
         cbatch = new CacheBatch(sprites);
 
         Time.mark();

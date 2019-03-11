@@ -5,18 +5,13 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.Palette;
 import io.anuke.mindustry.ui.ContentDisplay;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
-    public final String name;
-    public final String description;
     public final Color color;
-    public TextureRegion region;
+    private TextureRegion[] regions;
 
     /**type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.*/
     public ItemType type = ItemType.resource;
@@ -26,12 +21,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public float flammability = 0f;
     /**how radioactive this item is. 0=none, 1=chernobyl ground zero*/
     public float radioactivity;
-    /**how effective this item is as flux for smelting. 0 = not a flux, 0.5 = normal flux, 1 = very good*/
-    public float fluxiness = 0f;
     /**drill hardness of the item*/
     public int hardness = 0;
-    /**the burning color of this item. TODO unused; implement*/
-    public Color flameColor = Palette.darkFlame.cpy();
     /**
      * base material cost of this item, used for calculating place times
      * 1 cost = 1 tick added to build time
@@ -43,18 +34,21 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public boolean alwaysUnlocked = false;
 
     public Item(String name, Color color){
-        this.name = name;
+        super(name);
         this.color = color;
         this.description = Core.bundle.getOrNull("item." + this.name + ".description");
-
-        if(!Core.bundle.has("item." + this.name + ".name")){
-            Log.err("Warning: item '" + name + "' is missing a localized name. Add the following to bundle.properties:");
-            Log.err("item." + this.name + ".name = " + Strings.capitalize(name.replace('-', '_')));
-        }
     }
 
     public void load(){
-        this.region = Core.atlas.find("item-" + name);
+        regions = new TextureRegion[Icon.values().length];
+        for(int i = 0; i < regions.length; i++){
+            Icon icon = Icon.values()[i];
+            regions[i] = Core.atlas.find(icon == Icon.large ? "item-" + name : "item-" + name + "-" + icon.name());
+        }
+    }
+
+    public TextureRegion icon(Icon icon){
+        return regions[icon.ordinal()];
     }
 
     @Override
@@ -74,7 +68,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     @Override
     public TextureRegion getContentIcon(){
-        return region;
+        return icon(Icon.large);
     }
 
     @Override
@@ -88,13 +82,21 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     @Override
-    public String getContentName(){
-        return name;
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.item;
+    }
+
+    public enum Icon{
+        small(8*2),
+        medium(8*3),
+        large(8*4),
+        xlarge(8*5);
+
+        public final int size;
+
+        Icon(int size){
+            this.size = size;
+        }
     }
 
     /**Allocates a new array containing all items the generate ores.*/

@@ -2,9 +2,6 @@ package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.SolidEntity;
-import io.anuke.arc.entities.trait.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
@@ -13,11 +10,11 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.traits.AbsorbTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.traits.TeamTrait;
+import io.anuke.mindustry.entities.impl.SolidEntity;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
@@ -89,9 +86,19 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     }
 
     /**Internal use only.*/
-    @Remote(called = Loc.server)
+    @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, float x, float y, float angle){
         create(type, null, Team.none, x, y, angle);
+    }
+
+    /**ok*/
+    @Remote(called = Loc.server, unreliable = true)
+    public static void createBullet(BulletType type, Team team, float x, float y, float angle){
+        create(type, null, team, x, y, angle);
+    }
+
+    public Entity getOwner(){
+        return owner;
     }
 
     public boolean collidesTiles(){

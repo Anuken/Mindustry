@@ -19,6 +19,11 @@ public class BlockPart extends Block{
     }
 
     @Override
+    public boolean isHidden(){
+        return true;
+    }
+
+    @Override
     public void draw(Tile tile){
         //do nothing
     }

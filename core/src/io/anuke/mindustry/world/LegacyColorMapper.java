@@ -18,43 +18,47 @@ public class LegacyColorMapper implements ContentList{
 
     @Override
     public void load(){
-        defaultValue = new LegacyBlock(Blocks.stone, 0);
+        defaultValue = new LegacyBlock(Blocks.stone, Blocks.air);
 
-        map("ff0000", Blocks.dirt, 0);
-        map("00ff00", Blocks.stone, 0);
-        map("323232", Blocks.stone, 0);
-        map("646464", Blocks.stone, 1);
-        map("50965a", Blocks.grass, 0);
-        map("5ab464", Blocks.grass, 1);
-        map("506eb4", Blocks.water, 0);
-        map("465a96", Blocks.deepwater, 0);
-        map("252525", Blocks.blackstone, 0);
-        map("575757", Blocks.blackstone, 1);
-        map("988a67", Blocks.sand, 0);
-        map("e5d8bb", Blocks.sand, 1);
-        map("c2d1d2", Blocks.snow, 0);
-        map("c4e3e7", Blocks.ice, 0);
-        map("f7feff", Blocks.snow, 1);
-        map("6e501e", Blocks.dirt, 0);
-        map("ed5334", Blocks.blackstone, 0);
-        map("292929", Blocks.tar, 0);
-        map("c3a490", OreBlock.get(Blocks.stone, Items.copper), 0);
-        map("161616", OreBlock.get(Blocks.stone, Items.coal), 0);
-        map("6277bc", OreBlock.get(Blocks.stone, Items.titanium), 0);
-        map("83bc58", OreBlock.get(Blocks.stone, Items.thorium), 0);
+        map("ff0000", Blocks.stone, Blocks.spawn);
+        map("00ff00", Blocks.stone);
+        map("323232", Blocks.stone);
+        map("646464", Blocks.stone, Blocks.rocks);
+        map("50965a", Blocks.grass);
+        map("5ab464", Blocks.grass, Blocks.stainedRocks);
+        map("506eb4", Blocks.water);
+        map("465a96", Blocks.deepwater);
+        map("252525", Blocks.ignarock);
+        map("575757", Blocks.ignarock, Blocks.duneRocks);
+        map("988a67", Blocks.sand);
+        map("e5d8bb", Blocks.sand, Blocks.duneRocks);
+        map("c2d1d2", Blocks.snow);
+        map("c4e3e7", Blocks.ice);
+        map("f7feff", Blocks.snow, Blocks.snowrocks);
+        map("6e501e", Blocks.stainedStoneRed);
+        map("ed5334", Blocks.stainedStoneRed);
+        map("292929", Blocks.tar);
+        map("c3a490", OreBlock.get(Blocks.stone, Items.copper));
+        map("161616", OreBlock.get(Blocks.stone, Items.coal));
+        map("6277bc", OreBlock.get(Blocks.stone, Items.titanium));
+        map("83bc58", OreBlock.get(Blocks.stone, Items.thorium));
     }
     
-    private void map(String color, Block block, int elevation){
-        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, elevation));
+    private void map(String color, Block block, Block wall){
+        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall));
+    }
+
+    private void map(String color, Block block){
+        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, Blocks.air));
     }
 
     public static class LegacyBlock{
-        public final int elevation;
         public final Floor floor;
+        public final Block wall;
 
-        public LegacyBlock(Block floor, int elevation){
-            this.elevation = elevation;
+        public LegacyBlock(Block floor, Block wall){
             this.floor = (Floor) floor;
+            this.wall = wall;
         }
     }
 

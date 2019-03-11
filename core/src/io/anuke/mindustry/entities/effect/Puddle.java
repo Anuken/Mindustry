@@ -3,10 +3,10 @@ package io.anuke.mindustry.entities.effect;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.SolidEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.impl.SolidEntity;
+import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -212,7 +212,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 }
             });
 
-            if(liquid.temperature > 0.7f && tile.entity != null && Mathf.chance(0.3 * Time.delta())){
+            if(liquid.temperature > 0.7f && (tile.target().entity != null) && Mathf.chance(0.3 * Time.delta())){
                 Fire.create(tile);
             }
 

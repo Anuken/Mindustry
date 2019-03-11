@@ -80,7 +80,7 @@ public class RemoteWriteGenerator{
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().equals("io.anuke.mindustry.entities.Player")){
+            if(!elem.getParameters().get(0).asType().toString().equals("io.anuke.mindustry.entities.type.Player")){
                 Utils.messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", elem);
                 return;
             }

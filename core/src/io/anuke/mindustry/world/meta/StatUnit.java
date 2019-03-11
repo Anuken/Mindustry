@@ -12,7 +12,6 @@ public enum StatUnit{
     powerSecond,
     liquidSecond,
     itemsSecond,
-    pixelsSecond,
     liquidUnits,
     powerUnits,
     degrees,

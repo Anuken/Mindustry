@@ -32,8 +32,10 @@ public class Bar extends Element{
 
     public Bar(Supplier<String> name, Supplier<Color> color, FloatProvider fraction){
         this.fraction = fraction;
+        lastValue = value = Mathf.clamp(fraction.get());
         update(() -> {
             this.name = name.get();
+            this.blinkColor.set(color.get());
             setColor(color.get());
         });
     }
@@ -45,13 +47,14 @@ public class Bar extends Element{
 
     @Override
     public void draw(){
-        if(!Mathf.isEqual(lastValue, fraction.get())){
+        float computed = Mathf.clamp(fraction.get());
+        if(!Mathf.isEqual(lastValue, computed)){
             blink = 1f;
-            lastValue = fraction.get();
+            lastValue = computed;
         }
 
         blink = Mathf.lerpDelta(blink, 0f, 0.2f);
-        value = Mathf.lerpDelta(value, fraction.get(), 0.15f);
+        value = Mathf.lerpDelta(value, computed, 0.15f);
 
         Draw.colorl(0.1f);
         Draw.drawable("bar", x, y, width, height);
@@ -75,6 +78,7 @@ public class Bar extends Element{
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
+        font.setColor(Color.WHITE);
         font.draw(name, x + width/2f - lay.width/2f, y + height/2f + lay.height/2f + 1);
 
         Pools.free(lay);

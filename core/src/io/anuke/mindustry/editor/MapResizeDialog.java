@@ -1,14 +1,13 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.arc.function.BiConsumer;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.maps.MapTileData;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapResizeDialog extends FloatingDialog{
-    int[] validMapSizes = {200, 300, 400, 500};
+    private static final int minSize = 50, maxSize = 500, increment = 50;
     int width, height;
 
     public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
@@ -22,28 +21,23 @@ public class MapResizeDialog extends FloatingDialog{
             Table table = new Table();
 
             for(boolean w : Mathf.booleans){
-                int curr = w ? data.width() : data.height();
-                int idx = 0;
-                for(int i = 0; i < validMapSizes.length; i++){
-                    if(validMapSizes[i] == curr) idx = i;
-                }
-
                 table.add(w ? "$width" : "$height").padRight(8f);
-                ButtonGroup<TextButton> group = new ButtonGroup<>();
-                for(int i = 0; i < validMapSizes.length; i++){
-                    int size = validMapSizes[i];
-                    TextButton button = new TextButton(size + "", "toggle");
-                    button.clicked(() -> {
-                        if(w)
-                            width = size;
-                        else
-                            height = size;
-                    });
-                    group.add(button);
-                    if(i == idx) button.setChecked(true);
-                    table.add(button).size(100f, 54f).pad(2f);
-                }
+                table.defaults().height(60f).padTop(8);
+                table.addButton("<", () -> {
+                    if(w)
+                        width = move(width, -1);
+                    else
+                        height = move(height, -1);
+                }).size(60f);
 
+                table.table("button", t -> t.label(() -> (w ? width : height) + "")).width(200);
+
+                table.addButton(">", () -> {
+                    if(w)
+                        width = move(width, 1);
+                    else
+                        height = move(height, 1);
+                }).size(60f);
                 table.row();
             }
             cont.row();
@@ -57,6 +51,9 @@ public class MapResizeDialog extends FloatingDialog{
             cons.accept(width, height);
             hide();
         });
+    }
 
+    static int move(int value, int direction){
+        return Mathf.clamp((value / increment + direction) * increment, minSize, maxSize);
     }
 }

@@ -1,8 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.entities.Effects;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.type.Item;
@@ -10,10 +9,6 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -110,43 +105,6 @@ public abstract class LiquidTurret extends Turret{
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return super.acceptLiquid(tile, source, liquid, amount) && ammo.get(liquid) != null
                 && (tile.entity.liquids.current() == liquid || (ammo.containsKey(tile.entity.liquids.current()) && tile.entity.liquids.get(tile.entity.liquids.current()) <= ammo.get(tile.entity.liquids.current()).ammoMultiplier + 0.001f));
-    }
-
-    public class LiquidTurretEntity extends TurretEntity{
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeByte(ammo.size);
-            for(AmmoEntry entry : ammo){
-                LiquidEntry i = (LiquidEntry)entry;
-                stream.writeByte(i.liquid.id);
-                stream.writeShort(i.amount);
-            }
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            byte amount = stream.readByte();
-            for(int i = 0; i < amount; i++){
-                Liquid liquid = Vars.content.liquid(stream.readByte());
-                short a = stream.readShort();
-                totalAmmo += a;
-                ammo.add(new LiquidEntry(liquid, a));
-            }
-        }
-    }
-
-    class LiquidEntry extends AmmoEntry{
-        protected Liquid liquid;
-
-        LiquidEntry(Liquid liquid, int amount){
-            this.liquid = liquid;
-            this.amount = amount;
-        }
-
-        @Override
-        public BulletType type(){
-            return ammo.get(liquid);
-        }
     }
 
 }

@@ -11,15 +11,23 @@ import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
+def packFile = "../core/assets-raw/sprites/pack.json"
+def doAntialias = !project.hasProperty("disableAntialias")
+
 def antialias = {File file ->
+    if(!doAntialias || file.lastModified() <= 1000) return
+
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
     def getRGB = { int ix, int iy ->
+        //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
         return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
     }
 
     def color = new Color()
+    def color2 = new Color()
     def sum = new Color()
+    def suma = new Color()
 
     for (int x = 0; x < image.getWidth(); x++){
         for(int y = 0; y < image.getHeight(); y++){
@@ -45,18 +53,30 @@ def antialias = {File file ->
             if ((F==H && F!=B && H!=D && E!=G) || (H==D && H!=F && D!=B && E!=I)) p8=H
             if (F==H && F!=B && H!=D) p9=F
 
-            int total = 0
+            suma.set(0)
 
             [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
                 Color.argb8888ToColor(color, val)
+                suma.r += color.r*color.a
+                suma.g += color.g*color.a
+                suma.b += color.b*color.a
+                suma.a += color.a
+            }
 
-                if(color.a > 0.1){
-                    sum.r += color.r
-                    sum.g += color.g
-                    sum.b += color.b
-                    sum.a += color.a
-                    total++
-                }
+            suma.mul(suma.a <= 0.001f ? 0f : (float)(1f / suma.a))
+
+            float total = 0
+            sum.set(0)
+
+            [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
+                Color.argb8888ToColor(color, val)
+                float a = color.a
+                color.lerp(suma, (float)(1f - a))
+                sum.r += color.r
+                sum.g += color.g
+                sum.b += color.b
+                sum.a += a
+                total += 1f
             }
 
             sum.mul((float)(1f / total))
@@ -68,7 +88,6 @@ def antialias = {File file ->
 
     ImageIO.write(out, "png", file)
 }
-
 task swapColors(){
     doLast{
         if (project.hasProperty("colors")) {
@@ -112,6 +131,7 @@ task scaleSprites4x(){
                 def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
 
                 def getRGB = { int ix, int iy ->
+                    //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
                     return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
                 }
 
@@ -153,7 +173,6 @@ task scaleSprites4x(){
         }
     }
 }
-
 
 task scaleSprites(){
     finalizedBy 'genSprites'

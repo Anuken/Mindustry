@@ -2,13 +2,14 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.BlockPart;
@@ -311,6 +312,10 @@ public class Tile implements Position, TargetTrait{
         return null;
     }
 
+    public boolean interactable(Team team){
+        return getTeam() == Team.none || team == getTeam();
+    }
+
     public void updateOcclusion(){
         cost = 1;
         boolean occluded = false;
@@ -326,15 +331,15 @@ public class Tile implements Position, TargetTrait{
         }
 
         if(occluded){
-            cost += 1;
+            cost += 2;
         }
 
         if(target().synthetic()){
-            cost += target().block().health / 10f;
+            cost += Mathf.clamp(target().block().health / 10f, 0, 20);
         }
 
         if(floor.isLiquid){
-            cost += 100f;
+            cost += 10;
         }
     }
 
@@ -356,7 +361,7 @@ public class Tile implements Position, TargetTrait{
 
         if(block.hasEntity()){
             entity = block.newEntity().init(this, block.update);
-            entity.cons = new ConsumeModule();
+            entity.cons = new ConsumeModule(entity);
             if(block.hasItems) entity.items = new ItemModule();
             if(block.hasLiquids) entity.liquids = new LiquidModule();
             if(block.hasPower){

@@ -4,8 +4,8 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
 

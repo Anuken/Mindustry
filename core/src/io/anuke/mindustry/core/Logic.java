@@ -4,15 +4,19 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
-import io.anuke.arc.entities.Entities;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.EntityQuery;
+import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -28,15 +32,9 @@ import static io.anuke.mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
-        Events.on(TileChangeEvent.class, event -> {
-            if(event.tile.getTeam() == defaultTeam && event.tile.block().isVisible()){
-                handleContent(event.tile.block());
-            }
-        });
-
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
-                data.updateWaveScore(world.getZone(), state.wave);
+                world.getZone().updateWave(state.wave);
             }
         });
     }
@@ -70,7 +68,6 @@ public class Logic implements ApplicationListener{
         state.gameOver = state.launched = false;
         state.teams = new Teams();
         state.rules = new Rules();
-        state.rules.spawns = Waves.getDefaultSpawns();
         state.stats = new Stats();
 
         Time.clear();
@@ -83,16 +80,17 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
+                         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
 
     private void checkGameOver(){
-        if(!state.rules.pvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(state.rules.pvp){
+        }else if(!state.rules.waves){
             Team alive = null;
 
             for(Team team : Team.all){
@@ -109,6 +107,27 @@ public class Logic implements ApplicationListener{
                 Events.fire(new GameOverEvent(alive));
             }
         }
+    }
+
+    @Remote(called = Loc.both)
+    public static void launchZone(){
+        if(!headless){
+            ui.hudfrag.showLaunch();
+        }
+
+        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            Effects.effect(Fx.launch, tile);
+        }
+
+        Time.runTask(30f, () -> {
+            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+                for(Item item : content.items()){
+                    data.addItem(item, tile.entity.items.get(item));
+                }
+                world.removeBlock(tile);
+            }
+            state.launched = true;
+        });
     }
 
     @Remote(called = Loc.both)

@@ -6,6 +6,8 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.WindowedMean;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumePower;
@@ -22,7 +24,9 @@ public class PowerGraph{
     private final ObjectSet<Tile> batteries = new ObjectSet<>();
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
-    private long lastFrameUpdated;
+    private final WindowedMean powerBalance = new WindowedMean(60);
+
+    private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
 
@@ -32,6 +36,10 @@ public class PowerGraph{
 
     public int getID(){
         return graphID;
+    }
+
+    public float getPowerBalance(){
+        return powerBalance.getMean();
     }
 
     public float getPowerProduced(){
@@ -80,7 +88,7 @@ public class PowerGraph{
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
-        if(Mathf.isEqual(stored, 0f)){ return 0f; }
+        if(Mathf.isEqual(stored, 0f)) return 0f;
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
@@ -98,7 +106,7 @@ public class PowerGraph{
 
     public float chargeBatteries(float excess){
         float capacity = getBatteryCapacity();
-        if(Mathf.isEqual(capacity, 0f)){ return 0f; }
+        if(Mathf.isEqual(capacity, 0f)) return 0f;
 
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
@@ -114,30 +122,28 @@ public class PowerGraph{
     }
 
     public void distributePower(float needed, float produced){
-        if(Mathf.isEqual(needed, 0f)){ return; }
-
-        float coverage = Math.min(1, produced / needed);
+        //distribute even if not needed. this is because some might be requiring power but not requesting it; it updates consumers
+        float coverage = Mathf.isZero(needed) ? 1f : Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.has(ConsumePower.class)){
                 ConsumePower consumePower = consumes.get(ConsumePower.class);
-                if(!otherConsumersAreValid(consumer, consumePower)){
-                    consumer.entity.power.satisfaction = 0.0f; // Only supply power if the consumer would get valid that way
-                }else{
-                    if(consumePower.isBuffered){
+                //currently satisfies power even if it's not required yet
+                if(consumePower.isBuffered){
+                    if(!Mathf.isZero(consumePower.powerCapacity)){
                         // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
                         float maximumRate = consumePower.requestedPower(consumer.block(), consumer.entity()) * coverage * consumer.entity.delta();
                         consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.powerCapacity);
-                    }else{
-                        consumer.entity.power.satisfaction = coverage;
                     }
+                }else{
+                    consumer.entity.power.satisfaction = coverage;
                 }
             }
         }
     }
 
     public void update(){
-        if(Core.graphics.getFrameId() == lastFrameUpdated || consumers.size == 0 && producers.size == 0 && batteries.size == 0){
+        if(Core.graphics.getFrameId() == lastFrameUpdated || (consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
             return;
         }
 
@@ -145,6 +151,8 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
+
+        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
         if(!Mathf.isEqual(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
@@ -167,7 +175,10 @@ public class PowerGraph{
         tile.entity.power.graph = this;
         all.add(tile);
 
-        if(tile.block().outputsPower && tile.block().consumesPower){
+        if(tile.block().outputsPower && tile.block().consumesPower && !tile.block().consumes.get(ConsumePower.class).isBuffered){
+            producers.add(tile);
+            consumers.add(tile);
+        }else if(tile.block().outputsPower && tile.block().consumesPower){
             batteries.add(tile);
         }else if(tile.block().outputsPower){
             producers.add(tile);

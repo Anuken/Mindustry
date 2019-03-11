@@ -1,17 +1,16 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
@@ -23,19 +22,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.content;
-
 public class PowerSmelter extends PowerBlock{
     protected final int timerDump = timers++;
-    protected final int timerCraft = timers++;
 
-    protected Item result;
-
-    protected float minFlux = 0.2f;
-    protected int fluxNeeded = 1;
-    protected float fluxSpeedMult = 0.75f;
-    protected float baseFluxChance = 0.25f;
-    protected boolean useFlux = false;
+    protected Item output;
 
     protected float heatUpTime = 80f;
     protected float minHeat = 0.5f;
@@ -57,13 +47,9 @@ public class PowerSmelter extends PowerBlock{
 
     @Override
     public void init(){
-        if(useFlux){
-            consumes.item(Items.sand).optional(true);
-        }
-
         super.init();
 
-        produces.set(result);
+        produces.set(output);
     }
 
     @Override
@@ -76,7 +62,7 @@ public class PowerSmelter extends PowerBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.outputItem, result);
+        stats.add(BlockStat.outputItem, output);
         stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
         stats.add(BlockStat.inputItemCapacity, itemCapacity, StatUnit.items);
         stats.add(BlockStat.outputItemCapacity, itemCapacity, StatUnit.items);
@@ -87,8 +73,8 @@ public class PowerSmelter extends PowerBlock{
 
         PowerSmelterEntity entity = tile.entity();
 
-        if(entity.timer.get(timerDump, 5) && entity.items.has(result)){
-            tryDump(tile, result);
+        if(entity.timer.get(timerDump, 5) && entity.items.has(output)){
+            tryDump(tile, output);
         }
 
         //heat it up if there's enough power
@@ -107,46 +93,21 @@ public class PowerSmelter extends PowerBlock{
             return;
         }
 
-        float baseSmeltSpeed = 1f;
-        for(Item item : content.items()){
-            if(item.fluxiness >= minFlux && tile.entity.items.get(item) > 0){
-                baseSmeltSpeed = fluxSpeedMult;
-                break;
-            }
-        }
-
         entity.craftTime += entity.delta() * entity.power.satisfaction;
 
-        if(entity.items.get(result) >= itemCapacity //output full
+        if(entity.items.get(output) >= itemCapacity //output full
                 || entity.heat <= minHeat //not burning
-                || entity.craftTime < craftTime*baseSmeltSpeed){ //not yet time
+                || entity.craftTime < craftTime){ //not yet time
             return;
         }
 
         entity.craftTime = 0f;
 
-        boolean consumeInputs = true;
-
-        if(useFlux){
-            //remove flux materials if present
-            for(Item item : content.items()){
-                if(item.fluxiness >= minFlux && tile.entity.items.get(item) >= fluxNeeded){
-                    tile.entity.items.remove(item, fluxNeeded);
-
-                    //chance of not consuming inputs if flux material present
-                    consumeInputs = !Mathf.chance(item.fluxiness * baseFluxChance);
-                    break;
-                }
-            }
+        for(ItemStack item : consumes.items()){
+            entity.items.remove(item.item, item.amount);
         }
 
-        if(consumeInputs){
-            for(ItemStack item : consumes.items()){
-                entity.items.remove(item.item, item.amount);
-            }
-        }
-
-        offloadNear(tile, result);
+        offloadNear(tile, output);
         Effects.effect(craftEffect, flameColor, tile.drawx(), tile.drawy());
     }
 
@@ -159,8 +120,7 @@ public class PowerSmelter extends PowerBlock{
             }
         }
 
-        return useFlux && item.fluxiness >= minFlux && tile.entity.items.get(item) < itemCapacity;
-
+        return false;
     }
 
     @Override

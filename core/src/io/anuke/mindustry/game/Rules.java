@@ -24,9 +24,9 @@ public class Rules{
     /**Player respawn time in ticks.*/
     public float respawnTime = 60 * 4;
     /**Time between waves in ticks.*/
-    public float waveSpacing = 60 * 60;
+    public float waveSpacing = 60 * 60 * 2;
     /**Zone ID, -1 for invalid zone.*/
     public byte zone = -1;
     /**Spawn layout. Since only zones modify this, it should be assigned on save load.*/
-    public transient Array<SpawnGroup> spawns = new Array<>();
+    public transient Array<SpawnGroup> spawns = DefaultWaves.getDefaultSpawns();
 }

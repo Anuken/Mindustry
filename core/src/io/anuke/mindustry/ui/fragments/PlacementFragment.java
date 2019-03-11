@@ -5,22 +5,23 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.TileEntity;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.graphics.Palette;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Category;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
@@ -33,12 +34,13 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     Array<Block> returnArray = new Array<>();
+    Array<Category> returnCatArray = new Array<>();
+    boolean[] categoryEmpty = new boolean[Category.values().length];
     Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
-    boolean shown = true;
     boolean lastGround;
 
     //TODO make this configurable
@@ -56,14 +58,41 @@ public class PlacementFragment extends Fragment{
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
-            currentCategory = Category.turret;
-            Group group = toggler.getParent();
-            toggler.remove();
-            build(group);
+            control.input(0).block = null;
+            rebuild();
+        });
+
+        Events.on(UnlockEvent.class, event -> {
+            if(event.content instanceof Block){
+                rebuild();
+            }
         });
     }
 
+    void rebuild(){
+        currentCategory = Category.turret;
+        Group group = toggler.getParent();
+        int index = toggler.getZIndex();
+        toggler.remove();
+        build(group);
+        toggler.setZIndex(index);
+    }
+
     boolean gridUpdate(InputHandler input){
+        if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
+            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+
+            if(tile != null){
+                tile = tile.target();
+                Block tryRecipe = tile.block();
+                if(tryRecipe.isVisible() && unlocked(tryRecipe)){
+                    input.block = tryRecipe;
+                    currentCategory = input.block.buildCategory;
+                    return true;
+                }
+            }
+        }
+
         if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
         if(Core.input.keyDown(Binding.gridModeShift)){ //select category
             int i = 0;
@@ -75,24 +104,12 @@ public class PlacementFragment extends Fragment{
                 i++;
             }
             return true;
-        }else if(Core.input.keyDown(Binding.select)){ //mouse eyedropper select
-            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-
-            if(tile != null){
-                tile = tile.target();
-                Block tryRecipe = tile.block();
-                if(tryRecipe.isVisible() && data.isUnlocked(tryRecipe)){
-                    input.block = tryRecipe;
-                    currentCategory = input.block.buildCategory;
-                    return true;
-                }
-            }
         }else{ //select block
             int i = 0;
             Array<Block> recipes = getByCategory(currentCategory);
             for(KeyCode key : inputGrid){
                 if(Core.input.keyDown(key))
-                    input.block = (i < recipes.size && data.isUnlocked(recipes.get(i))) ? recipes.get(i) : null;
+                    input.block = (i < recipes.size && unlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }
         }
@@ -103,7 +120,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> !state.is(State.menu));
+            full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
 
             full.table(frame -> {
                 InputHandler input = control.input(0);
@@ -119,34 +136,28 @@ public class PlacementFragment extends Fragment{
                     group.setMinCheckCount(0);
 
                     for(Block block : getByCategory(currentCategory)){
-
                         if(index++ % rowWidth == 0){
                             blockTable.row();
                         }
 
-                        boolean[] unlocked = {false};
+                        if(!unlocked(block)){
+                            blockTable.add().size(46);
+                            continue;
+                        }
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
-                            if(data.isUnlocked(block)){
+                            if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
                         }).size(46f).group(group).get();
 
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
+
                         button.update(() -> { //color unplacable things gray
-                            boolean ulock = data.isUnlocked(block);
                             TileEntity core = players[0].getClosestCore();
-                            Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : ulock ? Color.GRAY : Color.WHITE;
+                            Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
-
-                            if(ulock == unlocked[0]) return;
-                            unlocked[0] = ulock;
-
-                            if(!ulock){
-                                button.replaceImage(new Image("icon-locked"));
-                            }else{
-                                button.replaceImage(new Image(block.icon(Icon.medium)));
-                            }
                         });
 
                         button.hovered(() -> hovered = block);
@@ -165,7 +176,7 @@ public class PlacementFragment extends Fragment{
                     top.add(new Table()).growX().update(topTable -> {
                         //don't refresh unnecessarily
                         if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround)
-                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastGround))
+                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastDisplay == tileDisplayBlock() && lastGround))
                             return;
 
                         topTable.clear();
@@ -181,10 +192,10 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !data.isUnlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.formalName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(data.isUnlocked(lastDisplay)){
+                                if(unlocked(lastDisplay)){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
                                     .size(8 * 5).padTop(-5).padRight(-5).right().grow();
                                 }
@@ -197,7 +208,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : lastDisplay.buildRequirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.region).size(8 * 2);
+                                        line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = players[0].getClosestCore();
@@ -231,7 +242,7 @@ public class PlacementFragment extends Fragment{
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("blank").color(Palette.accent).colspan(3).height(3).growX();
+                frame.addImage("blank").color(Pal.accent).colspan(3).height(3).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
@@ -244,15 +255,25 @@ public class PlacementFragment extends Fragment{
 
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
+                    //update category empty values
                     for(Category cat : Category.values()){
-                        if(getByCategory(cat).isEmpty()) continue;
+                        Array<Block> blocks = getByCategory(cat);
+                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !unlocked(blocks.first());
+                    }
+
+                    int f = 0;
+                    for(Category cat : getCategories()){
+                        if(f++ % 2 == 0) categories.row();
+
+                        if(categoryEmpty[cat.ordinal()]){
+                            categories.addImage("flat");
+                            continue;
+                        }
 
                         categories.addImageButton("icon-" + cat.name(), "clear-toggle", 16 * 2, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat));
-
-                        if(cat.ordinal() % 2 == 1) categories.row();
                     }
                 }).touchable(Touchable.enabled);
 
@@ -263,6 +284,13 @@ public class PlacementFragment extends Fragment{
             });
         });
     }
+
+    Array<Category> getCategories(){
+        returnCatArray.clear();
+        returnCatArray.addAll(Category.values());
+        returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
+        return returnCatArray;
+    }
     
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
@@ -271,7 +299,12 @@ public class PlacementFragment extends Fragment{
                 returnArray.add(block);
             }
         }
+        returnArray.sort((b1, b2) -> -Boolean.compare(unlocked(b1), unlocked(b2)));
         return returnArray;
+    }
+
+    boolean unlocked(Block block){
+        return !world.isZone() || data.isUnlocked(block);
     }
 
     /** Returns the currently displayed block in the top box. */
@@ -308,17 +341,5 @@ public class PlacementFragment extends Fragment{
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
         return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.floor() instanceof OreBlock ? hoverTile.floor() : null;
-    }
-
-    /** Show or hide the placement menu. */
-    void toggle(float t, Interpolation ip){
-        toggler.clearActions();
-        if(shown){
-            shown = false;
-            toggler.actions(Actions.translateBy(toggler.getTranslation().x + toggler.getWidth(), 0, t, ip));
-        }else{
-            shown = true;
-            toggler.actions(Actions.translateBy(-toggler.getTranslation().x, 0, t, ip));
-        }
     }
 }

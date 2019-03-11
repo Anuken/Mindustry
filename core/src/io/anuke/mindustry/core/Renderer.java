@@ -2,12 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
-import io.anuke.arc.entities.Effects;
-import io.anuke.arc.entities.EntityDraw;
-import io.anuke.arc.entities.EntityGroup;
-import io.anuke.arc.entities.impl.EffectEntity;
-import io.anuke.arc.entities.trait.DrawTrait;
-import io.anuke.arc.entities.trait.Entity;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
@@ -15,23 +9,32 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.entities.Unit;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityDraw;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
+import io.anuke.mindustry.entities.impl.EffectEntity;
 import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.mindustry.entities.units.BaseUnit;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -41,18 +44,17 @@ public class Renderer implements ApplicationListener{
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
 
+    public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
-    private Vector2 avgPosition = new Vector2();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
         batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(14);
-
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -63,8 +65,7 @@ public class Renderer implements ApplicationListener{
         Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
             if(effect == Fx.none) return;
             if(Core.settings.getBool("effects")){
-                Rectangle view = rect.setSize(camera.width, camera.height)
-                        .setCenter(camera.position.x, camera.position.y);
+                Rectangle view = camera.bounds(rect);
                 Rectangle pos = rect2.setSize(effect.size).setCenter(x, y);
 
                 if(view.overlaps(pos)){
@@ -72,7 +73,7 @@ public class Renderer implements ApplicationListener{
                     if(!(effect instanceof GroundEffect)){
                         EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.data = data;
                         entity.id++;
@@ -84,7 +85,7 @@ public class Renderer implements ApplicationListener{
                     }else{
                         GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
                         entity.effect = effect;
-                        entity.color = color;
+                        entity.color.set(color);
                         entity.rotation = rotation;
                         entity.id++;
                         entity.data = data;
@@ -113,11 +114,11 @@ public class Renderer implements ApplicationListener{
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
         }else{
-            Vector2 position = averagePosition();
+            Vector2 position = Tmp.v3.set(players[0]);
 
             if(players[0].isDead()){
                 TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == Unit.noSpawner){
+                if(core != null && players[0].spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
@@ -125,9 +126,6 @@ public class Renderer implements ApplicationListener{
             }else if(!mobile){
                 camera.position.lerpDelta(position, 0.08f);
             }
-
-            camera.position.x = Mathf.clamp(camera.position.x, -tilesize / 2f, world.width() * tilesize - tilesize / 2f);
-            camera.position.y = Mathf.clamp(camera.position.y, -tilesize / 2f, world.height() * tilesize - tilesize / 2f);
 
             updateShake(0.75f);
 
@@ -161,6 +159,10 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
+        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+            shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        }
+
         Draw.proj(camera.projection());
 
         blocks.floor.drawFloor();
@@ -172,7 +174,13 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+
+        blocks.floor.beginDraw();
+        blocks.floor.drawLayer(CacheLayer.walls);
+        blocks.floor.endDraw();
+
         blocks.drawBlocks(Layer.block);
+        blocks.drawFog();
 
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
@@ -195,17 +203,20 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        //TODO shield
-        /*
-        if(shieldGroup.size() > 0){
-            Graphics.beginShaders(Shaders.shield);
+        if(EntityDraw.countInBounds(shieldGroup) > 0){
+            Draw.flush();
+            shieldBuffer.begin();
+            graphics.clear(Color.CLEAR);
             EntityDraw.draw(shieldGroup);
             EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-            Draw.color(Palette.accent);
-            Graphics.endShaders();
+            Draw.flush();
+            shieldBuffer.end();
+            Draw.shader(Shaders.shield);
+            Draw.color(Pal.accent);
+            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
             Draw.color();
+            Draw.shader();
         }
-        */
 
         overlays.drawTop();
 
@@ -218,11 +229,8 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawFlyerShadows(){
-        //TODO fix flyer shadows
-        //Graphics.surface(effectSurface, true, false);
-
         float trnsX = -12, trnsY = -13;
-        Draw.color(0, 0, 0, 0.15f);
+        Draw.color(0, 0, 0, 0.22f);
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
@@ -234,8 +242,6 @@ public class Renderer implements ApplicationListener{
             drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
-        //Draw.color(0, 0, 0, 0.15f);
-        //Graphics.flushSurface();
         Draw.color();
     }
 
@@ -247,18 +253,11 @@ public class Renderer implements ApplicationListener{
                     playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawUnder);
+            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            Shaders.outline.color.set(team.color);
-            Shaders.mix.color.set(Color.WHITE);
-
-            //Graphics.beginShaders(Shaders.outline);
-            Draw.shader(Shaders.mix, true);
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            Draw.shader();
             blocks.drawTeamBlocks(Layer.turret, team);
-            //Graphics.endShaders();
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
@@ -281,15 +280,6 @@ public class Renderer implements ApplicationListener{
         return camerascale;
     }
 
-    public Vector2 averagePosition(){
-        avgPosition.setZero();
-
-        drawAndInterpolate(playerGroup, p -> p.isLocal, p -> avgPosition.add(p.x, p.y));
-
-        avgPosition.scl(1f / players.length);
-        return avgPosition;
-    }
-
     public void scaleCamera(float amount){
         targetscale += amount;
         clampScale();
@@ -297,47 +287,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 2.5f, Math.round(s * 7));
-    }
-
-    public void takeMapScreenshot(){
-        //TODO fix/implement
-        /*
-        float vpW = camera.width, vpH = camera.height;
-        int w = world.width()*tilesize, h =  world.height()*tilesize;
-        int pw = pixelSurface.width(), ph = pixelSurface.height();
-        disableUI = true;
-        pixelSurface.setSize(w, h, true);
-        Graphics.getEffectSurface().setSize(w, h, true);
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w/2f + tilesize/2f;
-        camera.position.y = h/2f + tilesize/2f;
-
-        draw();
-
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-
-        pixelSurface.getBuffer().begin();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i+= 4){
-            lines[i + 3] = (byte)255;
-        }
-        pixelSurface.getBuffer().end();
-
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-
-        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-        PixmapIO.writePNG(file, fullPixmap);
-        fullPixmap.dispose();
-
-        pixelSurface.setSize(pw, ph, false);
-        Graphics.getEffectSurface().setSize(pw, ph, false);
-
-        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));*/
+        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 5));
     }
 
 }
