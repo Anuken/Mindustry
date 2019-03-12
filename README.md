@@ -31,9 +31,7 @@ Server builds are bundled with each released build (in Releases). If you'd rathe
 
 ##### Troubleshooting
 
-If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. 
-
-NOTE: this is a one-time procedure.
+If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. *This is a one-time procedure.*
 
 ---
 

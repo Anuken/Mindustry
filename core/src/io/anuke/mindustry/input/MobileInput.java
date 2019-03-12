@@ -263,8 +263,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //rotate button
         table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
-        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center))
-        .visible(() -> block != null && block.rotate);
+        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
 
         //confirm button
         table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {

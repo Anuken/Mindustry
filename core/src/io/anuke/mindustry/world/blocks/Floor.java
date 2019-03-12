@@ -110,7 +110,7 @@ public class Floor extends Block{
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
         Floor floor = tile.oreBlock();
-        if(floor != Blocks.air){
+        if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.draw(tile);
         }
 

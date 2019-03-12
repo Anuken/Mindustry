@@ -120,14 +120,15 @@ public abstract class SaveFileVersion{
             byte floorid = stream.readByte();
             byte oreid = stream.readByte();
             int consecutives = stream.readUnsignedByte();
+            Block ore = content.block(oreid);
 
             tiles[x][y] = new Tile(x, y, floorid, (byte)0);
-            tiles[x][y].setOreByte(oreid);
+            tiles[x][y].setOre(ore);
 
             for(int j = i + 1; j < i + 1 + consecutives; j++){
                 int newx = j % width, newy = j / width;
                 Tile newTile = new Tile(newx, newy, floorid, (byte)0);
-                newTile.setOreByte(oreid);
+                newTile.setOre(ore);
                 tiles[newx][newy] = newTile;
             }
 

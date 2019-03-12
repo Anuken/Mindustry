@@ -337,8 +337,8 @@ public class Tile implements Position, TargetTrait{
         this.ore = ore;
     }
 
-    public void setOre(Block floor){
-        setOreByte(floor.id);
+    public void setOre(Block block){
+        setOreByte(block.id);
     }
 
     public void clearOre(){
