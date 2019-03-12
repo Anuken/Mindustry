@@ -43,8 +43,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private boolean shownWithMap = false;
     private Array<Block> blocksOut = new Array<>();
 
-    private ButtonGroup<ImageButton> blockgroup;
-
     public MapEditorDialog(){
         super("", "dialog");
 
@@ -295,15 +293,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         saved = false;
     }
 
-    public void updateSelectedBlock(){
-        for(int j = 0; j < Vars.content.blocks().size; j++){
-            if(editor.drawBlock.id == j && j < blockgroup.getButtons().size){
-                blockgroup.getButtons().get(j).setChecked(true);
-                break;
-            }
-        }
-    }
-
     public boolean hasPane(){
         return Core.scene.getScrollFocus() == pane || Core.scene.getKeyboardFocus() != this;
     }
@@ -475,7 +464,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        blockgroup = group;
 
         int i = 0;
 

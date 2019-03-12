@@ -59,13 +59,20 @@ public class MapIO{
         }
     }
 
-    //TODO implement
     public static Pixmap generatePreview(Map map) throws IOException{
-        Pixmap pixmap = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap floor = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap wall = new Pixmap(map.width, map.height, Format.RGBA8888);
+        int black = Color.rgba8888(Color.BLACK);
         CachedTile tile = new CachedTile(){
             @Override
+            public void setFloor(Floor type){
+                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(type, Blocks.air, getTeam()));
+            }
+
+            @Override
             protected void changed(){
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(floor(), block(), getTeam()));
+                int c = colorFor(Blocks.air, block(), getTeam());
+                if(c != black) wall.drawPixel(x, floor.getHeight() - 1 - y, c);
             }
         };
         readTiles(map, (x, y) -> {
@@ -73,7 +80,9 @@ public class MapIO{
             tile.y = (short)y;
             return tile;
         });
-        return pixmap;
+        floor.drawPixmap(wall, 0, 0);
+        wall.dispose();
+        return floor;
     }
 
     public static Pixmap generatePreview(Tile[][] tiles){
@@ -227,8 +236,8 @@ public class MapIO{
                 byte tagAmount = stream.readByte();
 
                 for(int i = 0; i < tagAmount; i++){
-                    stream.readUTF();
-                    stream.readUTF();
+                    stream.readUTF(); //key
+                    stream.readUTF(); //val
                 }
             }
 
@@ -344,7 +353,6 @@ public class MapIO{
         readLegacyMmapTiles(file, (x, y) -> tiles[x][y]);
     }
 
-    //TODO implement
     /**Reads a mmap in the old 4.0 .mmap format.*/
     private static void readLegacyMmapTiles(FileHandle file, TileProvider tiles) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(bufferSize))){

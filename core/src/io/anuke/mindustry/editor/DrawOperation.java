@@ -21,31 +21,34 @@ public class DrawOperation{
     }
 
     public void undo(MapEditor editor){
-        for(int i = 0; i < array.size; i++){
+        for(int i = array.size - 1; i >= 0; i--){
             long l = array.get(i);
-            set(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.from(l));
+            set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.from(l));
         }
     }
 
     public void redo(MapEditor editor){
         for(int i = 0; i < array.size; i++){
             long l = array.get(i);
-            set(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.to(l));
+            set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.to(l));
         }
     }
 
-    void set(Tile tile, byte type, byte to){
-        if(type == OpType.floor.ordinal()){
-            tile.setFloor((Floor)content.block(to));
-        }else if(type == OpType.block.ordinal()){
-            tile.setBlock(content.block(to));
-        }else if(type == OpType.rotation.ordinal()){
-            tile.setRotation(to);
-        }else if(type == OpType.team.ordinal()){
-            tile.setTeam(Team.all[to]);
-        }else if(type == OpType.ore.ordinal()){
-            tile.setOre(to);
-        }
+    void set(MapEditor editor, Tile tile, byte type, byte to){
+        editor.load(() -> {
+            if(type == OpType.floor.ordinal()){
+                tile.setFloor((Floor)content.block(to));
+            }else if(type == OpType.block.ordinal()){
+                tile.setBlock(content.block(to));
+            }else if(type == OpType.rotation.ordinal()){
+                tile.setRotation(to);
+            }else if(type == OpType.team.ordinal()){
+                tile.setTeam(Team.all[to]);
+            }else if(type == OpType.ore.ordinal()){
+                tile.setOre(to);
+            }
+        });
+        editor.renderer().updatePoint(tile.x, tile.y);
     }
 
     @Struct

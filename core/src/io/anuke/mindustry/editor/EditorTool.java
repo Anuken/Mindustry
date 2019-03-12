@@ -10,22 +10,20 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
-
-import static io.anuke.mindustry.Vars.ui;
-import static io.anuke.mindustry.Vars.world;
 
 public enum EditorTool{
     pick{
         public void touched(MapEditor editor, int x, int y){
-            if(!Structs.inBounds(x, y, world.width(), world.height())) return;
+            if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
             Tile tile = editor.tile(x, y);
 
             Block floor = tile.floor(), block = tile.block();
             byte link = tile.getLinkByte();
 
-            if(link != 0){
+            if(block instanceof BlockPart && link != 0){
                 x -= (Pack.leftByte(link) - 8);
                 y -= (Pack.rightByte(link) - 8);
 
@@ -34,7 +32,6 @@ public enum EditorTool{
             }
 
             editor.drawBlock = block == Blocks.air ? floor : block;
-            ui.editor.updateSelectedBlock();
         }
     },
     pencil{
@@ -86,7 +83,7 @@ public enum EditorTool{
         MapEditor data;
 
         public void touched(MapEditor editor, int x, int y){
-            if(!Structs.inBounds(x, y, world.width(), world.height())) return;
+            if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
             Tile tile = editor.tile(x, y);
 
             if(editor.drawBlock.isMultiblock()){
@@ -109,8 +106,8 @@ public enum EditorTool{
                 return;
             }
 
-            int width = world.width();
-            int height = world.height();
+            int width = editor.width();
+            int height = editor.height();
 
             IntPositionConsumer writer = (px, py) -> {
                 Tile write = editor.tile(px, py);
