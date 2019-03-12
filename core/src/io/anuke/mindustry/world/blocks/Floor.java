@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Effects.Effect;
@@ -45,8 +46,6 @@ public class Floor extends Block{
     public Liquid liquidDrop = null;
     /** item that drops from this block, used for drills */
     public Item itemDrop = null;
-    /** Whether ores generate on this block. */
-    public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
@@ -110,6 +109,10 @@ public class Floor extends Block{
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+        Floor floor = tile.oreBlock();
+        if(floor != Blocks.air){
+            floor.draw(tile);
+        }
 
         drawEdges(tile);
     }

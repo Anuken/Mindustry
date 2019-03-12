@@ -7,6 +7,7 @@ import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
@@ -66,13 +67,19 @@ public class MapIO{
         CachedTile tile = new CachedTile(){
             @Override
             public void setFloor(Floor type){
-                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(type, Blocks.air, getTeam()));
+                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
+            }
+
+            @Override
+            public void setOreByte(byte b){
+                if(b != 0)
+                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
 
             @Override
             protected void changed(){
                 super.changed();
-                int c = colorFor(Blocks.air, block(), getTeam());
+                int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
                 if(c != black) wall.drawPixel(x, floor.getHeight() - 1 - y, c);
             }
         };
@@ -91,17 +98,17 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles[x][y];
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.getTeam()));
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.oreBlock(), tile.getTeam()));
             }
         }
         return pixmap;
     }
 
-    public static int colorFor(Block floor, Block wall, Team team){
+    public static int colorFor(Block floor, Block wall, Block ore, Team team){
         if(wall.synthetic()){
             return team.intColor;
         }
-        return Color.rgba8888(wall.solid ? wall.color : floor.color);
+        return Color.rgba8888(wall.solid ? wall.color : ore == Blocks.air ? floor.color : ore.color);
     }
 
     public static void writeMap(FileHandle file, Map map, Tile[][] tiles) throws IOException{
@@ -130,13 +137,13 @@ public class MapIO{
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = tiles[i % width][i / width];
                 stream.writeByte(tile.getFloorID());
-                stream.writeByte(tile.getOre());
+                stream.writeByte(tile.getOreByte());
                 int consecutives = 0;
 
                 for(int j = i + 1; j < width * height && consecutives < 255; j++){
                     Tile nextTile = tiles[j % width][j / width];
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOre() != tile.getOre()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOreByte() != tile.getOreByte()){
                         break;
                     }
 
@@ -258,13 +265,13 @@ public class MapIO{
 
                         Tile tile = tiles.get(x, y);
                         tile.setFloor((Floor)content.block(floorid));
-                        tile.setOre(oreid);
+                        tile.setOreByte(oreid);
 
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
                             int newx = j % width, newy = j / width;
                             Tile newTile = tiles.get(newx, newy);
                             newTile.setFloor((Floor)content.block(floorid));
-                            newTile.setOre(oreid);
+                            newTile.setOreByte(oreid);
                         }
 
                         i += consecutives;
@@ -323,6 +330,7 @@ public class MapIO{
 
                 tile.setFloor(block.floor);
                 tile.setBlock(block.wall);
+                if(block.ore != null) tile.setOre(block.ore);
 
                 //place core
                 if(color == Color.rgba8888(Color.GREEN)){
@@ -384,9 +392,10 @@ public class MapIO{
                         String[] split = name.split("-");
                         String itemName = split[1], floorName = split[2];
                         Item item = content.getByName(ContentType.item, itemName);
+                        Block oreBlock = item == null ? null : content.getByName(ContentType.block, "ore-" + item.name);
                         Block floor = content.getByName(ContentType.block, floorName);
-                        if(item != null && floor != null){
-                            oreMap.put(id, item.id);
+                        if(oreBlock != null && floor != null){
+                            oreMap.put(id, oreBlock.id);
                             block = floor;
                         }else{
                             block = Blocks.air;
@@ -406,18 +415,22 @@ public class MapIO{
                     byte floorb = stream.readByte();
                     byte blockb = stream.readByte();
                     byte rotTeamb = stream.readByte();
-                    byte linkb = stream.readByte();
-                    stream.readByte(); //unused stuff
+                    byte link = stream.readByte();
+                    stream.readByte();//unused stuff
 
                     tile.setFloor((Floor)content.block(map.get(floorb, 0)));
                     tile.setBlock(content.block(map.get(blockb, 0)));
                     tile.setRotation(Pack.leftByte(rotTeamb));
+                    if(tile.block().synthetic()){
+                        tile.setTeam(Team.all[Mathf.clamp(Pack.rightByte(rotTeamb), 0, Team.all.length)]);
+                    }
+
                     if(tile.block() == Blocks.part){
-                        tile.setLinkByte(linkb);
+                        tile.setLinkByte(link);
                     }
 
                     if(oreMap.containsKey(floorb)){
-                        tile.setOre((byte)oreMap.get(floorb, 0));
+                        tile.setOreByte((byte)oreMap.get(floorb, 0));
                     }
                 }
             }

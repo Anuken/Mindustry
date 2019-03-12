@@ -422,6 +422,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }
 
+        if(Core.input.keyTap(KeyCode.ESCAPE)){
+            if(!menu.isShown()){
+                menu.show();
+            }
+        }
+
         if(Core.input.keyTap(KeyCode.R)){
             editor.rotation = Mathf.mod(editor.rotation + 1, 4);
         }

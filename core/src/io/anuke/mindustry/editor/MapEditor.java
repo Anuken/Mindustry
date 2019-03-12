@@ -3,6 +3,7 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
@@ -52,6 +53,7 @@ public class MapEditor{
         tiles = createTiles(map.width, map.height);
         tags.putAll(map.tags);
         MapIO.readTiles(map, tiles);
+        checkTiles();
         renderer.resize(width(), height());
         loading = false;
     }
@@ -60,7 +62,44 @@ public class MapEditor{
         reset();
 
         this.tiles = tiles;
+        checkTiles();
         renderer.resize(width(), height());
+    }
+
+    //adds missing blockparts
+    void checkTiles(){
+        //clear block parts first
+        for(int x = 0; x < width(); x ++){
+            for(int y = 0; y < height(); y++){
+                if(tiles[x][y].block() == Blocks.part){
+                    tiles[x][y].setBlock(Blocks.air);
+                    tiles[x][y].setLinkByte((byte)0);
+                }
+            }
+        }
+
+        //set up missing blockparts
+        for(int x = 0; x < width(); x ++){
+            for(int y = 0; y < height(); y ++){
+                Block drawBlock = tiles[x][y].block();
+                if(drawBlock.isMultiblock()){
+                    int offsetx = -(drawBlock.size - 1) / 2;
+                    int offsety = -(drawBlock.size - 1) / 2;
+                    for(int dx = 0; dx < drawBlock.size; dx++){
+                        for(int dy = 0; dy < drawBlock.size; dy++){
+                            int worldx = dx + offsetx + x;
+                            int worldy = dy + offsety + y;
+
+                            if(Structs.inBounds(worldx, worldy, width(), height()) && !(dx + offsetx == 0 && dy + offsety == 0)){
+                                Tile tile = tiles[worldx][worldy];
+                                tile.setBlock(Blocks.part);
+                                tile.setLinkByte(Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void load(Runnable r){
@@ -137,6 +176,7 @@ public class MapEditor{
                             Tile tile = tiles[worldx][worldy];
 
                             if(i == 1){
+                                tile.setBlock(Blocks.part);
                                 tile.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
                             }else{
                                 byte link = tile.getLinkByte();
@@ -170,10 +210,11 @@ public class MapEditor{
 
                         if(!isfloor){
                             byte link = tile.getLinkByte();
+                            Log.info("Remove linkd: " + tiles[x][y]);
 
                             if(tile.block().isMultiblock()){
                                 removeLinked(wx, wy);
-                            }else if(link != 0){
+                            }else if(link != 0 && tiles[x][y].block() == Blocks.part){
                                 removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
                             }
                         }

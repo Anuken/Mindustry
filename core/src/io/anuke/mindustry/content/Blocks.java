@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.type.Category;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -28,7 +27,8 @@ import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class Blocks implements ContentList{
     public static Block
@@ -38,6 +38,9 @@ public class Blocks implements ContentList{
     holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, moss, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,  grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
+
+    //ores
+    oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -145,7 +148,7 @@ public class Blocks implements ContentList{
         }};
 
         stone = new Floor("stone"){{
-            hasOres = true;
+
         }};
 
         craters = new Floor("craters"){{
@@ -170,12 +173,10 @@ public class Blocks implements ContentList{
 
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
-            hasOres = true;
             playerUnmineable = true;
         }};
 
         holostone = new Floor("holostone"){{
-            hasOres = true;
             edgeStyle = "blocky";
         }};
 
@@ -226,7 +227,6 @@ public class Blocks implements ContentList{
         }};
 
         pine = new StaticWall("pine"){{
-            //fillsTile = false;
             variants = 0;
         }};
 
@@ -253,7 +253,6 @@ public class Blocks implements ContentList{
         }};
 
         stainedStoneRed = new Floor("stained-stone-red"){{
-            hasOres = true;
             variants = 1;
         }};
 
@@ -307,6 +306,16 @@ public class Blocks implements ContentList{
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
         }};
+
+        //endregion
+        //region ore
+
+        oreCopper = new OreBlock(Items.copper);
+        oreLead = new OreBlock(Items.lead);
+        oreScrap = new OreBlock(Items.scrap);
+        oreCoal = new OreBlock(Items.coal);
+        oreTitanium = new OreBlock(Items.titanium);
+        oreThorium = new OreBlock(Items.thorium);
 
         //endregion
         //region crafting
@@ -1417,23 +1426,6 @@ public class Blocks implements ContentList{
             size = 3;
             consumes.powerBuffered(120f);
         }};
-
-        //endregion
-        //region ores
-
-        //create ores for every floor and item combination necessary
-        for(Item item : content.items()){
-            if(!item.genOre) continue;
-
-            for(Block block : content.blocks()){
-                if(block instanceof Floor && ((Floor) block).hasOres){
-                    new OreBlock(item, (Floor) block);
-                }
-            }
-        }
-
-        //special variants
-        new OreBlock(Items.scrap, (Floor)snow);
 
         //endregion
     }

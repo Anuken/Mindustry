@@ -5,9 +5,12 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
     public final Color color;
@@ -28,8 +31,6 @@ public class Item extends UnlockableContent implements Comparable<Item>{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 3f;
-    /**Whether this item has ores generated for it.*/
-    public boolean genOre = false;
     /**If true, item is always unlocked.*/
     public boolean alwaysUnlocked = false;
 
@@ -101,6 +102,6 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     /**Allocates a new array containing all items the generate ores.*/
     public static Array<Item> getAllOres(){
-        return Vars.content.items().select(i -> i.genOre);
+        return content.blocks().select(b -> b instanceof OreBlock).map(b -> ((Floor)b).itemDrop);
     }
 }

@@ -18,6 +18,11 @@ public class CachedTile extends Tile{
     }
 
     @Override
+    public Team getTeam(){
+        return Team.all[getTeamID()];
+    }
+
+    @Override
     protected void preChanged(){
         super.setTeam(Team.none);
     }

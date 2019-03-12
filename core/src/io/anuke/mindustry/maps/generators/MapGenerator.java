@@ -14,14 +14,13 @@ import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.StaticWall;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.world;
 
 public class MapGenerator extends Generator{
     private Map map;
@@ -159,10 +158,7 @@ public class MapGenerator extends Generator{
                             double dst = Mathf.dst(x, y);
                             if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
                                 Tile tile = tiles[wx][wy];
-                                if(tile.floor() instanceof OreBlock){
-                                    OreBlock block = (OreBlock)tile.floor();
-                                    tile.setFloor(block.base);
-                                }
+                                tile.clearOre();
                             }
                         }
                     }

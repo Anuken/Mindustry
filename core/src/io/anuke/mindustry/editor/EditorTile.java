@@ -1,11 +1,13 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.DrawOperation.OpType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -20,11 +22,29 @@ public class EditorTile extends Tile{
     }
 
     @Override
+    public Team getTeam(){
+        return Team.all[getTeamID()];
+    }
+
+    @Override
     public void setFloor(Floor type){
+        if(type instanceof OreBlock){
+            //don't place on liquids
+            if(!floor().isLiquid) setOreByte(type.id);
+            return;
+        }
+
         Block previous = floor();
-        if(previous == type) return;
+        Block ore = oreBlock();
+        if(previous == type && ore == Blocks.air) return;
         super.setFloor(type);
-        op(TileOp.get(x, y, (byte)OpType.floor.ordinal(), previous.id, type.id));
+        //ore may get nullified so make sure to save editrs
+        if(oreBlock() != ore){
+            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, oreBlock().id));
+        }
+        if(previous != type){
+            op(TileOp.get(x, y, (byte)OpType.floor.ordinal(), previous.id, type.id));
+        }
     }
 
     @Override
@@ -52,10 +72,10 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setOre(byte ore){
-        byte previous = getRotation();
+    public void setOreByte(byte ore){
+        byte previous = getOreByte();
         if(previous == ore) return;
-        super.setOre(ore);
+        super.setOreByte(ore);
         op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), previous, ore));
     }
 
