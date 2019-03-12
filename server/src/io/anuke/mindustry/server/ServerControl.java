@@ -46,7 +46,6 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-    private RulePreset lastPreset;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
