@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
@@ -26,6 +27,7 @@ import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -390,10 +392,10 @@ public class MapIO{
                         block = missingBlocks.get(name);
                     }else if(name.startsWith("ore-")){ //an ore floor combination
                         String[] split = name.split("-");
-                        String itemName = split[1], floorName = split[2];
+                        String itemName = split[1], floorName = Strings.join("-", Arrays.copyOfRange(split, 2, split.length));
                         Item item = content.getByName(ContentType.item, itemName);
                         Block oreBlock = item == null ? null : content.getByName(ContentType.block, "ore-" + item.name);
-                        Block floor = content.getByName(ContentType.block, floorName);
+                        Block floor = missingBlocks.get(floorName, content.getByName(ContentType.block, floorName));
                         if(oreBlock != null && floor != null){
                             oreMap.put(id, oreBlock.id);
                             block = floor;

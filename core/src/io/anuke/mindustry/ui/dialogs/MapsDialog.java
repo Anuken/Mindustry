@@ -32,8 +32,7 @@ public class MapsDialog extends FloatingDialog{
                     Map map = MapIO.readMap(file, true);
                     String name = map.tags.get("name", file.nameWithoutExtension());
 
-                    //TODO filename conflict, erasure
-                    Map conflict = world.maps.byName(name);
+                    Map conflict = world.maps.all().find(m -> m.fileName().equals(file.nameWithoutExtension()) || m.name().equals(file.name()));
 
                     if(conflict != null && !conflict.custom){
                         ui.showError(Core.bundle.format("editor.import.exists", name));
