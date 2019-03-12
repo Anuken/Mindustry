@@ -414,8 +414,8 @@ public class MapIO{
                     Tile tile = tiles.get(x, y);
                     byte floorb = stream.readByte();
                     byte blockb = stream.readByte();
-                    byte rotTeamb = stream.readByte();
                     byte link = stream.readByte();
+                    byte rotTeamb = stream.readByte();
                     stream.readByte();//unused stuff
 
                     tile.setFloor((Floor)content.block(map.get(floorb, 0)));
