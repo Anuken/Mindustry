@@ -79,6 +79,12 @@ public class MapGenerator extends Generator{
     @Override
     public void generate(Tile[][] tiles){
         try{
+            for(int x = 0; x < width; x++){
+                for(int y = 0; y < height; y++){
+                    tiles[x][y] = new Tile(x, y);
+                }
+            }
+
             MapIO.readTiles(map, tiles);
             Array<Point2> players = new Array<>();
             Array<Point2> enemies = new Array<>();

@@ -235,6 +235,11 @@ public class World implements ApplicationListener{
 
         try{
             createTiles(map.width, map.height);
+            for(int x = 0; x < map.width; x++){
+                for(int y = 0; y < map.height; y++){
+                    tiles[x][y] = new Tile(x, y);
+                }
+            }
             MapIO.readTiles(map, tiles);
             prepareTiles(tiles);
         }catch(Exception e){

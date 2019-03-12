@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
@@ -16,8 +15,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.IOException;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
@@ -59,7 +56,7 @@ public class MapEditor{
         loading = false;
     }
 
-    public void beginEdit(Tile[][] tiles) throws IOException{
+    public void beginEdit(Tile[][] tiles){
         reset();
 
         this.tiles = tiles;
@@ -120,13 +117,12 @@ public class MapEditor{
     }
 
     public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
-        //byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
-
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
         if(drawBlock.isMultiblock()){
-            x = Mathf.clamp(x, (drawBlock.size-1)/2, world.width() - drawBlock.size/2 - 1);
-            y = Mathf.clamp(y, (drawBlock.size-1)/2, world.height() - drawBlock.size/2 - 1);
+            
+            x = Mathf.clamp(x, (drawBlock.size-1)/2, width() - drawBlock.size/2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size-1)/2, height() - drawBlock.size/2 - 1);
 
             int offsetx = -(drawBlock.size - 1) / 2;
             int offsety = -(drawBlock.size - 1) / 2;
@@ -137,7 +133,7 @@ public class MapEditor{
                         int worldx = dx + offsetx + x;
                         int worldy = dy + offsety + y;
 
-                        if(Structs.inBounds(worldx, worldy, world.width(), world.height())){
+                        if(Structs.inBounds(worldx, worldy, width(), height())){
                             Tile tile = tiles[worldx][worldy];
 
                             if(i == 1){

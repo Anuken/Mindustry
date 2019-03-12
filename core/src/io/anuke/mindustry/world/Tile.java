@@ -45,6 +45,7 @@ public class Tile implements Position, TargetTrait{
     public Tile(int x, int y){
         this.x = (short) x;
         this.y = (short) y;
+        wall = floor = (Floor)Blocks.air;
     }
 
     public Tile(int x, int y, byte floor, byte wall){

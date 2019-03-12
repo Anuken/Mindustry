@@ -71,6 +71,7 @@ public class MapIO{
 
             @Override
             protected void changed(){
+                super.changed();
                 int c = colorFor(Blocks.air, block(), getTeam());
                 if(c != black) wall.drawPixel(x, floor.getHeight() - 1 - y, c);
             }

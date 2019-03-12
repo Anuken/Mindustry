@@ -16,7 +16,6 @@ import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BlockPart;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -44,7 +43,6 @@ public abstract class SaveFileVersion{
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{
-
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());
@@ -59,7 +57,7 @@ public abstract class SaveFileVersion{
             for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                 Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOre() != tile.getOre()){
+                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOre() != tile.getOre()){
                     break;
                 }
 
@@ -75,7 +73,7 @@ public abstract class SaveFileVersion{
             Tile tile = world.tile(i % world.width(), i / world.width());
             stream.writeByte(tile.getBlockID());
 
-            if(tile.block() instanceof BlockPart){
+            if(tile.block() == Blocks.part){
                 stream.writeByte(tile.link);
             }else if(tile.entity != null){
                 stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
@@ -141,6 +139,7 @@ public abstract class SaveFileVersion{
             int x = i % width, y = i / width;
             Block block = content.block(stream.readByte());
             Tile tile = tiles[x][y];
+            tile.setBlock(block);
 
             if(block == Blocks.part){
                 tile.link = stream.readByte();
@@ -172,8 +171,6 @@ public abstract class SaveFileVersion{
 
                 i += consecutives;
             }
-
-            tiles[x][y] = tile;
         }
 
         content.setTemporaryMapper(null);
