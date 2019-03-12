@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
+import io.anuke.mindustry.io.MapIO;
 
 public class Map{
     /** Whether this is a custom map.*/
@@ -12,17 +13,31 @@ public class Map{
     public final ObjectMap<String, String> tags;
     /** Base file of this map.*/
     public final FileHandle file;
-    /**Map width/height, shorts.*/
+    /** Format version.*/
+    public final int version;
+    /** Map width/height, shorts.*/
     public int width, height;
     /** Preview texture.*/
     public Texture texture;
+    /** Build that this map was created in. -1 = unknown or custom build.*/
+    public int build;
 
-    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
+    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom, int version, int build){
         this.custom = custom;
         this.tags = tags;
         this.file = file;
         this.width = width;
         this.height = height;
+        this.version = version;
+        this.build = build;
+    }
+
+    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom, int version){
+        this(file, width, height, tags, custom, version, -1);
+    }
+
+    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
+        this(file, width, height, tags, custom, MapIO.version);
     }
 
     public String fileName(){

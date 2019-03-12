@@ -39,8 +39,13 @@ public class MapsDialog extends FloatingDialog{
                         ui.showError(Core.bundle.format("editor.import.exists", name));
                     }else if(conflict != null){
                         ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                            world.maps.importMap(file, map);
-                            setup();
+                            try{
+                                world.maps.importMap(file, map);
+                                setup();
+                            }catch(Exception e){
+                                ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
+                                Log.err(e);
+                            }
                         });
                     }else{
                         world.maps.importMap(file, map);

@@ -30,6 +30,8 @@ import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /**IO buffer size.*/
+    public static final int bufferSize = 8192;
     /**global charset*/
     public static final Charset charset = Charset.forName("UTF-8");
     /**main application name, capitalized*/

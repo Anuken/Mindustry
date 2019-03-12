@@ -103,7 +103,7 @@ public class Maps implements Disposable{
     }
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(FileHandle file, Map map){
+    public void importMap(FileHandle file, Map map) throws IOException{
         file.copyTo(customMapDirectory.child(file.name()));
         if(!headless){
             map.texture = new Texture(MapIO.generatePreview(map));

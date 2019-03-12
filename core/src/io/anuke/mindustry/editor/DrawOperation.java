@@ -2,6 +2,12 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.LongArray;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.gen.TileOp;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.Floor;
+
+import static io.anuke.mindustry.Vars.content;
 
 public class DrawOperation{
     private LongArray array = new LongArray();
@@ -17,12 +23,28 @@ public class DrawOperation{
     public void undo(MapEditor editor){
         for(int i = 0; i < array.size; i++){
             long l = array.get(i);
+            set(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.from(l));
         }
     }
 
     public void redo(MapEditor editor){
         for(int i = 0; i < array.size; i++){
             long l = array.get(i);
+            set(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.to(l));
+        }
+    }
+
+    void set(Tile tile, byte type, byte to){
+        if(type == OpType.floor.ordinal()){
+            tile.setFloor((Floor)content.block(to));
+        }else if(type == OpType.block.ordinal()){
+            tile.setBlock(content.block(to));
+        }else if(type == OpType.rotation.ordinal()){
+            tile.setRotation(to);
+        }else if(type == OpType.team.ordinal()){
+            tile.setTeam(Team.all[to]);
+        }else if(type == OpType.ore.ordinal()){
+            tile.setOre(to);
         }
     }
 
@@ -39,6 +61,7 @@ public class DrawOperation{
         floor,
         block,
         rotation,
-        team
+        team,
+        ore
     }
 }

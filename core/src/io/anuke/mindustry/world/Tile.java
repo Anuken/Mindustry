@@ -361,7 +361,7 @@ public class Tile implements Position, TargetTrait{
         }
     }
 
-    private void preChanged(){
+    protected void preChanged(){
         block().removed(this);
         if(entity != null){
             entity.removeFromProximity();
@@ -369,7 +369,7 @@ public class Tile implements Position, TargetTrait{
         team = 0;
     }
 
-    private void changed(){
+    protected void changed(){
         if(entity != null){
             entity.remove();
             entity = null;

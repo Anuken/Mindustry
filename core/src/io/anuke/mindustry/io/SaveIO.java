@@ -48,7 +48,7 @@ public class SaveIO{
     }
 
     public static DataInputStream getSlotStream(int slot){
-        return new DataInputStream(new InflaterInputStream(fileFor(slot).read()));
+        return new DataInputStream(new InflaterInputStream(fileFor(slot).read(bufferSize)));
     }
 
     public static boolean isSaveValid(int slot){
@@ -60,7 +60,7 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(FileHandle file){
-        return isSaveValid(new DataInputStream(new InflaterInputStream(file.read())));
+        return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
     }
 
     public static boolean isSaveValid(DataInputStream stream){
@@ -95,7 +95,7 @@ public class SaveIO{
     }
 
     public static void write(FileHandle file){
-        write(new DeflaterOutputStream(file.write(false)){
+        write(new DeflaterOutputStream(file.write(false, bufferSize)){
             byte[] tmp = {0};
 
             public void write(int var1) throws IOException {
@@ -120,12 +120,12 @@ public class SaveIO{
     public static void load(FileHandle file) throws SaveException{
         try{
             //try and load; if any exception at all occurs
-            load(new InflaterInputStream(file.read()));
+            load(new InflaterInputStream(file.read(bufferSize)));
         }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
-                load(new InflaterInputStream(backup.read()));
+                load(new InflaterInputStream(backup.read(bufferSize)));
             }else{
                 throw new SaveException(e.getCause());
             }

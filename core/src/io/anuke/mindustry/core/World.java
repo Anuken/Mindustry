@@ -235,7 +235,7 @@ public class World implements ApplicationListener{
 
         try{
             createTiles(map.width, map.height);
-            tiles = MapIO.readTiles(map, tiles);
+            MapIO.readTiles(map, tiles);
             prepareTiles(tiles);
         }catch(Exception e){
             Log.err(e);
