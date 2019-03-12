@@ -7,12 +7,15 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 
@@ -57,16 +60,46 @@ public class MapIO{
         return pixmap;
     }
 
-    //TODO implement
     /**Reads a pixmap in the 3.5 pixmap format.*/
-    public static Tile[][] unfinished_readLegacyPixmap(Pixmap pixmap){
-        return null;
+    public static void readLegacyPixmap(Pixmap pixmap, Tile[][] tiles){
+        for(int x = 0; x < pixmap.getWidth(); x++){
+            for(int y = 0; y < pixmap.getHeight(); y++){
+                int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
+                LegacyBlock block = LegacyColorMapper.get(color);
+                Tile tile = tiles[x][y];
+
+                tile.setFloor(block.floor);
+                tile.setBlock(block.wall);
+
+                //place core
+                if(color == Color.rgba8888(Color.GREEN)){
+                    for(int dx = 0; dx < 3; dx++){
+                        for(int dy = 0; dy < 3; dy++){
+                            int worldx = dx - 1 + x;
+                            int worldy = dy - 1 + y;
+
+                            //multiblock parts
+                            if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
+                                Tile write = tiles[worldx][worldy];
+                                write.setBlock(Blocks.part);
+                                write.setTeam(Team.blue);
+                                write.setLinkByte(Pack.byteByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                            }
+                        }
+                    }
+
+                    //actual core parts
+                    tile.setBlock(Blocks.coreShard);
+                    tile.setTeam(Team.blue);
+                }
+            }
+        }
     }
 
     //TODO implement
     /**Reads a pixmap in the old 4.0 .mmap format.*/
-    private static Tile[][] unfinished_readLegacyMmap(InputStream stream) throws IOException{
-        return null;
+    private static void readLegacyMmap(FileHandle file, Tile[][] tiles) throws IOException{
+
     }
 
     public static int colorFor(Block floor, Block wall, Team team){
@@ -76,7 +109,9 @@ public class MapIO{
         return Color.rgba8888(wall.solid ? wall.color : floor.color);
     }
 
-    public static void writeMap(OutputStream output, Map map, Tile[][] tiles) throws IOException{
+    public static void writeMap(FileHandle file, Map map, Tile[][] tiles) throws IOException{
+        OutputStream output = file.write(false);
+
         try(DataOutputStream stream = new DataOutputStream(output)){
             stream.writeInt(version);
             stream.writeInt(Version.build);

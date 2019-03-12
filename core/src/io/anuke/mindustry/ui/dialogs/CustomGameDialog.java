@@ -106,7 +106,7 @@ public class CustomGameDialog extends FloatingDialog{
             image.row();
             image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
-            image.label((() -> Core.bundle.format("level.highscore", Core.settings.getInt("hiscore" + map.name, 0)))).pad(3f);
+            image.label((() -> Core.bundle.format("level.highscore", Core.settings.getInt("hiscore" + map.fileName(), 0)))).pad(3f);
 
             BorderImage border = new BorderImage(map.texture, 3f);
             border.setScaling(Scaling.fit);

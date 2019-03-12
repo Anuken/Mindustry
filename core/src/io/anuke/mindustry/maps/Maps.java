@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
@@ -34,6 +35,10 @@ public class Maps implements Disposable{
         return maps.select(m -> !m.custom);
     }
 
+    public Map byName(String name){
+        return maps.find(m -> m.name().equals(name));
+    }
+
     /**
      * Loads a map from the map folder and returns it. Should only be used for zone maps.
      * Does not add this map to the map list.
@@ -62,10 +67,32 @@ public class Maps implements Disposable{
         loadCustomMaps();
     }
 
-    /** Save a map. This updates all values and stored data necessary. */
-    public void saveMap(Map map, Tile[][] data){
+    /** Save a custom map to the directory. This updates all values and stored data necessary.
+     * The tags are copied to prevent mutation later.*/
+    public void saveMap(ObjectMap<String, String> baseTags, Tile[][] data){
+
         try{
-            MapIO.writeMap(map.file.write(false), map, data);
+            ObjectMap<String, String> tags = new ObjectMap<>(baseTags);
+            String name = tags.get("name");
+            if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
+            FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+
+            //find map with the same exact display name
+            Map other = maps.find(m -> m.getDisplayName().equals(name));
+
+            if(other != null){
+                //dispose of map if it's already there
+                if(other.texture != null){
+                    other.texture.dispose();
+                    other.texture = null;
+                }
+                maps.remove(other);
+            }
+
+            //create map, write it, etc etc etc
+            Map map = new Map(file, data.length, data[0].length, tags, true);
+            MapIO.writeMap(file, map, data);
+
             if(!headless){
                 map.texture = new Texture(MapIO.generatePreview(data));
             }

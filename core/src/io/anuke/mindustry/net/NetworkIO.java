@@ -27,10 +27,10 @@ public class NetworkIO{
         try(DataOutputStream stream = new DataOutputStream(os)){
             //--GENERAL STATE--
             Serialization.writeRules(stream, state.rules);
-            stream.writeUTF(world.getMap().name); //map name
+            stream.writeUTF(world.getMap().name()); //map name
 
             //write tags
-            ObjectMap<String, String> tags = world.getMap().meta.tags;
+            ObjectMap<String, String> tags = world.getMap().tags;
             stream.writeByte(tags.size);
             for(Entry<String, String> entry : tags.entries()){
                 stream.writeUTF(entry.key);
@@ -105,7 +105,7 @@ public class NetworkIO{
             //map
             world.spawner.read(stream);
             SaveIO.getSaveWriter().readMap(stream);
-            world.setMap(new Map(map, 0, 0));
+            world.setMap(new Map(customMapDirectory.child(map), 0, 0, new ObjectMap<>(), true));
 
             state.teams = new Teams();
 
@@ -141,7 +141,7 @@ public class NetworkIO{
         int maxlen = 32;
 
         String host = (headless ? "Server" : players[0].name);
-        String map = world.getMap() == null ? "None" : world.getMap().name;
+        String map = world.getMap() == null ? "None" : world.getMap().name();
 
         host = host.substring(0, Math.min(host.length(), maxlen));
         map = map.substring(0, Math.min(map.length(), maxlen));

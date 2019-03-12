@@ -19,7 +19,7 @@ public class SaveMeta{
         this.build = build;
         this.timestamp = timestamp;
         this.timePlayed = timePlayed;
-        this.map = world.maps.getByName(map);
+        this.map = world.maps.all().find(m -> m.fileName().equals(map));
         this.wave = wave;
         this.rules = rules;
     }

@@ -1,19 +1,21 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
+import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import static io.anuke.mindustry.Vars.content;
+import java.io.IOException;
+
 import static io.anuke.mindustry.Vars.world;
 
 public class MapEditor{
@@ -24,8 +26,8 @@ public class MapEditor{
     private Tile[][] tiles;
 
     private OperationStack stack = new OperationStack();
-    private DrawOperation op;
-    private GridBits used;
+    private DrawOperation currentOp;
+    private boolean loading;
 
     public int brushSize = 1;
     public int rotation;
@@ -36,25 +38,68 @@ public class MapEditor{
         return tags;
     }
 
-    public void beginEdit(Tile[][] map, ObjectMap<String, String> tags, boolean clear){
+    public void beginEdit(int width, int height){
+        reset();
 
-        this.brushSize = 1;
-        this.tags = tags;
+        loading = true;
+        tiles = createTiles(width, height);
+        renderer.resize(width(), height());
+        loading = false;
+    }
 
-        if(clear){
-            for(int x = 0; x < map.length; x++){
-                for(int y = 0; y < map[0].length; y++){
-                    map[x][y].setFloor((Floor)Blocks.stone);
-                }
+    public void beginEdit(Map map) throws IOException{
+        reset();
+
+        loading = true;
+        tiles = createTiles(map.width, map.height);
+        tags.putAll(map.tags);
+        MapIO.readTiles(map, tiles);
+        renderer.resize(width(), height());
+        loading = false;
+    }
+
+    public void beginEdit(Tile[][] tiles) throws IOException{
+        reset();
+
+        this.tiles = tiles;
+        renderer.resize(width(), height());
+    }
+
+    public void load(Runnable r){
+        loading = true;
+        r.run();
+        loading = false;
+    }
+
+    /**Creates a 2-D array of EditorTiles with stone as the floor block.*/
+    public Tile[][] createTiles(int width, int height){
+        tiles = new Tile[width][height];
+
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (byte)0);
             }
         }
+        return tiles;
+    }
 
+    public Map createMap(FileHandle file){
+        return new Map(file, width(), height(), new ObjectMap<>(tags), true);
+    }
+
+    private void reset(){
+        clearOp();
+        brushSize = 1;
         drawBlock = Blocks.stone;
-        renderer.resize(map.length, map[0].length);
+        tags = new ObjectMap<>();
     }
 
     public Tile[][] tiles(){
         return tiles;
+    }
+
+    public Tile tile(int x, int y){
+        return tiles[x][y];
     }
 
     public int width(){
@@ -74,9 +119,7 @@ public class MapEditor{
     }
 
     public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
-        byte writeID = drawBlock.id;
-        byte partID = Blocks.part.id;
-        byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
+        //byte rotationTeam = Pack.byteByte(drawBlock.rotate ? (byte)rotation : 0, drawBlock.synthetic() ? (byte)drawTeam.ordinal() : 0);
 
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
@@ -94,52 +137,44 @@ public class MapEditor{
                         int worldy = dy + offsety + y;
 
                         if(Structs.inBounds(worldx, worldy, world.width(), world.height())){
-                            TileDataMarker prev = getPrev(worldx, worldy, false);
+                            Tile tile = tiles[worldx][worldy];
 
                             if(i == 1){
-                                map.write(worldx, worldy, DataPosition.wall, partID);
-                                map.write(worldx, worldy, DataPosition.rotationTeam, rotationTeam);
-                                map.write(worldx, worldy, DataPosition.link, Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                tile.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
                             }else{
-                                byte link = map.read(worldx, worldy, DataPosition.link);
-                                byte block = map.read(worldx, worldy, DataPosition.wall);
+                                byte link = tile.getLinkByte();
+                                Block block = tile.block();
 
                                 if(link != 0){
                                     removeLinked(worldx - (Pack.leftByte(link) - 8), worldy - (Pack.rightByte(link) - 8));
-                                }else if(content.block(block).isMultiblock()){
+                                }else if(block.isMultiblock()){
                                     removeLinked(worldx, worldy);
                                 }
                             }
-
-                            onWrite(worldx, worldy, prev);
                         }
                     }
                 }
             }
 
-            TileDataMarker prev = getPrev(x, y, false);
-
-            map.write(x, y, DataPosition.wall, writeID);
-            map.write(x, y, DataPosition.link, (byte) 0);
-            map.write(x, y, DataPosition.rotationTeam, rotationTeam);
-
-            onWrite(x, y, prev);
+            Tile tile = tiles[x][y];
+            tile.setBlock(drawBlock);
+            tile.setTeam(drawTeam);
         }else{
             for(int rx = -brushSize; rx <= brushSize; rx++){
                 for(int ry = -brushSize; ry <= brushSize; ry++){
                     if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
                         int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= map.width() || wy >= map.height() || (paint && !isfloor && content.block(map.read(wx, wy, DataPosition.wall)) == Blocks.air)){
+                        if(wx < 0 || wy < 0 || wx >= width() || wy >= height() || (paint && !isfloor && tiles[wx][wy].block() == Blocks.air)){
                             continue;
                         }
 
-                        TileDataMarker prev = getPrev(wx, wy, true);
+                        Tile tile = tiles[wx][wy];
 
                         if(!isfloor){
-                            byte link = map.read(wx, wy, DataPosition.link);
+                            byte link = tile.getLinkByte();
 
-                            if(content.block(map.read(wx, wy, DataPosition.wall)).isMultiblock()){
+                            if(tile.block().isMultiblock()){
                                 removeLinked(wx, wy);
                             }else if(link != 0){
                                 removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
@@ -147,14 +182,13 @@ public class MapEditor{
                         }
 
                         if(isfloor){
-                            map.write(wx, wy, DataPosition.floor, writeID);
+                            tile.setFloor((Floor)drawBlock);
                         }else{
-                            map.write(wx, wy, DataPosition.wall, writeID);
-                            map.write(wx, wy, DataPosition.link, (byte) 0);
-                            map.write(wx, wy, DataPosition.rotationTeam, rotationTeam);
+                            tile.setBlock(drawBlock);
+                            if(drawBlock.synthetic()){
+                                tile.setTeam(drawTeam);
+                            }
                         }
-
-                        onWrite(x + rx, y + ry, prev);
                     }
                 }
             }
@@ -162,52 +196,18 @@ public class MapEditor{
     }
 
     private void removeLinked(int x, int y){
-        Block block = content.block(map.read(x, y, DataPosition.wall));
+        Block block = tiles[x][y].block();
 
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;
         for(int dx = 0; dx < block.size; dx++){
             for(int dy = 0; dy < block.size; dy++){
                 int worldx = x + dx + offsetx, worldy = y + dy + offsety;
-                if(Structs.inBounds(worldx, worldy, map.width(), map.height())){
-                    TileDataMarker prev = getPrev(worldx, worldy, false);
-
-                    map.write(worldx, worldy, DataPosition.link, (byte) 0);
-                    map.write(worldx, worldy, DataPosition.rotationTeam, (byte) 0);
-                    map.write(worldx, worldy, DataPosition.wall, (byte) 0);
-
-                    onWrite(worldx, worldy, prev);
+                if(Structs.inBounds(worldx, worldy, width(), height())){
+                    tiles[worldx][worldy].setTeam(Team.none);
+                    tiles[worldx][worldy].setBlock(Blocks.air);
                 }
             }
-        }
-    }
-
-    boolean checkDupes(int x, int y){
-        return Vars.ui.editor.getView().checkForDuplicates((short) x, (short) y);
-    }
-
-    void onWrite(int x, int y, TileDataMarker previous){
-        if(previous == null){
-            renderer.updatePoint(x, y);
-            return;
-        }
-
-        TileDataMarker current = map.new TileDataMarker();
-        map.position(x, y);
-        map.read(current);
-
-        Vars.ui.editor.getView().addTileOp(new TileOperation((short) x, (short) y, previous, current));
-        renderer.updatePoint(x, y);
-    }
-
-    TileDataMarker getPrev(int x, int y, boolean checkDupes){
-        if(checkDupes && checkDupes(x, y)){
-            return null;
-        }else{
-            TileDataMarker marker = map.newDataMarker();
-            map.position(x, y);
-            map.read(marker);
-            return marker;
         }
     }
 
@@ -216,8 +216,11 @@ public class MapEditor{
     }
 
     public void resize(int width, int height){
+        clearOp();
+
         Tile[][] previous = tiles;
         int offsetX = -(width - width())/2, offsetY = -(height - height())/2;
+        loading = true;
 
         tiles = new Tile[width][height];
         for(int x = 0; x < width; x++){
@@ -228,17 +231,17 @@ public class MapEditor{
                     tiles[x][y].x = (short)x;
                     tiles[x][y].y = (short)y;
                 }else{
-                    tiles[x][y] = new Tile(x, y, Blocks.stone.id, (byte)0);
+                    tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (byte)0);
                 }
             }
         }
+
         renderer.resize(width, height);
+        loading = false;
     }
 
-    public void changeFloor(int x, int y, Block to){
-        Block from = tiles[x][y].floor();
-        tiles[x][y].setFloor((Floor)to);
-        addTileOp(TileOp.get((short)x, (short)y, (byte)0, from.id, to.id));
+    public void clearOp(){
+        stack.clear();
     }
 
     public void undo(){
@@ -253,16 +256,26 @@ public class MapEditor{
         }
     }
 
-    public void addTileOp(long data){
-        used.set(TileOp.x(data), TileOp.y(data));
-        op.addOperation(data);
+    public boolean canUndo(){
+        return stack.canUndo();
     }
 
-    public boolean checkUsed(short x, short y){
-        if(used == null || used.width() != width() || used.height() != height()){
-            used = new GridBits(world.width(), world.height());
-        }
+    public boolean canRedo(){
+        return stack.canRedo();
+    }
 
-        return used.get(x, y);
+    public void flushOp(){
+        if(currentOp == null || currentOp.isEmpty()) return;
+        stack.add(currentOp);
+        currentOp = null;
+    }
+
+    public void addTileOp(long data){
+        if(loading) return;
+
+        if(currentOp == null) currentOp = new DrawOperation();
+        currentOp.addOperation(data);
+
+        renderer.updatePoint(TileOp.x(data), TileOp.y(data));
     }
 }

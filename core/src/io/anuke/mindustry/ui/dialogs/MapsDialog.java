@@ -29,12 +29,15 @@ public class MapsDialog extends FloatingDialog{
         buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
-                    Map map = MapIO.readMap(file.read(), file.name(), true, file::read);
+                    Map map = MapIO.readMap(file, true);
                     String name = map.tags.get("name", file.nameWithoutExtension());
 
-                    if(world.maps.getByName(name) != null && !world.maps.getByName(name).custom){
+                    //TODO filename conflict, erasure
+                    Map conflict = world.maps.byName(name);
+
+                    if(conflict != null && !conflict.custom){
                         ui.showError(Core.bundle.format("editor.import.exists", name));
-                    }else if(world.maps.getByName(name) != null){
+                    }else if(conflict != null){
                         ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
                             world.maps.importMap(file, map);
                             setup();
@@ -138,7 +141,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton("$editor.openin", "icon-load-map", 16 * 2, () -> {
             try{
-                Vars.ui.editor.beginEditMap(map.stream.get());
+                Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
                 hide();
             }catch(Exception e){
@@ -148,7 +151,7 @@ public class MapsDialog extends FloatingDialog{
         }).fillX().height(54f).marginLeft(10);
 
         table.addImageTextButton("$delete", "icon-trash-16", 16 * 2, () -> {
-            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name), () -> {
+            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();
                 setup();
