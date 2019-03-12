@@ -14,8 +14,8 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BlockPart;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -43,18 +43,37 @@ public abstract class SaveFileVersion{
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{
-
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());
 
+        //floor first
         for(int i = 0; i < world.width() * world.height(); i++){
             Tile tile = world.tile(i % world.width(), i / world.width());
-
             stream.writeByte(tile.getFloorID());
+            stream.writeByte(tile.getOreByte());
+            int consecutives = 0;
+
+            for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
+                Tile nextTile = world.tile(j % world.width(), j / world.width());
+
+                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOreByte() != tile.getOreByte()){
+                    break;
+                }
+
+                consecutives++;
+            }
+
+            stream.writeByte(consecutives);
+            i += consecutives;
+        }
+
+        //blocks
+        for(int i = 0; i < world.width() * world.height(); i++){
+            Tile tile = world.tile(i % world.width(), i / world.width());
             stream.writeByte(tile.getBlockID());
 
-            if(tile.block() instanceof BlockPart){
+            if(tile.block() == Blocks.part){
                 stream.writeByte(tile.link);
             }else if(tile.entity != null){
                 stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
@@ -67,13 +86,14 @@ public abstract class SaveFileVersion{
 
                 tile.entity.writeConfig(stream);
                 tile.entity.write(stream);
-            }else if(tile.block() == Blocks.air){
+            }else{
+                //write consecutive non-entity blocks
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air){
+                    if(nextTile.block() != tile.block()){
                         break;
                     }
 
@@ -94,14 +114,34 @@ public abstract class SaveFileVersion{
 
         Tile[][] tiles = world.createTiles(width, height);
 
+        //read floor and create tiles first
         for(int i = 0; i < width * height; i++){
             int x = i % width, y = i / width;
             byte floorid = stream.readByte();
-            byte wallid = stream.readByte();
+            byte oreid = stream.readByte();
+            int consecutives = stream.readUnsignedByte();
 
-            Tile tile = new Tile(x, y, floorid, wallid);
+            tiles[x][y] = new Tile(x, y, floorid, (byte)0);
+            tiles[x][y].setOreByte(oreid);
 
-            if(wallid == Blocks.part.id){
+            for(int j = i + 1; j < i + 1 + consecutives; j++){
+                int newx = j % width, newy = j / width;
+                Tile newTile = new Tile(newx, newy, floorid, (byte)0);
+                newTile.setOreByte(oreid);
+                tiles[newx][newy] = newTile;
+            }
+
+            i += consecutives;
+        }
+
+        //read blocks
+        for(int i = 0; i < width * height; i++){
+            int x = i % width, y = i / width;
+            Block block = content.block(stream.readByte());
+            Tile tile = tiles[x][y];
+            tile.setBlock(block);
+
+            if(block == Blocks.part){
                 tile.link = stream.readByte();
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
@@ -121,19 +161,16 @@ public abstract class SaveFileVersion{
 
                 tile.entity.readConfig(stream);
                 tile.entity.read(stream);
-            }else if(wallid == 0){
+            }else{
                 int consecutives = stream.readUnsignedByte();
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
-                    Tile newTile = new Tile(newx, newy, floorid, wallid);
-                    tiles[newx][newy] = newTile;
+                    tiles[newx][newy].setBlock(block);
                 }
 
                 i += consecutives;
             }
-
-            tiles[x][y] = tile;
         }
 
         content.setTemporaryMapper(null);

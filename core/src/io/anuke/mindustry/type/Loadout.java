@@ -3,13 +3,10 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.defaultTeam;
@@ -27,7 +24,7 @@ public class Loadout extends Content{
         put('2', new BlockEntry(Blocks.coreFoundation));
         put('3', new BlockEntry(Blocks.coreNucleus));
 
-        put('C', new BlockEntry(Blocks.mechanicalDrill, Items.copper));
+        put('C', new BlockEntry(Blocks.mechanicalDrill, Blocks.oreCopper));
     }};
 
     private final IntMap<BlockEntry> blocks = new IntMap<>();
@@ -79,8 +76,7 @@ public class Loadout extends Content{
             tile.setRotation((byte)entry.value.rotation);
             if(entry.value.ore != null){
                 for(Tile t : tile.getLinkedTiles(outArray)){
-                    Floor floor = t.floor();
-                    t.setFloor(OreBlock.get(floor, entry.value.ore) == null ? OreBlock.get(Blocks.stone, entry.value.ore) : OreBlock.get(floor, entry.value.ore));
+                    t.setOre(entry.value.ore);
                 }
             }
         }
@@ -93,10 +89,10 @@ public class Loadout extends Content{
 
     static class BlockEntry{
         final Block block;
-        final Item ore;
+        final Block ore;
         final int rotation;
 
-        BlockEntry(Block block, Item ore){
+        BlockEntry(Block block, Block ore){
             this.block = block;
             this.ore = ore;
             this.rotation = 0;

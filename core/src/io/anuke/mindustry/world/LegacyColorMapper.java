@@ -3,10 +3,8 @@ package io.anuke.mindustry.world;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
 
 public class LegacyColorMapper implements ContentList{
     private static IntMap<LegacyBlock> blockMap = new IntMap<>();
@@ -38,10 +36,14 @@ public class LegacyColorMapper implements ContentList{
         map("6e501e", Blocks.stainedStoneRed);
         map("ed5334", Blocks.stainedStoneRed);
         map("292929", Blocks.tar);
-        map("c3a490", OreBlock.get(Blocks.stone, Items.copper));
-        map("161616", OreBlock.get(Blocks.stone, Items.coal));
-        map("6277bc", OreBlock.get(Blocks.stone, Items.titanium));
-        map("83bc58", OreBlock.get(Blocks.stone, Items.thorium));
+        map("c3a490", Blocks.stone, Blocks.air, Blocks.oreCopper);
+        map("161616", Blocks.stone, Blocks.air, Blocks.oreCoal);
+        map("6277bc", Blocks.stone, Blocks.air, Blocks.oreTitanium);
+        map("83bc58", Blocks.stone, Blocks.air, Blocks.oreThorium);
+    }
+
+    private void map(String color, Block block, Block wall, Block ore){
+        blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall, ore));
     }
     
     private void map(String color, Block block, Block wall){
@@ -55,10 +57,18 @@ public class LegacyColorMapper implements ContentList{
     public static class LegacyBlock{
         public final Floor floor;
         public final Block wall;
+        public final Block ore;
 
         public LegacyBlock(Block floor, Block wall){
             this.floor = (Floor) floor;
             this.wall = wall;
+            this.ore = null;
+        }
+
+        public LegacyBlock(Block floor, Block wall, Block ore){
+            this.floor = (Floor) floor;
+            this.wall = wall;
+            this.ore = ore;
         }
     }
 

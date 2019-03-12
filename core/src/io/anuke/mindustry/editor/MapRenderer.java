@@ -9,14 +9,12 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
-import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
-import io.anuke.mindustry.maps.MapTileData.DataPosition;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MapRenderer implements Disposable{
@@ -102,27 +100,24 @@ public class MapRenderer implements Disposable{
     private void render(int wx, int wy){
         int x = wx / chunksize, y = wy / chunksize;
         IndexedRenderer mesh = chunks[x][y];
-        byte bf = editor.getMap().read(wx, wy, DataPosition.floor);
-        byte bw = editor.getMap().read(wx, wy, DataPosition.wall);
-        byte btr = editor.getMap().read(wx, wy, DataPosition.rotationTeam);
-        byte rotation = Pack.leftByte(btr);
-        Team team = Team.all[Pack.rightByte(btr)];
+        Tile tile = editor.tiles()[wx][wy];
 
-        Block floor = content.block(bf);
-        Block wall = content.block(bw);
+        Team team = tile.getTeam();
+        Block floor = tile.floor();
+        Block wall = tile.block();
 
         TextureRegion region;
 
         int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
         int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
 
-        if(bw != 0 && (wall.synthetic() || wall == Blocks.part)){
+        if(wall != Blocks.air && (wall.synthetic() || wall == Blocks.part)){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
             if(wall.rotate){
                 mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, rotation * 90 - 90);
+                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.getRotation() * 90 - 90);
             }else{
                 mesh.draw(idxWall, region,
                         wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
@@ -140,10 +135,12 @@ public class MapRenderer implements Disposable{
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
-        }else if(!wall.synthetic() && bw != 0){
+        }else if(!wall.synthetic() && wall != Blocks.air){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
             offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
             offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
+        }else if(wall == Blocks.air && tile.oreBlock() != null){
+            region = tile.oreBlock().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.oreBlock().editorVariantRegions().length-1)];;
         }else{
             region = Core.atlas.find("clear-editor");
         }

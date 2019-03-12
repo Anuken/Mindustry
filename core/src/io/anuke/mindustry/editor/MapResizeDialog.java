@@ -1,22 +1,20 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.function.IntPositionConsumer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.maps.MapTileData;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapResizeDialog extends FloatingDialog{
     private static final int minSize = 50, maxSize = 500, increment = 50;
     int width, height;
 
-    public MapResizeDialog(MapEditor editor, BiConsumer<Integer, Integer> cons){
+    public MapResizeDialog(MapEditor editor, IntPositionConsumer cons){
         super("$editor.resizemap");
         shown(() -> {
             cont.clear();
-            MapTileData data = editor.getMap();
-            width = data.width();
-            height = data.height();
+            width = editor.width();
+            height = editor.height();
 
             Table table = new Table();
 

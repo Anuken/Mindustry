@@ -9,9 +9,10 @@ import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.modules.ConsumeModule;
@@ -39,10 +40,13 @@ public class Tile implements Position, TargetTrait{
     private byte rotation;
     /** Team ordinal. */
     private byte team;
+    /**Ore that is on top of this (floor) block.*/
+    private byte ore = 0;
 
     public Tile(int x, int y){
         this.x = (short) x;
         this.y = (short) y;
+        wall = floor = (Floor)Blocks.air;
     }
 
     public Tile(int x, int y, byte floor, byte wall){
@@ -159,6 +163,7 @@ public class Tile implements Position, TargetTrait{
 
     public void setFloor(Floor type){
         this.floor = type;
+        this.ore = 0;
     }
 
     public byte getRotation(){
@@ -211,6 +216,14 @@ public class Tile implements Position, TargetTrait{
 
     public boolean isLinked(){
         return link != 0;
+    }
+
+    public byte getLinkByte(){
+        return link;
+    }
+
+    public void setLinkByte(byte b){
+        this.link = b;
     }
 
     /** Sets this to a linked tile, which sets the block to a part. dx and dy can only be -8-7. */
@@ -316,6 +329,30 @@ public class Tile implements Position, TargetTrait{
         return getTeam() == Team.none || team == getTeam();
     }
 
+    public byte getOreByte(){
+        return ore;
+    }
+
+    public void setOreByte(byte ore){
+        this.ore = ore;
+    }
+
+    public void setOre(Block floor){
+        setOreByte(floor.id);
+    }
+
+    public void clearOre(){
+        this.ore = 0;
+    }
+
+    public Floor oreBlock(){
+        return (Floor)content.block(ore);
+    }
+
+    public Item drop(){
+        return ore == 0 ? floor.itemDrop : ((Floor)content.block(ore)).itemDrop;
+    }
+
     public void updateOcclusion(){
         cost = 1;
         boolean occluded = false;
@@ -343,7 +380,7 @@ public class Tile implements Position, TargetTrait{
         }
     }
 
-    private void preChanged(){
+    protected void preChanged(){
         block().removed(this);
         if(entity != null){
             entity.removeFromProximity();
@@ -351,7 +388,7 @@ public class Tile implements Position, TargetTrait{
         team = 0;
     }
 
-    private void changed(){
+    protected void changed(){
         if(entity != null){
             entity.remove();
             entity = null;

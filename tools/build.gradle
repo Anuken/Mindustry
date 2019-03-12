@@ -88,6 +88,7 @@ def antialias = {File file ->
 
     ImageIO.write(out, "png", file)
 }
+
 task swapColors(){
     doLast{
         if (project.hasProperty("colors")) {

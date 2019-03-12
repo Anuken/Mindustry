@@ -15,7 +15,6 @@ public class Items implements ContentList{
             type = ItemType.material;
             hardness = 1;
             cost = 0.6f;
-            genOre = true;
             alwaysUnlocked = true;
         }};
 
@@ -23,7 +22,6 @@ public class Items implements ContentList{
             type = ItemType.material;
             hardness = 1;
             cost = 0.9f;
-            genOre = true;
         }};
 
         metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{
@@ -40,14 +38,12 @@ public class Items implements ContentList{
             explosiveness = 0.4f;
             flammability = 1f;
             hardness = 2;
-            genOre = true;
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{
             type = ItemType.material;
             hardness = 3;
             cost = 1.1f;
-            genOre = true;
         }};
 
         thorium = new Item("thorium", Color.valueOf("f9a3c7")){{
@@ -56,11 +52,10 @@ public class Items implements ContentList{
             hardness = 4;
             radioactivity = 1f;
             cost = 1.4f;
-            genOre = true;
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
-            genOre = true;
+
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{

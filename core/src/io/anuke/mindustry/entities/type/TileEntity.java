@@ -269,7 +269,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         //TODO better smoke effect, this one is awful
         if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
                 Mathf.chance(0.009f * Time.delta() * (1f - health / tile.block().health))){
-
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 
