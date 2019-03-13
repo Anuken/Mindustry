@@ -110,6 +110,13 @@ public class Control implements ApplicationListener{
 
         //todo high scores for custom maps, as well as other statistics
 
+        Events.on(WaveEvent.class, event -> {
+            if(world.getMap().getHightScore() < state.wave){
+                hiscore = true;
+                world.getMap().setHighScore(state.wave);
+            }
+        });
+
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);

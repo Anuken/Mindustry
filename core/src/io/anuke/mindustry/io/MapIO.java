@@ -44,8 +44,15 @@ public class MapIO{
     private static void initBlocks(){
         if(missingBlocks != null) return;
 
+        //stainedRocks, stainedRocksRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
         missingBlocks = ObjectMap.of(
-            "stained-stone", Blocks.moss
+            "stained-stone", Blocks.shale,
+            "stained-stone-red", Blocks.shale,
+            "stained-stone-yellow", Blocks.shale,
+            "stained-rocks", Blocks.shaleRocks,
+            "stained-boulder", Blocks.shaleBoulder,
+            "stained-rocks-red", Blocks.shaleRocks,
+            "stained-rocks-yellow", Blocks.shaleRocks
         );
     }
 
@@ -74,8 +81,7 @@ public class MapIO{
 
             @Override
             public void setOreByte(byte b){
-                if(b != 0)
-                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
+                if(b != 0) floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
 
             @Override
@@ -165,7 +171,7 @@ public class MapIO{
                     stream.writeByte(tile.link);
                 }else if(tile.entity != null){
                     stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
-                    stream.writeShort((short)tile.entity.health); //health
+                    stream.writeShort(/*(short)tile.entity.health*/tile.block().health); //health
                     tile.entity.writeConfig(stream);
                 }else{
                     //write consecutive non-entity blocks
@@ -267,13 +273,13 @@ public class MapIO{
 
                         Tile tile = tiles.get(x, y);
                         tile.setFloor((Floor)content.block(floorid));
-                        tile.setOreByte(oreid);
+                        tile.setOre(content.block(oreid));
 
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
                             int newx = j % width, newy = j / width;
                             Tile newTile = tiles.get(newx, newy);
                             newTile.setFloor((Floor)content.block(floorid));
-                            newTile.setOreByte(oreid);
+                            newTile.setOre(content.block(oreid));
                         }
 
                         i += consecutives;
@@ -297,7 +303,7 @@ public class MapIO{
                             byte rotation = Pack.rightByte(tr);
 
                             tile.setTeam(Team.all[team]);
-                            tile.entity.health = health;
+                            tile.entity.health = /*health*/tile.block().health;
                             tile.setRotation(rotation);
 
                             tile.entity.readConfig(stream);
@@ -432,7 +438,7 @@ public class MapIO{
                     }
 
                     if(oreMap.containsKey(floorb)){
-                        tile.setOreByte((byte)oreMap.get(floorb, 0));
+                        tile.setOre(content.block(oreMap.get(floorb, 0)));
                     }
                 }
             }

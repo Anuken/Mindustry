@@ -8,13 +8,13 @@ import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.function.Function;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
@@ -32,10 +32,7 @@ import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import java.util.Arrays;
 
@@ -202,6 +199,28 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
+    protected void drawPlaceText(String text, int x, int y, boolean valid){
+        Color color = valid ? Pal.accent : Pal.remove;
+        BitmapFont font = Core.scene.skin.getFont("default-font");
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f);
+        layout.setText(font, text);
+
+        font.setColor(color);
+        float dx = x*tilesize + offset(), dy = y*tilesize + offset() + size*tilesize/2f + 2;
+        font.draw(text, dx, dy + layout.height + 1, Align.center);
+        Lines.stroke(1f, color);
+        Lines.line(dx - layout.width/2f - 2f, dy, dx + layout.width/2f + 2f, dy);
+
+        font.setUseIntegerPositions(ints);
+        font.setColor(Color.WHITE);
+        font.getData().setScale(1f);
+        Draw.reset();
+        Pools.free(layout);
+    }
+
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
     }
@@ -246,6 +265,15 @@ public class Block extends BlockStorage{
         if(!headless && tile.getTeam() == players[0].getTeam()){
             logic.handleContent(content);
         }
+    }
+
+    public float sumAttribute(Attribute attr, int x, int y){
+        Tile tile = world.tile(x, y);
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += other.floor().attributes.get(attr);
+        }
+        return sum;
     }
 
     @Override

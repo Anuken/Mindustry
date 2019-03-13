@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.MapIO;
 
 public class Map{
@@ -42,6 +43,15 @@ public class Map{
 
     public String fileName(){
         return file.nameWithoutExtension();
+    }
+
+    public int getHightScore(){
+        return Core.settings.getInt("hiscore" + fileName(), 0);
+    }
+
+    public void setHighScore(int score){
+        Core.settings.put("hiscore" + fileName(), score);
+        Vars.data.modified();
     }
 
     public String getDisplayName(){

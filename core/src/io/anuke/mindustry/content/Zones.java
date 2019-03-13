@@ -279,7 +279,7 @@ public class Zones implements ContentList{
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
             .dist(2.5f, true)
-            .decor(new Decoration(Blocks.moss, Blocks.stainedBoulder, 0.01))){{
+            .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with(Items.copper, 100, Items.lead, 200, Items.silicon, 100);
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);

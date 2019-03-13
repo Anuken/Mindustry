@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. */
-    private static final String[] defaultMapNames = {"impact0079"};
+    private static final String[] defaultMapNames = {"Fortress"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
 
@@ -107,7 +107,7 @@ public class Maps implements Disposable{
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
     public void importMap(FileHandle file, Map map) throws IOException{
-        file.copyTo(customMapDirectory.child(file.name()));
+        file.copyTo(customMapDirectory.child(map.name() + ".mmap"));
         if(!headless){
             map.texture = new Texture(MapIO.generatePreview(map));
         }

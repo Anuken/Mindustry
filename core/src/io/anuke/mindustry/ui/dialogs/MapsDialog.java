@@ -137,8 +137,6 @@ public class MapsDialog extends FloatingDialog{
             t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();
             t.add(map.description()).growX().wrap().padTop(2);
-            t.row();
-            t.add("$editor.oregen.info").padRight(10).color(Color.GRAY);
         }).height(mapsize).width(mapsize);
 
         table.row();

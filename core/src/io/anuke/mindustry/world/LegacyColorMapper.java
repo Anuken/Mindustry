@@ -23,7 +23,7 @@ public class LegacyColorMapper implements ContentList{
         map("323232", Blocks.stone);
         map("646464", Blocks.stone, Blocks.rocks);
         map("50965a", Blocks.grass);
-        map("5ab464", Blocks.grass, Blocks.stainedRocks);
+        map("5ab464", Blocks.grass, Blocks.pine);
         map("506eb4", Blocks.water);
         map("465a96", Blocks.deepwater);
         map("252525", Blocks.ignarock);
@@ -33,8 +33,8 @@ public class LegacyColorMapper implements ContentList{
         map("c2d1d2", Blocks.snow);
         map("c4e3e7", Blocks.ice);
         map("f7feff", Blocks.snow, Blocks.snowrocks);
-        map("6e501e", Blocks.stainedStoneRed);
-        map("ed5334", Blocks.stainedStoneRed);
+        map("6e501e", Blocks.holostone);
+        map("ed5334", Blocks.magmarock);
         map("292929", Blocks.tar);
         map("c3a490", Blocks.stone, Blocks.air, Blocks.oreCopper);
         map("161616", Blocks.stone, Blocks.air, Blocks.oreCoal);

@@ -48,8 +48,6 @@ public class Floor extends Block{
     public Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
-    /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
-    public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
@@ -58,6 +56,8 @@ public class Floor extends Block{
     public Block blendGroup = this;
     /**Effect displayed when randomly updated.*/
     public Effect updateEffect = Fx.none;
+    /**Array of affinities to certain things.*/
+    public Attributes attributes = new Attributes();
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;

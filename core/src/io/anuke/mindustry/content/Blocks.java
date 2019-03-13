@@ -26,6 +26,7 @@ import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.mindustry.world.meta.Attribute;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -36,7 +37,7 @@ public class Blocks implements ContentList{
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, sandRocks, stainedRocks, moss, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,  grass, salt,
+    iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
 
     //ores
@@ -190,15 +191,18 @@ public class Blocks implements ContentList{
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
+            attributes.set(Attribute.water, 0.3f);
         }};
 
         snow = new Floor("snow"){{
+            attributes.set(Attribute.water, 0.2f);
         }};
 
         ice = new Floor("ice"){{
-            //TODO fix
+            //TODO fix drag/speed
             dragMultiplier = 1f;
             speedMultiplier = 1f;
+            attributes.set(Attribute.water, 0.4f);
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -244,32 +248,27 @@ public class Blocks implements ContentList{
             variants = 3;
         }};
 
-        stainedRocks = new StaticWall("stained-rocks"){{
+        shale = new Floor("shale"){{
+            variants = 3;
+            attributes.set(Attribute.oil, 0.3f);
+        }};
+
+        shaleRocks = new StaticWall("shalerocks"){{
+            variants = 2;
+        }};
+
+        shaleBoulder = new Rock("shale-boulder"){{
             variants = 2;
         }};
 
         moss = new Floor("moss"){{
             variants = 3;
+            attributes.set(Attribute.spores, 0.15f);
         }};
 
-        stainedRocksRed = new StaticWall("stained-rocks-red"){{
-            variants = 2;
-        }};
-
-        stainedStoneRed = new Floor("stained-stone-red"){{
-            variants = 1;
-        }};
-
-        stainedRocksYellow = new StaticWall("stained-rocks-yellow"){{
-            variants = 2;
-        }};
-
-        stainedStoneYellow = new Floor("stained-stone-yellow"){{
-            variants = 1;
-        }};
-
-        stainedBoulder = new Rock("stained-boulder"){{
-            variants = 2;
+        sporeMoss = new Floor("spore-moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.3f);
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -278,22 +277,18 @@ public class Blocks implements ContentList{
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
             variants = 6;
-            blendGroup = metalFloor;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         metalFloor3 = new Floor("metal-floor-3"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         ignarock = new Floor("ignarock"){{
@@ -301,12 +296,12 @@ public class Blocks implements ContentList{
         }};
 
         hotrock = new Floor("hotrock"){{
-            heat = 0.5f;
+            attributes.set(Attribute.heat, 0.5f);
             blendGroup = ignarock;
         }};
 
         magmarock = new Floor("magmarock"){{
-            heat = 0.75f;
+            attributes.set(Attribute.heat, 0.75f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
         }};
@@ -975,6 +970,7 @@ public class Blocks implements ContentList{
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
+            attribute = Attribute.water;
 
             consumes.power(0.90f);
         }};
@@ -988,6 +984,7 @@ public class Blocks implements ContentList{
             pumpAmount = 0.25f;
             size = 3;
             liquidCapacity = 30f;
+            attribute = Attribute.oil;
 
             consumes.item(Items.sand);
             consumes.power(3f);
