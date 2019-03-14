@@ -54,9 +54,9 @@ public class DesktopPlatform extends Platform{
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
             }else if(!state.rules.waves){
-                presence.details = Strings.capitalize(world.getMap().getDisplayName());
+                presence.details = Strings.capitalize(world.getMap().name());
             }else{
-                presence.details = Strings.capitalize(world.getMap().getDisplayName()) + " | Wave " + state.wave;
+                presence.details = Strings.capitalize(world.getMap().name()) + " | Wave " + state.wave;
                 presence.largeImageText = "Wave " + state.wave;
             }
 

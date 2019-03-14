@@ -28,9 +28,9 @@ public class Stats{
     public RankResult calculateRank(Zone zone, boolean launched){
         float score = 0;
 
-        //each new launch period adds onto the rank 1.5 'points'
+        //each new launch period adds onto the rank 'points'
         if(wavesLasted >= zone.conditionWave){
-           score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.5f;
+           score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.3f;
         }
 
         int capacity = zone.loadout.core().itemCapacity;
@@ -42,7 +42,7 @@ public class Stats{
             frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
         }
 
-        score += frac*2.4f;
+        score += frac*2.0f;
 
         if(!launched){
             score *= 0.5f;

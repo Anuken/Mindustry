@@ -34,7 +34,7 @@ public class Save16 extends SaveFileVersion{
             state.rules.spawns = content.<Zone>getByID(ContentType.zone, state.rules.zone).rules.get().spawns;
         }
         String mapname = stream.readUTF();
-        Map map = world.maps.all().find(m -> m.fileName().equals(mapname));
+        Map map = world.maps.all().find(m -> m.name().equals(mapname));
         if(map == null) map = new Map(customMapDirectory.child(mapname), 1, 1, new ObjectMap<>(), true);
         world.setMap(map);
 
@@ -62,7 +62,7 @@ public class Save16 extends SaveFileVersion{
 
         //--GENERAL STATE--
         Serialization.writeRules(stream, state.rules);
-        stream.writeUTF(world.getMap().fileName()); //map name
+        stream.writeUTF(world.getMap().name()); //map name
 
         stream.writeInt(state.wave); //wave
         stream.writeFloat(state.wavetime); //wave countdown

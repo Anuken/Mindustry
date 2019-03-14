@@ -228,7 +228,7 @@ public class ServerControl implements ApplicationListener{
 
                 host();
             }catch(MapException e){
-                Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                Log.err(e.map.name() + ": " + e.getMessage());
             }
         });
 
@@ -664,7 +664,7 @@ public class ServerControl implements ApplicationListener{
                     try{
                         r.run();
                     }catch(MapException e){
-                        Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                        Log.err(e.map.name() + ": " + e.getMessage());
                         Net.closeServer();
                     }
                 }

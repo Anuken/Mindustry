@@ -22,6 +22,12 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        bars.remove("liquid");
+    }
+
+    @Override
     public void draw(Tile tile){
         Draw.rect(name, tile.worldx(), tile.worldy());
     }

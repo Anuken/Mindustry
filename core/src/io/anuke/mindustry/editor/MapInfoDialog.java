@@ -9,22 +9,16 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
-
-    private TextArea description;
-    private TextField author;
-    private TextField name;
+    private final WaveInfoDialog waveinfo;
 
     public MapInfoDialog(MapEditor editor){
         super("$editor.mapinfo");
         this.editor = editor;
+        this.waveinfo = new WaveInfoDialog(editor);
 
         addCloseButton();
 
         shown(this::setup);
-
-        hidden(() -> {
-
-        });
     }
 
     private void setup(){
@@ -36,7 +30,7 @@ public class MapInfoDialog extends FloatingDialog{
 
         cont.defaults().padTop(15);
 
-        name = cont.addField(tags.get("name", ""), text -> {
+        TextField name = cont.addField(tags.get("name", ""), text -> {
             tags.put("name", text);
         }).size(400, 55f).get();
         name.setMessageText("$unknown");
@@ -45,7 +39,7 @@ public class MapInfoDialog extends FloatingDialog{
 
         cont.add("$editor.description").padRight(8).left();
 
-        description = cont.addArea(tags.get("description", ""), "textarea", text -> {
+        TextArea description = cont.addArea(tags.get("description", ""), "textarea", text -> {
             tags.put("description", text);
         }).size(400f, 140f).get();
 
@@ -53,12 +47,21 @@ public class MapInfoDialog extends FloatingDialog{
 
         cont.add("$editor.author").padRight(8).left();
 
-        author = cont.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
+        TextField author = cont.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
             tags.put("author", text);
             Core.settings.put("mapAuthor", text);
             Core.settings.save();
         }).size(400, 55f).get();
         author.setMessageText("$unknown");
+
+        cont.row();
+        cont.add("$editor.waves").padRight(8).left();
+        cont.table(t -> {
+            t.add().growX();
+            t.label(() -> tags.containsKey("waves") ? "" : Core.bundle.get("editor.default")).left();
+            t.add().growX();
+            t.addButton("$edit", waveinfo::show).growY().width(200f);
+        }).size(400, 55f);
 
         name.change();
         description.change();

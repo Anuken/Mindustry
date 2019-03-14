@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.world.Tile;
 
@@ -16,10 +17,15 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
-    /** List of all built-in maps. */
+    /** List of all built-in maps. Filenames only.*/
     private static final String[] defaultMapNames = {"Fortress"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
+    /** Serializer for meta.*/
+    private Json json = new Json();
+
+    public Maps(){
+    }
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -78,10 +84,11 @@ public class Maps implements Disposable{
             ObjectMap<String, String> tags = new ObjectMap<>(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
-            FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+            //FileHandle file = customMapDirectory.child(name + "." + mapExtension);
+            FileHandle file;
 
             //find map with the same exact display name
-            Map other = maps.find(m -> m.getDisplayName().equals(name));
+            Map other = maps.find(m -> m.name().equals(name));
 
             if(other != null){
                 //dispose of map if it's already there
@@ -90,6 +97,9 @@ public class Maps implements Disposable{
                     other.texture = null;
                 }
                 maps.remove(other);
+                file = other.file;
+            }else{
+                file = findFile();
             }
 
             //create map, write it, etc etc etc
@@ -106,12 +116,11 @@ public class Maps implements Disposable{
     }
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(FileHandle file, Map map) throws IOException{
-        file.copyTo(customMapDirectory.child(map.name() + ".mmap"));
-        if(!headless){
-            map.texture = new Texture(MapIO.generatePreview(map));
-        }
-        maps.add(map);
+    public void importMap(FileHandle file) throws IOException{
+        FileHandle dest = findFile();
+        file.copyTo(dest);
+
+        loadMap(dest, true);
     }
 
     /** Removes a map completely. */
@@ -125,8 +134,22 @@ public class Maps implements Disposable{
         map.file.delete();
     }
 
+    /** Find a new filename to put a map to.*/
+    private FileHandle findFile(){
+        //find a map name that isn't used.
+        int i = maps.size;
+        while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
+            i ++;
+        }
+        return customMapDirectory.child("map_" + i + "." + mapExtension);
+    }
+
     private void loadMap(FileHandle file, boolean custom) throws IOException{
         Map map = MapIO.readMap(file, custom);
+
+        if(map.name() == null){
+            throw new IOException("Map name cannot be empty! File: " + file);
+        }
 
         if(!headless){
             map.texture = new Texture(MapIO.generatePreview(map));

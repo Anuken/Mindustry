@@ -30,29 +30,33 @@ public class MapsDialog extends FloatingDialog{
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
                     Map map = MapIO.readMap(file, true);
-                    String name = map.tags.get("name", file.nameWithoutExtension());
+                    String name = map.tags.get("name");
+                    if(name == null){
+                        ui.showError("$editor.errorname");
+                        return;
+                    }
 
-                    Map conflict = world.maps.all().find(m -> m.fileName().equals(file.nameWithoutExtension()) || m.name().equals(file.name()));
+                    Map conflict = world.maps.all().find(m -> m.name().equals(name));
 
                     if(conflict != null && !conflict.custom){
                         ui.showError(Core.bundle.format("editor.import.exists", name));
                     }else if(conflict != null){
                         ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
                             try{
-                                world.maps.importMap(file, map);
+                                world.maps.importMap(file);
                                 setup();
                             }catch(Exception e){
-                                ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
                                 Log.err(e);
                             }
                         });
                     }else{
-                        world.maps.importMap(file, map);
+                        world.maps.importMap(file);
                         setup();
                     }
 
                 }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errorimageload", Strings.parseException(e, false)));
+                    ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
                     Log.err(e);
                 }
             }, true, mapExtension);
@@ -88,7 +92,7 @@ public class MapsDialog extends FloatingDialog{
             TextButton button = maps.addButton("", "clear", () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
-            button.add(map.getDisplayName()).width(mapsize - 18f).center().get().setEllipsis(true);
+            button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
             button.addImage("white").growX().pad(4).color(Color.GRAY);
             button.row();
@@ -128,7 +132,7 @@ public class MapsDialog extends FloatingDialog{
 
             t.add("$editor.name").padRight(10).color(Color.GRAY).padTop(0);
             t.row();
-            t.add(map.getDisplayName()).growX().wrap().padTop(2);
+            t.add(map.name()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();

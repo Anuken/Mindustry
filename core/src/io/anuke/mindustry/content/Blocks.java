@@ -250,7 +250,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 0.3f);
+            attributes.set(Attribute.oil, 0.15f);
         }};
 
         shaleRocks = new StaticWall("shalerocks"){{

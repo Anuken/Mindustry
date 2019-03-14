@@ -12,7 +12,7 @@ public class Map{
     public final boolean custom;
     /** Metadata. Author description, display name, etc.*/
     public final ObjectMap<String, String> tags;
-    /** Base file of this map.*/
+    /** Base file of this map. File can be named anything at all.*/
     public final FileHandle file;
     /** Format version.*/
     public final int version;
@@ -41,21 +41,13 @@ public class Map{
         this(file, width, height, tags, custom, MapIO.version);
     }
 
-    public String fileName(){
-        return file.nameWithoutExtension();
-    }
-
     public int getHightScore(){
-        return Core.settings.getInt("hiscore" + fileName(), 0);
+        return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
     }
 
     public void setHighScore(int score){
-        Core.settings.put("hiscore" + fileName(), score);
+        Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
         Vars.data.modified();
-    }
-
-    public String getDisplayName(){
-        return tags.get("name", fileName());
     }
 
     public String author(){
@@ -72,6 +64,10 @@ public class Map{
 
     public String tag(String name){
         return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
+    }
+
+    public boolean hasTag(String name){
+        return tags.containsKey(name);
     }
 
     @Override

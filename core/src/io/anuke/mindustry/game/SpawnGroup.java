@@ -1,20 +1,26 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.util.serialization.Json;
+import io.anuke.arc.util.serialization.Json.Serializable;
+import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.UnitType;
+
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * A spawn group defines spawn information for a specific type of unit, with optional extra information like
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
-public class SpawnGroup{
+public class SpawnGroup implements Serializable{
     protected static final int never = Integer.MAX_VALUE;
 
     /**The unit type spawned*/
-    public final UnitType type;
+    public UnitType type;
     /**When this spawn should end*/
     protected int end = never;
     /**When this spawn should start*/
@@ -34,6 +40,10 @@ public class SpawnGroup{
 
     public SpawnGroup(UnitType type){
         this.type = type;
+    }
+
+    public SpawnGroup(){
+        //serialization use only
     }
 
     /**Returns the amount of units spawned on a specific wave.*/
@@ -62,6 +72,30 @@ public class SpawnGroup{
         }
 
         return unit;
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeObjectStart();
+        json.writeValue("type", type.name);
+        json.writeValue("begin", begin);
+        json.writeValue("end", end);
+        json.writeValue("spacing", spacing);
+        json.writeValue("max", max);
+        json.writeValue("scaling", unitScaling);
+        json.writeValue("amount", unitAmount);
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read (Json json, JsonValue data) {
+        type = content.getByName(ContentType.unit, data.getString("type", "dagger"));
+        begin = data.getInt("begin", 0);
+        end = data.getInt("end", never);
+        spacing = data.getInt("spacing", 1);
+        max = data.getInt("spacing", 40);
+        unitScaling = data.getFloat("scaling", never);
+        unitAmount = data.getInt("amount", 1);
     }
 
     @Override

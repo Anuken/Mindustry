@@ -398,6 +398,10 @@ public class Block extends BlockStorage{
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
                 Core.bundle.get("blocks.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
+
+        if(hasItems && configurable){
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("blocks.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+        }
     }
 
     public boolean isSolidFor(Tile tile){

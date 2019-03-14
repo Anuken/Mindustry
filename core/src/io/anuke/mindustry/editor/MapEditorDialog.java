@@ -199,7 +199,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void save(){
-        String name = editor.getTags().get("name", "");
+        String name = editor.getTags().get("name", "").trim();
 
         if(name.isEmpty()){
             infoDialog.show();

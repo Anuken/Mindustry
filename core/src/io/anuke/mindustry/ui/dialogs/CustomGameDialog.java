@@ -104,7 +104,7 @@ public class CustomGameDialog extends FloatingDialog{
             image.getImageCell().size(images);
             image.top();
             image.row();
-            image.add("[accent]" + map.getDisplayName()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
+            image.add("[accent]" + map.name()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
             image.row();
             image.label((() -> Core.bundle.format("level.highscore", map.getHightScore()))).pad(3f);
 
