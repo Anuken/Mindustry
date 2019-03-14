@@ -86,7 +86,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     }
                 }
             }).growX().height(70f);
-        }).growY().width(200f).growY();
+        }).growY().width(180f).growY();
 
         buildGroups();
     }
@@ -214,6 +214,8 @@ public class WaveInfoDialog extends FloatingDialog{
                     spawned[spawn.type.id] += spawn.getUnitsSpawned(wave);
                 }
 
+                int f = 0;
+
                 for(int j = 0; j < spawned.length; j++){
                     if(spawned[j] > 0){
                         UnitType type = content.getByID(ContentType.unit, j);
@@ -226,7 +228,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 if(table.getChildren().size == 1){
                     table.add("$none").color(Pal.remove);
                 }
-            }).width(130f).pad(2f);
+            }).width(110f).pad(2f);
 
             preview.row();
         }
