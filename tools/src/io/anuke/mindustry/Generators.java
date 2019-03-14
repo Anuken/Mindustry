@@ -1,6 +1,7 @@
 package io.anuke.mindustry;
 
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
@@ -165,8 +166,8 @@ public class Generators {
 
                 int off = image.width()/2 - mech.weapon.region.getWidth()/2;
 
-                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off + 4, false, false);
-                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off + 4, true, false);
+                image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
+                image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
 
 
                 image.save("mech-icon-" + mech.name);
@@ -187,14 +188,12 @@ public class Generators {
                 image.draw(type.legRegion, true, false);
                 image.draw(type.region);
 
-                image.draw(type.weapon.region,
-                        -(int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
-                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
-                        false, false);
-                image.draw(type.weapon.region,
-                        (int)type.weapon.width + image.width()/2 - type.weapon.region.getWidth()/2,
-                        (int)type.weaponOffsetY - image.height()/2 - type.weapon.region.getHeight()/2 + 1,
-                        true, false);
+                for(boolean b : Mathf.booleans){
+                    image.draw(type.weapon.region,
+                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width()/2 - type.weapon.region.getWidth()/2),
+                    (int)(type.weaponOffsetY / Draw.scl + image.height()/2f - type.weapon.region.getHeight()/2f),
+                    b, false);
+                }
 
                 image.save("unit-icon-" + type.name);
             }

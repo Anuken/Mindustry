@@ -51,16 +51,16 @@ public class WaveInfoDialog extends FloatingDialog{
 
         cont.clear();
 
-        cont.table("button-disabled", main -> {
+        cont.table("clear", main -> {
             main.pane(t -> table = t).growX().growY().get().setScrollingDisabled(true, false);
             main.row();
             main.addButton("$add", () -> {
                 if(groups == null) groups = new Array<>();
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
-            }).growX().height(80f);
+            }).growX().height(70f);
         }).width(390f).growY();
-        cont.table("button-disabled", m -> {
+        cont.table("clear", m -> {
             m.add("Preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.addButton("-", () -> {}).update(t -> {
@@ -98,7 +98,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         if(groups != null){
             for(SpawnGroup group : groups){
-                table.table("button-disabled", t -> {
+                table.table("clear", t -> {
                     t.margin(6f).defaults().pad(2).padLeft(5f).growX().left();
                     t.addButton(b -> {
                         b.left();
@@ -166,7 +166,7 @@ public class WaveInfoDialog extends FloatingDialog{
                         t.remove();
                         updateWaves();
                     }).growX().pad(-6f).padTop(5);
-                }).width(340f).pad(3);
+                }).width(340f).pad(5);
                 table.row();
             }
         }else{
@@ -204,7 +204,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         for(int i = start; i < displayed + start; i ++){
             int wave = i;
-            preview.table("button-disabled", table -> {
+            preview.table("underline", table -> {
                 table.add(wave + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
                 table.row();
 

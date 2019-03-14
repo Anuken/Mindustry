@@ -72,7 +72,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
 
     //turrets
-    duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+    duo, scatter, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
@@ -1066,6 +1066,26 @@ public class Blocks implements ContentList{
             rotatespeed = 10f;
         }};
 
+        scatter = new BurstTurret("scatter"){{
+            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90), true);
+            ammo(
+                Items.scrap, Bullets.flakScrap,
+                Items.lead, Bullets.flakLead
+            );
+            reload = 45f;
+            range = 160f;
+            size = 2;
+            burstSpacing = 5f;
+            shots = 2;
+
+            recoil = 2f;
+            rotatespeed = 10f;
+            inaccuracy = 18f;
+            shootCone = 35f;
+
+            health = 220;
+        }};
+
         hail = new ArtilleryTurret("hail"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 60, Items.graphite, 35));
             ammo(
@@ -1138,6 +1158,7 @@ public class Blocks implements ContentList{
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;
+            targetAir = false;
             consumes.powerBuffered(80f);
             range = 80f;
             shootEffect = Fx.lightningShoot;
@@ -1221,7 +1242,7 @@ public class Blocks implements ContentList{
             );
             xRand = 4f;
             reload = 8f;
-            range = 145f;
+            range = 160f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;

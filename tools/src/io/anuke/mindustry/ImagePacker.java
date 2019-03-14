@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -94,6 +95,8 @@ public class ImagePacker{
                 return regionCache.containsKey(s);
             }
         };
+
+        Draw.scl = 1f/Core.atlas.find("scale_marker").getWidth();
 
         Time.mark();
         Generators.generate();
