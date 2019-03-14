@@ -1,11 +1,17 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.DefaultWaves;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.MapIO;
+
+import static io.anuke.mindustry.Vars.world;
 
 public class Map{
     /** Whether this is a custom map.*/
@@ -39,6 +45,20 @@ public class Map{
 
     public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
         this(file, width, height, tags, custom, MapIO.version);
+    }
+
+    public Array<SpawnGroup> getWaves(){
+        if(tags.containsKey("waves")){
+            try{
+                return world.maps.readWaves(tags.get("waves"));
+            }catch(Exception e){
+                Log.err("Malformed waves: {0}", tags.get("waves"));
+                e.printStackTrace();
+                return DefaultWaves.getDefaultSpawns();
+            }
+        }else{
+            return DefaultWaves.getDefaultSpawns();
+        }
     }
 
     public int getHightScore(){

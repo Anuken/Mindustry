@@ -138,7 +138,7 @@ public class MenuFragment extends Fragment{
         FloatingDialog dialog = new FloatingDialog("$play");
         dialog.setFillParent(false);
         dialog.addCloseButton();
-        dialog.cont.defaults().size(230f, 64f);
+        dialog.cont.defaults().size(210f, 64f);
         dialog.cont.add(new MenuButton("icon-editor", "$newgame", () -> {
             dialog.hide();
             ui.custom.show();

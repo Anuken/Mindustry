@@ -24,7 +24,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
     private static final float shockwaveBase = 380f, shockwaveRand = 0f, maxShockwaveDst = shockwaveBase + shockwaveRand;
-    private Array<SpawnGroup> groups;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
     private IntArray loadedSpawns = new IntArray();
@@ -59,7 +58,7 @@ public class WaveSpawner{
 
     public void spawnEnemies(){
 
-        for(SpawnGroup group : groups){
+        for(SpawnGroup group : state.rules.spawns){
             int spawned = group.getUnitsSpawned(state.wave);
 
             float spawnX, spawnY;
@@ -105,7 +104,6 @@ public class WaveSpawner{
 
         flySpawns.clear();
         groundSpawns.clear();
-        groups = state.rules.spawns;
 
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){

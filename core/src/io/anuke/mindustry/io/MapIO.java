@@ -8,9 +8,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
@@ -70,6 +68,7 @@ public class MapIO{
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{
+        Time.mark();
         Pixmap floor = new Pixmap(map.width, map.height, Format.RGBA8888);
         Pixmap wall = new Pixmap(map.width, map.height, Format.RGBA8888);
         int black = Color.rgba8888(Color.BLACK);

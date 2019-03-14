@@ -9,22 +9,25 @@ import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.serialization.Json;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. Filenames only.*/
-    private static final String[] defaultMapNames = {"Fortress"};
+    private static final String[] defaultMapNames = {"fortress"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta.*/
     private Json json = new Json();
 
     public Maps(){
+
     }
 
     /** Returns a list of all maps, including custom ones. */
@@ -134,6 +137,28 @@ public class Maps implements Disposable{
         map.file.delete();
     }
 
+    public String writeWaves(Array<SpawnGroup> groups){
+        if(groups == null){
+            return "[]";
+        }
+
+        StringWriter buffer = new StringWriter();
+        json.setWriter(buffer);
+
+        json.writeArrayStart();
+        for(int i = 0; i < groups.size; i++){
+            json.writeObjectStart(SpawnGroup.class, SpawnGroup.class);
+            groups.get(i).write(json);
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
+        return buffer.toString();
+    }
+
+    public Array<SpawnGroup> readWaves(String str){
+        return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
+    }
+
     /** Find a new filename to put a map to.*/
     private FileHandle findFile(){
         //find a map name that isn't used.
@@ -173,6 +198,12 @@ public class Maps implements Disposable{
 
     @Override
     public void dispose(){
-
+        for(Map map : maps){
+            if(map.texture != null){
+                map.texture.dispose();
+                map.texture = null;
+            }
+        }
+        maps.clear();
     }
 }

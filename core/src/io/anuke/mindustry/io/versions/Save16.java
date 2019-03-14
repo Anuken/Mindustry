@@ -6,8 +6,6 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Zone;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -29,14 +27,11 @@ public class Save16 extends SaveFileVersion{
 
         //general state
         state.rules = Serialization.readRules(stream);
-        //load zone spawn patterns if applicable
-        if(content.getByID(ContentType.zone, state.rules.zone) != null){
-            state.rules.spawns = content.<Zone>getByID(ContentType.zone, state.rules.zone).rules.get().spawns;
-        }
         String mapname = stream.readUTF();
         Map map = world.maps.all().find(m -> m.name().equals(mapname));
         if(map == null) map = new Map(customMapDirectory.child(mapname), 1, 1, new ObjectMap<>(), true);
         world.setMap(map);
+        state.rules.spawns = map.getWaves();
 
         int wave = stream.readInt();
         float wavetime = stream.readFloat();

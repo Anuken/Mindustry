@@ -1,18 +1,234 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.game.DefaultWaves;
+import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends FloatingDialog{
     private final MapEditor editor;
+    private final static int displayed = 20;
+    private Array<SpawnGroup> groups;
+
+    private Table table, preview;
+    private int start = 0;
+    private UnitType lastType = UnitTypes.dagger;
+    private float updateTimer, updatePeriod = 1f;
 
     public WaveInfoDialog(MapEditor editor){
-        super("$editor.waves");
+        super("$waves.title");
         this.editor = editor;
 
         shown(this::setup);
+        hidden(() -> editor.getTags().put("waves", world.maps.writeWaves(groups)));
+
+        addCloseButton();
+        buttons.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () ->{
+            groups = null;
+            buildGroups();
+        })).size(270f, 64f);
     }
 
     void setup(){
+        groups = world.maps.readWaves(editor.getTags().get("waves"));
 
+        cont.clear();
+
+        cont.table("button-disabled", main -> {
+            main.pane(t -> table = t).growX().growY().get().setScrollingDisabled(true, false);
+            main.row();
+            main.addButton("$add", () -> {
+                if(groups == null) groups = new Array<>();
+                groups.add(new SpawnGroup(lastType));
+                buildGroups();
+            }).growX().height(80f);
+        }).width(390f).growY();
+        cont.table("button-disabled", m -> {
+            m.add("Preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
+            m.row();
+            m.addButton("-", () -> {}).update(t -> {
+                if(t.getClickListener().isPressed()){
+                    updateTimer += Time.delta();
+                    if(updateTimer >= updatePeriod){
+                        start = Math.max(start - 1, 0);
+                        updateTimer = 0f;
+                        updateWaves();
+                    }
+                }
+            }).growX().height(70f);
+            m.row();
+            m.pane(t -> preview = t).grow().get().setScrollingDisabled(true, false);
+            m.row();
+            m.addButton("+", () -> {}).update(t -> {
+                if(t.getClickListener().isPressed()){
+                    updateTimer += Time.delta();
+                    if(updateTimer >= updatePeriod){
+                        start ++;
+                        updateTimer = 0f;
+                        updateWaves();
+                    }
+                }
+            }).growX().height(70f);
+        }).growY().width(200f).growY();
+
+        buildGroups();
+    }
+
+    void buildGroups(){
+        table.clear();
+        table.top();
+        table.margin(10f);
+
+        if(groups != null){
+            for(SpawnGroup group : groups){
+                table.table("button-disabled", t -> {
+                    t.margin(6f).defaults().pad(2).padLeft(5f).growX().left();
+                    t.addButton(b -> {
+                        b.left();
+                        b.addImage(group.type.iconRegion).size(30f).padRight(3);
+                        b.add(group.type.localizedName).color(Pal.accent);
+                    }, () -> showUpdate(group)).pad(-6f).padBottom(0f);
+
+                    t.row();
+                    t.table(spawns -> {
+                        spawns.addField("" + group.begin, TextFieldFilter.digitsOnly, text -> {
+                             if(Strings.canParsePostiveInt(text)){
+                                 group.begin = Strings.parseInt(text);
+                                 updateWaves();
+                             }
+                        }).width(100f);
+                        spawns.add("$waves.to").padLeft(4).padRight(4);
+                        spawns.addField(group.end == never ? "" : group.end + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.end = Strings.parseInt(text);
+                                updateWaves();
+                            }else if(text.isEmpty()){
+                                group.end = never;
+                                updateWaves();
+                            }
+                        }).width(100f).get().setMessageText(Core.bundle.get("waves.never"));
+                    });
+                    t.row();
+                    t.table(p -> {
+                        p.add("$waves.every").padRight(4);
+                        p.addField(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.spacing = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(100f);
+                        p.add("$waves.waves").padLeft(4);
+                    });
+
+                    t.row();
+                    t.table(a -> {
+                        a.addField(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.unitAmount = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+
+                        a.add(" + ");
+                        a.addField(Math.max((int)(Mathf.isZero(group.unitScaling) ? 0 : 1f/group.unitScaling), 0) + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePostiveInt(text)){
+                                group.unitScaling = 1f / Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+                        a.add("$waves.perspawn").padLeft(4);
+                    });
+
+                    t.row();
+                    t.addCheck("$waves.boss", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
+
+                    t.row();
+                    t.addButton("$waves.remove", () -> {
+                        groups.remove(group);
+                        table.getCell(t).pad(0f);
+                        t.remove();
+                        updateWaves();
+                    }).growX().pad(-6f).padTop(5);
+                }).width(340f).pad(3);
+                table.row();
+            }
+        }else{
+            table.add("$editor.default");
+        }
+
+        updateWaves();
+    }
+
+    void showUpdate(SpawnGroup group){
+        FloatingDialog dialog = new FloatingDialog("");
+        dialog.setFillParent(false);
+        int i = 0;
+        for(UnitType type : content.units()){
+            dialog.cont.addButton(t -> {
+                t.left();
+                t.addImage(type.iconRegion).size(40f).padRight(2f);
+                t.add(type.localizedName);
+            }, () -> {
+                lastType = type;
+                group.type = type;
+                dialog.hide();
+                buildGroups();
+            }).pad(2).margin(12f).fillX();
+            if(++i % 2 == 0)dialog.cont.row();
+        }
+        dialog.show();
+    }
+
+    void updateWaves(){
+        preview.clear();
+        preview.top();
+
+        Array<SpawnGroup> groups = (this.groups == null ? DefaultWaves.getDefaultSpawns() : this.groups);
+
+        for(int i = start; i < displayed + start; i ++){
+            int wave = i;
+            preview.table("button-disabled", table -> {
+                table.add(wave + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
+                table.row();
+
+                int[] spawned = new int[Vars.content.getBy(ContentType.unit).size];
+
+                for(SpawnGroup spawn : groups){
+                    spawned[spawn.type.id] += spawn.getUnitsSpawned(wave);
+                }
+
+                for(int j = 0; j < spawned.length; j++){
+                    if(spawned[j] > 0){
+                        UnitType type = content.getByID(ContentType.unit, j);
+                        table.addImage(type.iconRegion).size(30f).padRight(4);
+                        table.add(spawned[j] + "x").color(Color.LIGHT_GRAY).padRight(6);
+                        table.row();
+                    }
+                }
+
+                if(table.getChildren().size == 1){
+                    table.add("$none").color(Pal.remove);
+                }
+            }).width(130f).pad(2f);
+
+            preview.row();
+        }
     }
 }

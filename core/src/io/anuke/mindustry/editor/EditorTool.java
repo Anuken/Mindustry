@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 public enum EditorTool{
     pick{
@@ -99,8 +100,8 @@ public enum EditorTool{
             Block block = tile.block();
             boolean synth = editor.drawBlock.synthetic();
 
-            dest = isfloor ? floor : block;
             Block draw = editor.drawBlock;
+            dest = draw instanceof OreBlock ? tile.oreBlock() : isfloor ? floor : block;
 
             if(dest == draw || block == Blocks.part || block.isMultiblock()){
                 return;
@@ -189,7 +190,7 @@ public enum EditorTool{
         boolean eq(int px, int py){
             Tile tile = data.tile(px, py);
 
-            return (isfloor ? tile.floor() : tile.block()) == dest;
+            return (data.drawBlock instanceof OreBlock ? tile.oreBlock() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OreBlock && tile.floor().isLiquid);
         }
     },
     zoom;

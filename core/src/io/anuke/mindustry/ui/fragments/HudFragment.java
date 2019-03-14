@@ -124,7 +124,7 @@ public class HudFragment extends Fragment{
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
-                    .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
+                    .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
         });
