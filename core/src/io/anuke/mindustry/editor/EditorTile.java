@@ -35,12 +35,12 @@ public class EditorTile extends Tile{
         }
 
         Block previous = floor();
-        Block ore = oreBlock();
+        Block ore = ore();
         if(previous == type && ore == Blocks.air) return;
         super.setFloor(type);
         //ore may get nullified so make sure to save editrs
-        if(oreBlock() != ore){
-            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, oreBlock().id));
+        if(ore() != ore){
+            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, ore().id));
         }
         if(previous != type){
             op(TileOp.get(x, y, (byte)OpType.floor.ordinal(), previous.id, type.id));

@@ -1,0 +1,78 @@
+package io.anuke.mindustry.editor.generation;
+
+import io.anuke.arc.Core;
+import io.anuke.arc.function.*;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
+
+public abstract class FilterOption{
+    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OreBlock)) && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
+
+    public abstract void build(Table table);
+
+    static class SliderOption extends FilterOption{
+        final String name;
+        final FloatProvider getter;
+        final FloatConsumer setter;
+        final float min, max;
+
+        SliderOption(String name, FloatProvider getter, FloatConsumer setter, float min, float max){
+            this.name = name;
+            this.getter = getter;
+            this.setter = setter;
+            this.min = min;
+            this.max = max;
+        }
+
+        @Override
+        public void build(Table table){
+            table.add(name);
+            table.row();
+            table.addSlider(min, max, (max-min)/100f, setter).get().setValue(getter.get());
+        }
+    }
+
+    static class BlockOption extends FilterOption{
+        final String name;
+        final Supplier<Block> supplier;
+        final Consumer<Block> consumer;
+        final Predicate<Block> filter;
+
+        BlockOption(String name, Supplier<Block> supplier, Consumer<Block> consumer, Predicate<Block> filter){
+            this.name = name;
+            this.supplier = supplier;
+            this.consumer = consumer;
+            this.filter = filter;
+        }
+
+        @Override
+        public void build(Table table){
+            table.add(name + ": ");
+            table.addButton(b -> {
+                b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3);
+            }, () -> {
+                FloatingDialog dialog = new FloatingDialog("");
+                dialog.setFillParent(false);
+                int i = 0;
+                for(Block block : Vars.content.blocks()){
+                    if(!filter.test(block)) continue;
+
+                    dialog.cont.addImage(block.icon(Icon.medium)).size(8*4).pad(3).get().clicked(() -> {
+                       consumer.accept(block);
+                       dialog.hide();
+                    });
+                    if(++i % 10 == 0) dialog.cont.row();
+                }
+
+                dialog.show();
+            });
+        }
+    }
+}

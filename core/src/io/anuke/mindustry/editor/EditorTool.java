@@ -101,7 +101,7 @@ public enum EditorTool{
             boolean synth = editor.drawBlock.synthetic();
 
             Block draw = editor.drawBlock;
-            dest = draw instanceof OreBlock ? tile.oreBlock() : isfloor ? floor : block;
+            dest = draw instanceof OreBlock ? tile.ore() : isfloor ? floor : block;
 
             if(dest == draw || block == Blocks.part || block.isMultiblock()){
                 return;
@@ -190,7 +190,7 @@ public enum EditorTool{
         boolean eq(int px, int py){
             Tile tile = data.tile(px, py);
 
-            return (data.drawBlock instanceof OreBlock ? tile.oreBlock() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OreBlock && tile.floor().isLiquid);
+            return (data.drawBlock instanceof OreBlock ? tile.ore() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OreBlock && tile.floor().isLiquid);
         }
     },
     zoom;

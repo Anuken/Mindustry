@@ -1083,7 +1083,7 @@ public class Blocks implements ContentList{
             inaccuracy = 18f;
             shootCone = 35f;
 
-            health = 220;
+            health = 220*size*size;
         }};
 
         hail = new ArtilleryTurret("hail"){{
@@ -1301,7 +1301,7 @@ public class Blocks implements ContentList{
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
             range = 160f;
-            reload = 200f;
+            reload = 170f;
             firingMoveFract = 0.1f;
             shootDuration = 220f;
 

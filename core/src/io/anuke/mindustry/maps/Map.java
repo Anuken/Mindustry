@@ -13,7 +13,7 @@ import io.anuke.mindustry.io.MapIO;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class Map{
+public class Map implements Comparable<Map>{
     /** Whether this is a custom map.*/
     public final boolean custom;
     /** Metadata. Author description, display name, etc.*/
@@ -54,10 +54,10 @@ public class Map{
             }catch(Exception e){
                 Log.err("Malformed waves: {0}", tags.get("waves"));
                 e.printStackTrace();
-                return DefaultWaves.getDefaultSpawns();
+                return DefaultWaves.get();
             }
         }else{
-            return DefaultWaves.getDefaultSpawns();
+            return DefaultWaves.get();
         }
     }
 
@@ -88,6 +88,16 @@ public class Map{
 
     public boolean hasTag(String name){
         return tags.containsKey(name);
+    }
+
+    @Override
+    public int compareTo(Map map){
+        int type = -Boolean.compare(custom, map.custom);
+        if(type != 0){
+            return type;
+        }else{
+            return name().compareTo(map.name());
+        }
     }
 
     @Override

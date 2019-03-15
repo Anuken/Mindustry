@@ -113,6 +113,7 @@ public class Maps implements Disposable{
                 map.texture = new Texture(MapIO.generatePreview(data));
             }
             maps.add(map);
+            maps.sort();
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -181,6 +182,7 @@ public class Maps implements Disposable{
         }
 
         maps.add(map);
+        maps.sort();
     }
 
     private void loadCustomMaps(){

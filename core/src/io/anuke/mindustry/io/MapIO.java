@@ -105,7 +105,7 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles[x][y];
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.oreBlock(), tile.getTeam()));
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.ore(), tile.getTeam()));
             }
         }
         return pixmap;

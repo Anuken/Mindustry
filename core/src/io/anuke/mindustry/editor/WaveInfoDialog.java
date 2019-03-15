@@ -200,7 +200,7 @@ public class WaveInfoDialog extends FloatingDialog{
         preview.clear();
         preview.top();
 
-        Array<SpawnGroup> groups = (this.groups == null ? DefaultWaves.getDefaultSpawns() : this.groups);
+        Array<SpawnGroup> groups = (this.groups == null ? DefaultWaves.get() : this.groups);
 
         for(int i = start; i < displayed + start; i ++){
             int wave = i;

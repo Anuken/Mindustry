@@ -340,6 +340,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.oreBlock() != Blocks.air ? hoverTile.oreBlock() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.ore() != Blocks.air ? hoverTile.ore() : null;
     }
 }

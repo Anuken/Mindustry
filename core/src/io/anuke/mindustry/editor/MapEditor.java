@@ -224,6 +224,9 @@ public class MapEditor{
                             if(drawBlock.synthetic()){
                                 tile.setTeam(drawTeam);
                             }
+                            if(drawBlock.rotate){
+                                tile.setRotation((byte)rotation);
+                            }
                         }
                     }
                 }

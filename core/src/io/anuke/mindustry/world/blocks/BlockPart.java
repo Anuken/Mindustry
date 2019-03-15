@@ -19,6 +19,11 @@ public class BlockPart extends Block{
     }
 
     @Override
+    public boolean synthetic(){
+        return true;
+    }
+
+    @Override
     public boolean isHidden(){
         return true;
     }

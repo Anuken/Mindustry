@@ -345,7 +345,7 @@ public class Tile implements Position, TargetTrait{
         this.ore = 0;
     }
 
-    public Floor oreBlock(){
+    public Floor ore(){
         return (Floor)content.block(ore);
     }
 

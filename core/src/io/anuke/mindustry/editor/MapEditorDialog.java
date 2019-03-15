@@ -37,6 +37,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;
     private MapResizeDialog resizeDialog;
+    private MapGenerateDialog generateDialog;
     private ScrollPane pane;
     private FloatingDialog menu;
     private boolean saved = false;
@@ -50,8 +51,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         editor = new MapEditor();
         view = new MapView(editor);
-
         infoDialog = new MapInfoDialog(editor);
+        generateDialog = new MapGenerateDialog(editor);
 
         menu = new FloatingDialog("$menu");
         menu.addCloseButton();
@@ -62,12 +63,17 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
-            t.addImageTextButton("$editor.savemap", "icon-floppy-16", isize, this::save).size(swidth * 2f + 10, 60f).colspan(2);
-
-            t.row();
+            t.addImageTextButton("$editor.savemap", "icon-floppy-16", isize, this::save);
 
             t.addImageTextButton("$editor.mapinfo", "icon-pencil", isize, () -> {
                 infoDialog.show();
+                menu.hide();
+            });
+
+            t.row();
+
+            t.addImageTextButton("$editor.generate", "icon-editor", isize, () -> {
+                generateDialog.show();
                 menu.hide();
             });
 
