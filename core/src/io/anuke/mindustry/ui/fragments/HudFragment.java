@@ -21,6 +21,7 @@ import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
@@ -46,6 +47,16 @@ public class HudFragment extends Fragment{
     private float coreAttackTime;
     private float lastCoreHP;
     private float coreAttackOpacity = 0f;
+    private Table goshDarnHeckingFlippedTableWhyDoesThisHappen;
+
+    {
+        Events.on(PlayEvent.class, event -> {
+            if(goshDarnHeckingFlippedTableWhyDoesThisHappen != null){
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.invalidateHierarchy();
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.pack();
+            }
+        });
+    }
 
     public void build(Group parent){
 
@@ -55,6 +66,7 @@ public class HudFragment extends Fragment{
 
             if(mobile){
                 cont.table(select -> {
+                    goshDarnHeckingFlippedTableWhyDoesThisHappen = select;
                     select.left();
                     select.defaults().size(dsize).left();
 
