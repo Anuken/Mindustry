@@ -52,7 +52,7 @@ public class MapEditor{
         tiles = createTiles(map.width, map.height);
         tags.putAll(map.tags);
         MapIO.readTiles(map, tiles);
-        checkTiles();
+        checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
     }
@@ -61,12 +61,12 @@ public class MapEditor{
         reset();
 
         this.tiles = tiles;
-        checkTiles();
+        checkLinkedTiles();
         renderer.resize(width(), height());
     }
 
     //adds missing blockparts
-    void checkTiles(){
+    public void checkLinkedTiles(){
         //clear block parts first
         for(int x = 0; x < width(); x ++){
             for(int y = 0; y < height(); y++){
