@@ -32,7 +32,7 @@ public enum EditorTool{
                 block = tile.block();
             }
 
-            editor.drawBlock = block == Blocks.air ? floor : block;
+            editor.drawBlock = block == Blocks.air ? tile.ore() == Blocks.air ? floor : tile.ore() : block;
         }
     },
     pencil{

@@ -32,7 +32,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private GenerateInput input = new GenerateInput();
     private Array<GenerateFilter> filters = new Array<>();
     private int scaling = mobile ? 3 : 1;
-    private Supplier<GenerateFilter>[] filterTypes = new Supplier[]{NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new, RiverNoiseFilter::new};
+    private Supplier<GenerateFilter>[] filterTypes = new Supplier[]{NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new, RiverNoiseFilter::new, OreFilter::new};
     private Table filterTable;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
@@ -61,8 +61,6 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void setup(){
-        filters.clear();
-
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -156,9 +154,10 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void showAdd(){
-        FloatingDialog selection = new FloatingDialog("");
+        FloatingDialog selection = new FloatingDialog("$add");
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
+        int i = 0;
         for(Supplier<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
             selection.cont.addButton(filter.name(), () -> {
@@ -167,7 +166,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 update();
                 selection.hide();
             });
-            selection.cont.row();
+            if(++i % 2 == 0) selection.cont.row();
         }
 
         selection.addCloseButton();

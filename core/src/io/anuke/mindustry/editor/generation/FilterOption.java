@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.blocks.OreBlock;
 public abstract class FilterOption{
     public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OreBlock)) && Core.atlas.isFound(b.icon(Icon.full));
     public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> oresOnly = b -> b instanceof OreBlock && Core.atlas.isFound(b.icon(Icon.full));
 
     public abstract void build(Table table);
     public Runnable changed = () -> {};
@@ -35,7 +36,7 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.add(name);
+            table.add("$filter.option." + name);
             table.row();
             Slider slider = table.addSlider(min, max, (max-min)/200f, setter).growX().get();
             slider.setValue(getter.get());
@@ -78,7 +79,7 @@ public abstract class FilterOption{
                 dialog.show();
             }).pad(4).margin(12f);
 
-            table.add(name);
+            table.add("$filter.option." + name);
         }
     }
 }
