@@ -176,7 +176,7 @@ public class MapEditor{
 
                             if(i == 1){
                                 tile.setBlock(Blocks.part);
-                                tile.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+                                tile.setLinkByte(Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
                             }else{
                                 byte link = tile.getLinkByte();
                                 Block block = tile.block();
