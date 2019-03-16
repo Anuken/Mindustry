@@ -100,7 +100,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void beginForceLandscape(){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             }
 
             @Override

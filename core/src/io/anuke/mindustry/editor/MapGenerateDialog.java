@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.arc.util.async.AsyncResult;
 import io.anuke.mindustry.content.Blocks;
@@ -51,13 +50,15 @@ public class MapGenerateDialog extends FloatingDialog{
         buttons.addButton("$editor.apply", () -> {
             apply();
             hide();
-        }).size(180f, 64f);
+        }).size(160f, 64f);
         buttons.addButton("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
-        }).size(180f, 64f);
+        }).size(160f, 64f);
+
+        buttons.addImageTextButton("$add", "icon-add", 14*2, this::showAdd).height(64f).width(140f);
     }
 
     void setup(){
@@ -74,18 +75,16 @@ public class MapGenerateDialog extends FloatingDialog{
         cont.clear();
         cont.table("flat", t -> {
             t.margin(8f);
-            t.add(new BorderImage(texture)).grow().padRight(6).top().get().setScaling(Scaling.fit);
-            t.table(right -> {
-                right.pane(p -> filterTable = p).grow().get().setScrollingDisabled(true, false);
-                right.row();
-                right.addButton("$add", this::showAdd).fillX().height(50f);
-            }).grow();
+            t.add(new BorderImage(texture)).size(400f).padRight(6);
+            t.pane(p -> filterTable = p).width(300f).get().setScrollingDisabled(true, false);
         }).grow();
 
         update();
 
         buffer1 = create();
         buffer2 = create();
+
+        rebuildFilters();
     }
 
     DummyTile[][] create(){
@@ -150,6 +149,10 @@ public class MapGenerateDialog extends FloatingDialog{
                 }
             }).pad(3).padTop(0).width(280f);
             filterTable.row();
+        }
+
+        if(filters.isEmpty()){
+            filterTable.add("$filters.empty").wrap().width(200f);
         }
     }
 
