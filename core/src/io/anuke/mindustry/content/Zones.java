@@ -1,9 +1,7 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.collection.Array;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
 import io.anuke.mindustry.type.Item;
@@ -29,39 +27,6 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 1.5f;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 5;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 15;
-                        unitScaling = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 20;
-                        unitScaling = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 25;
-                        unitScaling = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 30;
-                        unitScaling = 2;
-                    }},
-
-
-                    bossGroup(UnitTypes.fortress)
-                );
             }};
         }};
 
@@ -76,49 +41,13 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 1f;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 2f;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 5;
-                        unitAmount = 2;
-                        spacing = 2;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 3;
-                        unitScaling = 2f;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 15;
-                        unitScaling = 1;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 20;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 25;
-                        unitScaling = 1;
-                        unitAmount = 2;
-                    }},
-
-                    bossGroup(UnitTypes.revenant)
-                );
             }};
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
             .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with(Items.copper, 100);
+            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
             zoneRequirements = new Zone[]{craters};
@@ -128,67 +57,12 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 1.5f;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.titan){{
-                        unitScaling = 3;
-                        end = 9;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 2;
-                        begin = 2;
-                        end = 9;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        unitScaling = 2;
-                        begin = 5;
-                        end = 9;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 0.5f;
-                        begin = 10;
-                        spacing = 10;
-                        unitAmount = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.titan){{
-                        begin = 11;
-                        unitAmount = 2;
-                        unitScaling = 2;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 12;
-                        unitAmount = 2;
-                        unitScaling = 2;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 0.5f;
-                        begin = 35;
-                        spacing = 10;
-                        unitAmount = 6;
-                    }},
-
-                    //boss
-                    new SpawnGroup(UnitTypes.revenant){{
-                        begin = configureWave;
-                        effect = StatusEffects.boss;
-                        unitScaling = never;
-                    }},
-
-                    bossGroup(UnitTypes.eruptor)
-                );
             }};
         }};
 
         ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1).dist(3f, true)){{
             loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with(Items.copper, 200, Items.graphite, 50);
+            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
             launchPeriod = 20;
@@ -200,66 +74,6 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 80;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.wraith){{
-                        unitScaling = 2;
-                        spacing = 2;
-                        end = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 1;
-                        spacing = 2;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 10;
-                        unitScaling = 0.5f;
-                        unitAmount = 6;
-                        spacing = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 5;
-                        unitScaling = 1;
-                        spacing = 5;
-                        unitAmount = 1;
-                        effect = StatusEffects.overdrive;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 22;
-                        unitScaling = 1;
-                        spacing = 20;
-                        unitScaling = 0.5f;
-                        unitAmount = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 11;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 12;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 12;
-                        spacing = 3;
-                        unitScaling = 3;
-                        unitAmount = 2;
-                    }},
-
-                    bossGroup(UnitTypes.revenant),
-                    bossGroup(UnitTypes.revenant)
-                );
             }};
         }};
 
@@ -281,7 +95,7 @@ public class Zones implements ContentList{
             .dist(2.5f, true)
             .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with(Items.copper, 100, Items.lead, 200, Items.silicon, 100);
+            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
             launchPeriod = 10;
@@ -293,69 +107,12 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.titan){{
-                        unitScaling = 2;
-                        spacing = 2;
-                        end = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 1;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 11;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.ghoul){{
-                        begin = 6;
-                        unitScaling = 0.5f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 10;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 23;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 20;
-                        unitScaling = 1;
-                        spacing = 10;
-                        unitScaling = 0.5f;
-                        unitAmount = 10;
-                    }},
-
-                    bossGroup(UnitTypes.chaosArray)
-                );
             }};
         }};
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
             loadout = Loadouts.basicNucleus;
-            baseLaunchCost = ItemStack.with(Items.copper, 500);
+            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 1500);
             itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
             conditionWave = 10;
@@ -367,62 +124,6 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 1.5f;
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 1;
-                        spacing = 2;
-                        end = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.titan){{
-                        begin = 1;
-                        unitScaling = 3;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        spacing = 2;
-                        unitScaling = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.titan){{
-                        begin = 10;
-                        unitScaling = 1f;
-                        unitAmount = 3;
-                        spacing = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.fortress){{
-                        begin = 5;
-                        unitScaling = 1;
-                        spacing = 5;
-                        unitAmount = 1;
-                    }},
-
-                    new SpawnGroup(UnitTypes.fortress){{
-                        begin = 13;
-                        unitScaling = 1;
-                        spacing = 4;
-                        unitAmount = 1;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 11;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        unitScaling = 1;
-                        spacing = 2;
-                        unitAmount = 4;
-                        begin = 13;
-                    }},
-
-                    bossGroup(UnitTypes.chaosArray)
-                );
             }};
         }};
 
@@ -430,7 +131,7 @@ public class Zones implements ContentList{
         .drops(ItemStack.with(Items.copper, 2000, Items.lead, 1500, Items.silicon, 1000, Items.graphite, 1000, Items.thorium, 200, Items.titanium, 2000, Items.metaglass, 1000))
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             loadout = Loadouts.basicNucleus;
-            baseLaunchCost = ItemStack.with(Items.copper, 500, Items.silicon, 200, Items.metaglass, 100);
+            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 3000, Items.silicon, 800, Items.metaglass, 400);
             itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
             conditionWave = 30;
@@ -442,77 +143,6 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
-
-                spawns = Array.with(
-                    new SpawnGroup(UnitTypes.titan){{
-                        unitScaling = 2;
-                        spacing = 2;
-                        end = 10;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 1;
-                        unitScaling = 2;
-                        spacing = 2;
-                        unitAmount = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 10;
-                        spacing = 2;
-                        unitScaling = 2;
-                        unitAmount = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.ghoul){{
-                        begin = 5;
-                        unitScaling = 0.5f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.fortress){{
-                        begin = 13;
-                        unitScaling = 2;
-                        spacing = 3;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 10;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 5;
-                    }},
-
-                    new SpawnGroup(UnitTypes.dagger){{
-                        begin = 2;
-                        unitScaling = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.wraith){{
-                        begin = 23;
-                        unitScaling = 1f;
-                        unitAmount = 1;
-                        spacing = 2;
-                    }},
-
-                    new SpawnGroup(UnitTypes.crawler){{
-                        begin = 20;
-                        unitScaling = 1;
-                        spacing = 10;
-                        unitScaling = 0.5f;
-                        unitAmount = 10;
-                    }},
-
-                    bossGroup(UnitTypes.reaper)
-                );
             }};
         }};
     }

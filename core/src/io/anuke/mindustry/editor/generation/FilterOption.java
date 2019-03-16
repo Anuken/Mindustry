@@ -59,9 +59,7 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> {
-                b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3);
-            }, () -> {
+            table.addButton(b -> b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3), () -> {
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
                 int i = 0;

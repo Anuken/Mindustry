@@ -147,9 +147,9 @@ public class WaveInfoDialog extends FloatingDialog{
                         }).width(80f);
 
                         a.add(" + ");
-                        a.addField(Math.max((int)(Mathf.isZero(group.unitScaling) ? 0 : 1f/group.unitScaling), 0) + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
-                                group.unitScaling = 1f / Strings.parseInt(text);
+                        a.addField(Strings.toFixed(Math.max((Mathf.isZero(group.unitScaling) ? 0 : 1f/group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
+                            if(Strings.canParsePositiveFloat(text)){
+                                group.unitScaling = 1f / Strings.parseFloat(text);
                                 updateWaves();
                             }
                         }).width(80f);
