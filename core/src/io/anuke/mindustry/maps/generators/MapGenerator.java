@@ -25,7 +25,7 @@ import static io.anuke.mindustry.Vars.world;
 public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
-    private Array<Decoration> decorations = new Array<>();
+    private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
     private Loadout loadout;
     /**How much the landscape is randomly distorted.*/
     public float distortion = 3;
@@ -123,6 +123,10 @@ public class MapGenerator extends Generator{
                     }
 
                     for(Decoration decor : decorations){
+                        if(x > 0 && y > 0 && (tiles[x - 1][y].block() == decor.wall || tiles[x][y - 1].block() == decor.wall)){
+                            continue;
+                        }
+
                         if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
                             tile.setBlock(decor.wall);
                         }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
