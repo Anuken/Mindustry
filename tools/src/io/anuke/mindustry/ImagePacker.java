@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -95,6 +96,8 @@ public class ImagePacker{
             }
         };
 
+        Draw.scl = 1f/Core.atlas.find("scale_marker").getWidth();
+
         Time.mark();
         Generators.generate();
         Log.info("&ly[Generator]&lc Total time to generate: &lg{0}&lcms", Time.elapsed());
@@ -131,7 +134,7 @@ public class ImagePacker{
     }
 
     static void err(String message, Object... args){
-        throw new IllegalArgumentException(Strings.formatArgs(message, args));
+        throw new IllegalArgumentException(Strings.format(message, args));
     }
 
     static class GenRegion extends AtlasRegion{

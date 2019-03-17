@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.entities.Effects.Effect;
@@ -45,12 +46,8 @@ public class Floor extends Block{
     public Liquid liquidDrop = null;
     /** item that drops from this block, used for drills */
     public Item itemDrop = null;
-    /** Whether ores generate on this block. */
-    public boolean hasOres = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
-    /** Heat of this block, 0 at baseline. Used for calculating output of thermal generators.*/
-    public float heat = 0f;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
@@ -59,6 +56,8 @@ public class Floor extends Block{
     public Block blendGroup = this;
     /**Effect displayed when randomly updated.*/
     public Effect updateEffect = Fx.none;
+    /**Array of affinities to certain things.*/
+    public Attributes attributes = new Attributes();
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
@@ -110,17 +109,32 @@ public class Floor extends Block{
         Mathf.random.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+        Floor floor = tile.ore();
+        if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
+            floor.draw(tile);
+        }
 
         drawEdges(tile);
     }
 
+
+    public void drawNonLayer(Tile tile){
+        Mathf.random.setSeed(tile.pos());
+
+        drawEdges(tile, true);
+    }
+
     protected void drawEdges(Tile tile){
+        drawEdges(tile, false);
+    }
+
+    protected void drawEdges(Tile tile, boolean sameLayer){
         eq = 0;
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && doEdge(other.floor()) && other.floor().edges() != null){
+            if(other != null && doEdge(other.floor(), sameLayer) && other.floor().edges() != null){
                 eq |= (1 << i);
             }
         }
@@ -140,8 +154,8 @@ public class Floor extends Block{
         return ((Floor)blendGroup).edges;
     }
 
-    protected boolean doEdge(Floor other){
-        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this);
+    protected boolean doEdge(Floor other, boolean sameLayer){
+        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
     }
 
     protected boolean edgeOnto(Floor other){

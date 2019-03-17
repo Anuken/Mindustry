@@ -16,10 +16,6 @@ public class NumberValue implements StatValue{
     public NumberValue(float value, StatUnit unit){
         this.unit = unit;
         this.value = value;
-
-        if(unit != StatUnit.none && unit.localized().contains("???")){
-            throw new RuntimeException("No bundle definition found for unit: '" + unit + "'");
-        }
     }
 
     @Override

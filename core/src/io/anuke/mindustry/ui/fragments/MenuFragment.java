@@ -43,7 +43,7 @@ public class MenuFragment extends Fragment{
         }
 
         //version info
-        parent.fill(c -> c.bottom().left().add(Strings.formatArgs("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
+        parent.fill(c -> c.bottom().left().add(Strings.format("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
                 (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
                 .visible(() -> state.is(State.menu)));
     }
@@ -138,7 +138,7 @@ public class MenuFragment extends Fragment{
         FloatingDialog dialog = new FloatingDialog("$play");
         dialog.setFillParent(false);
         dialog.addCloseButton();
-        dialog.cont.defaults().size(230f, 64f);
+        dialog.cont.defaults().size(210f, 64f);
         dialog.cont.add(new MenuButton("icon-editor", "$newgame", () -> {
             dialog.hide();
             ui.custom.show();

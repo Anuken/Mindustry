@@ -1,20 +1,14 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.collection.OrderedMap;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.values.*;
 
-import java.util.Locale;
-
 /**Hold and organizes a list of block stats.*/
 public class BlockStats{
-    private static final boolean errorWhenMissing = false;
-
     private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
     private boolean dirty;
 
@@ -50,22 +44,6 @@ public class BlockStats{
 
     /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
-        if(!Core.bundle.has("blocks." + stat.name().toLowerCase(Locale.ROOT))){
-            if(!errorWhenMissing){
-                Log.err("Warning: No bundle entry for stat type \"" + stat + "\"!");
-            }else{
-                throw new RuntimeException("No bundle entry for stat type \"" + stat + "\"!");
-            }
-        }
-
-        if(!Core.bundle.has("category." + stat.category.name().toLowerCase(Locale.ROOT))){
-            if(!errorWhenMissing){
-                Log.err("Warning: No bundle entry for stat category \"" + stat.category + "\"!");
-            }else{
-                throw new RuntimeException("No bundle entry for stat category \"" + stat.category + "\"!");
-            }
-        }
-
         if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
             throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block.");
         }

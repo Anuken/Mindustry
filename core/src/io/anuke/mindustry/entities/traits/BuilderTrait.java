@@ -252,10 +252,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         TileEntity core = unit.getClosestCore();
 
         if(core == null || tile.block() != Blocks.air || dst(tile.worldx(), tile.worldy()) > mineDistance
-                || tile.floor().itemDrop == null || !unit.acceptsItem(tile.floor().itemDrop) || !canMine(tile.floor().itemDrop)){
+                || tile.drop() == null || !unit.acceptsItem(tile.drop()) || !canMine(tile.drop())){
             setMineTile(null);
         }else{
-            Item item = tile.floor().itemDrop;
+            Item item = tile.drop();
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(tile.worldx(), tile.worldy()), 0.4f);
 
             if(Mathf.chance(Time.delta() * (0.06 - item.hardness * 0.01) * getMinePower())){

@@ -165,6 +165,7 @@ public class BlockRenderer{
             for(int y = miny; y <= maxy; y++){
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
+                if(tile == null) continue; //how is this possible?
                 Block block = tile.block();
 
                 if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){

@@ -21,6 +21,7 @@ import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
@@ -46,6 +47,16 @@ public class HudFragment extends Fragment{
     private float coreAttackTime;
     private float lastCoreHP;
     private float coreAttackOpacity = 0f;
+    private Table goshDarnHeckingFlippedTableWhyDoesThisHappen;
+
+    {
+        Events.on(PlayEvent.class, event -> {
+            if(goshDarnHeckingFlippedTableWhyDoesThisHappen != null){
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.invalidateHierarchy();
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.pack();
+            }
+        });
+    }
 
     public void build(Group parent){
 
@@ -55,6 +66,7 @@ public class HudFragment extends Fragment{
 
             if(mobile){
                 cont.table(select -> {
+                    goshDarnHeckingFlippedTableWhyDoesThisHappen = select;
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -124,7 +136,7 @@ public class HudFragment extends Fragment{
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
-                    .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
+                    .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
         });
@@ -132,7 +144,7 @@ public class HudFragment extends Fragment{
 
         //fps display
         parent.fill(info -> {
-            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps"));
+            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
             info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();

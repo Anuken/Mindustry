@@ -1,0 +1,82 @@
+{
+  "reduce": [
+    {
+      "archive": "jre/lib/rt.jar",
+      "paths": [
+        
+		"javax/transaction",
+		"javax/tools",
+		"javax/swing",
+		"javax/sql",
+		"javax/smartcardio",
+		"javax/rmi",
+		"javax/print",
+		"javax/naming",
+		"javax/management",
+		"javax/lang",
+		"javax/jws",
+		"javax/swing",
+		"javax/imageio",
+		"javax/annotation",
+		"javax/activity",
+		"javax/activation",
+		"javax/accessibility",
+        "com/sun/corba",
+        "com/sun/jmx",
+        "com/sun/jndi",
+        "com/sun/xml",
+        "com/sun/script",
+        "com/sun/media",
+        "com/sun/naming",
+        "java/awt",
+        
+		"com/sun/org/apache/xpath",
+        
+        "com/sun/rowset",
+        "com/sun/script",
+        "sun/applet",
+        "sun/corba",
+        "sun/management"
+      ]
+    },
+    {
+      "archive": "jre/lib/charsets.jar",
+      "paths": [
+      ]
+    },
+    {
+      "archive": "jre/lib/jsse.jar",
+      "paths": [
+      ]
+    },
+    {
+      "archive": "jre/lib/resources.jar",
+      "paths": [
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "platform": "*",
+      "paths": [
+        "jre/lib/rhino.jar"
+      ]
+    },
+    {
+      "platform": "linux",
+      "paths": [
+        "jre/lib/amd64/libawt.so",
+        "jre/lib/amd64/libawt_xawt.so",
+        "jre/lib/amd64/libjawt.so"
+      ]
+    },
+    {
+      "platform": "windows",
+      "paths": [
+        "jre/bin/*.exe",
+        "jre/bin/client",
+        "jre/bin/awt.dll"
+      ]
+    }
+  ]
+}

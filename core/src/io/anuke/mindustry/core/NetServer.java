@@ -233,6 +233,12 @@ public class NetServer implements ApplicationListener{
     }
 
     public static void onDisconnect(Player player){
+        //singleplayer multiplayer wierdness
+        if(player.con == null){
+            player.remove();
+            return;
+        }
+
         if(player.con.hasConnected){
             Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
             Call.onPlayerDisconnect(player.id);
@@ -573,7 +579,7 @@ public class NetServer implements ApplicationListener{
 
                 NetConnection connection = player.con;
 
-                if(!connection.isConnected() || !connections.containsKey(connection.id)){
+                if(connection == null || !connection.isConnected() || !connections.containsKey(connection.id)){
                     //player disconnected, call d/c event
                     onDisconnect(player);
                     return;

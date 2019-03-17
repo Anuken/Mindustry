@@ -20,6 +20,7 @@ public class DesktopLauncher extends Lwjgl3Application{
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setTitle("Mindustry");
             config.setMaximized(true);
+            config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 0);
             config.setWindowedMode(960, 540);
             config.setWindowIcon("sprites/icon.png");
 

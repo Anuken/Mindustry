@@ -203,7 +203,7 @@ public class BlockIndexer{
         for(int x = Math.max(0, tile.x - oreQuadrantSize / 2); x < tile.x + oreQuadrantSize / 2 && x < world.width(); x++){
             for(int y = Math.max(0, tile.y - oreQuadrantSize / 2); y < tile.y + oreQuadrantSize / 2 && y < world.height(); y++){
                 Tile res = world.tile(x, y);
-                if(res.block() == Blocks.air && res.floor().itemDrop == item){
+                if(res.block() == Blocks.air && res.drop() == item){
                     return res;
                 }
             }
@@ -241,9 +241,9 @@ public class BlockIndexer{
         for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
             for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
                 Tile result = world.tile(x, y);
-                if( result == null || result.floor().itemDrop == null || !scanOres.contains(result.floor().itemDrop)) continue;
+                if( result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
 
-                itemSet.add(result.floor().itemDrop);
+                itemSet.add(result.drop());
             }
         }
 
@@ -280,7 +280,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
                 for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
-                    Tile result = world.tile(x, y);
+                    Tile result = world.tile(x, y).target();
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
                         structQuadrants[data.team.ordinal()].set(index);
@@ -320,8 +320,8 @@ public class BlockIndexer{
                 Tile tile = world.tile(x, y);
 
                 //add position of quadrant to list when an ore is found
-                if(tile.floor().itemDrop != null && scanOres.contains(tile.floor().itemDrop) && tile.block() == Blocks.air){
-                    ores.get(tile.floor().itemDrop).add(world.tile(
+                if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
+                    ores.get(tile.drop()).add(world.tile(
                             //make sure to clamp quadrant middle position, since it might go off bounds
                             Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
                             Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1)));

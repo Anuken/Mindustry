@@ -30,7 +30,7 @@ public class Bullets implements ContentList{
     artilleryDense, arilleryPlastic, artilleryPlasticFrag, artilleryHoming, artlleryIncendiary, artilleryExplosive, artilleryUnit,
 
     //flak
-    flakPlastic, flakExplosive, flakSurge,
+    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge,
 
     //missiles
     missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm, missileRevenant,
@@ -138,6 +138,25 @@ public class Bullets implements ContentList{
             splashDamage = 50f;
             backColor = Pal.bulletYellowBack;
             frontColor = Pal.bulletYellow;
+        }};
+
+        flakLead = new FlakBulletType(3.9f, 3){{
+            shootEffect = Fx.shootSmall;
+            bulletWidth = 6f;
+            bulletHeight = 8f;
+            hitEffect = Fx.flakExplosion;
+            splashDamage = 25f;
+            splashDamageRadius = 15f;
+        }};
+
+        flakScrap = new FlakBulletType(3.5f, 3){{
+            shootEffect = Fx.shootSmall;
+            reloadMultiplier = 0.5f;
+            bulletWidth = 6f;
+            bulletHeight = 8f;
+            hitEffect = Fx.flakExplosion;
+            splashDamage = 16f;
+            splashDamageRadius = 24f;
         }};
 
         flakPlastic = new FlakBulletType(4f, 6){{
@@ -360,6 +379,7 @@ public class Bullets implements ContentList{
 
             {
                 shootEffect = Fx.shootHeal;
+                smokeEffect = Fx.hitLaser;
                 hitEffect = Fx.hitLaser;
                 despawnEffect = Fx.hitLaser;
                 collidesTeam = true;
@@ -610,6 +630,11 @@ public class Bullets implements ContentList{
             }
 
             @Override
+            public float range(){
+                return 70f;
+            }
+
+            @Override
             public void draw(Bullet b){
             }
 
@@ -684,28 +709,16 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.pulverize;
                 lifetime = 23f;
                 speed = 1f;
-                splashDamageRadius = 60f;
-                splashDamage = 30f;
+                splashDamageRadius = 50f;
+                splashDamage = 20f;
             }
 
             @Override
             public void init(Bullet b){
                 if(b.getOwner() instanceof Unit){
-                    Unit unit = (Unit)b.getOwner();
-
-                    unit.damage(unit.maxHealth() + 1);
+                    ((Unit)b.getOwner()).kill();
                 }
                 b.time(b.lifetime());
-            }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-
-                for(int i = 0; i < 3; i++){
-                    Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    Puddle.deposit(tile, Liquids.oil, 5f);
-                }
             }
         };
     }

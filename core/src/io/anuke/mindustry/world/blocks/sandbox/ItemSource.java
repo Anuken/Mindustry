@@ -14,6 +14,12 @@ public class ItemSource extends Sorter{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        bars.remove("items");
+    }
+
+    @Override
     public boolean outputsItems(){
         return true;
     }

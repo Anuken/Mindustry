@@ -46,7 +46,6 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-    private RulePreset lastPreset;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -144,11 +143,11 @@ public class ServerControl implements ApplicationListener{
 
                     Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                    + "\nNext selected map:[accent] "+map.name+"[]"
-                    + (map.meta.author() != null ? " by[accent] " + map.meta.author() + "[]" : "") + "."+
+                    + "\nNext selected map:[accent] "+map.name()+"[]"
+                    + (map.author() != null ? " by[accent] " + map.author() + "[]" : "") + "."+
                     "\nNew game begins in " + roundExtraTime + " seconds.");
 
-                    info("Selected next map to be {0}.", map.name);
+                    info("Selected next map to be {0}.", map.name());
 
                     Map fmap = map;
 
@@ -199,7 +198,7 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = world.maps.all().find(map -> map.name.equalsIgnoreCase(arg[0]));
+            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0]));
 
             if(result == null){
                 err("No map with name &y'{0}'&lr found.", arg[0]);
@@ -229,7 +228,7 @@ public class ServerControl implements ApplicationListener{
 
                 host();
             }catch(MapException e){
-                Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                Log.err(e.map.name() + ": " + e.getMessage());
             }
         });
 
@@ -252,7 +251,7 @@ public class ServerControl implements ApplicationListener{
             if(!world.maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : world.maps.all()){
-                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.meta.width, map.meta.height);
+                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
                 }
             }else{
                 info("No maps found.");
@@ -265,7 +264,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name), state.wave);
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
 
                 if(state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
@@ -306,7 +305,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("fillitems", "[team]", "Fill the core with 2000 items.", arg -> {
+        handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
             if(!state.is(State.playing)){
                 err("Not playing. Host first.");
                 return;
@@ -322,7 +321,7 @@ public class ServerControl implements ApplicationListener{
                 
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
-                        state.teams.get(team).cores.first().entity.items.add(item, 2000);
+                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
                     }
                 }
                 
@@ -665,7 +664,7 @@ public class ServerControl implements ApplicationListener{
                     try{
                         r.run();
                     }catch(MapException e){
-                        Log.err(e.map.getDisplayName() + ": " + e.getMessage());
+                        Log.err(e.map.name() + ": " + e.getMessage());
                         Net.closeServer();
                     }
                 }

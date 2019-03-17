@@ -19,6 +19,16 @@ public class BlockPart extends Block{
     }
 
     @Override
+    public void drawTeam(Tile tile){
+
+    }
+
+    @Override
+    public boolean synthetic(){
+        return true;
+    }
+
+    @Override
     public boolean isHidden(){
         return true;
     }

@@ -194,8 +194,8 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.loadFromSlot(0);
 
-        assertEquals(world.width(), map.meta.width);
-        assertEquals(world.height(), map.meta.height);
+        assertEquals(world.width(), map.width);
+        assertEquals(world.height(), map.height);
         assertTrue(state.teams.get(defaultTeam).cores.size > 0);
     }
 

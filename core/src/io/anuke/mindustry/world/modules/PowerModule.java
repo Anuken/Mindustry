@@ -34,5 +34,6 @@ public class PowerModule extends BlockModule{
             links.add(stream.readInt());
         }
         satisfaction = stream.readFloat();
+        if(Float.isNaN(satisfaction) || Float.isInfinite(satisfaction)) satisfaction = 0f;
     }
 }

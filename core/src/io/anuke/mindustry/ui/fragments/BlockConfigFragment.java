@@ -29,6 +29,7 @@ public class BlockConfigFragment extends Fragment{
 
     @Override
     public void build(Group parent){
+        table.visible(false);
         parent.addChild(table);
     }
 

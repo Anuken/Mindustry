@@ -5,15 +5,18 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.EntityQuery;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.EventType.GameOverEvent;
+import io.anuke.mindustry.game.EventType.PlayEvent;
+import io.anuke.mindustry.game.EventType.ResetEvent;
+import io.anuke.mindustry.game.EventType.WaveEvent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -58,6 +61,7 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
+        state.rules.spawns = world.getMap().getWaves();
 
         Events.fire(new PlayEvent());
     }
@@ -87,10 +91,10 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(!state.rules.pvp && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(state.rules.pvp){
+        }else if(!state.rules.waves){
             Team alive = null;
 
             for(Team team : Team.all){

@@ -111,7 +111,7 @@ public class MassDriver extends Block{
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name + "-turret")};
+        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name)};
     }
 
     @Override

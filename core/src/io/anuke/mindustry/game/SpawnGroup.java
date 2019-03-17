@@ -1,39 +1,49 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.util.serialization.Json;
+import io.anuke.arc.util.serialization.Json.Serializable;
+import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.type.UnitType;
+
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * A spawn group defines spawn information for a specific type of unit, with optional extra information like
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
-public class SpawnGroup{
-    protected static final int never = Integer.MAX_VALUE;
+public class SpawnGroup implements Serializable{
+    public static final int never = Integer.MAX_VALUE;
 
     /**The unit type spawned*/
-    public final UnitType type;
+    public UnitType type;
     /**When this spawn should end*/
-    protected int end = never;
+    public int end = never;
     /**When this spawn should start*/
-    protected int begin;
+    public int begin;
     /**The spacing, in waves, of spawns. For example, 2 = spawns every other wave*/
-    protected int spacing = 1;
+    public int spacing = 1;
     /**Maximum amount of units that spawn*/
-    protected int max = 40;
+    public int max = 40;
     /**How many waves need to pass before the amount of units spawned increases by 1*/
-    protected float unitScaling = 9999f;
+    public float unitScaling = never;
     /**Amount of enemies spawned initially, with no scaling*/
-    protected int unitAmount = 1;
+    public int unitAmount = 1;
     /**Status effect applied to the spawned unit. Null to disable.*/
-    protected StatusEffect effect;
+    public StatusEffect effect;
     /**Items this unit spawns with. Null to disable.*/
-    protected ItemStack items;
+    public ItemStack items;
 
     public SpawnGroup(UnitType type){
         this.type = type;
+    }
+
+    public SpawnGroup(){
+        //serialization use only
     }
 
     /**Returns the amount of units spawned on a specific wave.*/
@@ -62,6 +72,30 @@ public class SpawnGroup{
         }
 
         return unit;
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("type", type.name);
+        if(begin != 0) json.writeValue("begin", begin);
+        if(end != never) json.writeValue("end", end);
+        if(spacing != 1) json.writeValue("spacing", spacing);
+        if(max != 40) json.writeValue("max", max);
+        if(unitScaling != never) json.writeValue("scaling", unitScaling);
+        if(unitAmount != 1) json.writeValue("amount", unitAmount);
+        if(effect != null) json.writeValue("effect", effect.id);
+    }
+
+    @Override
+    public void read (Json json, JsonValue data) {
+        type = content.getByName(ContentType.unit, data.getString("type", "dagger"));
+        begin = data.getInt("begin", 0);
+        end = data.getInt("end", never);
+        spacing = data.getInt("spacing", 1);
+        max = data.getInt("spacing", 40);
+        unitScaling = data.getFloat("scaling", never);
+        unitAmount = data.getInt("amount", 1);
+        effect = content.getByID(ContentType.status, data.getInt("effect", -1));
     }
 
     @Override

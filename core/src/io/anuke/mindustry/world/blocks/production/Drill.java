@@ -18,6 +18,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -167,9 +168,6 @@ public class Drill extends Block{
     public void update(Tile tile){
         DrillEntity entity = tile.entity();
 
-        if(Float.isNaN(entity.drillTime)) entity.drillTime = 0f;
-        if(Float.isNaN(entity.warmup)) entity.warmup = 0f;
-
         if(entity.dominantItem == null){
             oreCount.clear();
             itemArray.clear();
@@ -185,7 +183,7 @@ public class Drill extends Block{
             }
 
             itemArray.sort((item1, item2) -> Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0)));
-            itemArray.sort((item1, item2) -> item1.genOre && !item2.genOre ? 1 : item1.genOre == item2.genOre ? 0 : -1);
+            itemArray.sort((item1, item2) -> Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material));
 
             if(itemArray.size == 0){
                 return;
@@ -262,12 +260,12 @@ public class Drill extends Block{
     }
 
     public Item getDrop(Tile tile){
-        return tile.floor().itemDrop;
+        return tile.drop();
     }
 
     public boolean isValid(Tile tile){
         if(tile == null) return false;
-        Item drops = tile.floor().itemDrop;
+        Item drops = tile.drop();
         return drops != null && drops.hardness <= tier;
     }
 

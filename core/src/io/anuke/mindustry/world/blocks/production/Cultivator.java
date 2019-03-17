@@ -10,7 +10,10 @@ import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.Attribute;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,6 +47,21 @@ public class Cultivator extends GenericCrafter{
 
         CultivatorEntity entity = tile.entity();
         entity.warmup = Mathf.lerpDelta(entity.warmup, entity.cons.valid() ? 1f : 0f, 0.015f);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("multiplier", entity -> new Bar(() ->
+        Core.bundle.format("blocks.efficiency",
+        ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup)*100f,1),
+        () -> Pal.ammo,
+        () -> ((CultivatorEntity)entity).warmup));
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPlaceText(Core.bundle.format("blocks.efficiency", (1+sumAttribute(Attribute.spores, x, y))*100, 1), x, y, valid);
     }
 
     @Override
@@ -84,8 +102,23 @@ public class Cultivator extends GenericCrafter{
         return new CultivatorEntity();
     }
 
+    @Override
+    public void onProximityAdded(Tile tile){
+        super.onProximityAdded(tile);
+
+        CultivatorEntity entity = tile.entity();
+        entity.boost = sumAttribute(Attribute.spores, tile.x, tile.y);
+    }
+
+    @Override
+    protected float getProgressIncrease(TileEntity entity, float baseTime){
+        CultivatorEntity c = (CultivatorEntity)entity;
+        return super.getProgressIncrease(entity, baseTime) * (1f + c.boost);
+    }
+
     public static class CultivatorEntity extends GenericCrafterEntity{
         public float warmup;
+        public float boost;
 
         @Override
         public void write(DataOutput stream) throws IOException{

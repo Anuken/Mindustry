@@ -14,6 +14,7 @@ public class Shaders{
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;
+    public static SurfaceShader water, tar;
 
     public static void init(){
         shadow = new Shadow();
@@ -22,6 +23,8 @@ public class Shaders{
         build = new UnitBuild();
         fog = new FogShader();
         menu = new MenuShader();
+        water = new SurfaceShader("water");
+        tar = new SurfaceShader("tar");
     }
 
     public static class MenuShader extends LoadShader{
@@ -121,6 +124,20 @@ public class Shaders{
                     Core.camera.position.y - Core.camera.height / 2 );
             setUniformf("u_texsize", Core.camera.width ,
             Core.camera.height );
+        }
+    }
+
+    public static class SurfaceShader extends LoadShader{
+
+        public SurfaceShader(String frag){
+            super(frag, "default");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("camerapos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("screensize", Core.camera.width, Core.camera.height);
+            setUniformf("time", Time.time());
         }
     }
     
