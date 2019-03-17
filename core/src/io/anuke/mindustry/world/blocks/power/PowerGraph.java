@@ -143,6 +143,10 @@ public class PowerGraph{
     }
 
     public void update(){
+        if(Core.graphics.getFrameId() == lastFrameUpdated){
+            return;
+        }
+
         lastFrameUpdated = Core.graphics.getFrameId();
 
         float powerNeeded = getPowerNeeded();
@@ -150,7 +154,7 @@ public class PowerGraph{
 
         powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
-        if(Core.graphics.getFrameId() == lastFrameUpdated || (consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
+        if(consumers.size == 0 && producers.size == 0 && batteries.size == 0){
             return;
         }
 

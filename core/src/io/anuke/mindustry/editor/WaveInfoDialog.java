@@ -37,7 +37,13 @@ public class WaveInfoDialog extends FloatingDialog{
         this.editor = editor;
 
         shown(this::setup);
-        hidden(() -> editor.getTags().put("waves", world.maps.writeWaves(groups)));
+        hidden(() -> {
+            if(groups == null){
+                editor.getTags().remove("waves");
+            }else{
+                editor.getTags().put("waves", world.maps.writeWaves(groups));
+            }
+        });
 
         addCloseButton();
         buttons.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () ->{
