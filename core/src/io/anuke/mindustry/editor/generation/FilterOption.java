@@ -12,6 +12,8 @@ import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
+import static io.anuke.mindustry.Vars.updateEditorOnChange;
+
 public abstract class FilterOption{
     public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OreBlock)) && Core.atlas.isFound(b.icon(Icon.full));
     public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
@@ -40,7 +42,11 @@ public abstract class FilterOption{
             table.row();
             Slider slider = table.addSlider(min, max, (max-min)/200f, setter).growX().get();
             slider.setValue(getter.get());
-            slider.changed(changed);
+            if(updateEditorOnChange){
+                slider.changed(changed);
+            }else{
+                slider.released(changed);
+            }
         }
     }
 

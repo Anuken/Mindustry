@@ -58,6 +58,7 @@ public abstract class Turret extends Block{
     protected float shootShake = 0f;
     protected float xRand = 0f;
     protected boolean targetAir = true;
+    protected boolean targetGround = true;
 
     protected Vector2 tr = new Vector2();
     protected Vector2 tr2 = new Vector2();
@@ -108,6 +109,7 @@ public abstract class Turret extends Block{
         stats.add(BlockStat.reload, 60f / reload, StatUnit.none);
         stats.add(BlockStat.shots, shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
+        stats.add(BlockStat.targetsGround, targetGround);
     }
 
     @Override
@@ -201,7 +203,7 @@ public abstract class Turret extends Block{
         TurretEntity entity = tile.entity();
 
         entity.target = Units.getClosestTarget(tile.getTeam(),
-                tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir));
+                tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
     }
 
     protected void turnToTarget(Tile tile, float targetRot){

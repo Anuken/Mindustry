@@ -6,10 +6,12 @@ import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.arc.util.async.AsyncResult;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.generation.*;
 import io.anuke.mindustry.editor.generation.GenerateFilter.GenerateInput;
 import io.anuke.mindustry.game.Team;
@@ -21,7 +23,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import static io.anuke.mindustry.Vars.mobile;
+import static io.anuke.mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends FloatingDialog{
@@ -48,8 +50,10 @@ public class MapGenerateDialog extends FloatingDialog{
         shown(this::setup);
         addCloseButton();
         buttons.addButton("$editor.apply", () -> {
-            apply();
-            hide();
+            ui.loadAnd(() -> {
+                apply();
+                hide();
+            });
         }).size(160f, 64f);
         buttons.addButton("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
@@ -75,15 +79,20 @@ public class MapGenerateDialog extends FloatingDialog{
         cont.clear();
         cont.table("flat", t -> {
             t.margin(8f);
-            t.add(new BorderImage(texture)).size(400f).padRight(6);
+            t.stack(new BorderImage(texture), new Stack(){{
+                add(new Image("loadDim"));
+                add(new Image("icon-refresh"){{
+                    setScaling(Scaling.none);
+                }});
+                visible(() -> generating);
+            }}).size(mobile ? 300f : 400f).padRight(6);
             t.pane(p -> filterTable = p).width(300f).get().setScrollingDisabled(true, false);
         }).grow();
-
-        update();
 
         buffer1 = create();
         buffer2 = create();
 
+        update();
         rebuildFilters();
     }
 
@@ -186,6 +195,16 @@ public class MapGenerateDialog extends FloatingDialog{
             result.get();
         }
 
+        buffer1 = null;
+        buffer2 = null;
+        generating = false;
+        if(pixmap != null){
+            pixmap.dispose();
+            texture.dispose();
+            pixmap = null;
+            texture = null;
+        }
+
         //writeback buffer
         DummyTile[][] writeTiles = new DummyTile[editor.width()][editor.height()];
 
@@ -196,7 +215,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         for(GenerateFilter filter : filters){
-            input.setFilter(filter, (x, y) -> dset(editor.tile(x, y)));
+            input.setFilter(filter, editor.width(), editor.height(), 1, (x, y) -> dset(editor.tile(x, y)));
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
@@ -215,10 +234,10 @@ public class MapGenerateDialog extends FloatingDialog{
                         DummyTile write = writeTiles[x][y];
 
                         tile.setRotation((byte)write.rotation);
-                        tile.setFloor((Floor)write.floor);
-                        tile.setBlock(write.block);
-                        tile.setTeam(write.team);
-                        tile.setOre(write.ore);
+                        tile.setFloor((Floor)content.block(write.floor));
+                        tile.setBlock(content.block(write.block));
+                        tile.setTeam(Team.all[write.team]);
+                        tile.setOre(content.block(write.ore));
                     }
                 }
             });
@@ -239,74 +258,81 @@ public class MapGenerateDialog extends FloatingDialog{
         Array<GenerateFilter> copy = new Array<>(filters);
 
         result = executor.submit(() -> {
-            generating = true;
+            try{
+                generating = true;
 
-            if(!filters.isEmpty()){
-                //write to buffer1 for reading
+                if(!filters.isEmpty()){
+                    //write to buffer1 for reading
+                    for(int px = 0; px < pixmap.getWidth(); px++){
+                        for(int py = 0; py < pixmap.getHeight(); py++){
+                            buffer1[px][py].set(editor.tile(px * scaling, py * scaling));
+                        }
+                    }
+                }
+
+                for(GenerateFilter filter : copy){
+                    input.setFilter(filter, pixmap.getWidth(), pixmap.getHeight(), scaling, (x, y) -> buffer1[x][y]);
+                    //read from buffer1 and write to buffer2
+                    for(int px = 0; px < pixmap.getWidth(); px++){
+                        for(int py = 0; py < pixmap.getHeight(); py++){
+                            int x = px * scaling, y = py * scaling;
+                            DummyTile tile = buffer1[px][py];
+                            input.begin(editor, x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
+                            filter.apply(input);
+                            buffer2[px][py].set(input.floor, input.block, input.ore, Team.all[tile.team], tile.rotation);
+                        }
+                    }
+                    for(int px = 0; px < pixmap.getWidth(); px++){
+                        for(int py = 0; py < pixmap.getHeight(); py++){
+                            buffer1[px][py].set(buffer2[px][py]);
+                        }
+                    }
+                }
+
                 for(int px = 0; px < pixmap.getWidth(); px++){
                     for(int py = 0; py < pixmap.getHeight(); py++){
-                        buffer1[px][py].set(editor.tile(px * scaling, py * scaling));
+                        int color;
+                        //get result from buffer1 if there's filters left, otherwise get from editor directly
+                        if(filters.isEmpty()){
+                            Tile tile = editor.tile(px * scaling, py * scaling);
+                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.ore(), Team.none);
+                        }else{
+                            DummyTile tile = buffer1[px][py];
+                            color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.none);
+                        }
+                        pixmap.drawPixel(px, pixmap.getHeight() - 1 - py, color);
                     }
                 }
-            }
 
-            for(GenerateFilter filter : copy){
-                input.setFilter(filter, (x, y) -> buffer1[x][y]);
-                //read from buffer1 and write to buffer2
-                for(int px = 0; px < pixmap.getWidth(); px++){
-                    for(int py = 0; py < pixmap.getHeight(); py++){
-                        int x = px*scaling, y = py*scaling;
-                        DummyTile tile = buffer1[px][py];
-                        input.begin(editor, x, y, tile.floor, tile.block, tile.ore);
-                        filter.apply(input);
-                        buffer2[px][py].set(input.floor, input.block, input.ore, tile.team, tile.rotation);
-                    }
-                }
-                for(int px = 0; px < pixmap.getWidth(); px++){
-                    for(int py = 0; py < pixmap.getHeight(); py++){
-                        buffer1[px][py].set(buffer2[px][py]);
-                    }
-                }
-            }
-
-            for(int px = 0; px < pixmap.getWidth(); px++){
-                for(int py = 0; py < pixmap.getHeight(); py++){
-                    int color;
-                    //get result from buffer1 if there's filters left, otherwise get from editor directly
-                    if(filters.isEmpty()){
-                        Tile tile = editor.tile(px * scaling, py * scaling);
-                        color = MapIO.colorFor(tile.floor(), tile.block(), tile.ore(), Team.none);
-                    }else{
-                        DummyTile tile = buffer1[px][py];
-                        color = MapIO.colorFor(tile.floor, tile.block, tile.ore, Team.none);
-                    }
-                    pixmap.drawPixel(px, pixmap.getHeight() - 1 - py, color);
-                }
-            }
-
-            Core.app.post(() -> {
-                texture.draw(pixmap, 0, 0);
+                Core.app.post(() -> {
+                    texture.draw(pixmap, 0, 0);
+                    generating = false;
+                });
+            }catch(Exception e){
                 generating = false;
-            });
+                e.printStackTrace();
+            }
             return null;
         });
     }
 
     public static class DummyTile{
-        public Block block = Blocks.air, ore = Blocks.air, floor = Blocks.air;
-        public Team team = Team.none;
-        public int rotation;
+        public byte block, floor, ore, team, rotation;
 
         void set(Block floor, Block wall, Block ore, Team team, int rotation){
-            this.floor = floor;
-            this.block = wall;
-            this.ore = ore;
-            this.team = team;
-            this.rotation = rotation;
+            this.floor = floor.id;
+            this.block = wall.id;
+            this.ore = ore.id;
+            this.team = (byte)team.ordinal();
+            this.rotation = (byte)rotation;
         }
 
         void set(DummyTile other){
-            set(other.floor, other.block, other.ore, other.team, other.rotation);
+            this.floor = other.floor;
+            this.block = other.block;
+            this.ore = other.ore;
+            this.team = other.team;
+            this.rotation = other.rotation;
         }
 
         void set(Tile other){

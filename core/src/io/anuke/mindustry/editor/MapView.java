@@ -267,7 +267,9 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        if(Core.scene.getKeyboardFocus() != null && isDescendantOf(Core.scene.getKeyboardFocus())){
+            editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        }
         Draw.reset();
 
         if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){

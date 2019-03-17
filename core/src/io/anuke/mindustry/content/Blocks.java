@@ -36,9 +36,9 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
-    holostone, rocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
+    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -211,6 +211,14 @@ public class Blocks implements ContentList{
         }};
 
         rocks = new StaticWall("rocks"){{
+            variants = 2;
+        }};
+
+        sporerocks = new StaticWall("sporerocks"){{
+            variants = 2;
+        }};
+
+        rock = new Rock("rock"){{
             variants = 2;
         }};
 
@@ -694,7 +702,7 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 3));
+            requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
             capacity = 32;
             health = 25;
@@ -1067,20 +1075,21 @@ public class Blocks implements ContentList{
         }};
 
         scatter = new BurstTurret("scatter"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90), true);
+            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90));
             ammo(
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 45f;
+            reload = 43f;
             range = 160f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
+            targetGround = false;
 
             recoil = 2f;
             rotatespeed = 10f;
-            inaccuracy = 18f;
+            inaccuracy = 17f;
             shootCone = 35f;
 
             health = 220*size*size;
