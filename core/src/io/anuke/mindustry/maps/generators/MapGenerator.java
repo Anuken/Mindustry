@@ -120,6 +120,7 @@ public class MapGenerator extends Generator{
 
                     if(distortFloor){
                         tile.setFloor(tiles[newX][newY].floor());
+                        tile.setOre(tiles[newX][newY].ore());
                     }
 
                     for(Decoration decor : decorations){

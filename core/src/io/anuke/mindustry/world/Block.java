@@ -269,6 +269,7 @@ public class Block extends BlockStorage{
 
     public float sumAttribute(Attribute attr, int x, int y){
         Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
         float sum = 0;
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             sum += other.floor().attributes.get(attr);
