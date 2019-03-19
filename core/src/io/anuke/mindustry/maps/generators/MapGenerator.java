@@ -99,6 +99,10 @@ public class MapGenerator extends Generator{
                         enemies.add(new Point2(x, y));
                         tiles[x][y].setBlock(Blocks.air);
                     }
+
+                    if(tiles[x][y].block() == Blocks.part){
+                        tiles[x][y].setBlock(Blocks.air);
+                    }
                 }
             }
 

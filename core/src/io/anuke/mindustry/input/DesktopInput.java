@@ -3,12 +3,17 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Bresenham2;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.pooling.Pool;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
@@ -33,6 +38,12 @@ public class DesktopInput extends InputHandler{
     private PlaceMode mode;
     /**Animation scale for line.*/
     private float selectScale;
+    /**All requests for the line mode placing.*/
+    private Array<PlaceRequest> requests = new Array<>();
+
+    private Bresenham2 bres = new Bresenham2();
+    private Array<Point2> points = new Array<>();
+    private Array<Point2> outPoints = new Array<>();
 
     public DesktopInput(Player player){
         super(player);
@@ -77,32 +88,29 @@ public class DesktopInput extends InputHandler{
 
         //draw selection(s)
         if(mode == placing && block != null){
-            NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
+            int i = 0;
+            for(PlaceRequest request : requests){
+                int x = request.x, y = request.y;
 
-            for(int i = 0; i <= result.getLength(); i += block.size){
-                int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
-                int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
-
-                if(i + block.size > result.getLength() && block.rotate){
-                    Draw.color(!validPlace(x, y, block, result.rotation) ? Pal.removeBack : Pal.accentBack);
+                if(++i >= requests.size && block.rotate){
+                    Draw.color(!validPlace(x, y, block, request.rotation) ? Pal.removeBack : Pal.accentBack);
                     Draw.rect(Core.atlas.find("place-arrow"),
-                        x * tilesize + block.offset(),
-                        y * tilesize + block.offset() - 1,
-                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
+                    x * tilesize + block.offset(),
+                    y * tilesize + block.offset() - 1,
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, request.rotation * 90 - 90);
 
-                    Draw.color(!validPlace(x, y, block, result.rotation) ? Pal.remove : Pal.accent);
+                    Draw.color(!validPlace(x, y, block, request.rotation) ? Pal.remove : Pal.accent);
                     Draw.rect(Core.atlas.find("place-arrow"),
-                        x * tilesize + block.offset(),
-                        y * tilesize + block.offset(),
-                        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                        Core.atlas.find("place-arrow").getHeight() * Draw.scl, result.rotation * 90 - 90);
+                    x * tilesize + block.offset(),
+                    y * tilesize + block.offset(),
+                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
+                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, request.rotation * 90 - 90);
                 }
 
-                drawPlace(x, y, block, result.rotation);
+                drawPlace(request.x, request.y, block, request.rotation);
             }
 
-            Draw.reset();
         }else if(mode == breaking){
             NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursorX, cursorY, false, maxLength, 1f);
             NormalizeResult dresult = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
@@ -166,13 +174,17 @@ public class DesktopInput extends InputHandler{
 
         //renderer.minimap.zoomBy(-Core.input.axisTap(Binding.zoom_minimap));
 
-        if(player.isDead()) return;
+        if(player.isDead()){
+            cursorType = SystemCursor.arrow;
+            return;
+        }
 
         pollInput();
 
         //deselect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;
+            requests.clear();
         }
 
         if(player.isShooting && !canShoot()){
@@ -190,9 +202,7 @@ public class DesktopInput extends InputHandler{
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
-        if(player.isDead()){
-            cursorType = SystemCursor.arrow;
-        }else if(cursor != null){
+        if(cursor != null){
             cursor = cursor.target();
 
             cursorType = cursor.block().getCursor(cursor);
@@ -231,6 +241,7 @@ public class DesktopInput extends InputHandler{
                 selectX = cursorX;
                 selectY = cursorY;
                 mode = placing;
+                requests.add(new PlaceRequest(selectX, selectY, rotation));
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if (!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
@@ -255,20 +266,51 @@ public class DesktopInput extends InputHandler{
             selectY = tileY(Core.input.mouseY());
         }
 
+        if(isPlacing() && mode == placing){
+            if((cursorX != selectX || cursorY != selectY)){
+                points.clear();
+                outPoints.clear();
+                Pool<Point2> pool = Pools.get(Point2.class, Point2::new);
+                Array<Point2> out = bres.line(selectX, selectY, cursorX, cursorY, pool, outPoints);
+
+                for(int i = 0; i < out.size; i++){
+                    points.add(out.get(i));
+
+                    if(i != out.size - 1){
+                        Point2 curr = out.get(i);
+                        Point2 next = out.get(i + 1);
+                        //diagonal
+                        if(next.x != curr.x && next.y != curr.y){
+                            points.add(new Point2(next.x, curr.y));
+                        }
+                    }
+                }
+
+                for(Point2 point : points){
+                    if(checkUnused(point.x, point.y)){
+                        addRequest(point);
+                        selectX = point.x;
+                        selectY = point.y;
+                    }
+
+                }
+
+                pool.freeAll(outPoints);
+
+            }
+        }
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
-                NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, true, maxLength);
+                int rot = rotation;
 
-                for(int i = 0; i <= result.getLength(); i += block.size){
-                    int x = selectX + i * Mathf.sign(cursorX - selectX) * Mathf.num(result.isX());
-                    int y = selectY + i * Mathf.sign(cursorY - selectY) * Mathf.num(!result.isX());
-
-                    rotation = result.rotation;
-
-                    tryPlaceBlock(x, y);
+                for(PlaceRequest req : requests){
+                    rotation = req.rotation;
+                    tryPlaceBlock(req.x, req.y);
                 }
+
+                rotation = rot;
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
                 for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
@@ -285,9 +327,44 @@ public class DesktopInput extends InputHandler{
                 tryDropItems(selected.target(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
+            requests.clear();
             mode = none;
         }
         
+    }
+
+    boolean checkUnused(int x, int y){
+        Tmp.r2.setSize(block.size * tilesize);
+        Tmp.r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
+
+        for(PlaceRequest req : requests){
+            Tmp.r1.setSize(block.size * tilesize);
+            Tmp.r1.setCenter(req.x*tilesize + block.offset(), req.y*tilesize + block.offset());
+
+            if(Tmp.r2.overlaps(Tmp.r1)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void addRequest(Point2 point){
+        if(!checkUnused(point.x, point.y)) return;
+
+        PlaceRequest last = requests.peek();
+
+        if(last.x == point.x && last.y == point.y){
+            return;
+        }
+
+        int rel = Tile.relativeTo(last.x, last.y, point.x, point.y);
+
+        if(rel != -1){
+            last.rotation = rel;
+            rotation = rel;
+        }
+
+        requests.add(new PlaceRequest(point.x, point.y, rotation));
     }
 
     @Override
@@ -310,6 +387,25 @@ public class DesktopInput extends InputHandler{
 
         if(state.is(State.menu)){
             droppingItem = false;
+        }
+    }
+
+    class PlaceRequest{
+        int x, y, rotation;
+
+        public PlaceRequest(int x, int y, int rotation){
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+        }
+
+        @Override
+        public String toString(){
+            return "PlaceRequest{" +
+            "x=" + x +
+            ", y=" + y +
+            ", rotation=" + rotation +
+            '}';
         }
     }
 
