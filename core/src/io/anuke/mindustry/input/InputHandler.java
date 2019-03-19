@@ -3,10 +3,13 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.InputProcessor;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Bresenham2;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
@@ -43,6 +46,10 @@ public abstract class InputHandler implements InputProcessor{
     public Block block;
     public int rotation;
     public boolean droppingItem;
+
+    protected Bresenham2 bres = new Bresenham2();
+    protected Array<Point2> points = new Array<>();
+    protected Array<Point2> outPoints = new Array<>();
 
     public InputHandler(Player player){
         this.player = player;

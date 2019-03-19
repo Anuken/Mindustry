@@ -8,7 +8,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Bresenham2;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Tmp;
@@ -40,10 +39,6 @@ public class DesktopInput extends InputHandler{
     private float selectScale;
     /**All requests for the line mode placing.*/
     private Array<PlaceRequest> requests = new Array<>();
-
-    private Bresenham2 bres = new Bresenham2();
-    private Array<Point2> points = new Array<>();
-    private Array<Point2> outPoints = new Array<>();
 
     public DesktopInput(Player player){
         super(player);
