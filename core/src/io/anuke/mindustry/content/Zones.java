@@ -22,7 +22,7 @@ public class Zones implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
-            resources = new Item[]{Items.copper, Items.scrap};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

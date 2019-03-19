@@ -1069,7 +1069,7 @@ public class Blocks implements ContentList{
             range = 95f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 210;
+            health = 250;
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};
@@ -1092,7 +1092,7 @@ public class Blocks implements ContentList{
             inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 220*size*size;
+            health = 260*size*size;
         }};
 
         hail = new ArtilleryTurret("hail"){{
@@ -1107,7 +1107,7 @@ public class Blocks implements ContentList{
             range = 230f;
             inaccuracy = 1f;
             shootCone = 10f;
-            health = 120;
+            health = 260;
         }};
 
         wave = new LiquidTurret("wave"){{
@@ -1125,7 +1125,7 @@ public class Blocks implements ContentList{
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
             range = 100f;
-            health = 360;
+            health = 250*size*size;
 
             drawer = (tile, entity) -> {
                 Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -1156,7 +1156,7 @@ public class Blocks implements ContentList{
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.RED;
             size = 2;
-            health = 320;
+            health = 280*size*size;
             targetAir = false;
         }};
 
@@ -1174,6 +1174,7 @@ public class Blocks implements ContentList{
             heatColor = Color.RED;
             recoil = 1f;
             size = 1;
+            health = 260;
         }};
 
         swarmer = new BurstTurret("swarmer"){{
@@ -1190,7 +1191,7 @@ public class Blocks implements ContentList{
             range = 140f;
             xRand = 6f;
             size = 2;
-            health = 380;
+            health = 300*size*size;
         }};
 
         salvo = new BurstTurret("salvo"){{

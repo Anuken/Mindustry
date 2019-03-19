@@ -36,7 +36,7 @@ public class Mechs implements ContentList{
                 speed = 0.5f;
                 boostSpeed = 0.85f;
                 engineColor = Color.valueOf("ffd37f");
-                health = 250f;
+                health = 300f;
 
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
@@ -62,7 +62,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
-                health = 220f;
+                health = 250f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 engineColor = Color.valueOf("d3ddff");

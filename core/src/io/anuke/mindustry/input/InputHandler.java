@@ -15,6 +15,7 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
@@ -378,14 +379,23 @@ public abstract class InputHandler implements InputProcessor{
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
 
+        Tmp.r3.set(-1, -1, 0, 0);
+
         for(int i = 0; i < points.size; i++){
             Point2 point = points.get(i);
+
+            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x*tilesize + block.offset(), point.y*tilesize + block.offset()).overlaps(Tmp.r3)){
+                continue;
+            }
+
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
             line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
             line.last = next == null;
             cons.accept(line);
+
+            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x*tilesize + block.offset(), point.y*tilesize + block.offset());
         }
     }
 
