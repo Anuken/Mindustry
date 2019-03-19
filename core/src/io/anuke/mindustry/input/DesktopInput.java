@@ -296,7 +296,6 @@ public class DesktopInput extends InputHandler{
                 }
 
                 pool.freeAll(outPoints);
-
             }
         }
 
