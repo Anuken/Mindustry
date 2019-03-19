@@ -3,15 +3,11 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Tmp;
-import io.anuke.arc.util.pooling.Pool;
-import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
@@ -35,24 +31,19 @@ public class DesktopInput extends InputHandler{
     private PlaceMode mode;
     /**Animation scale for line.*/
     private float selectScale;
-    /**All requests for the line mode placing.*/
-    private Array<PlaceRequest> requests = new Array<>();
+
+    private int prevX, prevY, prevRotation;
 
     public DesktopInput(Player player){
         super(player);
     }
 
     /**Draws a placement icon for a specific block.*/
-    void drawPlace(int x, int y, Block block, int rotation, PlaceRequest prev){
+    void drawPlace(int x, int y, Block block, int rotation, int prevX, int prevY, int prevRotation){
         if(validPlace(x, y, block, rotation)){
-            if(prev != null){
-                block.getPlaceDraw(placeDraw, rotation, prev.x - x, prev.y - y, prev.rotation);
-            }else{
-                block.getPlaceDraw(placeDraw, rotation, 0, 0, rotation);
-            }
+            block.getPlaceDraw(placeDraw, rotation, prevX, prevY, prevRotation);
 
             Draw.color();
-
             Draw.rect(placeDraw.region, x * tilesize + block.offset(), y * tilesize + block.offset(),
                 placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
                 placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
@@ -62,14 +53,14 @@ public class DesktopInput extends InputHandler{
             for(int i = 0; i < 4; i++){
                 Point2 p = Geometry.d8edge[i];
                 float offset = -Math.max(block.size-1, 0)/2f * tilesize;
-                Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
+                if(i % 2 == 0)Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
             }
             Draw.color();
         }else{
             Draw.color(Pal.removeBack);
-            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f);
+            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f - 1);
             Draw.color(Pal.remove);
-            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f);
+            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f - 1);
         }
     }
 
@@ -86,30 +77,20 @@ public class DesktopInput extends InputHandler{
 
         //draw selection(s)
         if(mode == placing && block != null){
-            int i = 0;
-            PlaceRequest prev = null;
-            for(PlaceRequest request : requests){
-                int x = request.x, y = request.y;
+            prevX = selectX;
+            prevY = selectY;
+            prevRotation = rotation;
 
-                if(++i >= requests.size && block.rotate){
-                    Draw.color(!validPlace(x, y, block, request.rotation) ? Pal.removeBack : Pal.accentBack);
-                    Draw.rect(Core.atlas.find("place-arrow"),
-                    x * tilesize + block.offset(),
-                    y * tilesize + block.offset() - 1,
-                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, request.rotation * 90 - 90);
-
-                    Draw.color(!validPlace(x, y, block, request.rotation) ? Pal.remove : Pal.accent);
-                    Draw.rect(Core.atlas.find("place-arrow"),
-                    x * tilesize + block.offset(),
-                    y * tilesize + block.offset(),
-                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, request.rotation * 90 - 90);
+            iterateLine(selectX, selectY, cursorX, cursorY, l -> {
+                if(l.last && block.rotate){
+                    drawArrow(block, l.x, l.y, l.rotation);
                 }
+                drawPlace(l.x, l.y, block, l.rotation, prevX - l.x, prevY - l.y, prevRotation);
 
-                drawPlace(request.x, request.y, block, request.rotation, prev);
-                prev = request;
-            }
+                prevX = l.x;
+                prevY = l.y;
+                prevRotation = l.rotation;
+            });
 
         }else if(mode == breaking){
             NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursorX, cursorY, false, maxLength, 1f);
@@ -134,21 +115,9 @@ public class DesktopInput extends InputHandler{
             Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
         }else if(isPlacing()){
             if(block.rotate){
-                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Pal.removeBack : Pal.accentBack);
-                Draw.rect(Core.atlas.find("place-arrow"),
-                    cursorX * tilesize + block.offset(),
-                    cursorY * tilesize + block.offset() - 1,
-                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
-
-                Draw.color(!validPlace(cursorX, cursorY, block, rotation) ? Pal.remove : Pal.accent);
-                Draw.rect(Core.atlas.find("place-arrow"),
-                    cursorX * tilesize + block.offset(),
-                    cursorY * tilesize + block.offset(),
-                    Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-                    Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+                drawArrow(block, cursorX, cursorY, rotation);
             }
-            drawPlace(cursorX, cursorY, block, rotation, null);
+            drawPlace(cursorX, cursorY, block, rotation, cursorX, cursorY, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
@@ -184,7 +153,6 @@ public class DesktopInput extends InputHandler{
         //deselect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;
-            requests.clear();
         }
 
         if(player.isShooting && !canShoot()){
@@ -241,7 +209,6 @@ public class DesktopInput extends InputHandler{
                 selectX = cursorX;
                 selectY = cursorY;
                 mode = placing;
-                requests.add(new PlaceRequest(selectX, selectY, rotation));
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if (!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
@@ -266,50 +233,13 @@ public class DesktopInput extends InputHandler{
             selectY = tileY(Core.input.mouseY());
         }
 
-        if(isPlacing() && mode == placing){
-            if((cursorX != selectX || cursorY != selectY)){
-                points.clear();
-                outPoints.clear();
-                Pool<Point2> pool = Pools.get(Point2.class, Point2::new);
-                Array<Point2> out = bres.line(selectX, selectY, cursorX, cursorY, pool, outPoints);
-
-                for(int i = 0; i < out.size; i++){
-                    points.add(out.get(i));
-
-                    if(i != out.size - 1){
-                        Point2 curr = out.get(i);
-                        Point2 next = out.get(i + 1);
-                        //diagonal
-                        if(next.x != curr.x && next.y != curr.y){
-                            points.add(new Point2(next.x, curr.y));
-                        }
-                    }
-                }
-
-                for(Point2 point : points){
-                    if(checkUnused(point.x, point.y)){
-                        addRequest(point);
-                        selectX = point.x;
-                        selectY = point.y;
-                    }
-
-                }
-
-                pool.freeAll(outPoints);
-            }
-        }
-
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
-                int rot = rotation;
-
-                for(PlaceRequest req : requests){
-                    rotation = req.rotation;
-                    tryPlaceBlock(req.x, req.y);
-                }
-
-                rotation = rot;
+                iterateLine(selectX, selectY, cursorX, cursorY, l -> {
+                    rotation = l.rotation;
+                    tryPlaceBlock(l.x, l.y);
+                });
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
                 for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
@@ -326,44 +256,8 @@ public class DesktopInput extends InputHandler{
                 tryDropItems(selected.target(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
-            requests.clear();
             mode = none;
         }
-        
-    }
-
-    boolean checkUnused(int x, int y){
-        Tmp.r2.setSize(block.size * tilesize);
-        Tmp.r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
-
-        for(PlaceRequest req : requests){
-            Tmp.r1.setSize(block.size * tilesize);
-            Tmp.r1.setCenter(req.x*tilesize + block.offset(), req.y*tilesize + block.offset());
-
-            if(Tmp.r2.overlaps(Tmp.r1)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    void addRequest(Point2 point){
-        if(!checkUnused(point.x, point.y)) return;
-
-        PlaceRequest last = requests.peek();
-
-        if(last.x == point.x && last.y == point.y){
-            return;
-        }
-
-        int rel = Tile.relativeTo(last.x, last.y, point.x, point.y);
-
-        if(rel != -1){
-            last.rotation = rel;
-            rotation = rel;
-        }
-
-        requests.add(new PlaceRequest(point.x, point.y, rotation));
     }
 
     @Override
@@ -388,15 +282,4 @@ public class DesktopInput extends InputHandler{
             droppingItem = false;
         }
     }
-
-    private class PlaceRequest{
-        int x, y, rotation;
-
-        public PlaceRequest(int x, int y, int rotation){
-            this.x = x;
-            this.y = y;
-            this.rotation = rotation;
-        }
-    }
-
 }

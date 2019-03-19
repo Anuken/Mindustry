@@ -28,12 +28,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -411,6 +411,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
+        BuildRequest last = null;
         for(BuildRequest request : getPlaceQueue()){
             if(getCurrentRequest() == request && request.progress > 0.001f) continue;
 
@@ -433,20 +434,34 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 request.y * tilesize + block.offset(), rad);
             }else{
                 Draw.color();
+                PlaceDraw draw = PlaceDraw.instance;
 
-                TextureRegion region = request.block.icon(Icon.full);
+                draw.scalex = 1;
+                draw.scaley = 1;
+                draw.rotation = request.rotation;
 
-                Draw.rect(region, request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                region.getWidth() * 1f * Draw.scl,
-                region.getHeight() * 1f * Draw.scl, request.block.rotate ? request.rotation * 90 : 0);
+                if(last == null){
+                    request.block.getPlaceDraw(draw, request.rotation, request.x, request.y, request.rotation);
+                }else{
+                    request.block.getPlaceDraw(draw, request.rotation, last.x - request.x, last.y - request.y, last.rotation);
+                }
+
+                TextureRegion region = draw.region;
+
+                Draw.rect(region,
+                    request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
+                    region.getWidth() * 1f * Draw.scl * draw.scalex,
+                    region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
 
                 Draw.color(Pal.accent);
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(request.block.size-1, 0)/2f * tilesize;
-                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    if(i % 2 == 0) Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
+
+                last = request;
             }
         }
 

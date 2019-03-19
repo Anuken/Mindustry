@@ -1,13 +1,44 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Bresenham2;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.world.Block;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class PlaceUtils{
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
+    private static Bresenham2 bres = new Bresenham2();
+    private static Array<Point2> points = new Array<>();
+
+    /**Normalize a diagonal line into points. */
+    public static Array<Point2> normalizeDiagonal(int startX, int startY, int endX, int endY){
+        Pools.freeAll(points);
+        points.clear();
+        return bres.lineNoDiagonal(startX, startY, endX, endY, Pools.get(Point2.class, Point2::new), points);
+    }
+
+    /**Normalize two points into one straight line, no diagonals.*/
+    public static Array<Point2> normalizeLine(int startX, int startY, int endX, int endY){
+        Pools.freeAll(points);
+        points.clear();
+        if(Math.abs(startX - endX) > Math.abs(startY - endY)){
+            //go width
+            for(int i = 0; i <= Math.abs(startX - endX); i++){
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX + i*Mathf.sign(endX - startX), startY));
+            }
+        }else{
+            //go height
+            for(int i = 0; i <= Math.abs(startY - endY); i++){
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY + i*Mathf.sign(endY - startY)));
+            }
+        }
+        return points;
+    }
 
     /**
      * Normalizes a placement area and returns the result, ready to be used for drawing a rectangle.
