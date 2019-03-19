@@ -5,6 +5,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.input.InputProcessor;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
@@ -50,6 +51,7 @@ public abstract class InputHandler implements InputProcessor{
     protected Bresenham2 bres = new Bresenham2();
     protected Array<Point2> points = new Array<>();
     protected Array<Point2> outPoints = new Array<>();
+    protected PlaceDraw placeDraw = new PlaceDraw();
 
     public InputHandler(Player player){
         this.player = player;
@@ -344,4 +346,8 @@ public abstract class InputHandler implements InputProcessor{
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }
 
+    public class PlaceDraw{
+        public int rotation, scalex, scaley;
+        public TextureRegion region;
+    }
 }

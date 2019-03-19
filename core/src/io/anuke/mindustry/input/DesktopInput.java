@@ -6,7 +6,6 @@ import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -21,7 +20,6 @@ import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -45,15 +43,20 @@ public class DesktopInput extends InputHandler{
     }
 
     /**Draws a placement icon for a specific block.*/
-    void drawPlace(int x, int y, Block block, int rotation){
+    void drawPlace(int x, int y, Block block, int rotation, PlaceRequest prev){
         if(validPlace(x, y, block, rotation)){
+            if(prev != null){
+                block.getPlaceDraw(placeDraw, rotation, prev.x - x, prev.y - y, prev.rotation);
+            }else{
+                block.getPlaceDraw(placeDraw, rotation, 0, 0, rotation);
+            }
+
             Draw.color();
 
-            TextureRegion region = block.icon(Icon.full);
-
-            Draw.rect(region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                region.getWidth() * selectScale * Draw.scl,
-                region.getHeight() * selectScale * Draw.scl, block.rotate ? rotation * 90 : 0);
+            Draw.rect(placeDraw.region, x * tilesize + block.offset(), y * tilesize + block.offset(),
+                placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
+                placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
+                block.rotate ? placeDraw.rotation * 90 : 0);
 
             Draw.color(Pal.accent);
             for(int i = 0; i < 4; i++){
@@ -84,6 +87,7 @@ public class DesktopInput extends InputHandler{
         //draw selection(s)
         if(mode == placing && block != null){
             int i = 0;
+            PlaceRequest prev = null;
             for(PlaceRequest request : requests){
                 int x = request.x, y = request.y;
 
@@ -103,7 +107,8 @@ public class DesktopInput extends InputHandler{
                     Core.atlas.find("place-arrow").getHeight() * Draw.scl, request.rotation * 90 - 90);
                 }
 
-                drawPlace(request.x, request.y, block, request.rotation);
+                drawPlace(request.x, request.y, block, request.rotation, prev);
+                prev = request;
             }
 
         }else if(mode == breaking){
@@ -143,7 +148,7 @@ public class DesktopInput extends InputHandler{
                     Core.atlas.find("place-arrow").getWidth() * Draw.scl,
                     Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
             }
-            drawPlace(cursorX, cursorY, block, rotation);
+            drawPlace(cursorX, cursorY, block, rotation, null);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
@@ -385,22 +390,13 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    class PlaceRequest{
+    private class PlaceRequest{
         int x, y, rotation;
 
         public PlaceRequest(int x, int y, int rotation){
             this.x = x;
             this.y = y;
             this.rotation = rotation;
-        }
-
-        @Override
-        public String toString(){
-            return "PlaceRequest{" +
-            "x=" + x +
-            ", y=" + y +
-            ", rotation=" + rotation +
-            '}';
         }
     }
 
