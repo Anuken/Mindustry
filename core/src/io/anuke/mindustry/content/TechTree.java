@@ -43,20 +43,22 @@ public class TechTree implements ContentList{
             });
 
             node(duo, () -> {
-                node(hail, () -> {
+                node(scatter, () -> {
+                    node(hail, () -> {
 
-                    node(salvo, () -> {
-                        node(swarmer, () -> {
-                            node(cyclone, () -> {
-                                node(spectre, () -> {
+                        node(salvo, () -> {
+                            node(swarmer, () -> {
+                                node(cyclone, () -> {
+                                    node(spectre, () -> {
 
+                                    });
                                 });
                             });
-                        });
 
-                        node(ripple, () -> {
-                            node(fuse, () -> {
+                            node(ripple, () -> {
+                                node(fuse, () -> {
 
+                                });
                             });
                         });
                     });
@@ -257,7 +259,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 10);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 8);
         }
         
         return new TechNode(block, requirements, children);

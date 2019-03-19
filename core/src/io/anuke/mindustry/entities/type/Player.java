@@ -579,6 +579,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(!ui.chatfrag.chatOpen()){
             velocity.add(movement.x, movement.y);
+        }else{
+            isShooting = false;
         }
         float prex = x, prey = y;
         updateVelocityStatus();
