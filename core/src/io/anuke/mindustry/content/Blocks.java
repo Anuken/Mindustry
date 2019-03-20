@@ -38,7 +38,7 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -189,11 +189,6 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
-        iceSnow = new Floor("ice-snow"){{
-            variants = 3;
-            attributes.set(Attribute.water, 0.3f);
-        }};
-
         snow = new Floor("snow"){{
             attributes.set(Attribute.water, 0.2f);
         }};
@@ -203,6 +198,12 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
+        }};
+
+        iceSnow = new Floor("ice-snow"){{
+            variants = 3;
+            attributes.set(Attribute.water, 0.3f);
+            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -219,6 +220,10 @@ public class Blocks implements ContentList{
         }};
 
         rock = new Rock("rock"){{
+            variants = 2;
+        }};
+
+        snowrock = new Rock("snowrock"){{
             variants = 2;
         }};
 
@@ -277,6 +282,7 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
+            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{

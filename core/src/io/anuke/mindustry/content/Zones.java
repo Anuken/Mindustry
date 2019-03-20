@@ -16,7 +16,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
+        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1).decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01))){{
             baseLaunchCost = ItemStack.with(Items.copper, -100);
             startingItems = ItemStack.list(Items.copper, 100);
             alwaysUnlocked = true;
@@ -30,7 +30,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0)){{
+        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
             itemRequirements = ItemStack.with(Items.copper, 2000);

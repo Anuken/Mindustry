@@ -212,7 +212,7 @@ public class MapEditor{
 
                             if(tile.block().isMultiblock()){
                                 removeLinked(wx, wy);
-                            }else if(link != 0 && tiles[x][y].block() == Blocks.part){
+                            }else if(link != 0 && tiles[wx][wy].block() == Blocks.part){
                                 removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
                             }
                         }
