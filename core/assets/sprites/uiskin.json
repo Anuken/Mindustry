@@ -12,6 +12,10 @@
       name: white,
       color: { r: 0, g: 0, b: 0, a: 0.9 }
     },
+    guideDim: {
+      name: white,
+      color: { r: 0, g: 0, b: 0, a: 0.3 }
+    },
     invis: {
       name: white,
       color: { r: 0, g: 0, b: 0, a: 0 }

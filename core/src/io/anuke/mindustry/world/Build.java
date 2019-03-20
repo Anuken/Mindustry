@@ -31,7 +31,7 @@ public class Build{
         if(tile == null) return;
 
         if(tile.entity != null){
-            prevPercent = tile.entity.health();
+            prevPercent = tile.entity.healthf();
         }
 
         tile = tile.target();

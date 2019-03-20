@@ -241,10 +241,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             return;
         }
 
+        if(!isFlying() && (world.tileWorld(x, y) != null && world.tileWorld(x, y).solid())){
+            kill();
+        }
+
         avoidOthers(1.25f);
 
         if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
-            damage(health);
+            kill();
         }
 
         updateTargeting();

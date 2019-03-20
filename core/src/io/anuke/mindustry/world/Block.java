@@ -26,6 +26,7 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
@@ -269,6 +270,7 @@ public class Block extends BlockStorage{
 
     public float sumAttribute(Attribute attr, int x, int y){
         Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
         float sum = 0;
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             sum += other.floor().attributes.get(attr);
@@ -544,6 +546,12 @@ public class Block extends BlockStorage{
             icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
+    }
+
+    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
+        draw.region = icon(Icon.full);
+        draw.scalex = draw.scaley = 1;
+        draw.rotation = rotation;
     }
 
     /**Never use outside of the editor!*/

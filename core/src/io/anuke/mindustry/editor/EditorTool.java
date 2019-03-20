@@ -21,18 +21,21 @@ public enum EditorTool{
 
             Tile tile = editor.tile(x, y);
 
-            Block floor = tile.floor(), block = tile.block();
             byte link = tile.getLinkByte();
 
-            if(block instanceof BlockPart && link != 0){
+            if(tile.block() instanceof BlockPart && link != 0){
                 x -= (Pack.leftByte(link) - 8);
                 y -= (Pack.rightByte(link) - 8);
 
                 tile = editor.tile(x, y);
-                block = tile.block();
             }
 
-            editor.drawBlock = block == Blocks.air ? floor : block;
+            //do not.
+            if(tile.block() instanceof BlockPart){
+                return;
+            }
+
+            editor.drawBlock = tile.block() == Blocks.air ? tile.ore() == Blocks.air ? tile.floor() : tile.ore() : tile.block();
         }
     },
     pencil{

@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Pack;
@@ -13,6 +14,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Layer;
+import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -89,7 +91,6 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         entity.blendbits = 0;
         entity.blendsclx = entity.blendscly = 1;
-        entity.blendshadowrot = -1;
 
         if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 3;
@@ -103,11 +104,32 @@ public class Conveyor extends Block{
         }else if(blends(tile, 1)){
             entity.blendbits = 1;
             entity.blendscly = -1;
-            entity.blendshadowrot = 0;
         }else if(blends(tile, 3)){
             entity.blendbits = 1;
-            entity.blendshadowrot = 1;
         }
+    }
+
+    @Override
+    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
+        draw.rotation = rotation;
+        draw.scalex = draw.scaley = 1;
+
+        int blendbits = 0;
+
+        if(blends(rotation, 1, prevX, prevY, prevRotation)){
+            blendbits = 1;
+            draw.scaley = -1;
+        }else if(blends(rotation, 3, prevX, prevY, prevRotation)){
+            blendbits = 1;
+        }
+
+        draw.rotation = rotation;
+        draw.region = regions[blendbits][0];
+    }
+
+    private boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
+        Point2 left = Geometry.d4(rotation - offset);
+        return left.equals(prevX, prevY) && prevRotation == Mathf.mod(rotation + offset, 4);
     }
 
     private boolean blends(Tile tile, int direction){
@@ -343,7 +365,6 @@ public class Conveyor extends Block{
         byte lastInserted;
         float minitem = 1;
 
-        int blendshadowrot = -1;
         int blendbits;
         int blendsclx, blendscly;
 

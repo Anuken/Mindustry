@@ -45,7 +45,7 @@ import static io.anuke.mindustry.Vars.*;
 public interface BuilderTrait extends Entity, TeamTrait{
     //these are not instance variables!
     Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
-    float placeDistance = 150f;
+    float placeDistance = 220f;
     float mineDistance = 70f;
     Array<BuildRequest> removal = new Array<>();
 

@@ -27,6 +27,7 @@ public class WaveSpawner{
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
     private IntArray loadedSpawns = new IntArray();
+    private boolean spawning = false;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
@@ -57,6 +58,7 @@ public class WaveSpawner{
     }
 
     public void spawnEnemies(){
+        spawning = true;
 
         for(SpawnGroup group : state.rules.spawns){
             int spawned = group.getUnitsSpawned(state.wave);
@@ -90,7 +92,7 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(i*5, () -> shockwave(unit));
+                        Time.run(Math.min(i*5, 60*2), () -> shockwave(unit));
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
@@ -98,6 +100,12 @@ public class WaveSpawner{
                 }
             }
         }
+
+        Time.runTask(121f, () -> spawning = false);
+    }
+
+    public boolean isSpawning(){
+        return spawning;
     }
 
     private void reset(){

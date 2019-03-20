@@ -36,9 +36,9 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
-    holostone, rocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
+    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -189,11 +189,6 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
-        iceSnow = new Floor("ice-snow"){{
-            variants = 3;
-            attributes.set(Attribute.water, 0.3f);
-        }};
-
         snow = new Floor("snow"){{
             attributes.set(Attribute.water, 0.2f);
         }};
@@ -205,12 +200,30 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, 0.4f);
         }};
 
+        iceSnow = new Floor("ice-snow"){{
+            variants = 3;
+            attributes.set(Attribute.water, 0.3f);
+            edgeStyle = "blocky";
+        }};
+
         cliffs = new StaticWall("cliffs"){{
             variants = 1;
             fillsTile = false;
         }};
 
         rocks = new StaticWall("rocks"){{
+            variants = 2;
+        }};
+
+        sporerocks = new StaticWall("sporerocks"){{
+            variants = 2;
+        }};
+
+        rock = new Rock("rock"){{
+            variants = 2;
+        }};
+
+        snowrock = new Rock("snowrock"){{
             variants = 2;
         }};
 
@@ -269,6 +282,7 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
+            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -694,7 +708,7 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 3));
+            requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
             capacity = 32;
             health = 25;
@@ -1061,29 +1075,30 @@ public class Blocks implements ContentList{
             range = 95f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 210;
+            health = 250;
             inaccuracy = 2f;
             rotatespeed = 10f;
         }};
 
         scatter = new BurstTurret("scatter"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90), true);
+            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90));
             ammo(
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 45f;
+            reload = 43f;
             range = 160f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
+            targetGround = false;
 
             recoil = 2f;
             rotatespeed = 10f;
-            inaccuracy = 18f;
+            inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 220*size*size;
+            health = 260*size*size;
         }};
 
         hail = new ArtilleryTurret("hail"){{
@@ -1098,7 +1113,7 @@ public class Blocks implements ContentList{
             range = 230f;
             inaccuracy = 1f;
             shootCone = 10f;
-            health = 120;
+            health = 260;
         }};
 
         wave = new LiquidTurret("wave"){{
@@ -1116,7 +1131,7 @@ public class Blocks implements ContentList{
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
             range = 100f;
-            health = 360;
+            health = 250*size*size;
 
             drawer = (tile, entity) -> {
                 Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -1147,7 +1162,7 @@ public class Blocks implements ContentList{
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.RED;
             size = 2;
-            health = 320;
+            health = 280*size*size;
             targetAir = false;
         }};
 
@@ -1165,6 +1180,7 @@ public class Blocks implements ContentList{
             heatColor = Color.RED;
             recoil = 1f;
             size = 1;
+            health = 260;
         }};
 
         swarmer = new BurstTurret("swarmer"){{
@@ -1181,7 +1197,7 @@ public class Blocks implements ContentList{
             range = 140f;
             xRand = 6f;
             size = 2;
-            health = 380;
+            health = 300*size*size;
         }};
 
         salvo = new BurstTurret("salvo"){{

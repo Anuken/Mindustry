@@ -124,6 +124,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.screenshakePref();
         game.checkPref("effects", true);
+        game.checkPref("swapdiagonal", false);
         if(mobile){
             game.checkPref("autotarget", true);
         }

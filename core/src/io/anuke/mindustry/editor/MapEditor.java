@@ -52,7 +52,7 @@ public class MapEditor{
         tiles = createTiles(map.width, map.height);
         tags.putAll(map.tags);
         MapIO.readTiles(map, tiles);
-        checkTiles();
+        checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
     }
@@ -61,12 +61,12 @@ public class MapEditor{
         reset();
 
         this.tiles = tiles;
-        checkTiles();
+        checkLinkedTiles();
         renderer.resize(width(), height());
     }
 
     //adds missing blockparts
-    void checkTiles(){
+    public void checkLinkedTiles(){
         //clear block parts first
         for(int x = 0; x < width(); x ++){
             for(int y = 0; y < height(); y++){
@@ -176,7 +176,7 @@ public class MapEditor{
 
                             if(i == 1){
                                 tile.setBlock(Blocks.part);
-                                tile.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
+                                tile.setLinkByte(Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
                             }else{
                                 byte link = tile.getLinkByte();
                                 Block block = tile.block();
@@ -212,7 +212,7 @@ public class MapEditor{
 
                             if(tile.block().isMultiblock()){
                                 removeLinked(wx, wy);
-                            }else if(link != 0 && tiles[x][y].block() == Blocks.part){
+                            }else if(link != 0 && tiles[wx][wy].block() == Blocks.part){
                                 removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
                             }
                         }

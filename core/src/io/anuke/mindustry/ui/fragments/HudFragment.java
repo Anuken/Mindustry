@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Element;
@@ -31,6 +32,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -222,16 +224,37 @@ public class HudFragment extends Fragment{
         //launch button
         parent.fill(t -> {
             t.top().visible(() -> !state.is(State.menu));
+            TextButton[] testb = {null};
 
-            TextButton button = Elements.newButton("$launch", () -> ui.showConfirm("$launch", "$launch.confirm", Call::launchZone));
+            TextButton button = Elements.newButton("$launch", () -> {
+                FloatingDialog dialog = new FloatingDialog("$launch");
+                dialog.update(() -> {
+                    if(!testb[0].isVisible()){
+                        dialog.hide();
+                    }
+                });
+                dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+                dialog.buttons.defaults().size(200f, 54f).pad(2f);
+                dialog.setFillParent(false);
+                dialog.buttons.addButton("$cancel", dialog::hide);
+                dialog.buttons.addButton("$ok", () -> {
+                    dialog.hide();
+                    Call.launchZone();
+                });
+                dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+                dialog.keyDown(KeyCode.BACK, dialog::hide);
+                dialog.show();
+
+            });
+
+            testb[0] = button;
 
             button.getStyle().disabledFontColor = Color.WHITE;
             button.visible(() ->
                 world.isZone() &&
                 world.getZone().metCondition() &&
                 !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0 &&
-                state.wavetime < state.rules.waveSpacing * launchWaveMultiplier - 70);
+                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -286,7 +309,7 @@ public class HudFragment extends Fragment{
         container.setTranslation(0, table.getPrefHeight());
         container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
         //nesting actions() calls is necessary so the right prefHeight() is used
-        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
+        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
     }
 
     public boolean shown(){
@@ -332,7 +355,7 @@ public class HudFragment extends Fragment{
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
                 lastUnlockTable = null;
                 lastUnlockLayout = null;
-            }), Actions.removeActor())));
+            }), Actions.remove())));
 
             lastUnlockTable = container;
             lastUnlockLayout = in;
@@ -444,6 +467,6 @@ public class HudFragment extends Fragment{
             }
         }).growY().fillX().right().width(40f)
         .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
-        && (state.wavetime < state.rules.waveSpacing - 60 || !state.rules.waveTimer));
+        && (!world.spawner.isSpawning() || !state.rules.waveTimer));
     }
 }

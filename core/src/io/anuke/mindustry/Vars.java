@@ -66,6 +66,8 @@ public class Vars{
     public static final float finalWorldBounds = worldBounds + 500;
     /**ticks spent out of bound until self destruct.*/
     public static final float boundsCountdown = 60*7;
+    /**for map generator dialog*/
+    public static boolean updateEditorOnChange = false;
     /**size of tiles in units*/
     public static final int tilesize = 8;
     /**all choosable player colors in join/host dialog*/

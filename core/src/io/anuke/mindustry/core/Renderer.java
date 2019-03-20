@@ -13,7 +13,6 @@ import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
@@ -130,10 +129,6 @@ public class Renderer implements ApplicationListener{
             updateShake(0.75f);
 
             draw();
-        }
-
-        if(!ui.chatfrag.chatOpen()){
-            ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
         }
     }
 

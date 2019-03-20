@@ -3,6 +3,7 @@ package io.anuke.mindustry.editor.generation;
 import io.anuke.arc.Core;
 import io.anuke.arc.function.*;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.arc.scene.ui.Slider;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -11,11 +12,15 @@ import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
+import static io.anuke.mindustry.Vars.updateEditorOnChange;
+
 public abstract class FilterOption{
     public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OreBlock)) && Core.atlas.isFound(b.icon(Icon.full));
     public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> oresOnly = b -> b instanceof OreBlock && Core.atlas.isFound(b.icon(Icon.full));
 
     public abstract void build(Table table);
+    public Runnable changed = () -> {};
 
     static class SliderOption extends FilterOption{
         final String name;
@@ -33,9 +38,15 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.add(name);
+            table.add("$filter.option." + name);
             table.row();
-            table.addSlider(min, max, (max-min)/100f, setter).get().setValue(getter.get());
+            Slider slider = table.addSlider(min, max, (max-min)/200f, setter).growX().get();
+            slider.setValue(getter.get());
+            if(updateEditorOnChange){
+                slider.changed(changed);
+            }else{
+                slider.released(changed);
+            }
         }
     }
 
@@ -54,10 +65,7 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.add(name + ": ");
-            table.addButton(b -> {
-                b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3);
-            }, () -> {
+            table.addButton(b -> b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3), () -> {
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
@@ -65,14 +73,17 @@ public abstract class FilterOption{
                     if(!filter.test(block)) continue;
 
                     dialog.cont.addImage(block.icon(Icon.medium)).size(8*4).pad(3).get().clicked(() -> {
-                       consumer.accept(block);
-                       dialog.hide();
+                        consumer.accept(block);
+                        dialog.hide();
+                        changed.run();
                     });
                     if(++i % 10 == 0) dialog.cont.row();
                 }
 
                 dialog.show();
-            });
+            }).pad(4).margin(12f);
+
+            table.add("$filter.option." + name);
         }
     }
 }
