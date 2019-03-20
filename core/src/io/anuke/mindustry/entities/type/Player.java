@@ -9,9 +9,13 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
@@ -24,12 +28,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -407,6 +411,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
+        BuildRequest last = null;
         for(BuildRequest request : getPlaceQueue()){
             if(getCurrentRequest() == request && request.progress > 0.001f) continue;
 
@@ -426,32 +431,37 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
                 Lines.square(
                 request.x * tilesize + block.offset(),
-                request.y * tilesize + block.offset(),
-                rad);
+                request.y * tilesize + block.offset(), rad);
             }else{
-                float rad = Mathf.absin(Time.time(), 7f, 1f) - 1.5f + request.block.size * tilesize / 2f;
-
-                //draw place request
-                Lines.stroke(1f, Pal.accentBack);
-
-                Lines.square(
-                request.x * tilesize + request.block.offset(),
-                request.y * tilesize + request.block.offset() - 1,
-                rad);
-
                 Draw.color();
+                PlaceDraw draw = PlaceDraw.instance;
 
-                Draw.rect(request.block.icon(Icon.full),
-                        request.x * tilesize + request.block.offset(),
-                        request.y * tilesize + request.block.offset(), rad*2, rad*2, request.block.rotate ? request.rotation * 90 : 0);
+                draw.scalex = 1;
+                draw.scaley = 1;
+                draw.rotation = request.rotation;
 
+                if(last == null){
+                    request.block.getPlaceDraw(draw, request.rotation, request.x, request.y, request.rotation);
+                }else{
+                    request.block.getPlaceDraw(draw, request.rotation, last.x - request.x, last.y - request.y, last.rotation);
+                }
+
+                TextureRegion region = draw.region;
+
+                Draw.rect(region,
+                    request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
+                    region.getWidth() * 1f * Draw.scl * draw.scalex,
+                    region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
 
                 Draw.color(Pal.accent);
+                for(int i = 0; i < 4; i++){
+                    Point2 p = Geometry.d8edge[i];
+                    float offset = -Math.max(request.block.size-1, 0)/2f * tilesize;
+                    if(i % 2 == 0) Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                }
+                Draw.color();
 
-                Lines.square(
-                request.x * tilesize + request.block.offset(),
-                request.y * tilesize + request.block.offset(),
-                rad);
+                last = request;
             }
         }
 
@@ -584,6 +594,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(!ui.chatfrag.chatOpen()){
             velocity.add(movement.x, movement.y);
+        }else{
+            isShooting = false;
         }
         float prex = x, prey = y;
         updateVelocityStatus();

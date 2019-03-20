@@ -31,7 +31,7 @@ public class StaticWall extends Rock{
                 Draw.rect(large, tile.worldx() + tilesize/2f, tile.worldy() + tilesize/2f);
             }
         }else if(variants > 0){
-            Draw.rect(regions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, regions.length - 1))], tile.worldx(), tile.worldy());
+            Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }

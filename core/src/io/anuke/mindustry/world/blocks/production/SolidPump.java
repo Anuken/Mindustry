@@ -1,17 +1,20 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.content.Liquids;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.Bar;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.Attribute;
+import io.anuke.mindustry.world.meta.BlockStat;
 
 /**
  * Pump that makes liquid from solids and takes in power. Only works on solid floor blocks.
@@ -21,6 +24,8 @@ public class SolidPump extends Pump{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
     protected float rotateSpeed = 1f;
+    /**Attribute that is checked when calculating output.*/
+    protected Attribute attribute;
 
     public SolidPump(String name){
         super(name);
@@ -35,10 +40,26 @@ public class SolidPump extends Pump{
     }
 
     @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        if(attribute != null){
+            drawPlaceText(Core.bundle.formatDouble("blocks.efficiency", (sumAttribute(attribute, x, y) + 1f)*100, 1), x, y, valid);
+        }
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("efficiency", entity -> new Bar(() ->
+        Core.bundle.formatDouble("blocks.efficiency",
+        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100, 1),
+        () -> Pal.ammo,
+        () -> ((SolidPumpEntity)entity).warmup));
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
-        // stats.remove(BlockStat.liquidOutput);
         stats.add(BlockStat.liquidOutput, result);
     }
 
@@ -75,6 +96,8 @@ public class SolidPump extends Pump{
         }else{
             if(isValid(tile)) fraction = 1f;
         }
+
+        fraction += entity.boost;
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
             float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.power.satisfaction);
@@ -115,6 +138,16 @@ public class SolidPump extends Pump{
         return new SolidPumpEntity();
     }
 
+    @Override
+    public void onProximityAdded(Tile tile){
+        super.onProximityAdded(tile);
+
+        if(attribute != null){
+            SolidPumpEntity entity = tile.entity();
+            entity.boost = sumAttribute(attribute, tile.x, tile.y);
+        }
+    }
+
     public float typeLiquid(Tile tile){
         return tile.entity.liquids.total();
     }
@@ -122,5 +155,6 @@ public class SolidPump extends Pump{
     public static class SolidPumpEntity extends TileEntity{
         public float warmup;
         public float pumpTime;
+        public float boost;
     }
 }

@@ -241,10 +241,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             return;
         }
 
+        if(!isFlying() && (world.tileWorld(x, y) != null && world.tileWorld(x, y).solid())){
+            kill();
+        }
+
         avoidOthers(1.25f);
 
         if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
-            damage(health);
+            kill();
         }
 
         updateTargeting();
@@ -337,6 +341,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void write(DataOutput data) throws IOException{
         super.writeSave(data);
         data.writeByte(type.id);
+        data.writeInt(spawner);
     }
 
     @Override
@@ -344,6 +349,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         float lastx = x, lasty = y, lastrot = rotation;
         super.readSave(data);
         this.type = content.getByID(ContentType.unit, data.readByte());
+        this.spawner = data.readInt();
 
         interpolator.read(lastx, lasty, x, y, rotation);
         rotation = lastrot;

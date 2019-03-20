@@ -16,13 +16,13 @@ public class DirectConsumerTests extends PowerTestFixture{
 
     @Test
     void noPowerRequestedWithNoItems(){
-        testUnitFactory(0, 0, 0.08f, 0.08f, 0f);
+        testUnitFactory(0, 0, 0.08f, 0.08f, 1f);
     }
 
     @Test
     void noPowerRequestedWithInsufficientItems(){
-        testUnitFactory(30, 0, 0.08f, 0.08f, 0f);
-        testUnitFactory(0, 30, 0.08f, 0.08f, 0f);
+        testUnitFactory(30, 0, 0.08f, 0.08f, 1f);
+        testUnitFactory(0, 30, 0.08f, 0.08f, 1f);
     }
 
     @Test

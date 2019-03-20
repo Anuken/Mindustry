@@ -129,8 +129,7 @@ public class UI implements ApplicationListener{
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(8*2 * Math.max(Unit.dp.scl(1f), 0.5f));
-        //param.size = (int)(14*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.size = (int)(9*2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;
@@ -238,7 +237,7 @@ public class UI implements ApplicationListener{
     public void showInfoFade(String info){
         Table table = new Table();
         table.setFillParent(true);
-        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
+        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.remove());
         table.top().add(info).padTop(10);
         Core.scene.add(table);
     }

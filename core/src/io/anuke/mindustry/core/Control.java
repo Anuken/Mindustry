@@ -63,11 +63,6 @@ public class Control implements ApplicationListener{
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
 
-        if(Core.atlas.getTextures().size != 1){
-            throw new IllegalStateException("Atlas must be exactly one texture. " +
-            "If more textures are used, the map editor will not display them correctly.");
-        }
-
         data.load();
 
         Core.settings.setAppName(appName);
@@ -114,6 +109,13 @@ public class Control implements ApplicationListener{
         });
 
         //todo high scores for custom maps, as well as other statistics
+
+        Events.on(WaveEvent.class, event -> {
+            if(world.getMap().getHightScore() < state.wave){
+                hiscore = true;
+                world.getMap().setHighScore(state.wave);
+            }
+        });
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;

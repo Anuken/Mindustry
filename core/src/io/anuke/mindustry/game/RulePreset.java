@@ -9,13 +9,13 @@ public enum RulePreset{
         waveTimer = true;
         waves = true;
         unitDrops = true;
-        spawns = DefaultWaves.getDefaultSpawns();
+        spawns = DefaultWaves.get();
     }}),
     sandbox(() -> new Rules(){{
         infiniteResources = true;
         waves = true;
         waveTimer = false;
-        spawns = DefaultWaves.getDefaultSpawns();
+        spawns = DefaultWaves.get();
     }}),
     attack(() -> new Rules(){{
         enemyCheat = true;

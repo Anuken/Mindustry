@@ -30,7 +30,7 @@ public class Bullets implements ContentList{
     artilleryDense, arilleryPlastic, artilleryPlasticFrag, artilleryHoming, artlleryIncendiary, artilleryExplosive, artilleryUnit,
 
     //flak
-    flakPlastic, flakExplosive, flakSurge,
+    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge,
 
     //missiles
     missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm, missileRevenant,
@@ -138,6 +138,25 @@ public class Bullets implements ContentList{
             splashDamage = 50f;
             backColor = Pal.bulletYellowBack;
             frontColor = Pal.bulletYellow;
+        }};
+
+        flakLead = new FlakBulletType(3.9f, 3){{
+            shootEffect = Fx.shootSmall;
+            bulletWidth = 6f;
+            bulletHeight = 8f;
+            hitEffect = Fx.flakExplosion;
+            splashDamage = 25f;
+            splashDamageRadius = 15f;
+        }};
+
+        flakScrap = new FlakBulletType(3.5f, 3){{
+            shootEffect = Fx.shootSmall;
+            reloadMultiplier = 0.5f;
+            bulletWidth = 6f;
+            bulletHeight = 8f;
+            hitEffect = Fx.flakExplosion;
+            splashDamage = 16f;
+            splashDamageRadius = 24f;
         }};
 
         flakPlastic = new FlakBulletType(4f, 6){{
@@ -360,6 +379,7 @@ public class Bullets implements ContentList{
 
             {
                 shootEffect = Fx.shootHeal;
+                smokeEffect = Fx.hitLaser;
                 hitEffect = Fx.hitLaser;
                 despawnEffect = Fx.hitLaser;
                 collidesTeam = true;
@@ -607,6 +627,11 @@ public class Bullets implements ContentList{
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
                 keepVelocity = false;
+            }
+
+            @Override
+            public float range(){
+                return 70f;
             }
 
             @Override

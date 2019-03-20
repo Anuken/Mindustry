@@ -75,7 +75,7 @@ public class DeployDialog extends FloatingDialog{
                         show();
                     }
                 });
-            }).size(200f).get();
+            }).size(230f).get();
             b[0] = button;
 
             String color = "[lightgray]";

@@ -100,7 +100,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void beginForceLandscape(){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             }
 
             @Override
@@ -178,12 +178,14 @@ public class AndroidLauncher extends AndroidApplication{
                             ui.showError("$save.import.invalid");
                         }
                     }else if(map){ //open map
+                        FileHandle file = Core.files.local("temp-map." + mapExtension);
+                        file.write(inStream, false);
                         Core.app.post(() -> {
                             System.out.println("Opening map.");
                             if(!ui.editor.isShown()){
                                 ui.editor.show();
                             }
-                            ui.editor.beginEditMap(inStream);
+                            ui.editor.beginEditMap(file);
                         });
                     }
                 });

@@ -18,9 +18,10 @@ public class ConsumeModule extends BlockModule{
     public void update(){
         boolean prevValid = valid();
         valid = true;
+        boolean docons = entity.tile.block().shouldConsume(entity.tile);
 
         for(Consume cons : entity.tile.block().consumes.all()){
-            if(cons.isUpdate() && prevValid && entity.tile.block().shouldConsume(entity.tile) && cons.valid(entity.getTile().block(), entity)){
+            if(docons && cons.isUpdate() && prevValid && cons.valid(entity.getTile().block(), entity)){
                 cons.update(entity.getTile().block(), entity);
             }
 

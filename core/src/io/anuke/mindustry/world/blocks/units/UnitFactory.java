@@ -35,6 +35,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class UnitFactory extends Block{
+    //for attack mode
     protected float gracePeriodMultiplier = 15f;
     protected float speedupTime = 60f * 60f * 20;
     protected float maxSpeedup = 2f;
@@ -57,14 +58,14 @@ public class UnitFactory extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitFactorySpawn(Tile tile){
+    public static void onUnitFactorySpawn(Tile tile, int spawns){
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
         UnitFactoryEntity entity = tile.entity();
         UnitFactory factory = (UnitFactory) tile.block();
 
         entity.buildTime = 0f;
-        entity.spawned ++;
+        entity.spawned = spawns;
 
         Effects.shake(2f, 3f, entity);
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
@@ -182,7 +183,7 @@ public class UnitFactory extends Block{
         if(entity.buildTime >= produceTime){
             entity.buildTime = 0f;
 
-            Call.onUnitFactorySpawn(tile);
+            Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, type);
 
             for(ItemStack stack : consumes.items()){

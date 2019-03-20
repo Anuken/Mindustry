@@ -8,12 +8,13 @@ import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.function.Function;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
@@ -25,16 +26,14 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import java.util.Arrays;
 
@@ -110,8 +109,8 @@ public class Block extends BlockStorage{
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] variantRegions;
-    protected TextureRegion region;
+    protected TextureRegion[] variantRegions, editorVariantRegions;
+    protected TextureRegion region, editorIcon;
 
     public Block(String name){
         super(name);
@@ -201,6 +200,28 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
+    protected void drawPlaceText(String text, int x, int y, boolean valid){
+        Color color = valid ? Pal.accent : Pal.remove;
+        BitmapFont font = Core.scene.skin.getFont("default-font");
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f);
+        layout.setText(font, text);
+
+        font.setColor(color);
+        float dx = x*tilesize + offset(), dy = y*tilesize + offset() + size*tilesize/2f + 2;
+        font.draw(text, dx, dy + layout.height + 1, Align.center);
+        Lines.stroke(1f, color);
+        Lines.line(dx - layout.width/2f - 2f, dy, dx + layout.width/2f + 2f, dy);
+
+        font.setUseIntegerPositions(ints);
+        font.setColor(Color.WHITE);
+        font.getData().setScale(1f);
+        Draw.reset();
+        Pools.free(layout);
+    }
+
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
     }
@@ -245,6 +266,16 @@ public class Block extends BlockStorage{
         if(!headless && tile.getTeam() == players[0].getTeam()){
             logic.handleContent(content);
         }
+    }
+
+    public float sumAttribute(Attribute attr, int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += other.floor().attributes.get(attr);
+        }
+        return sum;
     }
 
     @Override
@@ -366,8 +397,12 @@ public class Block extends BlockStorage{
             boolean buffered = consumes.get(ConsumePower.class).isBuffered;
             float capacity = consumes.get(ConsumePower.class).powerCapacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<BUGGED>" : (int)(entity.power.satisfaction * capacity)) :
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
                 Core.bundle.get("blocks.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+        }
+
+        if(hasItems && configurable){
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("blocks.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
     }
 
@@ -511,6 +546,31 @@ public class Block extends BlockStorage{
             icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
+    }
+
+    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
+        draw.region = icon(Icon.full);
+        draw.scalex = draw.scaley = 1;
+        draw.rotation = rotation;
+    }
+
+    /**Never use outside of the editor!*/
+    public TextureRegion editorIcon(){
+        if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
+        return editorIcon;
+    }
+
+    /**Never use outside of the editor!*/
+    public TextureRegion[] editorVariantRegions(){
+        if(editorVariantRegions == null){
+            variantRegions();
+            editorVariantRegions = new TextureRegion[variantRegions.length];
+            for(int i = 0; i < variantRegions.length; i ++){
+                AtlasRegion region = (AtlasRegion)variantRegions[i];
+                editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
+            }
+        }
+        return editorVariantRegions;
     }
 
     protected TextureRegion[] generateIcons(){

@@ -32,20 +32,18 @@ public abstract class FlyingUnit extends BaseUnit{
                 target = null;
             }
 
-            if(target == null){
+            retarget(() -> {
+                targetClosest();
 
-                retarget(() -> {
-                    targetClosest();
+                if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
+                if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
 
-                    if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
-                    if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
+                if(target == null){
+                    setState(patrol);
+                }
+            });
 
-                    if(target == null){
-                        setState(patrol);
-                    }
-                });
-
-            }else{
+            if(target != null){
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation

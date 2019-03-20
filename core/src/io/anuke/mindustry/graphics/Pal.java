@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.Color;
 public class Pal{
     public static final Color
 
+    items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
     bulletYellow = Color.valueOf("ffeec9"),
