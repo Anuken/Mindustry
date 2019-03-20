@@ -56,7 +56,7 @@ public abstract class GenerateFilter{
         public Floor srcfloor;
         public Block srcblock;
         public Block srcore;
-        public int x, y;
+        public int x, y, width, height, scaling;
 
         public MapEditor editor;
         public Block floor, block, ore;
@@ -74,14 +74,17 @@ public abstract class GenerateFilter{
             this.y = y;
         }
 
-        public void setFilter(GenerateFilter filter, TileProvider buffer){
+        public void setFilter(GenerateFilter filter, int width, int height, int scaling, TileProvider buffer){
             this.buffer = buffer;
+            this.width = width;
+            this.height = height;
+            this.scaling = scaling;
             noise.setSeed(filter.seed);
             pnoise.setSeed((int)(filter.seed + 1));
         }
 
         DummyTile tile(float x, float y){
-            return buffer.get(Mathf.clamp((int)x, 0, editor.width() - 1), Mathf.clamp((int)y, 0, editor.height() - 1));
+            return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 
         public interface TileProvider{

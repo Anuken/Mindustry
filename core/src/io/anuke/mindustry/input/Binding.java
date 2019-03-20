@@ -15,6 +15,7 @@ public enum Binding implements KeyBind{
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),
     rotate(new Axis(KeyCode.SCROLL)),
+    diagonal_placement(KeyCode.CONTROL_LEFT),
     pick(KeyCode.MOUSE_MIDDLE),
     dash(KeyCode.SHIFT_LEFT),
     gridMode(KeyCode.GRAVE),

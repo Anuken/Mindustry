@@ -3,6 +3,7 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -37,13 +38,49 @@ public class WaveInfoDialog extends FloatingDialog{
         this.editor = editor;
 
         shown(this::setup);
-        hidden(() -> editor.getTags().put("waves", world.maps.writeWaves(groups)));
+        hidden(() -> {
+            if(groups == null){
+                editor.getTags().remove("waves");
+            }else{
+                editor.getTags().put("waves", world.maps.writeWaves(groups));
+            }
+        });
+
+        keyDown(key -> {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
+                Core.app.post(this::hide);
+            }
+        });
 
         addCloseButton();
-        buttons.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () ->{
-            groups = null;
-            buildGroups();
-        })).size(270f, 64f);
+        buttons.addButton("$waves.edit", () -> {
+            FloatingDialog dialog = new FloatingDialog("$waves.edit");
+            dialog.addCloseButton();
+            dialog.setFillParent(false);
+            dialog.cont.defaults().size(210f, 64f);
+            dialog.cont.addButton("$waves.copy", () -> {
+                ui.showInfoFade("$waves.copied");
+                Core.app.getClipboard().setContents(world.maps.writeWaves(groups));
+                dialog.hide();
+            }).disabled(b -> groups == null);
+            dialog.cont.row();
+            dialog.cont.addButton("$waves.load", () -> {
+                try{
+                    groups = world.maps.readWaves(Core.app.getClipboard().getContents());
+                    buildGroups();
+                }catch(Exception e){
+                    ui.showError("$waves.invalid");
+                }
+                dialog.hide();
+            }).disabled(b -> Core.app.getClipboard().getContents() == null || Core.app.getClipboard().getContents().isEmpty());
+            dialog.cont.row();
+            dialog.cont.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () ->{
+                groups = null;
+                buildGroups();
+                dialog.hide();
+            }));
+            dialog.show();
+        }).size(270f, 64f);
     }
 
     void setup(){
@@ -61,7 +98,7 @@ public class WaveInfoDialog extends FloatingDialog{
             }).growX().height(70f);
         }).width(390f).growY();
         cont.table("clear", m -> {
-            m.add("Preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
+            m.add("$waves.preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.addButton("-", () -> {}).update(t -> {
                 if(t.getClickListener().isPressed()){
@@ -108,16 +145,16 @@ public class WaveInfoDialog extends FloatingDialog{
 
                     t.row();
                     t.table(spawns -> {
-                        spawns.addField("" + group.begin, TextFieldFilter.digitsOnly, text -> {
+                        spawns.addField("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
                              if(Strings.canParsePostiveInt(text)){
-                                 group.begin = Strings.parseInt(text);
+                                 group.begin = Strings.parseInt(text) - 1;
                                  updateWaves();
                              }
                         }).width(100f);
                         spawns.add("$waves.to").padLeft(4).padRight(4);
-                        spawns.addField(group.end == never ? "" : group.end + "", TextFieldFilter.digitsOnly, text -> {
+                        spawns.addField(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePostiveInt(text)){
-                                group.end = Strings.parseInt(text);
+                                group.end = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }else if(text.isEmpty()){
                                 group.end = never;
@@ -205,7 +242,7 @@ public class WaveInfoDialog extends FloatingDialog{
         for(int i = start; i < displayed + start; i ++){
             int wave = i;
             preview.table("underline", table -> {
-                table.add(wave + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
+                table.add((wave+1) + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
                 table.row();
 
                 int[] spawned = new int[Vars.content.getBy(ContentType.unit).size];

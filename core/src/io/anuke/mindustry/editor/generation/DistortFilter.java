@@ -4,6 +4,8 @@ import io.anuke.mindustry.editor.MapGenerateDialog.DummyTile;
 import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
 import io.anuke.mindustry.world.blocks.Floor;
 
+import static io.anuke.mindustry.Vars.content;
+
 public class DistortFilter extends GenerateFilter{
     float scl = 40, mag = 5;
 
@@ -16,10 +18,10 @@ public class DistortFilter extends GenerateFilter{
 
     @Override
     public void apply(){
-        DummyTile tile = in.tile(in.x + noise(in.x, in.y, scl, mag)-mag/2f, in.y + noise(in.x, in.y+o, scl, mag)-mag/2f);
+        DummyTile tile = in.tile(in.x / (in.scaling) + (noise(in.x, in.y, scl, mag)-mag/2f)/in.scaling, in.y / (in.scaling) + (noise(in.x, in.y+o, scl, mag)-mag/2f)/in.scaling);
 
-        in.floor = tile.floor;
-        if(!tile.block.synthetic() && !in.block.synthetic()) in.block = tile.block;
-        if(!((Floor)in.floor).isLiquid) in.ore = tile.ore;
+        in.floor = content.block(tile.floor);
+        if(!content.block(tile.block).synthetic() && !in.block.synthetic()) in.block = content.block(tile.block);
+        if(!((Floor)in.floor).isLiquid) in.ore = content.block(tile.ore);
     }
 }

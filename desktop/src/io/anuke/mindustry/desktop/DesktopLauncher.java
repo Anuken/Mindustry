@@ -3,11 +3,11 @@ package io.anuke.mindustry.desktop;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3Application;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 
 public class DesktopLauncher extends Lwjgl3Application{
 
