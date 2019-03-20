@@ -9,6 +9,7 @@ import io.anuke.arc.util.serialization.JsonWriter.OutputType;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,34 +26,24 @@ public class CrashHandler{
 
         try{
             //check crash report setting
-            if(!Core.settings.getBool("crashreport")){
+            if(!Core.settings.getBool("crashreport", true)){
                 return;
             }
         }catch(Throwable ignored){
-            //don't send since we don't know if the user has the setting set
-            return;
-        }
-
-        if(!OS.isMac){
-            try{
-                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            }catch(Throwable ignored){}
+            //if there's no settings init we don't know what the user wants but chances are it's an important crash, so send it anyway
         }
 
         boolean badGPU = false;
 
-        if(!OS.isMac && e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
-            try{
-                javax.swing.JOptionPane.showMessageDialog(null, "Your graphics card does not support OpenGL 2.0!\n" +
-                    "Try to update your graphics drivers.\n\n" +
-                    "(If that doesn't work, your computer just doesn't support Mindustry.)",
-                    "oh no", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                badGPU = true;
-            }catch(Throwable ignored){}
+        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
+
+            dialog(() -> TinyFileDialogs.tinyfd_messageBox("oh no", "Your graphics card does not support OpenGL 2.0!\n" +
+                "Try to update your graphics drivers.\n\n" +
+                "(If that doesn't work, your computer just doesn't support Mindustry.)", "ok", "error", true));
+            badGPU = true;
         }
 
-        //don't create crash logs for me (anuke), as it's expected
-        //also don't create logs for custom builds
+        //don't create crash logs for me (anuke) or custom builds, as it's expected
         if(System.getProperty("user.name").equals("anuke") || Version.build == -1) return;
 
         boolean netActive = false, netServer = false;
@@ -83,14 +74,12 @@ public class CrashHandler{
 
         try{
             Path path = Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes",
-                "crash-report-" + DateTimeFormatter.ofPattern("MM dd yyyy  HH mm ss").format(LocalDateTime.now()) + ".txt");
+                "crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
             Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
-
             Files.write(path, parseException(e).getBytes());
 
             if(!badGPU){
-                javax.swing.JOptionPane.showMessageDialog(null, "A crash has occured. It has been saved in:\n" + path.toAbsolutePath().toString(),
-                "oh no", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                dialog(() ->  TinyFileDialogs.tinyfd_messageBox("oh no", "A crash has occured. It has been saved in:\n" + path.toAbsolutePath().toString(), "ok", "error", true));
             }
         }catch(Throwable t){
             Log.err("Failed to save local crash report.");
@@ -107,8 +96,12 @@ public class CrashHandler{
             System.exit(1);
         });
 
-        //sleep forever
-        try{ Thread.sleep(Long.MAX_VALUE); }catch(InterruptedException ignored){}
+        //sleep for 10 seconds or until crash report is sent
+        try{ Thread.sleep(10000); }catch(InterruptedException ignored){}
+    }
+
+    private static void dialog(Runnable r){
+        new Thread(r).start();
     }
 
     private static String parseException(Throwable e){

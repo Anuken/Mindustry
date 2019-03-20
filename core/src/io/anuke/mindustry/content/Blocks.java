@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.type.Category;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -27,17 +26,22 @@ import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.mindustry.world.meta.Attribute;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.world;
 
 public class Blocks implements ContentList{
     public static Block
 
     //environment
     air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
-    holostone, rocks, icerocks, cliffs, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, stainedRocks, stainedStone, stainedRocksRed, stainedStoneRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks,
+    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
+    iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+
+    //ores
+    oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -68,7 +72,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
 
     //turrets
-    duo, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+    duo, scatter, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
@@ -141,11 +145,11 @@ public class Blocks implements ContentList{
             variants = 0;
             liquidDrop = Liquids.oil;
             isLiquid = true;
-            cacheLayer = CacheLayer.oil;
+            cacheLayer = CacheLayer.tar;
         }};
 
         stone = new Floor("stone"){{
-            hasOres = true;
+
         }};
 
         craters = new Floor("craters"){{
@@ -170,26 +174,36 @@ public class Blocks implements ContentList{
 
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
-            hasOres = true;
             playerUnmineable = true;
         }};
 
         holostone = new Floor("holostone"){{
-            hasOres = true;
             edgeStyle = "blocky";
+        }};
+
+        grass = new Floor("grass"){{
+
+        }};
+
+        salt = new Floor("salt"){{
+            variants = 0;
+        }};
+
+        snow = new Floor("snow"){{
+            attributes.set(Attribute.water, 0.2f);
+        }};
+
+        ice = new Floor("ice"){{
+            //TODO fix drag/speed
+            dragMultiplier = 1f;
+            speedMultiplier = 1f;
+            attributes.set(Attribute.water, 0.4f);
         }};
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
-        }};
-
-        snow = new Floor("snow"){{
-        }};
-
-        ice = new Floor("ice"){{
-            //TODO fix
-            dragMultiplier = 1f;
-            speedMultiplier = 1f;
+            attributes.set(Attribute.water, 0.3f);
+            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -198,6 +212,18 @@ public class Blocks implements ContentList{
         }};
 
         rocks = new StaticWall("rocks"){{
+            variants = 2;
+        }};
+
+        sporerocks = new StaticWall("sporerocks"){{
+            variants = 2;
+        }};
+
+        rock = new Rock("rock"){{
+            variants = 2;
+        }};
+
+        snowrock = new Rock("snowrock"){{
             variants = 2;
         }};
 
@@ -213,8 +239,15 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        sandRocks = new StaticWall("sandrocks"){{
+            variants = 2;
+        }};
+
+        sporePine = new StaticWall("spore-pine"){{
+            variants = 0;
+        }};
+
         pine = new StaticWall("pine"){{
-            //fillsTile = false;
             variants = 0;
         }};
 
@@ -228,34 +261,28 @@ public class Blocks implements ContentList{
             variants = 3;
         }};
 
-        stainedRocks = new StaticWall("stained-rocks"){{
+        shale = new Floor("shale"){{
+            variants = 3;
+            attributes.set(Attribute.oil, 0.15f);
+        }};
+
+        shaleRocks = new StaticWall("shalerocks"){{
             variants = 2;
         }};
 
-        stainedStone = new Floor("stained-stone"){{
+        shaleBoulder = new Rock("shale-boulder"){{
+            variants = 2;
+        }};
+
+        moss = new Floor("moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.15f);
+        }};
+
+        sporeMoss = new Floor("spore-moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.3f);
             edgeStyle = "blocky";
-            hasOres = true;
-        }};
-
-        stainedRocksRed = new StaticWall("stained-rocks-red"){{
-            variants = 2;
-        }};
-
-        stainedStoneRed = new Floor("stained-stone-red"){{
-            edgeStyle = "blocky";
-            hasOres = true;
-        }};
-
-        stainedRocksYellow = new StaticWall("stained-rocks-yellow"){{
-            variants = 2;
-        }};
-
-        stainedStoneYellow = new Floor("stained-stone-yellow"){{
-            edgeStyle = "blocky";
-        }};
-
-        stainedBoulder = new Rock("stained-boulder"){{
-            variants = 2;
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -264,38 +291,44 @@ public class Blocks implements ContentList{
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
             variants = 6;
-            blendGroup = metalFloor;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         metalFloor3 = new Floor("metal-floor-3"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
-            blendGroup = metalFloor;
         }};
 
         ignarock = new Floor("ignarock"){{
-            blendGroup = sand;
+
         }};
 
         hotrock = new Floor("hotrock"){{
-            heat = 0.5f;
-            blendGroup = sand;
+            attributes.set(Attribute.heat, 0.5f);
+            blendGroup = ignarock;
         }};
 
         magmarock = new Floor("magmarock"){{
-            heat = 0.75f;
+            attributes.set(Attribute.heat, 0.75f);
             updateEffect = Fx.magmasmoke;
-            blendGroup = sand;
+            blendGroup = ignarock;
         }};
+
+        //endregion
+        //region ore
+
+        oreCopper = new OreBlock(Items.copper);
+        oreLead = new OreBlock(Items.lead);
+        oreScrap = new OreBlock(Items.scrap);
+        oreCoal = new OreBlock(Items.coal);
+        oreTitanium = new OreBlock(Items.titanium);
+        oreThorium = new OreBlock(Items.thorium);
 
         //endregion
         //region crafting
@@ -675,7 +708,7 @@ public class Blocks implements ContentList{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, ItemStack.with(Items.copper, 3));
+            requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
             capacity = 32;
             health = 25;
@@ -717,7 +750,8 @@ public class Blocks implements ContentList{
         massDriver = new MassDriver("mass-driver"){{
             requirements(Category.distribution, ItemStack.with(Items.titanium, 250, Items.silicon, 150, Items.lead, 250, Items.thorium, 100));
             size = 3;
-            itemCapacity = 60;
+            itemCapacity = 120;
+            reloadTime = 200f;
             range = 440f;
         }};
 
@@ -950,6 +984,7 @@ public class Blocks implements ContentList{
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
+            attribute = Attribute.water;
 
             consumes.power(0.90f);
         }};
@@ -963,6 +998,7 @@ public class Blocks implements ContentList{
             pumpAmount = 0.25f;
             size = 3;
             liquidCapacity = 30f;
+            attribute = Attribute.oil;
 
             consumes.item(Items.sand);
             consumes.power(3f);
@@ -977,7 +1013,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 3000;
+            itemCapacity = 5000;
             size = 3;
         }};
 
@@ -985,7 +1021,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 3000, Items.silicon, 2000));
 
             health = 2000;
-            itemCapacity = 6000;
+            itemCapacity = 9000;
             size = 4;
         }};
 
@@ -993,7 +1029,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 8000, Items.silicon, 4000, Items.surgealloy, 2000));
 
             health = 4000;
-            itemCapacity = 10000;
+            itemCapacity = 13000;
             size = 5;
         }};
 
@@ -1039,9 +1075,30 @@ public class Blocks implements ContentList{
             range = 95f;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
-            health = 210;
+            health = 250;
             inaccuracy = 2f;
             rotatespeed = 10f;
+        }};
+
+        scatter = new BurstTurret("scatter"){{
+            requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90));
+            ammo(
+                Items.scrap, Bullets.flakScrap,
+                Items.lead, Bullets.flakLead
+            );
+            reload = 43f;
+            range = 160f;
+            size = 2;
+            burstSpacing = 5f;
+            shots = 2;
+            targetGround = false;
+
+            recoil = 2f;
+            rotatespeed = 10f;
+            inaccuracy = 17f;
+            shootCone = 35f;
+
+            health = 260*size*size;
         }};
 
         hail = new ArtilleryTurret("hail"){{
@@ -1056,7 +1113,7 @@ public class Blocks implements ContentList{
             range = 230f;
             inaccuracy = 1f;
             shootCone = 10f;
-            health = 120;
+            health = 260;
         }};
 
         wave = new LiquidTurret("wave"){{
@@ -1074,7 +1131,7 @@ public class Blocks implements ContentList{
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
             range = 100f;
-            health = 360;
+            health = 250*size*size;
 
             drawer = (tile, entity) -> {
                 Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -1105,7 +1162,7 @@ public class Blocks implements ContentList{
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.RED;
             size = 2;
-            health = 320;
+            health = 280*size*size;
             targetAir = false;
         }};
 
@@ -1116,12 +1173,14 @@ public class Blocks implements ContentList{
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;
+            targetAir = false;
             consumes.powerBuffered(80f);
             range = 80f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;
             size = 1;
+            health = 260;
         }};
 
         swarmer = new BurstTurret("swarmer"){{
@@ -1138,7 +1197,7 @@ public class Blocks implements ContentList{
             range = 140f;
             xRand = 6f;
             size = 2;
-            health = 380;
+            health = 300*size*size;
         }};
 
         salvo = new BurstTurret("salvo"){{
@@ -1199,7 +1258,7 @@ public class Blocks implements ContentList{
             );
             xRand = 4f;
             reload = 8f;
-            range = 145f;
+            range = 160f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;
@@ -1258,7 +1317,7 @@ public class Blocks implements ContentList{
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
             range = 160f;
-            reload = 200f;
+            reload = 170f;
             firingMoveFract = 0.1f;
             shootDuration = 220f;
 
@@ -1405,23 +1464,6 @@ public class Blocks implements ContentList{
             size = 3;
             consumes.powerBuffered(120f);
         }};
-
-        //endregion
-        //region ores
-
-        //create ores for every floor and item combination necessary
-        for(Item item : content.items()){
-            if(!item.genOre) continue;
-
-            for(Block block : content.blocks()){
-                if(block instanceof Floor && ((Floor) block).hasOres){
-                    new OreBlock(item, (Floor) block);
-                }
-            }
-        }
-
-        //special variants
-        new OreBlock(Items.scrap, (Floor)snow);
 
         //endregion
     }

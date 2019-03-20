@@ -59,7 +59,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     private boolean sleeping;
     private float sleepTime;
 
-    @Remote(called = Loc.server)
+    @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
             tile.entity.health = health;
@@ -269,7 +269,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         //TODO better smoke effect, this one is awful
         if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
                 Mathf.chance(0.009f * Time.delta() * (1f - health / tile.block().health))){
-
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 

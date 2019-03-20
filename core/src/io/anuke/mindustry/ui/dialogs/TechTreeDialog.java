@@ -1,12 +1,12 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
@@ -35,16 +35,14 @@ public class TechTreeDialog extends FloatingDialog{
     public TechTreeDialog(){
         super("");
 
-        TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = Unit.dp.scl(60f);
-        layout.gapBetweenNodes = Unit.dp.scl(40f);
-        layout.layout(root);
-
         titleTable.remove();
         margin(0f).marginBottom(8);
         cont.stack(new View(), items = new ItemsDisplay()).grow();
 
-        shown(() -> checkNodes(root));
+        shown(() -> {
+            checkNodes(root);
+            treeLayout();
+        });
         hidden(ui.deploy::setup);
         addCloseButton();
 
@@ -59,6 +57,25 @@ public class TechTreeDialog extends FloatingDialog{
         drawDefaultBackground(x, y);
     }
 
+    void treeLayout(){
+        TreeLayout layout = new TreeLayout();
+        layout.gapBetweenLevels = Unit.dp.scl(60f);
+        layout.gapBetweenNodes = Unit.dp.scl(40f);
+        LayoutNode node = new LayoutNode(root, null);
+        layout.layout(node);
+        copyInfo(node);
+    }
+
+    void copyInfo(LayoutNode node){
+        node.node.x = node.x;
+        node.node.y = node.y;
+        if(node.children != null){
+            for(LayoutNode child : node.children){
+                copyInfo(child);
+            }
+        }
+    }
+
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
         if(!locked) node.visible = true;
@@ -71,30 +88,32 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void showToast(String info){
-        int maxIndex = 0;
-
-        for(Element e : Core.scene.root.getChildren()){
-            if("toast".equals(e.getName())){
-                maxIndex = Math.max(maxIndex, (Integer)e.getUserObject() + 1);
-            }
-        }
-
-        int m = maxIndex;
-
         Table table = new Table();
-        table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.removeActor());
+        table.actions(Actions.fadeOut(0.5f, Interpolation.fade), Actions.remove());
         table.top().add(info);
         table.setName("toast");
-        table.setUserObject(maxIndex);
         table.update(() -> {
             table.toFront();
-            table.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight() - 21 - m*20f, Align.top);
+            table.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight() - 21, Align.top);
         });
         Core.scene.add(table);
     }
 
     boolean locked(TechNode node){
         return node.block.locked();
+    }
+
+    class LayoutNode extends TreeNode<LayoutNode>{
+        final TechTreeNode node;
+
+        LayoutNode(TechTreeNode node, LayoutNode parent){
+            this.node = node;
+            this.parent = parent;
+            this.width = this.height = nodeSize;
+            if(node.children != null){
+                children = Array.with(node.children).select(n -> n.visible).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
+            }
+        }
     }
 
     class TechTreeNode extends TreeNode<TechTreeNode>{
@@ -126,6 +145,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             for(TechTreeNode node : nodes){
                 ImageButton button = new ImageButton(node.node.block.icon(Icon.medium), "node");
+                button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(mobile){
                         hoverNode = button;
@@ -174,7 +194,9 @@ public class TechTreeDialog extends FloatingDialog{
             showToast(Core.bundle.format("researched", node.block.localizedName));
             checkNodes(root);
             hoverNode = null;
+            treeLayout();
             rebuild();
+            Core.scene.act();
         }
 
         void rebuild(){
@@ -242,9 +264,11 @@ public class TechTreeDialog extends FloatingDialog{
             float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
 
             for(TechTreeNode node : nodes){
+                if(!node.visible) continue;
                 for(TechTreeNode child : node.children){
-                    Lines.stroke(Unit.dp.scl(3f), locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
+                    if(!child.visible) continue;
 
+                    Lines.stroke(Unit.dp.scl(3f), locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

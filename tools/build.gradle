@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
+def packFile = "../core/assets-raw/sprites/pack.json"
 def doAntialias = !project.hasProperty("disableAntialias")
 
 def antialias = {File file ->
@@ -87,6 +88,7 @@ def antialias = {File file ->
 
     ImageIO.write(out, "png", file)
 }
+
 task swapColors(){
     doLast{
         if (project.hasProperty("colors")) {

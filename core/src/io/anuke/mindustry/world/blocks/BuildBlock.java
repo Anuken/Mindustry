@@ -56,8 +56,12 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         if(tile == null) return;
+        float healthf = tile.entity == null ? 1f : tile.entity.healthf();
         tile.setRotation(rotation);
         world.setBlock(tile, block, team);
+        if(tile.entity != null){
+            tile.entity.health = block.health * healthf;
+        }
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
         Core.app.post(() -> tile.block().placed(tile));
 
@@ -186,7 +190,7 @@ public class BuildBlock extends Block{
 
         public void construct(Unit builder, TileEntity core, float amount){
             if(block == null){
-                damage(99999);
+                kill();
                 return;
             }
 

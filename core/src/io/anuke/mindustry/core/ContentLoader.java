@@ -8,20 +8,17 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.LegacyColorMapper;
 
@@ -34,7 +31,7 @@ import static io.anuke.arc.Core.files;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private boolean loaded = false;
-    private boolean verbose = true;
+    private boolean verbose = false;
 
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
@@ -56,6 +53,10 @@ public class ContentLoader{
         //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),
     };
+
+    public void setVerbose(){
+        verbose = true;
+    }
 
     /**Creates all content types.*/
     public void load(){
@@ -231,6 +232,10 @@ public class ContentLoader{
 
     public Array<Zone> zones(){
         return getBy(ContentType.zone);
+    }
+
+    public Array<UnitType> units(){
+        return getBy(ContentType.unit);
     }
 
     /**

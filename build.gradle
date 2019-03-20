@@ -10,6 +10,7 @@ buildscript{
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
+        classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
     }
 }
 

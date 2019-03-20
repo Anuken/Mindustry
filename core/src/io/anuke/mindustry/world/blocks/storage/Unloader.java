@@ -42,6 +42,12 @@ public class Unloader extends Block implements SelectionTrait{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        bars.remove("items");
+    }
+
+    @Override
     public void playerPlaced(Tile tile){
         Core.app.post(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
     }
@@ -57,7 +63,7 @@ public class Unloader extends Block implements SelectionTrait{
     public void update(Tile tile){
         SortedUnloaderEntity entity = tile.entity();
 
-        if(tile.entity.timer.get(timerUnload, speed) && tile.entity.items.total() == 0){
+        if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.getTeam()) && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
                 ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){

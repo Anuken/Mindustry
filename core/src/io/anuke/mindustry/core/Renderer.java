@@ -13,7 +13,6 @@ import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.ScreenRecorder;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
@@ -44,7 +43,7 @@ public class Renderer implements ApplicationListener{
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
 
-    private FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
@@ -131,10 +130,6 @@ public class Renderer implements ApplicationListener{
 
             draw();
         }
-
-        if(!ui.chatfrag.chatOpen()){
-            ScreenRecorder.record(); //this only does something if CoreGifRecorder is on the class path, which it usually isn't
-        }
     }
 
     void updateShake(float scale){
@@ -158,6 +153,10 @@ public class Renderer implements ApplicationListener{
         }
 
         graphics.clear(clearColor);
+
+        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+            shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        }
 
         Draw.proj(camera.projection());
 
@@ -200,10 +199,6 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
-                shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
-            }
-
             Draw.flush();
             shieldBuffer.begin();
             graphics.clear(Color.CLEAR);

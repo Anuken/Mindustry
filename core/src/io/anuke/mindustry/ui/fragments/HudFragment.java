@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Element;
@@ -21,6 +22,7 @@ import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
@@ -30,6 +32,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -46,6 +49,16 @@ public class HudFragment extends Fragment{
     private float coreAttackTime;
     private float lastCoreHP;
     private float coreAttackOpacity = 0f;
+    private Table goshDarnHeckingFlippedTableWhyDoesThisHappen;
+
+    {
+        Events.on(PlayEvent.class, event -> {
+            if(goshDarnHeckingFlippedTableWhyDoesThisHappen != null){
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.invalidateHierarchy();
+                goshDarnHeckingFlippedTableWhyDoesThisHappen.pack();
+            }
+        });
+    }
 
     public void build(Group parent){
 
@@ -55,6 +68,7 @@ public class HudFragment extends Fragment{
 
             if(mobile){
                 cont.table(select -> {
+                    goshDarnHeckingFlippedTableWhyDoesThisHappen = select;
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -124,7 +138,7 @@ public class HudFragment extends Fragment{
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
-                    .grow()).fillX().visible(() -> world.isZone() && state.boss() != null).height(60f).get();
+                    .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
         });
@@ -210,16 +224,37 @@ public class HudFragment extends Fragment{
         //launch button
         parent.fill(t -> {
             t.top().visible(() -> !state.is(State.menu));
+            TextButton[] testb = {null};
 
-            TextButton button = Elements.newButton("$launch", () -> ui.showConfirm("$launch", "$launch.confirm", Call::launchZone));
+            TextButton button = Elements.newButton("$launch", () -> {
+                FloatingDialog dialog = new FloatingDialog("$launch");
+                dialog.update(() -> {
+                    if(!testb[0].isVisible()){
+                        dialog.hide();
+                    }
+                });
+                dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+                dialog.buttons.defaults().size(200f, 54f).pad(2f);
+                dialog.setFillParent(false);
+                dialog.buttons.addButton("$cancel", dialog::hide);
+                dialog.buttons.addButton("$ok", () -> {
+                    dialog.hide();
+                    Call.launchZone();
+                });
+                dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+                dialog.keyDown(KeyCode.BACK, dialog::hide);
+                dialog.show();
+
+            });
+
+            testb[0] = button;
 
             button.getStyle().disabledFontColor = Color.WHITE;
             button.visible(() ->
                 world.isZone() &&
                 world.getZone().metCondition() &&
                 !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0 &&
-                state.wavetime < state.rules.waveSpacing * launchWaveMultiplier - 70);
+                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -274,7 +309,7 @@ public class HudFragment extends Fragment{
         container.setTranslation(0, table.getPrefHeight());
         container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
         //nesting actions() calls is necessary so the right prefHeight() is used
-        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
+        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
     }
 
     public boolean shown(){
@@ -320,7 +355,7 @@ public class HudFragment extends Fragment{
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
                 lastUnlockTable = null;
                 lastUnlockLayout = null;
-            }), Actions.removeActor())));
+            }), Actions.remove())));
 
             lastUnlockTable = container;
             lastUnlockLayout = in;
@@ -432,6 +467,6 @@ public class HudFragment extends Fragment{
             }
         }).growY().fillX().right().width(40f)
         .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
-        && (state.wavetime < state.rules.waveSpacing - 60 || !state.rules.waveTimer));
+        && (!world.spawner.isSpawning() || !state.rules.waveTimer));
     }
 }

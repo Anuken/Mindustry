@@ -10,6 +10,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.input.InputHandler;
@@ -35,18 +36,30 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        for(Player player : playerGroup.all()){
-            if(Core.settings.getBool("indicators") && player != players[0] && player.getTeam() == players[0].getTeam()){
-                if(!rect.setSize(Core.camera.width  * 0.9f, Core.camera.height  * 0.9f)
-                .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
+        if(Core.settings.getBool("indicators")){
+            for(Player player : playerGroup.all()){
+                if(player != players[0] && player.getTeam() == players[0].getTeam()){
+                    if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
-                    Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                        Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
-                    Lines.stroke(2f, player.getTeam().color);
-                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
-                    Draw.reset();
+                        Lines.stroke(2f, player.getTeam().color);
+                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                        Draw.reset();
+                    }
                 }
             }
+
+            Units.allUnits(unit -> {
+                if(unit != players[0] && unit.getTeam() != players[0].getTeam() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
+                    Tmp.v1.set(unit.x, unit.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+
+                    Lines.stroke(1f, unit.getTeam().color);
+                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
+                    Draw.reset();
+                }
+            });
         }
 
         for(Player player : players){

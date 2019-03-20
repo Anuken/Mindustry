@@ -39,6 +39,8 @@ public class BundleLoader{
     }
 
     private static void loadBundle(){
+        if(headless) return;
+
         try{
             //try loading external bundle
             FileHandle handle = Core.files.local("bundle");

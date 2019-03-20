@@ -48,7 +48,7 @@ public class DatabaseDialog extends FloatingDialog{
                 list.left();
 
                 int maxWidth = UIUtils.portrait() ? 7 : 13;
-                int size = 8 * 4;
+                int size = 8 * 5;
 
                 int count = 0;
 

@@ -23,11 +23,11 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float shockwaveBase = 380f, shockwaveRand = 50f, maxShockwaveDst = shockwaveBase + shockwaveRand;
-    private Array<SpawnGroup> groups;
+    private static final float shockwaveBase = 380f, shockwaveRand = 0f, maxShockwaveDst = shockwaveBase + shockwaveRand;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
     private IntArray loadedSpawns = new IntArray();
+    private boolean spawning = false;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
@@ -58,8 +58,9 @@ public class WaveSpawner{
     }
 
     public void spawnEnemies(){
+        spawning = true;
 
-        for(SpawnGroup group : groups){
+        for(SpawnGroup group : state.rules.spawns){
             int spawned = group.getUnitsSpawned(state.wave);
 
             float spawnX, spawnY;
@@ -91,7 +92,7 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(i*5, () -> shockwave(unit));
+                        Time.run(Math.min(i*5, 60*2), () -> shockwave(unit));
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
@@ -99,13 +100,18 @@ public class WaveSpawner{
                 }
             }
         }
+
+        Time.runTask(121f, () -> spawning = false);
+    }
+
+    public boolean isSpawning(){
+        return spawning;
     }
 
     private void reset(){
 
         flySpawns.clear();
         groundSpawns.clear();
-        groups = state.rules.spawns;
 
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){

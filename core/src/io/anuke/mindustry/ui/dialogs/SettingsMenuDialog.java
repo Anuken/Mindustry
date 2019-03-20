@@ -120,9 +120,11 @@ public class SettingsMenuDialog extends SettingsDialog{
     void addSettings(){
         //TODO add when sound works again
         //sound.volumePrefs();
+        sound.add("[LIGHT_GRAY]there is no sound implemented in v4 yet");
 
         game.screenshakePref();
         game.checkPref("effects", true);
+        game.checkPref("swapdiagonal", false);
         if(mobile){
             game.checkPref("autotarget", true);
         }
@@ -194,6 +196,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
+        graphics.checkPref("animatedwater", !mobile);
         graphics.checkPref("lasers", true);
     }
 

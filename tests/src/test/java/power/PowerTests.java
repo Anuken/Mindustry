@@ -41,8 +41,8 @@ public class PowerTests extends PowerTestFixture{
                 // That's why we inject the description into the test method for now.
                 // Additional Note: If you don't see any labels in front of the values supplied as function parameters, use a better IDE like IntelliJ IDEA.
                 dynamicTest("01", () -> simulateDirectConsumption(0.0f, 1.0f, 0.0f, "0.0 produced, 1.0 consumed (no power available)")),
-                dynamicTest("02", () -> simulateDirectConsumption(0.0f, 0.0f, 0.0f, "0.0 produced, 0.0 consumed (no power anywhere)")),
-                dynamicTest("03", () -> simulateDirectConsumption(1.0f, 0.0f, 0.0f, "1.0 produced, 0.0 consumed (no power requested)")),
+                dynamicTest("02", () -> simulateDirectConsumption(0.0f, 0.0f, 1.0f, "0.0 produced, 0.0 consumed (no power anywhere)")),
+                dynamicTest("03", () -> simulateDirectConsumption(1.0f, 0.0f, 1.0f, "1.0 produced, 0.0 consumed (no power requested)")),
                 dynamicTest("04", () -> simulateDirectConsumption(1.0f, 1.0f, 1.0f, "1.0 produced, 1.0 consumed (stable consumption)")),
                 dynamicTest("05", () -> simulateDirectConsumption(0.5f, 1.0f, 0.5f, "0.5 produced, 1.0 consumed (power shortage)")),
                 dynamicTest("06", () -> simulateDirectConsumption(1.0f, 0.5f, 1.0f, "1.0 produced, 0.5 consumed (power excess)")),
