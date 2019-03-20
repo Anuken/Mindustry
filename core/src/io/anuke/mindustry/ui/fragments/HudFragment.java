@@ -309,7 +309,7 @@ public class HudFragment extends Fragment{
         container.setTranslation(0, table.getPrefHeight());
         container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
         //nesting actions() calls is necessary so the right prefHeight() is used
-        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.removeActor())));
+        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
     }
 
     public boolean shown(){
@@ -355,7 +355,7 @@ public class HudFragment extends Fragment{
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
                 lastUnlockTable = null;
                 lastUnlockLayout = null;
-            }), Actions.removeActor())));
+            }), Actions.remove())));
 
             lastUnlockTable = container;
             lastUnlockLayout = in;

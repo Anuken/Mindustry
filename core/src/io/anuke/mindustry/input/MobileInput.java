@@ -2,7 +2,7 @@ package io.anuke.mindustry.input;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
@@ -16,6 +16,8 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
@@ -32,7 +34,6 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -50,7 +51,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private Vector2 vector = new Vector2();
     private float lastDistance = -1f;
     /** Set of completed guides. */
-    private ObjectSet<String> guides = new ObjectSet<>();
+    //private ObjectSet<String> guides = new ObjectSet<>();
 
     /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY;
@@ -169,20 +170,30 @@ public class MobileInput extends InputHandler implements GestureListener{
         removals.add(request);
     }
 
-    void showGuide(String type){
-        if(!guides.contains(type) && !Core.settings.getBool(type, false)){
-            FloatingDialog dialog = new FloatingDialog("$" + type + ".title");
-            dialog.addCloseButton();
-            dialog.cont.left();
-            dialog.cont.add("$" + type).growX().wrap();
-            dialog.cont.row();
-            dialog.cont.addCheck("$showagain", false, checked -> {
-                Core.settings.put(type, checked);
-                Core.settings.save();
-            }).growX().left().get().left();
-            dialog.show();
-            guides.add(type);
+    void showGuide(String type, BooleanProvider done){
+        if(!Core.settings.getBool(type, false)){
+            Core.scene.table("guideDim", t -> {
+                t.margin(10f);
+                t.touchable(Touchable.disabled);
+                t.top().table("button", s -> s.add("$"+type).growX().wrap().labelAlign(Align.center, Align.center)).growX();
+                t.update(() -> {
+                    if((done.get() || state.is(State.menu)) && t.getUserObject() == null){
+                        t.actions(Actions.delay(1f), Actions.fadeOut(1f, Interpolation.fade), Actions.remove());
+                        t.setUserObject("ha");
+                    }
+                });
+            });
+            Core.settings.put(type, true);
+            data.modified();
         }
+    }
+
+    boolean isLinePlacing(){
+        return mode == placing && lineMode && Mathf.dst(lineStartX * tilesize, lineStartY * tilesize, Core.input.mouseWorld().x, Core.input.mouseWorld().y) >= 3*tilesize;
+    }
+
+    boolean isAreaBreaking(){
+        return mode == breaking && lineMode && Mathf.dst(lineStartX * tilesize, lineStartY * tilesize, Core.input.mouseWorld().x, Core.input.mouseWorld().y) >= 2*tilesize;
     }
 
     //endregion
@@ -193,9 +204,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!request.remove){
             if(prev != null){
-                block.getPlaceDraw(placeDraw, request.rotation, prev.x - request.x, prev.y - request.y, prev.rotation);
+                request.block.getPlaceDraw(placeDraw, request.rotation, prev.x - request.x, prev.y - request.y, prev.rotation);
             }else{
-                block.getPlaceDraw(placeDraw, request.rotation, 0, 0, request.rotation);
+                request.block.getPlaceDraw(placeDraw, request.rotation, 0, 0, request.rotation);
             }
 
             //draw placing request
@@ -266,7 +277,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
             if(mode == breaking){
-                showGuide("deconstruction");
+                showGuide("removearea", this::isAreaBreaking);
             }
         }).update(l -> l.setChecked(mode == breaking));
 
@@ -603,7 +614,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         if(block != null){
-            showGuide("construction");
+            showGuide("placeline", this::isLinePlacing);
         }
 
         if(block == null && mode == placing){
