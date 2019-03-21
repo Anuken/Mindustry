@@ -869,7 +869,7 @@ public class Blocks implements ContentList{
         batteryLarge = new Battery("battery-large"){{
             requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 30));
             size = 3;
-            consumes.powerBuffered(20000f, 1f);
+            consumes.powerBuffered(37440f, 1f);
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
@@ -914,13 +914,13 @@ public class Blocks implements ContentList{
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, ItemStack.with(Items.lead, 20, Items.silicon, 30));
-            powerProduction = 0.045f;
+            powerProduction = 0.06f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             requirements(Category.power, ItemStack.with(Items.lead, 200, Items.silicon, 290, Items.phasefabric, 30));
             size = 3;
-            powerProduction = 0.55f;
+            powerProduction = 0.9f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{

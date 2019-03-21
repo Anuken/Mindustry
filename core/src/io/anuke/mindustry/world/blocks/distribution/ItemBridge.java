@@ -10,7 +10,6 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -93,18 +92,6 @@ public class ItemBridge extends Block{
     public Tile findLink(int x, int y){
         if(world.tile(x, y) != null && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Pos.get(x, y)){
             return world.tile(lastPlaced);
-        }
-
-        for(int j = 0; j < 4; j ++){
-            Point2 p = Geometry.d4(j + 1);
-            for(int i = 1; i <= range; i++){
-                Tile tile = world.tile(x + p.x * i, y + p.y * i);
-
-                if(tile == null) break;
-                if(tile.block() == this && !(tile.x == x && tile.y == y) && tile.entity != null && tile.<ItemBridgeEntity>entity().link == Pos.invalid){
-                    return tile;
-                }
-            }
         }
         return null;
     }

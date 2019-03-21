@@ -14,18 +14,18 @@ public class DefaultWaves{
             spawns = Array.with(
                 new SpawnGroup(UnitTypes.dagger){{
                     end = 8;
-                    unitScaling = 2;
+                    unitScaling = 1.5f;
                 }},
 
                 new SpawnGroup(UnitTypes.wraith){{
                     begin = 12;
                     end = 14;
-                    unitScaling = 2;
+                    unitScaling = 1f;
                 }},
 
                 new SpawnGroup(UnitTypes.dagger){{
                     begin = 11;
-                    unitScaling = 2;
+                    unitScaling = 1.7f;
                     spacing = 2;
                     max = 4;
                 }},
@@ -43,7 +43,6 @@ public class DefaultWaves{
                     unitScaling = 1;
                     unitAmount = 1;
                     spacing = 2;
-                    end = 30;
                 }},
 
                 new SpawnGroup(UnitTypes.titan){{
@@ -73,7 +72,7 @@ public class DefaultWaves{
                     unitScaling = 1;
                     spacing = 2;
 
-                    max = 7;
+                    max = 12;
                 }},
 
                 new SpawnGroup(UnitTypes.dagger){{
@@ -90,15 +89,14 @@ public class DefaultWaves{
                     unitAmount = 1;
                     unitScaling = 3;
                     effect = StatusEffects.shielded;
-                    max = 10;
                 }},
 
                 new SpawnGroup(UnitTypes.fortress){{
                     begin = 40;
                     spacing = 5;
                     unitAmount = 2;
-                    unitScaling = 3;
-                    max = 10;
+                    unitScaling = 2;
+                    max = 20;
                 }},
 
                 new SpawnGroup(UnitTypes.dagger){{
@@ -150,16 +148,21 @@ public class DefaultWaves{
                     unitScaling = 3;
                     spacing = 4;
                     max = 8;
-                    end = 74;
+                }},
+
+                new SpawnGroup(UnitTypes.eruptor){{
+                    begin = 31;
+                    unitAmount = 4;
+                    unitScaling = 1;
+                    spacing = 3;
                 }},
 
                 new SpawnGroup(UnitTypes.ghoul){{
-                    begin = 53;
+                    begin = 90;
                     unitAmount = 2;
                     unitScaling = 3;
                     spacing = 4;
                     max = 8;
-                    end = 74;
                 }}
             );
         }
