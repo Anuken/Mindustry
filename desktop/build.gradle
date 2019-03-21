@@ -136,11 +136,11 @@ task packrZip(){
 
     if(project.hasProperty("platform")){
 
-        if(getPlatform() == "mac"){
+        if(getPlatform() == PackrConfig.Platform.MacOS){
             dependsOn "fixMac"
         }
 
-        if(getPlatform() == "windows32"){
+        if(getPlatform() == PackrConfig.Platform.Windows32){
             dependsOn "fixWindows32"
         }
 
