@@ -198,7 +198,7 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')));
+            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
             if(result == null){
                 err("No map with name &y'{0}'&lr found.", arg[0]);
