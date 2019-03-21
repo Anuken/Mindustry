@@ -32,7 +32,7 @@ public class Fx implements ContentList{
     plasticExplosion, artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak, burning, fire,
     fireSmoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven, dropItem, shockwave,
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
-    shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
+    shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
     unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion;
 
@@ -221,7 +221,7 @@ public class Fx implements ContentList{
             Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
             Lines.stroke(0.5f + e.fout());
 
-            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+            Angles.randLenVectors(e.id, 2, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
                 float ang = Mathf.angle(x, y);
                 Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
             });
@@ -731,6 +731,16 @@ public class Fx implements ContentList{
 
             Angles.randLenVectors(e.id, 8, e.finpow() * 44f, e.rotation, 10f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
+            });
+
+            Draw.reset();
+        });
+
+        shootPyraFlame = new Effect(33f, e -> {
+            Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.GRAY, e.fin());
+
+            Angles.randLenVectors(e.id, 10, e.finpow() * 50f, e.rotation, 10f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
             });
 
             Draw.reset();

@@ -46,7 +46,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, fuseShot, driverBolt, healBullet, frag, eruptorShot,
+    fireball, basicFlame, pyraFlame, fuseShot, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil, explode;
@@ -454,14 +454,34 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(2.3f, 5){
+        basicFlame = new BulletType(2.5f, 5){
             {
+                ammoMultiplier = 3f;
                 hitSize = 7f;
-                lifetime = 35f;
+                lifetime = 40f;
                 pierce = true;
                 drag = 0.05f;
                 statusDuration = 60f * 4;
                 shootEffect = Fx.shootSmallFlame;
+                hitEffect = Fx.hitFlameSmall;
+                despawnEffect = Fx.none;
+                status = StatusEffects.burning;
+            }
+
+            @Override
+            public void draw(Bullet b){
+            }
+        };
+
+        pyraFlame = new BulletType(2.7f, 8){
+            {
+                ammoMultiplier = 4f;
+                hitSize = 7f;
+                lifetime = 40f;
+                pierce = true;
+                drag = 0.05f;
+                statusDuration = 60f * 6;
+                shootEffect = Fx.shootPyraFlame;
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
@@ -644,7 +664,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 20){{
+        arc = new BulletType(0.001f, 21){{
                 lifetime = 1;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
@@ -655,7 +675,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 14);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 15);
             }
         };
 

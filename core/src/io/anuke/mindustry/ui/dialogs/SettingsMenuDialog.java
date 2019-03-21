@@ -179,6 +179,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
 
         if(!mobile){
+            graphics.sliderPref("antialias", 0, 0, 5, 1, s -> (s == 0 ? 0 : (1 << s)) + "x");
+
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){

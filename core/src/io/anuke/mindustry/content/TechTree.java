@@ -64,21 +64,25 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(arc, () -> {
-                    node(wave, () -> {
-
-                    });
-
-                    node(lancer, () -> {
-                        node(meltdown, () -> {
+                node(scorch, () -> {
+                    node(arc, () -> {
+                        node(wave, () -> {
 
                         });
 
-                        node(shockMine, () -> {
+                        node(lancer, () -> {
+                            node(meltdown, () -> {
 
+                            });
+
+                            node(shockMine, () -> {
+
+                            });
                         });
                     });
                 });
+
+
 
                 node(copperWall, () -> {
                     node(copperWallLarge);

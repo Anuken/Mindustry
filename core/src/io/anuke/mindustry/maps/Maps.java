@@ -7,7 +7,6 @@ import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.MapIO;
@@ -65,7 +64,6 @@ public class Maps implements Disposable{
 
     /** Load all maps. Should be called at application start. */
     public void load(){
-        Time.mark();
         try{
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
@@ -76,7 +74,11 @@ public class Maps implements Disposable{
         }
 
         loadCustomMaps();
-        Log.info("Time to load maps: {0}", Time.elapsed());
+    }
+
+    public void reload(){
+        dispose();
+        load();
     }
 
     /** Save a custom map to the directory. This updates all values and stored data necessary.

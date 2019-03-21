@@ -35,9 +35,9 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, ice, snow,
+    air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, darksand, ice, snow,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
 
     //ores
@@ -72,7 +72,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
 
     //turrets
-    duo, scatter, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
     spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
@@ -172,7 +172,23 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.water;
         }};
 
+        darksandWater = new Floor("darksand-water"){{
+            liquidColor = Color.valueOf("596ab8");
+            speedMultiplier = 0.8f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 50f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+        }};
+
         sand = new Floor("sand"){{
+            itemDrop = Items.sand;
+            playerUnmineable = true;
+        }};
+
+        darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
         }};
@@ -1101,8 +1117,23 @@ public class Blocks implements ContentList{
             health = 260*size*size;
         }};
 
+        scorch = new ItemTurret("scorch"){{
+            requirements(Category.turret, ItemStack.with(Items.copper, 50, Items.graphite, 45));
+            ammo(
+                Items.coal, Bullets.basicFlame,
+                Items.pyratite, Bullets.pyraFlame
+            );
+            recoil = 0f;
+            reload = 4f;
+            range = 53f;
+            shootCone = 50f;
+            targetAir = false;
+            ammoUseEffect = Fx.none;
+            health = 400;
+        }};
+
         hail = new ArtilleryTurret("hail"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 60, Items.graphite, 35));
+            requirements(Category.turret, ItemStack.with(Items.copper, 80, Items.graphite, 35));
             ammo(
                 Items.graphite, Bullets.artilleryDense,
                 Items.silicon, Bullets.artilleryHoming,
@@ -1169,7 +1200,7 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 70));
             shootType = Bullets.arc;
-            reload = 20f;
+            reload = 25f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;

@@ -84,7 +84,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 add(new Image("icon-refresh"){{
                     setScaling(Scaling.none);
                 }});
-                visible(() -> generating);
+                visible(() -> generating && !updateEditorOnChange);
             }}).size(mobile ? 300f : 400f).padRight(6);
             t.pane(p -> filterTable = p).width(300f).get().setScrollingDisabled(true, false);
         }).grow();

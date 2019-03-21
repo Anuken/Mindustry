@@ -110,6 +110,8 @@ public enum EditorTool{
                 return;
             }
 
+            boolean alt = isAlt();
+
             int width = editor.width();
             int height = editor.height();
 
@@ -117,7 +119,13 @@ public enum EditorTool{
                 Tile write = editor.tile(px, py);
 
                 if(isfloor){
-                    write.setFloor((Floor)draw);
+                    if(alt && !(draw instanceof OreBlock)){
+                        Block ore = write.ore();
+                        write.setFloor((Floor)draw);
+                        write.setOre(ore);
+                    }else{
+                        write.setFloor((Floor)draw);
+                    }
                 }else{
                     write.setBlock(draw);
                 }

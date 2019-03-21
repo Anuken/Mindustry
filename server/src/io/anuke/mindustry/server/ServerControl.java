@@ -259,6 +259,16 @@ public class ServerControl implements ApplicationListener{
             info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
+        handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
+            int beforeMaps = world.maps.all().size;
+            world.maps.reload();
+            if(world.maps.all().size > beforeMaps){
+                info("&lc{0}&ly new map(s) found and reloaded.", world.maps.all().size - beforeMaps);
+            }else{
+                info("&lyMaps reloaded.");
+            }
+        });
+
         handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
                 info("Status: &rserver closed");
