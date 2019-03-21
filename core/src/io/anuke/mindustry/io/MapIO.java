@@ -69,25 +69,25 @@ public class MapIO{
 
     public static Pixmap generatePreview(Map map) throws IOException{
         Time.mark();
-        Pixmap floor = new Pixmap(map.width, map.height, Format.RGBA8888);
-        Pixmap wall = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
         int black = Color.rgba8888(Color.BLACK);
         CachedTile tile = new CachedTile(){
             @Override
             public void setFloor(Floor type){
-                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
+                floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
             }
 
             @Override
             public void setOreByte(byte b){
-                if(b != 0) floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
+                if(b != 0) floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
 
             @Override
             protected void changed(){
                 super.changed();
                 int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
-                if(c != black) wall.drawPixel(x, floor.getHeight() - 1 - y, c);
+                if(c != black) walls.drawPixel(x, floors.getHeight() - 1 - y, c);
             }
         };
         readTiles(map, (x, y) -> {
@@ -95,9 +95,9 @@ public class MapIO{
             tile.y = (short)y;
             return tile;
         });
-        floor.drawPixmap(wall, 0, 0);
-        wall.dispose();
-        return floor;
+        floors.drawPixmap(walls, 0, 0);
+        walls.dispose();
+        return floors;
     }
 
     public static Pixmap generatePreview(Tile[][] tiles){

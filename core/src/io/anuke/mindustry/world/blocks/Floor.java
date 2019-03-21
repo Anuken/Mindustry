@@ -118,6 +118,9 @@ public class Floor extends Block{
         }
     }
 
+    public boolean isDeep(){
+        return drownTime > 0;
+    }
 
     public void drawNonLayer(Tile tile){
         Mathf.random.setSeed(tile.pos());

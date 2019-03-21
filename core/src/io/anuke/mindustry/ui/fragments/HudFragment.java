@@ -16,13 +16,13 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
@@ -49,16 +49,6 @@ public class HudFragment extends Fragment{
     private float coreAttackTime;
     private float lastCoreHP;
     private float coreAttackOpacity = 0f;
-    private Table goshDarnHeckingFlippedTableWhyDoesThisHappen;
-
-    {
-        Events.on(PlayEvent.class, event -> {
-            if(goshDarnHeckingFlippedTableWhyDoesThisHappen != null){
-                goshDarnHeckingFlippedTableWhyDoesThisHappen.invalidateHierarchy();
-                goshDarnHeckingFlippedTableWhyDoesThisHappen.pack();
-            }
-        });
-    }
 
     public void build(Group parent){
 
@@ -67,8 +57,13 @@ public class HudFragment extends Fragment{
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
-                cont.table(select -> {
-                    goshDarnHeckingFlippedTableWhyDoesThisHappen = select;
+
+                {
+                    Table select = new Table(){
+                        public float getPrefWidth(){ return Unit.dp.scl(dsize*4 + 3); }
+                        public float getPrefHeight(){ return Unit.dp.scl(dsize); }
+                    };
+
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -111,7 +106,8 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
-                }).left();
+                    cont.add(select).prefSize(dsize*4 + 3, dsize).left();
+                }
 
                 cont.row();
                 cont.addImage("blank").height(3f).color(Pal.accent).fillX();

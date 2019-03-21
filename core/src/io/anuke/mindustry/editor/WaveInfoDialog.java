@@ -166,7 +166,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     t.table(p -> {
                         p.add("$waves.every").padRight(4);
                         p.addField(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePostiveInt(text) && Strings.parseInt(text) > 0){
                                 group.spacing = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -228,7 +228,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 dialog.hide();
                 buildGroups();
             }).pad(2).margin(12f).fillX();
-            if(++i % 2 == 0)dialog.cont.row();
+            if(++i % 3 == 0)dialog.cont.row();
         }
         dialog.show();
     }

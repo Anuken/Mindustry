@@ -88,6 +88,14 @@ public class EditorTile extends Tile{
     protected void changed(){
         entity = null;
 
+        if(wall == null){
+            wall = Blocks.air;
+        }
+
+        if(floor == null){
+            floor = (Floor)Blocks.air;
+        }
+
         Block block = block();
 
         if(block.hasEntity()){

@@ -34,8 +34,8 @@ public class Tile implements Position, TargetTrait{
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;
-    private Block wall;
-    private Floor floor;
+    protected Block wall;
+    protected Floor floor;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
     private byte rotation;
     /** Team ordinal. */

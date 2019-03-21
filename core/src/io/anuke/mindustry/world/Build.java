@@ -153,7 +153,7 @@ public class Build{
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if(other == null || (other.block() != Blocks.air && !other.block().alwaysReplace) ||
                             !other.floor().placeableOn ||
-                            (other.floor().isLiquid && !type.floating)){
+                            (other.floor().isDeep() && !type.floating)){
                         return false;
                     }
                 }
@@ -162,7 +162,7 @@ public class Build{
         }else{
             return tile.interactable(team)
                     && contactsGround(tile.x, tile.y, type)
-                    && (!tile.floor().isLiquid || type.floating)
+                    && (!tile.floor().isDeep() || type.floating)
                     && tile.floor().placeableOn
                     && ((type.canReplace(tile.block())
                     && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
@@ -174,19 +174,19 @@ public class Build{
         if(block.isMultiblock()){
             for(Point2 point : Edges.getInsideEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);
-                if(tile != null && !tile.floor().isLiquid) return true;
+                if(tile != null && !tile.floor().isDeep()) return true;
             }
 
             for(Point2 point : Edges.getEdges(block.size)){
                 Tile tile = world.tile(x + point.x, y + point.y);
-                if(tile != null && !tile.floor().isLiquid) return true;
+                if(tile != null && !tile.floor().isDeep()) return true;
             }
         }else{
             for(Point2 point : Geometry.d4){
                 Tile tile = world.tile(x + point.x, y + point.y);
-                if(tile != null && !tile.floor().isLiquid) return true;
+                if(tile != null && !tile.floor().isDeep()) return true;
             }
-            return world.tile(x, y) != null && !world.tile(x, y).floor().isLiquid;
+            return world.tile(x, y) != null && !world.tile(x, y).floor().isDeep();
         }
         return false;
     }
