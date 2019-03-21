@@ -73,9 +73,9 @@ public class BlockRenderer{
 
         Events.on(TileChangeEvent.class, event -> {
             int avgx = (int)(camera.position.x / tilesize);
-            int avgy = (int)(camera.position. y/ tilesize);
-            int rangex = (int) (camera.width  / tilesize / 2) + 2;
-            int rangey = (int) (camera.height  / tilesize / 2) + 2;
+            int avgy = (int)(camera.position. y / tilesize);
+            int rangex = (int) (camera.width / tilesize / 2) + 2;
+            int rangey = (int) (camera.height / tilesize / 2) + 2;
 
             if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated

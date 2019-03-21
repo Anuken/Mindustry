@@ -29,7 +29,7 @@ import java.io.IOException;
 import static io.anuke.mindustry.Vars.*;
 
 public class Conveyor extends Block{
-    private static final float itemSpace = 0.135f * 3f;
+    private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
     private static ItemPos pos1 = new ItemPos();
@@ -60,7 +60,7 @@ public class Conveyor extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.itemsMoved, speed * 60, StatUnit.itemsSecond);
+        stats.add(BlockStat.itemsMoved, speed * 60 * (1f / itemSpace), StatUnit.itemsSecond);
     }
 
     @Override

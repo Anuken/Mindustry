@@ -136,6 +136,28 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.water;
         }};
 
+        sandWater = new Floor("sand-water"){{
+            liquidColor = Color.valueOf("596ab8");
+            speedMultiplier = 0.8f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 50f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+        }};
+
+        darksandWater = new Floor("darksand-water"){{
+            liquidColor = Color.valueOf("596ab8");
+            speedMultiplier = 0.8f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 50f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+        }};
+
         tar = new Floor("tar"){{
             drownTime = 150f;
             liquidColor = Color.valueOf("292929");
@@ -159,28 +181,6 @@ public class Blocks implements ContentList{
 
         charr = new Floor("char"){{
             blendGroup = stone;
-        }};
-
-        sandWater = new Floor("sand-water"){{
-            liquidColor = Color.valueOf("596ab8");
-            speedMultiplier = 0.8f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 50f;
-            liquidDrop = Liquids.water;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
-        }};
-
-        darksandWater = new Floor("darksand-water"){{
-            liquidColor = Color.valueOf("596ab8");
-            speedMultiplier = 0.8f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 50f;
-            liquidDrop = Liquids.water;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
         }};
 
         sand = new Floor("sand"){{
