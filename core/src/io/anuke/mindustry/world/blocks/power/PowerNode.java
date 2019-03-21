@@ -125,7 +125,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void update(Tile tile){
-        tile.entity.power.graph.update();
+        if(tile.entity != null && tile.entity.power != null && tile.entity.power.graph != null) tile.entity.power.graph.update();
     }
 
     @Override

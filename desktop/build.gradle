@@ -69,12 +69,6 @@ task dist(type: Jar){
     }
 }
 
-task ttt(){
-    fileTree("/home/anuke/Projects/Mindustry/deploy/Mindustry-Linux64-4-beta-66/jre/lib/amd64/newst").each{t ->
-        println("\"jre/lib/amd64/${t.absoluteFile.name}\",")
-    }
-}
-
 //note: call desktop:dist beforehand
 task packrCmd(){
 
