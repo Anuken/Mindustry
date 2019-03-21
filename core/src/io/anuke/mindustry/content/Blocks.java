@@ -1359,7 +1359,7 @@ public class Blocks implements ContentList{
         //region units
 
         spiritFactory = new UnitFactory("spirit-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 100));
+            requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 80));
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;

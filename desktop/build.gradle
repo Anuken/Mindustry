@@ -69,6 +69,12 @@ task dist(type: Jar){
     }
 }
 
+task ttt(){
+    fileTree("/home/anuke/Projects/Mindustry/deploy/Mindustry-Linux64-4-beta-66/jre/lib/amd64/newst").each{t ->
+        println("\"jre/lib/amd64/${t.absoluteFile.name}\",")
+    }
+}
+
 //note: call desktop:dist beforehand
 task packrCmd(){
 
@@ -83,6 +89,8 @@ task packrCmd(){
             outDir = file("packr-out/")
             mainClass = project.ext.mainClassName
             classpath = ["desktop/build/libs/desktop-release.jar"]
+            removePlatformLibs = ["desktop/build/libs/desktop-release.jar"]
+
             vmArgs = ["Djava.net.preferIPv4Stack=true"]
             minimizeJre = "desktop/packr_minimize.json"
             jdk = JDK_DIR + "jdk-${getPlatform().toString().toLowerCase()}.zip"
