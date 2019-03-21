@@ -92,7 +92,7 @@ public class Zones implements ContentList{
         }};*/
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
-            .dist(2.5f, true)
+            .dist(0f, false)
             .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();

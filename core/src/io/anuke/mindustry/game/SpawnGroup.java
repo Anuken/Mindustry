@@ -28,7 +28,7 @@ public class SpawnGroup implements Serializable{
     /**The spacing, in waves, of spawns. For example, 2 = spawns every other wave*/
     public int spacing = 1;
     /**Maximum amount of units that spawn*/
-    public int max = 40;
+    public int max = 100;
     /**How many waves need to pass before the amount of units spawned increases by 1*/
     public float unitScaling = never;
     /**Amount of enemies spawned initially, with no scaling*/
@@ -80,7 +80,7 @@ public class SpawnGroup implements Serializable{
         if(begin != 0) json.writeValue("begin", begin);
         if(end != never) json.writeValue("end", end);
         if(spacing != 1) json.writeValue("spacing", spacing);
-        if(max != 40) json.writeValue("max", max);
+        //if(max != 40) json.writeValue("max", max);
         if(unitScaling != never) json.writeValue("scaling", unitScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.id);
@@ -92,7 +92,7 @@ public class SpawnGroup implements Serializable{
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
         spacing = data.getInt("spacing", 1);
-        max = data.getInt("spacing", 40);
+        //max = data.getInt("max", 40);
         unitScaling = data.getFloat("scaling", never);
         unitAmount = data.getInt("amount", 1);
         effect = content.getByID(ContentType.status, data.getInt("effect", -1));
