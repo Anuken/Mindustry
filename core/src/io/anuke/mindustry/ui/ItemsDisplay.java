@@ -27,6 +27,8 @@ public class ItemsDisplay extends Table{
 
         table("flat", t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
+            t.add("$launcheditems").colspan(3).left().padBottom(5);
+            t.row();
             ObjectIntMap<Item> items = data.items();
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){

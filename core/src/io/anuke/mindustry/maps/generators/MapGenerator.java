@@ -95,7 +95,7 @@ public class MapGenerator extends Generator{
                         tiles[x][y].setBlock(Blocks.air);
                     }
 
-                    if(tiles[x][y].block() == Blocks.spawn){
+                    if(tiles[x][y].block() == Blocks.spawn && enemySpawns != -1){
                         enemies.add(new Point2(x, y));
                         tiles[x][y].setBlock(Blocks.air);
                     }
