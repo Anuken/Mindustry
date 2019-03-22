@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, deepwater, water, tar, stone, craters, charr, sand, darksand, ice, snow,
+    air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
@@ -114,7 +114,6 @@ public class Blocks implements ContentList{
         }
 
         deepwater = new Floor("deepwater"){{
-            liquidColor = Color.valueOf("4d5ca4");
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -126,7 +125,6 @@ public class Blocks implements ContentList{
         }};
 
         water = new Floor("water"){{
-            liquidColor = Color.valueOf("596ab8");
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -136,8 +134,28 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.water;
         }};
 
+        taintedWater = new Floor("tainted-water"){{
+            speedMultiplier = 0.17f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 140f;
+            drownTime = 120f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+        }};
+
+        darksandTaintedWater = new Floor("darksand-tainted-water"){{
+            speedMultiplier = 0.75f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 60f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+        }};
+
         sandWater = new Floor("sand-water"){{
-            liquidColor = Color.valueOf("596ab8");
             speedMultiplier = 0.8f;
             variants = 0;
             status = StatusEffects.wet;
@@ -148,7 +166,6 @@ public class Blocks implements ContentList{
         }};
 
         darksandWater = new Floor("darksand-water"){{
-            liquidColor = Color.valueOf("596ab8");
             speedMultiplier = 0.8f;
             variants = 0;
             status = StatusEffects.wet;
@@ -160,7 +177,6 @@ public class Blocks implements ContentList{
 
         tar = new Floor("tar"){{
             drownTime = 150f;
-            liquidColor = Color.valueOf("292929");
             status = StatusEffects.tarred;
             statusDuration = 240f;
             speedMultiplier = 0.19f;
@@ -194,7 +210,7 @@ public class Blocks implements ContentList{
         }};
 
         holostone = new Floor("holostone"){{
-            edgeStyle = "blocky";
+
         }};
 
         grass = new Floor("grass"){{

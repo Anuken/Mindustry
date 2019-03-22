@@ -115,7 +115,7 @@ public abstract class GroundUnit extends BaseUnit{
         Floor floor = getFloorOn();
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.liquidColor, 0.5f);
+            Draw.color(Color.WHITE, floor.color, 0.5f);
         }
 
         for(int i : Mathf.signs){
@@ -126,7 +126,7 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.liquidColor, drownTime * 0.4f);
+            Draw.color(Color.WHITE, floor.color, drownTime * 0.4f);
         }else{
             Draw.color(Color.WHITE);
         }
