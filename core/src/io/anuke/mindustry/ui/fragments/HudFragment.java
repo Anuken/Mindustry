@@ -60,8 +60,22 @@ public class HudFragment extends Fragment{
 
                 {
                     Table select = new Table(){
-                        public float getPrefWidth(){ return Unit.dp.scl(dsize*4 + 3); }
-                        public float getPrefHeight(){ return Unit.dp.scl(dsize); }
+                        @Override
+                        public void act(float delta){
+                            setSize(getPrefWidth(), getPrefHeight());
+                            setPosition(0, 0, Align.topLeft);
+                            super.act(delta);
+                        }
+
+                        @Override
+                        public float getPrefWidth(){
+                            return Unit.dp.scl(dsize*4 + 3);
+                        }
+
+                        @Override
+                        public float getPrefHeight(){
+                            return Unit.dp.scl(dsize);
+                        }
                     };
 
                     select.left();
