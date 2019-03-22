@@ -49,7 +49,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
-        Block previous = block();
+        Block previous = wall == null ? Blocks.air : wall;
         if(previous == type) return;
         super.setBlock(type);
         op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));
