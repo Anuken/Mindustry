@@ -26,7 +26,6 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 9;
-    private final static boolean disableShadows = false;
     private final static Color shadowColor = new Color(0, 0, 0, 0.19f);
 
     public final FloorRenderer floor = new FloorRenderer();
@@ -73,9 +72,9 @@ public class BlockRenderer{
 
         Events.on(TileChangeEvent.class, event -> {
             int avgx = (int)(camera.position.x / tilesize);
-            int avgy = (int)(camera.position. y/ tilesize);
-            int rangex = (int) (camera.width  / tilesize / 2) + 2;
-            int rangey = (int) (camera.height  / tilesize / 2) + 2;
+            int avgy = (int)(camera.position. y / tilesize);
+            int rangex = (int) (camera.width / tilesize / 2) + 2;
+            int rangey = (int) (camera.height / tilesize / 2) + 2;
 
             if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
@@ -100,7 +99,7 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
-        if(disableShadows) return;
+        if(!Core.settings.getBool("shadows")) return;
 
         Draw.color();
 

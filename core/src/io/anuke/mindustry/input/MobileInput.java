@@ -401,6 +401,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
                     drawPlace(l.x, l.y, block, l.rotation, prevX - l.x, prevY - l.y, prevRotation);
 
+                    rotation = l.rotation;
                     prevX = l.x;
                     prevY = l.y;
                     prevRotation = l.rotation;

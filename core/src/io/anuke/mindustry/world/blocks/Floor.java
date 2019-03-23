@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
@@ -40,8 +39,6 @@ public class Floor extends Block{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
-    /** Color of this floor's liquid. Used for tinting sprites. */
-    public Color liquidColor;
     /** liquids that drop from this block, used for pumps */
     public Liquid liquidDrop = null;
     /** item that drops from this block, used for drills */
@@ -93,15 +90,6 @@ public class Floor extends Block{
     @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
-    }
-
-    @Override
-    public void init(){
-        super.init();
-
-        if(isLiquid && liquidColor == null){
-            throw new RuntimeException("All liquids must define a liquidColor! Problematic block: " + name);
-        }
     }
 
     @Override
