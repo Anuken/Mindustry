@@ -63,7 +63,7 @@ public class HudFragment extends Fragment{
                         @Override
                         public void act(float delta){
                             setSize(getPrefWidth(), getPrefHeight());
-                            setPosition(0, 0, Align.topLeft);
+                            setPosition(0, Core.graphics.getHeight(), Align.topLeft);
                             super.act(delta);
                         }
 
@@ -78,6 +78,7 @@ public class HudFragment extends Fragment{
                         }
                     };
 
+                    select.visible(() -> !state.is(State.menu));
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -120,7 +121,8 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
-                    cont.add(select).prefSize(dsize*4 + 3, dsize).left();
+                    Core.scene.add(select);
+                    cont.add().size(dsize*4 + 3, dsize).left();
                 }
 
                 cont.row();
