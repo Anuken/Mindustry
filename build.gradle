@@ -156,7 +156,8 @@ project(":ios"){
     dependencies{
         compile project(":core")
         compile project(":net")
-
+        compileOnly project(":annotations")
+        
         compile arcModule("backends:backend-robovm")
         
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"

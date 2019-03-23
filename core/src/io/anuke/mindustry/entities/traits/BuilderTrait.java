@@ -38,16 +38,21 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.*;
 
 /**
  * Interface for units that build, break or mine things.
  */
 public interface BuilderTrait extends Entity, TeamTrait{
     //these are not instance variables!
-    Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     float placeDistance = 220f;
     float mineDistance = 70f;
-    Array<BuildRequest> removal = new Array<>();
+
+    //due to iOS wierdness
+    class BuildDataStatic{
+        static Array<BuildRequest> removal = new Array<>();
+        static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
+    }
 
     /**Returns the queue for storing build requests.*/
     Queue<BuildRequest> getPlaceQueue();
