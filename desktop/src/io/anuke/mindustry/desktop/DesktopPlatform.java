@@ -64,7 +64,7 @@ public class DesktopPlatform extends Platform{
             (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
 
             if(Net.active()){
-                presence.partyMax = 16;
+                presence.partyMax = 100;
                 presence.partySize = playerGroup.size();
             }
         }else{

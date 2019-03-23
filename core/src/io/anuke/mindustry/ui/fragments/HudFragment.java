@@ -16,12 +16,8 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -33,6 +29,8 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+
+import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -59,24 +57,7 @@ public class HudFragment extends Fragment{
             if(mobile){
 
                 {
-                    Table select = new Table(){
-                        @Override
-                        public void act(float delta){
-                            setSize(getPrefWidth(), getPrefHeight());
-                            setPosition(0, Core.graphics.getHeight(), Align.topLeft);
-                            super.act(delta);
-                        }
-
-                        @Override
-                        public float getPrefWidth(){
-                            return Unit.dp.scl(dsize*4 + 3);
-                        }
-
-                        @Override
-                        public float getPrefHeight(){
-                            return Unit.dp.scl(dsize);
-                        }
-                    };
+                    Table select = new Table();
 
                     select.visible(() -> !state.is(State.menu));
                     select.left();
@@ -121,7 +102,25 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
-                    Core.scene.add(select);
+
+                    float size = dsize;
+                    Array<Element> children = new Array<>(select.getChildren());
+
+                    int index = 0;
+                    for(Element elem : children){
+                        int fi = index++;
+                        Core.scene.add(elem);
+                        elem.visible(() -> {
+                            if(fi < 4){
+                                elem.setSize(size);
+                            }else{
+                                elem.setSize(3f, size);
+                            }
+                            elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
+                            return !state.is(State.menu);
+                        });
+                    }
+
                     cont.add().size(dsize*4 + 3, dsize).left();
                 }
 
