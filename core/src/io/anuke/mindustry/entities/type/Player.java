@@ -292,7 +292,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.color(Color.WHITE, floor.liquidColor, 0.5f);
+                Draw.color(Color.WHITE, floor.color, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -312,7 +312,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.liquidColor, drownTime);
+            Draw.color(Color.WHITE, floor.color, drownTime);
         }else{
             Draw.color(Color.WHITE);
         }
@@ -524,7 +524,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(mech.shake > 1f){
                     Effects.shake(mech.shake, mech.shake, this);
                 }
-                Effects.effect(Fx.unitLand, tile.floor().liquidColor == null ? tile.floor().color : tile.floor().color, x, y, tile.floor().isLiquid ? 1f : 0.5f);
+                Effects.effect(Fx.unitLand, tile.floor().color, x, y, tile.floor().isLiquid ? 1f : 0.5f);
             }
             mech.onLand(this);
             achievedFlight = false;

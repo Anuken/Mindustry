@@ -476,7 +476,7 @@ public class Tile implements Position, TargetTrait{
         Block block = block();
         Block floor = floor();
 
-        return floor.name + ":" + block.name + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
+        return floor.name + ":" + block.name + ":" + content.block(ore) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (link != 0 ? " link=[" + (Pack.leftByte(link) - 8) + ", " + (Pack.rightByte(link) - 8) + "]" : "");
     }
 }

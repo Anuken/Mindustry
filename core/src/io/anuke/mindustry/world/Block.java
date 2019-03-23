@@ -143,6 +143,10 @@ public class Block extends BlockStorage{
     }
 
     protected void powerGraphRemoved(Tile tile){
+        if(tile.entity == null || tile.entity.power == null || tile.entity.power.graph == null){
+            return;
+        }
+
         tile.entity.power.graph.remove(tile);
         for(int i = 0; i < tile.entity.power.links.size; i++){
             Tile other = world.tile(tile.entity.power.links.get(i));
