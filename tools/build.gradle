@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
-def packFile = "../core/assets-raw/sprites/pack.json"
 def doAntialias = !project.hasProperty("disableAntialias")
 
 def antialias = {File file ->
@@ -201,6 +200,19 @@ task pack(){
         }
 
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+
+        delete{
+            delete fileTree(dir: '../core/assets-raw/sprites_out/' , include: '**/pack.json')
+        }
+
+        copy{
+            from '../core/assets-raw/sprites_out/'
+            into '../core/assets-raw/sprites_out/'
+            include '**/*.json'
+            rename 'pack_fallback.json', "pack.json"
+        }
+
+        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites_fallback.atlas")
     }
     
 }
