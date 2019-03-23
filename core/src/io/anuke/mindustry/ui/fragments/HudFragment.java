@@ -60,10 +60,25 @@ public class HudFragment extends Fragment{
 
                 {
                     Table select = new Table(){
-                        public float getPrefWidth(){ return Unit.dp.scl(dsize*4 + 3); }
-                        public float getPrefHeight(){ return Unit.dp.scl(dsize); }
+                        @Override
+                        public void act(float delta){
+                            setSize(getPrefWidth(), getPrefHeight());
+                            setPosition(0, Core.graphics.getHeight(), Align.topLeft);
+                            super.act(delta);
+                        }
+
+                        @Override
+                        public float getPrefWidth(){
+                            return Unit.dp.scl(dsize*4 + 3);
+                        }
+
+                        @Override
+                        public float getPrefHeight(){
+                            return Unit.dp.scl(dsize);
+                        }
                     };
 
+                    select.visible(() -> !state.is(State.menu));
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -106,7 +121,8 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
-                    cont.add(select).prefSize(dsize*4 + 3, dsize).left();
+                    Core.scene.add(select);
+                    cont.add().size(dsize*4 + 3, dsize).left();
                 }
 
                 cont.row();
@@ -219,9 +235,8 @@ public class HudFragment extends Fragment{
 
         //launch button
         parent.fill(t -> {
-            t.top().visible(() -> !state.is(State.menu));
+            t.top().right().visible(() -> !state.is(State.menu));
             TextButton[] testb = {null};
-
             TextButton button = Elements.newButton("$launch", () -> {
                 FloatingDialog dialog = new FloatingDialog("$launch");
                 dialog.update(() -> {
@@ -266,10 +281,8 @@ public class HudFragment extends Fragment{
             });
 
             button.setDisabled(() -> state.enemies() > 0);
-
             button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
-
-            t.add(button).size(350f, 80f);
+            t.add(button).size(250f, 80f);
         });
 
         //paused table

@@ -229,7 +229,7 @@ public class PowerGraph{
         closedSet.clear();
 
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
-            if(other.entity.power == null || other.entity.power.graph != null){ continue; }
+            if(other.entity.power == null || other.entity.power.graph != null) continue;
             PowerGraph graph = new PowerGraph();
             queue.clear();
             queue.addLast(other);

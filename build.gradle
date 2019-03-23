@@ -29,11 +29,11 @@ allprojects{
         arcHash = null
         
         debugged = {
-            return new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null
+            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release")
         }
 
         localArc = {
-            return (System.properties["release"] == null || System.properties["release"] == "false") && new File(projectDir.parent, '../Arc').exists()
+            return (!project.hasProperty("release")) && new File(projectDir.parent, '../Arc').exists()
         }
 
         getArcHash = {

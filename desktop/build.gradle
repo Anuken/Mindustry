@@ -69,12 +69,6 @@ task dist(type: Jar){
     }
 }
 
-task ttt(){
-    fileTree("/home/anuke/Projects/Mindustry/deploy/Mindustry-Linux64-4-beta-66/jre/lib/amd64/newst").each{t ->
-        println("\"jre/lib/amd64/${t.absoluteFile.name}\",")
-    }
-}
-
 //note: call desktop:dist beforehand
 task packrCmd(){
 
@@ -101,6 +95,20 @@ task packrCmd(){
         }
 
         new Packr().pack(config)
+    }
+}
+
+task copyTemplate(){
+    doLast{
+        copy{
+            into "packr-out/"
+            from "${JDK_DIR}/templates/${getPlatform().toString().toLowerCase()}"
+        }
+
+        copy{
+            into "packr-out/"
+            from "build/libs/desktop-release.jar"
+        }
     }
 }
 
@@ -139,17 +147,22 @@ task packrZip(){
         }
     }
     
-    dependsOn "packrCmd"
     finalizedBy "clearOut"
 
     if(project.hasProperty("platform")){
+        def plat = getPlatform()
+        if(plat == PackrConfig.Platform.Windows32 || plat == PackrConfig.Platform.Windows64){
+            dependsOn "copyTemplate"
+        }else{
+            dependsOn "packrCmd"
 
-        if(getPlatform() == PackrConfig.Platform.MacOS){
-            dependsOn "fixMac"
-        }
+            if(getPlatform() == PackrConfig.Platform.MacOS){
+                dependsOn "fixMac"
+            }
 
-        if(getPlatform() == PackrConfig.Platform.Windows32){
-            dependsOn "fixWindows32"
+            if(getPlatform() == PackrConfig.Platform.Windows32){
+                dependsOn "fixWindows32"
+            }
         }
 
         task rzip(type: Zip){

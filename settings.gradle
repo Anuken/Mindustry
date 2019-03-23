@@ -19,7 +19,7 @@ if(new File(settingsDir, 'local.properties').exists()){
     println("No local.properties found. Not loading Android module.")
 }
 
-if(System.properties["release"] == null || System.properties["release"] == "false"){
+if(!hasProperty("release")){
     if (new File(settingsDir, '../Arc').exists()) {
         use(':Arc', '../Arc')
         use(':Arc:arc-core', '../Arc/arc-core')

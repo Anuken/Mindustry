@@ -179,6 +179,37 @@ public class ApplicationTests{
     }
 
     @Test
+    void manyTimers(){
+        int runs = 100000;
+        int[] total = {0};
+        for(int i = 0; i < runs; i++){
+            Time.run(0.999f, () -> total[0]++);
+        }
+        assertEquals(0, total[0]);
+        Time.update();
+        assertEquals(runs, total[0]);
+    }
+
+    @Test
+    void longTimers(){
+        Time.setDeltaProvider(() -> Float.MAX_VALUE);
+        Time.update();
+        int steps = 100;
+        float delay = 100000f;
+        Time.setDeltaProvider(() -> delay / steps + 0.01f);
+        int runs = 100000;
+        int[] total = {0};
+        for(int i = 0; i < runs; i++){
+            Time.run(delay, () -> total[0]++);
+        }
+        assertEquals(0, total[0]);
+        for(int i = 0; i < steps; i++){
+            Time.update();
+        }
+        assertEquals(runs, total[0]);
+    }
+
+    @Test
     void save(){
         world.loadMap(testMap);
         assertTrue(state.teams.get(defaultTeam).cores.size > 0);
