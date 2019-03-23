@@ -235,9 +235,8 @@ public class HudFragment extends Fragment{
 
         //launch button
         parent.fill(t -> {
-            t.top().visible(() -> !state.is(State.menu));
+            t.top().right().visible(() -> !state.is(State.menu));
             TextButton[] testb = {null};
-
             TextButton button = Elements.newButton("$launch", () -> {
                 FloatingDialog dialog = new FloatingDialog("$launch");
                 dialog.update(() -> {
@@ -282,10 +281,8 @@ public class HudFragment extends Fragment{
             });
 
             button.setDisabled(() -> state.enemies() > 0);
-
             button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
-
-            t.add(button).size(350f, 80f);
+            t.add(button).size(250f, 80f);
         });
 
         //paused table

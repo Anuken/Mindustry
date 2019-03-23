@@ -338,7 +338,7 @@ public class Blocks implements ContentList{
         }};
 
         ignarock = new Floor("ignarock"){{
-
+            blendGroup = darksand;
         }};
 
         hotrock = new Floor("hotrock"){{
