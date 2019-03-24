@@ -1,5 +1,6 @@
 package io.anuke.mindustry.core;
 
+import io.anuke.annotations.Annotations.Nullable;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
@@ -96,11 +97,11 @@ public class World implements ApplicationListener{
         return tiles == null ? 0 : tiles[0].length;
     }
 
-    public Tile tile(int pos){
+    public @Nullable Tile tile(int pos){
         return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
-    public Tile tile(int x, int y){
+    public @Nullable Tile tile(int x, int y){
         if(tiles == null){
             return null;
         }
@@ -112,7 +113,7 @@ public class World implements ApplicationListener{
         return tiles[x][y];
     }
 
-    public Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
@@ -270,6 +271,11 @@ public class World implements ApplicationListener{
                 }
                 if(invalidMap){
                     ui.showError("$map.nospawn.pvp");
+                }
+            }else if(!state.rules.waves){ //pvp maps need two cores to be valid
+                invalidMap = state.teams.get(waveTeam).cores.isEmpty();
+                if(invalidMap){
+                    ui.showError("$map.nospawn.attack");
                 }
             }
         }else{

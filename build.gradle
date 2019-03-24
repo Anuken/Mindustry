@@ -43,7 +43,7 @@ allprojects{
                     arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
                 }catch(e){
                     e.printStackTrace()
-                    arcHash = "-SNAPSHOT";
+                    arcHash = "-SNAPSHOT"
                 }
             }
             return arcHash

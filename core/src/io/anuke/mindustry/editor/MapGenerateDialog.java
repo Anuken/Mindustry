@@ -233,7 +233,7 @@ public class MapGenerateDialog extends FloatingDialog{
                         Tile tile = editor.tile(x, y);
                         DummyTile write = writeTiles[x][y];
 
-                        tile.setRotation((byte)write.rotation);
+                        tile.setRotation(write.rotation);
                         tile.setFloor((Floor)content.block(write.floor));
                         tile.setBlock(content.block(write.block));
                         tile.setTeam(Team.all[write.team]);

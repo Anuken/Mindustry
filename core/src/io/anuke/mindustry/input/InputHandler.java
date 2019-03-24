@@ -308,25 +308,20 @@ public abstract class InputHandler implements InputProcessor{
         }
     }
 
-    public boolean cursorNear(){
-        return true;
-    }
-
     public void tryPlaceBlock(int x, int y){
-        if(block != null && validPlace(x, y, block, rotation) && cursorNear()){
+        if(block != null && validPlace(x, y, block, rotation)){
             placeBlock(x, y, block, rotation);
         }
     }
 
     public void tryBreakBlock(int x, int y){
-        if(cursorNear() && validBreak(x, y)){
+        if(validBreak(x, y)){
             breakBlock(x, y);
         }
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation){
-        return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-        Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validPlace(player.getTeam(), x, y, type, rotation);
     }
 
     public boolean validBreak(int x, int y){

@@ -169,10 +169,10 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         float currentDuration = 0.0f;
         while((currentDuration += Time.delta()) <= fakeItemDuration){
             generator.update(tile);
-            assertEquals(expectedEfficiency, entity.productionEfficiency, "Duration: " + String.valueOf(currentDuration));
+            assertEquals(expectedEfficiency, entity.productionEfficiency, "Duration: " + currentDuration);
         }
         generator.update(tile);
-        assertEquals(0.0f, entity.productionEfficiency, "Duration: " + String.valueOf(currentDuration));
+        assertEquals(0.0f, entity.productionEfficiency, "Duration: " + currentDuration);
     }
     
     enum InputType{

@@ -30,7 +30,7 @@ public class BundleLauncher {
                 Log.info("Parsing bundle: {0}", child);
 
                 OrderedMap<String, String> other = new OrderedMap<>();
-                PropertiesUtils.load(other, Files.newBufferedReader(child, StandardCharsets.UTF_8));
+                PropertiesUtils.load(other, Files.newBufferedReader(child, Strings.utf8));
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
@@ -68,7 +68,7 @@ public class BundleLauncher {
                     other.remove(key);
                 }
 
-                Files.write(child, result.toString().getBytes(StandardCharsets.UTF_8));
+                Files.write(child, result.toString().getBytes(Strings.utf8));
 
             }catch (IOException e){
                 throw new RuntimeException(e);
