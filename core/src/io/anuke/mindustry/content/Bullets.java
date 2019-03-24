@@ -294,7 +294,6 @@ public class Bullets implements ContentList{
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{
             bulletWidth = 9f;
             bulletHeight = 12f;
-            armorPierce = 0.2f;
             reloadMultiplier = 0.6f;
             ammoMultiplier = 2;
         }};
@@ -302,7 +301,6 @@ public class Bullets implements ContentList{
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
             bulletWidth = 10f;
             bulletHeight = 13f;
-            armorPierce = 0.5f;
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
             ammoMultiplier = 2;
@@ -348,14 +346,12 @@ public class Bullets implements ContentList{
         standardDenseBig = new BasicBulletType(7f, 42, "bullet"){{
             bulletWidth = 15f;
             bulletHeight = 21f;
-            armorPierce = 0.2f;
             shootEffect = Fx.shootBig;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 65, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 23f;
-            armorPierce = 0.5f;
             shootEffect = Fx.shootBig;
         }};
 

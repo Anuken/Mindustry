@@ -108,6 +108,7 @@ public class UI implements ApplicationListener{
         });
 
         Colors.put("accent", Pal.accent);
+        Colors.put("stat", Pal.stat);
 
         loadCursors();
     }

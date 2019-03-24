@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.OrderedMap;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.effect.Fire;
@@ -8,7 +9,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
+import io.anuke.mindustry.world.meta.values.AmmoListValue;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -23,14 +24,14 @@ public abstract class LiquidTurret extends Turret{
 
     /**Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...]*/
     protected void ammo(Object... objects){
-        ammo = ObjectMap.of(objects);
+        ammo = OrderedMap.of(objects);
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.inputLiquid, new LiquidFilterValue(item -> ammo.containsKey(item)));
+        stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
     }
 
     @Override
