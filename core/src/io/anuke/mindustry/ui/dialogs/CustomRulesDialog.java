@@ -15,6 +15,10 @@ public class CustomRulesDialog extends FloatingDialog{
 
     public CustomRulesDialog(){
         super("$mode.custom");
+
+        rules.waves = true;
+        rules.waveTimer = true;
+
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
@@ -31,12 +35,14 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
         main.addCheck("$rules.wavetimer", b -> rules.waveTimer = b).checked(b -> rules.waveTimer);
         main.row();
-        main.addCheck("$rules.waves", b -> rules.waves = b).checked(b -> rules.waves);
+        main.addCheck("$rules.waves", b -> rules.waves = b).checked(b -> rules.waves).disabled(b -> rules.pvp);
         main.row();
-        main.addCheck("$rules.pvp", b -> rules.pvp = b).checked(b -> rules.pvp);
+        main.addCheck("$rules.pvp", b -> rules.pvp = b).checked(b -> rules.pvp).disabled(b -> rules.waves);
         main.row();
         main.addCheck("$rules.unitdrops", b -> rules.unitDrops = b).checked(b -> rules.unitDrops);
         main.row();
+        number("$rules.buildcostmultiplier", f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier);
+        number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f*tilesize, () -> Math.min(rules.enemyCoreBuildRadius/tilesize, 200));
         number("$rules.respawntime", f -> rules.respawnTime = f*60f, () -> rules.respawnTime/60f);
         number("$rules.wavespacing", f -> rules.waveSpacing = f*60f, () -> rules.waveSpacing/60f);
@@ -46,7 +52,7 @@ public class CustomRulesDialog extends FloatingDialog{
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
-            Platform.instance.addDialog(t.addField((int)prov.get() + "", s -> cons.accept(Strings.parseFloat(s)))
+            Platform.instance.addDialog(t.addField(prov.get() + "", s -> cons.accept(Strings.parseFloat(s)))
             .valid(Strings::canParsePositiveFloat).width(120f).left().get());
         });
 

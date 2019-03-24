@@ -215,9 +215,10 @@ public class PlacementFragment extends Fragment{
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items.get(stack.item);
-                                            String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");
+                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
+                                            String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
-                                            return color + ui.formatAmount(amount) + "[white]/" + stack.amount;
+                                            return color + ui.formatAmount(amount) + "[white]/" + stackamount;
                                         }).padLeft(5);
                                     }).left();
                                     req.row();

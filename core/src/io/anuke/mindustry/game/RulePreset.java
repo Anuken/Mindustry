@@ -25,6 +25,8 @@ public enum RulePreset{
         pvp = true;
         enemyCoreBuildRadius = 600f;
         respawnTime = 60 * 10;
+        buildCostMultiplier = 0.5f;
+        buildSpeedMultiplier = 2f;
     }});
 
     private final Supplier<Rules> rules;
