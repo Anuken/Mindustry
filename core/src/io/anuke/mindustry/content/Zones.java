@@ -137,7 +137,7 @@ public class Zones implements ContentList{
             conditionWave = 30;
             launchPeriod = 15;
             zoneRequirements = new Zone[]{desolateRift};
-            blockRequirements = new Block[]{Blocks.blastDrill, Blocks.thermalGenerator};
+            blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;

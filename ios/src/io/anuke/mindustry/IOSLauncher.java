@@ -32,6 +32,8 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             Unit.dp.addition = 0.5f;
+        }else{
+            Unit.dp.addition = -0.5f;
         }
 
         Platform.instance = new Platform() {

@@ -16,8 +16,12 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -29,8 +33,6 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-
-import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -103,7 +105,7 @@ public class HudFragment extends Fragment{
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
 
-                    float size = dsize;
+                    float size = Unit.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
                     int index = 0;
