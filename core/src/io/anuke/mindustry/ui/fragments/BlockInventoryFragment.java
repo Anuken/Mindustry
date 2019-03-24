@@ -87,8 +87,6 @@ public class BlockInventoryFragment extends Fragment{
 
     private void rebuild(boolean actions){
 
-        Player player = input.player;
-
         IntSet container = new IntSet();
 
         table.clearChildren();

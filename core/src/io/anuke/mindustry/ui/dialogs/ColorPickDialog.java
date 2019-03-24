@@ -7,8 +7,8 @@ import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 
+import static io.anuke.mindustry.Vars.player;
 import static io.anuke.mindustry.Vars.playerColors;
-import static io.anuke.mindustry.Vars.players;
 
 public class ColorPickDialog extends Dialog{
     private Consumer<Color> cons;
@@ -29,7 +29,7 @@ public class ColorPickDialog extends Dialog{
                 cons.accept(color);
                 hide();
             }).size(48).get();
-            button.setChecked(players[0].color.equals(color));
+            button.setChecked(player.color.equals(color));
             button.getStyle().imageUpColor = color;
 
             if(i % 4 == 3){

@@ -66,7 +66,7 @@ public class BuildBlock extends Block{
         Core.app.post(() -> tile.block().placed(tile));
 
         //last builder was this local client player, call placed()
-        if(!headless && builderID == players[0].id){
+        if(!headless && builderID == player.id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
             Core.app.post(() -> tile.block().playerPlaced(tile));

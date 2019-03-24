@@ -14,7 +14,6 @@ import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
@@ -184,8 +183,6 @@ public class JoinDialog extends FloatingDialog{
 
     void setup(){
         float w = targetWidth();
-
-        Player player = players[0];
 
         hosts.clear();
 

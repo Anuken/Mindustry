@@ -6,12 +6,11 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.net.Net;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.players;
+import static io.anuke.mindustry.Vars.player;
 import static io.anuke.mindustry.Vars.ui;
 
 public class HostDialog extends FloatingDialog{
@@ -19,8 +18,6 @@ public class HostDialog extends FloatingDialog{
 
     public HostDialog(){
         super("$hostserver");
-
-        Player player = players[0];
 
         addCloseButton();
 

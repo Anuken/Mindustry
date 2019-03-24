@@ -98,7 +98,7 @@ public class PlayerListFragment extends Fragment{
 
             button.addImage("icon-admin").size(14 * 2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
-            if((Net.server() || players[0].isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
+            if((Net.server() || player.isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
                 button.add().growY();
 
                 float bs = (h) / 2f;

@@ -91,7 +91,7 @@ public class UnitTypes implements ContentList{
             hitsize = 10f;
             rotatespeed = 0.06f;
             targetAir = false;
-            health = 800;
+            health = 750;
             weapon = new Weapon("artillery"){{
                 length = 1f;
                 reload = 60f;

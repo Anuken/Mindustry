@@ -49,6 +49,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
+        if(type == null) return;
         Block previous = wall == null ? Blocks.air : wall;
         if(previous == type) return;
         super.setBlock(type);

@@ -134,28 +134,32 @@ public class Bullets implements ContentList{
             bulletWidth = bulletHeight = 14f;
             collides = true;
             collidesTiles = true;
-            splashDamageRadius = 45f;
-            splashDamage = 50f;
+            splashDamageRadius = 20f;
+            splashDamage = 38f;
             backColor = Pal.bulletYellowBack;
             frontColor = Pal.bulletYellow;
         }};
 
-        flakLead = new FlakBulletType(3.9f, 3){{
+        flakLead = new FlakBulletType(4.2f, 3){{
+            lifetime = 50f;
+            ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 25f;
+            splashDamage = 30f;
             splashDamageRadius = 15f;
         }};
 
-        flakScrap = new FlakBulletType(3.5f, 3){{
+        flakScrap = new FlakBulletType(4f, 3){{
+            lifetime = 50f;
+            ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.5f;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 16f;
+            splashDamage = 24f;
             splashDamageRadius = 24f;
         }};
 
@@ -454,11 +458,11 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(2.5f, 5){
+        basicFlame = new BulletType(3f, 6f){
             {
                 ammoMultiplier = 3f;
                 hitSize = 7f;
-                lifetime = 40f;
+                lifetime = 42f;
                 pierce = true;
                 drag = 0.05f;
                 statusDuration = 60f * 4;
@@ -473,11 +477,11 @@ public class Bullets implements ContentList{
             }
         };
 
-        pyraFlame = new BulletType(2.7f, 8){
+        pyraFlame = new BulletType(3.3f, 9f){
             {
                 ammoMultiplier = 4f;
                 hitSize = 7f;
-                lifetime = 40f;
+                lifetime = 42f;
                 pierce = true;
                 drag = 0.05f;
                 statusDuration = 60f * 6;

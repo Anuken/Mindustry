@@ -63,7 +63,6 @@ public class UI implements ApplicationListener{
     public AdminsDialog admins;
     public TraceDialog traces;
     public ChangelogDialog changelog;
-    public LocalPlayerDialog localplayers;
     public DatabaseDialog database;
     public ContentInfoDialog content;
     public DeployDialog deploy;
@@ -175,7 +174,6 @@ public class UI implements ApplicationListener{
         admins = new AdminsDialog();
         traces = new TraceDialog();
         maps = new MapsDialog();
-        localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
@@ -183,7 +181,7 @@ public class UI implements ApplicationListener{
         Group group = Core.scene.root;
 
         backfrag.build(group);
-        control.input(0).getFrag().build(group);
+        control.input().getFrag().build(group);
         hudfrag.build(group);
         menufrag.build(group);
         chatfrag.container().build(group);
@@ -219,7 +217,7 @@ public class UI implements ApplicationListener{
             cont.margin(30).add(text).padRight(6f);
             TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
-            field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
+            field.setFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
             buttons.defaults().size(120, 54).pad(4);
             buttons.addButton("$ok", () -> {

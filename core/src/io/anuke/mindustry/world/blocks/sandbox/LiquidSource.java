@@ -74,7 +74,7 @@ public class LiquidSource extends Block{
             final int f = i;
             ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> {
                 Call.setLiquidSourceLiquid(null, tile, items.get(f));
-                control.input(0).frag.config.hideConfig();
+                control.input().frag.config.hideConfig();
             }).size(38).group(group).get();
             button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
             button.setChecked(entity.source.id == f);

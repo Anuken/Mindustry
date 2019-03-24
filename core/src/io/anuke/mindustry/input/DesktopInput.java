@@ -10,7 +10,6 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
 import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
@@ -33,10 +32,6 @@ public class DesktopInput extends InputHandler{
     private float selectScale;
 
     private int prevX, prevY, prevRotation;
-
-    public DesktopInput(Player player){
-        super(player);
-    }
 
     /**Draws a placement icon for a specific block.*/
     void drawPlace(int x, int y, Block block, int rotation, int prevX, int prevY, int prevRotation){

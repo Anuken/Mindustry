@@ -218,7 +218,7 @@ public class BlockRenderer{
                 block.drawShadow(req.tile);
             }else if(req.layer == Layer.block){
                 block.draw(req.tile);
-                if(block.synthetic() && req.tile.getTeam() != players[0].getTeam()){
+                if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
                     block.drawTeam(req.tile);
                 }
             }else if(req.layer == block.layer){

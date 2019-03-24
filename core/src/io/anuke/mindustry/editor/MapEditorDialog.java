@@ -181,7 +181,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         shown(() -> {
             saved = true;
-            Platform.instance.beginForceLandscape();
+            if(!Core.settings.getBool("landscape")) Platform.instance.beginForceLandscape();
             editor.clearOp();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
@@ -195,7 +195,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         hidden(() -> {
             editor.clearOp();
             Platform.instance.updateRPC();
-            Platform.instance.endForceLandscape();
+            if(!Core.settings.getBool("landscape")) Platform.instance.endForceLandscape();
         });
     }
 

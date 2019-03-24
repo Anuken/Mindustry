@@ -184,9 +184,9 @@ public class HudFragment extends Fragment{
             t.table("flat", c -> c.add("")
             .update(l ->{
                 l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
-                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - players[0].destructTime) / 60f)));
+                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - player.destructTime) / 60f)));
             }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(players[0].isOutOfBounds()), 0.1f);
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(player.isOutOfBounds()), 0.1f);
             }).get().color.a = 0f;
         });
 
@@ -207,13 +207,13 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || state.teams.get(players[0].getTeam()).cores.size == 0 ||
-                state.teams.get(players[0].getTeam()).cores.first().entity == null){
+                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 ||
+                state.teams.get(player.getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }
 
-                float curr = state.teams.get(players[0].getTeam()).cores.first().entity.health;
+                float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
                 if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
                     coreAttackTime = notifDuration;
                 }
@@ -470,13 +470,13 @@ public class HudFragment extends Fragment{
 
     private void addPlayButton(Table table){
         table.right().addImageButton("icon-play", "right", 30f, () -> {
-            if(Net.client() && players[0].isAdmin){
-                Call.onAdminRequest(players[0], AdminAction.wave);
+            if(Net.client() && player.isAdmin){
+                Call.onAdminRequest(player, AdminAction.wave);
             }else{
                 state.wavetime = 0f;
             }
         }).growY().fillX().right().width(40f)
-        .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
+        .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0
         && (!world.spawner.isSpawning() || !state.rules.waveTimer));
     }
 }

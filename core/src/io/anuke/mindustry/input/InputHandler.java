@@ -44,7 +44,6 @@ public abstract class InputHandler implements InputProcessor{
     /**Distance on the back from where items originate.*/
     final static float backTrns = 3f;
 
-    public final Player player;
     public final OverlayFragment frag = new OverlayFragment(this);
 
     public Block block;
@@ -53,10 +52,6 @@ public abstract class InputHandler implements InputProcessor{
 
     protected PlaceDraw placeDraw = new PlaceDraw();
     private PlaceLine line = new PlaceLine();
-
-    public InputHandler(Player player){
-        this.player = player;
-    }
 
     //methods to override
 

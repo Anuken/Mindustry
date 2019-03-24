@@ -54,7 +54,7 @@ public class WaveSpawner{
 
     /**@return true if the player is near a ground spawn point.*/
     public boolean playerNear(){
-        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, players[0].x, players[0].y) < maxShockwaveDst) > 0;
+        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < maxShockwaveDst) > 0;
     }
 
     public void spawnEnemies(){

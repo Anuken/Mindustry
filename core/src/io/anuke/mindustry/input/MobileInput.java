@@ -28,7 +28,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;
@@ -81,8 +80,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     private int prevX, prevY, prevRotation;
 
-    public MobileInput(Player player){
-        super(player);
+    public MobileInput(){
         Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
     }
 

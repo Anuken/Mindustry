@@ -109,7 +109,7 @@ public class ChatFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.skin.get(TextField.TextFieldStyle.class)));
-        chatfield.setTextFieldFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
+        chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = scene.skin.getFont("default-font-chat");
         chatfield.getStyle().fontColor = Color.WHITE;
@@ -207,7 +207,7 @@ public class ChatFragment extends Table{
 
         history.insert(1, message);
 
-        Call.sendMessage(players[0], message);
+        Call.sendMessage(player, message);
     }
 
     public void toggle(){
