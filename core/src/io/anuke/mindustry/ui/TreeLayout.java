@@ -237,9 +237,8 @@ public class TreeLayout{
             }
             executeShifts(v);
             float midpoint = (v.children[0].prelim + v.children[v.children.length-1].prelim) / 2f;
-            TreeNode w = leftSibling;
-            if(w != null){
-                v.prelim = w.prelim + getDistance(v, w);
+            if(leftSibling != null){
+                v.prelim = leftSibling.prelim + getDistance(v, leftSibling);
                 v.mode = v.prelim - midpoint;
             }else{
                 v.prelim = midpoint;

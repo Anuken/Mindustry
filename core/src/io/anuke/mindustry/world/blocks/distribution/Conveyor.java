@@ -231,7 +231,7 @@ public class Conveyor extends Block{
             pos.y = Mathf.clamp(pos.y, 0, nextMax);
 
             if(pos.y >= 0.9999f && offloadDir(tile, pos.item)){
-                if(next.block() instanceof Conveyor){
+                if(next != null && next.block() instanceof Conveyor){
                     ConveyorEntity othere = next.entity();
 
                     ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);

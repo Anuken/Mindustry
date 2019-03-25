@@ -457,9 +457,7 @@ public class World implements ApplicationListener{
             }
 
             for(int x = 0; x < tiles.length; x++){
-                for(int y = 0; y < tiles[0].length; y++){
-                    dark[x][y] = writeBuffer[x][y];
-                }
+                System.arraycopy(writeBuffer[x], 0, dark[x], 0, tiles[0].length);
             }
         }
 

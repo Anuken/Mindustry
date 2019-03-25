@@ -4,13 +4,13 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.function.BiFunction;
 import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.io.PropertiesUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
