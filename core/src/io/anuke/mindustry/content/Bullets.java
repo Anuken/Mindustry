@@ -141,25 +141,25 @@ public class Bullets implements ContentList{
         }};
 
         flakLead = new FlakBulletType(4.2f, 3){{
-            lifetime = 50f;
+            lifetime = 60f;
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 30f;
+            splashDamage = 35f;
             splashDamageRadius = 15f;
         }};
 
         flakScrap = new FlakBulletType(4f, 3){{
-            lifetime = 50f;
+            lifetime = 60f;
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.5f;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 24f;
+            splashDamage = 26f;
             splashDamageRadius = 24f;
         }};
 

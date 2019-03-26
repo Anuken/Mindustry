@@ -35,9 +35,9 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
         main.addCheck("$rules.wavetimer", b -> rules.waveTimer = b).checked(b -> rules.waveTimer);
         main.row();
-        main.addCheck("$rules.waves", b -> rules.waves = b).checked(b -> rules.waves).disabled(b -> rules.pvp);
+        main.addCheck("$rules.waves", b -> rules.waves = b).checked(b -> rules.waves);
         main.row();
-        main.addCheck("$rules.pvp", b -> rules.pvp = b).checked(b -> rules.pvp).disabled(b -> rules.waves);
+        main.addCheck("$rules.pvp", b -> rules.pvp = b).checked(b -> rules.pvp);
         main.row();
         main.addCheck("$rules.unitdrops", b -> rules.unitDrops = b).checked(b -> rules.unitDrops);
         main.row();

@@ -13,8 +13,6 @@ public class PowerDistributor extends PowerBlock{
 
     @Override
     public void update(Tile tile){
-        if(tile.entity.power.graph != null){
-            tile.entity.power.graph.update();
-        }
+        tile.entity.power.graph.update();
     }
 }

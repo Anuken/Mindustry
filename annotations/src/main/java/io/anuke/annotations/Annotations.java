@@ -7,13 +7,13 @@ import java.lang.annotation.Target;
 
 public class Annotations{
 
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Nullable{
 
     }
 
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NonNull{
 

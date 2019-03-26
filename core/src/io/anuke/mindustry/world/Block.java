@@ -136,14 +136,14 @@ public class Block extends BlockStorage{
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null && other.entity.power.graph != null){
+            if(other.entity.power != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }
     }
 
     protected void powerGraphRemoved(Tile tile){
-        if(tile.entity == null || tile.entity.power == null || tile.entity.power.graph == null){
+        if(tile.entity == null || tile.entity.power == null){
             return;
         }
 

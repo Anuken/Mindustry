@@ -449,15 +449,17 @@ public class HudFragment extends Fragment{
             builder.append(wavef.get(state.wave));
             builder.append("\n");
 
-            if(state.enemies() > 0 && !state.rules.waveTimer){
+            if(state.enemies() > 0){
                 if(state.enemies() == 1){
                     builder.append(enemyf.get(state.enemies()));
                 }else{
                     builder.append(enemiesf.get(state.enemies()));
                 }
-            }else if(state.rules.waveTimer){
+            }
+
+            if(state.rules.waveTimer){
                 builder.append(waitingf.get((int)(state.wavetime/60)));
-            }else{
+            }else if(state.enemies() == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
 

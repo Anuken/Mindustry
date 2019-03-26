@@ -146,6 +146,27 @@ public class MapEditor{
         return tiles[0].length;
     }
 
+    public void updateLinks(Block block, int x, int y){
+        int offsetx = -(block.size - 1) / 2;
+        int offsety = -(block.size - 1) / 2;
+
+        for(int dx = 0; dx < block.size; dx++){
+            for(int dy = 0; dy < block.size; dy++){
+                int worldx = dx + offsetx + x;
+                int worldy = dy + offsety + y;
+
+                if(Structs.inBounds(worldx, worldy, width(), height())){
+                    Tile tile = tiles[worldx][worldy];
+
+                    if(!(worldx == x && worldy == y)){
+                        tile.setBlock(Blocks.part);
+                        tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
+                    }
+                }
+            }
+        }
+    }
+
     public void draw(int x, int y, boolean paint){
         draw(x, y, paint, drawBlock);
     }

@@ -72,17 +72,15 @@ public class PowerNode extends PowerBlock{
 
         TileEntity entity = tile.entity();
 
-        //clear all graph data first
-        PowerGraph tg = entity.power.graph;
-        tg.clear();
-
         entity.power.links.removeValue(other.pos());
         other.entity.power.links.removeValue(tile.pos());
 
-        //reflow from this point, covering all tiles on this side
-        tg.reflow(tile);
+        PowerGraph newgraph = new PowerGraph();
 
-        if(other.entity.power.graph != tg){
+        //reflow from this point, covering all tiles on this side
+        newgraph.reflow(tile);
+
+        if(other.entity.power.graph != newgraph){
             //create new graph for other end
             PowerGraph og = new PowerGraph();
             //reflow from other end
@@ -95,9 +93,9 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("blocks.powerbalance",
-            entity.power.graph == null ? "+0" : ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1))),
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1))),
             () -> Pal.powerBar,
-            () -> entity.power.graph == null ? 0 : Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
+            () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
     }
 
     @Override
@@ -125,7 +123,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void update(Tile tile){
-        if(tile.entity.power.graph != null) tile.entity.power.graph.update();
+        tile.entity.power.graph.update();
     }
 
     @Override
@@ -169,8 +167,8 @@ public class PowerNode extends PowerBlock{
 
         Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange*tilesize);
 
-        for(int x = (int) (tile.x - laserRange); x <= tile.x + laserRange; x++){
-            for(int y = (int) (tile.y - laserRange); y <= tile.y + laserRange; y++){
+        for(int x = (int) (tile.x - laserRange - 1); x <= tile.x + laserRange + 1; x++){
+            for(int y = (int) (tile.y - laserRange - 1); y <= tile.y + laserRange + 1; y++){
                 Tile link = world.tile(x, y);
                 if(link != null) link = link.target();
 

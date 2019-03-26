@@ -41,6 +41,8 @@ public enum BlockStat{
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
 
+    repairTime(StatCategory.shooting),
+    range(StatCategory.shooting),
     shootRange(StatCategory.shooting),
     inaccuracy(StatCategory.shooting),
     shots(StatCategory.shooting),
@@ -51,7 +53,9 @@ public enum BlockStat{
     ammo(StatCategory.shooting),
 
     boostItem(StatCategory.optional),
-    boostLiquid(StatCategory.optional),;
+    boostLiquid(StatCategory.optional),
+
+    ;
 
     public final StatCategory category;
 

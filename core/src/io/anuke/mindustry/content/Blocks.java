@@ -53,7 +53,7 @@ public class Blocks implements ContentList{
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
     conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
@@ -529,7 +529,7 @@ public class Blocks implements ContentList{
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
             output = Items.sporePod;
-            craftTime = 200;
+            craftTime = 160;
             size = 2;
             hasLiquids = true;
             hasPower = true;
@@ -544,7 +544,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 60f;
             craftTime = 20f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 2.5f;
+            outputLiquidAmount = 4f;
             size = 2;
             health = 320;
             hasLiquids = true;
@@ -695,10 +695,23 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
+        mender = new MendProjector("mender"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 60, Items.copper, 50));
+            consumes.power(0.7f);
+            size = 1;
+            reload = 200f;
+            range = 40f;
+            healPercent = 5f;
+            consumes.item(Items.phasefabric).optional(true);
+        }};
+
         mendProjector = new MendProjector("mend-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 180));
-            consumes.power(2f);
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 40, Items.silicon, 80));
+            consumes.power(1.8f);
             size = 2;
+            reload = 250f;
+            range = 70f;
+            healPercent = 13f;
             consumes.item(Items.phasefabric).optional(true);
         }};
 
@@ -1118,7 +1131,7 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 33f;
+            reload = 25f;
             range = 180f;
             size = 2;
             burstSpacing = 5f;
@@ -1126,7 +1139,7 @@ public class Blocks implements ContentList{
             targetGround = false;
 
             recoil = 2f;
-            rotatespeed = 10f;
+            rotatespeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
 

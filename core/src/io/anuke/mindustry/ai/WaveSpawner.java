@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Pos;
 
 import java.io.DataInput;
@@ -105,7 +106,7 @@ public class WaveSpawner{
     }
 
     public boolean isSpawning(){
-        return spawning;
+        return spawning && !Net.client();
     }
 
     private void reset(){
