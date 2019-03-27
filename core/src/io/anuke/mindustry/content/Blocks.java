@@ -1191,11 +1191,11 @@ public class Blocks implements ContentList{
             );
             size = 2;
             recoil = 0f;
-            reload = 3f;
+            reload = 2f;
             inaccuracy = 5f;
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
-            range = 100f;
+            range = 110f;
             health = 250*size*size;
 
             drawer = (tile, entity) -> {

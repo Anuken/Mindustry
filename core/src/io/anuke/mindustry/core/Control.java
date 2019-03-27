@@ -170,8 +170,8 @@ public class Control implements ApplicationListener{
             }
         });
 
-        Events.on(ZoneCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.complete", e.zone.conditionWave));
+        Events.on(ZoneRequireCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", state.wave, e.zone.localizedName));
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {

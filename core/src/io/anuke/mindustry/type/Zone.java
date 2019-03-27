@@ -7,8 +7,10 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Loadouts;
-import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
+import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
+import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
@@ -17,8 +19,7 @@ import io.anuke.mindustry.world.Block;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.data;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
     public final Generator generator;
@@ -29,7 +30,7 @@ public class Zone extends UnlockableContent{
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
-    public int configureWave = 10;
+    public int configureWave = 15;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
 
@@ -67,12 +68,15 @@ public class Zone extends UnlockableContent{
             Core.settings.put(name + "-wave", wave);
             data.modified();
 
-            if(wave == conditionWave + 1){
-                Events.fire(new ZoneCompleteEvent(this));
+            for(Zone zone : content.zones()){
+                ZoneRequirement req = Structs.find(zone.zoneRequirements, f -> f.zone == this);
+                if(req != null && wave == req.wave + 1){
+                    Events.fire(new ZoneRequireCompleteEvent(zone, this));
+                }
             }
 
             if(wave == configureWave + 1){
-            //    Events.fire(new ZoneConfigureCompleteEvent(this));
+                Events.fire(new ZoneConfigureCompleteEvent(this));
             }
         }
     }

@@ -455,6 +455,7 @@ public class HudFragment extends Fragment{
                 }else{
                     builder.append(enemiesf.get(state.enemies()));
                 }
+                builder.append("\n");
             }
 
             if(state.rules.waveTimer){
