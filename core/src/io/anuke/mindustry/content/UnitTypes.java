@@ -178,7 +178,7 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             mass = 1.5f;
             isFlying = true;
-            health = 70;
+            health = 75;
             engineOffset = 5.5f;
             weapon = new Weapon("chain-blaster"){{
                 length = 1.5f;
@@ -190,7 +190,7 @@ public class UnitTypes implements ContentList{
         }};
 
         ghoul = new UnitType("ghoul", Ghoul.class, Ghoul::new){{
-            health = 250;
+            health = 220;
             speed = 0.2f;
             maxVelocity = 1.4f;
             mass = 3f;

@@ -8,11 +8,9 @@ import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Loadouts;
-import io.anuke.mindustry.content.StatusEffects;
 import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
 import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
@@ -32,7 +30,7 @@ public class Zone extends UnlockableContent{
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
-    public int configureWave = 40;
+    public int configureWave = 10;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
 
@@ -43,15 +41,6 @@ public class Zone extends UnlockableContent{
     public Zone(String name, MapGenerator generator){
         super(name);
         this.generator = generator;
-    }
-
-    protected SpawnGroup bossGroup(UnitType type){
-        return new SpawnGroup(type){{
-            begin = configureWave-1;
-            effect = StatusEffects.boss;
-            unitScaling = 1;
-            spacing = configureWave;
-        }};
     }
 
     public boolean isBossWave(int wave){

@@ -230,6 +230,7 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
+            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
@@ -702,16 +703,20 @@ public class Blocks implements ContentList{
             reload = 200f;
             range = 40f;
             healPercent = 5f;
-            consumes.item(Items.phasefabric).optional(true);
+            phaseBoost = 4f;
+            phaseRangeBoost = 20f;
+            health = 80;
+            consumes.item(Items.silicon).optional(true);
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 40, Items.silicon, 80));
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 80));
             consumes.power(1.8f);
             size = 2;
             reload = 250f;
-            range = 70f;
-            healPercent = 13f;
+            range = 85f;
+            healPercent = 14f;
+            health = 80 * size * size;
             consumes.item(Items.phasefabric).optional(true);
         }};
 
@@ -1131,7 +1136,7 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 25f;
+            reload = 20f;
             range = 180f;
             size = 2;
             burstSpacing = 5f;
@@ -1317,8 +1322,8 @@ public class Blocks implements ContentList{
                 Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
-            reload = 8f;
-            range = 160f;
+            reload = 7f;
+            range = 170f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;

@@ -56,7 +56,6 @@ void main() {
 
     if(color.r > 0.01){
         color = texture2D(u_texture, c + vec2(sin(stime/3.0 + coords.y/0.75) * v.x, 0.0)) * vec4(0.9, 0.9, 1, 1.0);
-        color.a = 1.0;
 
         float n1 = snoise(coords / 22.0 + vec2(-time) / 540.0);
         float n2 = snoise((coords + vec2(632.0)) / 8.0 + vec2(0.0, time) / 510.0);
@@ -65,7 +64,6 @@ void main() {
 
         if(r < -0.3 && r > -0.6){
             color *= 1.4;
-            color.a = 1.0;
         }
     }
 

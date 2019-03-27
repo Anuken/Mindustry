@@ -124,10 +124,17 @@ public class ZoneInfoDialog extends FloatingDialog{
                 rebuildLoadout[0] = () -> {
                     load.clear();
                     float bsize = 40f;
-                    int step = 100;
+                    int step = 50;
 
                     load.left();
                     for(ItemStack stack : zone.getStartingItems()){
+                        load.addButton("x", () -> {
+                            zone.getStartingItems().remove(stack);
+                            zone.updateLaunchCost();
+                            rebuildItems.run();
+                            rebuildLoadout[0].run();
+                        }).size(bsize).pad(2);
+
                         load.addButton("-", () -> {
                             stack.amount = Math.max(stack.amount - step, 0);
                             zone.updateLaunchCost();
