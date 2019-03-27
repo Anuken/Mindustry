@@ -9,7 +9,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Loadouts;
 import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
-import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
@@ -24,8 +23,8 @@ import static io.anuke.mindustry.Vars.state;
 public class Zone extends UnlockableContent{
     public final Generator generator;
     public Block[] blockRequirements = {};
-    public ItemStack[] itemRequirements = {};
-    public Zone[] zoneRequirements = {};
+    public ZoneRequirement[] zoneRequirements = {};
+    //TODO debug verify resources.
     public Item[] resources = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
@@ -73,7 +72,7 @@ public class Zone extends UnlockableContent{
             }
 
             if(wave == configureWave + 1){
-                Events.fire(new ZoneConfigureCompleteEvent(this));
+            //    Events.fire(new ZoneConfigureCompleteEvent(this));
             }
         }
     }
@@ -157,6 +156,24 @@ public class Zone extends UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.zone;
+    }
+
+    public static class ZoneRequirement{
+        public final Zone zone;
+        public final int wave;
+
+        public ZoneRequirement(Zone zone, int wave){
+            this.zone = zone;
+            this.wave = wave;
+        }
+
+        public static ZoneRequirement[] with(Object... objects){
+            ZoneRequirement[] out = new ZoneRequirement[objects.length/2];
+            for(int i = 0; i < objects.length; i+= 2){
+                out[i/2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
+            }
+            return out;
+        }
     }
 
 }

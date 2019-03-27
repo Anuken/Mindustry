@@ -199,6 +199,21 @@ public class Blocks implements ContentList{
             blendGroup = stone;
         }};
 
+        ignarock = new Floor("ignarock"){{
+
+        }};
+
+        hotrock = new Floor("hotrock"){{
+            attributes.set(Attribute.heat, 0.5f);
+            blendGroup = ignarock;
+        }};
+
+        magmarock = new Floor("magmarock"){{
+            attributes.set(Attribute.heat, 0.75f);
+            updateEffect = Fx.magmasmoke;
+            blendGroup = ignarock;
+        }};
+
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
@@ -336,21 +351,6 @@ public class Blocks implements ContentList{
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
-        }};
-
-        ignarock = new Floor("ignarock"){{
-            blendGroup = darksand;
-        }};
-
-        hotrock = new Floor("hotrock"){{
-            attributes.set(Attribute.heat, 0.5f);
-            blendGroup = ignarock;
-        }};
-
-        magmarock = new Floor("magmarock"){{
-            attributes.set(Attribute.heat, 0.75f);
-            updateEffect = Fx.magmasmoke;
-            blendGroup = ignarock;
         }};
 
         //endregion
@@ -1234,13 +1234,13 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 70));
             shootType = Bullets.arc;
-            reload = 25f;
+            reload = 24f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;
             targetAir = false;
-            consumes.powerBuffered(80f);
-            range = 80f;
+            consumes.powerBuffered(60f, 60f);
+            range = 95f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;

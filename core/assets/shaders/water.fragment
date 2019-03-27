@@ -61,14 +61,14 @@ void main() {
     float n2 = snoise((coords + vec2(632.0)) / 25.0 + vec2(0.0, -time) / 190.0);
 
     float r = (n1 + n2) * 3.0;
+    float tester = mod(float(int(coords.x + coords.y*1.1 + sin(stime / 8.0 + coords.x/5.0 - coords.y/100.0)*2.0)) +
+                           sin(stime / 20.0 + coords.y/3.0) * 1.0 +
+                           sin(stime / 10.0 + coords.y/2.0) * 2.0 +
+                           sin(stime / 7.0 + coords.y/1.0) * 0.5 +
+                           sin(coords.x + coords.y) +
+                           sin(stime / 20.0 + coords.x/4.0) * 1.0, mscl) + r;
 
-    if(mod(float(int(coords.x + coords.y*1.1 + sin(stime / 8.0 + coords.x/5.0 - coords.y/100.0)*2.0)) +
-        sin(stime / 20.0 + coords.y/3.0) * 1.0 +
-        sin(stime / 10.0 + coords.y/2.0) * 2.0 +
-        sin(stime / 7.0 + coords.y/1.0) * 0.5 +
-        sin(coords.x + coords.y) +
-        sin(stime / 20.0 + coords.x/4.0) * 1.0, mscl) + r < mth){
-
+    if(tester < mth){
         color *= 1.2;
         color.a = 1.0;
     }

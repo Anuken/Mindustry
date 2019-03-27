@@ -664,7 +664,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 21){{
+        arc = new BulletType(0.001f, 25){{
                 lifetime = 1;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
@@ -675,7 +675,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 15);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 25);
             }
         };
 

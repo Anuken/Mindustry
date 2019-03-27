@@ -10,6 +10,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.Zone.ZoneRequirement;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 
@@ -41,7 +42,10 @@ public class ZoneInfoDialog extends FloatingDialog{
         Runnable rebuildItems = () -> {
             int i = 0;
             iteminfo.clear();
-            ItemStack[] stacks = zone.unlocked() ? zone.getLaunchCost() : zone.itemRequirements;
+
+            if(!zone.unlocked()) return;
+
+            ItemStack[] stacks = zone.getLaunchCost();
             for(ItemStack stack : stacks){
                 if(stack.amount == 0) continue;
 
@@ -69,11 +73,11 @@ public class ZoneInfoDialog extends FloatingDialog{
                         req.table(r -> {
                             r.add("$complete").colspan(2).left();
                             r.row();
-                            for(Zone other : zone.zoneRequirements){
+                            for(ZoneRequirement other : zone.zoneRequirements){
                                 r.addImage("icon-zone").padRight(4);
-                                r.add(other.localizedName()).color(Color.LIGHT_GRAY);
-                                r.addImage(other.isCompleted() ? "icon-check-2" : "icon-cancel-2")
-                                .color(other.isCompleted() ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.LIGHT_GRAY);
+                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check-2" : "icon-cancel-2")
+                                .color(other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
                         });
@@ -190,7 +194,6 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {
             if(!data.isUnlocked(zone)){
-                data.removeItems(zone.itemRequirements);
                 data.unlockContent(zone);
                 ui.deploy.setup();
                 setup(zone);
@@ -211,8 +214,8 @@ public class ZoneInfoDialog extends FloatingDialog{
             return true;
         }
 
-        for(Zone other : zone.zoneRequirements){
-            if(!other.isCompleted()){
+        for(ZoneRequirement other : zone.zoneRequirements){
+            if(other.zone.bestWave() < other.wave){
                 return false;
             }
         }
@@ -223,6 +226,6 @@ public class ZoneInfoDialog extends FloatingDialog{
             }
         }
 
-        return data.hasItems(zone.itemRequirements);
+        return true;
     }
 }

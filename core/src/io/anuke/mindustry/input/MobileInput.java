@@ -491,6 +491,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(mode == placing && isPlacing()){
                 iterateLine(lineStartX, lineStartY, tileX, tileY, l -> {
+                    Tile tile = world.tile(l.x, l.y);
+                    if(tile != null && hasRequest(tile)){
+                        return;
+                    }
+
                     PlaceRequest request = new PlaceRequest(l.x, l.y, block, l.rotation);
                     request.scale = 1f;
                     selection.add(request);
