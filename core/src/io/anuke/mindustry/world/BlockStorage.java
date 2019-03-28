@@ -20,7 +20,6 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.BlockBars;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.Producers;
 
 public abstract class BlockStorage extends UnlockableContent{
     public boolean hasItems;
@@ -39,7 +38,7 @@ public abstract class BlockStorage extends UnlockableContent{
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
-    public final Producers produces = new Producers();
+    //public final Producers produces = new Producers();
 
     public BlockStorage(String name){
         super(name);

@@ -8,6 +8,8 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.LiquidStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -20,7 +22,8 @@ import java.io.IOException;
 public class GenericCrafter extends Block{
     protected final int timerDump = timers++;
 
-    protected Item output;
+    protected ItemStack outputItem;
+    protected LiquidStack outputLiquid;
 
     protected float craftTime = 80;
     protected Effect craftEffect = Fx.purify;
@@ -35,17 +38,17 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void init(){
-        super.init();
-
-        produces.set(output);
-    }
-
-    @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.craftSpeed, 60f / craftTime, StatUnit.itemsSecond);
-        stats.add(BlockStat.outputItem, output);
+        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.itemsSecond);
+
+        if(outputItem != null){
+            stats.add(BlockStat.output, outputItem);
+        }
+
+        if(outputLiquid != null){
+            stats.add(BlockStat.output, outputLiquid);
+        }
     }
 
     @Override
@@ -64,14 +67,15 @@ public class GenericCrafter extends Block{
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
 
-        if(entity.cons.valid() && tile.entity.items.get(output) < itemCapacity){
+        if(entity.cons.valid()){
 
             entity.progress += getProgressIncrease(entity, craftTime);
             entity.totalProgress += entity.delta();
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
 
-            if(Mathf.chance(Time.delta() * updateEffectChance))
+            if(Mathf.chance(Time.delta() * updateEffectChance)){
                 Effects.effect(updateEffect, entity.x + Mathf.range(size * 4f), entity.y + Mathf.range(size * 4));
+            }
         }else{
             entity.warmup = Mathf.lerp(entity.warmup, 0f, 0.02f);
         }
@@ -79,14 +83,28 @@ public class GenericCrafter extends Block{
         if(entity.progress >= 1f){
             entity.cons.trigger();
 
-            useContent(tile, output);
-            offloadNear(tile, output);
+            if(outputItem != null){
+                useContent(tile, outputItem.item);
+                for(int i = 0; i < outputItem.amount; i++){
+                    offloadNear(tile, outputItem.item);
+                }
+            }
+
+            if(outputLiquid != null){
+                useContent(tile, outputLiquid.liquid);
+                handleLiquid(tile, tile, outputLiquid.liquid, outputLiquid.amount);
+            }
+
             Effects.effect(craftEffect, tile.drawx(), tile.drawy());
             entity.progress = 0f;
         }
 
-        if(tile.entity.timer.get(timerDump, 5)){
-            tryDump(tile, output);
+        if(outputItem != null && tile.entity.timer.get(timerDump, 5)){
+            tryDump(tile, outputItem.item);
+        }
+
+        if(outputLiquid != null){
+            tryDumpLiquid(tile, outputLiquid.liquid);
         }
     }
 

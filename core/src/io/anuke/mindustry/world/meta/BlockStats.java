@@ -5,6 +5,7 @@ import io.anuke.arc.collection.OrderedMap;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.LiquidStack;
 import io.anuke.mindustry.world.meta.values.*;
 
 /**Hold and organizes a list of block stats.*/
@@ -35,6 +36,11 @@ public class BlockStats{
     /**Adds an item value.*/
     public void add(BlockStat stat, ItemStack item){
         add(stat, new ItemValue(item));
+    }
+
+    /**Adds an item value.*/
+    public void add(BlockStat stat, LiquidStack stack){
+        add(stat, new LiquidValue(stack.liquid, stack.amount));
     }
 
     /**Adds a single string value with this stat.*/

@@ -370,7 +370,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.copper, 150, Items.lead, 60));
 
             craftEffect = Fx.pulverizeMedium;
-            output = Items.graphite;
+            outputItem = Items.graphite;
             craftTime = 90f;
             size = 2;
             hasItems = true;
@@ -382,7 +382,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.titanium, 200, Items.silicon, 50, Items.lead, 200, Items.graphite, 100));
 
             craftEffect = Fx.pulverizeMedium;
-            output = Items.graphite;
+            outputItem = Items.graphite;
             craftTime = 30f;
             size = 3;
             hasItems = true;
@@ -425,7 +425,7 @@ public class Blocks implements ContentList{
             hasItems = true;
             liquidCapacity = 60f;
             craftTime = 60f;
-            output = Items.plastanium;
+            outputItem = Items.plastanium;
             size = 2;
             health = 320;
             hasPower = hasLiquids = true;
@@ -475,7 +475,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.lead, 60, Items.titanium, 40));
             hasItems = true;
             hasPower = true;
-            output = Items.blastCompound;
+            outputItem = Items.blastCompound;
             size = 2;
 
             consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
@@ -529,7 +529,7 @@ public class Blocks implements ContentList{
 
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
-            output = Items.sporePod;
+            outputItem = Items.sporePod;
             craftTime = 160;
             size = 2;
             hasLiquids = true;
@@ -556,7 +556,7 @@ public class Blocks implements ContentList{
 
         pulverizer = new Pulverizer("pulverizer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.lead, 50));
-            output = Items.sand;
+            outputItem = Items.sand;
             craftEffect = Fx.pulverize;
             craftTime = 40f;
             updateEffect = Fx.pulverizeSmall;

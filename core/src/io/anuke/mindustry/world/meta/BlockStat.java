@@ -16,8 +16,6 @@ public enum BlockStat{
     launchTime(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
-    liquidOutput(StatCategory.liquids),
-    liquidOutputSpeed(StatCategory.liquids),
     coolant(StatCategory.liquids),
     coolantUse(StatCategory.liquids),
 
@@ -32,12 +30,9 @@ public enum BlockStat{
 
     inputLiquid(StatCategory.crafting),
     liquidUse(StatCategory.crafting),
-    inputItem(StatCategory.crafting),
-    inputItems(StatCategory.crafting),
-    inputFuel(StatCategory.crafting),
-    fuelBurnTime(StatCategory.crafting),
-    craftSpeed(StatCategory.crafting),
-    outputItem(StatCategory.crafting),
+    input(StatCategory.crafting),
+    output(StatCategory.crafting),
+    productionTime(StatCategory.crafting),
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
@@ -53,8 +48,7 @@ public enum BlockStat{
     targetsGround(StatCategory.shooting),
     ammo(StatCategory.shooting),
 
-    boostItem(StatCategory.optional),
-    boostLiquid(StatCategory.optional),
+    booster(StatCategory.optional),
 
     ;
 
