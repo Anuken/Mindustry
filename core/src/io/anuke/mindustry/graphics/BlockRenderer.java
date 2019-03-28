@@ -23,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 9;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.7f);
+    private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
 

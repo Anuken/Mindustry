@@ -287,7 +287,7 @@ public class BuildBlock extends Block{
             this.previous = previous;
             this.accumulator = new float[block.buildRequirements.length];
             this.totalAccumulator = new float[block.buildRequirements.length];
-            this.buildCost = block.buildCost;
+            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
         }
 
         public void setDeconstruct(Block previous){
@@ -297,7 +297,7 @@ public class BuildBlock extends Block{
                 this.block = previous;
                 this.accumulator = new float[previous.buildRequirements.length];
                 this.totalAccumulator = new float[previous.buildRequirements.length];
-                this.buildCost = previous.buildCost;
+                this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             }else{
                 this.buildCost = 20f; //default no-requirement build cost is 20
             }
@@ -340,7 +340,7 @@ public class BuildBlock extends Block{
             if(rid != -1) block = content.block(rid);
 
             if(block != null){
-                buildCost = block.buildCost;
+                buildCost = block.buildCost * state.rules.buildCostMultiplier;
             }else{
                 buildCost = 20f;
             }

@@ -10,7 +10,6 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -178,7 +177,7 @@ public class DeployDialog extends FloatingDialog{
             this.height /= 2f;
             nodes.add(this);
 
-            arr.selectFrom(content.zones(), other -> Structs.find(other.zoneRequirements, f -> f.zone == zone) != null);
+            arr.selectFrom(content.zones(), other -> other.zoneRequirements.length > 0 && other.zoneRequirements[0].zone == zone);
 
             children = new ZoneNode[arr.size];
             for(int i = 0; i < children.length; i++){

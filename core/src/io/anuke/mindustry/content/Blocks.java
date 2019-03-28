@@ -599,7 +599,7 @@ public class Blocks implements ContentList{
         //endregion
         //region defense
 
-        int wallHealthMultiplier = 3;
+        int wallHealthMultiplier = 4;
 
         scrapWall = new Wall("scrap-wall"){{
             health = 60 * wallHealthMultiplier;

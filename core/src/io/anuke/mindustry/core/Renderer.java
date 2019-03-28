@@ -307,7 +307,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 5));
+        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
 }
