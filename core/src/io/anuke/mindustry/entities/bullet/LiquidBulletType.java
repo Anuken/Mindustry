@@ -20,7 +20,7 @@ public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
     public LiquidBulletType(Liquid liquid){
-        super(2.8f, 0);
+        super(3.5f, 0);
         this.liquid = liquid;
 
         lifetime = 74f;

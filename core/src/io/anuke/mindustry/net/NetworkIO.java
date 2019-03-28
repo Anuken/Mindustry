@@ -71,8 +71,6 @@ public class NetworkIO{
 
     public static void loadWorld(InputStream is){
 
-        Player player = players[0];
-
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
 
@@ -127,7 +125,7 @@ public class NetworkIO{
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
                 }
 
-                if(team == players[0].getTeam() && cores > 0){
+                if(team == player.getTeam() && cores > 0){
                     Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy());
                 }
             }
@@ -140,7 +138,7 @@ public class NetworkIO{
     public static ByteBuffer writeServerData(){
         int maxlen = 32;
 
-        String host = (headless ? "Server" : players[0].name);
+        String host = (headless ? "Server" : player.name);
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
         host = host.substring(0, Math.min(host.length(), maxlen));

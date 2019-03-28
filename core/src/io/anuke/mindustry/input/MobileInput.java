@@ -28,7 +28,6 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;
@@ -81,8 +80,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     private int prevX, prevY, prevRotation;
 
-    public MobileInput(Player player){
-        super(player);
+    public MobileInput(){
         Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
     }
 
@@ -231,7 +229,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
             Draw.color();
         }else{
-            float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
+            float rad = Math.max((tile.block().size * tilesize / 2f - 1) * request.scale, 1f);
+
+            if(rad <= 1.01f) return;
             Draw.mixcol();
             //draw removing request
             Draw.tint(Pal.removeBack);
@@ -493,6 +493,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(mode == placing && isPlacing()){
                 iterateLine(lineStartX, lineStartY, tileX, tileY, l -> {
+                    Tile tile = world.tile(l.x, l.y);
+                    if(tile != null && hasRequest(tile)){
+                        return;
+                    }
+
                     PlaceRequest request = new PlaceRequest(l.x, l.y, block, l.rotation);
                     request.scale = 1f;
                     selection.add(request);
@@ -724,7 +729,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public boolean zoom(float initialDistance, float distance){
         if(lastDistance == -1) lastDistance = initialDistance;
 
-        float amount = (Mathf.sign(distance > lastDistance) * 0.07f) * Time.delta();
+        float amount = (Mathf.sign(distance > lastDistance) * 0.04f) * Time.delta();
         renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
         lastDistance = distance;
         return true;

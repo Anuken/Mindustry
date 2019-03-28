@@ -7,6 +7,18 @@ import java.lang.annotation.Target;
 
 public class Annotations{
 
+    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Nullable{
+
+    }
+
+    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface NonNull{
+
+    }
+
     /** Marks a class as serializable.*/
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)

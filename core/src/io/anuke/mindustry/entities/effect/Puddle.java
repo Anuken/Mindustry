@@ -305,9 +305,10 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
         y = data.readFloat();
         liquid = content.liquid(data.readByte());
         targetAmount = data.readShort() / 4f;
-        tile = world.tile(data.readInt());
+        int pos = data.readInt();
+        tile = world.tile(pos);
 
-        map.put(tile.pos(), this);
+        map.put(pos, this);
     }
 
     @Override

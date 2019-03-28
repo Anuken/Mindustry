@@ -12,9 +12,9 @@ import io.anuke.mindustry.type.Item.Icon;
 
 import static io.anuke.mindustry.Vars.*;
 
-public interface SelectionTrait{
+public class ItemSelection{
 
-    default void buildItemTable(Table table, Supplier<Item> holder, Consumer<Item> consumer){
+    public static void buildItemTable(Table table, Supplier<Item> holder, Consumer<Item> consumer){
 
         Array<Item> items = content.items();
 
@@ -28,7 +28,7 @@ public interface SelectionTrait{
         for(Item item : items){
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
-            ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> control.input(0).frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> control.input().frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Icon.medium));
             button.update(() -> button.setChecked(holder.get() == item));

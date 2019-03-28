@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 
@@ -194,11 +195,22 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("fullscreen")){
                 Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
             }
+        }else{
+            graphics.checkPref("landscape", false, b -> {
+                if(b){
+                    Platform.instance.beginForceLandscape();
+                }else{
+                    Platform.instance.endForceLandscape();
+                }
+            });
+
+            if(Core.settings.getBool("landscape")){
+                Platform.instance.beginForceLandscape();
+            }
         }
 
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("shadows", true);
         graphics.checkPref("animatedwater", !mobile);
         graphics.checkPref("lasers", true);
     }

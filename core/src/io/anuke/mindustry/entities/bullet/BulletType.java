@@ -1,10 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 import io.anuke.mindustry.world.Tile;
@@ -41,8 +48,6 @@ public abstract class BulletType extends Content{
     public StatusEffect status = StatusEffects.none;
     /**Intensity of applied status effect in terms of duration.*/
     public float statusDuration = 60 * 1f;
-    /**What fraction of armor is pierced, 0-1*/
-    public float armorPierce = 0f;
     /**Whether to sync this bullet to clients.*/
     public boolean syncable;
     /**Whether this bullet type collides with tiles.*/
@@ -55,6 +60,27 @@ public abstract class BulletType extends Content{
     public boolean collides = true;
     /**Whether velocity is inherited from the shooter.*/
     public boolean keepVelocity = true;
+
+    //additional effects
+
+    public int fragBullets = 9;
+    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
+    public BulletType fragBullet = null;
+
+    /**Use a negative value to disable splash damage.*/
+    public float splashDamageRadius = -1f;
+
+    public int incendAmount = 0;
+    public float incendSpread = 8f;
+    public float incendChance = 1f;
+
+    public float homingPower = 0f;
+    public float homingRange = 50f;
+
+    public int lightining;
+    public int lightningLength = 5;
+
+    public float hitShake = 0f;
 
     public BulletType(float speed, float damage){
         this.speed = speed;
@@ -81,12 +107,38 @@ public abstract class BulletType extends Content{
         hit(b, b.x, b.y);
     }
 
-    public void hit(Bullet b, float hitx, float hity){
-        Effects.effect(hitEffect, hitx, hity, b.rot());
+    public void hit(Bullet b, float x, float y){
+        Effects.effect(hitEffect, x, y, b.rot());
+
+        Effects.shake(hitShake, hitShake, b);
+
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
+                float len = Mathf.random(1f, 7f);
+                float a = Mathf.random(360f);
+                Bullet.create(fragBullet, b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
+            }
+        }
+
+        if(Mathf.chance(incendChance)){
+            Damage.createIncend(x, y, incendSpread, incendAmount);
+        }
+
+        if(splashDamageRadius > 0){
+            Damage.damage(b.getTeam(), x, y, splashDamageRadius, splashDamage);
+        }
     }
 
     public void despawned(Bullet b){
         Effects.effect(despawnEffect, b.x, b.y, b.rot());
+
+        if(fragBullet != null || splashDamageRadius > 0){
+            hit(b);
+        }
+
+        for (int i = 0; i < lightining; i++) {
+            Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
+        }
     }
 
     public void draw(Bullet b){
@@ -96,6 +148,13 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bullet b){
+
+        if(homingPower > 0.0001f){
+            TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
+            if(target != null){
+                b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
+            }
+        }
     }
 
     @Override

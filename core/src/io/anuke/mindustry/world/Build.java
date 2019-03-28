@@ -186,7 +186,8 @@ public class Build{
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
-            return world.tile(x, y) != null && !world.tile(x, y).floor().isDeep();
+            Tile tile = world.tile(x, y);
+            return tile != null && !tile.floor().isDeep();
         }
         return false;
     }

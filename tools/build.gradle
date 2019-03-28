@@ -152,7 +152,7 @@ task scaleSprites4x(){
                             J = getRGB(x, y + 2),
                             K = getRGB(x - 2, y),
                             L = getRGB(x + 2, y),
-                            M = getRGB(x, y - 2);
+                            M = getRGB(x, y - 2)
 
                         if (B==D && B!=F && D!=H && (E!=A || E==C || E==G || A==J || A==K)) p1 = B
                         if (B==F & B!=D & F!=H && (E!=C || E==A || E==I || C==J || C==L)) p2 = F

@@ -4,13 +4,13 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.function.BiFunction;
 import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.io.PropertiesUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +30,7 @@ public class BundleLauncher {
                 Log.info("Parsing bundle: {0}", child);
 
                 OrderedMap<String, String> other = new OrderedMap<>();
-                PropertiesUtils.load(other, Files.newBufferedReader(child, StandardCharsets.UTF_8));
+                PropertiesUtils.load(other, Files.newBufferedReader(child, Strings.utf8));
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
@@ -68,7 +68,7 @@ public class BundleLauncher {
                     other.remove(key);
                 }
 
-                Files.write(child, result.toString().getBytes(StandardCharsets.UTF_8));
+                Files.write(child, result.toString().getBytes(Strings.utf8));
 
             }catch (IOException e){
                 throw new RuntimeException(e);

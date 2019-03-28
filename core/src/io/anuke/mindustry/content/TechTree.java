@@ -19,15 +19,20 @@ public class TechTree implements ContentList{
                 node(junction, () -> {
                     node(itemBridge);
                     node(router, () -> {
+                        node(launchPad, () -> {
+                            node(launchPadLarge, () -> {
+
+                            });
+                        });
+
                         node(distributor);
-                        node(overflowGate);
-                        node(sorter);
+                        node(sorter, () -> {
+                            node(overflowGate);
+                        });
                         node(container, () -> {
                             node(unloader);
                             node(vault, () -> {
-                                node(launchPad, () -> {
 
-                                });
                             });
                         });
 
@@ -201,7 +206,9 @@ public class TechTree implements ContentList{
                                     });
                                 });
                             });
+                        });
 
+                        node(mender, () -> {
                             node(mendProjector, () -> {
                                 node(forceProjector, () -> {
                                     node(overdriveProjector, () -> {
@@ -263,7 +270,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 6);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 5);
         }
         
         return new TechNode(block, requirements, children);

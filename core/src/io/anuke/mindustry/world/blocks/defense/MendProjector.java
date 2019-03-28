@@ -15,6 +15,8 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,8 +34,8 @@ public class MendProjector extends Block{
 
     protected TextureRegion topRegion;
     protected float reload = 250f;
-    protected float range = 50f;
-    protected float healPercent = 6f;
+    protected float range = 60f;
+    protected float healPercent = 12f;
     protected float phaseBoost = 12f;
     protected float phaseRangeBoost = 50f;
     protected float useTime = 400f;
@@ -50,6 +52,14 @@ public class MendProjector extends Block{
     public void load(){
         super.load();
         topRegion = Core.atlas.find(name + "-top");
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
+        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
     }
 
     @Override

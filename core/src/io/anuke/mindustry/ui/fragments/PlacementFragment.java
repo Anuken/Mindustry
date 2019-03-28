@@ -58,7 +58,7 @@ public class PlacementFragment extends Fragment{
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
-            control.input(0).block = null;
+            control.input().block = null;
             rebuild();
         });
 
@@ -123,7 +123,7 @@ public class PlacementFragment extends Fragment{
             full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
 
             full.table(frame -> {
-                InputHandler input = control.input(0);
+                InputHandler input = control.input();
 
                 //rebuilds the category table with the correct recipes
                 Runnable rebuildCategory = () -> {
@@ -154,8 +154,8 @@ public class PlacementFragment extends Fragment{
                         button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
 
                         button.update(() -> { //color unplacable things gray
-                            TileEntity core = players[0].getClosestCore();
-                            Color color = core != null && (core.items.has(block.buildRequirements) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
+                            TileEntity core = player.getClosestCore();
+                            Color color = core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -211,13 +211,14 @@ public class PlacementFragment extends Fragment{
                                         line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
                                         line.labelWrap(() -> {
-                                            TileEntity core = players[0].getClosestCore();
+                                            TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
                                             int amount = core.items.get(stack.item);
-                                            String color = (amount < stack.amount / 2f ? "[red]" : amount < stack.amount ? "[accent]" : "[white]");
+                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
+                                            String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
-                                            return color + ui.formatAmount(amount) + "[white]/" + stack.amount;
+                                            return color + ui.formatAmount(amount) + "[white]/" + stackamount;
                                         }).padLeft(5);
                                     }).left();
                                     req.row();
@@ -231,7 +232,7 @@ public class PlacementFragment extends Fragment{
                                 t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
                                 t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
                             }).growX().left();
-                            if(hoverTile.getTeam() == players[0].getTeam()){
+                            if(hoverTile.getTeam() == player.getTeam()){
                                 topTable.row();
                                 topTable.table(t -> {
                                     t.left().defaults().left();
@@ -326,8 +327,8 @@ public class PlacementFragment extends Fragment{
         }
 
         //block currently selected
-        if(control.input(0).block != null){
-            toDisplay = control.input(0).block;
+        if(control.input().block != null){
+            toDisplay = control.input().block;
         }
 
         //block hovered on in build menu

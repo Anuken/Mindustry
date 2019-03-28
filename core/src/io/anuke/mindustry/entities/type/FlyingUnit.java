@@ -47,7 +47,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation
-                && dst(target) < Math.max(getWeapon().bullet.range(), type.range)){
+                && dst(target) < getWeapon().bullet.range()){
                     BulletType ammo = getWeapon().bullet;
 
                     if(type.rotateWeapon){
@@ -75,8 +75,9 @@ public abstract class FlyingUnit extends BaseUnit{
                 targetClosest();
                 targetClosestEnemyFlag(BlockFlag.target);
 
-                if(target != null){
+                if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
+                    return;
                 }
 
                 target = getClosestCore();

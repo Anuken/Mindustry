@@ -67,10 +67,7 @@ public class PowerCrafter extends Block{
         if(outputItem != null && tile.entity.items.get(outputItem) >= itemCapacity){
             return false;
         }
-        if(outputLiquid != null && tile.entity.liquids.get(outputLiquid) >= liquidCapacity - 0.01f){
-            return false;
-        }
-        return true;
+        return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid) >= liquidCapacity - 0.01f);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class BuildBlock extends Block{
         Core.app.post(() -> tile.block().placed(tile));
 
         //last builder was this local client player, call placed()
-        if(!headless && builderID == players[0].id){
+        if(!headless && builderID == player.id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
             Core.app.post(() -> tile.block().playerPlaced(tile));
@@ -197,8 +197,9 @@ public class BuildBlock extends Block{
             float maxProgress = checkRequired(core.items, amount, false);
 
             for(int i = 0; i < block.buildRequirements.length; i++){
-                accumulator[i] += Math.min(block.buildRequirements[i].amount * maxProgress, block.buildRequirements[i].amount - totalAccumulator[i] + 0.00001f); //add min amount progressed to the accumulator
-                totalAccumulator[i] = Math.min(totalAccumulator[i] + block.buildRequirements[i].amount * maxProgress, block.buildRequirements[i].amount);
+                int reqamount = Math.round(state.rules.buildCostMultiplier * block.buildRequirements[i].amount);
+                accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001f); //add min amount progressed to the accumulator
+                totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
             maxProgress = checkRequired(core.items, maxProgress, true);
@@ -215,6 +216,7 @@ public class BuildBlock extends Block{
         }
 
         public void deconstruct(Unit builder, TileEntity core, float amount){
+            float deconstructMultiplier = 0.5f;
 
             if(block != null){
                 ItemStack[] requirements = block.buildRequirements;
@@ -223,8 +225,9 @@ public class BuildBlock extends Block{
                 }
 
                 for(int i = 0; i < requirements.length; i++){
-                    accumulator[i] += Math.min(requirements[i].amount * amount / 2f, requirements[i].amount / 2f - totalAccumulator[i]); //add scaled amount progressed to the accumulator
-                    totalAccumulator[i] = Math.min(totalAccumulator[i] + requirements[i].amount * amount / 2f, requirements[i].amount);
+                    int reqamount = Math.round(state.rules.buildCostMultiplier * requirements[i].amount);
+                    accumulator[i] += Math.min(amount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
+                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * amount * deconstructMultiplier, reqamount);
 
                     int accumulated = (int)(accumulator[i]); //get amount
 
@@ -248,9 +251,10 @@ public class BuildBlock extends Block{
             float maxProgress = amount;
 
             for(int i = 0; i < block.buildRequirements.length; i++){
+                int sclamount = Math.round(state.rules.buildCostMultiplier * block.buildRequirements[i].amount);
                 int required = (int) (accumulator[i]); //calculate items that are required now
 
-                if(inventory.get(block.buildRequirements[i].item) == 0){
+                if(inventory.get(block.buildRequirements[i].item) == 0 && sclamount != 0){
                     maxProgress = 0f;
                 }else if(required > 0){ //if this amount is positive...
                     //calculate how many items it can actually use
@@ -283,7 +287,7 @@ public class BuildBlock extends Block{
             this.previous = previous;
             this.accumulator = new float[block.buildRequirements.length];
             this.totalAccumulator = new float[block.buildRequirements.length];
-            this.buildCost = block.buildCost;
+            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
         }
 
         public void setDeconstruct(Block previous){
@@ -293,7 +297,7 @@ public class BuildBlock extends Block{
                 this.block = previous;
                 this.accumulator = new float[previous.buildRequirements.length];
                 this.totalAccumulator = new float[previous.buildRequirements.length];
-                this.buildCost = previous.buildCost;
+                this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             }else{
                 this.buildCost = 20f; //default no-requirement build cost is 20
             }
@@ -336,7 +340,7 @@ public class BuildBlock extends Block{
             if(rid != -1) block = content.block(rid);
 
             if(block != null){
-                buildCost = block.buildCost;
+                buildCost = block.buildCost * state.rules.buildCostMultiplier;
             }else{
                 buildCost = 20f;
             }

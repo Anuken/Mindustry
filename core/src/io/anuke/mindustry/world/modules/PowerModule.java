@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
+import io.anuke.annotations.Annotations.NonNull;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.mindustry.world.blocks.power.PowerGraph;
 
@@ -15,7 +16,7 @@ public class PowerModule extends BlockModule{
     public float satisfaction = 0.0f;
     /** Specifies power which is required additionally, e.g. while a force projector is being shot at. */
     public float extraUse = 0f;
-    public PowerGraph graph = new PowerGraph();
+    public @NonNull PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
 
     @Override

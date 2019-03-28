@@ -136,14 +136,14 @@ public class Block extends BlockStorage{
         TileEntity entity = tile.entity();
 
         for(Tile other : getPowerConnections(tile, tempTiles)){
-            if(other.entity.power != null && other.entity.power.graph != null){
+            if(other.entity.power != null){
                 other.entity.power.graph.add(entity.power.graph);
             }
         }
     }
 
     protected void powerGraphRemoved(Tile tile){
-        if(tile.entity == null || tile.entity.power == null || tile.entity.power.graph == null){
+        if(tile.entity == null || tile.entity.power == null){
             return;
         }
 
@@ -267,7 +267,7 @@ public class Block extends BlockStorage{
 
     /**Call when some content is produced. This unlocks the content if it is applicable.*/
     public void useContent(Tile tile, UnlockableContent content){
-        if(!headless && tile.getTeam() == players[0].getTeam()){
+        if(!headless && tile.getTeam() == player.getTeam()){
             logic.handleContent(content);
         }
     }

@@ -34,20 +34,7 @@ public abstract class Consume{
         return update;
     }
 
-    public abstract void build(Tile tile, Table table);/*{
-
-        Table t = new Table("flat");
-        t.margin(4);
-        buildTooltip(t);
-
-        int scale = mobile ? 4 : 3;
-
-        table.table(out -> {
-            out.addImage(getIcon()).size(10 * scale).color(Color.DARK_GRAY).padRight(-10 * scale).padBottom(-scale * 2);
-            out.addImage(getIcon()).size(10 * scale).color(Pal.accent);
-            out.addImage("icon-missing").size(10 * scale).color(Pal.remove).padLeft(-10 * scale);
-        }).size(10 * scale).get().addListener(new Tooltip<>(t));
-    }*/
+    public abstract void build(Tile tile, Table table);
 
     /**Called when a consumption is triggered manually.*/
     public void trigger(Block block, TileEntity entity){

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.editor.generation;
 
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
 import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
 import io.anuke.mindustry.world.Block;
 

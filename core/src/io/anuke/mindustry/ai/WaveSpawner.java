@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Pos;
 
 import java.io.DataInput;
@@ -54,7 +55,7 @@ public class WaveSpawner{
 
     /**@return true if the player is near a ground spawn point.*/
     public boolean playerNear(){
-        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, players[0].x, players[0].y) < maxShockwaveDst) > 0;
+        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < maxShockwaveDst) > 0;
     }
 
     public void spawnEnemies(){
@@ -105,7 +106,7 @@ public class WaveSpawner{
     }
 
     public boolean isSpawning(){
-        return spawning;
+        return spawning && !Net.client();
     }
 
     private void reset(){

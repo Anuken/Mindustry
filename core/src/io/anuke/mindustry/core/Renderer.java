@@ -53,7 +53,7 @@ public class Renderer implements ApplicationListener{
     public Renderer(){
         batch = new SpriteBatch(4096);
         camera = new Camera();
-        Lines.setCircleVertices(14);
+        Lines.setCircleVertices(20);
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -113,11 +113,11 @@ public class Renderer implements ApplicationListener{
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
         }else{
-            Vector2 position = Tmp.v3.set(players[0]);
+            Vector2 position = Tmp.v3.set(player);
 
-            if(players[0].isDead()){
-                TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == null){
+            if(player.isDead()){
+                TileEntity core = player.getClosestCore();
+                if(core != null && player.spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
@@ -148,8 +148,8 @@ public class Renderer implements ApplicationListener{
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
-            camera.position.x = players[0].x;
-            camera.position.y = players[0].y;
+            camera.position.x = player.x;
+            camera.position.y = player.y;
         }
 
         graphics.clear(clearColor);
@@ -169,6 +169,7 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+        Draw.color();
 
         blocks.floor.beginDraw();
         blocks.floor.drawLayer(CacheLayer.walls);
@@ -182,6 +183,8 @@ public class Renderer implements ApplicationListener{
         Draw.shader();
 
         blocks.drawBlocks(Layer.overlay);
+
+        drawGroundShadows();
 
         drawAllTeams(false);
 
@@ -221,6 +224,28 @@ public class Renderer implements ApplicationListener{
 
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawGroundShadows(){
+        Draw.color(0, 0, 0, 0.4f);
+        float rad = 1.6f;
+
+        Consumer<Unit> draw = u -> {
+            float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
+            Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
+        };
+
+        for(EntityGroup<? extends BaseUnit> group : unitGroups){
+            if(!group.isEmpty()){
+                drawAndInterpolate(group, unit -> !unit.isDead(), draw::accept);
+            }
+        }
+
+        if(!playerGroup.isEmpty()){
+            drawAndInterpolate(playerGroup, unit -> !unit.isDead(), draw::accept);
+        }
+
+        Draw.color();
     }
 
     private void drawFlyerShadows(){
@@ -282,7 +307,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 5));
+        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
 }
