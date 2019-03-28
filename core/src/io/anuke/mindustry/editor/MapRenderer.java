@@ -72,8 +72,7 @@ public class MapRenderer implements Disposable{
                 IndexedRenderer mesh = chunks[x][y];
 
                 if(mesh == null){
-                    chunks[x][y] = new IndexedRenderer(chunksize * chunksize * 2);
-                    mesh = chunks[x][y];
+                    continue;
                 }
 
                 mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
