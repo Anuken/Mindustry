@@ -69,7 +69,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad, launchPadLarge,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -754,7 +754,7 @@ public class Blocks implements ContentList{
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 2, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.07f;
+            speed = 0.08f;
         }};
 
         junction = new Junction("junction"){{
@@ -1101,13 +1101,23 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
+            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.silicon, 150, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 8;
             hasPower = true;
             consumes.power(1f);
         }};
+
+        launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.titanium, 400, Items.silicon, 300, Items.lead, 500, Items.plastanium, 150));
+            size = 4;
+            itemCapacity = 250;
+            launchTime = 60f * 7;
+            hasPower = true;
+            consumes.power(2f);
+        }};
+
 
         //endregion
         //region turrets

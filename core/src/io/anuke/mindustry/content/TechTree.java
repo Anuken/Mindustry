@@ -19,15 +19,20 @@ public class TechTree implements ContentList{
                 node(junction, () -> {
                     node(itemBridge);
                     node(router, () -> {
+                        node(launchPad, () -> {
+                            node(launchPadLarge, () -> {
+
+                            });
+                        });
+
                         node(distributor);
-                        node(overflowGate);
-                        node(sorter);
+                        node(sorter, () -> {
+                            node(overflowGate);
+                        });
                         node(container, () -> {
                             node(unloader);
                             node(vault, () -> {
-                                node(launchPad, () -> {
 
-                                });
                             });
                         });
 

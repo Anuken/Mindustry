@@ -13,6 +13,7 @@ public enum BlockStat{
     inputItemCapacity(StatCategory.items),
     outputItemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
+    launchTime(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
     liquidOutput(StatCategory.liquids),
