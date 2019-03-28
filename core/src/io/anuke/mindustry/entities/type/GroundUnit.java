@@ -54,10 +54,11 @@ public abstract class GroundUnit extends BaseUnit{
     patrol = new UnitState(){
         public void update(){
             TileEntity target = getClosestCore();
+
             if(target != null){
                 if(dst(target) > 400f){
                     moveAwayFromCore();
-                }else{
+                }else if(!(!Units.invalidateTarget(GroundUnit.this.target, GroundUnit.this) && dst(GroundUnit.this.target) < getWeapon().bullet.range())){
                     patrol();
                 }
             }

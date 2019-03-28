@@ -180,6 +180,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             health = 75;
             engineOffset = 5.5f;
+            range = 140f;
             weapon = new Weapon("chain-blaster"){{
                 length = 1.5f;
                 reload = 28f;
@@ -198,6 +199,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             targetAir = false;
             engineOffset = 7.8f;
+            range = 140f;
             weapon = new Weapon("bomber"){{
                 length = 0f;
                 width = 2f;

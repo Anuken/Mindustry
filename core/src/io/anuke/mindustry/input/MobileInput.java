@@ -229,7 +229,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
             Draw.color();
         }else{
-            float rad = (tile.block().size * tilesize / 2f - 1) * request.scale;
+            float rad = Math.max((tile.block().size * tilesize / 2f - 1) * request.scale, 1f);
+
+            if(rad <= 1.01f) return;
             Draw.mixcol();
             //draw removing request
             Draw.tint(Pal.removeBack);

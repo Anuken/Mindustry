@@ -248,6 +248,7 @@ public class NetClient implements ApplicationListener{
             for(int i = 0; i < cores; i++){
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);
+
                 if(tile != null && tile.entity != null){
                     tile.entity.items.read(input);
                 }else{
