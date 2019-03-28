@@ -278,7 +278,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(dead) return;
 
         if(!movement.isZero() && moved && !state.isPaused()){
-            walktime += movement.len() / 1f * getFloorOn().speedMultiplier;
+            walktime += movement.len() * getFloorOn().speedMultiplier * 2f;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
         }
 

@@ -184,6 +184,8 @@ public class Renderer implements ApplicationListener{
 
         blocks.drawBlocks(Layer.overlay);
 
+        drawGroundShadows();
+
         drawAllTeams(false);
 
         blocks.skipLayer(Layer.turret);
@@ -222,6 +224,28 @@ public class Renderer implements ApplicationListener{
 
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawGroundShadows(){
+        Draw.color(0, 0, 0, 0.4f);
+        float rad = 1.6f;
+
+        Consumer<Unit> draw = u -> {
+            float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
+            Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
+        };
+
+        for(EntityGroup<? extends BaseUnit> group : unitGroups){
+            if(!group.isEmpty()){
+                drawAndInterpolate(group, unit -> !unit.isDead(), draw::accept);
+            }
+        }
+
+        if(!playerGroup.isEmpty()){
+            drawAndInterpolate(playerGroup, unit -> !unit.isDead(), draw::accept);
+        }
+
+        Draw.color();
     }
 
     private void drawFlyerShadows(){
