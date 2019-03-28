@@ -32,7 +32,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             table.add(t.localizedName()).padRight(10).left().top();
             table.table("underline", bt -> {
                 bt.left().defaults().padRight(3).left();
-                bt.add(Core.bundle.format("bullet.damage", type.damage));
+
+                if(type.damage > 0){
+                    bt.add(Core.bundle.format("bullet.damage", type.damage));
+                }
 
                 if(type.splashDamage > 0){
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.toFixed(type.splashDamageRadius / tilesize, 1)));
