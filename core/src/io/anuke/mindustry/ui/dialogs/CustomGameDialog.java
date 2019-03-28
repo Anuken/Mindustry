@@ -46,7 +46,8 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
-        selmode.add("$level.mode").padRight(15f);
+        selmode.add("$level.mode").colspan(4);
+        selmode.row();
         int i = 0;
 
         Table modes = new Table();
@@ -75,7 +76,8 @@ public class CustomGameDialog extends FloatingDialog{
 
         Table sdif = new Table();
 
-        sdif.add("$setting.difficulty.name").padRight(15f);
+        sdif.add("$setting.difficulty.name").colspan(3);
+        sdif.row();
         sdif.defaults().height(s + 4);
         sdif.addImageButton("icon-arrow-left", 10 * 3, () -> {
             difficulty = (ds[Mathf.mod(difficulty.ordinal() - 1, ds.length)]);
