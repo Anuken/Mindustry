@@ -4,8 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Sort;
-import io.anuke.mindustry.entities.EntityDraw;
-import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -13,7 +11,6 @@ import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -26,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockRenderer{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 9;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.19f);
+    private final static Color shadowColor = new Color(0, 0, 0, 0.7f);
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -37,6 +34,7 @@ public class BlockRenderer{
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
     private Array<Tile> outArray = new Array<>();
+    private Array<Tile> shadowEvents = new Array<>();
 
     public BlockRenderer(){
 
@@ -45,7 +43,29 @@ public class BlockRenderer{
         }
 
         Events.on(WorldLoadEvent.class, event -> {
+            shadowEvents.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+
+            shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            shadows.resize(world.width(), world.height());
+            shadows.begin();
+            Core.graphics.clear(Color.WHITE);
+            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+
+            Draw.color(shadowColor);
+
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.rawTile(x, y);
+                    if(tile.block() != Blocks.air){
+                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    }
+                }
+            }
+
+            Draw.flush();
+            Draw.color();
+            shadows.end();
 
             fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
             fog.resize(world.width(), world.height());
@@ -53,8 +73,6 @@ public class BlockRenderer{
             Core.graphics.clear(Color.WHITE);
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
-            //TODO highly inefficient, width*height rectangles isn't great
-            //TODO handle shadow rotation generation with GPU blur/erode algorithm
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
@@ -71,6 +89,8 @@ public class BlockRenderer{
         });
 
         Events.on(TileChangeEvent.class, event -> {
+            shadowEvents.add(event.tile);
+
             int avgx = (int)(camera.position.x / tilesize);
             int avgy = (int)(camera.position. y / tilesize);
             int rangex = (int) (camera.width / tilesize / 2) + 2;
@@ -99,43 +119,36 @@ public class BlockRenderer{
     }
 
     public void drawShadows(){
-        if(!Core.settings.getBool("shadows")) return;
+        if(!shadowEvents.isEmpty()){
+            Draw.flush();
+            shadows.begin();
+            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
-        Draw.color();
+            for(Tile tile : shadowEvents){
+                Draw.color(tile.block() == Blocks.air ? Color.WHITE : shadowColor);
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+            }
 
-        if(!Core.graphics.isHidden() && (shadows.getWidth() != Core.graphics.getWidth() || shadows.getHeight() != Core.graphics.getHeight())){
-            shadows.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            Draw.flush();
+            Draw.color();
+            shadows.end();
+            shadowEvents.clear();
+
+            Draw.proj(camera.projection());
         }
+
+        float ww = world.width() * tilesize, wh = world.height() * tilesize;
+        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
+        float u = (x - camera.width/2f) / ww,
+        v = (y - camera.height/2f) / wh,
+        u2 = (x + camera.width/2f) / ww,
+        v2 = (y + camera.height/2f) / wh;
 
         Tmp.tr1.set(shadows.getTexture());
-        Shaders.shadow.color.set(shadowColor);
-        Shaders.shadow.scl = renderer.cameraScale()/3f;
-        Shaders.shadow.region = Tmp.tr1;
+        Tmp.tr1.set(u, v2, u2, v);
 
-        Draw.flush();
-        shadows.begin();
-        Core.graphics.clear(Color.CLEAR);
-
-        floor.beginDraw();
-        floor.drawLayer(CacheLayer.walls);
-        floor.endDraw();
-
-        drawBlocks(Layer.shadow);
-
-        EntityDraw.drawWith(playerGroup, player -> !player.isDead(), Unit::draw);
-        for(EntityGroup group : unitGroups){
-            EntityDraw.drawWith(group, unit -> !unit.isDead(), Unit::draw);
-        }
-
-        Draw.color();
-        Draw.flush();
-        shadows.end();
-
-        Draw.shader(Shaders.shadow);
-        Draw.rect(Draw.wrap(shadows.getTexture()),
-            camera.position.x,
-            camera.position.y,
-            camera.width, -camera.height);
+        Draw.shader(Shaders.fog);
+        Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
         Draw.shader();
     }
 
