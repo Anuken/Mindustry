@@ -33,8 +33,7 @@ public class Zones implements ContentList{
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
-            itemRequirements = ItemStack.with(Items.copper, 2000);
-            zoneRequirements = new Zone[]{groundZero};
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead};
             rules = () -> new Rules(){{
@@ -50,8 +49,7 @@ public class Zones implements ContentList{
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
-            zoneRequirements = new Zone[]{craters};
-            itemRequirements = ItemStack.with(Items.copper, 4000, Items.lead, 2000);
+            zoneRequirements = ZoneRequirement.with(craters, 10);
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
@@ -66,8 +64,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
             launchPeriod = 20;
-            zoneRequirements = new Zone[]{frozenForest};
-            itemRequirements = ItemStack.with(Items.lead, 6000, Items.graphite, 2000);
+            zoneRequirements = ZoneRequirement.with(frozenForest, 10, craters, 15);
             blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
@@ -99,9 +96,8 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
             launchPeriod = 10;
-            zoneRequirements = new Zone[]{frozenForest};
+            zoneRequirements = ZoneRequirement.with(frozenForest, 15);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
-            itemRequirements = ItemStack.with(Items.copper, 8000, Items.silicon, 2000);
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
             rules = () -> new Rules(){{
                 waves = true;
@@ -114,10 +110,9 @@ public class Zones implements ContentList{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 1500);
-            itemRequirements = ItemStack.with(Items.copper, 8000, Items.metaglass, 2000, Items.graphite, 3000);
             conditionWave = 10;
             launchPeriod = 20;
-            zoneRequirements = new Zone[]{ruinousShores};
+            zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
@@ -133,10 +128,9 @@ public class Zones implements ContentList{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 3000, Items.silicon, 800, Items.metaglass, 400);
-            itemRequirements = ItemStack.with(Items.copper, 10000, Items.titanium, 8000, Items.metaglass, 6000, Items.plastanium, 2000);
             conditionWave = 30;
             launchPeriod = 15;
-            zoneRequirements = new Zone[]{desolateRift};
+            zoneRequirements = ZoneRequirement.with(desolateRift, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
             rules = () -> new Rules(){{

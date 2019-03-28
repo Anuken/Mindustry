@@ -53,7 +53,7 @@ public class Blocks implements ContentList{
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mendProjector, overdriveProjector, forceProjector, shockMine,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
     conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
@@ -69,7 +69,7 @@ public class Blocks implements ContentList{
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader, launchPad, launchPadLarge,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
@@ -199,6 +199,21 @@ public class Blocks implements ContentList{
             blendGroup = stone;
         }};
 
+        ignarock = new Floor("ignarock"){{
+
+        }};
+
+        hotrock = new Floor("hotrock"){{
+            attributes.set(Attribute.heat, 0.5f);
+            blendGroup = ignarock;
+        }};
+
+        magmarock = new Floor("magmarock"){{
+            attributes.set(Attribute.heat, 0.75f);
+            updateEffect = Fx.magmasmoke;
+            blendGroup = ignarock;
+        }};
+
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
@@ -230,6 +245,7 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
+            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
@@ -335,21 +351,6 @@ public class Blocks implements ContentList{
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
-        }};
-
-        ignarock = new Floor("ignarock"){{
-            blendGroup = darksand;
-        }};
-
-        hotrock = new Floor("hotrock"){{
-            attributes.set(Attribute.heat, 0.5f);
-            blendGroup = ignarock;
-        }};
-
-        magmarock = new Floor("magmarock"){{
-            attributes.set(Attribute.heat, 0.75f);
-            updateEffect = Fx.magmasmoke;
-            blendGroup = ignarock;
         }};
 
         //endregion
@@ -529,7 +530,7 @@ public class Blocks implements ContentList{
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
             output = Items.sporePod;
-            craftTime = 200;
+            craftTime = 160;
             size = 2;
             hasLiquids = true;
             hasPower = true;
@@ -544,7 +545,7 @@ public class Blocks implements ContentList{
             liquidCapacity = 60f;
             craftTime = 20f;
             outputLiquid = Liquids.oil;
-            outputLiquidAmount = 2.5f;
+            outputLiquidAmount = 4f;
             size = 2;
             health = 320;
             hasLiquids = true;
@@ -695,10 +696,27 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
+        mender = new MendProjector("mender"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 60, Items.copper, 50));
+            consumes.power(0.7f);
+            size = 1;
+            reload = 200f;
+            range = 40f;
+            healPercent = 5f;
+            phaseBoost = 4f;
+            phaseRangeBoost = 20f;
+            health = 80;
+            consumes.item(Items.silicon).optional(true);
+        }};
+
         mendProjector = new MendProjector("mend-projector"){{
-            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 180));
-            consumes.power(2f);
+            requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 80));
+            consumes.power(1.8f);
             size = 2;
+            reload = 250f;
+            range = 85f;
+            healPercent = 14f;
+            health = 80 * size * size;
             consumes.item(Items.phasefabric).optional(true);
         }};
 
@@ -736,7 +754,7 @@ public class Blocks implements ContentList{
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 2, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.07f;
+            speed = 0.08f;
         }};
 
         junction = new Junction("junction"){{
@@ -1083,13 +1101,23 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.titanium, 200, Items.silicon, 200, Items.lead, 200));
+            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.silicon, 150, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 8;
             hasPower = true;
             consumes.power(1f);
         }};
+
+        launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.titanium, 400, Items.silicon, 300, Items.lead, 500, Items.plastanium, 150));
+            size = 4;
+            itemCapacity = 250;
+            launchTime = 60f * 7;
+            hasPower = true;
+            consumes.power(2f);
+        }};
+
 
         //endregion
         //region turrets
@@ -1118,15 +1146,15 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 43f;
-            range = 160f;
+            reload = 20f;
+            range = 180f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
             targetGround = false;
 
             recoil = 2f;
-            rotatespeed = 10f;
+            rotatespeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
 
@@ -1141,7 +1169,7 @@ public class Blocks implements ContentList{
             );
             recoil = 0f;
             reload = 4f;
-            range = 53f;
+            range = 60f;
             shootCone = 50f;
             targetAir = false;
             ammoUseEffect = Fx.none;
@@ -1173,11 +1201,11 @@ public class Blocks implements ContentList{
             );
             size = 2;
             recoil = 0f;
-            reload = 3f;
+            reload = 2f;
             inaccuracy = 5f;
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
-            range = 100f;
+            range = 110f;
             health = 250*size*size;
 
             drawer = (tile, entity) -> {
@@ -1216,13 +1244,13 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 70, Items.lead, 70));
             shootType = Bullets.arc;
-            reload = 25f;
+            reload = 24f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUsed = 1f / 2f;
             targetAir = false;
-            consumes.powerBuffered(80f);
-            range = 80f;
+            consumes.powerBuffered(60f, 60f);
+            range = 95f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
             recoil = 1f;
@@ -1304,8 +1332,8 @@ public class Blocks implements ContentList{
                 Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
-            reload = 8f;
-            range = 160f;
+            reload = 7f;
+            range = 170f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;

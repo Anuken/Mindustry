@@ -63,7 +63,6 @@ public class NetClient implements ApplicationListener{
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
-            Player player = players[0];
 
             player.isAdmin = false;
 
@@ -188,8 +187,8 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void onPositionSet(float x, float y){
-        players[0].x = x;
-        players[0].y = y;
+        player.x = x;
+        player.y = y;
     }
 
     @Remote
@@ -333,8 +332,6 @@ public class NetClient implements ApplicationListener{
     void sync(){
 
         if(timer.get(0, playerSyncTime)){
-            Player player = players[0];
-
             BuildRequest[] requests;
             //limit to 10 to prevent buffer overflows
             int usedRequests = Math.min(player.getPlaceQueue().size, 10);

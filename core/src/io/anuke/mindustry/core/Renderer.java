@@ -53,7 +53,7 @@ public class Renderer implements ApplicationListener{
     public Renderer(){
         batch = new SpriteBatch(4096);
         camera = new Camera();
-        Lines.setCircleVertices(14);
+        Lines.setCircleVertices(20);
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -113,11 +113,11 @@ public class Renderer implements ApplicationListener{
         if(state.is(State.menu)){
             graphics.clear(Color.BLACK);
         }else{
-            Vector2 position = Tmp.v3.set(players[0]);
+            Vector2 position = Tmp.v3.set(player);
 
-            if(players[0].isDead()){
-                TileEntity core = players[0].getClosestCore();
-                if(core != null && players[0].spawner == null){
+            if(player.isDead()){
+                TileEntity core = player.getClosestCore();
+                if(core != null && player.spawner == null){
                     camera.position.lerpDelta(core.x, core.y, 0.08f);
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
@@ -148,8 +148,8 @@ public class Renderer implements ApplicationListener{
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
-            camera.position.x = players[0].x;
-            camera.position.y = players[0].y;
+            camera.position.x = player.x;
+            camera.position.y = player.y;
         }
 
         graphics.clear(clearColor);
@@ -169,6 +169,7 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         blocks.drawShadows();
+        Draw.color();
 
         blocks.floor.beginDraw();
         blocks.floor.drawLayer(CacheLayer.walls);

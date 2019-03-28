@@ -60,8 +60,8 @@ public class DesktopPlatform extends Platform{
                 presence.largeImageText = "Wave " + state.wave;
             }
 
-            presence.state = unitGroups[players[0].getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
-            (unitGroups[players[0].getTeam().ordinal()].size() + " Units Active");
+            presence.state = unitGroups[player.getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+            (unitGroups[player.getTeam().ordinal()].size() + " Units Active");
 
             if(Net.active()){
                 presence.partyMax = 100;

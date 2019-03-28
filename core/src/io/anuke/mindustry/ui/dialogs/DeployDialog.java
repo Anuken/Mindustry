@@ -17,6 +17,7 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.Zone.ZoneRequirement;
 import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
 import io.anuke.mindustry.ui.TreeLayout.TreeNode;
@@ -100,8 +101,8 @@ public class DeployDialog extends FloatingDialog{
     }
 
     boolean hidden(Zone zone){
-        for(Zone other : zone.zoneRequirements){
-            if(!data.isUnlocked(other)){
+        for(ZoneRequirement other : zone.zoneRequirements){
+            if(!data.isUnlocked(other.zone)){
                 return true;
             }
         }
@@ -177,7 +178,7 @@ public class DeployDialog extends FloatingDialog{
             this.height /= 2f;
             nodes.add(this);
 
-            arr.selectFrom(content.zones(), other -> Structs.contains(other.zoneRequirements, zone));
+            arr.selectFrom(content.zones(), other -> Structs.find(other.zoneRequirements, f -> f.zone == zone) != null);
 
             children = new ZoneNode[arr.size];
             for(int i = 0; i < children.length; i++){

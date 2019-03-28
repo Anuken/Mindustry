@@ -133,7 +133,7 @@ public class AndroidLauncher extends AndroidApplication{
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
         if(requestCode == PERMISSION_REQUEST_CODE){
             for(int i : grantResults){
                 if(i != PackageManager.PERMISSION_GRANTED) return;

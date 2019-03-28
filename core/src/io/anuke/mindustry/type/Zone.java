@@ -7,12 +7,11 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Loadouts;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.game.EventType.ZoneCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
+import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
 import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
@@ -20,19 +19,18 @@ import io.anuke.mindustry.world.Block;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.data;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
     public final Generator generator;
     public Block[] blockRequirements = {};
-    public ItemStack[] itemRequirements = {};
-    public Zone[] zoneRequirements = {};
+    public ZoneRequirement[] zoneRequirements = {};
+    //TODO debug verify resources.
     public Item[] resources = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
-    public int configureWave = 40;
+    public int configureWave = 15;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
 
@@ -43,15 +41,6 @@ public class Zone extends UnlockableContent{
     public Zone(String name, MapGenerator generator){
         super(name);
         this.generator = generator;
-    }
-
-    protected SpawnGroup bossGroup(UnitType type){
-        return new SpawnGroup(type){{
-            begin = configureWave-1;
-            effect = StatusEffects.boss;
-            unitScaling = 1;
-            spacing = configureWave;
-        }};
     }
 
     public boolean isBossWave(int wave){
@@ -79,8 +68,11 @@ public class Zone extends UnlockableContent{
             Core.settings.put(name + "-wave", wave);
             data.modified();
 
-            if(wave == conditionWave + 1){
-                Events.fire(new ZoneCompleteEvent(this));
+            for(Zone zone : content.zones()){
+                ZoneRequirement req = Structs.find(zone.zoneRequirements, f -> f.zone == this);
+                if(req != null && wave == req.wave + 1){
+                    Events.fire(new ZoneRequireCompleteEvent(zone, this));
+                }
             }
 
             if(wave == configureWave + 1){
@@ -168,6 +160,24 @@ public class Zone extends UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.zone;
+    }
+
+    public static class ZoneRequirement{
+        public final Zone zone;
+        public final int wave;
+
+        public ZoneRequirement(Zone zone, int wave){
+            this.zone = zone;
+            this.wave = wave;
+        }
+
+        public static ZoneRequirement[] with(Object... objects){
+            ZoneRequirement[] out = new ZoneRequirement[objects.length/2];
+            for(int i = 0; i < objects.length; i+= 2){
+                out[i/2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
+            }
+            return out;
+        }
     }
 
 }

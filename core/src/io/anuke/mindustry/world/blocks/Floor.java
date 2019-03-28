@@ -1,6 +1,8 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
@@ -58,6 +60,8 @@ public class Floor extends Block{
 
     protected TextureRegion[][] edges;
     protected byte eq = 0;
+    protected Array<Block> blenders = new Array<>();
+    protected IntSet blended = new IntSet();
 
     public Floor(String name){
         super(name);
@@ -121,25 +125,34 @@ public class Floor extends Block{
     }
 
     protected void drawEdges(Tile tile, boolean sameLayer){
+        blenders.clear();
+        blended.clear();
         eq = 0;
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
             if(other != null && doEdge(other.floor(), sameLayer) && other.floor().edges() != null){
+                if(blended.add(other.floor().id)){
+                    blenders.add(other.floor());
+                }
                 eq |= (1 << i);
             }
         }
 
-        for(int i = 0; i < 8; i++){
-            if(eq(i)){
+        blenders.sort((a, b) -> Integer.compare(a.id, b.id));
+
+        for(Block block : blenders){
+            for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.getNearby(point);
-
-                TextureRegion region = edge(other.floor(), type(i), 2-(point.x + 1), 2-(point.y + 1));
-                Draw.rect(region, tile.worldx(), tile.worldy());
+                if(other != null && other.floor() == block){
+                    TextureRegion region = edge((Floor)block, type(i), 2-(point.x + 1), 2-(point.y + 1));
+                    Draw.rect(region, tile.worldx(), tile.worldy());
+                }
             }
         }
+
     }
 
     protected TextureRegion[][] edges(){

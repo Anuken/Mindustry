@@ -19,6 +19,10 @@ public class Rules{
     public boolean pvp;
     /**Whether enemy units drop random items on death.*/
     public boolean unitDrops;
+    /**Multiplier for buildings for the player.*/
+    public float buildCostMultiplier = 1f;
+    /**Multiplier for building speed.*/
+    public float buildSpeedMultiplier = 1f;
     /**No-build zone around enemy core radius.*/
     public float enemyCoreBuildRadius = 400f;
     /**Player respawn time in ticks.*/

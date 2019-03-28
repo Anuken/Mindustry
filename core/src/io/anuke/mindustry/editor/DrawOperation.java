@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.LongArray;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -39,7 +40,11 @@ public class DrawOperation{
             if(type == OpType.floor.ordinal()){
                 tile.setFloor((Floor)content.block(to));
             }else if(type == OpType.block.ordinal()){
-                tile.setBlock(content.block(to));
+                Block block = content.block(to);
+                tile.setBlock(block);
+                if(block.isMultiblock()){
+                    editor.updateLinks(block, tile.x, tile.y);
+                }
             }else if(type == OpType.rotation.ordinal()){
                 tile.setRotation(to);
             }else if(type == OpType.team.ordinal()){

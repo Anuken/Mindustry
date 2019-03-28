@@ -12,7 +12,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.SelectionTrait;
+import io.anuke.mindustry.world.blocks.ItemSelection;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class Unloader extends Block implements SelectionTrait{
+public class Unloader extends Block{
     protected float speed = 1f;
     protected final int timerUnload = timers++;
 
@@ -91,7 +91,7 @@ public class Unloader extends Block implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SortedUnloaderEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             Call.setSortedUnloaderItem(null, tile, item);
         });

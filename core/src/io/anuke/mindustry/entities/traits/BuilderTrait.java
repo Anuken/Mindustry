@@ -234,9 +234,9 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(!Net.client()){
             //deconstructing is 2x as fast
             if(current.breaking){
-                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile));
+                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
             }else{
-                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile));
+                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
             }
 
             current.progress = entity.progress();

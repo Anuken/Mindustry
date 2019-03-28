@@ -140,7 +140,7 @@ public class MapRenderer implements Disposable{
             offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
             offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
         }else if(wall == Blocks.air && tile.ore() != null){
-            region = tile.ore().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.ore().editorVariantRegions().length-1)];;
+            region = tile.ore().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.ore().editorVariantRegions().length-1)];
         }else{
             region = Core.atlas.find("clear-editor");
         }

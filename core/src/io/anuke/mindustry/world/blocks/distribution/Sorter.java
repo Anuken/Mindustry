@@ -9,7 +9,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.SelectionTrait;
+import io.anuke.mindustry.world.blocks.ItemSelection;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class Sorter extends Block implements SelectionTrait{
+public class Sorter extends Block{
     private static Item lastItem;
 
     public Sorter(String name){
@@ -119,7 +119,7 @@ public class Sorter extends Block implements SelectionTrait{
     @Override
     public void buildTable(Tile tile, Table table){
         SorterEntity entity = tile.entity();
-        buildItemTable(table, () -> entity.sortItem, item -> {
+        ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
             Call.setSorterItem(null, tile, item);
         });

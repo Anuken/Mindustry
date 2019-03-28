@@ -66,7 +66,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public SpawnerTrait spawner, lastSpawner;
 
     public NetConnection con;
-    public int playerIndex = 0;
     public boolean isLocal = false;
     public Interval timer = new Interval(4);
     public TargetTrait target;
@@ -585,7 +584,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             movement.x += xa * speed;
         }
 
-        Vector2 vec = Core.input.mouseWorld(control.input(playerIndex).getMouseX(), control.input(playerIndex).getMouseY());
+        Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(), control.input().getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -608,7 +607,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                     rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
             }else{
-                float angle = control.input(playerIndex).mouseAngle(x, y);
+                float angle = control.input().mouseAngle(x, y);
                 this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
             }
         }
@@ -727,8 +726,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 }
 
             }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input(playerIndex).getMouseX(),
-                control.input(playerIndex).getMouseY());
+                Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(),
+                control.input().getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;
 
@@ -808,7 +807,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(isLocal){
             stream.writeByte(mech.id);
-            stream.writeByte(playerIndex);
             stream.writeInt(lastSpawner == null ? noSpawner : lastSpawner.getTile().pos());
             super.writeSave(stream, false);
         }
@@ -820,14 +818,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(local && !headless){
             byte mechid = stream.readByte();
-            int index = stream.readByte();
             int spawner = stream.readInt();
             if(world.tile(spawner) != null && world.tile(spawner).entity != null && world.tile(spawner).entity instanceof SpawnerTrait){
                 lastSpawner = (SpawnerTrait)(world.tile(spawner).entity);
             }
-            players[index].readSaveSuper(stream);
-            players[index].mech = content.getByID(ContentType.mech, mechid);
-            players[index].dead = false;
+            player.readSaveSuper(stream);
+            player.mech = content.getByID(ContentType.mech, mechid);
+            player.dead = false;
         }else if(local){
             byte mechid = stream.readByte();
             stream.readByte();

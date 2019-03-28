@@ -6,6 +6,10 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
+ext.getServerFolder = {
+    return "../deploy/${appName}-server-${getVersionString()}"
+}
+
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
@@ -43,12 +47,39 @@ task dist(type: Jar) {
     }
 }
 
-task deploy(type: Copy){
+task dzip(type: Zip){
+    from getServerFolder()
+    archiveName "$appName-server-${getVersionString()}.zip"
+    destinationDir(file("../deploy/"))
+
+    finalizedBy 'cleanup'
+}
+
+task cleanup{
+    doLast{
+        delete{
+            delete getServerFolder()
+        }
+    }
+}
+
+task deploy{
     dependsOn "dist"
-    
-    from "build/libs/server-release.jar"
-    into "../deploy/"
-    rename ("server-release.jar", appName + "-server-" + getVersionString() + ".jar")
+
+    finalizedBy 'dzip'
+
+    doLast{
+        copy{
+            from "build/libs/server-release.jar"
+            into getServerFolder()
+            rename("server-release.jar", "server.jar")
+        }
+
+        copy{
+            from "server_template"
+            into getServerFolder()
+        }
+    }
 }
 
 dist.dependsOn classes

@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.6'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
         classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
     }
@@ -25,7 +25,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
-        roboVMVersion = '2.3.0'
+        roboVMVersion = '2.3.6'
         arcHash = null
         
         debugged = {
@@ -43,7 +43,7 @@ allprojects{
                     arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
                 }catch(e){
                     e.printStackTrace()
-                    arcHash = "-SNAPSHOT";
+                    arcHash = "-SNAPSHOT"
                 }
             }
             return arcHash

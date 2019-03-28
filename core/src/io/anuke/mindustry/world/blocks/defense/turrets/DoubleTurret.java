@@ -3,6 +3,8 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -12,6 +14,14 @@ public class DoubleTurret extends ItemTurret{
     public DoubleTurret(String name){
         super(name);
         shots = 2;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.remove(BlockStat.reload);
+        stats.add(BlockStat.reload, 60f / reload, StatUnit.none);
     }
 
     @Override

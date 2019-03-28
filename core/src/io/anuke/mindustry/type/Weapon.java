@@ -72,7 +72,7 @@ public class Weapon{
         if(player == null) return;
         //clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
         //messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
-        if(Net.client() && player == Vars.players[0]){
+        if(Net.client() && player == Vars.player){
             return;
         }
 

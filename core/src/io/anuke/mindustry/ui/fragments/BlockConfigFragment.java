@@ -14,8 +14,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
@@ -59,7 +58,7 @@ public class BlockConfigFragment extends Fragment{
                 return;
             }
 
-            if(configTile != null && configTile.block().shouldHideConfigure(configTile, input.player)){
+            if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
                 hideConfig();
                 return;
             }

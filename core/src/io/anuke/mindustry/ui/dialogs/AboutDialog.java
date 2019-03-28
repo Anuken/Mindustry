@@ -27,7 +27,9 @@ public class AboutDialog extends FloatingDialog{
     public AboutDialog(){
         super("$about.button");
 
-        Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
+        if(!ios){
+            Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
+        }
 
         shown(this::setup);
         onResize(this::setup);

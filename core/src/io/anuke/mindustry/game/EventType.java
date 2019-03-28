@@ -10,11 +10,12 @@ import io.anuke.mindustry.world.Tile;
 public class EventType{
 
     /**Called when a zone's requirements are met.*/
-    public static class ZoneCompleteEvent implements Event{
-        public final Zone zone;
+    public static class ZoneRequireCompleteEvent implements Event{
+        public final Zone zone, required;
 
-        public ZoneCompleteEvent(Zone zone){
+        public ZoneRequireCompleteEvent(Zone zone, Zone required){
             this.zone = zone;
+            this.required = required;
         }
     }
 

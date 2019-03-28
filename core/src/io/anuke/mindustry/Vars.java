@@ -142,7 +142,7 @@ public class Vars{
     public static EntityGroup<BaseUnit>[] unitGroups;
 
     /**all local players, currently only has one player. may be used for local co-op in the future*/
-    public static Player[] players = {};
+    public static Player player;
 
     public static void init(){
         Serialization.init();

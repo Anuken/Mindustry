@@ -134,28 +134,32 @@ public class Bullets implements ContentList{
             bulletWidth = bulletHeight = 14f;
             collides = true;
             collidesTiles = true;
-            splashDamageRadius = 45f;
-            splashDamage = 50f;
+            splashDamageRadius = 20f;
+            splashDamage = 38f;
             backColor = Pal.bulletYellowBack;
             frontColor = Pal.bulletYellow;
         }};
 
-        flakLead = new FlakBulletType(3.9f, 3){{
+        flakLead = new FlakBulletType(4.2f, 3){{
+            lifetime = 60f;
+            ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 25f;
+            splashDamage = 35f;
             splashDamageRadius = 15f;
         }};
 
-        flakScrap = new FlakBulletType(3.5f, 3){{
+        flakScrap = new FlakBulletType(4f, 3){{
+            lifetime = 60f;
+            ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.5f;
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 16f;
+            splashDamage = 26f;
             splashDamageRadius = 24f;
         }};
 
@@ -290,7 +294,6 @@ public class Bullets implements ContentList{
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{
             bulletWidth = 9f;
             bulletHeight = 12f;
-            armorPierce = 0.2f;
             reloadMultiplier = 0.6f;
             ammoMultiplier = 2;
         }};
@@ -298,7 +301,6 @@ public class Bullets implements ContentList{
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
             bulletWidth = 10f;
             bulletHeight = 13f;
-            armorPierce = 0.5f;
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
             ammoMultiplier = 2;
@@ -344,14 +346,12 @@ public class Bullets implements ContentList{
         standardDenseBig = new BasicBulletType(7f, 42, "bullet"){{
             bulletWidth = 15f;
             bulletHeight = 21f;
-            armorPierce = 0.2f;
             shootEffect = Fx.shootBig;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 65, "bullet"){{
             bulletWidth = 16f;
             bulletHeight = 23f;
-            armorPierce = 0.5f;
             shootEffect = Fx.shootBig;
         }};
 
@@ -454,11 +454,11 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(2.5f, 5){
+        basicFlame = new BulletType(3f, 6f){
             {
                 ammoMultiplier = 3f;
                 hitSize = 7f;
-                lifetime = 40f;
+                lifetime = 42f;
                 pierce = true;
                 drag = 0.05f;
                 statusDuration = 60f * 4;
@@ -473,11 +473,11 @@ public class Bullets implements ContentList{
             }
         };
 
-        pyraFlame = new BulletType(2.7f, 8){
+        pyraFlame = new BulletType(3.3f, 9f){
             {
                 ammoMultiplier = 4f;
                 hitSize = 7f;
-                lifetime = 40f;
+                lifetime = 42f;
                 pierce = true;
                 drag = 0.05f;
                 statusDuration = 60f * 6;
@@ -664,7 +664,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 21){{
+        arc = new BulletType(0.001f, 25){{
                 lifetime = 1;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
@@ -675,7 +675,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 15);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 25);
             }
         };
 

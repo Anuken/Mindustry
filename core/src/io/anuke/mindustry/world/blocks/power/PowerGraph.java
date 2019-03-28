@@ -176,6 +176,11 @@ public class PowerGraph{
     }
 
     public void add(Tile tile){
+        if(tile.block().consumes.has(ConsumePower.class) && !tile.block().consumes.get(ConsumePower.class).isBuffered){
+            //reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
+            tile.entity.power.satisfaction = 0.0f;
+        }
+
         tile.entity.power.graph = this;
         all.add(tile);
 
@@ -191,32 +196,15 @@ public class PowerGraph{
         }
     }
 
-    public void clear(){
-        for(Tile other : all){
-            if(other.entity != null && other.entity.power != null){
-                if(other.block().consumes.has(ConsumePower.class) && !other.block().consumes.get(ConsumePower.class).isBuffered){
-                    // Reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
-                    other.entity.power.satisfaction = 0.0f;
-                }
-                other.entity.power.graph = null;
-            }
-        }
-        all.clear();
-        producers.clear();
-        consumers.clear();
-        batteries.clear();
-    }
-
     public void reflow(Tile tile){
         queue.clear();
         queue.addLast(tile);
         closedSet.clear();
         while(queue.size > 0){
             Tile child = queue.removeFirst();
-            child.entity.power.graph = this;
             add(child);
             for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                if(next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.pos())){
+                if(!closedSet.contains(next.pos())){
                     queue.addLast(next);
                     closedSet.add(next.pos());
                 }
@@ -224,27 +212,47 @@ public class PowerGraph{
         }
     }
 
+    private void removeSingle(Tile tile){
+        all.remove(tile);
+        producers.remove(tile);
+        consumers.remove(tile);
+        batteries.remove(tile);
+    }
+
     public void remove(Tile tile){
-        clear();
+        removeSingle(tile);
+        //begin by clearing the closed set
         closedSet.clear();
 
+        //go through all the connections of this tile
         for(Tile other : tile.block().getPowerConnections(tile, outArray1)){
-            if(other.entity.power == null || other.entity.power.graph != null) continue;
+            //a graph has already been assigned to this tile from a previous call, skip it
+            if(other.entity.power.graph != this) continue;
+
+            //create graph for this branch
             PowerGraph graph = new PowerGraph();
+            graph.add(other);
+            //add to queue for BFS
             queue.clear();
             queue.addLast(other);
             while(queue.size > 0){
+                //get child from queue
                 Tile child = queue.removeFirst();
-                child.entity.power.graph = graph;
+                //remove it from this graph
+                removeSingle(child);
+                //add it to the new branch graph
                 graph.add(child);
+                //go through connections
                 for(Tile next : child.block().getPowerConnections(child, outArray2)){
-                    if(next != tile && next.entity.power != null && next.entity.power.graph == null && !closedSet.contains(next.pos())){
+                    //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
+                    //also skip closed tiles
+                    if(next != tile && next.entity.power.graph != graph && !closedSet.contains(next.pos())){
                         queue.addLast(next);
                         closedSet.add(next.pos());
                     }
                 }
             }
-            // Update the graph once so direct consumers without any connected producer lose their power
+            //update the graph once so direct consumers without any connected producer lose their power
             graph.update();
         }
     }
