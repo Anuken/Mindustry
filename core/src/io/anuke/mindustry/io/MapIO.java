@@ -8,7 +8,10 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.game.Team;
@@ -72,6 +75,7 @@ public class MapIO{
         Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
         Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
         int black = Color.rgba8888(Color.BLACK);
+        int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
         CachedTile tile = new CachedTile(){
             @Override
             public void setFloor(Floor type){
@@ -87,7 +91,10 @@ public class MapIO{
             protected void changed(){
                 super.changed();
                 int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
-                if(c != black) walls.drawPixel(x, floors.getHeight() - 1 - y, c);
+                if(c != black){
+                    walls.drawPixel(x, floors.getHeight() - 1 - y, c);
+                    floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+                }
             }
         };
         readTiles(map, (x, y) -> {
