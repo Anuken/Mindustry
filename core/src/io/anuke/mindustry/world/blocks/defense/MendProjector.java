@@ -83,7 +83,7 @@ public class MendProjector extends Block{
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Mathf.dst(x, y, tile.x, tile.y) > realRange) continue;
+                    if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
 
                     Tile other = world.tile(x, y);
 
@@ -125,7 +125,7 @@ public class MendProjector extends Block{
 
         Draw.alpha(1f);
         Lines.stroke((2f  * f + 0.2f)* entity.heat);
-        Lines.circle(tile.drawx(), tile.drawy(), (1f-f) * 9f);
+        Lines.circle(tile.drawx(), tile.drawy(), ((1f-f) * 8f) * size/2f);
 
         Draw.reset();
     }

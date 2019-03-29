@@ -5,7 +5,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.CommandHandler.Command;
@@ -13,6 +12,7 @@ import io.anuke.arc.util.CommandHandler.Response;
 import io.anuke.arc.util.CommandHandler.ResponseType;
 import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -308,7 +308,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime;
+                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
@@ -692,6 +692,7 @@ public class ServerControl implements ApplicationListener{
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            state.set(State.menu);
         }catch(IOException e){
             err(e);
             state.set(State.menu);
