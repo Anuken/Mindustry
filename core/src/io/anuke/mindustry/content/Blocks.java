@@ -87,6 +87,7 @@ public class Blocks implements ContentList{
 
         air = new Floor("air"){{
                 alwaysReplace = true;
+                hasShadow = false;
             }
 
             public void draw(Tile tile){}
@@ -735,6 +736,7 @@ public class Blocks implements ContentList{
 
         shockMine = new ShockMine("shock-mine"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 50, Items.silicon, 25));
+            hasShadow = false;
             health = 40;
             damage = 11;
             tileDamage = 7f;
@@ -1096,7 +1098,7 @@ public class Blocks implements ContentList{
         }};
 
         unloader = new Unloader("unloader"){{
-            requirements(Category.distribution, ItemStack.with(Items.titanium, 50, Items.silicon, 60));
+            requirements(Category.effect, ItemStack.with(Items.titanium, 50, Items.silicon, 60));
             speed = 7f;
         }};
 

@@ -95,6 +95,8 @@ public class Block extends BlockStorage{
     public boolean canOverdrive = true;
     /**Whether the icon region has an outline added.*/
     public boolean outlineIcon = false;
+    /**Whether this block has a shadow under it.*/
+    public boolean hasShadow = true;
 
     /**Cost of constructing this block.*/
     public ItemStack[] buildRequirements = new ItemStack[]{};
@@ -228,10 +230,6 @@ public class Block extends BlockStorage{
 
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
-    }
-
-    public void drawShadow(Tile tile){
-        draw(tile);
     }
 
     public void drawTeam(Tile tile){
