@@ -245,15 +245,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             for(int cy = -rad; cy <= rad; cy++){
                 Tile tile = world.tileWorld(x + cx*tilesize, y + cy*tilesize);
                 if(tile == null) continue;
-                float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y)/(8f * 1.2f * Mathf.sqrt2)) * 0.08f;
+                float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y)/(8f * 1.2f * Mathf.sqrt2)) * 0.1f;
 
                 moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * tile.weight * scl, Mathf.sign(y - tile.worldy()) * scaling * tile.weight * scl);
             }
         }
 
-        //moveVector.limit(0.2f);
+        moveVector.limit(0.2f);
 
-        move(moveVector.x, moveVector.y);
+        applyImpulse(moveVector.x, moveVector.y);
 
         Tile tile = world.tileWorld(x, y);
 
