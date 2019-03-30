@@ -3,17 +3,17 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
@@ -182,8 +182,13 @@ public class Drill extends Block{
                 itemArray.add(item);
             }
 
-            itemArray.sort((item1, item2) -> Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0)));
-            itemArray.sort((item1, item2) -> Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material));
+            itemArray.sort((item1, item2) -> {
+                int type = Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material);
+                if(type != 0) return type;
+                int count = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+                if(count != 0) return count;
+                return Integer.compare(item1.id, item2.id);
+            });
 
             if(itemArray.size == 0){
                 return;
