@@ -134,6 +134,7 @@ public class ContentDisplay{
             title.addImage(mech.getContentIcon()).size(8 * 6);
             title.add("[accent]" + mech.localizedName()).padLeft(5);
         });
+        table.left().defaults().left();
 
         table.row();
 
@@ -159,13 +160,17 @@ public class ContentDisplay{
             table.add(Core.bundle.format("mech.ability", Core.bundle.get("mech." + mech.name + ".ability")));
             table.row();
         }
+
+        table.add(Core.bundle.format("mech.buildspeed", (int)(mech.buildPower * 100f)));
+        table.row();
+
         table.add(Core.bundle.format("mech.health", (int)mech.health));
         table.row();
         table.add(Core.bundle.format("mech.itemcapacity", mech.itemCapacity));
         table.row();
 
         if(mech.drillPower > 0){
-            table.add(Core.bundle.format("mech.minespeed", (int) (mech.mineSpeed * 10)));
+            table.add(Core.bundle.format("mech.minespeed", (int)(mech.mineSpeed * 100f)));
             table.row();
             table.add(Core.bundle.format("mech.minepower", mech.drillPower));
             table.row();

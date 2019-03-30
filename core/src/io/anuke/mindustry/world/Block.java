@@ -163,7 +163,7 @@ public class Block extends BlockStorage{
         if(tile == null || tile.entity == null || tile.entity.power == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+            if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
                     && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
