@@ -200,8 +200,8 @@ public class Drill extends Block{
 
         float totalHardness = entity.dominantItems * entity.dominantItem.hardness;
 
-        if(entity.timer.get(timerDump, 15)){
-            tryDump(tile);
+        if(entity.timer.get(timerDump, 5)){
+            tryDump(tile, entity.dominantItem);
         }
 
         entity.drillTime += entity.warmup * entity.delta();
