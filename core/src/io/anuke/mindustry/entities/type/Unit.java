@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
@@ -15,7 +14,6 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.impl.DestructibleEntity;
 import io.anuke.mindustry.entities.traits.*;
@@ -49,8 +47,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final float maxAbsVelocity = 127f / velocityPercision;
     public static final int noSpawner = Pos.get(-1, 1);
 
-    private static final Rectangle queryRect = new Rectangle();
     private static final Vector2 moveVector = new Vector2();
+
+    private int lastWeightTile = Pos.invalid, lastWeightDelta;
+    private boolean wasFlying = false;
 
     public float rotation;
 
@@ -141,6 +141,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
+    public void removed(){
+        Tile tile = world.tile(lastWeightTile);
+
+        if(tile != null){
+            tile.weight -= Math.max(lastWeightDelta, tile.weight);
+        }
+    }
+
+    @Override
     public boolean isValid(){
         return !isDead() && isAdded();
     }
@@ -190,8 +199,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     protected void clampPosition(){
-        x = Mathf.clamp(x, tilesize, world.width() * tilesize - tilesize);
-        y = Mathf.clamp(y, tilesize, world.height() * tilesize - tilesize);
+        x = Mathf.clamp(x, 0, world.width() * tilesize - tilesize);
+        y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
     }
 
     public void kill(){
@@ -219,17 +228,56 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
-    //TODO optimize
     public void avoidOthers(float scaling){
-        hitbox(queryRect);
-        queryRect.setSize(queryRect.getWidth() * scaling);
+        boolean flying = isFlying();
 
-        Units.getNearby(queryRect, t -> {
-            if(t == this || t.isFlying() != isFlying()) return;
-            float dst = dst(t);
-            moveVector.set(x, y).sub(t.getX(), t.getY()).setLength(1f * (1f - (dst / queryRect.getWidth())));
-            applyImpulse(moveVector.x, moveVector.y);
-        });
+        if(lastWeightTile != Pos.invalid){
+            Tile tile = world.tile(lastWeightTile);
+
+            if(tile != null){
+                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
+                if(!wasFlying){
+                    tile.weight -= dec;
+                }else{
+                    tile.airWeight -= dec;
+                }
+
+            }
+        }
+
+        final int rad = 2;
+
+        moveVector.setZero();
+        for(int cx = -rad; cx <= rad; cx++){
+            for(int cy = -rad; cy <= rad; cy++){
+                Tile tile = world.tileWorld(x + cx*tilesize, y + cy*tilesize);
+                if(tile == null) continue;
+                int weight = flying ? tile.airWeight : tile.weight;
+                float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y)/(8f * 1.2f * Mathf.sqrt2)) * 0.1f;
+
+                moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * weight * scl, Mathf.sign(y - tile.worldy()) * scaling * weight * scl);
+            }
+        }
+
+        moveVector.limit(flying ? 0.1f : 0.2f);
+
+        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
+
+        Tile tile = world.tileWorld(x, y);
+
+        if(tile != null){
+            int tw = flying ? tile.airWeight : tile.weight;
+            lastWeightDelta = Math.min((int)(mass()), 127 - tw);
+            lastWeightTile = tile.pos();
+            if(!flying){
+                tile.weight += lastWeightDelta;
+            }else{
+                tile.airWeight += lastWeightDelta;
+            }
+        }else{
+            lastWeightTile = Pos.invalid;
+        }
+        wasFlying = flying;
     }
 
     public TileEntity getClosestCore(){
