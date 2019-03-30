@@ -261,7 +261,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         moveVector.limit(flying ? 0.1f : 0.2f);
 
-        applyImpulse(moveVector.x, moveVector.y);
+        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
 
         Tile tile = world.tileWorld(x, y);
 
