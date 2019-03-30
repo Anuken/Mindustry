@@ -50,6 +50,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     private static final Vector2 moveVector = new Vector2();
 
     private int lastWeightTile = Pos.invalid, lastWeightDelta;
+    private boolean wasFlying = false;
 
     public float rotation;
 
@@ -228,13 +229,19 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void avoidOthers(float scaling){
-        if(isFlying()) return;
+        boolean flying = isFlying();
 
         if(lastWeightTile != Pos.invalid){
             Tile tile = world.tile(lastWeightTile);
 
             if(tile != null){
-                tile.weight -= Math.min(lastWeightDelta, tile.weight);
+                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
+                if(!wasFlying){
+                    tile.weight -= dec;
+                }else{
+                    tile.airWeight -= dec;
+                }
+
             }
         }
 
@@ -245,25 +252,32 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             for(int cy = -rad; cy <= rad; cy++){
                 Tile tile = world.tileWorld(x + cx*tilesize, y + cy*tilesize);
                 if(tile == null) continue;
+                int weight = flying ? tile.airWeight : tile.weight;
                 float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y)/(8f * 1.2f * Mathf.sqrt2)) * 0.1f;
 
-                moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * tile.weight * scl, Mathf.sign(y - tile.worldy()) * scaling * tile.weight * scl);
+                moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * weight * scl, Mathf.sign(y - tile.worldy()) * scaling * weight * scl);
             }
         }
 
-        moveVector.limit(0.2f);
+        moveVector.limit(flying ? 0.1f : 0.2f);
 
         applyImpulse(moveVector.x, moveVector.y);
 
         Tile tile = world.tileWorld(x, y);
 
         if(tile != null){
-            lastWeightDelta = Math.min((int)(mass()), 127 - tile.weight);
+            int tw = flying ? tile.airWeight : tile.weight;
+            lastWeightDelta = Math.min((int)(mass()), 127 - tw);
             lastWeightTile = tile.pos();
-            tile.weight += lastWeightDelta;
+            if(!flying){
+                tile.weight += lastWeightDelta;
+            }else{
+                tile.airWeight += lastWeightDelta;
+            }
         }else{
             lastWeightTile = Pos.invalid;
         }
+        wasFlying = flying;
     }
 
     public TileEntity getClosestCore(){
