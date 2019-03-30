@@ -51,7 +51,7 @@ public class Separator extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
+        stats.add(BlockStat.output, new ItemFilterValue(item -> {
             for(ItemStack i : results){
                 if(item == i.item) return true;
             }

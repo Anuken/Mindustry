@@ -19,16 +19,10 @@ import static io.anuke.mindustry.Vars.content;
 public class ConsumeLiquidFilter extends Consume{
     private final Predicate<Liquid> filter;
     private final float use;
-    private final boolean isFuel;
-
-    public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount, boolean isFuel){
-        this.filter = liquid;
-        this.use = amount;
-        this.isFuel = isFuel;
-    }
 
     public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount){
-        this(liquid, amount, false);
+        this.filter = liquid;
+        this.use = amount;
     }
 
     @Override
@@ -58,12 +52,9 @@ public class ConsumeLiquidFilter extends Consume{
     @Override
     public void display(BlockStats stats){
         if(boost){
-            stats.add(BlockStat.boostLiquid, new LiquidFilterValue(filter));
-        }else if(isFuel){
-            stats.add(BlockStat.inputLiquidFuel, new LiquidFilterValue(filter));
-            stats.add(BlockStat.liquidFuelUse, 60f * use, StatUnit.liquidSecond);
+            stats.add(BlockStat.booster, new LiquidFilterValue(filter));
         }else {
-            stats.add(BlockStat.inputLiquid, new LiquidFilterValue(filter));
+            stats.add(BlockStat.input, new LiquidFilterValue(filter));
             stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
         }
     }

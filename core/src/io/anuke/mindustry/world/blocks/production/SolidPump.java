@@ -60,7 +60,7 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.liquidOutput, result);
+        stats.add(BlockStat.output, result);
     }
 
     @Override

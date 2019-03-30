@@ -106,6 +106,9 @@ public class Block extends BlockStorage{
     public BooleanProvider buildVisibility = () -> false;
     public boolean alwaysUnlocked = false;
 
+    protected TextureRegion[] cacheRegions = {};
+    protected Array<String> cacheRegionStrings = new Array<>();
+
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
@@ -324,6 +327,22 @@ public class Block extends BlockStorage{
     @Override
     public void load(){
         region = Core.atlas.find(name);
+
+        cacheRegions = new TextureRegion[cacheRegionStrings.size];
+        for(int i = 0; i < cacheRegions.length; i++){
+            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
+        }
+    }
+
+    /**Adds a region by name to be loaded. Returns an ID to looks this region up by in {@link #reg(int)}.*/
+    protected int addr(String name){
+        cacheRegionStrings.add(name);
+        return cacheRegionStrings.size - 1;
+    }
+
+    /**Returns an internally cached region by ID.*/
+    protected TextureRegion reg(int id){
+        return cacheRegions[id];
     }
 
     /** Called when the block is tapped. */

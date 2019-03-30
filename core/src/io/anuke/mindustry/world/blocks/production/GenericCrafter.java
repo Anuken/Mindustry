@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
@@ -30,6 +30,8 @@ public class GenericCrafter extends Block{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 
+    protected Consumer<Tile> drawer = null;
+
     public GenericCrafter(String name){
         super(name);
         update = true;
@@ -53,14 +55,11 @@ public class GenericCrafter extends Block{
 
     @Override
     public void draw(Tile tile){
-        Draw.rect(name, tile.drawx(), tile.drawy());
-
-        if(!hasLiquids) return;
-
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
-        Draw.color();
+        if(drawer == null){
+            super.draw(tile);
+        }else{
+            drawer.accept(tile);
+        }
     }
 
     @Override

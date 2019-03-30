@@ -10,11 +10,11 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 
 /**A GenericCrafter with a new glowing region drawn on top.*/
-public class PowerSmelter extends GenericCrafter{
+public class GenericSmelter extends GenericCrafter{
     protected Color flameColor = Color.valueOf("ffc999");
     protected TextureRegion topRegion;
 
-    public PowerSmelter(String name){
+    public GenericSmelter(String name){
         super(name);
     }
 

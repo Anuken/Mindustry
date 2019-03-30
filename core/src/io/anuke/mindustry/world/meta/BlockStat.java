@@ -10,8 +10,6 @@ public enum BlockStat{
     size(StatCategory.general),
 
     itemCapacity(StatCategory.items),
-    inputItemCapacity(StatCategory.items),
-    outputItemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
     launchTime(StatCategory.items),
 
@@ -23,12 +21,8 @@ public enum BlockStat{
     powerUse(StatCategory.power),
     powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
-    powerTransferSpeed(StatCategory.power),
     basePowerGeneration(StatCategory.power),
-    inputLiquidFuel(StatCategory.power),
-    liquidFuelUse(StatCategory.power),
 
-    inputLiquid(StatCategory.crafting),
     liquidUse(StatCategory.crafting),
     input(StatCategory.crafting),
     output(StatCategory.crafting),

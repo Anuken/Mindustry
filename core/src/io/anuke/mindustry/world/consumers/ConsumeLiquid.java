@@ -51,9 +51,9 @@ public class ConsumeLiquid extends Consume{
     public void display(BlockStats stats){
         if(!boost){
             stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
-            stats.add(BlockStat.inputLiquid, liquid);
+            stats.add(BlockStat.input, liquid);
         }else{
-            stats.add(BlockStat.boostLiquid, liquid);
+            stats.add(BlockStat.booster, liquid);
         }
     }
 

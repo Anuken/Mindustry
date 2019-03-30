@@ -54,6 +54,6 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(boost ? BlockStat.boostItem : BlockStat.inputItems, new ItemListValue(items));
+        stats.add(boost ? BlockStat.booster : BlockStat.input, new ItemListValue(items));
     }
 }

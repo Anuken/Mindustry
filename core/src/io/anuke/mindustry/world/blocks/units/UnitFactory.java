@@ -102,7 +102,7 @@ public class UnitFactory extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
         stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
 

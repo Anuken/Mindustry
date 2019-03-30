@@ -2,13 +2,12 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.world.Tile;
 
-public class Compressor extends PowerCrafter{
+public class Compressor extends GenericCrafter{
     protected TextureRegion liquidRegion, topRegion;
     protected TextureRegion[] frameRegions;
 
