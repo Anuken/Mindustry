@@ -30,7 +30,6 @@ import io.anuke.mindustry.world.blocks.storage.Vault;
 import io.anuke.mindustry.world.blocks.units.MechPad;
 import io.anuke.mindustry.world.blocks.units.RepairPoint;
 import io.anuke.mindustry.world.blocks.units.UnitFactory;
-import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.Attribute;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -521,7 +520,6 @@ public class Blocks implements ContentList{
             hasItems = true;
             rotate = false;
             solid = true;
-            singleLiquid = false;
             outputsLiquid = true;
 
             consumes.power(1f);
@@ -594,7 +592,7 @@ public class Blocks implements ContentList{
                 Items.titanium, 2
             );
             hasPower = true;
-            filterTime = 35f;
+            craftTime = 35f;
             spinnerLength = 1.5f;
             spinnerRadius = 3.5f;
             spinnerThickness = 1.5f;
@@ -829,13 +827,13 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 150, Items.plastanium, 60));
             consumes.power(3.50f);
             size = 2;
-            consumes.item(Items.phasefabric).optional(true).boost(true);
+            consumes.item(Items.phasefabric).optional(true);
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
             size = 3;
-            consumes.item(Items.phasefabric).optional(true).boost(true);
+            consumes.item(Items.phasefabric).optional(true);
         }};
 
         shockMine = new ShockMine("shock-mine"){{
@@ -1024,7 +1022,7 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        turbineGenerator = new TurbineGenerator("turbine-generator"){{
+        turbineGenerator = new BurnerGenerator("turbine-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.graphite, 50, Items.lead, 80, Items.silicon, 60));
             powerProduction = 6f;
             itemDuration = 30f;
@@ -1033,15 +1031,15 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        differentialGenerator = new DifferentialGenerator("differential-generator"){{
+        differentialGenerator = new ItemLiquidGenerator(true, true, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
             powerProduction = 13f;
             itemDuration = 50f;
-            consumes.remove(ConsumeItemFilter.class);
-            consumes.remove(ConsumeLiquidFilter.class);
+            hasLiquids = true;
+            size = 3;
+
             consumes.item(Items.pyratite);
             consumes.liquid(Liquids.cryofluid, 0.2f);
-            size = 3;
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
@@ -1076,7 +1074,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 80f;
-            useTime = 40f;
+            itemDuration = 40f;
             consumes.power(23f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.8f);
@@ -1091,6 +1089,7 @@ public class Blocks implements ContentList{
             drillTime = 600;
             size = 2;
             drawMineItem = true;
+            consumes.liquid(Liquids.water, 0.05f).optional(true);
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
@@ -1470,7 +1469,6 @@ public class Blocks implements ContentList{
             );
             reload = 6f;
             coolantMultiplier = 0.5f;
-            maxCoolantUsed = 1.5f;
             restitution = 0.1f;
             ammoUseEffect = Fx.shellEjectBig;
             range = 200f;
@@ -1484,6 +1482,7 @@ public class Blocks implements ContentList{
             shootCone = 24f;
 
             health = 155 * size * size;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true);
         }};
 
         meltdown = new LaserTurret("meltdown"){{

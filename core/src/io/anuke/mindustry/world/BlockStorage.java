@@ -33,7 +33,6 @@ public abstract class BlockStorage extends UnlockableContent{
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
-    //public final Producers produces = new Producers();
 
     public BlockStorage(String name){
         super(name);
@@ -112,7 +111,7 @@ public abstract class BlockStorage extends UnlockableContent{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.getTeamID() == tile.getTeamID() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
+            if(other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -140,7 +139,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
         next = next.target();
 
-        if(next.getTeamID() == tile.getTeamID() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
+        if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
@@ -190,7 +189,7 @@ public abstract class BlockStorage extends UnlockableContent{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -199,9 +198,7 @@ public abstract class BlockStorage extends UnlockableContent{
         handleItem(item, tile, tile);
     }
 
-    /**
-     * Try dumping any item near the tile.
-     */
+    /**Try dumping any item near the tile.*/
     public boolean tryDump(Tile tile){
         return tryDump(tile, null);
     }
@@ -230,7 +227,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 for(int ii = 0; ii < Vars.content.items().size; ii++){
                     Item item = Vars.content.item(ii);
 
-                    if(other.getTeamID() == tile.getTeamID() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                    if(other.getTeam() == tile.getTeam() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -239,7 +236,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 }
             }else{
 
-                if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
+                if(other.getTeam() == tile.getTeam() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);

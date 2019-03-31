@@ -23,6 +23,6 @@ public class NumberValue implements StatValue{
         int precision = Math.abs((int) value - value) <= 0.001f ? 0 : Math.abs((int) (value * 10) - value * 10) <= 0.001f ? 1 : 2;
 
         table.add(Strings.fixed(value, precision));
-        table.add(" " + unit.localized());
+        table.add((unit.space ? " " : "") + unit.localized());
     }
 }

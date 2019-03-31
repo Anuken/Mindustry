@@ -6,21 +6,16 @@ import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.ui.ReqImage;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
 
 public class ConsumeItems extends Consume{
-    private final ItemStack[] items;
+    public final ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
-    }
-
-    public ItemStack[] getItems(){
-        return items;
     }
 
     @Override
@@ -48,24 +43,24 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void update(Block block, TileEntity entity){
+    public void update(TileEntity entity){
 
     }
 
     @Override
-    public void trigger(Block block, TileEntity entity){
+    public void trigger(TileEntity entity){
         for(ItemStack stack : items){
             entity.items.remove(stack);
         }
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity){
+    public boolean valid(TileEntity entity){
         return entity.items != null && entity.items.has(items);
     }
 
     @Override
     public void display(BlockStats stats){
-        stats.add(boost ? BlockStat.booster : BlockStat.input, new ItemListValue(items));
+        stats.add(optional ? BlockStat.booster : BlockStat.input, new ItemListValue(items));
     }
 }

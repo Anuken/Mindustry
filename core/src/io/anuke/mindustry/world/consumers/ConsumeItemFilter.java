@@ -9,7 +9,6 @@ import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.ui.MultiReqImage;
 import io.anuke.mindustry.ui.ReqImage;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -18,7 +17,7 @@ import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 import static io.anuke.mindustry.Vars.content;
 
 public class ConsumeItemFilter extends Consume{
-    private final Predicate<Item> filter;
+    public final Predicate<Item> filter;
 
     public ConsumeItemFilter(Predicate<Item> item){
         this.filter = item;
@@ -49,12 +48,12 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void update(Block block, TileEntity entity){
+    public void update(TileEntity entity){
 
     }
 
     @Override
-    public void trigger(Block block, TileEntity entity){
+    public void trigger(TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
             if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
@@ -65,7 +64,7 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity){
+    public boolean valid(TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
             if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
@@ -77,6 +76,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(boost ? BlockStat.booster : BlockStat.input, new ItemFilterValue(filter));
+        stats.add(optional ? BlockStat.booster : BlockStat.input, new ItemFilterValue(filter));
     }
 }

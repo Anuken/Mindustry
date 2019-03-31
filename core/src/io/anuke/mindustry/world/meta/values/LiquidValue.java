@@ -8,18 +8,16 @@ import io.anuke.mindustry.world.meta.StatValue;
 public class LiquidValue implements StatValue{
     private final Liquid liquid;
     private final float amount;
+    private final boolean perSecond;
 
-    public LiquidValue(Liquid liquid, float amount){
+    public LiquidValue(Liquid liquid, float amount, boolean perSecond){
         this.liquid = liquid;
         this.amount = amount;
-    }
-
-    public LiquidValue(Liquid liquid){
-        this(liquid, 0f);
+        this.perSecond = perSecond;
     }
 
     @Override
     public void display(Table table){
-        table.add(new LiquidDisplay(liquid, amount));
+        table.add(new LiquidDisplay(liquid, amount, perSecond));
     }
 }

@@ -14,8 +14,6 @@ public enum BlockStat{
     launchTime(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
-    coolant(StatCategory.liquids),
-    coolantUse(StatCategory.liquids),
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
@@ -31,6 +29,7 @@ public enum BlockStat{
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
 
+    speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),
     range(StatCategory.shooting),
     shootRange(StatCategory.shooting),
@@ -43,7 +42,7 @@ public enum BlockStat{
     ammo(StatCategory.shooting),
 
     booster(StatCategory.optional),
-
+    boostEffect(StatCategory.optional)
     ;
 
     public final StatCategory category;

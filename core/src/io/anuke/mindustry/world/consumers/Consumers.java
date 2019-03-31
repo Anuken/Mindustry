@@ -1,47 +1,35 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.meta.BlockStats;
 
 public class Consumers{
     private Consume[] map = new Consume[ConsumeType.values().length];
-    private ObjectSet<ConsumeType> required = new ObjectSet<>();
-    private Consume[] results;
+    private Consume[] results, optionalResults;
 
     public final boolean[] itemFilters = new boolean[Vars.content.items().size];
     public final boolean[] liquidfilters = new boolean[Vars.content.liquids().size];
 
-    public void require(ConsumeType type){
-        required.add(type);
-    }
+    public void init(){
+        results = Structs.filter(Consume.class, map, m -> m != null);
+        optionalResults = Structs.filter(Consume.class, map, m -> m != null && m.isOptional());
 
-    public void checkRequired(Block block){
-        for(ConsumeType c : required){
-            if(!has(c)){
-                throw new RuntimeException("Missing required consumer of type \"" + c + "\" in block \"" + block.name + "\"!");
-            }
-        }
-
-        Array<Consume> array = new Array<>(Consume.class);
-        for(Consume cons : map){
-            if(cons != null){
-                array.add(cons);
-            }
-        }
-
-        results = array.toArray();
-
-        for(Consume cons : all()){
+        for(Consume cons : results){
             cons.applyItemFilter(itemFilters);
             cons.applyLiquidFilter(liquidfilters);
         }
+    }
+
+    public ConsumePower getPower(){
+        return get(ConsumeType.power);
+    }
+
+    public boolean hasPower(){
+        return has(ConsumeType.power);
     }
 
     public ConsumeLiquid liquid(Liquid liquid, float amount){
@@ -88,10 +76,6 @@ public class Consumers{
     }
 
     public <T extends Consume> T add(T consume){
-        if(map[consume.type().ordinal()] != null){
-            Log.warn("[WARN] Conflict: Replacing {0} with {1}", consume, map[consume.type().ordinal()]);
-        }
-
         map[consume.type().ordinal()] = consume;
         return consume;
     }
@@ -114,6 +98,10 @@ public class Consumers{
 
     public Consume[] all(){
         return results;
+    }
+
+    public Consume[] optionals(){
+        return optionalResults;
     }
 
     public void display(BlockStats stats){

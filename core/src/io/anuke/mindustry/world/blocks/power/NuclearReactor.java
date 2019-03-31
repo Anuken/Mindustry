@@ -12,9 +12,15 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeItems;
+import io.anuke.mindustry.world.consumers.ConsumeLiquid;
+import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +35,7 @@ public class NuclearReactor extends PowerGenerator{
 
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
-    protected int fuelUseTime = 120; //time to consume 1 fuel
+    protected int itemDuration = 120; //time to consume 1 fuel
     protected float heating = 0.01f; //heating per frame * fullness
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
     protected int explosionRadius = 19;
@@ -45,6 +51,15 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        if(hasItems){
+            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+        }
     }
 
     @Override
@@ -65,20 +80,23 @@ public class NuclearReactor extends PowerGenerator{
     public void update(Tile tile){
         NuclearReactorEntity entity = tile.entity();
 
-        int fuel = entity.items.get(consumes.item());
+        ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
+        Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
+
+        int fuel = entity.items.get(item);
         float fullness = (float) fuel / itemCapacity;
         entity.productionEfficiency = fullness;
 
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
 
-            if(entity.timer.get(timerFuel, fuelUseTime)){
+            if(entity.timer.get(timerFuel, itemDuration)){
                 entity.cons.trigger();
             }
         }
 
-        Liquid liquid = consumes.liquid();
-        float liquidAmount = consumes.liquidAmount();
+        Liquid liquid = cliquid.liquid;
+        float liquidAmount = cliquid.amount;
 
         if(entity.heat > 0){
             float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
@@ -109,7 +127,7 @@ public class NuclearReactor extends PowerGenerator{
 
         NuclearReactorEntity entity = tile.entity();
 
-        int fuel = entity.items.get(consumes.item());
+        int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
         if(fuel < 5 && entity.heat < 0.5f) return;
 

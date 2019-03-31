@@ -37,7 +37,7 @@ public class PowerGenerator extends PowerDistributor{
     public void setBars(){
         super.setBars();
 
-        if(hasPower && outputsPower && !consumes.has(ConsumePower.class)){
+        if(hasPower && outputsPower && !consumes.hasPower()){
             bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("blocks.poweroutput",
             Strings.fixed(entity.tile.block().getPowerProduction(entity.tile)*60 * entity.timeScale, 1)),

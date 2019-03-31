@@ -2,14 +2,13 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStats;
 
 /**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
     protected boolean optional;
-    protected boolean update = true, boost = false;
+    protected boolean update = true;
 
     /**Apply a filter to items accepted.
      * This should set all item IDs that are present in the filter to true.*/
@@ -33,11 +32,6 @@ public abstract class Consume{
         return this;
     }
 
-    public Consume boost(boolean boost){
-        this.boost = boost;
-        return this;
-    }
-
     public boolean isOptional(){
         return optional;
     }
@@ -51,15 +45,15 @@ public abstract class Consume{
     public abstract void build(Tile tile, Table table);
 
     /**Called when a consumption is triggered manually.*/
-    public void trigger(Block block, TileEntity entity){
+    public void trigger(TileEntity entity){
 
     }
 
     public abstract String getIcon();
 
-    public abstract void update(Block block, TileEntity entity);
+    public abstract void update(TileEntity entity);
 
-    public abstract boolean valid(Block block, TileEntity entity);
+    public abstract boolean valid(TileEntity entity);
 
     public abstract void display(BlockStats stats);
 }

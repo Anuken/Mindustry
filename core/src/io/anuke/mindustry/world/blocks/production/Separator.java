@@ -10,7 +10,10 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
 /**
@@ -20,7 +23,7 @@ public class Separator extends Block{
     protected final int timerDump = timers++;
 
     protected ItemStack[] results;
-    protected float filterTime;
+    protected float craftTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;
     protected float spinnerThickness = 1f;
@@ -41,6 +44,11 @@ public class Separator extends Block{
 
     @Override
     public void setStats(){
+        if(consumes.has(ConsumeType.liquid)){
+            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
+            cons.timePeriod = craftTime;
+        }
+
         super.setStats();
 
         stats.add(BlockStat.output, new ItemFilterValue(item -> {
@@ -49,6 +57,9 @@ public class Separator extends Block{
             }
             return false;
         }));
+
+        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+
     }
 
     @Override
@@ -74,7 +85,7 @@ public class Separator extends Block{
         entity.totalProgress += entity.warmup * entity.delta();
 
         if(entity.cons.valid()){
-            entity.progress += getProgressIncrease(entity, filterTime);
+            entity.progress += getProgressIncrease(entity, craftTime);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);

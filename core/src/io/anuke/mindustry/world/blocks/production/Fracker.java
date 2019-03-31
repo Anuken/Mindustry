@@ -1,11 +1,12 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 public class Fracker extends SolidPump{
     protected final float itemUseTime = 100f;
@@ -17,9 +18,13 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
-        singleLiquid = false;
+    }
 
-        consumes.require(ConsumeItem.class);
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.productionTime, itemUseTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -54,14 +59,13 @@ public class Fracker extends SolidPump{
     @Override
     public void update(Tile tile){
         FrackerEntity entity = tile.entity();
-        Item item = consumes.item();
-
-        while(entity.accumulator >= itemUseTime && entity.items.has(item, 1)){
-            entity.items.remove(item, 1);
-            entity.accumulator -= itemUseTime;
-        }
 
         if(entity.cons.valid() && entity.accumulator < itemUseTime){
+            if(entity.accumulator >= itemUseTime){
+                entity.cons.trigger();
+                entity.accumulator -= itemUseTime;
+            }
+
             super.update(tile);
             entity.accumulator += entity.delta() * entity.power.satisfaction;
         }else{

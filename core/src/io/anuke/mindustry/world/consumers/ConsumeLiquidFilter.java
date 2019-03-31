@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.MultiReqImage;
 import io.anuke.mindustry.ui.ReqImage;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -15,13 +14,12 @@ import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class ConsumeLiquidFilter extends Consume{
-    private final Predicate<Liquid> filter;
-    private final float use;
+public class ConsumeLiquidFilter extends ConsumeLiquidBase{
+    public final Predicate<Liquid> filter;
 
     public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount){
+        super(amount);
         this.filter = liquid;
-        this.use = amount;
     }
 
     @Override
@@ -30,15 +28,10 @@ public class ConsumeLiquidFilter extends Consume{
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.liquid;
-    }
-
-    @Override
     public void build(Tile tile, Table table){
         Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.test(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.getContentIcon(), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.block(), tile.entity))));
+        list.each(liquid -> image.add(new ReqImage(liquid.getContentIcon(), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.entity))));
 
         table.add(image).size(8*4);
     }
@@ -49,21 +42,17 @@ public class ConsumeLiquidFilter extends Consume{
     }
 
     @Override
-    public void update(Block block, TileEntity entity){
-        entity.liquids.remove(entity.liquids.current(), use(block, entity));
+    public void update(TileEntity entity){
+        entity.liquids.remove(entity.liquids.current(), use(entity));
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity){
-        return entity != null && entity.liquids != null && filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(block, entity);
+    public boolean valid(TileEntity entity){
+        return entity != null && entity.liquids != null && filter.test(entity.liquids.current()) && entity.liquids.currentAmount() >= use(entity);
     }
 
     @Override
     public void display(BlockStats stats){
-        stats.add(boost ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, use * 60f));
-    }
-
-    float use(Block block, TileEntity entity){
-        return Math.min(use * entity.delta(), block.liquidCapacity);
+        stats.add(optional ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, amount * timePeriod, timePeriod == 60f));
     }
 }

@@ -25,10 +25,10 @@ import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,6 +45,7 @@ public class UnitFactory extends Block{
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
     protected int maxSpawn = 2;
+    protected int[] capacities;
 
     public UnitFactory(String name){
         super(name);
@@ -53,8 +54,6 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
-
-        consumes.require(ConsumeItems.class);
     }
 
     @Remote(called = Loc.server)
@@ -76,6 +75,19 @@ public class UnitFactory extends Block{
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.velocity().y = factory.launchVelocity;
+        }
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        capacities = new int[Vars.content.items().size];
+        if(consumes.has(ConsumeType.item)){
+            ConsumeItems cons = consumes.get(ConsumeType.item);
+            for(ItemStack stack : cons.items){
+                capacities[stack.item.id] = stack.amount*2;
+            }
         }
     }
 
@@ -102,6 +114,7 @@ public class UnitFactory extends Block{
     public void setStats(){
         super.setStats();
 
+        stats.remove(BlockStat.itemCapacity);
         stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
         stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
@@ -191,23 +204,8 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) < stack.amount * 2){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item){
-                return stack.amount * 2;
-            }
-        }
-        return 0;
+        return capacities[item.id];
     }
 
     @Override
@@ -222,11 +220,11 @@ public class UnitFactory extends Block{
     }
 
     public static class UnitFactoryEntity extends TileEntity{
-        public float buildTime;
-        public float time;
-        public float speedScl;
-        public float warmup; //only for enemy spawners
-        public int spawned;
+        float buildTime;
+        float time;
+        float speedScl;
+        float warmup; //only for enemy spawners
+        int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{

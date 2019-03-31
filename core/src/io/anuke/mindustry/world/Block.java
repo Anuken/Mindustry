@@ -32,7 +32,7 @@ import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.*;
 
 import java.util.Arrays;
@@ -321,7 +321,7 @@ public class Block extends BlockStorage{
         setStats();
         setBars();
 
-        consumes.checkRequired(this);
+        consumes.init();
     }
 
     @Override
@@ -407,8 +407,8 @@ public class Block extends BlockStorage{
 
         if(hasLiquids){
             Function<TileEntity, Liquid> current;
-            if(consumes.has(ConsumeLiquid.class)){
-                Liquid liquid = consumes.liquid();
+            if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
+                Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
                 current = entity -> entity.liquids.current();
@@ -416,9 +416,9 @@ public class Block extends BlockStorage{
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("blocks.liquid") : current.get(entity).localizedName(), () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
-        if(hasPower && consumes.has(ConsumePower.class)){
-            boolean buffered = consumes.get(ConsumePower.class).isBuffered;
-            float capacity = consumes.get(ConsumePower.class).powerCapacity;
+        if(hasPower && consumes.hasPower()){
+            boolean buffered = consumes.getPower().isBuffered;
+            float capacity = consumes.getPower().powerCapacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
                 Core.bundle.get("blocks.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
@@ -477,8 +477,8 @@ public class Block extends BlockStorage{
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
-            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
+        if(consumes.hasPower() && consumes.getPower().isBuffered){
+            power += tile.entity.power.satisfaction * consumes.getPower().powerCapacity;
         }
 
         if(hasLiquids){
