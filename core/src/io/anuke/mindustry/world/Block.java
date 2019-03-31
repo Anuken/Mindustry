@@ -334,9 +334,9 @@ public class Block extends BlockStorage{
         }
     }
 
-    /**Adds a region by name to be loaded. Returns an ID to looks this region up by in {@link #reg(int)}.*/
-    protected int addr(String name){
-        cacheRegionStrings.add(name);
+    /**Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}.*/
+    protected int reg(String suffix){
+        cacheRegionStrings.add(name + suffix);
         return cacheRegionStrings.size - 1;
     }
 

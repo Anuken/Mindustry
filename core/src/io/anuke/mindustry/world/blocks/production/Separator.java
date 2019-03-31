@@ -1,10 +1,8 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -30,7 +28,7 @@ public class Separator extends Block{
     protected float spinnerSpeed = 2f;
 
     protected Color color = Color.valueOf("858585");
-    protected TextureRegion liquidRegion;
+    protected int liquidRegion;
 
     public Separator(String name){
         super(name);
@@ -38,13 +36,8 @@ public class Separator extends Block{
         solid = true;
         hasItems = true;
         hasLiquids = true;
-    }
 
-    @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find(name + "-liquid");
+        liquidRegion = reg("liquid");
     }
 
     @Override
@@ -67,7 +60,7 @@ public class Separator extends Block{
 
         Draw.color(tile.entity.liquids.current().color);
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
 
         Draw.color(color);
         Lines.stroke(spinnerThickness);

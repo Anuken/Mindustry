@@ -1,6 +1,8 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
@@ -31,6 +33,7 @@ public class GenericCrafter extends Block{
     protected float updateEffectChance = 0.04f;
 
     protected Consumer<Tile> drawer = null;
+    protected Supplier<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -60,6 +63,12 @@ public class GenericCrafter extends Block{
         }else{
             drawer.accept(tile);
         }
+    }
+
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return drawIcons == null ? super.generateIcons() : drawIcons.get();
     }
 
     @Override
@@ -121,6 +130,8 @@ public class GenericCrafter extends Block{
     public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity;
     }
+
+
 
     public static class GenericCrafterEntity extends TileEntity{
         public float progress;

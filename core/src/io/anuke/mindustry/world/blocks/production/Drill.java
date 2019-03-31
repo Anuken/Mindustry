@@ -33,7 +33,6 @@ public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
 
-    protected final Array<Tile> drawTiles = new Array<>();
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
@@ -270,14 +269,14 @@ public class Drill extends Block{
     }
 
     public static class DrillEntity extends TileEntity{
-        public float progress;
-        public int index;
-        public float warmup;
-        public float drillTime;
-        public float lastDrillSpeed;
+        float progress;
+        int index;
+        float warmup;
+        float drillTime;
+        float lastDrillSpeed;
 
-        public int dominantItems;
-        public Item dominantItem;
+        int dominantItems;
+        Item dominantItem;
     }
 
 }

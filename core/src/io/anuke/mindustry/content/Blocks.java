@@ -33,6 +33,7 @@ import io.anuke.mindustry.world.blocks.units.UnitFactory;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.Attribute;
+import io.anuke.mindustry.world.modules.LiquidModule;
 
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
@@ -426,7 +427,7 @@ public class Blocks implements ContentList{
             consumes.power(0.60f);
         }};
 
-        plastaniumCompressor = new PlastaniumCompressor("plastanium-compressor"){{
+        plastaniumCompressor = new GenericCrafter("plastanium-compressor"){{
             requirements(Category.crafting, ItemStack.with(Items.silicon, 160, Items.lead, 230, Items.graphite, 120, Items.titanium, 160));
             hasItems = true;
             liquidCapacity = 60f;
@@ -441,6 +442,18 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.oil, 0.25f);
             consumes.power(3f);
             consumes.item(Items.titanium, 2);
+
+            int topRegion = reg("-top");
+
+            drawer = tile -> {
+                super.draw(tile);
+
+                GenericCrafterEntity entity = tile.entity();
+
+                Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
+                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+                Draw.reset();
+            };
         }};
 
         phaseWeaver = new GenericCrafter("phase-weaver"){{
@@ -453,7 +466,7 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
 
-            int bottomRegion = addr(name + "-bottom"), weaveRegion = addr(name + "-weave");
+            int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
@@ -499,7 +512,7 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
         }};
 
-        cryofluidMixer = new LiquidMixer("cryofluidmixer"){{
+        cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
             outputLiquid = new LiquidStack(Liquids.cryofluid, 0.3f);
             craftTime = 5f;
@@ -514,6 +527,27 @@ public class Blocks implements ContentList{
             consumes.power(1f);
             consumes.item(Items.titanium);
             consumes.liquid(Liquids.water, 0.3f);
+
+            int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
+
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
+
+            drawer = tile -> {
+                LiquidModule mod = tile.entity.liquids;
+
+                int rotation = rotate ? tile.getRotation() * 90 : 0;
+
+                Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy(), rotation);
+
+                if(mod.total() > 0.001f){
+                    Draw.color(outputLiquid.liquid.color);
+                    Draw.alpha(mod.get(outputLiquid.liquid) / liquidCapacity);
+                    Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy(), rotation);
+                    Draw.color();
+                }
+
+                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy(), rotation);
+            };
         }};
 
         blastMixer = new GenericCrafter("blast-mixer"){{
@@ -584,7 +618,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
-        sporePress = new Compressor("spore-press"){{
+        sporePress = new GenericCrafter("spore-press"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 70, Items.silicon, 60));
             liquidCapacity = 60f;
             craftTime = 20f;
@@ -595,9 +629,28 @@ public class Blocks implements ContentList{
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
+
+            int[] frameRegions = new int[3];
+            for(int i = 0; i < 3; i++){
+                frameRegions[i] = reg("-frame" + i);
+            }
+
+            int liquidRegion = reg("-liquid");
+            int topRegion =reg("-top");
+
+            drawer = tile -> {
+                GenericCrafterEntity entity = tile.entity();
+
+                Draw.rect(region, tile.drawx(), tile.drawy());
+                Draw.rect(reg(frameRegions[(int) Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
+                Draw.color(Color.CLEAR, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
+                Draw.color();
+                Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
+            };
         }};
 
-        pulverizer = new Pulverizer("pulverizer"){{
+        pulverizer = new GenericCrafter("pulverizer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.lead, 50));
             outputItem = new ItemStack(Items.sand, 1);
             craftEffect = Fx.pulverize;
@@ -607,6 +660,15 @@ public class Blocks implements ContentList{
 
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
+
+            int rotatorRegion = reg("-rotator");
+
+            drawer = tile -> {
+                GenericCrafterEntity entity = tile.entity();
+
+                Draw.rect(region, tile.drawx(), tile.drawy());
+                Draw.rect(reg(rotatorRegion), tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
+            };
         }};
 
         incinerator = new Incinerator("incinerator"){{
