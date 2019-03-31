@@ -23,7 +23,7 @@ public class LiquidDisplay extends Table{
                 t.add(Strings.toFixed(amount, 2));
                 add(t);
             }
-        }}).size(8*3);
+        }}).size(8*4);
         add(liquid.localizedName()).padLeft(3);
     }
 }

@@ -45,7 +45,7 @@ public class GenericCrafter extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.itemsSecond);
+        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
 
         if(outputItem != null){
             stats.add(BlockStat.output, outputItem);
@@ -64,7 +64,6 @@ public class GenericCrafter extends Block{
             drawer.accept(tile);
         }
     }
-
 
     @Override
     public TextureRegion[] generateIcons(){
@@ -130,8 +129,6 @@ public class GenericCrafter extends Block{
     public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity;
     }
-
-
 
     public static class GenericCrafterEntity extends TileEntity{
         public float progress;
