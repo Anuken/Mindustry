@@ -162,7 +162,7 @@ public class UnitFactory extends Block{
 
         if(!tile.isEnemyCheat()){
             //player-made spawners have default behavior
-            if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
+            if(entity.cons.valid()){
                 entity.time += entity.delta() * entity.speedScl;
                 entity.buildTime += entity.delta() * entity.power.satisfaction;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
@@ -186,9 +186,7 @@ public class UnitFactory extends Block{
             Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, type);
 
-            for(ItemStack stack : consumes.items()){
-                entity.items.remove(stack.item, stack.amount);
-            }
+            entity.cons.trigger();
         }
     }
 
@@ -221,15 +219,6 @@ public class UnitFactory extends Block{
     public boolean canProduce(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         return entity.spawned < maxSpawn;
-    }
-
-    protected boolean hasRequirements(ItemModule inv, float fraction){
-        for(ItemStack stack : consumes.items()){
-            if(!inv.has(stack.item, (int) (fraction * stack.amount))){
-                return false;
-            }
-        }
-        return true;
     }
 
     public static class UnitFactoryEntity extends TileEntity{

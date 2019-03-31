@@ -10,7 +10,6 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
@@ -99,9 +98,7 @@ public class Separator extends Block{
                 count += stack.amount;
             }
 
-            if(consumes.has(ConsumeItem.class)){
-                entity.items.remove(consumes.item(), consumes.itemAmount());
-            }
+            entity.cons.trigger();
 
             if(item != null && entity.items.get(item) < itemCapacity){
                 offloadNear(tile, item);

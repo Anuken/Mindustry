@@ -11,6 +11,18 @@ public abstract class Consume{
     protected boolean optional;
     protected boolean update = true, boost = false;
 
+    /**Apply a filter to items accepted.
+     * This should set all item IDs that are present in the filter to true.*/
+    public void applyItemFilter(boolean[] filter){
+
+    }
+
+    /**Apply a filter to liquids accepted.
+     * This should set all liquid IDs that are present in the filter to true.*/
+    public void applyLiquidFilter(boolean[] filter){
+
+    }
+
     public Consume optional(boolean optional){
         this.optional = optional;
         return this;
@@ -33,6 +45,8 @@ public abstract class Consume{
     public boolean isUpdate(){
         return update;
     }
+
+    public abstract ConsumeType type();
 
     public abstract void build(Tile tile, Table table);
 

@@ -3,12 +3,12 @@ package io.anuke.mindustry.world.consumers;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.LiquidStack;
 import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatUnit;
 
 public class ConsumeLiquid extends Consume{
     protected final float use;
@@ -19,12 +19,22 @@ public class ConsumeLiquid extends Consume{
         this.use = use;
     }
 
+    @Override
+    public void applyLiquidFilter(boolean[] filter){
+        filter[liquid.id] = true;
+    }
+
     public float used(){
         return use;
     }
 
     public Liquid get(){
         return liquid;
+    }
+
+    @Override
+    public ConsumeType type(){
+        return ConsumeType.liquid;
     }
 
     @Override
@@ -49,12 +59,8 @@ public class ConsumeLiquid extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        if(!boost){
-            stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
-            stats.add(BlockStat.input, liquid);
-        }else{
-            stats.add(BlockStat.booster, liquid);
-        }
+        //stats.add(BlockStat.liquidUse, use * 60f, StatUnit.liquidSecond);
+        stats.add(boost ? BlockStat.booster : BlockStat.input, new LiquidStack(liquid, use * 60f));
     }
 
     float use(Block block, TileEntity entity){

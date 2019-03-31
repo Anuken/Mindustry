@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemListValue;
 
 public class ConsumeItems extends Consume{
-    private ItemStack[] items;
+    private final ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
@@ -21,6 +21,18 @@ public class ConsumeItems extends Consume{
 
     public ItemStack[] getItems(){
         return items;
+    }
+
+    @Override
+    public void applyItemFilter(boolean[] filter){
+        for(ItemStack stack : items){
+            filter[stack.item.id] = true;
+        }
+    }
+
+    @Override
+    public ConsumeType type(){
+        return ConsumeType.item;
     }
 
     @Override

@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 
 public class DifferentialGenerator extends TurbineGenerator{

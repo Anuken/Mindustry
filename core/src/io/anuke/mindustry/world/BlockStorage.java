@@ -12,11 +12,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
-import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.BlockBars;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -27,7 +23,6 @@ public abstract class BlockStorage extends UnlockableContent{
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
-    public boolean singleLiquid = true;
     public boolean consumesPower = true;
     public boolean outputsPower = false;
 
@@ -97,21 +92,11 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.entity != null && consumes.has(ConsumeItems.class)){
-            for(ItemStack stack : consumes.items()){
-                if(stack.item == item){
-                    return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
-                }
-            }
-        }
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item &&
-            tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        return consumes.itemFilters[item.id] && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)) &&
-                (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
+        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity && consumes.liquidfilters[liquid.id];
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){

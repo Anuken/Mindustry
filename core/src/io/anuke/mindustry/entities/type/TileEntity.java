@@ -5,17 +5,17 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.BaseEntity;
-import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.impl.BaseEntity;
+import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.game.Team;
@@ -24,7 +24,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.defense.Wall;
-import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.modules.ConsumeModule;
 import io.anuke.mindustry.world.modules.ItemModule;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -162,10 +161,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     public Tile getTile(){
         return tile;
-    }
-
-    public boolean consumed(Class<? extends Consume> type){
-        return tile.block().consumes.get(type).valid(tile.block(), this);
     }
 
     public void removeFromProximity(){

@@ -1,39 +1,51 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.util.Log;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.meta.BlockStats;
 
 public class Consumers{
-    private ObjectMap<Class<? extends Consume>, Consume> map = new ObjectMap<>();
-    private ObjectSet<Class<? extends Consume>> required = new ObjectSet<>();
-    private Array<Consume> results = new Array<>();
+    private Consume[] map = new Consume[ConsumeType.values().length];
+    private ObjectSet<ConsumeType> required = new ObjectSet<>();
+    private Consume[] results;
 
-    public void require(Class<? extends Consume> type){
+    public final boolean[] itemFilters = new boolean[Vars.content.items().size];
+    public final boolean[] liquidfilters = new boolean[Vars.content.liquids().size];
+
+    public void require(ConsumeType type){
         required.add(type);
     }
 
     public void checkRequired(Block block){
-        for(Class<? extends Consume> c : required){
-            if(!map.containsKey(c)){
+        for(ConsumeType c : required){
+            if(!has(c)){
                 throw new RuntimeException("Missing required consumer of type \"" + c + "\" in block \"" + block.name + "\"!");
             }
         }
 
-        for(Consume cons : map.values()){
-            results.add(cons);
+        Array<Consume> array = new Array<>(Consume.class);
+        for(Consume cons : map){
+            if(cons != null){
+                array.add(cons);
+            }
+        }
+
+        results = array.toArray();
+
+        for(Consume cons : all()){
+            cons.applyItemFilter(itemFilters);
+            cons.applyLiquidFilter(liquidfilters);
         }
     }
 
     public ConsumeLiquid liquid(Liquid liquid, float amount){
-        ConsumeLiquid c = new ConsumeLiquid(liquid, amount);
-        add(c);
-        return c;
+        return add(new ConsumeLiquid(liquid, amount));
     }
 
     /**
@@ -42,9 +54,7 @@ public class Consumers{
      * @return the created consumer object.
      */
     public ConsumePower power(float powerPerTick){
-        ConsumePower c = new ConsumePower(powerPerTick, 0.0f, false);
-        add(c);
-        return c;
+        return add(new ConsumePower(powerPerTick, 0.0f, false));
     }
 
     /**
@@ -62,83 +72,55 @@ public class Consumers{
      * @param ticksToFill   The number of ticks it shall take to fill the buffer.
      */
     public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
-        ConsumePower c = new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true);
-        add(c);
-        return c;
+        return add(new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true));
     }
 
-    public ConsumeItem item(Item item){
+    public ConsumeItems item(Item item){
         return item(item, 1);
     }
 
-    public ConsumeItem item(Item item, int amount){
-        ConsumeItem i = new ConsumeItem(item, amount);
-        add(i);
-        return i;
+    public ConsumeItems item(Item item, int amount){
+        return add(new ConsumeItems(new ItemStack[]{new ItemStack(item, amount)}));
     }
 
     public ConsumeItems items(ItemStack... items){
-        ConsumeItems i = new ConsumeItems(items);
-        add(i);
-        return i;
+        return add(new ConsumeItems(items));
     }
 
-    public Item item(){
-        return get(ConsumeItem.class).get();
-    }
+    public <T extends Consume> T add(T consume){
+        if(map[consume.type().ordinal()] != null){
+            Log.warn("[WARN] Conflict: Replacing {0} with {1}", consume, map[consume.type().ordinal()]);
+        }
 
-    public ItemStack[] items(){
-        return get(ConsumeItems.class).getItems();
-    }
-
-    public int itemAmount(){
-        return get(ConsumeItem.class).getAmount();
-    }
-
-    public Liquid liquid(){
-        return get(ConsumeLiquid.class).get();
-    }
-
-    public float liquidAmount(){
-        return get(ConsumeLiquid.class).use;
-    }
-
-    public Consume add(Consume consume){
-        map.put((consume instanceof ConsumePower ? ConsumePower.class : consume.getClass()), consume);
+        map[consume.type().ordinal()] = consume;
         return consume;
     }
 
-    public void remove(Class<? extends Consume> type){
-        map.remove(type);
+    public void remove(ConsumeType type){
+        map[type.ordinal()] = null;
     }
 
-    public boolean has(Class<? extends Consume> type){
-        return map.containsKey(type);
+    public boolean has(ConsumeType type){
+        return map[type.ordinal()] != null;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Consume> T get(Class<T> type){
-        if(!map.containsKey(type)){
+    public <T extends Consume> T get(ConsumeType type){
+        if(map[type.ordinal()] == null){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
-        return (T) map.get(type);
+        return (T) map[type.ordinal()];
     }
 
-    public Iterable<Consume> all(){
-        return map.values();
-    }
-
-    public Array<Consume> array(){
+    public Consume[] all(){
         return results;
     }
 
-    public boolean hasAny(){
-        return map.size > 0;
-    }
-
-    public void forEach(Consumer<Consume> cons){
-        for(Consume c : all()){
-            cons.accept(c);
+    public void display(BlockStats stats){
+        for(Consume c : map){
+            if(c != null){
+                c.display(stats);
+            }
         }
     }
 }

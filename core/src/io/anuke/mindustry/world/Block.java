@@ -395,7 +395,7 @@ public class Block extends BlockStorage{
         stats.add(BlockStat.size, "{0}x{0}", size);
         stats.add(BlockStat.health, health, StatUnit.none);
 
-        consumes.forEach(cons -> cons.display(stats));
+        consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);

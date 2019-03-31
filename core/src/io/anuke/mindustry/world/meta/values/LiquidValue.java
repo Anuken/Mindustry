@@ -1,12 +1,11 @@
 package io.anuke.mindustry.world.meta.values;
 
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.LiquidDisplay;
-import io.anuke.mindustry.world.meta.ContentStatValue;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.world.meta.StatValue;
 
-public class LiquidValue implements ContentStatValue{
+public class LiquidValue implements StatValue{
     private final Liquid liquid;
     private final float amount;
 
@@ -17,11 +16,6 @@ public class LiquidValue implements ContentStatValue{
 
     public LiquidValue(Liquid liquid){
         this(liquid, 0f);
-    }
-
-    @Override
-    public UnlockableContent[] getValueContent(){
-        return new UnlockableContent[]{liquid};
     }
 
     @Override

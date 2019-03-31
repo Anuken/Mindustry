@@ -60,7 +60,9 @@ public class ContentDisplay{
                     Array<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
+                        inset.add().size(10f);
                     }
+
                     //map.get(stat).display(inset);
                 }).fillX().padLeft(10);
                 table.row();
@@ -201,7 +203,7 @@ public class ContentDisplay{
 
         table.add(Core.bundle.format("unit.health", unit.health));
         table.row();
-        table.add(Core.bundle.format("unit.speed", Strings.toFixed(unit.speed, 1)));
+        table.add(Core.bundle.format("unit.speed", Strings.fixed(unit.speed, 1)));
         table.row();
         table.row();
     }

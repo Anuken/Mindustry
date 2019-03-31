@@ -42,7 +42,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatDouble("blocks.efficiency", (sumAttribute(attribute, x, y) + 1f)*100, 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("blocks.efficiency", (sumAttribute(attribute, x, y) + 1f)*100, 1), x, y, valid);
         }
     }
 
@@ -50,7 +50,7 @@ public class SolidPump extends Pump{
     public void setBars(){
         super.setBars();
         bars.add("efficiency", entity -> new Bar(() ->
-        Core.bundle.formatDouble("blocks.efficiency",
+        Core.bundle.formatFloat("blocks.efficiency",
         ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100, 1),
         () -> Pal.ammo,
         () -> ((SolidPumpEntity)entity).warmup));

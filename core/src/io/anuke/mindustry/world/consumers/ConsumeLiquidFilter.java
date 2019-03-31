@@ -11,7 +11,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 
 import static io.anuke.mindustry.Vars.content;
@@ -23,6 +22,16 @@ public class ConsumeLiquidFilter extends Consume{
     public ConsumeLiquidFilter(Predicate<Liquid> liquid, float amount){
         this.filter = liquid;
         this.use = amount;
+    }
+
+    @Override
+    public void applyLiquidFilter(boolean[] arr){
+        content.liquids().each(filter, item -> arr[item.id] = true);
+    }
+
+    @Override
+    public ConsumeType type(){
+        return ConsumeType.liquid;
     }
 
     @Override
@@ -51,12 +60,7 @@ public class ConsumeLiquidFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        if(boost){
-            stats.add(BlockStat.booster, new LiquidFilterValue(filter));
-        }else {
-            stats.add(BlockStat.input, new LiquidFilterValue(filter));
-            stats.add(BlockStat.liquidUse, 60f * use, StatUnit.liquidSecond);
-        }
+        stats.add(boost ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, use * 60f));
     }
 
     float use(Block block, TileEntity entity){

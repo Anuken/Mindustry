@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
 import io.anuke.arc.graphics.g2d.Draw;
 
 public class Fracker extends SolidPump{

@@ -25,6 +25,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
+    public ConsumeType type(){
+        return ConsumeType.power;
+    }
+
+    @Override
     public void build(Tile tile, Table table){
         //No tooltip for power, for now
     }

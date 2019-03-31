@@ -10,7 +10,7 @@ import io.anuke.mindustry.type.Liquid;
 public class LiquidDisplay extends Table{
 
     public LiquidDisplay(Liquid liquid){
-        add(new Image(liquid.getContentIcon())).size(8*3);
+        add(new Image(liquid.getContentIcon())).size(8*4);
         add(liquid.localizedName()).padLeft(3);
     }
 
@@ -20,7 +20,7 @@ public class LiquidDisplay extends Table{
 
             if(amount != 0){
                 Table t = new Table().left().bottom();
-                t.add(Strings.toFixed(amount, 2));
+                t.add(Strings.autoFixed(amount));
                 add(t);
             }
         }}).size(8*4);

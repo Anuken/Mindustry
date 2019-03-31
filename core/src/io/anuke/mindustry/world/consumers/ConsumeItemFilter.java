@@ -25,6 +25,16 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
+    public void applyItemFilter(boolean[] arr){
+        content.items().each(filter, item -> arr[item.id] = true);
+    }
+
+    @Override
+    public ConsumeType type(){
+        return ConsumeType.item;
+    }
+
+    @Override
     public void build(Tile tile, Table table){
         Array<Item> list = content.items().select(filter);
         MultiReqImage image = new MultiReqImage();

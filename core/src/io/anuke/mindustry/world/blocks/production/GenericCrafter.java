@@ -14,6 +14,7 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.LiquidStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -46,6 +47,11 @@ public class GenericCrafter extends Block{
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+
+        if(consumes.has(ConsumeType.liquid)){
+            //TODO replace with per second instead of
+            //stats.remove();
+        }
 
         if(outputItem != null){
             stats.add(BlockStat.output, outputItem);

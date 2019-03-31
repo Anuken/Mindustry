@@ -26,7 +26,7 @@ public class BlockStats{
 
     /**Adds an item value.*/
     public void add(BlockStat stat, Item item){
-        add(stat, new ItemValue(new ItemStack(item, 1)));
+        add(stat, new ItemListValue(new ItemStack(item, 1)));
     }
 
     /**Adds a liquid value.*/
@@ -36,7 +36,7 @@ public class BlockStats{
 
     /**Adds an item value.*/
     public void add(BlockStat stat, ItemStack item){
-        add(stat, new ItemValue(item));
+        add(stat, new ItemListValue(item));
     }
 
     /**Adds an item value.*/
@@ -51,10 +51,6 @@ public class BlockStats{
 
     /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
-        //if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
-        //    throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block.");
-        //}
-
         if(!map.containsKey(stat.category)){
             map.put(stat.category, new OrderedMap<>());
         }
