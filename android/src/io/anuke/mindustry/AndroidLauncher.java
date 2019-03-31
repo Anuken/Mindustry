@@ -54,9 +54,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void hide(){
-                ui.showConfirm("$confirm", "$quit.confirm", () -> {
-                    AndroidLauncher.this.moveTaskToBack(true);
-                });
+                moveTaskToBack(true);
             }
 
             @Override
