@@ -11,7 +11,6 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -22,7 +21,6 @@ import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
@@ -33,7 +31,6 @@ public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
     protected final int timerDump = timers++;
 
-    protected final Array<Tile> drawTiles = new Array<>();
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
@@ -41,8 +38,6 @@ public class Drill extends Block{
     protected int tier;
     /**Base time to drill one ore, in frames.*/
     protected float drillTime = 300;
-    /**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
-    protected boolean liquidRequired = false;
     /**How many times faster the drill will progress when boosted by liquid.*/
     protected float liquidBoostIntensity = 1.6f;
     /**Speed at which the drill speeds up.*/
@@ -75,8 +70,6 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-
-        consumes.liquid(Liquids.water, 0.05f).optional(true);
     }
 
     @Override
@@ -86,7 +79,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("blocks.outputspeed", Strings.toFixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -162,6 +155,7 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        stats.add(BlockStat.boostEffect, liquidBoostIntensity, StatUnit.timesSpeed);
     }
 
     @Override
@@ -210,9 +204,10 @@ public class Drill extends Block{
 
             float speed = 1f;
 
-            if(entity.consumed(ConsumeLiquid.class) && !liquidRequired){
+            if(entity.cons.optionalValid()){
                 speed = liquidBoostIntensity;
             }
+
             if(hasPower){
                 speed *= entity.power.satisfaction; // Drill slower when not at full power
             }
@@ -275,14 +270,14 @@ public class Drill extends Block{
     }
 
     public static class DrillEntity extends TileEntity{
-        public float progress;
-        public int index;
-        public float warmup;
-        public float drillTime;
-        public float lastDrillSpeed;
+        float progress;
+        int index;
+        float warmup;
+        float drillTime;
+        float lastDrillSpeed;
 
-        public int dominantItems;
-        public Item dominantItem;
+        int dominantItems;
+        Item dominantItem;
     }
 
 }

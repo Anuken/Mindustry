@@ -25,6 +25,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
+    public ConsumeType type(){
+        return ConsumeType.power;
+    }
+
+    @Override
     public void build(Tile tile, Table table){
         //No tooltip for power, for now
     }
@@ -35,12 +40,12 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void update(Block block, TileEntity entity){
+    public void update(TileEntity entity){
         // Nothing to do since PowerGraph directly updates entity.power.satisfaction
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity){
+    public boolean valid(TileEntity entity){
         if(isBuffered){
             return true;
         }else{

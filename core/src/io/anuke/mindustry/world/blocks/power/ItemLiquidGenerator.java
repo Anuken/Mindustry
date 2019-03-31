@@ -1,19 +1,21 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -44,11 +46,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
         this.hasLiquids = hasLiquids;
 
         if(hasItems){
-            consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true);
+            consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false);
         }
 
         if(hasLiquids){
-            consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, 0.001f, true)).update(false).optional(true);
+            consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false);
         }
     }
 
@@ -57,6 +59,15 @@ public class ItemLiquidGenerator extends PowerGenerator{
         super.load();
         if(hasItems){
             topRegion = Core.atlas.find(name + "-top");
+        }
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        if(hasItems){
+            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 

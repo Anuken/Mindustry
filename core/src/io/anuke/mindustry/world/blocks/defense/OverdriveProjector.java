@@ -12,6 +12,8 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -51,15 +53,26 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
+        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+
+        stats.add(BlockStat.boostEffect, phaseRangeBoost/tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+    }
+
+    @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
-            entity.items.remove(consumes.item(), 1);
+        if(entity.timer.get(timerUse, useTime)){
+            entity.cons.trigger();
         }
 
         if(entity.charge >= reload){

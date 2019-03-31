@@ -16,8 +16,21 @@ public enum StatUnit{
     powerUnits,
     degrees,
     seconds,
+    perSecond,
+    timesSpeed(false),
+    percent(false),
     none,
     items;
+
+    public final boolean space;
+
+    StatUnit(boolean space){
+        this.space = space;
+    }
+
+    StatUnit(){
+        this(true);
+    }
 
     public String localized(){
         if(this == none) return "";
