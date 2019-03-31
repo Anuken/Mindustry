@@ -92,7 +92,7 @@ public class PowerNode extends PowerBlock{
     public void setBars(){
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
-            Core.bundle.format("blocks.powerbalance",
+            Core.bundle.format("bar.powerbalance",
             ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance()*60, 1))),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));

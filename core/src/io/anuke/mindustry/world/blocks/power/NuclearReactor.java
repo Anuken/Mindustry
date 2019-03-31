@@ -73,7 +73,7 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", entity -> new Bar("blocks.heat", Pal.lightOrange, () -> ((NuclearReactorEntity)entity).heat));
+        bars.add("heat", entity -> new Bar("bar.heat", Pal.lightOrange, () -> ((NuclearReactorEntity)entity).heat));
     }
 
     @Override

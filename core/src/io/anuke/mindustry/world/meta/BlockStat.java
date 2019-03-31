@@ -21,7 +21,6 @@ public enum BlockStat{
     powerRange(StatCategory.power),
     basePowerGeneration(StatCategory.power),
 
-    liquidUse(StatCategory.crafting),
     input(StatCategory.crafting),
     output(StatCategory.crafting),
     productionTime(StatCategory.crafting),

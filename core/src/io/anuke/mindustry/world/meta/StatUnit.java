@@ -18,7 +18,6 @@ public enum StatUnit{
     seconds,
     perSecond,
     timesSpeed(false),
-    timesRadius(false),
     percent(false),
     none,
     items;
