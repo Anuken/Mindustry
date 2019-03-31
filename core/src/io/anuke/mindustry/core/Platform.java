@@ -69,6 +69,9 @@ public abstract class Platform {
      */
     public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
 
+    /**Hide the app. Android only.*/
+    public void hide(){}
+
     /**Forces the app into landscape mode. Currently Android only.*/
     public void beginForceLandscape(){}
 

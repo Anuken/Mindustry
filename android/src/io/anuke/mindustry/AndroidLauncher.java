@@ -53,6 +53,13 @@ public class AndroidLauncher extends AndroidApplication{
         Platform.instance = new Platform(){
 
             @Override
+            public void hide(){
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
+                    AndroidLauncher.this.moveTaskToBack(true);
+                });
+            }
+
+            @Override
             public void openDonations(){
                 showDonations();
             }

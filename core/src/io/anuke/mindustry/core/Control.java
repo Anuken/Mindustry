@@ -310,6 +310,10 @@ public class Control implements ApplicationListener{
             if(!state.isPaused()){
                 Time.update();
             }
+
+            if(!scene.hasDialog() && Core.input.keyTap(KeyCode.BACK)){
+                Platform.instance.hide();
+            }
         }
     }
 }
