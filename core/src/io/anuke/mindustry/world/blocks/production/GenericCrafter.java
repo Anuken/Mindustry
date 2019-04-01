@@ -41,6 +41,7 @@ public class GenericCrafter extends Block{
         super(name);
         update = true;
         solid = true;
+        hasItems = true;
         health = 60;
     }
 

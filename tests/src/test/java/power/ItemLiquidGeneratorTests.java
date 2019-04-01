@@ -1,5 +1,6 @@
 package power;
 
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.content.Liquids;
@@ -7,6 +8,8 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
+import io.anuke.mindustry.world.consumers.Consume;
+import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -36,7 +39,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
             {
                 powerProduction = 0.1f;
-                itemDuration = 60f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
             }
@@ -135,6 +137,13 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
             entity.items.add(item, amount);
         }
         entity.cons.update();
+        if(!entity.cons.valid()){
+            Log.info("not valid: ");
+            for(Consume cons : entity.block.consumes.all()){
+                if(cons instanceof ConsumeItemFilter)
+                Log.info("--" + cons.getClass().getSimpleName() + ": " + cons.valid(entity) + " " + ((ConsumeItemFilter)cons).filter.test(item) + " update: " + cons.isUpdate() + " optional: " + cons.isOptional());
+            }
+        }
         assertTrue(entity.cons.valid());
 
         // Perform an update on the generator once - This should use up one or zero items - dependent on if the item is accepted and available or not.

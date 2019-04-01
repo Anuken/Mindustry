@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.consumers.Consume;
 
@@ -19,9 +20,12 @@ public class ConsumeModule extends BlockModule{
         boolean prevValid = valid();
         valid = true;
         optionalValid = true;
-        boolean docons = entity.tile.block().shouldConsume(entity.tile);
+        boolean docons = entity.block.shouldConsume(entity.tile);
 
-        for(Consume cons : entity.tile.block().consumes.all()){
+        Log.info("update begin: is valid");
+
+        for(Consume cons : entity.block.consumes.all()){
+            Log.info("check cons {1}: {0}", cons, cons.valid(entity));
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }
@@ -31,7 +35,7 @@ public class ConsumeModule extends BlockModule{
             }
         }
 
-        for(Consume cons : entity.tile.block().consumes.optionals()){
+        for(Consume cons : entity.block.consumes.optionals()){
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }
@@ -41,13 +45,13 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void trigger(){
-        for(Consume cons : entity.tile.block().consumes.all()){
+        for(Consume cons : entity.block.consumes.all()){
             cons.trigger(entity);
         }
     }
 
     public boolean valid(){
-        return valid && entity.tile.block().canProduce(entity.tile);
+        return valid && entity.block.canProduce(entity.tile);
     }
 
     public boolean optionalValid(){
