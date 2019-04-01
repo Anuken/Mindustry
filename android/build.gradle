@@ -27,9 +27,6 @@ repositories {
 dependencies {
     implementation project(":core")
     implementation project(":net")
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'org.sufficientlysecure:donations:2.5'
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
     implementation arcModule("backends:backend-android")
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -102,12 +99,6 @@ android {
     }
 
     flavorDimensions "google"
-
-    productFlavors {
-        google {
-            buildConfigField "boolean", "DONATIONS_GOOGLE", "true"
-        }
-    }
 
     signingConfigs {
         release {
