@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.modules;
 
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.consumers.Consume;
 
@@ -22,10 +21,7 @@ public class ConsumeModule extends BlockModule{
         optionalValid = true;
         boolean docons = entity.block.shouldConsume(entity.tile);
 
-        Log.info("update begin: is valid");
-
         for(Consume cons : entity.block.consumes.all()){
-            Log.info("check cons {1}: {0}", cons, cons.valid(entity));
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }

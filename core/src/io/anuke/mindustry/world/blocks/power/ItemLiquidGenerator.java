@@ -79,11 +79,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
         //Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
 
-        if(!entity.cons.valid()){
-            entity.productionEfficiency = 0.0f;
-            return;
-        }
-
         Liquid liquid = null;
         for(Liquid other : content.liquids()){
             if(hasLiquids && entity.liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){
