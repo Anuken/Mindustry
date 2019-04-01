@@ -407,6 +407,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.silicon, 1);
             craftTime = 40f;
             size = 2;
+            hasPower = true;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
@@ -462,6 +463,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.phasefabric, 1);
             craftTime = 120f;
             size = 2;
+            hasPower = true;
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
@@ -507,6 +509,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.surgealloy, 1);
             craftTime = 75f;
             size = 3;
+            hasPower = true;
 
             consumes.power(4f);
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
@@ -625,6 +628,7 @@ public class Blocks implements ContentList{
             size = 2;
             health = 320;
             hasLiquids = true;
+            hasPower = true;
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
