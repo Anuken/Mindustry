@@ -89,7 +89,7 @@ public class AndroidLauncher extends AndroidApplication{
                     if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
                     }
-                    requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }
             }
 
@@ -183,17 +183,8 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private boolean isPackageInstalled(String packagename){
-        try{
-            getPackageManager().getPackageInfo(packagename, 0);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-
     private boolean isTablet(Context context){
         TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
+        return manager != null && manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
     }
 }
