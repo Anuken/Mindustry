@@ -209,6 +209,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        graphics.checkPref("minimap", !mobile);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", !mobile);

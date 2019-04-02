@@ -32,6 +32,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.IntFormat;
+import io.anuke.mindustry.ui.Minimap;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
@@ -156,15 +157,18 @@ public class HudFragment extends Fragment{
             }).visible(() -> shown);
         });
 
+        //minimap
+        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
         //fps display
         parent.fill(info -> {
-            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
+            info.bottom().left().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
-            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
-            info.row();
+
             info.label(() -> ping.get(Net.getPing())).visible(Net::client).right();
+            info.row();
+            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
         });
 
         //spawner warning

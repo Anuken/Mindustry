@@ -9,10 +9,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.util.BufferUtils;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
@@ -101,7 +98,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.camera.position.set(player));
+            Core.app.post(() -> Core.app.post(() -> Core.camera.position.set(player)));
         });
 
         Events.on(ResetEvent.class, event -> {
