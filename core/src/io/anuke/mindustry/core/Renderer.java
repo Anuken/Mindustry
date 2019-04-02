@@ -47,6 +47,7 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
+    public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
@@ -132,8 +133,11 @@ public class Renderer implements ApplicationListener{
             }
 
             updateShake(0.75f);
-
-            draw();
+            if(pixelator.enabled()){
+                pixelator.drawPixelate();
+            }else{
+                draw();
+            }
         }
     }
 

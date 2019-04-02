@@ -214,6 +214,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", false);
         graphics.checkPref("lasers", true);
+        graphics.checkPref("pixelate", false);
     }
 
     private void back(){

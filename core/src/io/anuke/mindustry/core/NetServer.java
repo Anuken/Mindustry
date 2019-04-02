@@ -294,10 +294,12 @@ public class NetServer implements ApplicationListener{
         player.isShooting = shooting;
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
+            Tile tile = world.tile(req.x, req.y);
+            if(tile == null) continue;
             //auto-skip done requests
-            if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
+            if(req.breaking && tile.block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.block && (!req.block.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);

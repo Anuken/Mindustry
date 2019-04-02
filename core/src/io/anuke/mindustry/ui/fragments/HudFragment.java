@@ -166,9 +166,10 @@ public class HudFragment extends Fragment{
             IntFormat fps = new IntFormat("fps");
             IntFormat ping = new IntFormat("ping");
 
-            info.label(() -> ping.get(Net.getPing())).visible(Net::client).right();
+
+            info.label(() -> ping.get(Net.getPing())).visible(Net::client).left();
             info.row();
-            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
+            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left();
         });
 
         //spawner warning

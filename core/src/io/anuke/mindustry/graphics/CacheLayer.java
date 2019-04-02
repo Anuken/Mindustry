@@ -43,7 +43,7 @@ public enum CacheLayer{
     }
 
     void beginShader(){
-        if(!Core.settings.getBool("animatedwater")) return;
+        if(!Core.settings.getBool("animatedwater") || renderer.pixelator.enabled()) return;
 
         renderer.blocks.floor.endc();
         renderer.shieldBuffer.begin();
@@ -52,7 +52,7 @@ public enum CacheLayer{
     }
 
     void endShader(Shader shader){
-        if(!Core.settings.getBool("animatedwater")) return;
+        if(!Core.settings.getBool("animatedwater") || renderer.pixelator.enabled()) return;
 
         renderer.blocks.floor.endc();
         renderer.shieldBuffer.end();

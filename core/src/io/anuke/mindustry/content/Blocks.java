@@ -641,6 +641,8 @@ public class Blocks implements ContentList{
             int liquidRegion = reg("-liquid");
             int topRegion =reg("-top");
 
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
+
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
 
@@ -665,6 +667,8 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
 
             int rotatorRegion = reg("-rotator");
+
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
 
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
