@@ -2,6 +2,7 @@ package power;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
@@ -34,6 +35,7 @@ public class PowerTestFixture{
         Core.graphics = new FakeGraphics();
         Vars.content = new ContentLoader();
         Vars.content.load();
+        Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
 
@@ -70,6 +72,11 @@ public class PowerTestFixture{
     protected static Tile createFakeTile(int x, int y, Block block){
         try{
             Tile tile = new Tile(x, y);
+
+            //workaround since init() is not called for custom blocks
+            if(block.consumes.all() == null){
+                block.consumes.init();
+            }
 
             // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create
             // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor

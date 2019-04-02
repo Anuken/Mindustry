@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.collection.OrderedMap;
 import io.anuke.mindustry.type.Item;
@@ -9,7 +10,7 @@ import io.anuke.mindustry.world.meta.values.*;
 
 /**Hold and organizes a list of block stats.*/
 public class BlockStats{
-    private final OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> map = new OrderedMap<>();
+    private final OrderedMap<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> map = new OrderedMap<>();
     private boolean dirty;
 
     /**Adds a single float value with this stat, formatted to 2 decimal places.*/
@@ -24,17 +25,17 @@ public class BlockStats{
 
     /**Adds an item value.*/
     public void add(BlockStat stat, Item item){
-        add(stat, new ItemValue(new ItemStack(item, 1)));
-    }
-
-    /**Adds a liquid value.*/
-    public void add(BlockStat stat, Liquid liquid){
-        add(stat, new LiquidValue(liquid));
+        add(stat, new ItemListValue(new ItemStack(item, 1)));
     }
 
     /**Adds an item value.*/
     public void add(BlockStat stat, ItemStack item){
-        add(stat, new ItemValue(item));
+        add(stat, new ItemListValue(item));
+    }
+
+    /**Adds an item value.*/
+    public void add(BlockStat stat, Liquid liquid, float amount, boolean perSecond){
+        add(stat, new LiquidValue(liquid, amount, perSecond));
     }
 
     /**Adds a single string value with this stat.*/
@@ -44,15 +45,11 @@ public class BlockStats{
 
     /**Adds a stat value.*/
     public void add(BlockStat stat, StatValue value){
-        if(map.containsKey(stat.category) && map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("Duplicate stat entry: \"" + stat + "\" in block.");
-        }
-
         if(!map.containsKey(stat.category)){
             map.put(stat.category, new OrderedMap<>());
         }
 
-        map.get(stat.category).put(stat, value);
+        map.get(stat.category).getOr(stat, Array::new).add(value);
 
         dirty = true;
     }
@@ -68,11 +65,11 @@ public class BlockStats{
         dirty = true;
     }
 
-    public OrderedMap<StatCategory, OrderedMap<BlockStat, StatValue>> toMap(){
+    public OrderedMap<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> toMap(){
         //sort stats by index if they've been modified
         if(dirty){
             map.orderedKeys().sort();
-            for(Entry<StatCategory, OrderedMap<BlockStat, StatValue>> entry : map.entries()){
+            for(Entry<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> entry : map.entries()){
                 entry.value.orderedKeys().sort();
             }
 

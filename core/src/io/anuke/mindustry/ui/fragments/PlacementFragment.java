@@ -192,7 +192,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(header -> {
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("blocks.unknown") : lastDisplay.localizedName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){

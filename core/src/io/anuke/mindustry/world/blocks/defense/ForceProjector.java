@@ -21,6 +21,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -54,7 +55,7 @@ public class ForceProjector extends Block {
         canOverdrive = false;
         hasLiquids = true;
         hasItems = true;
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).boost(true).update(false);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).optional(true).update(false);
         consumePower = new ConsumeForceProjectorPower(60f, 60f);
         consumes.add(consumePower);
     }
@@ -71,6 +72,8 @@ public class ForceProjector extends Block {
 
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
+
+        stats.add(BlockStat.boostEffect, phaseRadiusBoost/tilesize, StatUnit.blocks);
     }
 
     @Override
@@ -83,10 +86,10 @@ public class ForceProjector extends Block {
             entity.shield.add();
         }
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat,  Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.cons.valid() && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.items.total() > 0){
-            entity.items.remove(consumes.item(), 1);
+        if(entity.cons.optionalValid() && !entity.broken && entity.timer.get(timerUse, phaseUseTime)){
+            entity.cons.trigger();
         }
 
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
@@ -95,7 +98,7 @@ public class ForceProjector extends Block {
             Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
         }
 
-        // Use Cases:
+        //use cases:
         // - There is enough power in the buffer, and there are no shots fired => Draw base power and keep shield up
         // - There is enough power in the buffer, but not enough power to cope for shots being fired => Draw all power and break shield
         // - There is enough power in the buffer and enough power to cope for shots being fired => Draw base power + additional power based on shots absorbed
@@ -120,8 +123,9 @@ public class ForceProjector extends Block {
 
         if(entity.buildup > 0){
             float scale = !entity.broken ? cooldownNormal : cooldownBrokenBase;
-            if(consumes.get(ConsumeLiquidFilter.class).valid(this, entity)){
-                consumes.get(ConsumeLiquidFilter.class).update(this, entity);
+            ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
+            if(cons.valid(entity)){
+                cons.update(entity);
                 scale *= (cooldownLiquid * (1f+(entity.liquids.current().heatCapacity-0.4f)*0.9f));
             }
 
@@ -268,8 +272,8 @@ public class ForceProjector extends Block {
             super(powerCapacity / ticksToFill, powerCapacity, true);
         }
         @Override
-        public boolean valid(Block block, TileEntity entity){
-            return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(block, entity);
+        public boolean valid(TileEntity entity){
+            return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(entity);
         }
     }
 }

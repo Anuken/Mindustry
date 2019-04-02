@@ -53,7 +53,7 @@ public class SpawnGroup implements Serializable{
         }
         float scaling = this.unitScaling;
 
-        return Math.min(unitAmount - 1 + Math.max((int) (((wave - begin) / spacing) / scaling), 1), max);
+        return Math.min(unitAmount - 1 + Math.max((int) (((wave - begin + 1) / spacing) / scaling), 1), max);
     }
 
     /**

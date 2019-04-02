@@ -10,11 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
 import io.anuke.arc.Core;
 import io.anuke.arc.backends.android.surfaceview.AndroidApplication;
 import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration;
@@ -53,8 +48,8 @@ public class AndroidLauncher extends AndroidApplication{
         Platform.instance = new Platform(){
 
             @Override
-            public void openDonations(){
-                showDonations();
+            public void hide(){
+                moveTaskToBack(true);
             }
 
             @Override
@@ -94,7 +89,7 @@ public class AndroidLauncher extends AndroidApplication{
                     if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
                     }
-                    requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }
             }
 
@@ -114,17 +109,10 @@ public class AndroidLauncher extends AndroidApplication{
             }
         };
 
-        try{
-            ProviderInstaller.installIfNeeded(this);
-        }catch(GooglePlayServicesRepairableException e){
-            GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-            apiAvailability.getErrorDialog(this, e.getConnectionStatusCode(), 0).show();
-        }catch(GooglePlayServicesNotAvailableException e){
-            Log.e("SecurityException", "Google Play Services not available.");
-        }
         if(doubleScaleTablets && isTablet(this.getContext())){
             Unit.dp.addition = 0.5f;
         }
+
         config.hideStatusBar = true;
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
@@ -195,22 +183,8 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private boolean isPackageInstalled(String packagename){
-        try{
-            getPackageManager().getPackageInfo(packagename, 0);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-
     private boolean isTablet(Context context){
         TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
-    }
-
-    private void showDonations(){
-        Intent intent = new Intent(this, DonationsActivity.class);
-        startActivity(intent);
+        return manager != null && manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
     }
 }

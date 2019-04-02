@@ -39,11 +39,6 @@ public class BlockPart extends Block{
     }
 
     @Override
-    public void drawShadow(Tile tile){
-        //also do nothing
-    }
-
-    @Override
     public boolean isSolidFor(Tile tile){
         return tile.getLinked() == null
                 || (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()

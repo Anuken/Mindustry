@@ -2,17 +2,35 @@ package io.anuke.mindustry.ui;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
+import io.anuke.arc.scene.event.ClickListener;
 import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.layout.Container;
+import io.anuke.arc.scene.ui.layout.Unit;
 
-import static io.anuke.mindustry.Vars.renderer;
+import static io.anuke.mindustry.Vars.*;
 
 public class Minimap extends Container<Element>{
 
     public Minimap(){
-        super(new Element(){
+        background("pane");
+        float margin = 5f;
+        touchable(Touchable.enabled);
+
+        addChild(new Element(){
+            {
+                setSize(Unit.dp.scl(140f));
+            }
+
+            @Override
+            public void act(float delta){
+                setPosition(margin, margin);
+
+                super.act(delta);
+            }
 
             @Override
             public void draw(){
@@ -26,16 +44,42 @@ public class Minimap extends Container<Element>{
             }
         });
 
-        background("pane");
-
         size(140f);
-        margin(5f);
+        margin(margin);
 
         addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountx, float amounty){
                 renderer.minimap.zoomBy(amounty);
                 return true;
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer){
+                if(mobile){
+                    renderer.minimap.zoomBy(Core.input.deltaY(pointer) / 12f / Unit.dp.scl(1f));
+                }
+            }
+        });
+
+        addListener(new ClickListener(){
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                float tapSquareSize = Unit.dp.scl(14f);
+                if(Math.abs(x - touchDownX) < tapSquareSize && Math.abs(y - touchDownY) < tapSquareSize){
+                    super.touchUp(event, x, y, pointer, button);
+                }
+            }
+
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                ui.minimap.show();
             }
         });
 

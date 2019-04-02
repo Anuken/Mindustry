@@ -1,8 +1,6 @@
 package io.anuke.mindustry.graphics;
 
 public enum Layer{
-    /**Drawn under everything.*/
-    shadow,
     /**Base block layer.*/
     block,
     /**for placement*/

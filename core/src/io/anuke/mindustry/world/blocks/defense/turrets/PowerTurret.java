@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -20,7 +19,7 @@ public abstract class PowerTurret extends CooledTurret{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerShot, powerUsed * consumes.get(ConsumePower.class).powerCapacity, StatUnit.powerUnits);
+        stats.add(BlockStat.powerShot, powerUsed * consumes.getPower().powerCapacity, StatUnit.powerUnits);
     }
 
     @Override

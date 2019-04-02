@@ -36,7 +36,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
             {
                 powerProduction = 0.1f;
-                itemDuration = 60f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
             }
@@ -90,7 +89,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         entity.liquids.add(liquid, availableLiquidAmount);
         entity.cons.update();
-        assertTrue(entity.cons.valid());
 
         // Perform an update on the generator once - This should use up any resource up to the maximum liquid usage
         generator.update(tile);
@@ -135,7 +133,6 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
             entity.items.add(item, amount);
         }
         entity.cons.update();
-        assertTrue(entity.cons.valid());
 
         // Perform an update on the generator once - This should use up one or zero items - dependent on if the item is accepted and available or not.
         generator.update(tile);
