@@ -163,8 +163,9 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+        if(!graphics.isHidden() && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
             shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+            pixelator.rebind();
         }
 
         Draw.proj(camera.projection());
@@ -211,18 +212,22 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            Draw.flush();
-            shieldBuffer.begin();
-            graphics.clear(Color.CLEAR);
-            EntityDraw.draw(shieldGroup);
-            EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-            Draw.flush();
-            shieldBuffer.end();
-            Draw.shader(Shaders.shield);
-            Draw.color(Pal.accent);
-            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-            Draw.color();
-            Draw.shader();
+            if(settings.getBool("animatedshields") && !pixelator.enabled()){
+                Draw.flush();
+                shieldBuffer.begin();
+                graphics.clear(Color.CLEAR);
+                EntityDraw.draw(shieldGroup);
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                Draw.flush();
+                shieldBuffer.end();
+                Draw.shader(Shaders.shield);
+                Draw.color(Pal.accent);
+                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+                Draw.color();
+                Draw.shader();
+            }else{
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+            }
         }
 
         overlays.drawTop();

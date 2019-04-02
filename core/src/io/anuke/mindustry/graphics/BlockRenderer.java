@@ -121,6 +121,7 @@ public class BlockRenderer{
     public void drawShadows(){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
+
             shadows.begin();
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
