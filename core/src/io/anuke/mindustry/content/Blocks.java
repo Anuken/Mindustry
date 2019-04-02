@@ -1507,6 +1507,7 @@ public class Blocks implements ContentList{
             shootDuration = 220f;
 
             health = 165 * size * size;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
         //endregion

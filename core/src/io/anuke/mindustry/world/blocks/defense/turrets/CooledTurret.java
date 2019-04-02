@@ -17,7 +17,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class CooledTurret extends Turret{
     /**How much reload is lowered by for each unit of liquid of heat capacity.*/
-    protected float coolantMultiplier = 2f;
+    protected float coolantMultiplier = 5f;
     protected Effect coolEffect = Fx.fuelburn;
 
     public CooledTurret(String name){
@@ -25,7 +25,7 @@ public class CooledTurret extends Turret{
         hasLiquids = true;
         liquidCapacity = 20f;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false).optional(true);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).optional(true);
     }
 
     @Override
