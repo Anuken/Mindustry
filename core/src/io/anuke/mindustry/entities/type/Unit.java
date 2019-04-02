@@ -241,7 +241,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }else{
                     tile.airWeight -= dec;
                 }
-
             }
         }
 
