@@ -14,6 +14,10 @@ public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer(2, 2);
 
     public void drawPixelate(){
+        boolean hadShields = Core.settings.getBool("animatedshields");
+        boolean hadWater = Core.settings.getBool("animatedwater");
+        Core.settings.put("animatedwater", false);
+        Core.settings.put("animatedshields", false);
         graphics.clear(0f, 0f, 0f, 1f);
 
         float px = Core.camera.position.x, py = Core.camera.position.y;
@@ -38,6 +42,8 @@ public class Pixelator implements Disposable{
         Draw.blend();
 
         Core.camera.position.set(px, py);
+        Core.settings.put("animatedwater", hadWater);
+        Core.settings.put("animatedshields", hadShields);
     }
 
     public void rebind(){

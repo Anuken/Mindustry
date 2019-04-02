@@ -163,9 +163,8 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(!graphics.isHidden() && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight()){
             shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
-            pixelator.rebind();
         }
 
         Draw.proj(camera.projection());
@@ -212,7 +211,7 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            if(settings.getBool("animatedshields") && !pixelator.enabled()){
+            if(settings.getBool("animatedshields")){
                 Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.CLEAR);

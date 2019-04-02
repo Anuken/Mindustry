@@ -277,11 +277,12 @@ public class ForceProjector extends Block {
             float rad = realRadius(entity);
 
             Draw.color(Pal.accent);
+            Lines.stroke(1.5f);
             Draw.alpha(0.09f + 0.08f * entity.hit);
             Fill.poly(x, y, 6, rad);
             Draw.alpha(1f);
             Lines.poly(x, y, 6, rad);
-            Draw.color();
+            Draw.reset();
         }
 
         @Override
