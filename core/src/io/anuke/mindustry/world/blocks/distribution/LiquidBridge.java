@@ -57,6 +57,11 @@ public class LiquidBridge extends ItemBridge{
     }
 
     @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+    }
+
+    @Override
     public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
         ItemBridgeEntity entity = tile.entity();
 

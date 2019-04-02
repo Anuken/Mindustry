@@ -48,6 +48,7 @@ public class Minimap extends Container<Element>{
         margin(margin);
 
         addListener(new InputListener(){
+
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountx, float amounty){
                 renderer.minimap.zoomBy(amounty);
@@ -68,13 +69,28 @@ public class Minimap extends Container<Element>{
         });
 
         addListener(new ClickListener(){
+            {
+                tapSquareSize = Unit.dp.scl(11f);
+            }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                float tapSquareSize = Unit.dp.scl(14f);
-                if(Math.abs(x - touchDownX) < tapSquareSize && Math.abs(y - touchDownY) < tapSquareSize){
+                if(inTapSquare()){
                     super.touchUp(event, x, y, pointer, button);
+                }else{
+                    pressed = false;
+                    pressedPointer = -1;
+                    pressedButton = null;
+                    cancelled = false;
                 }
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer){
+                if(!inTapSquare(x, y)){
+                    invalidateTapSquare();
+                }
+                super.touchDragged(event, x, y, pointer);
             }
 
             @Override
