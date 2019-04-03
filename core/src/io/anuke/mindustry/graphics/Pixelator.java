@@ -5,9 +5,11 @@ import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Disposable;
+import io.anuke.mindustry.entities.type.Player;
 
 import static io.anuke.arc.Core.camera;
 import static io.anuke.arc.Core.graphics;
+import static io.anuke.mindustry.Vars.playerGroup;
 import static io.anuke.mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
@@ -40,6 +42,8 @@ public class Pixelator implements Disposable{
         Draw.blend(Blending.disabled);
         Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
         Draw.blend();
+
+        renderer.drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
 
         Core.camera.position.set(px, py);
         Core.settings.put("animatedwater", hadWater);

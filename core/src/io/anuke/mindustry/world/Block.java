@@ -210,6 +210,8 @@ public class Block extends BlockStorage{
     }
 
     protected void drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return;
+
         Color color = valid ? Pal.accent : Pal.remove;
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -290,7 +292,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
+        return icon(Icon.large);
     }
 
     @Override

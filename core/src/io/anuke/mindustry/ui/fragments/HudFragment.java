@@ -267,6 +267,7 @@ public class HudFragment extends Fragment{
             testb[0] = button;
 
             button.getStyle().disabledFontColor = Color.WHITE;
+            button.margin(16f);
             button.visible(() ->
                 world.isZone() &&
                 world.getZone().metCondition() &&
@@ -282,8 +283,8 @@ public class HudFragment extends Fragment{
                 button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
                     Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
-                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
-                    Mathf.absin(Time.time(), 7f, 1f)));
+                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET,
+                    Mathf.absin(Time.time(), 2f, 1f)));
             });
 
             button.setDisabled(() -> state.enemies() > 0);

@@ -15,6 +15,7 @@ public enum RulePreset{
         infiniteResources = true;
         waves = true;
         waveTimer = false;
+        respawnTime = 0f;
         spawns = DefaultWaves.get();
     }}),
     attack(() -> new Rules(){{

@@ -273,7 +273,7 @@ public class Bullets implements ContentList{
             keepVelocity = false;
             splashDamageRadius = 25f;
             splashDamage = 10f;
-            lifetime = 80f;
+            lifetime = 50f;
             trailColor = Pal.unitBack;
             backColor = Pal.unitBack;
             frontColor = Pal.unitFront;

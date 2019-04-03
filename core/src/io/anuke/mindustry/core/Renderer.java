@@ -231,9 +231,7 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
-        EntityDraw.setClip(true);
 
         Draw.color();
         Draw.flush();

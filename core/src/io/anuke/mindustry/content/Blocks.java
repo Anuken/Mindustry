@@ -447,7 +447,7 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawer = tile -> {
-                super.draw(tile);
+                Draw.rect(region, tile.drawx(), tile.drawy());
 
                 GenericCrafterEntity entity = tile.entity();
 
@@ -810,7 +810,7 @@ public class Blocks implements ContentList{
 
         mender = new MendProjector("mender"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 60, Items.copper, 50));
-            consumes.power(0.7f);
+            consumes.power(0.3f);
             size = 1;
             reload = 200f;
             range = 40f;
@@ -823,7 +823,7 @@ public class Blocks implements ContentList{
 
         mendProjector = new MendProjector("mend-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 80));
-            consumes.power(1.8f);
+            consumes.power(1.5f);
             size = 2;
             reload = 250f;
             range = 85f;
@@ -1009,20 +1009,20 @@ public class Blocks implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 30, Items.silicon, 4));
-            consumes.powerBuffered(3200f, 1f);
+            requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 40));
+            consumes.powerBuffered(4000f, 1f);
         }};
 
         batteryLarge = new Battery("battery-large"){{
-            requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 30));
+            requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 40));
             size = 3;
-            consumes.powerBuffered(37440f, 1f);
+            consumes.powerBuffered(50000f, 1f);
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 50, Items.lead, 30));
             powerProduction = 1f;
-            itemDuration = 40f;
+            itemDuration = 60f;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -1035,7 +1035,7 @@ public class Blocks implements ContentList{
         turbineGenerator = new BurnerGenerator("turbine-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.graphite, 50, Items.lead, 80, Items.silicon, 60));
             powerProduction = 6f;
-            itemDuration = 30f;
+            itemDuration = 40f;
             consumes.liquid(Liquids.water, 0.05f);
             hasLiquids = true;
             size = 2;
@@ -1260,7 +1260,7 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 20f;
+            reload = 15f;
             range = 180f;
             size = 2;
             burstSpacing = 5f;

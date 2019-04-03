@@ -199,12 +199,14 @@ public class TechTree implements ContentList{
                 node(combustionGenerator, () -> {
                     node(powerNode, () -> {
                         node(powerNodeLarge, () -> {
-                            node(battery, () -> {
-                                node(batteryLarge, () -> {
-                                    node(surgeTower, () -> {
+                            node(surgeTower, () -> {
 
-                                    });
-                                });
+                            });
+                        });
+
+                        node(battery, () -> {
+                            node(batteryLarge, () -> {
+
                             });
                         });
 
@@ -243,11 +245,12 @@ public class TechTree implements ContentList{
                         });
                     });
 
+                    node(spiritFactory, () -> {
+                        node(phantomFactory);
+                    });
+
                     node(alphaDartPad, () -> {
                         node(deltaPad, () -> {
-                            node(spiritFactory, () -> {
-                                node(phantomFactory);
-                            });
 
                             node(javelinPad, () -> {
                                 node(tridentPad, () -> {

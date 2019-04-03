@@ -278,6 +278,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void removed(){
+        super.removed();
         Tile tile = world.tile(spawner);
         if(tile != null){
             tile.block().unitRemoved(tile, this);
