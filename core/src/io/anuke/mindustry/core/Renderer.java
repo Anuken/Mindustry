@@ -317,6 +317,15 @@ public class Renderer implements ApplicationListener{
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
+    public float getScale(){
+        return targetscale;
+    }
+
+    public void setScale(float scl){
+        targetscale = scl;
+        clampScale();
+    }
+
     public void takeMapScreenshot(){
         drawGroundShadows();
 

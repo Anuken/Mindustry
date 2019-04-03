@@ -176,6 +176,15 @@ public class Damage{
         }
 
         int trad = (int) (radius / tilesize);
+        Tile tile = world.tileWorld(x, y);
+        if(tile != null){
+            tileDamage(tile.x, tile.y, trad);
+        }
+
+    }
+
+    private static void tileDamage(int x, int y, int radius){
+        /*
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
@@ -184,8 +193,7 @@ public class Damage{
                     tile.entity.damage(amount);
                 }
             }
-        }
-
+        }*/
     }
 
     private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
