@@ -97,7 +97,7 @@ public class WaveSpawner{
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
-                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, shockwaveBase + Mathf.random(shockwaveRand), 99999999f));
+                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, shockwaveBase + Mathf.random(shockwaveRand), 99999999f, true));
                 }
             }
         }

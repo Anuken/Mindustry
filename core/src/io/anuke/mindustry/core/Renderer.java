@@ -331,8 +331,10 @@ public class Renderer implements ApplicationListener{
 
         int w = world.width()*tilesize, h =  world.height()*tilesize;
 
-        boolean isWater = settings.getBool("animatedwater");
-        settings.put("animatedwater", false);
+        boolean hadShields = Core.settings.getBool("animatedshields");
+        boolean hadWater = Core.settings.getBool("animatedwater");
+        Core.settings.put("animatedwater", false);
+        Core.settings.put("animatedshields", false);
 
         FrameBuffer buffer = new FrameBuffer(w, h);
 
@@ -366,7 +368,8 @@ public class Renderer implements ApplicationListener{
 
         buffer.dispose();
 
-        settings.put("animatedwater", isWater);
+        Core.settings.put("animatedwater", hadWater);
+        Core.settings.put("animatedshields", hadShields);
     }
 
 }
