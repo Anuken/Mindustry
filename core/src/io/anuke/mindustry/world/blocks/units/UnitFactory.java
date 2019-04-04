@@ -176,8 +176,8 @@ public class UnitFactory extends Block{
         if(!tile.isEnemyCheat()){
             //player-made spawners have default behavior
             if(entity.cons.valid()){
-                entity.time += entity.delta() * entity.speedScl;
-                entity.buildTime += entity.delta() * entity.power.satisfaction;
+                entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+                entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);

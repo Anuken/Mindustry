@@ -217,7 +217,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float maxHealth(){
-        return type.health;
+        return type.health * Vars.state.rules.unitHealthMultiplier;
     }
 
     @Override

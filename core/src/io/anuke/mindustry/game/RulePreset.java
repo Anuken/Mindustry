@@ -28,6 +28,9 @@ public enum RulePreset{
         respawnTime = 60 * 10;
         buildCostMultiplier = 0.5f;
         buildSpeedMultiplier = 2f;
+        playerDamageMultiplier = 0.5f;
+        unitBuildSpeedMultiplier = 3f;
+        unitHealthMultiplier = 2f;
     }});
 
     private final Supplier<Rules> rules;

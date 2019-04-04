@@ -92,6 +92,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
+    public float getDamageMultipler(){
+        return status.getDamageMultiplier() * state.rules.playerDamageMultiplier;
+    }
+
+    @Override
     public void hitbox(Rectangle rectangle){
         rectangle.setSize(mech.hitsize).setCenter(x, y);
     }
