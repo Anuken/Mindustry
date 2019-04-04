@@ -357,6 +357,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         interpolator.read(lastx, lasty, x, y, rotation);
         rotation = lastrot;
+        x = lastx;
+        y = lasty;
     }
 
     public void onSuperDeath(){

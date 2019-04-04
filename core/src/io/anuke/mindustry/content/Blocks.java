@@ -1043,7 +1043,7 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new ItemLiquidGenerator(true, true, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 13f;
+            powerProduction = 16f;
             itemDuration = 50f;
             hasLiquids = true;
             size = 3;
@@ -1083,9 +1083,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 80f;
+            powerProduction = 100f;
             itemDuration = 40f;
-            consumes.power(23f);
+            consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.8f);
         }};
@@ -1505,12 +1505,12 @@ public class Blocks implements ContentList{
             shootShake = 2f;
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
-            range = 160f;
+            range = 190f;
             reload = 170f;
-            firingMoveFract = 0.1f;
+            firingMoveFract = 0.2f;
             shootDuration = 220f;
 
-            health = 165 * size * size;
+            health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 

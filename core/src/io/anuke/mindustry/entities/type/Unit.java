@@ -95,7 +95,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        super.damage(calculateDamage(amount));
+        if(!Net.client()){
+            super.damage(calculateDamage(amount));
+        }
         hitTime = hitDuration;
     }
 

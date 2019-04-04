@@ -63,6 +63,7 @@ public class NetClient implements ApplicationListener{
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+            Log.info("Connecting to server: {0}", packet.addressTCP);
 
             player.isAdmin = false;
 
