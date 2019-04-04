@@ -44,7 +44,7 @@ dependencies {
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/google/release/android-google-release.apk"
+    from "build/outputs/apk/release/android-release.apk"
     into "../deploy/"
     rename ("android-google-release.apk", appName + "-android-" + getVersionString() + ".apk")
 }
