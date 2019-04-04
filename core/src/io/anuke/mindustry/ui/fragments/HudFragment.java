@@ -155,22 +155,22 @@ public class HudFragment extends Fragment{
                     .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
+
+            //fps display
+            cont.table(info -> {
+                info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
+                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize*4 + 3), 0));
+                IntFormat fps = new IntFormat("fps");
+                IntFormat ping = new IntFormat("ping");
+
+                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left();
+                info.row();
+                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left();
+            }).top().left();
         });
 
         //minimap
         parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
-
-        //fps display
-        parent.fill(info -> {
-            info.bottom().left().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
-            IntFormat fps = new IntFormat("fps");
-            IntFormat ping = new IntFormat("ping");
-
-
-            info.label(() -> ping.get(Net.getPing())).visible(Net::client).left();
-            info.row();
-            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left();
-        });
 
         //spawner warning
         parent.fill(t -> {
