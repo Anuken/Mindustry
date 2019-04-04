@@ -1522,6 +1522,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
+            maxSpawn = 2;
             consumes.power(0.80f);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }};
@@ -1531,6 +1532,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.phantom;
             produceTime = 7300;
             size = 2;
+            maxSpawn = 2;
             consumes.power(2f);
             consumes.items(new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80));
         }};
@@ -1594,6 +1596,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.fortress;
             produceTime = 5000;
             size = 3;
+            maxSpawn = 3;
             consumes.power(2f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50));
         }};
