@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Disposable;
 import io.anuke.mindustry.entities.type.Player;
 
@@ -15,21 +14,12 @@ import static io.anuke.mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer(2, 2);
-    private float lastScale = -1;
 
     public void drawPixelate(){
+        float pre = renderer.getScale();
         float scale = renderer.getScale();
-        if(lastScale > 0){
-            //going smaller
-            if(scale < lastScale){
-                scale = (int)scale;
-            }else if(scale > lastScale){
-                scale = Mathf.ceil(scale);
-
-            }
-            renderer.setScale(scale);
-        }
-        lastScale = renderer.getScale();
+        scale = (int)scale;
+        renderer.setScale(scale);
         camera.width = (int)camera.width;
         camera.height = (int)camera.height;
 
@@ -65,6 +55,7 @@ public class Pixelator implements Disposable{
         Core.camera.position.set(px, py);
         Core.settings.put("animatedwater", hadWater);
         Core.settings.put("animatedshields", hadShields);
+        renderer.setScale(pre);
     }
 
     public void rebind(){

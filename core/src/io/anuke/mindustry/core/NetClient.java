@@ -213,6 +213,11 @@ public class NetClient implements ApplicationListener{
                 SyncTrait entity = (SyncTrait) group.getByID(id);
                 boolean add = false;
 
+                if(entity == null && id == player.id){
+                    entity = player;
+                    add = true;
+                }
+
                 //entity must not be added yet, so create it
                 if(entity == null){
                     entity = (SyncTrait) TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
