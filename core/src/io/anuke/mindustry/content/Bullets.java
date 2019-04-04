@@ -730,7 +730,7 @@ public class Bullets implements ContentList{
                 lifetime = 23f;
                 speed = 1f;
                 splashDamageRadius = 50f;
-                splashDamage = 20f;
+                splashDamage = 28f;
             }
 
             @Override
