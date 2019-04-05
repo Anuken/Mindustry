@@ -517,18 +517,19 @@ public class Blocks implements ContentList{
 
         cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.3f);
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.6f);
             craftTime = 5f;
             size = 2;
             hasPower = true;
             hasItems = true;
+            hasLiquids = true;
             rotate = false;
             solid = true;
             outputsLiquid = true;
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.liquid(Liquids.water, 0.6f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
@@ -629,6 +630,7 @@ public class Blocks implements ContentList{
             health = 320;
             hasLiquids = true;
             hasPower = true;
+            craftEffect = Fx.none;
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);

@@ -163,7 +163,7 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight()){
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
             shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
