@@ -643,6 +643,8 @@ public class Bullets implements ContentList{
         lightning = new BulletType(0.001f, 12f){
             {
                 lifetime = 1f;
+                shootEffect = Fx.hitLancer;
+                smokeEffect = Fx.none;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
                 keepVelocity = false;

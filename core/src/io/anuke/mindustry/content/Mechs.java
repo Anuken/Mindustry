@@ -75,10 +75,12 @@ public class Mechs implements ContentList{
                 engineColor = Color.valueOf("d3ddff");
 
                 weapon = new Weapon("shockgun"){{
+                    shake = 2f;
                     length = 1f;
                     reload = 40f;
+                    shotDelay = 3f;
                     roundrobin = true;
-                    shots = 1;
+                    shots = 3;
                     inaccuracy = 0f;
                     velocityRnd = 0.2f;
                     ejectEffect = Fx.none;

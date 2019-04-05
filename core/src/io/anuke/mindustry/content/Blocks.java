@@ -627,7 +627,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.lead, 70, Items.silicon, 60));
             liquidCapacity = 60f;
             craftTime = 20f;
-            outputLiquid = new LiquidStack(Liquids.oil, 4f);
+            outputLiquid = new LiquidStack(Liquids.oil, 6f);
             size = 2;
             health = 320;
             hasLiquids = true;
@@ -1451,7 +1451,7 @@ public class Blocks implements ContentList{
             );
             xRand = 4f;
             reload = 6f;
-            range = 190f;
+            range = 200f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;

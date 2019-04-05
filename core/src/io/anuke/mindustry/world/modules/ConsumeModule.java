@@ -22,13 +22,13 @@ public class ConsumeModule extends BlockModule{
         boolean docons = entity.block.shouldConsume(entity.tile);
 
         for(Consume cons : entity.block.consumes.all()){
+            if(cons.isOptional()) continue;
+
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }
 
-            if(!cons.isOptional()){
-                valid &= cons.valid(entity);
-            }
+            valid &= cons.valid(entity);
         }
 
         for(Consume cons : entity.block.consumes.optionals()){

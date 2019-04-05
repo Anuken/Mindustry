@@ -200,6 +200,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        //compile arcModule("extensions:postprocessing")
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")

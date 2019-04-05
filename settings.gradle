@@ -26,6 +26,7 @@ if(!hasProperty("release")){
         use(':Arc:extensions', '../Arc/extensions')
         use(':Arc:extensions:freetype', '../Arc/extensions/freetype')
         use(':Arc:extensions:recorder', '../Arc/extensions/recorder')
+        //use(':Arc:extensions:postprocessing', '../Arc/extensions/postprocessing')
         use(':Arc:backends', '../Arc/backends')
         use(':Arc:backends:backend-lwjgl3', '../Arc/backends/backend-lwjgl3')
         use(':Arc:backends:backend-android', '../Arc/backends/backend-android')
