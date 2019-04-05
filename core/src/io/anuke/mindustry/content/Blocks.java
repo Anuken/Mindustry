@@ -470,6 +470,8 @@ public class Blocks implements ContentList{
 
             int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
+
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
 
