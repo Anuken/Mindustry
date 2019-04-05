@@ -104,7 +104,7 @@ public abstract class LiquidTurret extends Turret{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return super.acceptLiquid(tile, source, liquid, amount) && ammo.get(liquid) != null
+        return ammo.get(liquid) != null
                 && (tile.entity.liquids.current() == liquid || (ammo.containsKey(tile.entity.liquids.current()) && tile.entity.liquids.get(tile.entity.liquids.current()) <= ammo.get(tile.entity.liquids.current()).ammoMultiplier + 0.001f));
     }
 

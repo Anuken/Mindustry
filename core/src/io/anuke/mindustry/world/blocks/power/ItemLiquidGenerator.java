@@ -123,18 +123,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 entity.productionEfficiency = 0.0f;
             }
         }
-
-        super.update(tile);
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return hasItems && getItemEfficiency(item) >= minItemEfficiency && tile.entity.items.total() < itemCapacity;
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return hasLiquids && getLiquidEfficiency(liquid) >= minLiquidEfficiency && tile.entity.liquids.get(liquid) < liquidCapacity;
     }
 
     @Override

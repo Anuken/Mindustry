@@ -533,13 +533,13 @@ public class Bullets implements ContentList{
             }
         };
 
-        meltdownLaser = new BulletType(0.001f, 35){
+        meltdownLaser = new BulletType(0.001f, 70){
             Color tmpColor = new Color();
             Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] strokes = {2f, 1.5f, 1f, 0.3f};
             float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
-            float length = 200f;
+            float length = 220f;
 
             {
                 hitEffect = Fx.hitMeltdown;
@@ -626,7 +626,6 @@ public class Bullets implements ContentList{
 
         slagShot = new LiquidBulletType(Liquids.slag){{
             damage = 4;
-            speed = 1.9f;
             drag = 0.03f;
         }};
 
@@ -644,6 +643,8 @@ public class Bullets implements ContentList{
         lightning = new BulletType(0.001f, 12f){
             {
                 lifetime = 1f;
+                shootEffect = Fx.hitLancer;
+                smokeEffect = Fx.none;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
                 keepVelocity = false;

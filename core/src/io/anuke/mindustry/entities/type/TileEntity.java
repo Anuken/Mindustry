@@ -280,11 +280,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         if(health <= 0){
             onDeath();
+            return; //no need to update anymore
         }
+
         Block previous = block;
         block.update(tile);
         if(block == previous && cons != null){
             cons.update();
+        }
+
+        if(block == previous && power != null){
+            power.graph.update();
         }
     }
 

@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Mechs;
@@ -308,7 +309,7 @@ public class Control implements ApplicationListener{
                 Time.update();
             }
 
-            if(!scene.hasDialog() && Core.input.keyTap(KeyCode.BACK)){
+            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) &&Core.input.keyTap(KeyCode.BACK)){
                 Platform.instance.hide();
             }
         }

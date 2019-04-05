@@ -48,23 +48,10 @@ public class Minimap extends Container<Element>{
         margin(margin);
 
         addListener(new InputListener(){
-
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountx, float amounty){
                 renderer.minimap.zoomBy(amounty);
                 return true;
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                return true;
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer){
-                if(mobile){
-                    renderer.minimap.zoomBy(Core.input.deltaY(pointer) / 12f / Unit.dp.scl(1f));
-                }
             }
         });
 
@@ -91,6 +78,11 @@ public class Minimap extends Container<Element>{
                     invalidateTapSquare();
                 }
                 super.touchDragged(event, x, y, pointer);
+
+                if(mobile){
+                    float max = Math.min(world.width(), world.height()) / 16f / 2f;
+                    renderer.minimap.setZoom(1f + y / height * (max - 1f));
+                }
             }
 
             @Override

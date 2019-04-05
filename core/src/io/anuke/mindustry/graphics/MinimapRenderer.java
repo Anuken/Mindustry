@@ -9,13 +9,12 @@ import io.anuke.arc.graphics.Pixmaps;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.ScissorStack;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Disposable;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.io.MapIO;
@@ -49,7 +48,11 @@ public class MinimapRenderer implements Disposable{
 
     public void zoomBy(float amount){
         zoom += amount;
-        zoom = Mathf.clamp(zoom, 1f, Math.min(world.width(), world.height()) / baseSize / 2f);
+        setZoom(zoom);
+    }
+
+    public void setZoom(float amount){
+        zoom = Mathf.clamp(amount, 1f, Math.min(world.width(), world.height()) / baseSize / 2f);
     }
 
     public float getZoom(){
@@ -75,21 +78,15 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        if(!ScissorStack.pushScissors(scissor.set(x, y, w, h))){
-            return;
-        }
-
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Fill.crect(x + rx, y + ry, w / (sz * 2), h / (sz * 2));
+            Fill.rect(x + rx, y + ry, baseSize/2f, baseSize/2f);
         }
 
         Draw.color();
-
-        ScissorStack.popScissors();
     }
 
     public TextureRegion getRegion(){

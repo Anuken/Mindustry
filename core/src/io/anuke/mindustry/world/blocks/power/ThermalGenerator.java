@@ -22,8 +22,6 @@ public class ThermalGenerator extends PowerGenerator{
         if(entity.productionEfficiency > 0.1f && Mathf.chance(0.05 * entity.delta())){
             Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
         }
-
-        super.update(tile);
     }
 
     @Override

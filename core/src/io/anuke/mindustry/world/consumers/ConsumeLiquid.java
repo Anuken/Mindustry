@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.ReqImage;

@@ -879,10 +879,10 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         interpolator.read(lastx, lasty, x, y, rotation, baseRotation);
         rotation = lastrot;
+        x = lastx;
+        y = lasty;
 
         if(isLocal){
-            x = lastx;
-            y = lasty;
             velocity.x = lastvx;
             velocity.y = lastvy;
         }else{

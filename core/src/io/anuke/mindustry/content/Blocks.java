@@ -470,6 +470,8 @@ public class Blocks implements ContentList{
 
             int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
+
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
 
@@ -517,18 +519,19 @@ public class Blocks implements ContentList{
 
         cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.3f);
-            craftTime = 5f;
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 7.2f);
+            craftTime = 60f;
             size = 2;
             hasPower = true;
             hasItems = true;
+            hasLiquids = true;
             rotate = false;
             solid = true;
             outputsLiquid = true;
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.liquid(Liquids.water, 7.2f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
@@ -624,11 +627,12 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.lead, 70, Items.silicon, 60));
             liquidCapacity = 60f;
             craftTime = 20f;
-            outputLiquid = new LiquidStack(Liquids.oil, 4f);
+            outputLiquid = new LiquidStack(Liquids.oil, 6f);
             size = 2;
             health = 320;
             hasLiquids = true;
             hasPower = true;
+            craftEffect = Fx.none;
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
@@ -1043,7 +1047,7 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new ItemLiquidGenerator(true, true, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 13f;
+            powerProduction = 16f;
             itemDuration = 50f;
             hasLiquids = true;
             size = 3;
@@ -1083,9 +1087,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 80f;
+            powerProduction = 100f;
             itemDuration = 40f;
-            consumes.power(23f);
+            consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.8f);
         }};
@@ -1446,12 +1450,12 @@ public class Blocks implements ContentList{
                 Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
-            reload = 7f;
-            range = 170f;
+            reload = 6f;
+            range = 200f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;
-            inaccuracy = 13f;
+            inaccuracy = 10f;
             shootCone = 30f;
 
             health = 145 * size * size;
@@ -1505,12 +1509,12 @@ public class Blocks implements ContentList{
             shootShake = 2f;
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
-            range = 160f;
-            reload = 170f;
-            firingMoveFract = 0.1f;
+            range = 190f;
+            reload = 50f;
+            firingMoveFract = 0.5f;
             shootDuration = 220f;
 
-            health = 165 * size * size;
+            health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 

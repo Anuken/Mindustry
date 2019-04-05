@@ -190,20 +190,7 @@ public class NetServer implements ApplicationListener{
 
             //playing in pvp mode automatically assigns players to teams
             if(state.rules.pvp){
-                //find team with minimum amount of players and auto-assign player to that.
-                Team min = Structs.findMin(Team.all, team -> {
-                    if(state.teams.isActive(team)){
-                        int count = 0;
-                        for(Player other : playerGroup.all()){
-                            if(other.getTeam() == team){
-                                count ++;
-                            }
-                        }
-                        return count;
-                    }
-                    return Integer.MAX_VALUE;
-                });
-                player.setTeam(min);
+                player.setTeam(assignTeam(playerGroup.all()));
                 Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
@@ -218,6 +205,22 @@ public class NetServer implements ApplicationListener{
             Player player = connections.get(id);
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
+        });
+    }
+
+    public Team assignTeam(Iterable<Player> players){
+        //find team with minimum amount of players and auto-assign player to that.
+        return Structs.findMin(Team.all, team -> {
+            if(state.teams.isActive(team)){
+                int count = 0;
+                for(Player other : players){
+                    if(other.getTeam() == team){
+                        count ++;
+                    }
+                }
+                return count;
+            }
+            return Integer.MAX_VALUE;
         });
     }
 
@@ -427,7 +430,7 @@ public class NetServer implements ApplicationListener{
             Log.err("Cannot kick unknown player!");
             return;
         }else{
-            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
+            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason.name());
         }
 
         Player player = connections.get(con.id);

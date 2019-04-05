@@ -30,7 +30,7 @@ public class GenericCrafter extends Block{
     protected LiquidStack outputLiquid;
 
     protected float craftTime = 80;
-    protected Effect craftEffect = Fx.purify;
+    protected Effect craftEffect = Fx.none;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 
@@ -125,7 +125,10 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean canProduce(Tile tile){
-        return super.canProduce(tile);
+        if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){
+            return false;
+        }
+        return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid.liquid) >= liquidCapacity);
     }
 
     @Override
