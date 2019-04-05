@@ -626,7 +626,6 @@ public class Bullets implements ContentList{
 
         slagShot = new LiquidBulletType(Liquids.slag){{
             damage = 4;
-            speed = 1.9f;
             drag = 0.03f;
         }};
 

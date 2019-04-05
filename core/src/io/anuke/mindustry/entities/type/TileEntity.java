@@ -288,6 +288,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         if(block == previous && cons != null){
             cons.update();
         }
+
+        if(block == previous && power != null){
+            power.graph.update();
+        }
     }
 
     @Override

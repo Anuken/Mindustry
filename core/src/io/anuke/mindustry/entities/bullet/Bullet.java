@@ -135,10 +135,6 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         if(owner instanceof Unit){
             return ((Unit) owner).getDamageMultipler();
         }
-
-        if(owner instanceof Lightning && data instanceof Float){
-            return (Float)data;
-        }
         return 1f;
     }
 
@@ -155,6 +151,9 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
 
     @Override
     public float damage(){
+        if(owner instanceof Lightning && data instanceof Float){
+            return (Float)data;
+        }
         return type.damage * damageMultiplier();
     }
 

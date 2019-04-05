@@ -125,7 +125,10 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean canProduce(Tile tile){
-        return super.canProduce(tile);
+        if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){
+            return false;
+        }
+        return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid.liquid) >= liquidCapacity);
     }
 
     @Override

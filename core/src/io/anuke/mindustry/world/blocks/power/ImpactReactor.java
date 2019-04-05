@@ -84,8 +84,6 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         entity.productionEfficiency = Mathf.pow(entity.warmup, 5f);
-
-        super.update(tile);
     }
 
     @Override

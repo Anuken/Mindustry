@@ -116,8 +116,6 @@ public class NuclearReactor extends PowerGenerator{
 
         if(entity.heat >= 0.999f){
             entity.kill();
-        }else{
-            super.update(tile);
         }
     }
 

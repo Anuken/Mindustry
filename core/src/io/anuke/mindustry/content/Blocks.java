@@ -519,8 +519,8 @@ public class Blocks implements ContentList{
 
         cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.6f);
-            craftTime = 5f;
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 7.2f);
+            craftTime = 60f;
             size = 2;
             hasPower = true;
             hasItems = true;
@@ -531,7 +531,7 @@ public class Blocks implements ContentList{
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.6f);
+            consumes.liquid(Liquids.water, 7.2f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
@@ -1450,12 +1450,12 @@ public class Blocks implements ContentList{
                 Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
-            reload = 7f;
-            range = 170f;
+            reload = 6f;
+            range = 190f;
             size = 3;
             recoil = 3f;
             rotatespeed = 10f;
-            inaccuracy = 13f;
+            inaccuracy = 10f;
             shootCone = 30f;
 
             health = 145 * size * size;

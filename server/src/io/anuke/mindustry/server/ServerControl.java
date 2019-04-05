@@ -4,6 +4,7 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Array.ArrayIterable;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.*;
@@ -663,7 +664,7 @@ public class ServerControl implements ApplicationListener{
             for(Player p : players){
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam());
+                    p.setTeam(netServer.assignTeam(new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p, p.con.id);
             }
