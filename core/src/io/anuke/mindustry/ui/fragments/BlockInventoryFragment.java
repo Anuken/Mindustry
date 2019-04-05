@@ -31,7 +31,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 40f;
+    private final static float holdWithdraw = 20f;
 
     private Table table;
     private Tile tile;

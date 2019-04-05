@@ -1,21 +1,22 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.EntityQuery;
-import io.anuke.mindustry.entities.impl.BaseEntity;
-import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.impl.BaseEntity;
 import io.anuke.mindustry.entities.traits.AbsorbTrait;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -36,7 +37,7 @@ public class ForceProjector extends Block {
     protected float phaseUseTime = 350f;
 
     protected float phaseRadiusBoost = 80f;
-    protected float radius = 100f;
+    protected float radius = 101.7f;
     protected float breakage = 550f;
     protected float cooldownNormal = 1.75f;
     protected float cooldownLiquid = 1.5f;
@@ -45,7 +46,6 @@ public class ForceProjector extends Block {
     protected float powerDamage = 0.1f;
     protected final ConsumeForceProjectorPower consumePower;
     protected TextureRegion topRegion;
-
 
     public ForceProjector(String name) {
         super(name);
@@ -74,6 +74,16 @@ public class ForceProjector extends Block {
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
 
         stats.add(BlockStat.boostEffect, phaseRadiusBoost/tilesize, StatUnit.blocks);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        Draw.color(Pal.accent);
+        Lines.stroke(1f);
+        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Draw.color();
     }
 
     @Override
@@ -112,13 +122,13 @@ public class ForceProjector extends Block {
 
         if(entity.power.satisfaction < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
-            entity.power.satisfaction = .0f;
+            entity.power.satisfaction = 0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw);
+            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw*Time.delta());
         }
 
         if(entity.buildup > 0){
@@ -259,6 +269,20 @@ public class ForceProjector extends Block {
             Draw.alpha(entity.hit);
             Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();
+        }
+
+        public void drawSimple(){
+            if(realRadius(entity) < 0.5f) return;;
+
+            float rad = realRadius(entity);
+
+            Draw.color(Pal.accent);
+            Lines.stroke(1.5f);
+            Draw.alpha(0.09f + 0.08f * entity.hit);
+            Fill.poly(x, y, 6, rad);
+            Draw.alpha(1f);
+            Lines.poly(x, y, 6, rad);
+            Draw.reset();
         }
 
         @Override

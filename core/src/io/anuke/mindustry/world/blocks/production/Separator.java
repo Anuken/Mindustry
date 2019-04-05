@@ -39,7 +39,7 @@ public class Separator extends Block{
         hasItems = true;
         hasLiquids = true;
 
-        liquidRegion = reg("liquid");
+        liquidRegion = reg("-liquid");
     }
 
     @Override

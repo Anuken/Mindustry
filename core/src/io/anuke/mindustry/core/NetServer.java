@@ -190,20 +190,7 @@ public class NetServer implements ApplicationListener{
 
             //playing in pvp mode automatically assigns players to teams
             if(state.rules.pvp){
-                //find team with minimum amount of players and auto-assign player to that.
-                Team min = Structs.findMin(Team.all, team -> {
-                    if(state.teams.isActive(team)){
-                        int count = 0;
-                        for(Player other : playerGroup.all()){
-                            if(other.getTeam() == team){
-                                count ++;
-                            }
-                        }
-                        return count;
-                    }
-                    return Integer.MAX_VALUE;
-                });
-                player.setTeam(min);
+                player.setTeam(assignTeam());
                 Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
@@ -218,6 +205,22 @@ public class NetServer implements ApplicationListener{
             Player player = connections.get(id);
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
+        });
+    }
+
+    public Team assignTeam(){
+        //find team with minimum amount of players and auto-assign player to that.
+        return Structs.findMin(Team.all, team -> {
+            if(state.teams.isActive(team)){
+                int count = 0;
+                for(Player other : playerGroup.all()){
+                    if(other.getTeam() == team){
+                        count ++;
+                    }
+                }
+                return count;
+            }
+            return Integer.MAX_VALUE;
         });
     }
 
@@ -294,10 +297,12 @@ public class NetServer implements ApplicationListener{
         player.isShooting = shooting;
         player.getPlaceQueue().clear();
         for(BuildRequest req : requests){
+            Tile tile = world.tile(req.x, req.y);
+            if(tile == null) continue;
             //auto-skip done requests
-            if(req.breaking && world.tile(req.x, req.y).block() == Blocks.air){
+            if(req.breaking && tile.block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && world.tile(req.x, req.y).block() == req.block && (!req.block.rotate || world.tile(req.x, req.y).getRotation() == req.rotation)){
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.getRotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
@@ -425,7 +430,7 @@ public class NetServer implements ApplicationListener{
             Log.err("Cannot kick unknown player!");
             return;
         }else{
-            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
+            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason.name());
         }
 
         Player player = connections.get(con.id);

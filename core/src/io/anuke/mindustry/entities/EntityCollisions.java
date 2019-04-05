@@ -12,7 +12,7 @@ import io.anuke.mindustry.entities.traits.SolidTrait;
 
 public class EntityCollisions{
     //range for tile collision scanning
-    private static final int r = 2;
+    private static final int r = 1;
     //move in 1-unit chunks
     private static final float seg = 1f;
 

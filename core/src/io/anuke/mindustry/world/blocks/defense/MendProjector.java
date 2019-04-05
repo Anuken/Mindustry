@@ -13,6 +13,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -101,6 +102,13 @@ public class MendProjector extends Block{
                 }
             }
         }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Pal.accent);
+        Lines.dashCircle(x * tilesize, y * tilesize, range);
+        Draw.color();
     }
 
     @Override

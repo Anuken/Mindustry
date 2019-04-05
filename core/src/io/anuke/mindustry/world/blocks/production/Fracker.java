@@ -60,7 +60,7 @@ public class Fracker extends SolidPump{
     public void update(Tile tile){
         FrackerEntity entity = tile.entity();
 
-        if(entity.cons.valid() && entity.accumulator < itemUseTime){
+        if(entity.cons.valid()){
             if(entity.accumulator >= itemUseTime){
                 entity.cons.trigger();
                 entity.accumulator -= itemUseTime;

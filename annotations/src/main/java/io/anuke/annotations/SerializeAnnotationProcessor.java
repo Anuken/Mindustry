@@ -50,8 +50,21 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
+            TypeName jsonType = ClassName.bestGuess("io.anuke.arc.util.serialization.Json");
+            TypeName jsonValueType = ClassName.bestGuess("io.anuke.arc.util.serialization.JsonValue");
+            TypeName ubJsonWriterType = ClassName.bestGuess("io.anuke.arc.util.serialization.UBJsonWriter");
+            TypeName ubJsonReaderType = ClassName.bestGuess("io.anuke.arc.util.serialization.UBJsonReader");
+
+            classBuilder.addField(jsonType, "bjson", Modifier.STATIC, Modifier.PRIVATE);
+            classBuilder.addField(ubJsonReaderType, "bjsonReader", Modifier.STATIC, Modifier.PRIVATE);
+            classBuilder.addStaticBlock(CodeBlock.builder()
+                .addStatement("bjson = new " + jsonType + "()")
+                .addStatement("bjsonReader = new " + ubJsonReaderType + "()")
+            .build());
+
             for(TypeElement elem : elements){
                 TypeName type = TypeName.get(elem.asType());
+                String simpleTypeName = type.toString().substring(type.toString().lastIndexOf('.') + 1);
 
                 TypeSpec.Builder serializer = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(
@@ -70,7 +83,19 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC);
 
+                MethodSpec.Builder jsonWriteMethod = MethodSpec.methodBuilder("write" + simpleTypeName + "Json")
+                .returns(void.class)
+                .addParameter(jsonType, "json")
+                .addParameter(type, "object")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+                MethodSpec.Builder jsonReadMethod = MethodSpec.methodBuilder("read" + simpleTypeName + "Json")
+                .returns(type)
+                .addParameter(jsonValueType, "value")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
                 readMethod.addStatement("$L object = new $L()", type, type);
+                jsonReadMethod.addStatement("$L object = new $L()", type, type);
 
                 List<VariableElement> fields = ElementFilter.fieldsIn(Utils.elementUtils.getAllMembers(elem));
                 for(VariableElement field : fields){
@@ -83,6 +108,9 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                     if(field.asType().getKind().isPrimitive()){
                         writeMethod.addStatement("stream.write" + capName + "(object." + name + ")");
                         readMethod.addStatement("object." + name + "= stream.read" + capName + "()");
+
+                        jsonWriteMethod.addStatement("json.writeValue(\"" + name + "\", object." + name +")");
+                        jsonReadMethod.addStatement("if(value.has(\"" + name + "\")) object." + name + "= value.get" + capName + "(\"" + name + "\")");
                     }else{
                         writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
                         readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).read(stream)");
@@ -90,22 +118,47 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 }
 
                 readMethod.addStatement("return object");
+                jsonReadMethod.addStatement("return object");
 
                 serializer.addMethod(writeMethod.build());
                 serializer.addMethod(readMethod.build());
 
                 method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
 
-                String sname = type.toString().substring(type.toString().lastIndexOf('.') + 1);
-
-                name(writeMethod, "write" + sname);
-                name(readMethod, "read" + sname);
+                name(writeMethod, "write" + simpleTypeName);
+                name(readMethod, "read" + simpleTypeName);
 
                 writeMethod.addModifiers(Modifier.STATIC);
                 readMethod.addModifiers(Modifier.STATIC);
 
                 classBuilder.addMethod(writeMethod.build());
                 classBuilder.addMethod(readMethod.build());
+
+                classBuilder.addMethod(jsonWriteMethod.build());
+                classBuilder.addMethod(jsonReadMethod.build());
+
+                MethodSpec.Builder binaryJsonWriteMethod = MethodSpec.methodBuilder("write" + simpleTypeName + "StreamJson")
+                .returns(void.class)
+                .addParameter(DataOutput.class, "stream")
+                .addParameter(type, "object")
+                .addException(IOException.class)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addStatement("java.io.StringWriter output = new java.io.StringWriter()")
+                .addStatement("bjson.setWriter(output)")
+                .addStatement("bjson.writeObjectStart(" + type + ".class, " + type + ".class)")
+                .addStatement("write" + simpleTypeName + "Json(bjson, object)")
+                .addStatement("bjson.writeObjectEnd()")
+                .addStatement("stream.writeUTF(output.toString())");
+
+                MethodSpec.Builder binaryJsonReadMethod = MethodSpec.methodBuilder("read" + simpleTypeName + "StreamJson")
+                .returns(type)
+                .addParameter(DataInput.class, "stream")
+                .addException(IOException.class)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addStatement("return read" + simpleTypeName + "Json(bjson.fromJson(null, stream.readUTF()))");
+
+                classBuilder.addMethod(binaryJsonWriteMethod.build());
+                classBuilder.addMethod(binaryJsonReadMethod.build());
             }
 
             classBuilder.addMethod(method.build());

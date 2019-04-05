@@ -19,6 +19,12 @@ public class Rules{
     public boolean pvp;
     /**Whether enemy units drop random items on death.*/
     public boolean unitDrops;
+    /**How fast unit pads build units.*/
+    public float unitBuildSpeedMultiplier = 1f;
+    /**How much health units start with.*/
+    public float unitHealthMultiplier = 1f;
+    /**How much damage player mechs deal.*/
+    public float playerDamageMultiplier = 1f;
     /**Multiplier for buildings for the player.*/
     public float buildCostMultiplier = 1f;
     /**Multiplier for building speed.*/

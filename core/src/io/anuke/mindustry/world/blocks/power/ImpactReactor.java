@@ -41,7 +41,6 @@ public class ImpactReactor extends PowerGenerator{
         super(name);
         hasPower = true;
         hasLiquids = true;
-        powerProduction = 2.0f;
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
@@ -53,7 +52,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", entity -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
-            Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().powerPerTick, 0)*60 * entity.delta(), 1)),
+            Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().powerPerTick, 0)*60 * entity.timeScale, 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
     }
@@ -73,6 +72,9 @@ public class ImpactReactor extends PowerGenerator{
 
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
+            if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
+                entity.warmup =1f;
+            }
 
             if(entity.timer.get(timerUse, itemDuration)){
                 entity.cons.trigger();

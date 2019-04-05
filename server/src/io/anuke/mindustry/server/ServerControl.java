@@ -144,7 +144,7 @@ public class ServerControl implements ApplicationListener{
                     Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
                     + "\nNext selected map:[accent] "+map.name()+"[]"
-                    + (map.author() != null ? " by[accent] " + map.author() + "[]" : "") + "."+
+                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "."+
                     "\nNew game begins in " + roundExtraTime + " seconds.");
 
                     info("Selected next map to be {0}.", map.name());
@@ -662,6 +662,9 @@ public class ServerControl implements ApplicationListener{
             logic.play();
             for(Player p : players){
                 p.reset();
+                if(state.rules.pvp){
+                    p.setTeam(netServer.assignTeam());
+                }
                 netServer.sendWorldData(p, p.con.id);
             }
             inExtraRound = false;
