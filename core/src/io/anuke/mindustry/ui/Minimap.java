@@ -79,10 +79,10 @@ public class Minimap extends Container<Element>{
                 }
                 super.touchDragged(event, x, y, pointer);
 
-                //if(mobile){
+                if(mobile){
                     float max = Math.min(world.width(), world.height()) / 16f / 2f;
                     renderer.minimap.setZoom(1f + y / height * (max - 1f));
-                //}
+                }
             }
 
             @Override

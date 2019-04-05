@@ -222,6 +222,8 @@ public class Damage{
 
             if(scaledDamage <= 0 || tile == null) continue;
 
+            tile = tile.target();
+
             //apply damage to entity if needed
             if(tile.entity != null && tile.getTeam() != team){
                 int health = (int)tile.entity.health;
