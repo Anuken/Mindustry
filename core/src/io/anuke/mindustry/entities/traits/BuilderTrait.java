@@ -202,9 +202,9 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         if(!(tile.block() instanceof BuildBlock)){
             if(canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
-                Build.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
+                Call.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
             }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
-                Build.beginBreak(getTeam(), current.x, current.y);
+                Call.beginBreak(getTeam(), current.x, current.y);
             }else{
                 getPlaceQueue().removeFirst();
                 return;
@@ -213,8 +213,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         TileEntity core = unit.getClosestCore();
 
-        //if there is no core to build with, stop building!
-        if(core == null){
+        //if there is no core to build with or no build entity, stop building!
+        if(core == null || !(tile.entity instanceof BuildEntity)){
             return;
         }
 
@@ -222,7 +222,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
         BuildEntity entity = tile.entity();
 
         if(entity == null){
-            getPlaceQueue().removeFirst();
             return;
         }
 

@@ -37,8 +37,6 @@ public abstract class Platform {
     }
     /**Update discord RPC.*/
     public void updateRPC(){}
-    /**Open donation dialog. Currently android only.*/
-    public void openDonations(){}
     /**Whether donating is supported.*/
     public boolean canDonate(){
         return false;

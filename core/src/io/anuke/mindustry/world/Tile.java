@@ -3,10 +3,7 @@ package io.anuke.mindustry.world;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Position;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -140,6 +137,11 @@ public class Tile implements Position, TargetTrait{
 
     public Block block(){
         return wall;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Block> T cblock(){
+        return (T)wall;
     }
 
     @Override
@@ -325,6 +327,10 @@ public class Tile implements Position, TargetTrait{
     public Tile target(){
         Tile link = getLinked();
         return link == null ? this : link;
+    }
+
+    public Rectangle getHitbox(Rectangle rect){
+        return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
     }
 
     public Tile getNearby(Point2 relative){

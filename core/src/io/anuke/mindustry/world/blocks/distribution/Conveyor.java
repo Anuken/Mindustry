@@ -199,7 +199,6 @@ public class Conveyor extends Block{
 
     @Override
     public void update(Tile tile){
-
         ConveyorEntity entity = tile.entity();
         entity.minitem = 1f;
         Tile next = tile.getNearby(tile.getRotation());

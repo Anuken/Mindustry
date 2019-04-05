@@ -210,6 +210,8 @@ public class Block extends BlockStorage{
     }
 
     protected void drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return;
+
         Color color = valid ? Pal.accent : Pal.remove;
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -290,7 +292,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
+        return icon(Icon.large);
     }
 
     @Override
@@ -418,7 +420,7 @@ public class Block extends BlockStorage{
             boolean buffered = consumes.getPower().isBuffered;
             float capacity = consumes.getPower().powerCapacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
                 Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
 

@@ -30,7 +30,7 @@ public class GenericCrafter extends Block{
     protected LiquidStack outputLiquid;
 
     protected float craftTime = 80;
-    protected Effect craftEffect = Fx.purify;
+    protected Effect craftEffect = Fx.none;
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 

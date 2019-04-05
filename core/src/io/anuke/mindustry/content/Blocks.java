@@ -407,6 +407,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.silicon, 1);
             craftTime = 40f;
             size = 2;
+            hasPower = true;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
@@ -446,7 +447,7 @@ public class Blocks implements ContentList{
             int topRegion = reg("-top");
 
             drawer = tile -> {
-                super.draw(tile);
+                Draw.rect(region, tile.drawx(), tile.drawy());
 
                 GenericCrafterEntity entity = tile.entity();
 
@@ -462,6 +463,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.phasefabric, 1);
             craftTime = 120f;
             size = 2;
+            hasPower = true;
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
@@ -507,6 +509,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.surgealloy, 1);
             craftTime = 75f;
             size = 3;
+            hasPower = true;
 
             consumes.power(4f);
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
@@ -514,18 +517,19 @@ public class Blocks implements ContentList{
 
         cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.3f);
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.6f);
             craftTime = 5f;
             size = 2;
             hasPower = true;
             hasItems = true;
+            hasLiquids = true;
             rotate = false;
             solid = true;
             outputsLiquid = true;
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.3f);
+            consumes.liquid(Liquids.water, 0.6f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
@@ -625,6 +629,8 @@ public class Blocks implements ContentList{
             size = 2;
             health = 320;
             hasLiquids = true;
+            hasPower = true;
+            craftEffect = Fx.none;
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
@@ -636,6 +642,8 @@ public class Blocks implements ContentList{
 
             int liquidRegion = reg("-liquid");
             int topRegion =reg("-top");
+
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
 
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
@@ -661,6 +669,8 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
 
             int rotatorRegion = reg("-rotator");
+
+            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
 
             drawer = tile -> {
                 GenericCrafterEntity entity = tile.entity();
@@ -802,7 +812,7 @@ public class Blocks implements ContentList{
 
         mender = new MendProjector("mender"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 60, Items.copper, 50));
-            consumes.power(0.7f);
+            consumes.power(0.3f);
             size = 1;
             reload = 200f;
             range = 40f;
@@ -815,7 +825,7 @@ public class Blocks implements ContentList{
 
         mendProjector = new MendProjector("mend-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 50, Items.silicon, 80));
-            consumes.power(1.8f);
+            consumes.power(1.5f);
             size = 2;
             reload = 250f;
             range = 85f;
@@ -1001,20 +1011,20 @@ public class Blocks implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 30, Items.silicon, 4));
-            consumes.powerBuffered(3200f, 1f);
+            requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 40));
+            consumes.powerBuffered(4000f, 1f);
         }};
 
         batteryLarge = new Battery("battery-large"){{
-            requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 30));
+            requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 40));
             size = 3;
-            consumes.powerBuffered(37440f, 1f);
+            consumes.powerBuffered(50000f, 1f);
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 50, Items.lead, 30));
             powerProduction = 1f;
-            itemDuration = 40f;
+            itemDuration = 60f;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -1027,7 +1037,7 @@ public class Blocks implements ContentList{
         turbineGenerator = new BurnerGenerator("turbine-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.graphite, 50, Items.lead, 80, Items.silicon, 60));
             powerProduction = 6f;
-            itemDuration = 30f;
+            itemDuration = 40f;
             consumes.liquid(Liquids.water, 0.05f);
             hasLiquids = true;
             size = 2;
@@ -1035,7 +1045,7 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new ItemLiquidGenerator(true, true, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
-            powerProduction = 13f;
+            powerProduction = 16f;
             itemDuration = 50f;
             hasLiquids = true;
             size = 3;
@@ -1075,9 +1085,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 80f;
+            powerProduction = 100f;
             itemDuration = 40f;
-            consumes.power(23f);
+            consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.8f);
         }};
@@ -1252,7 +1262,7 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 20f;
+            reload = 15f;
             range = 180f;
             size = 2;
             burstSpacing = 5f;
@@ -1497,12 +1507,13 @@ public class Blocks implements ContentList{
             shootShake = 2f;
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
-            range = 160f;
+            range = 190f;
             reload = 170f;
-            firingMoveFract = 0.1f;
+            firingMoveFract = 0.2f;
             shootDuration = 220f;
 
-            health = 165 * size * size;
+            health = 200 * size * size;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
         //endregion
@@ -1513,6 +1524,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
+            maxSpawn = 2;
             consumes.power(0.80f);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }};
@@ -1522,6 +1534,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.phantom;
             produceTime = 7300;
             size = 2;
+            maxSpawn = 2;
             consumes.power(2f);
             consumes.items(new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80));
         }};
@@ -1585,6 +1598,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.fortress;
             produceTime = 5000;
             size = 3;
+            maxSpawn = 3;
             consumes.power(2f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.thorium, 50));
         }};

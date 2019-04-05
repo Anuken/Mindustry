@@ -39,7 +39,7 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 1f;
+                waveSpacing = 60 * 60 * 1.5f;
             }};
         }};
 

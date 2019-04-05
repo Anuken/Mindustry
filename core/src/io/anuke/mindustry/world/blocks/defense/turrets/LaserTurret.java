@@ -12,6 +12,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.meta.BlockStat;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -24,6 +25,13 @@ public class LaserTurret extends PowerTurret{
         canOverdrive = false;
 
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.remove(BlockStat.boostEffect);
     }
 
     @Override

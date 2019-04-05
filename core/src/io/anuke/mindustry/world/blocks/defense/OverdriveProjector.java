@@ -10,6 +10,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -50,6 +51,13 @@ public class OverdriveProjector extends Block{
     public void load(){
         super.load();
         topRegion = Core.atlas.find(name + "-top");
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Pal.accent);
+        Lines.dashCircle(x * tilesize, y * tilesize, range);
+        Draw.color();
     }
 
     @Override

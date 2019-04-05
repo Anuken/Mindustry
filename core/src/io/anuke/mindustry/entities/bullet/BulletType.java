@@ -125,7 +125,7 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.getTeam(), x, y, splashDamageRadius, splashDamage);
+            Damage.damage(b.getTeam(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
         }
     }
 

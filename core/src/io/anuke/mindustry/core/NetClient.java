@@ -63,6 +63,7 @@ public class NetClient implements ApplicationListener{
     public NetClient(){
 
         Net.handleClient(Connect.class, packet -> {
+            Log.info("Connecting to server: {0}", packet.addressTCP);
 
             player.isAdmin = false;
 
@@ -211,6 +212,11 @@ public class NetClient implements ApplicationListener{
 
                 SyncTrait entity = (SyncTrait) group.getByID(id);
                 boolean add = false;
+
+                if(entity == null && id == player.id){
+                    entity = player;
+                    add = true;
+                }
 
                 //entity must not be added yet, so create it
                 if(entity == null){
