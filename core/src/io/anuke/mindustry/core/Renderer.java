@@ -47,6 +47,7 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
+    public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
@@ -132,8 +133,11 @@ public class Renderer implements ApplicationListener{
             }
 
             updateShake(0.75f);
-
-            draw();
+            if(pixelator.enabled()){
+                pixelator.drawPixelate();
+            }else{
+                draw();
+            }
         }
     }
 
@@ -159,7 +163,7 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
             shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -207,25 +211,27 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            Draw.flush();
-            shieldBuffer.begin();
-            graphics.clear(Color.CLEAR);
-            EntityDraw.draw(shieldGroup);
-            EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-            Draw.flush();
-            shieldBuffer.end();
-            Draw.shader(Shaders.shield);
-            Draw.color(Pal.accent);
-            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-            Draw.color();
-            Draw.shader();
+            if(settings.getBool("animatedshields")){
+                Draw.flush();
+                shieldBuffer.begin();
+                graphics.clear(Color.CLEAR);
+                EntityDraw.draw(shieldGroup);
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                Draw.flush();
+                shieldBuffer.end();
+                Draw.shader(Shaders.shield);
+                Draw.color(Pal.accent);
+                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+                Draw.color();
+                Draw.shader();
+            }else{
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+            }
         }
 
         overlays.drawTop();
 
-        EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
-        EntityDraw.setClip(true);
 
         Draw.color();
         Draw.flush();
@@ -311,13 +317,24 @@ public class Renderer implements ApplicationListener{
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
+    public float getScale(){
+        return targetscale;
+    }
+
+    public void setScale(float scl){
+        targetscale = scl;
+        clampScale();
+    }
+
     public void takeMapScreenshot(){
         drawGroundShadows();
 
         int w = world.width()*tilesize, h =  world.height()*tilesize;
 
-        boolean isWater = settings.getBool("animatedwater");
-        settings.put("animatedwater", false);
+        boolean hadShields = Core.settings.getBool("animatedshields");
+        boolean hadWater = Core.settings.getBool("animatedwater");
+        Core.settings.put("animatedwater", false);
+        Core.settings.put("animatedshields", false);
 
         FrameBuffer buffer = new FrameBuffer(w, h);
 
@@ -351,7 +368,8 @@ public class Renderer implements ApplicationListener{
 
         buffer.dispose();
 
-        settings.put("animatedwater", isWater);
+        Core.settings.put("animatedwater", hadWater);
+        Core.settings.put("animatedshields", hadShields);
     }
 
 }

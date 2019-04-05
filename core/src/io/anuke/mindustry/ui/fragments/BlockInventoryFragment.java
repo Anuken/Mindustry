@@ -31,7 +31,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 40f;
+    private final static float holdWithdraw = 20f;
 
     private Table table;
     private Tile tile;
@@ -187,9 +187,9 @@ public class BlockInventoryFragment extends Fragment{
     private String round(float f){
         f = (int) f;
         if(f >= 1000000){
-            return Strings.toFixed(f / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(f / 1000000f, 1) + "[gray]mil[]";
         }else if(f >= 1000){
-            return Strings.toFixed(f / 1000, 1) + "k";
+            return Strings.fixed(f / 1000, 1) + "k";
         }else{
             return (int) f + "";
         }

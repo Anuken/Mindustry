@@ -26,7 +26,7 @@ public class Save16 extends SaveFileVersion{
         stream.readInt(); //build
 
         //general state
-        state.rules = Serialization.readRules(stream);
+        state.rules = Serialization.readRulesStreamJson(stream);
         String mapname = stream.readUTF();
         Map map = world.maps.all().find(m -> m.name().equals(mapname));
         if(map == null) map = new Map(customMapDirectory.child(mapname), 1, 1, new ObjectMap<>(), true);
@@ -56,7 +56,7 @@ public class Save16 extends SaveFileVersion{
         stream.writeInt(Version.build); //build
 
         //--GENERAL STATE--
-        Serialization.writeRules(stream, state.rules);
+        Serialization.writeRulesStreamJson(stream, state.rules);
         stream.writeUTF(world.getMap().name()); //map name
 
         stream.writeInt(state.wave); //wave

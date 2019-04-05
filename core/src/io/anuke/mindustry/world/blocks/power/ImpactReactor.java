@@ -16,7 +16,8 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +30,7 @@ public class ImpactReactor extends PowerGenerator{
 
     protected int plasmas = 4;
     protected float warmupSpeed = 0.001f;
-    protected float useTime = 60f;
+    protected float itemDuration = 60f;
     protected int explosionRadius = 30;
     protected int explosionDamage = 180;
 
@@ -40,7 +41,6 @@ public class ImpactReactor extends PowerGenerator{
         super(name);
         hasPower = true;
         hasLiquids = true;
-        powerProduction = 2.0f;
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
@@ -51,10 +51,19 @@ public class ImpactReactor extends PowerGenerator{
         super.setBars();
 
         bars.add("poweroutput", entity -> new Bar(() ->
-            Core.bundle.format("blocks.poweroutput",
-            Strings.toFixed(Math.max(entity.tile.block().getPowerProduction(entity.tile) - consumes.get(ConsumePower.class).powerPerTick, 0)*60 * entity.delta(), 1)),
+            Core.bundle.format("bar.poweroutput",
+            Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().powerPerTick, 0)*60 * entity.timeScale, 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        if(hasItems){
+            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+        }
     }
 
     @Override
@@ -63,9 +72,12 @@ public class ImpactReactor extends PowerGenerator{
 
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
+            if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
+                entity.warmup =1f;
+            }
 
-            if(entity.timer.get(timerUse, useTime)){
-                entity.items.remove(consumes.item(), consumes.itemAmount());
+            if(entity.timer.get(timerUse, itemDuration)){
+                entity.cons.trigger();
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.01f);

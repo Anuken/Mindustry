@@ -54,8 +54,8 @@ public class PowerGraph{
         float powerNeeded = 0f;
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                ConsumePower consumePower = consumes.get(ConsumePower.class);
+            if(consumes.hasPower()){
+                ConsumePower consumePower = consumes.getPower();
                 if(otherConsumersAreValid(consumer, consumePower)){
                     powerNeeded += consumePower.requestedPower(consumer.block(), consumer.entity) * consumer.entity.delta();
                 }
@@ -68,8 +68,8 @@ public class PowerGraph{
         float totalAccumulator = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                totalAccumulator += battery.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
+            if(consumes.hasPower()){
+                totalAccumulator += battery.entity.power.satisfaction * consumes.getPower().powerCapacity;
             }
         }
         return totalAccumulator;
@@ -79,8 +79,8 @@ public class PowerGraph{
         float totalCapacity = 0f;
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                totalCapacity += consumes.get(ConsumePower.class).requestedPower(battery.block(), battery.entity) * battery.entity.delta();
+            if(consumes.hasPower()){
+                totalCapacity += consumes.getPower().requestedPower(battery.block(), battery.entity) * battery.entity.delta();
             }
         }
         return totalCapacity;
@@ -94,8 +94,8 @@ public class PowerGraph{
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                ConsumePower consumePower = consumes.get(ConsumePower.class);
+            if(consumes.hasPower()){
+                ConsumePower consumePower = consumes.getPower();
                 if(consumePower.powerCapacity > 0f){
                     battery.entity.power.satisfaction = Math.max(0.0f, battery.entity.power.satisfaction - consumedPowerPercentage);
                 }
@@ -110,8 +110,8 @@ public class PowerGraph{
 
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                ConsumePower consumePower = consumes.get(ConsumePower.class);
+            if(consumes.hasPower()){
+                ConsumePower consumePower = consumes.getPower();
                 if(consumePower.powerCapacity > 0f){
                     float additionalPowerPercentage = Math.min(1.0f, excess / consumePower.powerCapacity);
                     battery.entity.power.satisfaction = Math.min(1.0f, battery.entity.power.satisfaction + additionalPowerPercentage);
@@ -126,8 +126,8 @@ public class PowerGraph{
         float coverage = Mathf.isZero(needed) ? 1f : Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
-            if(consumes.has(ConsumePower.class)){
-                ConsumePower consumePower = consumes.get(ConsumePower.class);
+            if(consumes.hasPower()){
+                ConsumePower consumePower = consumes.getPower();
                 //currently satisfies power even if it's not required yet
                 if(consumePower.isBuffered){
                     if(!Mathf.isZero(consumePower.powerCapacity)){
@@ -176,7 +176,7 @@ public class PowerGraph{
     }
 
     public void add(Tile tile){
-        if(tile.block().consumes.has(ConsumePower.class) && !tile.block().consumes.get(ConsumePower.class).isBuffered){
+        if(tile.block().consumes.hasPower() && !tile.block().consumes.getPower().isBuffered){
             //reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
             tile.entity.power.satisfaction = 0.0f;
         }
@@ -184,7 +184,7 @@ public class PowerGraph{
         tile.entity.power.graph = this;
         all.add(tile);
 
-        if(tile.block().outputsPower && tile.block().consumesPower && !tile.block().consumes.get(ConsumePower.class).isBuffered){
+        if(tile.block().outputsPower && tile.block().consumesPower && !tile.block().consumes.getPower().isBuffered){
             producers.add(tile);
             consumers.add(tile);
         }else if(tile.block().outputsPower && tile.block().consumesPower){
@@ -259,7 +259,7 @@ public class PowerGraph{
 
     private boolean otherConsumersAreValid(Tile tile, Consume consumePower){
         for(Consume cons : tile.block().consumes.all()){
-            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.block(), tile.entity())){
+            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile.entity())){
                 return false;
             }
         }

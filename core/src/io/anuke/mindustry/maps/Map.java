@@ -83,7 +83,7 @@ public class Map implements Comparable<Map>{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name): Core.bundle.get("unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name) : Core.bundle.get("unknown");
     }
 
     public boolean hasTag(String name){

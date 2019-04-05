@@ -69,7 +69,7 @@ public class Items implements ContentList{
 
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
-            flammability = 0.2f;
+            flammability = 0.1f;
             explosiveness = 0.2f;
             cost = 1.3f;
         }};

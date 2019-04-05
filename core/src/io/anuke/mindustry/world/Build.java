@@ -1,5 +1,7 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.math.Mathf;
@@ -19,6 +21,7 @@ public class Build{
     private static final Rectangle rect = new Rectangle();
 
     /**Returns block type that was broken, or null if unsuccesful.*/
+    @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
@@ -69,6 +72,7 @@ public class Build{
     }
 
     /**Places a BuildBlock at this location.*/
+    @Remote(called = Loc.server)
     public static void beginPlace(Team team, int x, int y, Block result, int rotation){
         if(!validPlace(team, x, y, result, rotation)){
             return;

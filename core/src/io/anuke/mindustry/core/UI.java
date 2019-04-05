@@ -67,6 +67,7 @@ public class UI implements ApplicationListener{
     public ContentInfoDialog content;
     public DeployDialog deploy;
     public TechTreeDialog tech;
+    public MinimapDialog minimap;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -178,6 +179,7 @@ public class UI implements ApplicationListener{
         content = new ContentInfoDialog();
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
+        minimap = new MinimapDialog();
 
         Group group = Core.scene.root;
 
@@ -287,11 +289,11 @@ public class UI implements ApplicationListener{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.toFixed(number / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]mil[]";
         }else if(number >= 10000){
             return number / 1000 + "[gray]k[]";
         }else if(number >= 1000){
-            return Strings.toFixed(number / 1000f, 1) + "[gray]k[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]k[]";
         }else{
             return number + "";
         }

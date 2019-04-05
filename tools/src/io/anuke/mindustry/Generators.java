@@ -61,9 +61,8 @@ public class Generators {
                             for(int y = 0; y < out.height(); y++){
 
                                 Color color = base.getColor(x, y);
-                                if(color.a >= 0.01f){
-                                    out.draw(x, y, color);
-                                }else{
+                                out.draw(x, y, color);
+                                if(color.a < 1f){
                                     boolean found = false;
                                     outer:
                                     for(int rx = -radius; rx <= radius; rx++){

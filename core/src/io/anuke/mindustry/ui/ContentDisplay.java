@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -45,7 +46,7 @@ public class ContentDisplay{
         BlockStats stats = block.stats;
 
         for(StatCategory cat : stats.toMap().keys()){
-            OrderedMap<BlockStat, StatValue> map = stats.toMap().get(cat);
+            OrderedMap<BlockStat, Array<StatValue>> map = stats.toMap().get(cat);
 
             if(map.size == 0) continue;
 
@@ -56,7 +57,13 @@ public class ContentDisplay{
                 table.table(inset -> {
                     inset.left();
                     inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ");
-                    map.get(stat).display(inset);
+                    Array<StatValue> arr = map.get(stat);
+                    for(StatValue value : arr){
+                        value.display(inset);
+                        inset.add().size(10f);
+                    }
+
+                    //map.get(stat).display(inset);
                 }).fillX().padLeft(10);
                 table.row();
             }
@@ -201,7 +208,7 @@ public class ContentDisplay{
 
         table.add(Core.bundle.format("unit.health", unit.health));
         table.row();
-        table.add(Core.bundle.format("unit.speed", Strings.toFixed(unit.speed, 1)));
+        table.add(Core.bundle.format("unit.speed", Strings.fixed(unit.speed, 1)));
         table.row();
         table.row();
     }

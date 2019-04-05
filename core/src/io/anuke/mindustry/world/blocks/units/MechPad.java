@@ -23,6 +23,8 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -43,6 +45,13 @@ public class MechPad extends Block{
         update = true;
         solidifes = true;
         hasPower = true;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.productionTime, buildTime/60f, StatUnit.seconds);
     }
 
     @Override

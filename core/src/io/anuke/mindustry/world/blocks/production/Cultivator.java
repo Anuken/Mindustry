@@ -53,7 +53,7 @@ public class Cultivator extends GenericCrafter{
     public void setBars(){
         super.setBars();
         bars.add("multiplier", entity -> new Bar(() ->
-        Core.bundle.formatDouble("blocks.efficiency",
+        Core.bundle.formatFloat("bar.efficiency",
         ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup)*100f,1),
         () -> Pal.ammo,
         () -> ((CultivatorEntity)entity).warmup));
@@ -61,7 +61,7 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatDouble("blocks.efficiency", (1+sumAttribute(Attribute.spores, x, y))*100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1+sumAttribute(Attribute.spores, x, y))*100, 1), x, y, valid);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 
@@ -17,4 +18,8 @@ public class LiquidRouter extends LiquidBlock{
         }
     }
 
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+    }
 }
