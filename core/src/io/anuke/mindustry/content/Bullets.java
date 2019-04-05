@@ -533,7 +533,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        meltdownLaser = new BulletType(0.001f, 50){
+        meltdownLaser = new BulletType(0.001f, 70){
             Color tmpColor = new Color();
             Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};

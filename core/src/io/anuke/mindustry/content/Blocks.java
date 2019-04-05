@@ -1510,8 +1510,8 @@ public class Blocks implements ContentList{
             powerUsed = 0.5f;
             consumes.powerBuffered(1200f);
             range = 190f;
-            reload = 170f;
-            firingMoveFract = 0.2f;
+            reload = 50f;
+            firingMoveFract = 0.5f;
             shootDuration = 220f;
 
             health = 200 * size * size;
