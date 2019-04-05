@@ -213,8 +213,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         TileEntity core = unit.getClosestCore();
 
-        //if there is no core to build with, stop building!
-        if(core == null){
+        //if there is no core to build with or no build entity, stop building!
+        if(core == null || !(tile.entity instanceof BuildEntity)){
             return;
         }
 

@@ -46,7 +46,7 @@ task deploy(type: Copy){
 
     from "build/outputs/apk/release/android-release.apk"
     into "../deploy/"
-    rename ("android-google-release.apk", appName + "-android-" + getVersionString() + ".apk")
+    rename ("android-release.apk", appName + "-android-" + getVersionString() + ".apk")
 }
 
 android {
