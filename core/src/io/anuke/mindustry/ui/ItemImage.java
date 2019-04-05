@@ -27,7 +27,7 @@ public class ItemImage extends Stack{
     }
 
     public ItemImage(ItemStack stack){
-        add(new Image(stack.item.icon(Icon.medium)));
+        add(new Image(stack.item.icon(Icon.large)));
 
         if(stack.amount != 0){
             Table t = new Table().left().bottom();

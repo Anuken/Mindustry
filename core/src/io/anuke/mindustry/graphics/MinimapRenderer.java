@@ -25,13 +25,13 @@ import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
 public class MinimapRenderer implements Disposable{
-    private static final int baseSize = 16;
+    private static final float baseSize = 16f;
     private final Array<Unit> units = new Array<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
     private Rectangle rect = new Rectangle(), scissor = new Rectangle();
-    private int zoom = 4;
+    private float zoom = 4;
 
     public MinimapRenderer(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -49,7 +49,7 @@ public class MinimapRenderer implements Disposable{
 
     public void zoomBy(float amount){
         zoom += amount;
-        zoom = Mathf.clamp(zoom, 1, Math.min(world.width(), world.height()) / baseSize / 2);
+        zoom = Mathf.clamp(zoom, 1f, Math.min(world.width(), world.height()) / baseSize / 2f);
     }
 
     public float getZoom(){
@@ -69,7 +69,7 @@ public class MinimapRenderer implements Disposable{
     public void drawEntities(float x, float y, float w, float h){
         updateUnitArray();
 
-        int sz = baseSize * zoom;
+        float sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);
@@ -95,7 +95,7 @@ public class MinimapRenderer implements Disposable{
     public TextureRegion getRegion(){
         if(texture == null) return null;
 
-        int sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
+        float sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);
@@ -124,7 +124,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void updateUnitArray(){
-        int sz = baseSize * zoom;
+        float sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);

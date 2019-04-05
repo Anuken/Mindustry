@@ -36,7 +36,6 @@ public class Interpolator{
     }
 
     public void update(){
-
         if(lastUpdated != 0 && updateSpacing != 0){
             float timeSinceUpdate = Time.timeSinceMillis(lastUpdated);
             float alpha = Math.min(timeSinceUpdate / updateSpacing, 2f);

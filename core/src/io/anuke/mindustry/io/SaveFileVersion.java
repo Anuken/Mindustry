@@ -36,7 +36,7 @@ public abstract class SaveFileVersion{
         long playtime = stream.readLong();
         int build = stream.readInt();
 
-        Rules rules = Serialization.readRules(stream);
+        Rules rules = Serialization.readRulesStreamJson(stream);
         String map = stream.readUTF();
         int wave = stream.readInt();
         return new SaveMeta(version, time, playtime, build, map, wave, rules);

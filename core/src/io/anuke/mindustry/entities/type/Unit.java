@@ -95,7 +95,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        super.damage(calculateDamage(amount));
+        if(!Net.client()){
+            super.damage(calculateDamage(amount));
+        }
         hitTime = hitDuration;
     }
 
@@ -142,10 +144,17 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void removed(){
-        Tile tile = world.tile(lastWeightTile);
+        if(lastWeightTile != Pos.invalid){
+            Tile tile = world.tile(lastWeightTile);
 
-        if(tile != null){
-            tile.weight -= Math.max(lastWeightDelta, tile.weight);
+            if(tile != null){
+                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
+                if(!wasFlying){
+                    tile.weight -= dec;
+                }else{
+                    tile.airWeight -= dec;
+                }
+            }
         }
     }
 
@@ -241,7 +250,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 }else{
                     tile.airWeight -= dec;
                 }
-
             }
         }
 

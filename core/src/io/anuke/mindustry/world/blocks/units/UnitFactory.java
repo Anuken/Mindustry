@@ -25,10 +25,10 @@ import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockFlag;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,7 +44,8 @@ public class UnitFactory extends Block{
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
-    protected int maxSpawn = 2;
+    protected int maxSpawn = 4;
+    protected int[] capacities;
 
     public UnitFactory(String name){
         super(name);
@@ -53,8 +54,6 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
-
-        consumes.require(ConsumeItems.class);
     }
 
     @Remote(called = Loc.server)
@@ -80,6 +79,19 @@ public class UnitFactory extends Block{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        capacities = new int[Vars.content.items().size];
+        if(consumes.has(ConsumeType.item)){
+            ConsumeItems cons = consumes.get(ConsumeType.item);
+            for(ItemStack stack : cons.items){
+                capacities[stack.item.id] = stack.amount*2;
+            }
+        }
+    }
+
+    @Override
     public void load(){
         super.load();
 
@@ -89,8 +101,8 @@ public class UnitFactory extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("blocks.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
-        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("blocks.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
+        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("bar.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
     }
 
     @Override
@@ -102,7 +114,8 @@ public class UnitFactory extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+        stats.remove(BlockStat.itemCapacity);
+        stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
         stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
 
@@ -162,9 +175,9 @@ public class UnitFactory extends Block{
 
         if(!tile.isEnemyCheat()){
             //player-made spawners have default behavior
-            if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
-                entity.time += entity.delta() * entity.speedScl;
-                entity.buildTime += entity.delta() * entity.power.satisfaction;
+            if(entity.cons.valid()){
+                entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+                entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
@@ -186,30 +199,13 @@ public class UnitFactory extends Block{
             Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, type);
 
-            for(ItemStack stack : consumes.items()){
-                entity.items.remove(stack.item, stack.amount);
-            }
+            entity.cons.trigger();
         }
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) < stack.amount * 2){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item){
-                return stack.amount * 2;
-            }
-        }
-        return 0;
+        return capacities[item.id];
     }
 
     @Override
@@ -223,21 +219,12 @@ public class UnitFactory extends Block{
         return entity.spawned < maxSpawn;
     }
 
-    protected boolean hasRequirements(ItemModule inv, float fraction){
-        for(ItemStack stack : consumes.items()){
-            if(!inv.has(stack.item, (int) (fraction * stack.amount))){
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static class UnitFactoryEntity extends TileEntity{
-        public float buildTime;
-        public float time;
-        public float speedScl;
-        public float warmup; //only for enemy spawners
-        public int spawned;
+        float buildTime;
+        float time;
+        float speedScl;
+        float warmup; //only for enemy spawners
+        int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{

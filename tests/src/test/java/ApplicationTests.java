@@ -334,6 +334,43 @@ public class ApplicationTests{
         assertEquals(Blocks.air, world.tile(1, 1).block());
     }
 
+    @Test
+    void allBlockTest(){
+        Tile[][] tiles = world.createTiles(256 + 20, 10);
+
+        world.beginMapLoad();
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                tiles[x][y] = new Tile(x, y, Blocks.stone.id, (byte)0);
+            }
+        }
+        int i = 0;
+
+        for(int x = 5; x < tiles.length && i < content.blocks().size;){
+            Block block = content.block(i++);
+            if(block.buildVisibility.get()){
+                tiles[x][5].setBlock(block);
+                x += block.size;
+            }
+        }
+        world.endMapLoad();
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = world.tile(x, y);
+                if(tile.entity != null){
+                    try{
+                        tile.entity.update();
+                    }catch(Throwable t){
+                        fail("Failed to update block '" + tile.block() + "'.", t);
+                    }
+                    assertEquals(tile.block(), tile.entity.block);
+                    assertEquals(tile.block().health, tile.entity.health);
+                }
+            }
+        }
+    }
+
     void initBuilding(){
         createMap();
 

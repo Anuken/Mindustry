@@ -121,6 +121,7 @@ public class BlockRenderer{
     public void drawShadows(){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
+
             shadows.begin();
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
@@ -139,6 +140,7 @@ public class BlockRenderer{
             shadowEvents.clear();
 
             Draw.proj(camera.projection());
+            renderer.pixelator.rebind();
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;

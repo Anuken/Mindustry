@@ -58,7 +58,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(core == null) return;
 
-            if((entity.progress() < 1f || entity.progress() > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
+            if((entity.progress() < 1f || entity.progress() > 0f) && entity.block instanceof BuildBlock){ //building is valid
                 if(!isBuilding() && dst(target) < placeDistance * 0.9f){ //within distance, begin placing
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
@@ -127,7 +127,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             }
 
             //core full
-            if(targetItem != null && entity.tile.block().acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
+            if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
                 setState(repair);
                 return;
             }

@@ -209,10 +209,13 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        graphics.checkPref("minimap", !mobile);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", !mobile);
+        graphics.checkPref("animatedwater", false);
+        graphics.checkPref("animatedshields", !mobile);
         graphics.checkPref("lasers", true);
+        graphics.checkPref("pixelate", false);
     }
 
     private void back(){

@@ -8,9 +8,11 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Intersector;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -92,8 +94,8 @@ public class PowerNode extends PowerBlock{
     public void setBars(){
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
-            Core.bundle.format("blocks.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.toFixed(entity.power.graph.getPowerBalance()*60, 1))),
+            Core.bundle.format("bar.powerbalance",
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance()*60, 1))),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
     }
@@ -224,19 +226,19 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(!(tile != link && link != null && link.block().hasPower) || tile.getTeamID() != link.getTeamID()) return false;
+        if(tile == link || link == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
 
-        if(link.block() instanceof PowerNode){
-            TileEntity oe = link.entity();
-
-            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy()) <= Math.max(laserRange * tilesize,
-                    ((PowerNode) link.block()).laserRange * tilesize)
-                    + (link.block().size - 1) * tilesize / 2f + (tile.block().size - 1) * tilesize / 2f &&
-                    (!checkMaxNodes || (oe.power.links.size < ((PowerNode) link.block()).maxNodes || oe.power.links.contains(tile.pos())));
-        }else{
-            return Mathf.dst(tile.drawx(), tile.drawy(), link.drawx(), link.drawy())
-                    <= laserRange * tilesize + (link.block().size - 1) * tilesize;
+        if(overlaps(tile, link, laserRange*tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange*tilesize))){
+            if(checkMaxNodes && link.block() instanceof PowerNode){
+                return link.entity.power.links.size < link.<PowerNode>cblock().maxNodes || link.entity.power.links.contains(tile.pos());
+            }
+            return true;
         }
+        return false;
+    }
+
+    protected boolean overlaps(Tile src, Tile other, float range){
+        return Intersector.overlaps(Tmp.cr1.set(src.drawx(), src.drawy(), range), other.getHitbox(Tmp.r1));
     }
 
     protected void drawLaser(Tile tile, Tile target){

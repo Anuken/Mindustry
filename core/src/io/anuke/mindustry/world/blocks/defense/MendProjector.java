@@ -13,6 +13,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
@@ -60,6 +61,9 @@ public class MendProjector extends Block{
 
         stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+
+        stats.add(BlockStat.boostEffect, phaseRangeBoost/tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
     @Override
@@ -68,10 +72,10 @@ public class MendProjector extends Block{
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.cons.valid() && entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
-            entity.items.remove(consumes.item(), 1);
+        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime)){
+            entity.cons.trigger();
         }
 
         if(entity.charge >= reload){
@@ -98,6 +102,13 @@ public class MendProjector extends Block{
                 }
             }
         }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Pal.accent);
+        Lines.dashCircle(x * tilesize, y * tilesize, range);
+        Draw.color();
     }
 
     @Override
