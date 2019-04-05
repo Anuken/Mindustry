@@ -34,6 +34,10 @@ public class Items implements ContentList{
             cost = 1f;
         }};
 
+        sand = new Item("sand", Color.valueOf("f7cba4")){{
+
+        }};
+
         coal = new Item("coal", Color.valueOf("272727")){{
             explosiveness = 0.4f;
             flammability = 1f;
@@ -65,7 +69,7 @@ public class Items implements ContentList{
 
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             type = ItemType.material;
-            flammability = 0.2f;
+            flammability = 0.1f;
             explosiveness = 0.2f;
             cost = 1.3f;
         }};
@@ -82,10 +86,6 @@ public class Items implements ContentList{
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
             flammability = 1.05f;
-        }};
-
-        sand = new Item("sand", Color.valueOf("f7cba4")){{
-
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{

@@ -57,7 +57,7 @@ public class BlockRenderer{
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
-                    if(tile.block() != Blocks.air){
+                    if(tile.block().hasShadow){
                         Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                     }
                 }
@@ -121,11 +121,16 @@ public class BlockRenderer{
     public void drawShadows(){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
+
             shadows.begin();
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
             for(Tile tile : shadowEvents){
-                Draw.color(tile.block() == Blocks.air ? Color.WHITE : shadowColor);
+                //clear it first
+                Draw.color(Color.WHITE);
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                //then draw the shadow
+                Draw.color(!tile.block().hasShadow ? Color.WHITE : shadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 
@@ -135,6 +140,7 @@ public class BlockRenderer{
             shadowEvents.clear();
 
             Draw.proj(camera.projection());
+            renderer.pixelator.rebind();
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
@@ -186,7 +192,6 @@ public class BlockRenderer{
                     }
 
                     if(block.expanded || !expanded){
-                        addRequest(tile, Layer.shadow);
 
                         if(block.layer != null && block.isLayer(tile)){
                             addRequest(tile, block.layer);
@@ -227,9 +232,7 @@ public class BlockRenderer{
             BlockRequest req = requests.get(iterateidx);
             Block block = req.tile.block();
 
-            if(req.layer == Layer.shadow){
-                block.drawShadow(req.tile);
-            }else if(req.layer == Layer.block){
+            if(req.layer == Layer.block){
                 block.draw(req.tile);
                 if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
                     block.drawTeam(req.tile);

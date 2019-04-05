@@ -1,16 +1,13 @@
-import static io.anuke.mindustry.Vars.logic;
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.world.Tile;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static io.anuke.mindustry.Vars.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorldTests {
     static Tile[][] tiles;
@@ -30,7 +27,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_allSolid_maxDarkness(){
+    void addDarknessAllSolidMaxDarkness(){
         fillWith(Blocks.rocks.id);
         world.addDarkness(tiles);
 
@@ -42,7 +39,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_allSyntethic_noDarkness(){
+    void addDarknessAllSyntethicNoDarkness(){
         fillWith(Blocks.copperWall.id);
         world.addDarkness(tiles);
 
@@ -54,7 +51,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_allNotSolid_noDarkness(){
+    void addDarknessAllNotSolidNoDarkness(){
         fillWith(Blocks.air.id);
         world.addDarkness(tiles);
 
@@ -66,7 +63,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_allNotFilled_noDarkness(){
+    void addDarknessAllNotFilledNoDarkness(){
         fillWith(Blocks.cliffs.id);
         world.addDarkness(tiles);
 
@@ -78,7 +75,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_oneNotSolidMiddle_noDarkness(){
+    void addDarknessOneNotSolidMiddleNoDarkness(){
         fillWith(Blocks.rocks.id);
         tiles[5][5] = new Tile(5, 5, (byte)0, Blocks.copperWall.id, (byte)0, (byte)0);
         world.addDarkness(tiles);
@@ -93,7 +90,7 @@ public class WorldTests {
     }
 
     @Test
-    void addDarkness_oneNotSolidCorner_noDarkness(){
+    void addDarknessOneNotSolidCornerNoDarkness(){
         fillWith(Blocks.rocks.id);
         tiles[7][7] = new Tile(5, 5, (byte)0, Blocks.copperWall.id, (byte)0, (byte)0);
         world.addDarkness(tiles);

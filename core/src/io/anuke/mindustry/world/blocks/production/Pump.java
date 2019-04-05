@@ -1,17 +1,16 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.meta.BlockGroup;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.graphics.g2d.Draw;
 
 public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
@@ -40,7 +39,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.liquidOutputSpeed, 60f * pumpAmount, StatUnit.liquidSecond);
+        stats.add(BlockStat.output, 60f * pumpAmount, StatUnit.liquidSecond);
     }
 
     @Override
@@ -105,11 +104,6 @@ public class Pump extends LiquidBlock{
         }
 
         tryDumpLiquid(tile, tile.entity.liquids.current());
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return consumes.has(ConsumeLiquid.class) && consumes.liquid() == liquid && super.acceptLiquid(tile, source, liquid, amount);
     }
 
     protected boolean isValid(Tile tile){

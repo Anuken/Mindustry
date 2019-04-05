@@ -1,10 +1,8 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
@@ -12,8 +10,10 @@ import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.production.GenericCrafter.GenericCrafterEntity;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
+import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
 /**
@@ -23,14 +23,14 @@ public class Separator extends Block{
     protected final int timerDump = timers++;
 
     protected ItemStack[] results;
-    protected float filterTime;
+    protected float craftTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;
     protected float spinnerThickness = 1f;
     protected float spinnerSpeed = 2f;
 
     protected Color color = Color.valueOf("858585");
-    protected TextureRegion liquidRegion;
+    protected int liquidRegion;
 
     public Separator(String name){
         super(name);
@@ -38,25 +38,28 @@ public class Separator extends Block{
         solid = true;
         hasItems = true;
         hasLiquids = true;
-    }
 
-    @Override
-    public void load(){
-        super.load();
-
-        liquidRegion = Core.atlas.find(name + "-liquid");
+        liquidRegion = reg("-liquid");
     }
 
     @Override
     public void setStats(){
+        if(consumes.has(ConsumeType.liquid)){
+            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
+            cons.timePeriod = craftTime;
+        }
+
         super.setStats();
 
-        stats.add(BlockStat.outputItem, new ItemFilterValue(item -> {
+        stats.add(BlockStat.output, new ItemFilterValue(item -> {
             for(ItemStack i : results){
                 if(item == i.item) return true;
             }
             return false;
         }));
+
+        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+
     }
 
     @Override
@@ -67,7 +70,7 @@ public class Separator extends Block{
 
         Draw.color(tile.entity.liquids.current().color);
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
+        Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
 
         Draw.color(color);
         Lines.stroke(spinnerThickness);
@@ -82,7 +85,7 @@ public class Separator extends Block{
         entity.totalProgress += entity.warmup * entity.delta();
 
         if(entity.cons.valid()){
-            entity.progress += getProgressIncrease(entity, filterTime);
+            entity.progress += getProgressIncrease(entity, craftTime);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
@@ -106,9 +109,7 @@ public class Separator extends Block{
                 count += stack.amount;
             }
 
-            if(consumes.has(ConsumeItem.class)){
-                entity.items.remove(consumes.item(), consumes.itemAmount());
-            }
+            entity.cons.trigger();
 
             if(item != null && entity.items.get(item) < itemCapacity){
                 offloadNear(tile, item);

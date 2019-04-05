@@ -2,10 +2,13 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.PixmapIO;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.graphics.g2d.SpriteBatch;
@@ -13,6 +16,8 @@ import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.BufferUtils;
+import io.anuke.arc.util.ScreenUtils;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.arc.util.pooling.Pools;
@@ -42,6 +47,7 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
+    public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Color clearColor;
@@ -127,8 +133,11 @@ public class Renderer implements ApplicationListener{
             }
 
             updateShake(0.75f);
-
-            draw();
+            if(pixelator.enabled()){
+                pixelator.drawPixelate();
+            }else{
+                draw();
+            }
         }
     }
 
@@ -154,7 +163,7 @@ public class Renderer implements ApplicationListener{
 
         graphics.clear(clearColor);
 
-        if(graphics.getWidth() >= 2 && graphics.getHeight() >= 2 && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
+        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
             shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -202,25 +211,27 @@ public class Renderer implements ApplicationListener{
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(EntityDraw.countInBounds(shieldGroup) > 0){
-            Draw.flush();
-            shieldBuffer.begin();
-            graphics.clear(Color.CLEAR);
-            EntityDraw.draw(shieldGroup);
-            EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
-            Draw.flush();
-            shieldBuffer.end();
-            Draw.shader(Shaders.shield);
-            Draw.color(Pal.accent);
-            Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-            Draw.color();
-            Draw.shader();
+            if(settings.getBool("animatedshields")){
+                Draw.flush();
+                shieldBuffer.begin();
+                graphics.clear(Color.CLEAR);
+                EntityDraw.draw(shieldGroup);
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                Draw.flush();
+                shieldBuffer.end();
+                Draw.shader(Shaders.shield);
+                Draw.color(Pal.accent);
+                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+                Draw.color();
+                Draw.shader();
+            }else{
+                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+            }
         }
 
         overlays.drawTop();
 
-        EntityDraw.setClip(false);
         drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
-        EntityDraw.setClip(true);
 
         Draw.color();
         Draw.flush();
@@ -296,10 +307,6 @@ public class Renderer implements ApplicationListener{
         EntityDraw.drawWith(group, toDraw, drawer);
     }
 
-    public float cameraScale(){
-        return camerascale;
-    }
-
     public void scaleCamera(float amount){
         targetscale += amount;
         clampScale();
@@ -308,6 +315,61 @@ public class Renderer implements ApplicationListener{
     public void clampScale(){
         float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
+    }
+
+    public float getScale(){
+        return targetscale;
+    }
+
+    public void setScale(float scl){
+        targetscale = scl;
+        clampScale();
+    }
+
+    public void takeMapScreenshot(){
+        drawGroundShadows();
+
+        int w = world.width()*tilesize, h =  world.height()*tilesize;
+
+        boolean hadShields = Core.settings.getBool("animatedshields");
+        boolean hadWater = Core.settings.getBool("animatedwater");
+        Core.settings.put("animatedwater", false);
+        Core.settings.put("animatedshields", false);
+
+        FrameBuffer buffer = new FrameBuffer(w, h);
+
+        float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
+        disableUI = true;
+        camera.width = w;
+        camera.height = h;
+        camera.position.x = w/2f + tilesize/2f;
+        camera.position.y = h/2f + tilesize/2f;
+        Draw.flush();
+        buffer.begin();
+        draw();
+        Draw.flush();
+        buffer.end();
+        disableUI = false;
+        camera.width = vpW;
+        camera.height = vpH;
+        camera.position.set(px, py);
+        buffer.begin();
+        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
+        for(int i = 0; i < lines.length; i+= 4){
+            lines[i + 3] = (byte)255;
+        }
+        buffer.end();
+        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
+        FileHandle file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+        PixmapIO.writePNG(file, fullPixmap);
+        fullPixmap.dispose();
+        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
+
+        buffer.dispose();
+
+        Core.settings.put("animatedwater", hadWater);
+        Core.settings.put("animatedshields", hadShields);
     }
 
 }

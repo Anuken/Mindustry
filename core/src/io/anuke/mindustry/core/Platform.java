@@ -37,8 +37,6 @@ public abstract class Platform {
     }
     /**Update discord RPC.*/
     public void updateRPC(){}
-    /**Open donation dialog. Currently android only.*/
-    public void openDonations(){}
     /**Whether donating is supported.*/
     public boolean canDonate(){
         return false;
@@ -68,6 +66,9 @@ public abstract class Platform {
      * @param filetype File extension to filter
      */
     public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){}
+
+    /**Hide the app. Android only.*/
+    public void hide(){}
 
     /**Forces the app into landscape mode. Currently Android only.*/
     public void beginForceLandscape(){}

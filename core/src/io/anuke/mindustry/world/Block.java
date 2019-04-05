@@ -32,7 +32,7 @@ import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
 import io.anuke.mindustry.world.consumers.Consume;
 import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.ConsumePower;
+import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.*;
 
 import java.util.Arrays;
@@ -95,6 +95,8 @@ public class Block extends BlockStorage{
     public boolean canOverdrive = true;
     /**Whether the icon region has an outline added.*/
     public boolean outlineIcon = false;
+    /**Whether this block has a shadow under it.*/
+    public boolean hasShadow = true;
 
     /**Cost of constructing this block.*/
     public ItemStack[] buildRequirements = new ItemStack[]{};
@@ -105,6 +107,9 @@ public class Block extends BlockStorage{
     /**Whether this block is visible and can currently be built.*/
     public BooleanProvider buildVisibility = () -> false;
     public boolean alwaysUnlocked = false;
+
+    protected TextureRegion[] cacheRegions = {};
+    protected Array<String> cacheRegionStrings = new Array<>();
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
@@ -161,7 +166,7 @@ public class Block extends BlockStorage{
         if(tile == null || tile.entity == null || tile.entity.power == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+            if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
                     && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
@@ -205,6 +210,8 @@ public class Block extends BlockStorage{
     }
 
     protected void drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return;
+
         Color color = valid ? Pal.accent : Pal.remove;
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -228,10 +235,6 @@ public class Block extends BlockStorage{
 
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
-    }
-
-    public void drawShadow(Tile tile){
-        draw(tile);
     }
 
     public void drawTeam(Tile tile){
@@ -289,7 +292,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
+        return icon(Icon.large);
     }
 
     @Override
@@ -318,12 +321,28 @@ public class Block extends BlockStorage{
         setStats();
         setBars();
 
-        consumes.checkRequired(this);
+        consumes.init();
     }
 
     @Override
     public void load(){
         region = Core.atlas.find(name);
+
+        cacheRegions = new TextureRegion[cacheRegionStrings.size];
+        for(int i = 0; i < cacheRegions.length; i++){
+            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
+        }
+    }
+
+    /**Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}.*/
+    protected int reg(String suffix){
+        cacheRegionStrings.add(name + suffix);
+        return cacheRegionStrings.size - 1;
+    }
+
+    /**Returns an internally cached region by ID.*/
+    protected TextureRegion reg(int id){
+        return cacheRegions[id];
     }
 
     /** Called when the block is tapped. */
@@ -376,7 +395,7 @@ public class Block extends BlockStorage{
         stats.add(BlockStat.size, "{0}x{0}", size);
         stats.add(BlockStat.health, health, StatUnit.none);
 
-        consumes.forEach(cons -> cons.display(stats));
+        consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
@@ -388,25 +407,25 @@ public class Block extends BlockStorage{
 
         if(hasLiquids){
             Function<TileEntity, Liquid> current;
-            if(consumes.has(ConsumeLiquid.class)){
-                Liquid liquid = consumes.liquid();
+            if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
+                Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
                 current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("blocks.liquid") : current.get(entity).localizedName(), () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(), () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
-        if(hasPower && consumes.has(ConsumePower.class)){
-            boolean buffered = consumes.get(ConsumePower.class).isBuffered;
-            float capacity = consumes.get(ConsumePower.class).powerCapacity;
+        if(hasPower && consumes.hasPower()){
+            boolean buffered = consumes.getPower().isBuffered;
+            float capacity = consumes.getPower().powerCapacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("blocks.powerbalance", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-                Core.bundle.get("blocks.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(() -> Core.bundle.format("blocks.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
     }
 
@@ -458,8 +477,8 @@ public class Block extends BlockStorage{
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.has(ConsumePower.class) && consumes.get(ConsumePower.class).isBuffered){
-            power += tile.entity.power.satisfaction * consumes.get(ConsumePower.class).powerCapacity;
+        if(consumes.hasPower() && consumes.getPower().isBuffered){
+            power += tile.entity.power.satisfaction * consumes.getPower().powerCapacity;
         }
 
         if(hasLiquids){

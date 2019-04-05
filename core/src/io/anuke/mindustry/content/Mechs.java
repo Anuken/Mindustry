@@ -35,6 +35,7 @@ public class Mechs implements ContentList{
                 mass = 1.2f;
                 speed = 0.5f;
                 boostSpeed = 0.85f;
+                buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
                 health = 300f;
 
@@ -45,6 +46,11 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardMechSmall;
                 }};
+            }
+
+            @Override
+            public void updateAlt(Player player){
+                player.healBy(Time.delta() * 0.4f);
             }
 
             @Override
@@ -63,6 +69,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 15;
                 mass = 0.9f;
                 health = 250f;
+                buildPower = 0.9f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 engineColor = Color.valueOf("d3ddff");
@@ -110,6 +117,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.8f;
                 canHeal = true;
                 health = 200f;
+                buildPower = 1.6f;
                 engineColor = Pal.heal;
 
                 weapon = new Weapon("heal-blaster"){{
@@ -161,6 +169,7 @@ public class Mechs implements ContentList{
                 weaponOffsetY = 0;
                 engineColor = Color.valueOf("feb380");
                 health = 300f;
+                buildPower = 1.5f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
                     recoil = 4f;
@@ -227,6 +236,7 @@ public class Mechs implements ContentList{
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
+                buildPower = 1.1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
                     reload = 20f;
@@ -315,6 +325,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 30;
                 engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
+                buildPower = 2f;
                 weapon = new Weapon("bomber"){{
                     length = 0f;
                     width = 2f;
@@ -346,6 +357,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 60;
                 engineColor = Color.valueOf("feb380");
                 cellTrnsY = 1f;
+                buildPower = 1.2f;
 
                 weapon = new Weapon("bomber"){{
                     length = 1.5f;

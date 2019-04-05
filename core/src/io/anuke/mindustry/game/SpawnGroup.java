@@ -53,7 +53,7 @@ public class SpawnGroup implements Serializable{
         }
         float scaling = this.unitScaling;
 
-        return Math.min(unitAmount - 1 + Math.max((int) (((wave - begin) / spacing) / scaling), 1), max);
+        return Math.min(unitAmount - 1 + Math.max((int) (((wave - begin + 1) / spacing) / scaling), 1), max);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SpawnGroup implements Serializable{
     }
 
     @Override
-    public void write (Json json) {
+    public void write(Json json){
         json.writeValue("type", type.name);
         if(begin != 0) json.writeValue("begin", begin);
         if(end != never) json.writeValue("end", end);
@@ -87,7 +87,7 @@ public class SpawnGroup implements Serializable{
     }
 
     @Override
-    public void read (Json json, JsonValue data) {
+    public void read(Json json, JsonValue data){
         type = content.getByName(ContentType.unit, data.getString("type", "dagger"));
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);

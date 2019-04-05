@@ -25,6 +25,7 @@ public enum Binding implements KeyBind{
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),
     pause(KeyCode.SPACE),
     toggle_menus(KeyCode.C),
+    screenshot(KeyCode.P),
     player_list(KeyCode.TAB, "multiplayer"),
     chat(KeyCode.ENTER),
     chat_history_prev(KeyCode.UP),

@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.util.Time;
 
 public class Router extends Block{
     protected float speed = 8f;
@@ -46,7 +46,7 @@ public class Router extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         SplitterEntity entity = tile.entity();
 
-        return tile.getTeamID() == source.getTeamID() && entity.lastItem == null && entity.items.total() == 0;
+        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
     }
 
     @Override
