@@ -63,6 +63,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         unit.onSuperDeath();
 
+        //visual only.
+        if(Net.client()){
+            Tile tile = world.tile(unit.spawner);
+            if(tile != null && !Net.client()){
+                tile.block().unitRemoved(tile, unit);
+            }
+
+            unit.spawner = noSpawner;
+        }
+
         //must run afterwards so the unit's group is not null when sending the removal packet
         Core.app.post(unit::remove);
     }
@@ -280,7 +290,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
-        if(tile != null){
+        if(tile != null && !Net.client()){
             tile.block().unitRemoved(tile, this);
         }
 

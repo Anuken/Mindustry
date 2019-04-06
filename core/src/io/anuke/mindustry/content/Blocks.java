@@ -517,9 +517,9 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
         }};
 
-        cryofluidMixer = new GenericCrafter("cryofluidmixer"){{
+        cryofluidMixer = new LiquidConverter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 7.2f);
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.1f);
             craftTime = 60f;
             size = 2;
             hasPower = true;
@@ -531,7 +531,7 @@ public class Blocks implements ContentList{
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 7.2f);
+            consumes.liquid(Liquids.water, 0.1f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
@@ -1080,7 +1080,8 @@ public class Blocks implements ContentList{
             health = 700;
             powerProduction = 14f;
             consumes.item(Items.thorium);
-            consumes.liquid(Liquids.cryofluid, 0.1f);
+            heating = 0.02f;
+            consumes.liquid(Liquids.cryofluid, 0.1f).update(false);
         }};
 
         impactReactor = new ImpactReactor("impact-reactor"){{

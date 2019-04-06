@@ -3,7 +3,6 @@ package io.anuke.mindustry.world;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
@@ -62,6 +61,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     /**Remove a stack from this inventory, and return the amount removed.*/
     public int removeStack(Tile tile, Item item, int amount){
+        if(tile.entity == null || tile.entity.items == null) return 0;
         amount = Math.min(amount, tile.entity.items.get(item));
         tile.entity.noSleep();
         tile.entity.items.remove(item, amount);

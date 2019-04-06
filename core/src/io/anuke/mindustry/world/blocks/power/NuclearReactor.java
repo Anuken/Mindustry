@@ -16,15 +16,11 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
