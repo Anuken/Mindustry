@@ -1,8 +1,9 @@
 package io.anuke.mindustry.desktop;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.OS;
+import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.PropertiesUtils;
 import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.arc.util.serialization.JsonValue.ValueType;
 import io.anuke.arc.util.serialization.JsonWriter.OutputType;
@@ -11,11 +12,8 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,6 +21,25 @@ public class CrashHandler{
 
     public static void handle(Throwable e){
         e.printStackTrace();
+        if(Version.number == 0){
+            try{
+                ObjectMap<String, String> map = new ObjectMap<>();
+                PropertiesUtils.load(map, new InputStreamReader(CrashHandler.class.getResourceAsStream("/version.properties")));
+
+                Version.type = map.get("type");
+                Version.number = Integer.parseInt(map.get("number"));
+                Version.modifier = map.get("modifier");
+                if(map.get("build").contains(".")){
+                    String[] split = map.get("build").split("\\.");
+                    Version.build = Integer.parseInt(split[0]);
+                    Version.revision = Integer.parseInt(split[1]);
+                }else{
+                    Version.build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
+                }
+            }catch(Throwable ignored){
+
+            }
+        }
 
         try{
             //check crash report setting

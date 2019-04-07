@@ -694,6 +694,8 @@ public class Bullets implements ContentList{
             bulletWidth = 9f;
             bulletHeight = 13f;
             hitEffect = Fx.flakExplosion;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
         }};
 
         bombIncendiary = new BombBulletType(7f, 10f, "shell"){{

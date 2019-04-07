@@ -82,7 +82,6 @@ public class Mechs implements ContentList{
                     roundrobin = true;
                     shots = 3;
                     inaccuracy = 0f;
-                    velocityRnd = 0.2f;
                     ejectEffect = Fx.none;
                     bullet = Bullets.lightning;
                 }};

@@ -305,6 +305,9 @@ public class MapGenerateDialog extends FloatingDialog{
                 }
 
                 Core.app.post(() -> {
+                    if(pixmap == null || texture == null){
+                        return;
+                    }
                     texture.draw(pixmap, 0, 0);
                     generating = false;
                 });

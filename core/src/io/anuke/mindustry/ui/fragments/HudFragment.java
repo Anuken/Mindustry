@@ -202,6 +202,7 @@ public class HudFragment extends Fragment{
 
         //'core is under attack' table
         parent.fill(t -> {
+            t.touchable(Touchable.disabled);
             float notifDuration = 240f;
 
             Events.on(StateChangeEvent.class, event -> {
@@ -236,7 +237,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$coreattack").pad(2)
-                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
+                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //launch button

@@ -269,7 +269,7 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting,
+        boolean boosting, boolean shooting, boolean chatting,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -293,6 +293,7 @@ public class NetServer implements ApplicationListener{
         player.pointerX = pointerX;
         player.pointerY = pointerY;
         player.setMineTile(mining);
+        player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;
         player.getPlaceQueue().clear();

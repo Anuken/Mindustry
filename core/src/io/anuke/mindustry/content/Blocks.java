@@ -818,7 +818,7 @@ public class Blocks implements ContentList{
             size = 1;
             reload = 200f;
             range = 40f;
-            healPercent = 5f;
+            healPercent = 4f;
             phaseBoost = 4f;
             phaseRangeBoost = 20f;
             health = 80;
@@ -1088,11 +1088,11 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 100f;
+            powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.cryofluid, 0.8f);
+            consumes.liquid(Liquids.cryofluid, 0.3f);
         }};
 
         //endregion power

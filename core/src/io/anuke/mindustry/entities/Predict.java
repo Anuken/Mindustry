@@ -39,7 +39,7 @@ public class Predict{
         Vector2 ts = quad(a, b, c);
 
         // Find smallest positive solution
-        Vector2 sol = vresult.set(0, 0);
+        Vector2 sol = vresult.set(dstx, dsty);
         if(ts != null){
             float t0 = ts.x, t1 = ts.y;
             float t = Math.min(t0, t1);
