@@ -8,22 +8,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -37,9 +29,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -821,22 +811,17 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void readSave(DataInput stream) throws IOException{
         boolean local = stream.readBoolean();
 
-        if(local && !headless){
+        if(local){
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
-            if(world.tile(spawner) != null && world.tile(spawner).entity != null && world.tile(spawner).entity instanceof SpawnerTrait){
-                lastSpawner = (SpawnerTrait)(world.tile(spawner).entity);
+            Tile stile = world.tile(spawner);
+            if(stile != null && stile.entity instanceof SpawnerTrait){
+                lastSpawner = (SpawnerTrait)stile.entity;
             }
+            Player player = headless ? this : Vars.player;
             player.readSaveSuper(stream);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
-        }else if(local){
-            byte mechid = stream.readByte();
-            stream.readByte();
-            stream.readInt();
-            readSaveSuper(stream);
-            mech = content.getByID(ContentType.mech, mechid);
-            dead = false;
         }
     }
 
