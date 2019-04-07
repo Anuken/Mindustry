@@ -52,7 +52,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 430;
-    private final static float serverSyncTime = 4, kickDuration = 30 * 1000;
+    private final static float serverSyncTime = 30, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     private final static Rectangle viewport = new Rectangle();
     private final static Array<Entity> returnArray = new Array<>();
