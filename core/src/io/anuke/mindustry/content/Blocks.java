@@ -610,19 +610,6 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.slag, 0.07f);
         }};
 
-        cultivator = new Cultivator("cultivator"){{
-            requirements(Category.crafting, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
-            outputItem = new ItemStack(Items.sporePod, 1);
-            craftTime = 160;
-            size = 2;
-            hasLiquids = true;
-            hasPower = true;
-            hasItems = true;
-
-            consumes.power(0.80f);
-            consumes.liquid(Liquids.water, 0.15f);
-        }};
-
         sporePress = new GenericCrafter("spore-press"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 70, Items.silicon, 60));
             liquidCapacity = 60f;
@@ -822,7 +809,7 @@ public class Blocks implements ContentList{
             phaseBoost = 4f;
             phaseRangeBoost = 20f;
             health = 80;
-            consumes.item(Items.silicon).optional(true);
+            consumes.item(Items.silicon).boost();
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
@@ -833,20 +820,20 @@ public class Blocks implements ContentList{
             range = 85f;
             healPercent = 14f;
             health = 80 * size * size;
-            consumes.item(Items.phasefabric).optional(true);
+            consumes.item(Items.phasefabric).boost();
         }};
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 150, Items.plastanium, 60));
             consumes.power(3.50f);
             size = 2;
-            consumes.item(Items.phasefabric).optional(true);
+            consumes.item(Items.phasefabric).boost();
         }};
 
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
             size = 3;
-            consumes.item(Items.phasefabric).optional(true);
+            consumes.item(Items.phasefabric).boost();
         }};
 
         shockMine = new ShockMine("shock-mine"){{
@@ -1052,7 +1039,7 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             size = 3;
 
-            consumes.item(Items.pyratite);
+            consumes.item(Items.pyratite).optional(true, false);
             consumes.liquid(Liquids.cryofluid, 0.2f);
         }};
 
@@ -1075,7 +1062,7 @@ public class Blocks implements ContentList{
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
-            requirements(Category.power, ItemStack.with(Items.lead, 600, Items.silicon, 400, Items.graphite, 300, Items.thorium, 300));
+            requirements(Category.power, ItemStack.with(Items.lead, 600, Items.silicon, 400, Items.graphite, 300, Items.thorium, 300, Items.metaglass, 100));
             size = 3;
             health = 700;
             powerProduction = 14f;
@@ -1091,7 +1078,7 @@ public class Blocks implements ContentList{
             powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
-            consumes.item(Items.blastCompound);
+            consumes.item(Items.blastCompound).optional(true, false);
             consumes.liquid(Liquids.cryofluid, 0.3f);
         }};
 
@@ -1104,7 +1091,7 @@ public class Blocks implements ContentList{
             drillTime = 600;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.05f).optional(true);
+            consumes.liquid(Liquids.water, 0.05f).boost();
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
@@ -1113,7 +1100,7 @@ public class Blocks implements ContentList{
             drillTime = 480;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.06f).optional(true);
+            consumes.liquid(Liquids.water, 0.06f).boost();
         }};
 
         laserDrill = new Drill("laser-drill"){{
@@ -1126,7 +1113,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineBig;
 
             consumes.power(1.10f);
-            consumes.liquid(Liquids.water, 0.08f).optional(true);
+            consumes.liquid(Liquids.water, 0.08f).boost();
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -1143,7 +1130,7 @@ public class Blocks implements ContentList{
             warmupSpeed = 0.01f;
 
             consumes.power(3f);
-            consumes.liquid(Liquids.water, 0.1f).optional(true);
+            consumes.liquid(Liquids.water, 0.1f).boost();
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
@@ -1156,6 +1143,19 @@ public class Blocks implements ContentList{
             attribute = Attribute.water;
 
             consumes.power(0.90f);
+        }};
+
+        cultivator = new Cultivator("cultivator"){{
+            requirements(Category.production, ItemStack.with(Items.copper, 20, Items.lead, 50, Items.silicon, 20));
+            outputItem = new ItemStack(Items.sporePod, 1);
+            craftTime = 160;
+            size = 2;
+            hasLiquids = true;
+            hasPower = true;
+            hasItems = true;
+
+            consumes.power(0.80f);
+            consumes.liquid(Liquids.water, 0.15f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
@@ -1497,7 +1497,7 @@ public class Blocks implements ContentList{
             shootCone = 24f;
 
             health = 155 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true);
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, false);
         }};
 
         meltdown = new LaserTurret("meltdown"){{

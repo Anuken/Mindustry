@@ -7,7 +7,10 @@ import io.anuke.mindustry.world.meta.BlockStats;
 
 /**An abstract class that defines a type of resource that a block can consume.*/
 public abstract class Consume{
+    /**If true, this consumer will not influence consumer validity.*/
     protected boolean optional;
+    /**If true, this consumer will be displayed as a boost input.*/
+    protected boolean booster;
     protected boolean update = true;
 
     /**Apply a filter to items accepted.
@@ -22,9 +25,14 @@ public abstract class Consume{
 
     }
 
-    public Consume optional(boolean optional){
+    public Consume optional(boolean optional, boolean boost){
         this.optional = optional;
+        this.booster = boost;
         return this;
+    }
+
+    public Consume boost(){
+        return optional(true, true);
     }
 
     public Consume update(boolean update){

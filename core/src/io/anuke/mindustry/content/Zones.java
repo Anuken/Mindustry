@@ -35,7 +35,7 @@ public class Zones implements ContentList{
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
             blockRequirements = new Block[]{Blocks.router};
-            resources = new Item[]{Items.copper, Items.lead};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -98,7 +98,7 @@ public class Zones implements ContentList{
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

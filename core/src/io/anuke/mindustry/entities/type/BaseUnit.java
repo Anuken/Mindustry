@@ -17,9 +17,7 @@ import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.units.StateMachine;
-import io.anuke.mindustry.entities.units.UnitDrops;
-import io.anuke.mindustry.entities.units.UnitState;
+import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
@@ -27,9 +25,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -179,6 +175,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public boolean isBoss(){
         return hasEffect(StatusEffects.boss);
+    }
+
+    @Override
+    public float getDamageMultipler(){
+        return status.getDamageMultiplier() * Vars.state.rules.unitDamageMultiplier;
     }
 
     @Override

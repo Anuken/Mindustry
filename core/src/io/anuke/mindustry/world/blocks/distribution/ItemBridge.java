@@ -100,7 +100,18 @@ public class ItemBridge extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile link = findLink(x, y);
 
-        Draw.tint(Pal.placing);
+        Lines.stroke(2f, Pal.placing);
+        for(int i = 0; i < 4; i++){
+            Lines.dashLine(
+            x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
+            y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
+            x * tilesize + Geometry.d4[i].x * (range + 0.5f) * tilesize,
+            y * tilesize + Geometry.d4[i].y * (range + 0.5f) * tilesize,
+            range);
+        }
+
+        Draw.reset();
+        Draw.color(Pal.placing);
         Lines.stroke(1f);
         if(link != null){
             int rot = link.absoluteRelativeTo(x, y);
@@ -246,7 +257,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.getTeamID() != source.target().getTeamID()) return false;
+        if(tile.getTeam() != source.target().getTeam()) return false;
 
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);

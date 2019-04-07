@@ -25,7 +25,7 @@ public class CooledTurret extends Turret{
         hasLiquids = true;
         liquidCapacity = 20f;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).optional(true);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
     }
 
     @Override

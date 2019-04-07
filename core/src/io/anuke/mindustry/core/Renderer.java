@@ -330,6 +330,12 @@ public class Renderer implements ApplicationListener{
         drawGroundShadows();
 
         int w = world.width()*tilesize, h =  world.height()*tilesize;
+        int memory = w * h * 4 / 1024 / 1024;
+
+        if(memory >= 65){
+            ui.showInfo("$screenshot.invalid");
+            return;
+        }
 
         boolean hadShields = Core.settings.getBool("animatedshields");
         boolean hadWater = Core.settings.getBool("animatedwater");

@@ -46,6 +46,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);
+        number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f*tilesize, () -> Math.min(rules.enemyCoreBuildRadius/tilesize, 200));
         number("$rules.respawntime", f -> rules.respawnTime = f*60f, () -> rules.respawnTime/60f);
         number("$rules.wavespacing", f -> rules.waveSpacing = f*60f, () -> rules.waveSpacing/60f);

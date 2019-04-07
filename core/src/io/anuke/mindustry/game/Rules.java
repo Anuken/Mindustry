@@ -25,6 +25,8 @@ public class Rules{
     public float unitHealthMultiplier = 1f;
     /**How much damage player mechs deal.*/
     public float playerDamageMultiplier = 1f;
+    /**How much damage any other units deal.*/
+    public float unitDamageMultiplier = 1f;
     /**Multiplier for buildings for the player.*/
     public float buildCostMultiplier = 1f;
     /**Multiplier for building speed.*/

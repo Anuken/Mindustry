@@ -175,14 +175,17 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
     @Override
     public void write(DataOutput data) throws IOException{
-        data.writeFloat(x);
-        data.writeFloat(y);
+        data.writeInt(tile.pos());
+        data.writeFloat(lifetime);
     }
 
     @Override
     public void read(DataInput data) throws IOException{
-        x = data.readFloat();
-        y = data.readFloat();
+        int pos = data.readInt();
+        this.lifetime = data.readFloat();
+
+        x = Pos.x(pos) * tilesize;
+        y = Pos.y(pos) * tilesize;
     }
 
     @Override
