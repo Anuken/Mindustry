@@ -5,8 +5,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
@@ -120,11 +119,13 @@ public class WaveSpawner{
 
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
+
                 if(world.tile(x, y).block() == Blocks.spawn){
                     addSpawns(x, y);
 
                     //hide spawnpoints, they have served their purpose
                     world.tile(x, y).setBlock(Blocks.air);
+                    Log.info("Add spawn "+ x + " " + y);
                 }
             }
         }

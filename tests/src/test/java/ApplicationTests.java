@@ -25,9 +25,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
     static Map testMap;
+    static boolean initialized;
 
     @BeforeAll
     static void launchApplication(){
+        //only gets called once
+        if(initialized) return;
+        initialized = true;
+
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
@@ -102,6 +107,7 @@ public class ApplicationTests{
     @Test
     void spawnWaves(){
         world.loadMap(testMap);
+        assertTrue(world.spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
@@ -109,7 +115,7 @@ public class ApplicationTests{
         Time.update();
         Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
-        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
+        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty(), "No enemies spawned.");
     }
 
     @Test

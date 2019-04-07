@@ -261,6 +261,8 @@ public class BlockIndexer{
     }
 
     private void updateQuadrant(Tile tile){
+        if(structQuadrants == null) return;
+
         //this quadrant is now 'dirty', re-scan the whole thing
         int quadrantX = tile.x / structQuadrantSize;
         int quadrantY = tile.y / structQuadrantSize;

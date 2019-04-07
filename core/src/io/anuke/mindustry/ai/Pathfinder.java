@@ -90,7 +90,7 @@ public class Pathfinder{
      * This only occurs for active teams.*/
     private void update(Tile tile, Team team){
         //make sure team exists
-        if(paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
+        if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
             PathData path = paths[team.ordinal()];
 
             //impassable tiles have a weight of float.max
