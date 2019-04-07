@@ -39,4 +39,11 @@ public class Rules{
     public byte zone = -1;
     /**Spawn layout. Since only zones modify this, it should be assigned on save load.*/
     public transient Array<SpawnGroup> spawns = DefaultWaves.get();
+    /****/
+    /****/
+    public boolean limitedRespawns = false;
+    /****/
+    public int respawns = 5;
+    /****/
+    public boolean waitForWaveToEnd = false;
 }

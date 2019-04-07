@@ -64,6 +64,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public Color color = new Color();
     public Mech mech;
     public SpawnerTrait spawner, lastSpawner;
+    public int respawns;
 
     public NetConnection con;
     public boolean isLocal = false;
@@ -110,6 +111,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void onRespawn(Tile tile){
         boostHeat = 1f;
         achievedFlight = true;
+        if (state.rules.limitedRespawns) {
+            respawns -= 1;
+        }
     }
 
     @Override
@@ -479,6 +483,10 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void update(){
 
+        if ( (unitGroups[waveTeam.ordinal()].size() == 0) && state.rules.limitedRespawns ) {
+            respawns = state.rules.respawns;
+        }
+
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
@@ -765,6 +773,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         boostHeat = drownTime = hitTime = 0f;
         mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
         placeQueue.clear();
+        respawns = state.rules.respawns;
     }
 
     public boolean isShooting(){

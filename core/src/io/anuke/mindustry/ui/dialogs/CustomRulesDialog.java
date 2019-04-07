@@ -41,6 +41,10 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
         main.addCheck("$rules.unitdrops", b -> rules.unitDrops = b).checked(b -> rules.unitDrops);
         main.row();
+        main.addCheck("$rules.waitForWaveToEnd", b -> rules.waitForWaveToEnd = b).checked(b -> rules.waitForWaveToEnd);
+        main.row();
+        main.addCheck("$rules.limitedRespawns", b -> rules.limitedRespawns= b).checked(b -> rules.limitedRespawns);
+        main.row();
         number("$rules.buildcostmultiplier", f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier);
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
@@ -49,6 +53,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f*tilesize, () -> Math.min(rules.enemyCoreBuildRadius/tilesize, 200));
         number("$rules.respawntime", f -> rules.respawnTime = f*60f, () -> rules.respawnTime/60f);
         number("$rules.wavespacing", f -> rules.waveSpacing = f*60f, () -> rules.waveSpacing/60f);
+        number("$rules.respawns", f -> rules.respawns = (int) f, () -> rules.respawns);
     }
 
     void number(String text, FloatConsumer cons, FloatProvider prov){

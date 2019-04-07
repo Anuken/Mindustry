@@ -150,7 +150,9 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    if (state.rules.waitForWaveToEnd && (unitGroups[waveTeam.ordinal()].size() == 0)) {
+                        state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    }
                 }
 
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
