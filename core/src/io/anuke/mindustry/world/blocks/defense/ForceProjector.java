@@ -1,34 +1,25 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.impl.BaseEntity;
-import io.anuke.mindustry.entities.traits.AbsorbTrait;
-import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -46,6 +37,25 @@ public class ForceProjector extends Block {
     protected float powerDamage = 0.1f;
     protected final ConsumeForceProjectorPower consumePower;
     protected TextureRegion topRegion;
+
+    private static Tile paramTile;
+    private static ForceProjector paramBlock;
+    private static ForceEntity paramEntity;
+    private static Consumer<SolidTrait> shieldConsumer = bullet -> {
+        AbsorbTrait trait = (AbsorbTrait)bullet;
+        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && paramBlock.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+            trait.absorb();
+            Effects.effect(Fx.absorb, trait);
+            float relativeDamagePowerDraw = trait.getShieldDamage() * paramBlock.powerDamage / paramBlock.consumePower.powerCapacity;
+            paramEntity.hit = 1f;
+
+            paramEntity.power.satisfaction -= Math.min(relativeDamagePowerDraw, paramEntity.power.satisfaction);
+            if(paramEntity.power.satisfaction <= 0.0001f){
+                paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup * 2f;
+            }
+            paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup;
+        }
+    };
 
     public ForceProjector(String name) {
         super(name);
@@ -160,23 +170,10 @@ public class ForceProjector extends Block {
 
         float realRadius = realRadius(entity);
 
-        if(!entity.broken){
-            EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, bullet -> {
-                AbsorbTrait trait = (AbsorbTrait)bullet;
-                if(trait.canBeAbsorbed() && trait.getTeam() != tile.getTeam() && isInsideHexagon(trait.getX(), trait.getY(), realRadius * 2f, tile.drawx(), tile.drawy())){
-                    trait.absorb();
-                    Effects.effect(Fx.absorb, trait);
-                    float relativeDamagePowerDraw = trait.getShieldDamage() * powerDamage / consumePower.powerCapacity;
-                    entity.hit = 1f;
-
-                    entity.power.satisfaction -= Math.min(relativeDamagePowerDraw, entity.power.satisfaction);
-                    if(entity.power.satisfaction <= 0.0001f){
-                       entity.buildup += trait.getShieldDamage() * entity.warmup * 2f;
-                    }
-                    entity.buildup += trait.getShieldDamage() * entity.warmup;
-                }
-            });
-        }
+        paramTile = tile;
+        paramEntity = entity;
+        paramBlock = this;
+        EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, shieldConsumer);
     }
 
     float realRadius(ForceEntity entity){
