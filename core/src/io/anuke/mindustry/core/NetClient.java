@@ -115,24 +115,35 @@ public class NetClient implements ApplicationListener{
         });
     }
 
-    @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void sendMessage(Player player, String message){
-        if(message.length() > maxTextLength){
-            throw new ValidateException(player, "Player has sent a message above the text limit.");
-        }
-
-        Log.info("&y{0}: &lb{1}", (player == null || player.name == null ? "" : player.name), message);
-
+    //called on all clients
+    @Remote(called = Loc.server, targets = Loc.server)
+    public static void sendMessage(String message, String sender){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message, player == null ? null : colorizeName(player.id, player.name));
+            Vars.ui.chatfrag.addMessage(message, sender);
         }
     }
 
-    @Remote(called = Loc.server, variants = Variant.both, forward = true)
+    //equivalent to above method but there's no sender and no console log
+    @Remote(called = Loc.server, targets = Loc.server)
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, null);
         }
+    }
+
+    //called when a server recieves a chat message from a player
+    @Remote(called = Loc.server, targets = Loc.client)
+    public static void sendChatMessage(Player player, String message){
+        if(message.length() > maxTextLength){
+            throw new ValidateException(player, "Player has sent a message above the text limit.");
+        }
+
+        //server console logging
+        Log.info("&y{0}: &lb{1}", player.name, message);
+
+        //invoke event for all clients but also locally
+        //this is required so other clients get the correct name even if they don't know who's sending it yet
+        Call.sendMessage(message, colorizeName(player.id, player.name));
     }
 
     private static String colorizeName(int id, String name){

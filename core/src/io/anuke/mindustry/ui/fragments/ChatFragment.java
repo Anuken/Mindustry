@@ -174,7 +174,7 @@ public class ChatFragment extends Table{
 
         history.insert(1, message);
 
-        Call.sendMessage(player, message);
+        Call.sendChatMessage(message);
     }
 
     public void toggle(){

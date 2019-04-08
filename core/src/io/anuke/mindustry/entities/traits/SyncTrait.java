@@ -1,8 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.core.NetClient;
 import io.anuke.mindustry.net.Interpolator;
 
 import java.io.*;
@@ -26,17 +23,6 @@ public interface SyncTrait extends Entity, TypeTrait{
     default void interpolate(){
         if(getInterpolator() == null){
             throw new RuntimeException("This entity must have an interpolator to interpolate()!");
-        }
-
-        if(isClipped()){
-            //move off screen when no longer in bounds
-            Tmp.r1.setSize(Core.camera.width * NetClient.viewScale, Core.camera.height * NetClient.viewScale)
-            .setCenter(Core.camera.position.x, Core.camera.position.y);
-
-            if(!Tmp.r1.contains(getX(), getY()) && !Tmp.r1.contains(getInterpolator().last.x, getInterpolator().last.y)){
-                set(-99999f, -99999f);
-                return;
-            }
         }
 
         getInterpolator().update();
