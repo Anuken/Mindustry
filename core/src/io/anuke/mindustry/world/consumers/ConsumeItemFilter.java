@@ -6,9 +6,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.ui.ItemImage;
-import io.anuke.mindustry.ui.MultiReqImage;
-import io.anuke.mindustry.ui.ReqImage;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -39,7 +37,7 @@ public class ConsumeItemFilter extends Consume{
         MultiReqImage image = new MultiReqImage();
         list.each(item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
 
-        table.add(image).size(8*4);
+        table.add(image).size(8 * 4);
     }
 
     @Override
@@ -76,6 +74,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.booster : BlockStat.input, new ItemFilterValue(filter));
+        stats.add(booster ? BlockStat.booster : BlockStat.input, new ItemFilterValue(filter));
     }
 }

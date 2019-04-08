@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.graphics.g2d.CapStyle;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.world.Tile;
@@ -27,22 +25,22 @@ public class ExtendingItemBridge extends ItemBridge{
         int i = tile.absoluteRelativeTo(other.x, other.y);
 
         float ex = other.worldx() - tile.worldx() - Geometry.d4[i].x * tilesize / 2f,
-                ey = other.worldy() - tile.worldy() - Geometry.d4[i].y * tilesize / 2f;
+        ey = other.worldy() - tile.worldy() - Geometry.d4[i].y * tilesize / 2f;
 
         ex *= entity.uptime;
         ey *= entity.uptime;
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
-                tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
-                tile.worldy() + Geometry.d4[i].y * tilesize / 2f,
-                tile.worldx() + ex,
-                tile.worldy() + ey, CapStyle.none, 0f);
+        tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
+        tile.worldy() + Geometry.d4[i].y * tilesize / 2f,
+        tile.worldx() + ex,
+        tile.worldy() + ey, CapStyle.none, 0f);
 
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
         Draw.rect(endRegion,
-                tile.worldx() + ex + Geometry.d4[i].x * tilesize / 2f,
-                tile.worldy() + ey + Geometry.d4[i].y * tilesize / 2f, i * 90 + 270);
+        tile.worldx() + ex + Geometry.d4[i].x * tilesize / 2f,
+        tile.worldy() + ey + Geometry.d4[i].y * tilesize / 2f, i * 90 + 270);
 
         int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
@@ -51,10 +49,10 @@ public class ExtendingItemBridge extends ItemBridge{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
-                    tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * entity.uptime,
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime, i * 90f);
+            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * entity.uptime,
+            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime, i * 90f);
         }
         Draw.reset();
     }

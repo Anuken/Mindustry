@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Pal;
 
-/**An extended BulletType for most ammo-based bullets shot from turrets and units.*/
+/** An extended BulletType for most ammo-based bullets shot from turrets and units. */
 public class BasicBulletType extends BulletType{
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public float bulletWidth = 5f, bulletHeight = 7f;

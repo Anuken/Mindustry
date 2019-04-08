@@ -28,7 +28,7 @@ public interface VelocityTrait extends MoveTrait{
         velocity().scl(1f - drag() * Time.delta());
 
         if(this instanceof SolidTrait){
-            ((SolidTrait) this).move(velocity().x * Time.delta(), velocity().y * Time.delta());
+            ((SolidTrait)this).move(velocity().x * Time.delta(), velocity().y * Time.delta());
         }else{
             moveBy(velocity().x * Time.delta(), velocity().y * Time.delta());
         }

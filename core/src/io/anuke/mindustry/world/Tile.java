@@ -12,10 +12,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,7 +25,7 @@ public class Tile implements Position, TargetTrait{
     public byte link = 0;
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Weight of [ground] units on this tile.*/
+    /** Weight of [ground] units on this tile. */
     public byte weight, airWeight = 0;
     /** Tile entity, usually null. */
     public TileEntity entity;
@@ -39,32 +36,32 @@ public class Tile implements Position, TargetTrait{
     private byte rotation;
     /** Team ordinal. */
     private byte team;
-    /**Ore that is on top of this (floor) block.*/
+    /** Ore that is on top of this (floor) block. */
     private byte ore = 0;
 
     public Tile(int x, int y){
-        this.x = (short) x;
-        this.y = (short) y;
+        this.x = (short)x;
+        this.y = (short)y;
         wall = floor = (Floor)Blocks.air;
     }
 
     public Tile(int x, int y, byte floor, byte wall){
         this(x, y);
-        this.floor = (Floor) content.block(floor);
+        this.floor = (Floor)content.block(floor);
         this.wall = content.block(wall);
         changed();
     }
 
     public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
         this(x, y);
-        this.floor = (Floor) content.block(floor);
+        this.floor = (Floor)content.block(floor);
         this.wall = content.block(wall);
         this.rotation = rotation;
         changed();
         this.team = team;
     }
 
-    /**Returns this tile's position as a {@link Pos}.*/
+    /** Returns this tile's position as a {@link Pos}. */
     public int pos(){
         return Pos.get(x, y);
     }
@@ -112,7 +109,7 @@ public class Tile implements Position, TargetTrait{
 
     @SuppressWarnings("unchecked")
     public <T extends TileEntity> T entity(){
-        return (T) entity;
+        return (T)entity;
     }
 
     public float worldx(){
@@ -150,7 +147,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void setTeam(Team team){
-        this.team = (byte) team.ordinal();
+        this.team = (byte)team.ordinal();
     }
 
     public byte getTeamID(){
@@ -162,7 +159,7 @@ public class Tile implements Position, TargetTrait{
         if(rotation < 0) rotation = (-rotation + 2);
         this.wall = type;
         this.link = 0;
-        setRotation((byte) (rotation % 4));
+        setRotation((byte)(rotation % 4));
         changed();
     }
 

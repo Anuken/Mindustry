@@ -16,15 +16,11 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -84,7 +80,7 @@ public class NuclearReactor extends PowerGenerator{
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
 
         int fuel = entity.items.get(item);
-        float fullness = (float) fuel / itemCapacity;
+        float fullness = (float)fuel / itemCapacity;
         entity.productionEfficiency = fullness;
 
         if(fuel > 0){
@@ -108,7 +104,7 @@ public class NuclearReactor extends PowerGenerator{
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
                 Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
-                        tile.worldy() + Mathf.random(size * tilesize / 2f));
+                tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
 

@@ -6,40 +6,33 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Logic;
-import io.anuke.mindustry.core.NetServer;
-import io.anuke.mindustry.core.World;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.Spirit;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Zone;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import org.junit.jupiter.api.*;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
     static Map testMap;
+    static boolean initialized;
 
     @BeforeAll
     static void launchApplication(){
+        //only gets called once
+        if(initialized) return;
+        initialized = true;
+
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
@@ -94,7 +87,7 @@ public class ApplicationTests{
 
     @BeforeEach
     void resetWorld(){
-        Time.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -114,6 +107,7 @@ public class ApplicationTests{
     @Test
     void spawnWaves(){
         world.loadMap(testMap);
+        assertTrue(world.spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
@@ -121,7 +115,7 @@ public class ApplicationTests{
         Time.update();
         Time.setDeltaProvider(() -> 1f);
         unitGroups[waveTeam.ordinal()].updateEvents();
-        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty());
+        assertFalse(unitGroups[waveTeam.ordinal()].isEmpty(), "No enemies spawned.");
     }
 
     @Test
@@ -144,8 +138,8 @@ public class ApplicationTests{
         int by = 4;
         world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
-        for(int x = bx-1; x <= bx + 1; x++){
-            for(int y = by-1; y <= by + 1; y++){
+        for(int x = bx - 1; x <= bx + 1; x++){
+            for(int y = by - 1; y <= by + 1; y++){
                 if(x == bx && by == y){
                     assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
@@ -253,8 +247,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -308,8 +302,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -346,7 +340,7 @@ public class ApplicationTests{
         }
         int i = 0;
 
-        for(int x = 5; x < tiles.length && i < content.blocks().size;){
+        for(int x = 5; x < tiles.length && i < content.blocks().size; ){
             Block block = content.block(i++);
             if(block.buildVisibility.get()){
                 tiles[x][5].setBlock(block);

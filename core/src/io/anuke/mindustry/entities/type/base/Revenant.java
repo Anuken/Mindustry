@@ -14,7 +14,7 @@ public class Revenant extends FlyingUnit{
             float tra = rotation - 90, trY = -getWeapon().getRecoil(this, i > 0) + type.weaponOffsetY;
             float w = i > 0 ? -12 : 12;
             float wx = x + Angles.trnsx(tra, getWeapon().width * i, trY), wy = y + Angles.trnsy(tra, getWeapon().width * i, trY);
-            int wi = (i + 1)/2;
+            int wi = (i + 1) / 2;
             Draw.rect(getWeapon().region, wx, wy, w, 12, weaponAngles[wi] - 90);
         }
     }

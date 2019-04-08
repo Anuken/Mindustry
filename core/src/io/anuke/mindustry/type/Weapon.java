@@ -22,38 +22,38 @@ import io.anuke.mindustry.net.Net;
 public class Weapon{
     public final String name;
 
-    /**minimum cursor distance from player, fixes 'cross-eyed' shooting.*/
+    /** minimum cursor distance from player, fixes 'cross-eyed' shooting. */
     protected static float minPlayerDist = 20f;
     protected static int sequenceNum = 0;
-    /**bullet shot*/
+    /** bullet shot */
     public BulletType bullet;
-    /**shell ejection effect*/
+    /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
-    /**weapon reload in frames*/
+    /** weapon reload in frames */
     public float reload;
-    /**amount of shots per fire*/
+    /** amount of shots per fire */
     public int shots = 1;
-    /**spacing in degrees between multiple shots, if applicable*/
+    /** spacing in degrees between multiple shots, if applicable */
     public float spacing = 12f;
-    /**inaccuracy of degrees of each shot*/
+    /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
-    /**intensity and duration of each shot's screen shake*/
+    /** intensity and duration of each shot's screen shake */
     public float shake = 0f;
-    /**visual weapon knockback.*/
+    /** visual weapon knockback. */
     public float recoil = 1.5f;
-    /**shoot barrel y offset*/
+    /** shoot barrel y offset */
     public float length = 3f;
-    /**shoot barrel x offset.*/
+    /** shoot barrel x offset. */
     public float width = 4f;
-    /**fraction of velocity that is random*/
+    /** fraction of velocity that is random */
     public float velocityRnd = 0f;
-    /**whether to shoot the weapons in different arms one after another, rather than all at once*/
+    /** whether to shoot the weapons in different arms one after another, rather than all at once */
     public boolean roundrobin = false;
-    /**randomization of shot length*/
+    /** randomization of shot length */
     public float lengthRand = 0f;
-    /**delay in ticks between shots*/
+    /** delay in ticks between shots */
     public float shotDelay = 0;
-    /**whether shooter rotation is ignored when shooting.*/
+    /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
 
     public TextureRegion region;
@@ -95,7 +95,7 @@ public class Weapon{
         if(weapon.shotDelay > 0.01f){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
                 Time.run(sequenceNum * weapon.shotDelay, () -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
-                sequenceNum ++;
+                sequenceNum++;
             });
         }else{
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
@@ -156,7 +156,7 @@ public class Weapon{
             shootDirect(p, x, y, angle, left);
         }else{
             if(p instanceof Player){ //players need special weapon handling logic
-                Call.onPlayerShootWeapon((Player) p, x, y, angle, left);
+                Call.onPlayerShootWeapon((Player)p, x, y, angle, left);
             }else{
                 Call.onGenericShootWeapon(p, x, y, angle, left);
             }
@@ -168,6 +168,6 @@ public class Weapon{
 
         Tmp.v1.trns(angle, 3f);
         Bullet.create(bullet,
-                owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
+        owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
     }
 }

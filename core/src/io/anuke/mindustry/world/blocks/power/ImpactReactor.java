@@ -6,9 +6,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
@@ -19,9 +17,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -51,10 +47,10 @@ public class ImpactReactor extends PowerGenerator{
         super.setBars();
 
         bars.add("poweroutput", entity -> new Bar(() ->
-            Core.bundle.format("bar.poweroutput",
-            Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().powerPerTick, 0)*60 * entity.timeScale, 1)),
-            () -> Pal.powerBar,
-            () -> ((GeneratorEntity)entity).productionEfficiency));
+        Core.bundle.format("bar.poweroutput",
+        Strings.fixed(Math.max(entity.block.getPowerProduction(entity.tile) - consumes.getPower().powerPerTick, 0) * 60 * entity.timeScale, 1)),
+        () -> Pal.powerBar,
+        () -> ((GeneratorEntity)entity).productionEfficiency));
     }
 
     @Override
@@ -73,7 +69,7 @@ public class ImpactReactor extends PowerGenerator{
         if(entity.cons.valid()){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
-                entity.warmup =1f;
+                entity.warmup = 1f;
             }
 
             if(entity.timer.get(timerUse, itemDuration)){
@@ -95,7 +91,7 @@ public class ImpactReactor extends PowerGenerator{
         for(int i = 0; i < plasmas; i++){
             float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
 
-            Draw.color(plasma1, plasma2, (float) i / plasmas);
+            Draw.color(plasma1, plasma2, (float)i / plasmas);
             Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
             Draw.blend(Blending.additive);
             Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);

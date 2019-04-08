@@ -34,7 +34,7 @@ public class BasicGenerator extends RandomGenerator{
             for(int i = ores.size - 1; i >= 0; i--){
                 Item entry = ores.get(i);
                 if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY)) > 0.23f &&
-                        Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (40 + i * 4), offsetX, offsetY)) > 0.32f){
+                Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (40 + i * 4), offsetX, offsetY)) > 0.32f){
 
                     //floor = OreBlock.get(floor, entry);
                     break;

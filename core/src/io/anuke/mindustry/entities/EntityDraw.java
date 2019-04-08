@@ -46,7 +46,7 @@ public class EntityDraw{
         for(Entity e : group.all()){
             if(!(e instanceof DrawTrait) || !toDraw.test((T)e) || !e.isAdded()) continue;
 
-            if(!clip || rect.setSize(((DrawTrait) e).drawSize()).setCenter(e.getX(), e.getY()).overlaps(viewport)){
+            if(!clip || rect.setSize(((DrawTrait)e).drawSize()).setCenter(e.getX(), e.getY()).overlaps(viewport)){
                 cons.accept((T)e);
             }
         }

@@ -5,12 +5,8 @@ import io.anuke.arc.collection.LongArray;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Layer;
@@ -18,13 +14,9 @@ import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -79,9 +71,9 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         byte rotation = tile.getRotation();
 
-        int frame = entity.clogHeat <= 0.5f ? (int) (((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
+        int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
-            tilesize * entity.blendsclx, tilesize * entity.blendscly,  rotation*90);
+        tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
     }
 
     @Override
@@ -162,8 +154,8 @@ public class Conveyor extends Block{
                 tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
                 Draw.rect(pos.item.icon(Item.Icon.medium),
-                        (tile.x * tilesize + tr1.x * pos.y + tr2.x),
-                        (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
+                (tile.x * tilesize + tr1.x * pos.y + tr2.x),
+                (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
             }
 
         }catch(IndexOutOfBoundsException e){
@@ -321,7 +313,7 @@ public class Conveyor extends Block{
         int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.getRotation());
         float minitem = tile.<ConveyorEntity>entity().minitem;
         return (((direction == 0) && minitem > itemSpace) ||
-                ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == tile.getRotation()));
+        ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == tile.getRotation()));
     }
 
     @Override
@@ -350,7 +342,7 @@ public class Conveyor extends Block{
 
         //this item must be greater than anything there...
         entity.convey.add(result);
-        entity.lastInserted = (byte)(entity.convey.size-1);
+        entity.lastInserted = (byte)(entity.convey.size - 1);
     }
 
     @Override
@@ -407,9 +399,9 @@ public class Conveyor extends Block{
 
         static long packItem(Item item, float x, float y){
             short[] shorts = packShorts;
-            shorts[0] = (short) item.id;
-            shorts[1] = (short) (x * Short.MAX_VALUE);
-            shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
+            shorts[0] = (short)item.id;
+            shorts[1] = (short)(x * Short.MAX_VALUE);
+            shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);
         }
 
@@ -417,13 +409,13 @@ public class Conveyor extends Block{
             short[] values = Pack.shorts(value, writeShort);
 
             short itemid = values[0];
-            float x = values[1] / (float) Short.MAX_VALUE;
-            float y = ((float) values[2]) / Short.MAX_VALUE + 1f;
+            float x = values[1] / (float)Short.MAX_VALUE;
+            float y = ((float)values[2]) / Short.MAX_VALUE + 1f;
 
             byte[] bytes = writeByte;
-            bytes[0] = (byte) itemid;
-            bytes[1] = (byte) (x * 127);
-            bytes[2] = (byte) (y * 255 - 128);
+            bytes[0] = (byte)itemid;
+            bytes[1] = (byte)(x * 127);
+            bytes[2] = (byte)(y * 255 - 128);
 
             return Pack.intBytes(bytes);
         }
@@ -433,12 +425,12 @@ public class Conveyor extends Block{
 
             byte itemid = values[0];
             float x = values[1] / 127f;
-            float y = ((int) values[2] + 128) / 255f;
+            float y = ((int)values[2] + 128) / 255f;
 
             short[] shorts = writeShort;
-            shorts[0] = (short) itemid;
-            shorts[1] = (short) (x * Short.MAX_VALUE);
-            shorts[2] = (short) ((y - 1f) * Short.MAX_VALUE);
+            shorts[0] = (short)itemid;
+            shorts[1] = (short)(x * Short.MAX_VALUE);
+            shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);
         }
 
@@ -450,8 +442,8 @@ public class Conveyor extends Block{
             else
                 item = content.items().get(values[0]);
 
-            x = values[1] / (float) Short.MAX_VALUE;
-            y = ((float) values[2]) / Short.MAX_VALUE + 1f;
+            x = values[1] / (float)Short.MAX_VALUE;
+            y = ((float)values[2]) / Short.MAX_VALUE + 1f;
             return this;
         }
 

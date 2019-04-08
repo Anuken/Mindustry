@@ -4,12 +4,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
@@ -17,22 +13,21 @@ import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePower;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -73,7 +68,7 @@ public class MassDriver extends Block{
         //just in case the client has invalid data
         if(!(tile.entity instanceof MassDriverEntity) || !(target.entity instanceof MassDriverEntity)) return;
 
-        MassDriver driver = (MassDriver) tile.block();
+        MassDriver driver = (MassDriver)tile.block();
 
         MassDriverEntity entity = tile.entity();
         MassDriverEntity other = target.entity();
@@ -87,7 +82,7 @@ public class MassDriver extends Block{
         data.to = other;
         int totalUsed = 0;
         for(int i = 0; i < content.items().size; i++){
-            int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver) tile.block()).itemCapacity - totalUsed);
+            int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
             data.items[i] = maxTransfer;
             totalUsed += maxTransfer;
         }
@@ -97,14 +92,14 @@ public class MassDriver extends Block{
 
         other.isRecieving = true;
         Bullet.create(Bullets.driverBolt, entity, entity.getTeam(),
-                tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
-                angle, 1f, 1f, data);
+        tile.drawx() + Angles.trnsx(angle, driver.translation), tile.drawy() + Angles.trnsy(angle, driver.translation),
+        angle, 1f, 1f, data);
 
         Effects.effect(driver.shootEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
-                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
+        tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
 
         Effects.effect(driver.smokeEffect, tile.drawx() + Angles.trnsx(angle, driver.translation),
-                tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
+        tile.drawy() + Angles.trnsy(angle, driver.translation), angle);
 
         Effects.shake(driver.shake, driver.shake, entity);
     }
@@ -157,9 +152,9 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
-                    linkValid(tile) && //only fire when at 100% power capacity
-                    tile.entity.power.satisfaction >= powerPercentageUsed &&
-                    link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
+            linkValid(tile) && //only fire when at 100% power capacity
+            tile.entity.power.satisfaction >= powerPercentageUsed &&
+            link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();
                 other.waiting.add(tile);
@@ -188,8 +183,8 @@ public class MassDriver extends Block{
         MassDriverEntity entity = tile.entity();
 
         Draw.rect(region,
-                tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
-                tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
+        tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
+        tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
     }
 
     @Override
@@ -198,7 +193,7 @@ public class MassDriver extends Block{
 
         Draw.color(Pal.accent);
         Lines.stroke(1f);
-        Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size/2f+1) * tilesize + sin);
+        Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size / 2f + 1) * tilesize + sin);
 
         MassDriverEntity entity = tile.entity();
 
@@ -206,7 +201,7 @@ public class MassDriver extends Block{
             Tile target = world.tile(entity.link);
 
             Draw.color(Pal.place);
-            Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size/2f+1) * tilesize + sin);
+            Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size / 2f + 1) * tilesize + sin);
             Draw.reset();
         }
 
@@ -278,12 +273,12 @@ public class MassDriver extends Block{
 
             //add all the items possible
             for(int i = 0; i < data.items.length; i++){
-                int maxAdd = Math.min(data.items[i], itemCapacity*2 - totalItems);
+                int maxAdd = Math.min(data.items[i], itemCapacity * 2 - totalItems);
                 items.add(content.item(i), maxAdd);
                 data.items[i] -= maxAdd;
                 totalItems += maxAdd;
 
-                if(totalItems >= itemCapacity*2){
+                if(totalItems >= itemCapacity * 2){
                     break;
                 }
             }

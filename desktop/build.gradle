@@ -6,8 +6,9 @@ sourceSets.main.java.srcDirs = ["src/"]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-import com.badlogicgames.packr.PackrConfig
+
 import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.PackrConfig
 
 def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
@@ -146,7 +147,7 @@ task packrZip(){
             }
         }
     }
-    
+
     finalizedBy "clearOut"
 
     if(project.hasProperty("platform")){

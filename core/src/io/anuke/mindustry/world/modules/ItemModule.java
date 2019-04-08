@@ -3,9 +3,7 @@ package io.anuke.mindustry.world.modules;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.content;
@@ -15,7 +13,7 @@ public class ItemModule extends BlockModule{
 
     private int[] items = new int[content.items().size];
     private int total;
-    private int id = lastID ++;
+    private int id = lastID++;
 
     public void forEach(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
@@ -98,8 +96,8 @@ public class ItemModule extends BlockModule{
 
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
-           this.items[i] += items.items[i];
-           total += items.items[i];
+            this.items[i] += items.items[i];
+            total += items.items[i];
         }
     }
 

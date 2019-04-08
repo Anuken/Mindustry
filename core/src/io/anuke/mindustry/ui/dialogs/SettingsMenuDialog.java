@@ -50,7 +50,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         title.setAlignment(Align.center);
         titleTable.row();
         titleTable.add(new Image("white"))
-                .growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        .growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();

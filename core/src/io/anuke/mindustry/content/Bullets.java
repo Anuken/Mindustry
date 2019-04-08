@@ -1,20 +1,15 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.CapStyle;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.bullet.*;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.effect.Puddle;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shapes;
@@ -37,7 +32,7 @@ public class Bullets implements ContentList{
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
-            standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
+    standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //electric
     lancerLaser, meltdownLaser, lightning, arc, damageLightning,
@@ -562,7 +557,7 @@ public class Bullets implements ContentList{
             public void hit(Bullet b, float hitx, float hity){
                 Effects.effect(hitEffect, colors[2], hitx, hity);
                 if(Mathf.chance(0.4)){
-                    Fire.create(world.tileWorld(hitx+Mathf.range(5f), hity+Mathf.range(5f)));
+                    Fire.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
                 }
             }
 
@@ -586,6 +581,7 @@ public class Bullets implements ContentList{
         fuseShot = new BulletType(0.01f, 70){
             int rays = 3;
             float rayLength = 80f;
+
             {
                 hitEffect = Fx.hitFuse;
                 lifetime = 13f;
@@ -594,23 +590,23 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void init(Bullet b) {
-                for (int i = 0; i < rays; i++) {
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays/2))*20f);
+            public void init(Bullet b){
+                for(int i = 0; i < rays; i++){
+                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                 }
             }
 
             @Override
-            public void draw(Bullet b) {
+            public void draw(Bullet b){
                 super.draw(b);
                 Draw.color(Color.WHITE, Pal.surge, b.fin());
                 for(int i = 0; i < 7; i++){
                     Tmp.v1.trns(b.rot(), i * 8f);
-                    float sl = Mathf.clamp(b.fout()-0.5f) * (80f - i *10);
+                    float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
                     Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
                     Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
                 }
-                Shapes.tri(b.x, b.y, 13f, (rayLength+50) * b.fout(), b.rot());
+                Shapes.tri(b.x, b.y, 13f, (rayLength + 50) * b.fout(), b.rot());
                 Shapes.tri(b.x, b.y, 13f, 10f * b.fout(), b.rot() + 180f);
                 Draw.reset();
             }
@@ -665,14 +661,16 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 25){{
+        arc = new BulletType(0.001f, 25){
+            {
                 lifetime = 1;
                 despawnEffect = Fx.none;
                 hitEffect = Fx.hitLancer;
             }
 
             @Override
-            public void draw(Bullet b){}
+            public void draw(Bullet b){
+            }
 
             @Override
             public void init(Bullet b){
@@ -694,6 +692,8 @@ public class Bullets implements ContentList{
             bulletWidth = 9f;
             bulletHeight = 13f;
             hitEffect = Fx.flakExplosion;
+            shootEffect = Fx.none;
+            smokeEffect = Fx.none;
         }};
 
         bombIncendiary = new BombBulletType(7f, 10f, "shell"){{
@@ -707,7 +707,8 @@ public class Bullets implements ContentList{
             incendSpread = 10f;
         }};
 
-        bombOil = new BombBulletType(2f, 3f, "shell"){{
+        bombOil = new BombBulletType(2f, 3f, "shell"){
+            {
                 bulletWidth = 8f;
                 bulletHeight = 12f;
                 hitEffect = Fx.pulverize;
@@ -726,7 +727,8 @@ public class Bullets implements ContentList{
             }
         };
 
-        explode = new BombBulletType(2f, 3f, "clear"){{
+        explode = new BombBulletType(2f, 3f, "clear"){
+            {
                 hitEffect = Fx.pulverize;
                 lifetime = 23f;
                 speed = 1f;

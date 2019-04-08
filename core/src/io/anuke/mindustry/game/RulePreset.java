@@ -3,7 +3,7 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.Core;
 import io.anuke.arc.function.Supplier;
 
-/**Defines preset rule sets..*/
+/** Defines preset rule sets.. */
 public enum RulePreset{
     survival(() -> new Rules(){{
         waveTimer = true;

@@ -33,7 +33,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         MultiReqImage image = new MultiReqImage();
         list.each(liquid -> image.add(new ReqImage(liquid.getContentIcon(), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.entity))));
 
-        table.add(image).size(8*4);
+        table.add(image).size(8 * 4);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, amount * timePeriod, timePeriod == 60f));
+        stats.add(booster ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, amount * timePeriod, timePeriod == 60f));
     }
 }

@@ -7,16 +7,14 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class CooledTurret extends Turret{
-    /**How much reload is lowered by for each unit of liquid of heat capacity.*/
+    /** How much reload is lowered by for each unit of liquid of heat capacity. */
     protected float coolantMultiplier = 5f;
     protected Effect coolEffect = Fx.fuelburn;
 
@@ -25,7 +23,7 @@ public class CooledTurret extends Turret{
         hasLiquids = true;
         liquidCapacity = 20f;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).optional(true);
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
     }
 
     @Override

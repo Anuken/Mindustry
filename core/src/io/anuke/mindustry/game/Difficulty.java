@@ -2,15 +2,17 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
 
-/**Presets for time between waves.
- * TODO specify correct time*/
+/**
+ * Presets for time between waves.
+ * TODO specify correct time
+ */
 public enum Difficulty{
     easy(1.4f),
     normal(1f),
     hard(0.5f),
     insane(0.25f);
 
-    /**Multiplier of the time between waves.*/
+    /** Multiplier of the time between waves. */
     public final float waveTime;
 
     private String value;

@@ -14,19 +14,19 @@ import io.anuke.mindustry.io.MapIO;
 import static io.anuke.mindustry.Vars.world;
 
 public class Map implements Comparable<Map>{
-    /** Whether this is a custom map.*/
+    /** Whether this is a custom map. */
     public final boolean custom;
-    /** Metadata. Author description, display name, etc.*/
+    /** Metadata. Author description, display name, etc. */
     public final ObjectMap<String, String> tags;
-    /** Base file of this map. File can be named anything at all.*/
+    /** Base file of this map. File can be named anything at all. */
     public final FileHandle file;
-    /** Format version.*/
+    /** Format version. */
     public final int version;
-    /** Map width/height, shorts.*/
+    /** Map width/height, shorts. */
     public int width, height;
-    /** Preview texture.*/
+    /** Preview texture. */
     public Texture texture;
-    /** Build that this map was created in. -1 = unknown or custom build.*/
+    /** Build that this map was created in. -1 = unknown or custom build. */
     public int build;
 
     public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom, int version, int build){
@@ -103,9 +103,9 @@ public class Map implements Comparable<Map>{
     @Override
     public String toString(){
         return "Map{" +
-                "file='" + file + '\'' +
-                ", custom=" + custom +
-                ", tags=" + tags +
-                '}';
+        "file='" + file + '\'' +
+        ", custom=" + custom +
+        ", tags=" + tags +
+        '}';
     }
 }

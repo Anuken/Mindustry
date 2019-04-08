@@ -8,22 +8,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.CachedTile;
-import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -35,7 +27,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.bufferSize;
 import static io.anuke.mindustry.Vars.content;
 
-/** Reads and writes map files.*/
+/** Reads and writes map files. */
 public class MapIO{
     public static final int version = 1;
 
@@ -47,13 +39,13 @@ public class MapIO{
 
         //stainedRocks, stainedRocksRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
         missingBlocks = ObjectMap.of(
-            "stained-stone", Blocks.shale,
-            "stained-stone-red", Blocks.shale,
-            "stained-stone-yellow", Blocks.shale,
-            "stained-rocks", Blocks.shaleRocks,
-            "stained-boulder", Blocks.shaleBoulder,
-            "stained-rocks-red", Blocks.shaleRocks,
-            "stained-rocks-yellow", Blocks.shaleRocks
+        "stained-stone", Blocks.shale,
+        "stained-stone-red", Blocks.shale,
+        "stained-stone-yellow", Blocks.shale,
+        "stained-rocks", Blocks.shaleRocks,
+        "stained-boulder", Blocks.shaleBoulder,
+        "stained-rocks-red", Blocks.shaleRocks,
+        "stained-rocks-yellow", Blocks.shaleRocks
         );
     }
 
@@ -84,7 +76,8 @@ public class MapIO{
 
             @Override
             public void setOreByte(byte b){
-                if(b != 0) floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
+                if(b != 0)
+                    floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
 
             @Override
@@ -223,12 +216,12 @@ public class MapIO{
         }
     }
 
-    /**Reads tiles from a map, version-agnostic.*/
+    /** Reads tiles from a map, version-agnostic. */
     public static void readTiles(Map map, Tile[][] tiles) throws IOException{
         readTiles(map, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads tiles from a map, version-agnostic.*/
+    /** Reads tiles from a map, version-agnostic. */
     public static void readTiles(Map map, TileProvider tiles) throws IOException{
         if(map.version == 0){
             readLegacyMmapTiles(map.file, tiles);
@@ -239,12 +232,12 @@ public class MapIO{
         }
     }
 
-    /**Reads tiles from a map in the new build-65 format.*/
+    /** Reads tiles from a map in the new build-65 format. */
     private static void readTiles(FileHandle file, int width, int height, Tile[][] tiles) throws IOException{
         readTiles(file, width, height, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads tiles from a map in the new build-65 format.*/
+    /** Reads tiles from a map in the new build-65 format. */
     private static void readTiles(FileHandle file, int width, int height, TileProvider tiles) throws IOException{
         try(BufferedInputStream input = file.read(bufferSize)){
 
@@ -334,7 +327,7 @@ public class MapIO{
 
     //region legacy IO
 
-    /**Reads a pixmap in the 3.5 pixmap format.*/
+    /** Reads a pixmap in the 3.5 pixmap format. */
     public static void readLegacyPixmap(Pixmap pixmap, Tile[][] tiles){
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
@@ -358,7 +351,7 @@ public class MapIO{
                                 Tile write = tiles[worldx][worldy];
                                 write.setBlock(Blocks.part);
                                 write.setTeam(Team.blue);
-                                write.setLinkByte(Pack.byteByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                                write.setLinkByte(Pack.byteByte((byte)(dx - 1 + 8), (byte)(dy - 1 + 8)));
                             }
                         }
                     }
@@ -371,12 +364,12 @@ public class MapIO{
         }
     }
 
-    /**Reads a pixmap in the old 4.0 .mmap format.*/
+    /** Reads a pixmap in the old 4.0 .mmap format. */
     private static void readLegacyMmapTiles(FileHandle file, Tile[][] tiles) throws IOException{
         readLegacyMmapTiles(file, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads a mmap in the old 4.0 .mmap format.*/
+    /** Reads a mmap in the old 4.0 .mmap format. */
     private static void readLegacyMmapTiles(FileHandle file, TileProvider tiles) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(bufferSize))){
             stream.readInt(); //version

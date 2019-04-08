@@ -1,8 +1,6 @@
 package io.anuke.mindustry.desktop;
 
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
+import club.minnced.discord.rpc.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
@@ -85,7 +83,8 @@ public class DesktopPlatform extends Platform{
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement()) ;
+            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement())
+                ;
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];

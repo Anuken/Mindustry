@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
 public class Rock extends Block{
     protected int variants;

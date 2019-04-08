@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.meta.values;
 
-import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.StatValue;
 
 /**
  * A stat that is a number with a unit attacked.
@@ -20,7 +20,7 @@ public class NumberValue implements StatValue{
 
     @Override
     public void display(Table table){
-        int precision = Math.abs((int) value - value) <= 0.001f ? 0 : Math.abs((int) (value * 10) - value * 10) <= 0.001f ? 1 : 2;
+        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
 
         table.add(Strings.fixed(value, precision));
         table.add((unit.space ? " " : "") + unit.localized());

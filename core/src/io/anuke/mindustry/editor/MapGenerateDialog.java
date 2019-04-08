@@ -62,7 +62,7 @@ public class MapGenerateDialog extends FloatingDialog{
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", "icon-add", 14*2, this::showAdd).height(64f).width(140f);
+        buttons.addImageTextButton("$add", "icon-add", 14 * 2, this::showAdd).height(64f).width(140f);
     }
 
     void setup(){
@@ -120,24 +120,24 @@ public class MapGenerateDialog extends FloatingDialog{
                 t.table(b -> {
                     b.left();
                     b.defaults().size(50f);
-                    b.addImageButton("icon-refresh", 14*2, () -> {
+                    b.addImageButton("icon-refresh", 14 * 2, () -> {
                         filter.randomize();
                         update();
                     });
 
-                    b.addImageButton("icon-arrow-up", 10*2, () -> {
+                    b.addImageButton("icon-arrow-up", 10 * 2, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.max(0, idx - 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-arrow-down", 10*2, () -> {
+                    b.addImageButton("icon-arrow-down", 10 * 2, () -> {
                         int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.min(filters.size-1, idx + 1));
+                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-trash", 14*2, () -> {
+                    b.addImageButton("icon-trash", 14 * 2, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
@@ -305,6 +305,9 @@ public class MapGenerateDialog extends FloatingDialog{
                 }
 
                 Core.app.post(() -> {
+                    if(pixmap == null || texture == null){
+                        return;
+                    }
                     texture.draw(pixmap, 0, 0);
                     generating = false;
                 });

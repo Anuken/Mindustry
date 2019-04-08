@@ -16,16 +16,16 @@ public class ItemStack implements Comparable<ItemStack>{
     }
 
     public static ItemStack[] with(Object... items){
-        ItemStack[] stacks = new ItemStack[items.length/2];
-        for(int i = 0; i < items.length; i+= 2){
-            stacks[i/2] = new ItemStack((Item)items[i], (Integer)items[i + 1]);
+        ItemStack[] stacks = new ItemStack[items.length / 2];
+        for(int i = 0; i < items.length; i += 2){
+            stacks[i / 2] = new ItemStack((Item)items[i], (Integer)items[i + 1]);
         }
         return stacks;
     }
 
     public static Array<ItemStack> list(Object... items){
-        Array<ItemStack> stacks = new Array<>(items.length/2);
-        for(int i = 0; i < items.length; i+= 2){
+        Array<ItemStack> stacks = new Array<>(items.length / 2);
+        for(int i = 0; i < items.length; i += 2){
             stacks.add(new ItemStack((Item)items[i], (Integer)items[i + 1]));
         }
         return stacks;

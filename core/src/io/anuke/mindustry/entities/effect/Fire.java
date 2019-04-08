@@ -3,9 +3,6 @@ package io.anuke.mindustry.entities.effect;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -13,22 +10,17 @@ import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -42,10 +34,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     private float baseFlammability = -1, puddleFlammability;
     private float lifetime;
 
-    /**Deserialization use only!*/
-    public Fire(){}
+    /** Deserialization use only! */
+    public Fire(){
+    }
 
-    /**Start a fire on the tile. If there already is a file there, refreshes its lifetime.*/
+    /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(Net.client() || tile == null) return; //not clientside.
 
@@ -153,8 +146,8 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
                 entity.damage(0.4f);
             }
             Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f,
-                    unit -> !unit.isFlying() && !unit.isImmune(StatusEffects.burning),
-                    unit -> unit.applyEffect(StatusEffects.burning, 60 * 5));
+            unit -> !unit.isFlying() && !unit.isImmune(StatusEffects.burning),
+            unit -> unit.applyEffect(StatusEffects.burning, 60 * 5));
         }
     }
 
@@ -175,14 +168,17 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
     @Override
     public void write(DataOutput data) throws IOException{
-        data.writeFloat(x);
-        data.writeFloat(y);
+        data.writeInt(tile.pos());
+        data.writeFloat(lifetime);
     }
 
     @Override
     public void read(DataInput data) throws IOException{
-        x = data.readFloat();
-        y = data.readFloat();
+        int pos = data.readInt();
+        this.lifetime = data.readFloat();
+
+        x = Pos.x(pos) * tilesize;
+        y = Pos.y(pos) * tilesize;
     }
 
     @Override

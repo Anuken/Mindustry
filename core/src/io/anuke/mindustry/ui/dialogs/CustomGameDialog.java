@@ -4,10 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
@@ -60,7 +57,8 @@ public class CustomGameDialog extends FloatingDialog{
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
-        selmode.addButton("$mode.custom", "toggle", () -> {})
+        selmode.addButton("$mode.custom", "toggle", () -> {
+        })
         .update(b -> b.setChecked(lastPreset == null)).size(108f).group(group).get().tapped(() -> {
             lastPreset = null;
             dialog.show();
@@ -84,7 +82,8 @@ public class CustomGameDialog extends FloatingDialog{
             state.wavetime = difficulty.waveTime;
         }).width(s);
 
-        sdif.addButton("", () -> {})
+        sdif.addButton("", () -> {
+        })
         .update(t -> {
             t.setText(difficulty.toString());
             t.touchable(Touchable.disabled);

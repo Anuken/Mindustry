@@ -22,13 +22,13 @@ public class SaveDialog extends LoadDialog{
 
     public void addSetup(){
         slots.row();
-        slots.addImageTextButton("$save.new", "icon-add",14 * 3, () ->
-                ui.showTextInput("$save", "$save.newslot", "", text -> {
-                    ui.loadAnd("$saving", () -> {
-                        control.saves.addSave(text);
-                        Core.app.post(() -> Core.app.post(this::setup));
-                    });
-                })
+        slots.addImageTextButton("$save.new", "icon-add", 14 * 3, () ->
+        ui.showTextInput("$save", "$save.newslot", "", text -> {
+            ui.loadAnd("$saving", () -> {
+                control.saves.addSave(text);
+                Core.app.post(() -> Core.app.post(this::setup));
+            });
+        })
         ).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
     }
 

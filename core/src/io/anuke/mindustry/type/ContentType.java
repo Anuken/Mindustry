@@ -1,7 +1,7 @@
 package io.anuke.mindustry.type;
 
-/**Do not rearrange, ever!*/
-public enum ContentType {
+/** Do not rearrange, ever! */
+public enum ContentType{
     item,
     block,
     mech,

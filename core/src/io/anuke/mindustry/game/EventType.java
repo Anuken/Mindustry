@@ -2,14 +2,14 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Tile;
 
 public class EventType{
 
-    /**Called when a zone's requirements are met.*/
+    /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent implements Event{
         public final Zone zone, required;
 
@@ -19,7 +19,7 @@ public class EventType{
         }
     }
 
-    /**Called when a zone's requirements are met.*/
+    /** Called when a zone's requirements are met. */
     public static class ZoneConfigureCompleteEvent implements Event{
         public final Zone zone;
 
@@ -28,7 +28,7 @@ public class EventType{
         }
     }
 
-    /**Called when the game is first loaded.*/
+    /** Called when the game is first loaded. */
     public static class GameLoadEvent implements Event{
 
     }
@@ -53,12 +53,12 @@ public class EventType{
         }
     }
 
-    /**Called when a game begins and the world is loaded.*/
+    /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent implements Event{
 
     }
 
-    /**Called from the logic thread. Do not access graphics here!*/
+    /** Called from the logic thread. Do not access graphics here! */
     public static class TileChangeEvent implements Event{
         public final Tile tile;
 
@@ -84,8 +84,10 @@ public class EventType{
         }
     }
 
-    /**Called when block building begins by placing down the BuildBlock.
-     * The tile's block will nearly always be a BuildBlock.*/
+    /**
+     * Called when block building begins by placing down the BuildBlock.
+     * The tile's block will nearly always be a BuildBlock.
+     */
     public static class BlockBuildBeginEvent implements Event{
         public final Tile tile;
         public final Team team;
@@ -110,8 +112,10 @@ public class EventType{
         }
     }
 
-    /**Called when a player or drone begins building something.
-     * This does not necessarily happen when a new BuildBlock is created.*/
+    /**
+     * Called when a player or drone begins building something.
+     * This does not necessarily happen when a new BuildBlock is created.
+     */
     public static class BuildSelectEvent implements Event{
         public final Tile tile;
         public final Team team;

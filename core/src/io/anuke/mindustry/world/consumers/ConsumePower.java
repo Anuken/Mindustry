@@ -5,9 +5,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{

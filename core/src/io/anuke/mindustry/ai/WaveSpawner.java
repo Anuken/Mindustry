@@ -5,8 +5,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
@@ -17,9 +16,7 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Pos;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -53,7 +50,11 @@ public class WaveSpawner{
         }
     }
 
-    /**@return true if the player is near a ground spawn point.*/
+    public int countSpawns(){
+        return groundSpawns.size;
+    }
+
+    /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
         return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < maxShockwaveDst) > 0;
     }
@@ -85,7 +86,7 @@ public class WaveSpawner{
                 for(GroundSpawn spawn : groundSpawns){
                     spawnX = spawn.x * tilesize;
                     spawnY = spawn.y * tilesize;
-                    spread = tilesize*2;
+                    spread = tilesize * 2;
 
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
@@ -93,7 +94,7 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(Math.min(i*5, 60*2), () -> shockwave(unit));
+                        Time.run(Math.min(i * 5, 60 * 2), () -> shockwave(unit));
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
@@ -116,11 +117,13 @@ public class WaveSpawner{
 
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
+
                 if(world.tile(x, y).block() == Blocks.spawn){
                     addSpawns(x, y);
 
                     //hide spawnpoints, they have served their purpose
                     world.tile(x, y).setBlock(Blocks.air);
+                    Log.info("Add spawn " + x + " " + y);
                 }
             }
         }
@@ -140,7 +143,7 @@ public class WaveSpawner{
         groundSpawns.add(spawn);
 
         FlyerSpawn fspawn = new FlyerSpawn();
-        fspawn.angle = Angles.angle(world.width()/2f, world.height()/2f, x, y);
+        fspawn.angle = Angles.angle(world.width() / 2f, world.height() / 2f, x, y);
         flySpawns.add(fspawn);
     }
 

@@ -6,12 +6,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Strings;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.*;
@@ -22,11 +22,11 @@ import java.util.Collections;
 import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
-public class IOSLauncher extends IOSApplication.Delegate {
+public class IOSLauncher extends IOSApplication.Delegate{
     private boolean forced;
 
     @Override
-    protected IOSApplication createApplication() {
+    protected IOSApplication createApplication(){
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
 
@@ -36,7 +36,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
             Unit.dp.addition = -0.5f;
         }
 
-        Platform.instance = new Platform() {
+        Platform.instance = new Platform(){
 
             @Override
             public void shareFile(FileHandle file){
@@ -72,14 +72,14 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     @Override
-    public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options) {
+    public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
         System.out.println("Opened URL: " + url.getPath());
         openURL(url);
         return false;
     }
 
     @Override
-    public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options) {
+    public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options){
         boolean b = super.didFinishLaunching(application, options);
 
         if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
@@ -102,7 +102,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
                     try{
                         SaveSlot slot = control.saves.importSave(file);
                         ui.load.runLoadSave(slot);
-                    }catch (IOException e){
+                    }catch(IOException e){
                         ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
                     }
                 }else{
@@ -111,7 +111,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
             }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
                 Core.app.post(() -> {
-                    if (!ui.editor.isShown()) {
+                    if(!ui.editor.isShown()){
                         ui.editor.show();
                     }
 
@@ -121,7 +121,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         });
     }
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv){
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
         pool.close();

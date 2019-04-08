@@ -3,9 +3,7 @@ package io.anuke.annotations;
 import com.squareup.javapoet.*;
 import io.anuke.annotations.IOFinder.ClassSerializer;
 
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic.Kind;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -25,24 +23,23 @@ public class RemoteReadGenerator{
 
     /**
      * Generates a class for reading remote invoke packets.
-     *
      * @param entries List of methods to use.
      * @param className Simple target class name.
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
      */
     public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
+    throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
 
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addParameter(ByteBuffer.class, "buffer") //buffer to read form
-                .addParameter(int.class, "id") //ID of method type to read
-                .returns(void.class);
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addParameter(ByteBuffer.class, "buffer") //buffer to read form
+        .addParameter(int.class, "id") //ID of method type to read
+        .returns(void.class);
 
         if(needsPlayer){
             //since the player type isn't loaded yet, creating a type def is necessary
@@ -115,13 +112,13 @@ public class RemoteReadGenerator{
 
             //execute the relevant method before the forward
             //if it throws a ValidateException, the method won't be forwarded
-            readBlock.addStatement("$N." + entry.element.getSimpleName() + "(" + varResult.toString() + ")", ((TypeElement) entry.element.getEnclosingElement()).getQualifiedName().toString());
+            readBlock.addStatement("$N." + entry.element.getSimpleName() + "(" + varResult.toString() + ")", ((TypeElement)entry.element.getEnclosingElement()).getQualifiedName().toString());
 
             //call forwarded method, don't forward on the client reader
             if(entry.forward && entry.where.isServer && needsPlayer){
                 //call forwarded method
                 readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
-                        "__forward(player.con.id" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
+                "__forward(player.con.id" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");

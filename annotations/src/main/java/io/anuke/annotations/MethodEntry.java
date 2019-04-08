@@ -1,8 +1,6 @@
 package io.anuke.annotations;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.PacketPriority;
-import io.anuke.annotations.Annotations.Variant;
+import io.anuke.annotations.Annotations.*;
 
 import javax.lang.model.element.ExecutableElement;
 

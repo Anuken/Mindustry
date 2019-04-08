@@ -77,7 +77,7 @@ public class BlockRenderer{
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
                     if(tile.getRotation() > 0 && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
-                        Draw.color(0f, 0f, 0f, Math.min((tile.getRotation() + 0.5f)/4f, 1f));
+                        Draw.color(0f, 0f, 0f, Math.min((tile.getRotation() + 0.5f) / 4f, 1f));
                         Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                     }
                 }
@@ -92,9 +92,9 @@ public class BlockRenderer{
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);
-            int avgy = (int)(camera.position. y / tilesize);
-            int rangex = (int) (camera.width / tilesize / 2) + 2;
-            int rangey = (int) (camera.height / tilesize / 2) + 2;
+            int avgy = (int)(camera.position.y / tilesize);
+            int rangex = (int)(camera.width / tilesize / 2) + 2;
+            int rangey = (int)(camera.height / tilesize / 2) + 2;
 
             if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
@@ -104,11 +104,11 @@ public class BlockRenderer{
 
     public void drawFog(){
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
-        float u = (x - camera.width/2f) / ww,
-        v = (y - camera.height/2f) / wh,
-        u2 = (x + camera.width/2f) / ww,
-        v2 = (y + camera.height/2f) / wh;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
 
         Tmp.tr1.set(fog.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
@@ -144,11 +144,11 @@ public class BlockRenderer{
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
-        float u = (x - camera.width/2f) / ww,
-        v = (y - camera.height/2f) / wh,
-        u2 = (x + camera.width/2f) / ww,
-        v2 = (y + camera.height/2f) / wh;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
 
         Tmp.tr1.set(shadows.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
@@ -158,15 +158,15 @@ public class BlockRenderer{
         Draw.shader();
     }
 
-    /**Process all blocks to draw.*/
+    /** Process all blocks to draw. */
     public void processBlocks(){
         iterateidx = 0;
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
 
-        int rangex = (int) (camera.width / tilesize / 2) + 3;
-        int rangey = (int) (camera.height / tilesize / 2) + 3;
+        int rangex = (int)(camera.width / tilesize / 2) + 3;
+        int rangey = (int)(camera.height / tilesize / 2) + 3;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;

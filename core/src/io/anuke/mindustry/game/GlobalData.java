@@ -2,20 +2,16 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.*;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.state;
 
-/**Stores player unlocks. Clientside only.*/
+/** Stores player unlocks. Clientside only. */
 public class GlobalData{
     private ObjectMap<ContentType, ObjectSet<String>> unlocked = new ObjectMap<>();
     private ObjectIntMap<Item> items = new ObjectIntMap<>();
@@ -74,7 +70,7 @@ public class GlobalData{
         return items;
     }
 
-    /** Returns whether or not this piece of content is unlocked yet.*/
+    /** Returns whether or not this piece of content is unlocked yet. */
     public boolean isUnlocked(UnlockableContent content){
         return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
     }
@@ -95,7 +91,7 @@ public class GlobalData{
         }
     }
 
-    /** Clears all unlocked content. Automatically saves.*/
+    /** Clears all unlocked content. Automatically saves. */
     public void reset(){
         save();
     }
@@ -116,7 +112,7 @@ public class GlobalData{
 
         //set up default values
         if(!Core.settings.has("item-" + Items.copper.name)){
-           addItem(Items.copper, 50);
+            addItem(Items.copper, 50);
         }
     }
 

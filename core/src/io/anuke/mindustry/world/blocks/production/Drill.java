@@ -21,9 +21,7 @@ import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -34,24 +32,24 @@ public class Drill extends Block{
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
-    /**Maximum tier of blocks this drill can mine.*/
+    /** Maximum tier of blocks this drill can mine. */
     protected int tier;
-    /**Base time to drill one ore, in frames.*/
+    /** Base time to drill one ore, in frames. */
     protected float drillTime = 300;
-    /**How many times faster the drill will progress when boosted by liquid.*/
+    /** How many times faster the drill will progress when boosted by liquid. */
     protected float liquidBoostIntensity = 1.6f;
-    /**Speed at which the drill speeds up.*/
+    /** Speed at which the drill speeds up. */
     protected float warmupSpeed = 0.02f;
 
-    /**Whether to draw the item this drill is mining.*/
+    /** Whether to draw the item this drill is mining. */
     protected boolean drawMineItem = false;
-    /**Effect played when an item is produced. This is colored.*/
+    /** Effect played when an item is produced. This is colored. */
     protected Effect drillEffect = Fx.mine;
-    /**Speed the drill bit rotates at.*/
+    /** Speed the drill bit rotates at. */
     protected float rotateSpeed = 2f;
-    /**Effect randomly played while drilling.*/
+    /** Effect randomly played while drilling. */
     protected Effect updateEffect = Fx.pulverizeSmall;
-    /**Chance the update effect will appear.*/
+    /** Chance the update effect will appear. */
     protected float updateEffectChance = 0.02f;
 
     protected boolean drawRim = false;
@@ -226,7 +224,7 @@ public class Drill extends Block{
         }
 
         if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * Math.max(totalHardness, 1f) / entity.dominantItems
-                && tile.entity.items.total() < itemCapacity){
+        && tile.entity.items.total() < itemCapacity){
 
             offloadNear(tile, entity.dominantItem);
 
@@ -236,7 +234,7 @@ public class Drill extends Block{
             entity.progress = 0f;
 
             Effects.effect(drillEffect, entity.dominantItem.color,
-                    entity.x + Mathf.range(size), entity.y + Mathf.range(size));
+            entity.x + Mathf.range(size), entity.y + Mathf.range(size));
         }
     }
 

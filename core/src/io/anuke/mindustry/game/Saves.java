@@ -2,9 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
@@ -48,7 +46,7 @@ public class Saves{
         saves.clear();
         IntArray slots = Core.settings.getObject("save-slots", IntArray.class, IntArray::new);
 
-        for(int i = 0; i < slots.size; i ++){
+        for(int i = 0; i < slots.size; i++){
             int index = slots.get(i);
             if(SaveIO.isSaveValid(index)){
                 SaveSlot slot = new SaveSlot(index);
@@ -68,7 +66,7 @@ public class Saves{
         SaveSlot current = this.current;
 
         if(current != null && !state.is(State.menu)
-            && !(state.isPaused() && Core.scene.hasDialog())){
+        && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
                 totalPlaytime += Time.timeSinceMillis(lastTimestamp);
             }

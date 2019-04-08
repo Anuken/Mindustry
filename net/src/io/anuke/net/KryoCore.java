@@ -61,6 +61,6 @@ public class KryoCore{
     }
 
     private static int calculateLag(){
-        return fakeLagMin + (int) (Math.random() * (fakeLagMax - fakeLagMin));
+        return fakeLagMin + (int)(Math.random() * (fakeLagMax - fakeLagMin));
     }
 }

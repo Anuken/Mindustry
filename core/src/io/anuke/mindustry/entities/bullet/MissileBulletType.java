@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.bullet;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.graphics.Pal;
 
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Pal.missileYellowBack;

@@ -7,14 +7,9 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
@@ -40,7 +35,7 @@ public class PowerGenerator extends PowerDistributor{
         if(hasPower && outputsPower && !consumes.hasPower()){
             bars.add("power", entity -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
-            Strings.fixed(entity.block.getPowerProduction(entity.tile)*60 * entity.timeScale, 1)),
+            Strings.fixed(entity.block.getPowerProduction(entity.tile) * 60 * entity.timeScale, 1)),
             () -> Pal.powerBar,
             () -> ((GeneratorEntity)entity).productionEfficiency));
         }

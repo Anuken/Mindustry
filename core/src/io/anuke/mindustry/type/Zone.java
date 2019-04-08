@@ -115,7 +115,7 @@ public class Zone extends UnlockableContent{
         data.modified();
     }
 
-    /**Whether this zone has met its condition; if true, the player can leave.*/
+    /** Whether this zone has met its condition; if true, the player can leave. */
     public boolean metCondition(){
         return state.wave >= conditionWave;
     }
@@ -147,14 +147,17 @@ public class Zone extends UnlockableContent{
 
     //neither of these are implemented, as zones are not displayed in a normal fashion... yet
     @Override
-    public void displayInfo(Table table){}
+    public void displayInfo(Table table){
+    }
 
     @Override
-    public TextureRegion getContentIcon(){ return null; }
+    public TextureRegion getContentIcon(){
+        return null;
+    }
 
     @Override
     public String localizedName(){
-        return Core.bundle.get("zone."+name+".name");
+        return Core.bundle.get("zone." + name + ".name");
     }
 
     @Override
@@ -172,9 +175,9 @@ public class Zone extends UnlockableContent{
         }
 
         public static ZoneRequirement[] with(Object... objects){
-            ZoneRequirement[] out = new ZoneRequirement[objects.length/2];
-            for(int i = 0; i < objects.length; i+= 2){
-                out[i/2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
+            ZoneRequirement[] out = new ZoneRequirement[objects.length / 2];
+            for(int i = 0; i < objects.length; i += 2){
+                out[i / 2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
             }
             return out;
         }

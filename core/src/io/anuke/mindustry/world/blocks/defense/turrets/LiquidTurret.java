@@ -22,7 +22,7 @@ public abstract class LiquidTurret extends Turret{
         hasLiquids = true;
     }
 
-    /**Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...]*/
+    /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
     protected void ammo(Object... objects){
         ammo = OrderedMap.of(objects);
     }
@@ -35,21 +35,21 @@ public abstract class LiquidTurret extends Turret{
     }
 
     @Override
-    protected boolean validateTarget(Tile tile) {
+    protected boolean validateTarget(Tile tile){
         TurretEntity entity = tile.entity();
         if(entity.liquids.current().canExtinguish() && entity.target instanceof Tile){
-            return Fire.has(((Tile) entity.target).x, ((Tile) entity.target).y);
+            return Fire.has(((Tile)entity.target).x, ((Tile)entity.target).y);
         }
         return super.validateTarget(tile);
     }
 
     @Override
-    protected void findTarget(Tile tile) {
+    protected void findTarget(Tile tile){
         TurretEntity entity = tile.entity();
         if(entity.liquids.current().canExtinguish()){
             int tr = (int)(range / tilesize);
-            for (int x = -tr; x <= tr; x++) {
-                for (int y = -tr; y <= tr; y++) {
+            for(int x = -tr; x <= tr; x++){
+                for(int y = -tr; y <= tr; y++){
                     if(Fire.has(x + tile.x, y + tile.y)){
                         entity.target = world.tile(x + tile.x, y + tile.y);
                         return;
@@ -105,7 +105,7 @@ public abstract class LiquidTurret extends Turret{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return ammo.get(liquid) != null
-                && (tile.entity.liquids.current() == liquid || (ammo.containsKey(tile.entity.liquids.current()) && tile.entity.liquids.get(tile.entity.liquids.current()) <= ammo.get(tile.entity.liquids.current()).ammoMultiplier + 0.001f));
+        && (tile.entity.liquids.current() == liquid || (ammo.containsKey(tile.entity.liquids.current()) && tile.entity.liquids.get(tile.entity.liquids.current()) <= ammo.get(tile.entity.liquids.current()).ammoMultiplier + 0.001f));
     }
 
 }

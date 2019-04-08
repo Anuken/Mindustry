@@ -137,7 +137,7 @@ public class DeployDialog extends FloatingDialog{
                 TextButton button = new TextButton("", "node");
                 button.setSize(node.width, node.height);
                 button.update(() -> {
-                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
+                    button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center);
                 });
                 button.clearChildren();
                 buildButton(node.zone, button);
@@ -152,7 +152,7 @@ public class DeployDialog extends FloatingDialog{
 
         @Override
         public void draw(){
-            float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
+            float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.children){

@@ -50,7 +50,7 @@ public class BlockConfigFragment extends Fragment{
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
         table.update(() -> {
             if(state.is(State.menu)){

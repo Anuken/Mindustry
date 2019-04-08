@@ -12,9 +12,7 @@ import io.anuke.mindustry.net.Net;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -55,7 +53,7 @@ public class CrashHandler{
 
         try{
             Path path = Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes",
-                "crash-report-" + DateTimeFormatter.ofPattern("MM-dd-yyyy-HH:mm:ss").format(LocalDateTime.now()) + ".txt");
+            "crash-report-" + DateTimeFormatter.ofPattern("MM-dd-yyyy-HH:mm:ss").format(LocalDateTime.now()) + ".txt");
             Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
             Files.write(path, parseException(e).getBytes());
 
@@ -70,7 +68,10 @@ public class CrashHandler{
         Net.http(Vars.crashReportURL, "POST", value.toJson(OutputType.json), r -> System.exit(1), t -> System.exit(1));
 
         //sleep forever
-        try{ Thread.sleep(Long.MAX_VALUE); }catch(InterruptedException ignored){}
+        try{
+            Thread.sleep(Long.MAX_VALUE);
+        }catch(InterruptedException ignored){
+        }
     }
 
     private static String parseException(Throwable e){

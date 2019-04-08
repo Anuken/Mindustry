@@ -7,9 +7,7 @@ import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveFileVersion;
 import io.anuke.mindustry.maps.Map;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 

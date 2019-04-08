@@ -76,7 +76,7 @@ public class OverlayRenderer{
         buildFadeTime = Mathf.lerpDelta(buildFadeTime, input.isPlacing() ? 1f : 0f, 0.06f);
 
         Draw.reset();
-        Lines.stroke(buildFadeTime*2f);
+        Lines.stroke(buildFadeTime * 2f);
 
         if(buildFadeTime > 0.005f){
             for(Team enemy : state.teams.enemiesOf(player.getTeam())){

@@ -7,9 +7,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 
@@ -61,8 +59,8 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         // Execute all tests for the case where only liquids are accepted and for the case where liquids and items are accepted (but supply only liquids)
         InputType[] inputTypesToBeTested = new InputType[]{
-            InputType.liquids,
-            InputType.any
+        InputType.liquids,
+        InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
@@ -103,8 +101,8 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         // Execute all tests for the case where only items are accepted and for the case where liquids and items are accepted (but supply only items)
         InputType[] inputTypesToBeTested = new InputType[]{
-            InputType.items,
-            InputType.any
+        InputType.items,
+        InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
@@ -171,7 +169,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         generator.update(tile);
         assertEquals(0.0f, entity.productionEfficiency, "Duration: " + currentDuration);
     }
-    
+
     enum InputType{
         items,
         liquids,

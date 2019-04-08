@@ -8,22 +8,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -37,9 +29,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -58,7 +48,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public float pointerX, pointerY;
     public String name = "name";
     public String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -379,11 +369,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
-        size + Mathf.absin(Time.time(), 2f, size/4f));
+        size + Mathf.absin(Time.time(), 2f, size / 4f));
 
         Draw.color(Color.WHITE);
-        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset-1f), y + Angles.trnsy(rotation + 180, mech.engineOffset-1f),
-        (size + Mathf.absin(Time.time(), 2f, size/4f)) / 2f);
+        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
+        (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
     }
 
@@ -457,15 +447,16 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 TextureRegion region = draw.region;
 
                 Draw.rect(region,
-                    request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                    region.getWidth() * 1f * Draw.scl * draw.scalex,
-                    region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
+                request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
+                region.getWidth() * 1f * Draw.scl * draw.scalex,
+                region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
 
                 Draw.color(Pal.accent);
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(request.block.size-1, 0)/2f * tilesize;
-                    if(i % 2 == 0) Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
+                    if(i % 2 == 0)
+                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 
@@ -633,7 +624,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
         mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
@@ -653,7 +644,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
             if(dst(moveTarget) < 2f){
                 if(tapping){
-                    Tile tile = ((TileEntity) moveTarget).tile;
+                    Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
 
@@ -713,7 +704,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
-                                target = ((Tile) target).entity;
+                                target = ((Tile)target).entity;
                             }
                         }
 
@@ -721,7 +712,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                             setMineTile(null);
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
                 mech.canHeal && dst(target) < getWeapon().bullet.range())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
@@ -830,22 +821,17 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void readSave(DataInput stream) throws IOException{
         boolean local = stream.readBoolean();
 
-        if(local && !headless){
+        if(local){
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
-            if(world.tile(spawner) != null && world.tile(spawner).entity != null && world.tile(spawner).entity instanceof SpawnerTrait){
-                lastSpawner = (SpawnerTrait)(world.tile(spawner).entity);
+            Tile stile = world.tile(spawner);
+            if(stile != null && stile.entity instanceof SpawnerTrait){
+                lastSpawner = (SpawnerTrait)stile.entity;
             }
+            Player player = headless ? this : Vars.player;
             player.readSaveSuper(stream);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
-        }else if(local){
-            byte mechid = stream.readByte();
-            stream.readByte();
-            stream.readInt();
-            readSaveSuper(stream);
-            mech = content.getByID(ContentType.mech, mechid);
-            dead = false;
         }
     }
 
@@ -859,12 +845,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
-        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2));
+        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
         buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
-        buffer.writeShort((short) (baseRotation * 2));
+        buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);
     }
@@ -878,6 +864,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         isAdmin = (bools & 1) != 0;
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
+        isTyping = (bools & 8) != 0;
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();

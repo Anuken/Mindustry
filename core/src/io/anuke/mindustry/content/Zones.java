@@ -4,9 +4,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
@@ -35,7 +33,7 @@ public class Zones implements ContentList{
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
             blockRequirements = new Block[]{Blocks.router};
-            resources = new Item[]{Items.copper, Items.lead};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -44,7 +42,7 @@ public class Zones implements ContentList{
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
-            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
@@ -89,8 +87,8 @@ public class Zones implements ContentList{
         }};*/
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
-            .dist(0f, false)
-            .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
+        .dist(0f, false)
+        .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
@@ -98,7 +96,7 @@ public class Zones implements ContentList{
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

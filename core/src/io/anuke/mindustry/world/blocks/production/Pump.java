@@ -4,14 +4,11 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
@@ -19,7 +16,7 @@ public class Pump extends LiquidBlock{
 
     protected final int timerContentCheck = timers++;
 
-    /**Pump amount, total.*/
+    /** Pump amount, total. */
     protected float pumpAmount = 1f;
 
     public Pump(String name){

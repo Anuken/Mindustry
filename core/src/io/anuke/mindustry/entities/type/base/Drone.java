@@ -2,31 +2,24 @@ package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Queue;
-import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.FlyingUnit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.unitGroups;
 import static io.anuke.mindustry.Vars.world;
@@ -48,7 +41,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
 
         public void update(){
-            BuildEntity entity = (BuildEntity) target;
+            BuildEntity entity = (BuildEntity)target;
             TileEntity core = getClosestCore();
 
             if(entity == null){
@@ -105,7 +98,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             if(target == null) return;
 
             if(target.dst(Drone.this) > type.range){
-                circle(type.range*0.9f);
+                circle(type.range * 0.9f);
             }else{
                 getWeapon().update(Drone.this, target.getX(), target.getY());
             }
@@ -155,10 +148,10 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                     moveTo(type.range / 1.5f);
 
                     if(dst(target) < type.range && mineTile != target){
-                        setMineTile((Tile) target);
+                        setMineTile((Tile)target);
                     }
 
-                    if(((Tile) target).block() != Blocks.air){
+                    if(((Tile)target).block() != Blocks.air){
                         setState(drop);
                     }
                 }
@@ -190,7 +183,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(target == null) return;
 
-            TileEntity tile = (TileEntity) target;
+            TileEntity tile = (TileEntity)target;
 
             if(dst(target) < type.range){
                 if(tile.tile.block().acceptStack(item.item, item.amount, tile.tile, Drone.this) == item.amount){
@@ -312,7 +305,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent &&
-                Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
+        Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }

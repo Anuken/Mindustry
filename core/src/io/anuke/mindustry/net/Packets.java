@@ -76,7 +76,7 @@ public class Packets{
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
             TypeIO.writeString(buffer, usid);
-            buffer.put(mobile ? (byte) 1 : 0);
+            buffer.put(mobile ? (byte)1 : 0);
             buffer.putInt(color);
             buffer.put(Base64Coder.decode(uuid));
         }
@@ -115,7 +115,7 @@ public class Packets{
         public void write(ByteBuffer buffer){
             buffer.put(type);
             buffer.put(priority);
-            buffer.putShort((short) writeLength);
+            buffer.putShort((short)writeLength);
 
             writeBuffer.position(0);
             for(int i = 0; i < writeLength; i++){
@@ -139,7 +139,7 @@ public class Packets{
         }
     }
 
-    /**Marks the beginning of a stream.*/
+    /** Marks the beginning of a stream. */
     public static class StreamBegin implements Packet{
         private static int lastid;
 
@@ -169,7 +169,7 @@ public class Packets{
         @Override
         public void write(ByteBuffer buffer){
             buffer.putInt(id);
-            buffer.putShort((short) data.length);
+            buffer.putShort((short)data.length);
             buffer.put(data);
         }
 

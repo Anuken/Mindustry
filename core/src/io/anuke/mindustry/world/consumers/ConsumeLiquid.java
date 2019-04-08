@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.ReqImage;
@@ -24,7 +23,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Tile tile, Table table){
-        table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.entity))).size(8*4);
+        table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.entity))).size(8 * 4);
     }
 
     @Override
@@ -44,6 +43,6 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void display(BlockStats stats){
-        stats.add(optional ? BlockStat.booster : BlockStat.input, liquid, amount * timePeriod, timePeriod == 60);
+        stats.add(booster ? BlockStat.booster : BlockStat.input, liquid, amount * timePeriod, timePeriod == 60);
     }
 }

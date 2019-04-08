@@ -11,9 +11,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
@@ -27,7 +25,7 @@ public class FileChooser extends FloatingDialog{
     public static Predicate<FileHandle> defaultFilter = file -> true;
     private Table files;
     private FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
-            Core.files.getExternalStoragePath());
+    Core.files.getExternalStoragePath());
     private FileHandle directory = homeDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
@@ -241,7 +239,7 @@ public class FileChooser extends FloatingDialog{
             button.add(image).padRight(4f).size(14 * 2f);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
-                    .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
+            .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
             button.getLabel().setAlignment(Align.left);
             files.row();
         }

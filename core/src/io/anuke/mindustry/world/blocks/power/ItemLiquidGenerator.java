@@ -46,11 +46,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
         this.hasLiquids = hasLiquids;
 
         if(hasItems){
-            consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false);
+            consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true, false);
         }
 
         if(hasLiquids){
-            consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false);
+            consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false).optional(true, false);
         }
     }
 
@@ -78,6 +78,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
         //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
         //Power amount is delta'd by PowerGraph class already.
         float calculationDelta = entity.delta();
+
+        if(!entity.cons.valid()){
+            entity.productionEfficiency = 0.0f;
+            return;
+        }
 
         Liquid liquid = null;
         for(Liquid other : content.liquids()){
