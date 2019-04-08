@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.game.EventType.PlayEvent;
@@ -38,6 +39,9 @@ public class Logic implements ApplicationListener{
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
+            }
+            for (Player p : playerGroup.all()) {
+                p.respawns = state.rules.respawns;
             }
         });
     }
@@ -150,7 +154,7 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if ( (state.rules.waitForWaveToEnd && (unitGroups[waveTeam.ordinal()].size() == 0)) || (!state.rules.waitForWaveToEnd)) {
+                    if(!state.rules.waitForWaveToEnd || unitGroups[waveTeam.ordinal()].size() == 0){
                         state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                     }
                 }

@@ -176,16 +176,6 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
-
-        Events.on(WaveEvent.class, e-> {
-            for (Player p : playerGroup.all()) {
-                p.respawns = state.rules.respawns;
-            }
-        });
-
-        Events.on(WorldLoadEvent.class, e-> {
-            player.respawns = state.rules.respawns;
-        });
     }
 
     void createPlayer(){

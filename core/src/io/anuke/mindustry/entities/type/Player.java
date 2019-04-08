@@ -111,8 +111,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void onRespawn(Tile tile){
         boostHeat = 1f;
         achievedFlight = true;
-        if (state.rules.limitedRespawns) {
-            respawns -= 1;
+        if(state.rules.limitedRespawns){
+            respawns--;
         }
     }
 
@@ -483,7 +483,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void update(){
 
-        if ( (unitGroups[waveTeam.ordinal()].size() == 0) && state.rules.limitedRespawns ) {
+        if((unitGroups[waveTeam.ordinal()].size() == 0) && state.rules.limitedRespawns){
             respawns = state.rules.respawns;
         }
 
