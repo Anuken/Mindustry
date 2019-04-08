@@ -96,7 +96,6 @@ public class Net{
         if(loaded){
             //handle all packets that were skipped while loading
             for(int i = 0; i < packetQueue.size; i++){
-                Log.info("Processing {0} packet post-load.", packetQueue.get(i).getClass());
                 handleClientReceived(packetQueue.get(i));
             }
         }
@@ -268,7 +267,6 @@ public class Net{
                 Pools.free(object);
             }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
                 packetQueue.add(object);
-                Log.info("Queuing packet {0}", object);
             }else{
                 Pools.free(object);
             }
