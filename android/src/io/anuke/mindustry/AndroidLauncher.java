@@ -18,18 +18,15 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 import static io.anuke.mindustry.Vars.*;
@@ -59,7 +56,7 @@ public class AndroidLauncher extends AndroidApplication{
                     int len = s.length();
                     byte[] data = new byte[len / 2];
                     for(int i = 0; i < len; i += 2){
-                        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                        data[i / 2] = (byte)((Character.digit(s.charAt(i), 16) << 4)
                         + Character.digit(s.charAt(i + 1), 16));
                     }
                     String result = new String(Base64Coder.encode(data));
@@ -184,7 +181,7 @@ public class AndroidLauncher extends AndroidApplication{
     }
 
     private boolean isTablet(Context context){
-        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         return manager != null && manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
     }
 }

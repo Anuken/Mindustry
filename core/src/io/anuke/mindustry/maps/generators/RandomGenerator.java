@@ -24,11 +24,13 @@ public abstract class RandomGenerator extends Generator{
             }
         }
 
-        tiles[width/2][height/2].setBlock(Blocks.coreShard, Team.blue);
-        tiles[width/2][height/2 - 6].setBlock(Blocks.launchPad, Team.blue);
+        tiles[width / 2][height / 2].setBlock(Blocks.coreShard, Team.blue);
+        tiles[width / 2][height / 2 - 6].setBlock(Blocks.launchPad, Team.blue);
     }
 
-    /**Sets {@link #floor} and {@link #block} to the correct values as output.
-     * Before this method is called, both are set to {@link Blocks#air} as defaults.*/
+    /**
+     * Sets {@link #floor} and {@link #block} to the correct values as output.
+     * Before this method is called, both are set to {@link Blocks#air} as defaults.
+     */
     public abstract void generate(int x, int y);
 }

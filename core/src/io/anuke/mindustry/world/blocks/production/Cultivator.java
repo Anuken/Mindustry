@@ -2,9 +2,7 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.Time;
@@ -15,9 +13,7 @@ import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.Attribute;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class Cultivator extends GenericCrafter{
     protected static final Color plantColor = Color.valueOf("5541b1");
@@ -54,14 +50,14 @@ public class Cultivator extends GenericCrafter{
         super.setBars();
         bars.add("multiplier", entity -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup)*100f,1),
+        ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup) * 100f, 1),
         () -> Pal.ammo,
         () -> ((CultivatorEntity)entity).warmup));
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1+sumAttribute(Attribute.spores, x, y))*100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1 + sumAttribute(Attribute.spores, x, y)) * 100, 1), x, y, valid);
     }
 
     @Override

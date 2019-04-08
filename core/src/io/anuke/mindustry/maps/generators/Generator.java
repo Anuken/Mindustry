@@ -11,7 +11,8 @@ public abstract class Generator{
         this.height = height;
     }
 
-    public Generator(){}
+    public Generator(){
+    }
 
     public void init(Loadout loadout){
 

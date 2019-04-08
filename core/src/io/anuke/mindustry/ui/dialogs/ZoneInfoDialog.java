@@ -6,10 +6,7 @@ import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Zone.ZoneRequirement;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
@@ -52,7 +49,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 if(i++ % 2 == 0){
                     iteminfo.row();
                 }
-                iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8*3).padRight(1);
+                iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.LIGHT_GRAY).padRight(5);
             }
         };
@@ -168,7 +165,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             }).size(300f, 35f).pad(1).get();
                             button.clearChildren();
                             button.left();
-                            button.addImage(item.icon(Item.Icon.medium)).size(8*3).pad(4);
+                            button.addImage(item.icon(Item.Icon.medium)).size(8 * 3).pad(4);
                             button.add(item.localizedName);
                             dialog.cont.row();
                         }

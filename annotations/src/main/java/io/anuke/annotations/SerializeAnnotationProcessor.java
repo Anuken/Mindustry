@@ -5,13 +5,9 @@ import io.anuke.annotations.Annotations.Serialize;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.ElementFilter;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +17,7 @@ import java.util.Set;
 "io.anuke.annotations.Annotations.Serialize"
 })
 public class SerializeAnnotationProcessor extends AbstractProcessor{
-    /**Target class name.*/
+    /** Target class name. */
     private static final String className = "Serialization";
     /** Name of the base package to put all the generated classes. */
     private static final String packageName = "io.anuke.mindustry.gen";
@@ -58,8 +54,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             classBuilder.addField(jsonType, "bjson", Modifier.STATIC, Modifier.PRIVATE);
             classBuilder.addField(ubJsonReaderType, "bjsonReader", Modifier.STATIC, Modifier.PRIVATE);
             classBuilder.addStaticBlock(CodeBlock.builder()
-                .addStatement("bjson = new " + jsonType + "()")
-                .addStatement("bjsonReader = new " + ubJsonReaderType + "()")
+            .addStatement("bjson = new " + jsonType + "()")
+            .addStatement("bjsonReader = new " + ubJsonReaderType + "()")
             .build());
 
             for(TypeElement elem : elements){
@@ -99,7 +95,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
                 List<VariableElement> fields = ElementFilter.fieldsIn(Utils.elementUtils.getAllMembers(elem));
                 for(VariableElement field : fields){
-                    if(field.getModifiers().contains(Modifier.STATIC) || field.getModifiers().contains(Modifier.TRANSIENT) || field.getModifiers().contains(Modifier.PRIVATE)) continue;
+                    if(field.getModifiers().contains(Modifier.STATIC) || field.getModifiers().contains(Modifier.TRANSIENT) || field.getModifiers().contains(Modifier.PRIVATE))
+                        continue;
 
                     String name = field.getSimpleName().toString();
                     String typeName = Utils.typeUtils.erasure(field.asType()).toString().replace('$', '.');
@@ -109,11 +106,11 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                         writeMethod.addStatement("stream.write" + capName + "(object." + name + ")");
                         readMethod.addStatement("object." + name + "= stream.read" + capName + "()");
 
-                        jsonWriteMethod.addStatement("json.writeValue(\"" + name + "\", object." + name +")");
+                        jsonWriteMethod.addStatement("json.writeValue(\"" + name + "\", object." + name + ")");
                         jsonReadMethod.addStatement("if(value.has(\"" + name + "\")) object." + name + "= value.get" + capName + "(\"" + name + "\")");
                     }else{
-                        writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).write(stream, object." + name + ")");
-                        readMethod.addStatement("object." + name + " = (" +typeName+")io.anuke.arc.Core.settings.getSerializer(" + typeName+ ".class).read(stream)");
+                        writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).write(stream, object." + name + ")");
+                        readMethod.addStatement("object." + name + " = (" + typeName + ")io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).read(stream)");
                     }
                 }
 
@@ -123,7 +120,7 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 serializer.addMethod(writeMethod.build());
                 serializer.addMethod(readMethod.build());
 
-                method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)",  Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
+                method.addStatement("io.anuke.arc.Core.settings.setSerializer($N, $L)", Utils.elementUtils.getBinaryName(elem).toString().replace('$', '.') + ".class", serializer.build());
 
                 name(writeMethod, "write" + simpleTypeName);
                 name(readMethod, "read" + simpleTypeName);

@@ -20,7 +20,9 @@ public abstract class FilterOption{
     public static final Predicate<Block> oresOnly = b -> b instanceof OreBlock && Core.atlas.isFound(b.icon(Icon.full));
 
     public abstract void build(Table table);
-    public Runnable changed = () -> {};
+
+    public Runnable changed = () -> {
+    };
 
     static class SliderOption extends FilterOption{
         final String name;
@@ -40,7 +42,7 @@ public abstract class FilterOption{
         public void build(Table table){
             table.add("$filter.option." + name);
             table.row();
-            Slider slider = table.addSlider(min, max, (max-min)/200f, setter).growX().get();
+            Slider slider = table.addSlider(min, max, (max - min) / 200f, setter).growX().get();
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
@@ -65,14 +67,14 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8*3), () -> {
+            table.addButton(b -> b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable()).setRegion(supplier.get().icon(Icon.small))).size(8 * 3), () -> {
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.test(block)) continue;
 
-                    dialog.cont.addImage(block.icon(Icon.medium)).size(8*4).pad(3).get().clicked(() -> {
+                    dialog.cont.addImage(block.icon(Icon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.accept(block);
                         dialog.hide();
                         changed.run();

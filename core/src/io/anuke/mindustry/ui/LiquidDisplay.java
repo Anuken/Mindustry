@@ -8,7 +8,7 @@ import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-/**An ItemDisplay, but for liquids.*/
+/** An ItemDisplay, but for liquids. */
 public class LiquidDisplay extends Table{
 
     public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
@@ -20,7 +20,7 @@ public class LiquidDisplay extends Table{
                 t.add(Strings.autoFixed(amount, 1));
                 add(t);
             }
-        }}).size(8*4).padRight(3);
+        }}).size(8 * 4).padRight(3);
 
         if(perSecond){
             add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.LIGHT_GRAY);

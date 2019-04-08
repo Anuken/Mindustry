@@ -13,23 +13,17 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -203,7 +197,7 @@ public class BuildBlock extends Block{
             if(builder instanceof Player){
                 builderID = builder.getID();
             }
-            
+
             if(progress >= 1f || state.rules.infiniteResources){
                 Call.onConstructFinish(tile, block, builderID, tile.getRotation(), builder.getTeam());
             }
@@ -246,7 +240,7 @@ public class BuildBlock extends Block{
 
             for(int i = 0; i < block.buildRequirements.length; i++){
                 int sclamount = Math.round(state.rules.buildCostMultiplier * block.buildRequirements[i].amount);
-                int required = (int) (accumulator[i]); //calculate items that are required now
+                int required = (int)(accumulator[i]); //calculate items that are required now
 
                 if(inventory.get(block.buildRequirements[i].item) == 0 && sclamount != 0){
                     maxProgress = 0f;
@@ -254,7 +248,7 @@ public class BuildBlock extends Block{
                     //calculate how many items it can actually use
                     int maxUse = Math.min(required, inventory.get(block.buildRequirements[i].item));
                     //get this as a fraction
-                    float fraction = maxUse / (float) required;
+                    float fraction = maxUse / (float)required;
 
                     //move max progress down if this fraction is less than 1
                     maxProgress = Math.min(maxProgress, maxProgress * fraction);

@@ -1,15 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.Events;
 import io.anuke.arc.input.KeyCode;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
-import io.anuke.arc.Events;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.ScrollPane;
 
 import static io.anuke.mindustry.Vars.state;
 
@@ -23,7 +23,7 @@ public class FloatingDialog extends Dialog{
         this.title.setAlignment(Align.center);
         titleTable.row();
         titleTable.addImage("white", Pal.accent)
-                .growX().height(3f).pad(4f);
+        .growX().height(3f).pad(4f);
 
         hidden(() -> {
             if(shouldPause && !state.is(State.menu)){
@@ -43,14 +43,14 @@ public class FloatingDialog extends Dialog{
         boolean[] done = {false};
 
         shown(() -> Core.app.post(() ->
-                forEach(child -> {
-                    if(done[0]) return;
+        forEach(child -> {
+            if(done[0]) return;
 
-                    if(child instanceof ScrollPane){
-                        Core.scene.setScrollFocus(child);
-                        done[0] = true;
-                    }
-                })));
+            if(child instanceof ScrollPane){
+                Core.scene.setScrollFocus(child);
+                done[0] = true;
+            }
+        })));
     }
 
     protected void onResize(Runnable run){
@@ -66,7 +66,7 @@ public class FloatingDialog extends Dialog{
         buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(210f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
                 Core.app.post(this::hide);
             }
         });

@@ -2,9 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.scene.event.HandCursorListener;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.Tooltip;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.mindustry.Vars;
@@ -34,7 +32,7 @@ public class DatabaseDialog extends FloatingDialog{
 
         Array<Content>[] allContent = Vars.content.getContentMap();
 
-        for(int j = 0; j < allContent.length; j ++){
+        for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.values()[j];
 
             Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
@@ -53,7 +51,7 @@ public class DatabaseDialog extends FloatingDialog{
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
-                    UnlockableContent unlock = (UnlockableContent) array.get(i);
+                    UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
                     image.addListener(new HandCursorListener());

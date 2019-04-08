@@ -3,10 +3,7 @@ package io.anuke.mindustry.entities;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.QuadTree;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SolidTrait;
 
@@ -135,7 +132,7 @@ public class EntityCollisions{
 
         for(Entity entity : group.all()){
             if(entity instanceof SolidTrait){
-                SolidTrait s = (SolidTrait) entity;
+                SolidTrait s = (SolidTrait)entity;
                 s.lastPosition().set(s.getX(), s.getY());
                 tree.insert(s);
             }
@@ -144,8 +141,8 @@ public class EntityCollisions{
 
     private void checkCollide(Entity entity, Entity other){
 
-        SolidTrait a = (SolidTrait) entity;
-        SolidTrait b = (SolidTrait) other;
+        SolidTrait a = (SolidTrait)entity;
+        SolidTrait b = (SolidTrait)other;
 
         a.hitbox(this.r1);
         b.hitbox(this.r2);
@@ -228,7 +225,7 @@ public class EntityCollisions{
             if(!(entity instanceof SolidTrait) || collided.contains(entity.getID()))
                 continue;
 
-            SolidTrait solid = (SolidTrait) entity;
+            SolidTrait solid = (SolidTrait)entity;
 
             solid.hitbox(r1);
             r1.x += (solid.lastPosition().x - solid.getX());

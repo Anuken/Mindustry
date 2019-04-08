@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 
 public abstract class GenerateFilter{
-    protected float o = (float)(Math.random()*10000000.0);
+    protected float o = (float)(Math.random() * 10000000.0);
     protected long seed;
     protected GenerateInput in;
 
@@ -20,15 +20,15 @@ public abstract class GenerateFilter{
     protected abstract void apply();
 
     protected float noise(float x, float y, float scl, float mag){
-        return (float)in.noise.octaveNoise2D(1f, 0f, 1f/scl, x + o, y + o)*mag;
+        return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x + o, y + o) * mag;
     }
 
     protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
-        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f/scl, x + o, y + o)*mag;
+        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f / scl, x + o, y + o) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){
-        return in.pnoise.getValue((int)(x + o), (int)(y + o), 1f/scl)*mag;
+        return in.pnoise.getValue((int)(x + o), (int)(y + o), 1f / scl) * mag;
     }
 
     public void randomize(){

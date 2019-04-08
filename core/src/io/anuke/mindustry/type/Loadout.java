@@ -4,9 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.defaultTeam;
@@ -34,7 +32,7 @@ public class Loadout extends Content{
         int coreX = -1, coreY = -1;
 
         outer:
-        for(int y = 0; y < layout.length; y ++){
+        for(int y = 0; y < layout.length; y++){
             for(int x = 0; x < layout[0].length(); x++){
                 char c = layout[y].charAt(x);
                 if(entries.get(c) != null && entries.get(c).block instanceof CoreBlock){
@@ -48,7 +46,7 @@ public class Loadout extends Content{
 
         if(coreX == -1) throw new IllegalArgumentException("Schematic does not have a core.");
 
-        for(int y = 0; y < layout.length; y ++){
+        for(int y = 0; y < layout.length; y++){
             for(int x = 0; x < layout[0].length(); x++){
                 char c = layout[y].charAt(x);
                 if(entries.containsKey(c)){

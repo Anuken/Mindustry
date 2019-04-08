@@ -2,9 +2,7 @@ package io.anuke.mindustry.input;
 
 import io.anuke.arc.Application.ApplicationType;
 import io.anuke.arc.Core;
-import io.anuke.arc.KeyBinds.Axis;
-import io.anuke.arc.KeyBinds.KeyBind;
-import io.anuke.arc.KeyBinds.KeybindValue;
+import io.anuke.arc.KeyBinds.*;
 import io.anuke.arc.input.InputDevice.DeviceType;
 import io.anuke.arc.input.KeyCode;
 
@@ -37,9 +35,22 @@ public enum Binding implements KeyBind{
     private final KeybindValue defaultValue;
     private final String category;
 
-    Binding(KeybindValue defaultValue, String category){ this.defaultValue = defaultValue; this.category = category; }
-    Binding(KeybindValue defaultValue){ this(defaultValue, null); }
+    Binding(KeybindValue defaultValue, String category){
+        this.defaultValue = defaultValue;
+        this.category = category;
+    }
 
-    @Override public KeybindValue defaultValue(DeviceType type){ return defaultValue; }
-    @Override public String category(){ return category; }
+    Binding(KeybindValue defaultValue){
+        this(defaultValue, null);
+    }
+
+    @Override
+    public KeybindValue defaultValue(DeviceType type){
+        return defaultValue;
+    }
+
+    @Override
+    public String category(){
+        return category;
+    }
 }

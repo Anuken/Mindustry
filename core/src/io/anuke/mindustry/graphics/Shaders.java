@@ -120,10 +120,10 @@ public class Shaders{
             setUniformf("u_dp", Unit.dp.scl(1f));
             setUniformf("u_time", Time.time() / Unit.dp.scl(1f));
             setUniformf("u_offset",
-                    Core.camera.position.x - Core.camera.width / 2 ,
-                    Core.camera.position.y - Core.camera.height / 2 );
-            setUniformf("u_texsize", Core.camera.width ,
-            Core.camera.height );
+            Core.camera.position.x - Core.camera.width / 2,
+            Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_texsize", Core.camera.width,
+            Core.camera.height);
         }
     }
 
@@ -140,7 +140,7 @@ public class Shaders{
             setUniformf("time", Time.time());
         }
     }
-    
+
     public static class LoadShader extends Shader{
         public LoadShader(String frag, String vert){
             super(Core.files.internal("shaders/" + vert + ".vertex"), Core.files.internal("shaders/" + frag + ".fragment"));

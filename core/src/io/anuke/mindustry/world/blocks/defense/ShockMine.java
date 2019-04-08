@@ -3,15 +3,15 @@ package io.anuke.mindustry.world.blocks.defense;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class ShockMine extends Block{
-    protected int timerDamage = timers ++;
+    protected int timerDamage = timers++;
 
     protected float cooldown = 80f;
     protected float tileDamage = 5f;

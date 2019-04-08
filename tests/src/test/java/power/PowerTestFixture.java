@@ -12,19 +12,17 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.PowerBlock;
 import io.anuke.mindustry.world.blocks.power.Battery;
 import io.anuke.mindustry.world.blocks.power.PowerGenerator;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.lang.reflect.Field;
 
-/** This class provides objects commonly used by power related unit tests.
- *  For now, this is a helper with static methods, but this might change.
- *
- *  Note: All tests which subclass this will run with a fixed delta of 0.5!
- * */
+/**
+ * This class provides objects commonly used by power related unit tests.
+ * For now, this is a helper with static methods, but this might change.
+ * <p>
+ * Note: All tests which subclass this will run with a fixed delta of 0.5!
+ */
 public class PowerTestFixture{
     public static final float smallRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR;
     public static final float mediumRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR * 10;
@@ -62,10 +60,11 @@ public class PowerTestFixture{
             consumes.powerBuffered(capacity, ticksToFill);
         }};
     }
+
     /**
      * Creates a fake tile on the given location using the given block.
-     * @param x     The X coordinate.
-     * @param y     The y coordinate.
+     * @param x The X coordinate.
+     * @param y The y coordinate.
      * @param block The block on the tile.
      * @return The created tile or null in case of exceptions.
      */

@@ -4,10 +4,7 @@ import com.squareup.javapoet.*;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.IOFinder.ClassSerializer;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic.Kind;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -33,7 +30,7 @@ public class RemoteWriteGenerator{
 
             //add temporary write buffer
             classBuilder.addField(FieldSpec.builder(ByteBuffer.class, "TEMP_BUFFER", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
-                    .initializer("ByteBuffer.allocate($1L)", RemoteMethodAnnotationProcessor.maxPacketSize).build());
+            .initializer("ByteBuffer.allocate($1L)", RemoteMethodAnnotationProcessor.maxPacketSize).build());
 
             //go through each method entry in this class
             for(MethodEntry methodEntry : entry.methods){
@@ -65,8 +62,8 @@ public class RemoteWriteGenerator{
 
         //create builder
         MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
-                .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
-                .returns(void.class);
+        .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
+        .returns(void.class);
 
         //forwarded methods aren't intended for use, and are not public
         if(!forwarded){
@@ -119,7 +116,7 @@ public class RemoteWriteGenerator{
 
             //add the statement to call it
             method.addStatement("$N." + elem.getSimpleName() + "(" + results.toString() + ")",
-                    ((TypeElement) elem.getEnclosingElement()).getQualifiedName().toString());
+            ((TypeElement)elem.getEnclosingElement()).getQualifiedName().toString());
 
             if(methodEntry.local != Loc.both){
                 method.endControlFlow();
@@ -170,7 +167,7 @@ public class RemoteWriteGenerator{
                     method.addStatement("TEMP_BUFFER.put(" + varName + " ? (byte)1 : 0)");
                 }else{
                     method.addStatement("TEMP_BUFFER.put" +
-                            capName + "(" + varName + ")");
+                    capName + "(" + varName + ")");
                 }
             }else{
                 //else, try and find a serializer
@@ -209,7 +206,7 @@ public class RemoteWriteGenerator{
 
         //send the actual packet
         method.addStatement("io.anuke.mindustry.net.Net." + sendString + "packet, " +
-                (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp") + ")");
+        (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp") + ")");
 
 
         //end check for server/client
@@ -221,7 +218,7 @@ public class RemoteWriteGenerator{
 
     private String getCheckString(Loc loc){
         return loc.isClient && loc.isServer ? "io.anuke.mindustry.net.Net.server() || io.anuke.mindustry.net.Net.client()" :
-                loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
-                        loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
+        loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
+        loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
     }
 }

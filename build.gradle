@@ -27,7 +27,7 @@ allprojects{
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.6'
         arcHash = null
-        
+
         debugged = {
             return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release")
         }
@@ -89,7 +89,8 @@ allprojects{
 
             try{
                 pfile.createNewFile()
-            }catch(Exception ignored){}
+            }catch(Exception ignored){
+            }
 
             if(pfile.exists()){
                 props.load(new FileInputStream(pfile))
@@ -121,7 +122,7 @@ project(":desktop"){
     dependencies{
         compile project(":core")
         compile project(":net")
-        
+
         if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -157,9 +158,9 @@ project(":ios"){
         compile project(":core")
         compile project(":net")
         compileOnly project(":annotations")
-        
+
         compile arcModule("backends:backend-robovm")
-        
+
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"

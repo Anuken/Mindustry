@@ -1,11 +1,11 @@
 package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.LiquidDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.content;
 

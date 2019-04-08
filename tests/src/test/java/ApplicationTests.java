@@ -87,7 +87,7 @@ public class ApplicationTests{
 
     @BeforeEach
     void resetWorld(){
-        Time.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -138,8 +138,8 @@ public class ApplicationTests{
         int by = 4;
         world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
         assertEquals(world.tile(bx, by).getTeam(), Team.blue);
-        for(int x = bx-1; x <= bx + 1; x++){
-            for(int y = by-1; y <= by + 1; y++){
+        for(int x = bx - 1; x <= bx + 1; x++){
+            for(int y = by - 1; y <= by + 1; y++){
                 if(x == bx && by == y){
                     assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
@@ -247,8 +247,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -302,8 +302,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Spirit d1 = (Spirit) UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit) UnitTypes.spirit.create(Team.blue);
+        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -340,7 +340,7 @@ public class ApplicationTests{
         }
         int i = 0;
 
-        for(int x = 5; x < tiles.length && i < content.blocks().size;){
+        for(int x = 5; x < tiles.length && i < content.blocks().size; ){
             Block block = content.block(i++);
             if(block.buildVisibility.get()){
                 tiles[x][5].setBlock(block);

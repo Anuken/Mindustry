@@ -1,8 +1,6 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.freetype.FreeTypeFontGenerator;
@@ -13,19 +11,13 @@ import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.graphics.g2d.BitmapFont;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.Scene;
-import io.anuke.arc.scene.Skin;
+import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
-import io.anuke.arc.scene.ui.TooltipManager;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
@@ -84,21 +76,21 @@ public class UI implements ApplicationListener{
         Core.input.addProcessor(Core.scene);
 
         Dialog.setShowAction(() -> sequence(
-            alpha(0f),
-            originCenter(),
-            moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
-            scaleTo(0.0f, 1f),
-            parallel(
-                scaleTo(1f, 1f, 0.1f, Interpolation.fade),
-                fadeIn(0.1f, Interpolation.fade)
-            )
+        alpha(0f),
+        originCenter(),
+        moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
+        scaleTo(0.0f, 1f),
+        parallel(
+        scaleTo(1f, 1f, 0.1f, Interpolation.fade),
+        fadeIn(0.1f, Interpolation.fade)
+        )
         ));
 
         Dialog.setHideAction(() -> sequence(
-            parallel(
-                scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
-                fadeOut(0.1f, Interpolation.fade)
-            )
+        parallel(
+        scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
+        fadeOut(0.1f, Interpolation.fade)
+        )
         ));
 
         TooltipManager.getInstance().animations = false;
@@ -126,11 +118,11 @@ public class UI implements ApplicationListener{
 
         Core.graphics.restoreCursor();
     }
-    
+
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(9*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;

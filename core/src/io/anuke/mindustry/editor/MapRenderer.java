@@ -40,7 +40,7 @@ public class MapRenderer implements Disposable{
             }
         }
 
-        chunks = new IndexedRenderer[(int) Math.ceil((float) width / chunksize)][(int) Math.ceil((float) height / chunksize)];
+        chunks = new IndexedRenderer[(int)Math.ceil((float)width / chunksize)][(int)Math.ceil((float)height / chunksize)];
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
@@ -115,38 +115,38 @@ public class MapRenderer implements Disposable{
 
             if(wall.rotate){
                 mesh.draw(idxWall, region,
-                        wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.getRotation() * 90 - 90);
+                wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.getRotation() * 90 - 90);
             }else{
                 mesh.draw(idxWall, region,
-                        wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl)/2f,
-                        wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl)/2f,
-                        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
+                wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl) / 2f,
+                wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl) / 2f,
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
             }
         }else{
-            region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length-1)];
+            region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        float offsetX = -(wall.size/3)*tilesize, offsetY = -(wall.size/3) * tilesize;
+        float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
 
         if(wall.update || wall.destructible){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
         }else if(!wall.synthetic() && wall != Blocks.air){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
-            offsetX = tilesize/2f - region.getWidth()/2f * Draw.scl;
-            offsetY = tilesize/2f - region.getHeight()/2f * Draw.scl;
+            offsetX = tilesize / 2f - region.getWidth() / 2f * Draw.scl;
+            offsetY = tilesize / 2f - region.getHeight() / 2f * Draw.scl;
         }else if(wall == Blocks.air && tile.ore() != null){
-            region = tile.ore().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.ore().editorVariantRegions().length-1)];
+            region = tile.ore().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.ore().editorVariantRegions().length - 1)];
         }else{
             region = Core.atlas.find("clear-editor");
         }
 
         mesh.draw(idxDecal, region,
-                wx * tilesize + offsetX, wy * tilesize + offsetY,
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
+        wx * tilesize + offsetX, wy * tilesize + offsetY,
+        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }
 

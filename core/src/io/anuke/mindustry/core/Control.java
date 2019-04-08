@@ -1,8 +1,6 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -16,16 +14,10 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.GlobalData;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.Binding;
-import io.anuke.mindustry.input.DesktopInput;
-import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.input.MobileInput;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -152,20 +144,20 @@ public class Control implements ApplicationListener{
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
-                    state.stats.buildingsBuilt ++;
+                    state.stats.buildingsBuilt++;
                 }
             }
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.getTeam() == player.getTeam()){
-                state.stats.buildingsDestroyed ++;
+                state.stats.buildingsDestroyed++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.getTeam() != player.getTeam()){
-                state.stats.enemyUnitsDestroyed ++;
+                state.stats.enemyUnitsDestroyed++;
             }
         });
 
@@ -252,9 +244,9 @@ public class Control implements ApplicationListener{
                     Core.settings.save();
                 }).size(100f, 60f);
                 dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final v4 release.[]\n\n " +
-                        "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
-                        "All current art and UI is unfinished, and will be changed before release. " +
-                        "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
+                "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
+                "All current art and UI is unfinished, and will be changed before release. " +
+                "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
         }
@@ -309,7 +301,7 @@ public class Control implements ApplicationListener{
                 Time.update();
             }
 
-            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) &&Core.input.keyTap(KeyCode.BACK)){
+            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
                 Platform.instance.hide();
             }
         }

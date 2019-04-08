@@ -8,9 +8,9 @@ import io.anuke.mindustry.type.Weapon;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-        spirit, phantom,
-        wraith, ghoul, revenant, lich, reaper,
-        dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
+    spirit, phantom,
+    wraith, ghoul, revenant, lich, reaper,
+    dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){

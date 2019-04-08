@@ -8,15 +8,9 @@ import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -51,7 +45,7 @@ public class Logic implements ApplicationListener{
         });
     }
 
-    /**Handles the event of content being used by either the player or some block.*/
+    /** Handles the event of content being used by either the player or some block. */
     public void handleContent(UnlockableContent content){
         if(!headless){
             data.unlockContent(content);
@@ -85,7 +79,7 @@ public class Logic implements ApplicationListener{
         world.spawner.spawnEnemies();
         state.wave++;
         state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
-                         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
+        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }

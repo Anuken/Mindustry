@@ -3,13 +3,9 @@ package io.anuke.mindustry.graphics;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.graphics.Pixmaps;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Disposable;
@@ -83,7 +79,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, baseSize/2f, baseSize/2f);
+            Fill.rect(x + rx, y + ry, baseSize / 2f, baseSize / 2f);
         }
 
         Draw.color();

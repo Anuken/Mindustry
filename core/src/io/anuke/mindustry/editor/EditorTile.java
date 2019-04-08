@@ -8,10 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.ui;
 
@@ -49,7 +46,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
-        Block previous =wall;
+        Block previous = wall;
         if(previous == type) return;
         super.setBlock(type);
         op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));

@@ -5,24 +5,17 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.net.Host;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.Connect;
 import io.anuke.mindustry.net.Packets.Disconnect;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
+import java.net.*;
+import java.nio.*;
 import java.nio.channels.ClosedSelectorException;
 
 import static io.anuke.mindustry.Vars.netClient;

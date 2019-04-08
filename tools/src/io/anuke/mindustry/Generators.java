@@ -6,10 +6,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.ImagePacker.GenRegion;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -22,7 +19,7 @@ import java.nio.file.Paths;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class Generators {
+public class Generators{
 
     public static void generate(){
 
@@ -54,7 +51,7 @@ public class Generators {
                     Image last = null;
                     if(block.outlineIcon){
                         int radius = 3;
-                        GenRegion region = (GenRegion)regions[regions.length-1];
+                        GenRegion region = (GenRegion)regions[regions.length - 1];
                         Image base = ImagePacker.get(region);
                         Image out = last = new Image(region.getWidth(), region.getHeight());
                         for(int x = 0; x < out.width(); x++){
@@ -93,7 +90,7 @@ public class Generators {
 
                     int i = 0;
                     for(TextureRegion region : regions){
-                        i ++;
+                        i++;
                         if(i != regions.length || last == null){
                             image.draw(region);
                         }else{
@@ -163,7 +160,7 @@ public class Generators {
                     image.drawCenter(mech.region);
                 }
 
-                int off = image.width()/2 - mech.weapon.region.getWidth()/2;
+                int off = image.width() / 2 - mech.weapon.region.getWidth() / 2;
 
                 image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
                 image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
@@ -189,8 +186,8 @@ public class Generators {
 
                 for(boolean b : Mathf.booleans){
                     image.draw(type.weapon.region,
-                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width()/2 - type.weapon.region.getWidth()/2),
-                    (int)(type.weaponOffsetY / Draw.scl + image.height()/2f - type.weapon.region.getHeight()/2f),
+                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width() / 2 - type.weapon.region.getWidth() / 2),
+                    (int)(type.weaponOffsetY / Draw.scl + image.height() / 2f - type.weapon.region.getHeight() / 2f),
                     b, false);
                 }
 
@@ -205,15 +202,15 @@ public class Generators {
                 OreBlock ore = (OreBlock)block;
                 Item item = ore.itemDrop;
 
-                for (int i = 0; i < 3; i++) {
+                for(int i = 0; i < 3; i++){
                     //get base image to draw on
                     Image image = new Image(32, 32);
-                    Image shadow = ImagePacker.get(item.name + (i+1));
+                    Image shadow = ImagePacker.get(item.name + (i + 1));
 
-                    int offset = image.width()/tilesize;
+                    int offset = image.width() / tilesize;
 
-                    for (int x = 0; x < image.width(); x++) {
-                        for (int y = offset; y < image.height(); y++) {
+                    for(int x = 0; x < image.width(); x++){
+                        for(int y = offset; y < image.height(); y++){
                             Color color = shadow.getColor(x, y - offset);
 
                             //draw semi transparent background
@@ -224,9 +221,9 @@ public class Generators {
                         }
                     }
 
-                    image.draw(ImagePacker.get(item.name + (i+1)));
-                    image.save("../blocks/environment/ore-" + item.name + (i+1));
-                    image.save("../editor/editor-ore-" + item.name + (i+1));
+                    image.draw(ImagePacker.get(item.name + (i + 1)));
+                    image.save("../blocks/environment/ore-" + item.name + (i + 1));
+                    image.save("../editor/editor-ore-" + item.name + (i + 1));
 
                     //save icons
                     image.save(block.name + "-icon-full");
@@ -263,7 +260,8 @@ public class Generators {
 
                     result.save("../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){}
+                }catch(Exception ignored){
+                }
             }
         });
     }

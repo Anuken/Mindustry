@@ -5,37 +5,22 @@ import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
-import io.anuke.arc.graphics.Camera;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.PixmapIO;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.BufferUtils;
-import io.anuke.arc.util.ScreenUtils;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityDraw;
-import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
-import io.anuke.mindustry.entities.traits.DrawTrait;
-import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
@@ -84,7 +69,7 @@ public class Renderer implements ApplicationListener{
                         entity.id++;
                         entity.set(x, y);
                         if(data instanceof Entity){
-                            entity.setParent((Entity) data);
+                            entity.setParent((Entity)data);
                         }
                         effectGroup.add(entity);
                     }else{
@@ -96,7 +81,7 @@ public class Renderer implements ApplicationListener{
                         entity.data = data;
                         entity.set(x, y);
                         if(data instanceof Entity){
-                            entity.setParent((Entity) data);
+                            entity.setParent((Entity)data);
                         }
                         groundEffectGroup.add(entity);
                     }
@@ -281,7 +266,7 @@ public class Renderer implements ApplicationListener{
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
             if(group.count(p -> p.isFlying() == flying) +
-                    playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+            playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
             drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
@@ -329,7 +314,7 @@ public class Renderer implements ApplicationListener{
     public void takeMapScreenshot(){
         drawGroundShadows();
 
-        int w = world.width()*tilesize, h =  world.height()*tilesize;
+        int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
@@ -348,8 +333,8 @@ public class Renderer implements ApplicationListener{
         disableUI = true;
         camera.width = w;
         camera.height = h;
-        camera.position.x = w/2f + tilesize/2f;
-        camera.position.y = h/2f + tilesize/2f;
+        camera.position.x = w / 2f + tilesize / 2f;
+        camera.position.y = h / 2f + tilesize / 2f;
         Draw.flush();
         buffer.begin();
         draw();
@@ -361,7 +346,7 @@ public class Renderer implements ApplicationListener{
         camera.position.set(px, py);
         buffer.begin();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i+= 4){
+        for(int i = 0; i < lines.length; i += 4){
             lines[i + 3] = (byte)255;
         }
         buffer.end();

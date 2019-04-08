@@ -14,12 +14,12 @@ public class RiverNoiseFilter extends GenerateFilter{
 
     {
         options(
-            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-            new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
-            new SliderOption("threshold2", () -> threshold2, f -> threshold2 = f, 0f, 1f),
-            new BlockOption("block", () -> block, b -> block = b, wallsOnly),
-            new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
-            new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
+        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+        new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
+        new SliderOption("threshold2", () -> threshold2, f -> threshold2 = f, 0f, 1f),
+        new BlockOption("block", () -> block, b -> block = b, wallsOnly),
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+        new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
         );
     }
 

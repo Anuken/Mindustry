@@ -23,8 +23,8 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class ForceProjector extends Block {
-    protected int timerUse = timers ++;
+public class ForceProjector extends Block{
+    protected int timerUse = timers++;
     protected float phaseUseTime = 350f;
 
     protected float phaseRadiusBoost = 80f;
@@ -57,7 +57,7 @@ public class ForceProjector extends Block {
         }
     };
 
-    public ForceProjector(String name) {
+    public ForceProjector(String name){
         super(name);
         update = true;
         solid = true;
@@ -83,7 +83,7 @@ public class ForceProjector extends Block {
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
 
-        stats.add(BlockStat.boostEffect, phaseRadiusBoost/tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ForceProjector extends Block {
 
         boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat,  Mathf.num(phaseValid), 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
         if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime)){
             entity.cons.trigger();
@@ -117,7 +117,7 @@ public class ForceProjector extends Block {
         entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : 1f, 0.05f);
 
         if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
-            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize/2f), tile.drawy() + Mathf.range(tilesize/2f));
+            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
         }
 
         //use cases:
@@ -140,7 +140,7 @@ public class ForceProjector extends Block {
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw*Time.delta());
+            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw * Time.delta());
         }
 
         if(entity.buildup > 0){
@@ -148,10 +148,10 @@ public class ForceProjector extends Block {
             ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
             if(cons.valid(entity)){
                 cons.update(entity);
-                scale *= (cooldownLiquid * (1f+(entity.liquids.current().heatCapacity-0.4f)*0.9f));
+                scale *= (cooldownLiquid * (1f + (entity.liquids.current().heatCapacity - 0.4f) * 0.9f));
             }
 
-            entity.buildup -= Time.delta()*scale;
+            entity.buildup -= Time.delta() * scale;
         }
 
         if(entity.broken && entity.buildup <= 0 && entity.warmup >= 0.9f){
@@ -165,7 +165,7 @@ public class ForceProjector extends Block {
         }
 
         if(entity.hit > 0f){
-            entity.hit -= 1f/5f * Time.delta();
+            entity.hit -= 1f / 5f * Time.delta();
         }
 
         float realRadius = realRadius(entity);
@@ -173,18 +173,18 @@ public class ForceProjector extends Block {
         paramTile = tile;
         paramEntity = entity;
         paramBlock = this;
-        EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius*2f, shieldConsumer);
+        EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius * 2f, shieldConsumer);
     }
 
     float realRadius(ForceEntity entity){
-        return (radius+entity.phaseHeat*phaseRadiusBoost) * entity.radscl;
+        return (radius + entity.phaseHeat * phaseRadiusBoost) * entity.radscl;
     }
 
-    boolean isInsideHexagon(float x0, float y0, float d, float x, float y) {
-        float dx = Math.abs(x - x0)/d;
-        float dy = Math.abs(y - y0)/d;
+    boolean isInsideHexagon(float x0, float y0, float d, float x, float y){
+        float dx = Math.abs(x - x0) / d;
+        float dy = Math.abs(y - y0) / d;
         float a = 0.25f * Mathf.sqrt3;
-        return (dy <= a) && (a*dx + 0.25*dy <= 0.5*a);
+        return (dy <= a) && (a * dx + 0.25 * dy <= 0.5 * a);
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ForceProjector extends Block {
 
         @Override
         public float drawSize(){
-            return realRadius(entity)*2f+2f;
+            return realRadius(entity) * 2f + 2f;
         }
 
         @Override
@@ -271,7 +271,8 @@ public class ForceProjector extends Block {
         }
 
         public void drawSimple(){
-            if(realRadius(entity) < 0.5f) return;;
+            if(realRadius(entity) < 0.5f) return;
+            ;
 
             float rad = realRadius(entity);
 
@@ -294,6 +295,7 @@ public class ForceProjector extends Block {
         public ConsumeForceProjectorPower(float powerCapacity, float ticksToFill){
             super(powerCapacity / ticksToFill, powerCapacity, true);
         }
+
         @Override
         public boolean valid(TileEntity entity){
             return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(entity);

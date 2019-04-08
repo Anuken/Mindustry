@@ -365,11 +365,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
-        size + Mathf.absin(Time.time(), 2f, size/4f));
+        size + Mathf.absin(Time.time(), 2f, size / 4f));
 
         Draw.color(Color.WHITE);
-        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset-1f), y + Angles.trnsy(rotation + 180, mech.engineOffset-1f),
-        (size + Mathf.absin(Time.time(), 2f, size/4f)) / 2f);
+        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
+        (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
     }
 
@@ -443,15 +443,16 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 TextureRegion region = draw.region;
 
                 Draw.rect(region,
-                    request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                    region.getWidth() * 1f * Draw.scl * draw.scalex,
-                    region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
+                request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
+                region.getWidth() * 1f * Draw.scl * draw.scalex,
+                region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
 
                 Draw.color(Pal.accent);
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(request.block.size-1, 0)/2f * tilesize;
-                    if(i % 2 == 0) Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
+                    if(i % 2 == 0)
+                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 
@@ -615,7 +616,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
         mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
@@ -635,7 +636,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
             if(dst(moveTarget) < 2f){
                 if(tapping){
-                    Tile tile = ((TileEntity) moveTarget).tile;
+                    Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
 
@@ -695,7 +696,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
-                                target = ((Tile) target).entity;
+                                target = ((Tile)target).entity;
                             }
                         }
 
@@ -703,7 +704,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                             setMineTile(null);
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
                 mech.canHeal && dst(target) < getWeapon().bullet.range())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
@@ -840,7 +841,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
         buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
-        buffer.writeShort((short) (baseRotation * 2));
+        buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);
     }

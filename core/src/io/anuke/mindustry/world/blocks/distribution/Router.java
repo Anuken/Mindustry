@@ -4,9 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
 public class Router extends Block{
@@ -30,7 +28,7 @@ public class Router extends Block{
         }
 
         if(entity.lastItem != null){
-            entity.time += 1f/speed * Time.delta();
+            entity.time += 1f / speed * Time.delta();
             Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
 
             if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){
@@ -64,7 +62,7 @@ public class Router extends Block{
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
             if(tile == from) continue;
-            if(set) tile.setDump((byte) ((tile.getDump() + 1) % proximity.size));
+            if(set) tile.setDump((byte)((tile.getDump() + 1) % proximity.size));
             if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;
             }

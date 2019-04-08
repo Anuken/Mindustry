@@ -7,10 +7,7 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.Fx;
@@ -27,7 +24,7 @@ import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Utility class for damaging in an area.*/
+/** Utility class for damaging in an area. */
 public class Damage{
     private static Rectangle rect = new Rectangle();
     private static Rectangle hitrect = new Rectangle();
@@ -35,19 +32,19 @@ public class Damage{
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
 
-    /**Creates a dynamic explosion based on specified parameters.*/
+    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
-            int branches = 5 + Mathf.clamp((int) (power / 30), 1, 20);
+            int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
             Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.none, Pal.power, 3,
-                    x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
             Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, x, y, Mathf.random(360f)));
         }
 
-        int waves = Mathf.clamp((int) (explosiveness / 4), 0, 30);
+        int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
 
         for(int i = 0; i < waves; i++){
             int f = i;
@@ -67,7 +64,7 @@ public class Damage{
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(Fx.dynamicExplosion, x, y, radius/8f);
+        Effects.effect(Fx.dynamicExplosion, x, y, radius / 8f);
     }
 
     public static void createIncend(float x, float y, float range, int amount){
@@ -136,7 +133,7 @@ public class Damage{
         Units.getNearbyEnemies(team, rect, cons);
     }
 
-    /**Damages all entities and blocks in a radius that are enemies of the team.*/
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<io.anuke.mindustry.entities.type.Unit> predicate, Consumer<io.anuke.mindustry.entities.type.Unit> acceptor){
         Consumer<io.anuke.mindustry.entities.type.Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
@@ -157,17 +154,17 @@ public class Damage{
         }
     }
 
-    /**Damages everything in a radius.*/
+    /** Damages everything in a radius. */
     public static void damage(float x, float y, float radius, float damage){
         damage(null, x, y, radius, damage, false);
     }
 
-    /**Damages all entities and blocks in a radius that are enemies of the team.*/
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage){
         damage(team, x, y, radius, damage, false);
     }
 
-    /**Damages all entities and blocks in a radius that are enemies of the team.*/
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
         Consumer<Unit> cons = entity -> {
             if(entity.getTeam() == team || entity.dst(x, y) > radius){
@@ -201,11 +198,11 @@ public class Damage{
     public static void tileDamage(Team team, int startx, int starty, int radius, float baseDamage){
         bits.clear();
         propagation.clear();
-        int bitOffset = bits.width()/2;
+        int bitOffset = bits.width() / 2;
 
         propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
         //clamp radius to fit bits
-        radius = Math.min(radius, bits.width()/2);
+        radius = Math.min(radius, bits.width() / 2);
 
         while(!propagation.isEmpty()){
             int prop = propagation.removeLast();
@@ -242,7 +239,7 @@ public class Damage{
     }
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage){
-        int trad = (int) (radius / tilesize);
+        int trad = (int)(radius / tilesize);
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);

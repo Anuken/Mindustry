@@ -1,11 +1,11 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
@@ -45,7 +45,7 @@ public class MassDriverBolt extends BulletType{
 
         float hitDst = 7f;
 
-        DriverBulletData data = (DriverBulletData) b.getData();
+        DriverBulletData data = (DriverBulletData)b.getData();
 
         //if the target is dead, just keep flying until the bullet explodes
         if(data.to.isDead()){
@@ -87,7 +87,7 @@ public class MassDriverBolt extends BulletType{
 
         if(!(b.getData() instanceof DriverBulletData)) return;
 
-        DriverBulletData data = (DriverBulletData) b.getData();
+        DriverBulletData data = (DriverBulletData)b.getData();
         data.to.isRecieving = false;
 
         for(int i = 0; i < data.items.length; i++){

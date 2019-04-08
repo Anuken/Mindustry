@@ -3,9 +3,7 @@ package io.anuke.mindustry.world.modules;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.consumers.Consume;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;

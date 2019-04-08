@@ -14,7 +14,6 @@ public class Predict{
 
     /**
      * Calculates of intercept of a stationary and moving target. Do not call from multiple threads!
-     *
      * @param srcx X of shooter
      * @param srcy Y of shooter
      * @param dstx X of target
@@ -28,7 +27,7 @@ public class Predict{
         dstvx /= Time.delta();
         dstvy /= Time.delta();
         float tx = dstx - srcx,
-                ty = dsty - srcy;
+        ty = dsty - srcy;
 
         // Get quadratic equation components
         float a = dstvx * dstvx + dstvy * dstvy - v * v;
@@ -57,8 +56,8 @@ public class Predict{
      */
     public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(),
-            dst.getTargetVelocityX() - src.getTargetVelocityX(),
-            dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
+        dst.getTargetVelocityX() - src.getTargetVelocityX(),
+        dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
     }
 
     private static Vector2 quad(float a, float b, float c){

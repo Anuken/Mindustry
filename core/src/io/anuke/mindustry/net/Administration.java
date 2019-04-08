@@ -2,21 +2,19 @@ package io.anuke.mindustry.net;
 
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
 
 import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
 
-    /**All player info. Maps UUIDs to info. This persists throughout restarts.*/
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
 
     public Administration(){
         Core.settings.defaults(
-            "strict", true
+        "strict", true
         );
 
         load();
@@ -40,7 +38,7 @@ public class Administration{
         Core.settings.save();
     }
 
-    /**Call when a player joins to update their information here.*/
+    /** Call when a player joins to update their information here. */
     public void updatePlayerJoined(String id, String ip, String name){
         PlayerInfo info = getCreateInfo(id);
         info.lastName = name;
@@ -74,7 +72,7 @@ public class Administration{
         return true;
     }
 
-    /**Bans a player by UUID; returns whether this player was already banned.*/
+    /** Bans a player by UUID; returns whether this player was already banned. */
     public boolean banPlayerID(String id){
         if(playerInfo.containsKey(id) && playerInfo.get(id).banned)
             return false;
@@ -201,13 +199,13 @@ public class Administration{
         return info.admin && usid.equals(info.adminUsid);
     }
 
-    /**Finds player info by IP, UUID and name.*/
+    /** Finds player info by IP, UUID and name. */
     public ObjectSet<PlayerInfo> findByName(String name){
         ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
             if(info.lastName.toLowerCase().equals(name.toLowerCase()) || (info.names.contains(name, false))
-                || info.ips.contains(name, false) || info.id.equals(name)){
+            || info.ips.contains(name, false) || info.id.equals(name)){
                 result.add(info);
             }
         }

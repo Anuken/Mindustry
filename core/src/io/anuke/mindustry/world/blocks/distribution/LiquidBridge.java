@@ -28,7 +28,7 @@ public class LiquidBridge extends ItemBridge{
         entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();
 
         Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other) ){
+        if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
             if(entity.cons.valid()){

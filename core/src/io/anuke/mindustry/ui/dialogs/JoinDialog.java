@@ -154,10 +154,10 @@ public class JoinDialog extends FloatingDialog{
                 versionString = Core.bundle.get("server.outdated");
             }else if(host.version < Version.build && Version.build != -1){
                 versionString = Core.bundle.get("server.outdated") + "\n" +
-                        Core.bundle.format("server.version", host.version, "");
+                Core.bundle.format("server.version", host.version, "");
             }else if(host.version > Version.build && Version.build != -1){
                 versionString = Core.bundle.get("server.outdated.client") + "\n" +
-                        Core.bundle.format("server.version", host.version, "");
+                Core.bundle.format("server.version", host.version, "");
             }else{
                 versionString = Core.bundle.format("server.version", host.version, host.versionType);
             }
@@ -170,7 +170,7 @@ public class JoinDialog extends FloatingDialog{
                 t.add("[lightgray]" + Core.bundle.format("server.hostname", host.name)).width(targetWidth() - 10f).left().get().setEllipsis(true);
                 t.row();
                 t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
-                        Core.bundle.format("players.single", host.players))).left();
+                Core.bundle.format("players.single", host.players))).left();
                 t.row();
                 t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + " / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
             }).expand().left().bottom().padLeft(12f).padBottom(8);
@@ -229,7 +229,7 @@ public class JoinDialog extends FloatingDialog{
                 pad = 6;
             }
 
-            Cell cell = ((Table) pane.getParent()).getCell(button);
+            Cell cell = ((Table)pane.getParent()).getCell(button);
 
             if(!Mathf.isEqual(cell.getMinWidth(), pw)){
                 cell.width(pw);
@@ -256,7 +256,7 @@ public class JoinDialog extends FloatingDialog{
             local.add().growX();
             local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
-            local.background((Drawable) null);
+            local.background((Drawable)null);
         }
     }
 
@@ -264,8 +264,8 @@ public class JoinDialog extends FloatingDialog{
         if(totalHosts == 0){
             local.clear();
         }
-        local.background((Drawable) null);
-        totalHosts ++;
+        local.background((Drawable)null);
+        totalHosts++;
         float w = targetWidth();
 
         local.row();
@@ -324,7 +324,7 @@ public class JoinDialog extends FloatingDialog{
         void setIP(String ip){
 
             //parse ip:port, if unsuccessful, use default values
-            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length()-1){
+            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
                 try{
                     int idx = ip.lastIndexOf(':');
                     this.ip = ip.substring(0, idx);
@@ -343,6 +343,7 @@ public class JoinDialog extends FloatingDialog{
             return ip + (port != Vars.port ? ":" + port : "");
         }
 
-        public Server(){}
+        public Server(){
+        }
     }
 }

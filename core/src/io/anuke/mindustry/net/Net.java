@@ -1,12 +1,8 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Net.HttpRequest;
-import io.anuke.arc.Net.HttpResponse;
-import io.anuke.arc.Net.HttpResponseListener;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.Net.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.net.HttpRequestBuilder;
@@ -15,9 +11,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.net.Packets.StreamBegin;
-import io.anuke.mindustry.net.Packets.StreamChunk;
+import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Streamable.StreamBuilder;
 
 import java.io.IOException;
@@ -47,7 +41,7 @@ public class Net{
         return serverProvider != null;
     }
 
-    /**Display a network error. Call on the graphics thread.*/
+    /** Display a network error. Call on the graphics thread. */
     public static void showError(Throwable e){
 
         if(!headless){
@@ -170,7 +164,7 @@ public class Net{
      * Returns a list of all connections IDs.
      */
     public static Array<NetConnection> getConnections(){
-        return (Array<NetConnection>) serverProvider.getConnections();
+        return (Array<NetConnection>)serverProvider.getConnections();
     }
 
     /**
@@ -237,7 +231,7 @@ public class Net{
      * Registers a server listener for when an object is recieved.
      */
     public static <T> void handleServer(Class<T> type, BiConsumer<Integer, T> listener){
-        serverListeners.put(type, (BiConsumer<Integer, Object>) listener);
+        serverListeners.put(type, (BiConsumer<Integer, Object>)listener);
     }
 
     /**
@@ -246,10 +240,10 @@ public class Net{
     public static void handleClientReceived(Object object){
 
         if(object instanceof StreamBegin){
-            StreamBegin b = (StreamBegin) object;
+            StreamBegin b = (StreamBegin)object;
             streams.put(b.id, new StreamBuilder(b));
         }else if(object instanceof StreamChunk){
-            StreamChunk c = (StreamChunk) object;
+            StreamChunk c = (StreamChunk)object;
             StreamBuilder builder = streams.get(c.id);
             if(builder == null){
                 throw new RuntimeException("Recieved stream chunk without a StreamBegin beforehand!");
@@ -261,11 +255,11 @@ public class Net{
             }
         }else if(clientListeners.get(object.getClass()) != null){
 
-            if(clientLoaded || ((object instanceof Packet) && ((Packet) object).isImportant())){
+            if(clientLoaded || ((object instanceof Packet) && ((Packet)object).isImportant())){
                 if(clientListeners.get(object.getClass()) != null)
                     clientListeners.get(object.getClass()).accept(object);
                 Pools.free(object);
-            }else if(!((object instanceof Packet) && ((Packet) object).isUnimportant())){
+            }else if(!((object instanceof Packet) && ((Packet)object).isUnimportant())){
                 packetQueue.add(object);
             }else{
                 Pools.free(object);
@@ -369,24 +363,24 @@ public class Net{
         tcp, udp
     }
 
-    /**Client implementation.*/
+    /** Client implementation. */
     public interface ClientProvider{
-        /**Connect to a server.*/
+        /** Connect to a server. */
         void connect(String ip, int port, Runnable success) throws IOException;
 
-        /**Send an object to the server.*/
+        /** Send an object to the server. */
         void send(Object object, SendMode mode);
 
-        /**Update the ping. Should be done every second or so.*/
+        /** Update the ping. Should be done every second or so. */
         void updatePing();
 
-        /**Get ping in milliseconds. Will only be valid after a call to updatePing.*/
+        /** Get ping in milliseconds. Will only be valid after a call to updatePing. */
         int getPing();
 
-        /**Disconnect from the server.*/
+        /** Disconnect from the server. */
         void disconnect();
 
-        /**Decompress an input snapshot byte array.*/
+        /** Decompress an input snapshot byte array. */
         byte[] decompressSnapshot(byte[] input, int size);
 
         /**
@@ -396,43 +390,43 @@ public class Net{
          */
         void discover(Consumer<Host> callback, Runnable done);
 
-        /**Ping a host. If an error occured, failed() should be called with the exception.*/
+        /** Ping a host. If an error occured, failed() should be called with the exception. */
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
 
-        /**Close all connections.*/
+        /** Close all connections. */
         void dispose();
     }
 
-    /**Server implementation.*/
+    /** Server implementation. */
     public interface ServerProvider{
-        /**Host a server at specified port.*/
+        /** Host a server at specified port. */
         void host(int port) throws IOException;
 
-        /**Sends a large stream of data to a specific client.*/
+        /** Sends a large stream of data to a specific client. */
         void sendStream(int id, Streamable stream);
 
-        /**Send an object to everyone connected.*/
+        /** Send an object to everyone connected. */
         void send(Object object, SendMode mode);
 
-        /**Send an object to a specific client ID.*/
+        /** Send an object to a specific client ID. */
         void sendTo(int id, Object object, SendMode mode);
 
-        /**Send an object to everyone <i>except</i> a client ID.*/
+        /** Send an object to everyone <i>except</i> a client ID. */
         void sendExcept(int id, Object object, SendMode mode);
 
-        /**Close the server connection.*/
+        /** Close the server connection. */
         void close();
 
-        /**Compress an input snapshot byte array.*/
+        /** Compress an input snapshot byte array. */
         byte[] compressSnapshot(byte[] input);
 
-        /**Return all connected users.*/
+        /** Return all connected users. */
         Array<? extends NetConnection> getConnections();
 
-        /**Returns a connection by ID.*/
+        /** Returns a connection by ID. */
         NetConnection getByID(int id);
 
-        /**Close all connections.*/
+        /** Close all connections. */
         void dispose();
     }
 }

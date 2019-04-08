@@ -14,16 +14,16 @@ public class ScatterFilter extends GenerateFilter{
 
     {
         options(
-            new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
-            new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
-            new BlockOption("block", () -> block, b -> block = b, wallsOnly)
+        new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+        new BlockOption("block", () -> block, b -> block = b, wallsOnly)
         );
     }
 
     @Override
     public void apply(){
 
-        if(in.srcfloor == floor  && in.srcblock == Blocks.air && chance() <= chance){
+        if(in.srcfloor == floor && in.srcblock == Blocks.air && chance() <= chance){
             in.block = block;
         }
     }

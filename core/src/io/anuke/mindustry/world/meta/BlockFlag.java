@@ -1,13 +1,13 @@
 package io.anuke.mindustry.world.meta;
 
 public enum BlockFlag{
-    /**General important target for all types of units.*/
+    /** General important target for all types of units. */
     target(0),
-    /**Producer of important goods.*/
+    /** Producer of important goods. */
     producer(Float.MAX_VALUE),
-    /**A turret.*/
+    /** A turret. */
     turret(Float.MAX_VALUE),
-    /**Repair point.*/
+    /** Repair point. */
     repair(Float.MAX_VALUE);
 
     public final static BlockFlag[] all = values();

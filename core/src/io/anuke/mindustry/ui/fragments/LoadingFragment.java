@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.mindustry.graphics.Pal;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.graphics.Pal;
 
 public class LoadingFragment extends Fragment{
     private Table table;
@@ -25,7 +25,8 @@ public class LoadingFragment extends Fragment{
             t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
 
-            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.addButton("$cancel", () -> {
+            }).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }

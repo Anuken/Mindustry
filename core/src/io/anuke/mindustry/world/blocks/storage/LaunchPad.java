@@ -20,7 +20,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class LaunchPad extends StorageBlock{
     protected final int timerLaunch = timers++;
-    /**Time inbetween launches.*/
+    /** Time inbetween launches. */
     protected float launchTime;
 
     public LaunchPad(String name){
@@ -47,11 +47,11 @@ public class LaunchPad extends StorageBlock{
         super.draw(tile);
 
         float progress = Mathf.clamp((tile.entity.items.total() / (float)itemCapacity) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
-        float scale = size/3f;
+        float scale = size / 3f;
 
         Lines.stroke(2f);
         Draw.color(Pal.accentBack);
-        Lines.poly(tile.drawx(), tile.drawy(), 4, scale * 10f * (1f - progress), 45 + 360f*progress);
+        Lines.poly(tile.drawx(), tile.drawy(), 4, scale * 10f * (1f - progress), 45 + 360f * progress);
 
         Draw.color(Pal.accent);
 

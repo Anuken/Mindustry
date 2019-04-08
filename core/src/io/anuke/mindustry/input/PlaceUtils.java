@@ -15,26 +15,26 @@ public class PlaceUtils{
     private static Bresenham2 bres = new Bresenham2();
     private static Array<Point2> points = new Array<>();
 
-    /**Normalize a diagonal line into points. */
+    /** Normalize a diagonal line into points. */
     public static Array<Point2> normalizeDiagonal(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
         return bres.lineNoDiagonal(startX, startY, endX, endY, Pools.get(Point2.class, Point2::new), points);
     }
 
-    /**Normalize two points into one straight line, no diagonals.*/
+    /** Normalize two points into one straight line, no diagonals. */
     public static Array<Point2> normalizeLine(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
         if(Math.abs(startX - endX) > Math.abs(startY - endY)){
             //go width
             for(int i = 0; i <= Math.abs(startX - endX); i++){
-                points.add(Pools.obtain(Point2.class, Point2::new).set(startX + i*Mathf.sign(endX - startX), startY));
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX + i * Mathf.sign(endX - startX), startY));
             }
         }else{
             //go height
             for(int i = 0; i <= Math.abs(startY - endY); i++){
-                points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY + i*Mathf.sign(endY - startY)));
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY + i * Mathf.sign(endY - startY)));
             }
         }
         return points;
@@ -43,7 +43,6 @@ public class PlaceUtils{
     /**
      * Normalizes a placement area and returns the result, ready to be used for drawing a rectangle.
      * Returned x2 and y2 will <i>always</i> be greater than x and y.
-     *
      * @param block block that will be drawn
      * @param startx starting X coordinate
      * @param starty starting Y coordinate
@@ -80,7 +79,6 @@ public class PlaceUtils{
     /**
      * Normalizes a placement area and returns the result.
      * Returned x2 and y2 will <i>always</i> be greater than x and y.
-     *
      * @param tilex starting X coordinate
      * @param tiley starting Y coordinate
      * @param endx ending X coordinate

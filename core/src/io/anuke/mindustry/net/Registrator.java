@@ -6,11 +6,11 @@ import io.anuke.mindustry.net.Packets.*;
 
 public class Registrator{
     private static ClassEntry[] classes = {
-        new ClassEntry(StreamBegin.class, StreamBegin::new),
-        new ClassEntry(StreamChunk.class, StreamChunk::new),
-        new ClassEntry(WorldStream.class, WorldStream::new),
-        new ClassEntry(ConnectPacket.class, ConnectPacket::new),
-        new ClassEntry(InvokePacket.class, InvokePacket::new)
+    new ClassEntry(StreamBegin.class, StreamBegin::new),
+    new ClassEntry(StreamChunk.class, StreamChunk::new),
+    new ClassEntry(WorldStream.class, WorldStream::new),
+    new ClassEntry(ConnectPacket.class, ConnectPacket::new),
+    new ClassEntry(InvokePacket.class, InvokePacket::new)
     };
     private static ObjectIntMap<Class> ids = new ObjectIntMap<>();
 
@@ -26,7 +26,7 @@ public class Registrator{
     }
 
     public static byte getID(Class<?> type){
-        return (byte) ids.get(type, -1);
+        return (byte)ids.get(type, -1);
     }
 
     public static ClassEntry[] getClasses(){

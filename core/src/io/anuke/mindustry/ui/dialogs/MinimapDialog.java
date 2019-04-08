@@ -31,7 +31,7 @@ public class MinimapDialog extends FloatingDialog{
             t.addRect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
                 Draw.color(Color.WHITE);
-                Draw.rect(renderer.minimap.getRegion(), x + width/2f, y + height/2f, width, height);
+                Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
                 if(renderer.minimap.getTexture() != null){
                     renderer.minimap.drawEntities(x, y, width, height);

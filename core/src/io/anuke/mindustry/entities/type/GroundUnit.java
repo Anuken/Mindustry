@@ -111,7 +111,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void draw(){
         Draw.mixcol(Color.WHITE, hitTime / hitDuration);
 
-        float ft = Mathf.sin(walkTime * type.speed*5f, 6f, 2f + type.hitsize/15f);
+        float ft = Mathf.sin(walkTime * type.speed * 5f, 6f, 2f + type.hitsize / 15f);
 
         Floor floor = getFloorOn();
 
@@ -121,9 +121,9 @@ public abstract class GroundUnit extends BaseUnit{
 
         for(int i : Mathf.signs){
             Draw.rect(type.legRegion,
-                    x + Angles.trnsx(baseRotation, ft * i),
-                    y + Angles.trnsy(baseRotation, ft * i),
-                    type.legRegion.getWidth() * i * Draw.scl, type.legRegion.getHeight() * Draw.scl - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
+            x + Angles.trnsx(baseRotation, ft * i),
+            y + Angles.trnsy(baseRotation, ft * i),
+            type.legRegion.getWidth() * i * Draw.scl, type.legRegion.getHeight() * Draw.scl - Mathf.clamp(ft * i, 0, 2), baseRotation - 90);
         }
 
         if(floor.isLiquid){
@@ -138,10 +138,10 @@ public abstract class GroundUnit extends BaseUnit{
 
         for(int i : Mathf.signs){
             float tra = rotation - 90, trY = -type.weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
-            float w = - i * type.weapon.region.getWidth() * Draw.scl;
+            float w = -i * type.weapon.region.getWidth() * Draw.scl;
             Draw.rect(type.weapon.region,
-                    x + Angles.trnsx(tra, getWeapon().width * i, trY),
-                    y + Angles.trnsy(tra, getWeapon().width * i, trY), w, type.weapon.region.getHeight() * Draw.scl, rotation - 90);
+            x + Angles.trnsx(tra, getWeapon().width * i, trY),
+            y + Angles.trnsy(tra, getWeapon().width * i, trY), w, type.weapon.region.getHeight() * Draw.scl, rotation - 90);
         }
 
         drawItems();
@@ -211,7 +211,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile) return;
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed * Time.delta()));
         if(Units.invalidateTarget(target, this)){
             rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
         }
@@ -235,7 +235,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         if(tile == targetTile || core == null || dst(core) < 90f) return;
 
-        velocity.add(vec.trns(angleTo(targetTile), type.speed*Time.delta()));
+        velocity.add(vec.trns(angleTo(targetTile), type.speed * Time.delta()));
         rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);
     }
 }

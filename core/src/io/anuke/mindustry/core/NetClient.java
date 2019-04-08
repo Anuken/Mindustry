@@ -1,17 +1,12 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.PacketPriority;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.annotations.Annotations.Variant;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.RandomXS128;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.ReusableByteArrayInputStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
@@ -25,11 +20,9 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.NetworkIO;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
 
@@ -45,18 +38,18 @@ public class NetClient implements ApplicationListener{
     public final static float viewScale = 2f;
 
     private Interval timer = new Interval(5);
-    /**Whether the client is currently connecting.*/
+    /** Whether the client is currently connecting. */
     private boolean connecting = false;
-    /**If true, no message will be shown on disconnect.*/
+    /** If true, no message will be shown on disconnect. */
     private boolean quiet = false;
-    /**Counter for data timeout.*/
+    /** Counter for data timeout. */
     private float timeoutTime = 0f;
-    /**Last sent client snapshot ID.*/
+    /** Last sent client snapshot ID. */
     private int lastSent;
 
-    /**List of entities that were removed, and need not be added while syncing.*/
+    /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
-    /**Byte stream for reading in snapshots.*/
+    /** Byte stream for reading in snapshots. */
     private ReusableByteArrayInputStream byteStream = new ReusableByteArrayInputStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
 
@@ -210,7 +203,7 @@ public class NetClient implements ApplicationListener{
                 int id = input.readInt();
                 byte typeID = input.readByte();
 
-                SyncTrait entity = (SyncTrait) group.getByID(id);
+                SyncTrait entity = (SyncTrait)group.getByID(id);
                 boolean add = false;
 
                 if(entity == null && id == player.id){
@@ -220,7 +213,7 @@ public class NetClient implements ApplicationListener{
 
                 //entity must not be added yet, so create it
                 if(entity == null){
-                    entity = (SyncTrait) TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
+                    entity = (SyncTrait)TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
                     entity.resetID(id);
                     if(!netClient.isEntityUsed(entity.getID())){
                         add = true;
@@ -323,7 +316,7 @@ public class NetClient implements ApplicationListener{
         Net.disconnect();
     }
 
-    /**When set, any disconnects will be ignored and no dialogs will be shown.*/
+    /** When set, any disconnects will be ignored and no dialogs will be shown. */
     public void setQuiet(){
         quiet = true;
     }
@@ -349,13 +342,13 @@ public class NetClient implements ApplicationListener{
             }
 
             Call.onClientShapshot(lastSent++, player.x, player.y,
-                player.pointerX, player.pointerY, player.rotation, player.baseRotation,
-                player.velocity().x, player.velocity().y,
-                player.getMineTile(),
-                player.isBoosting, player.isShooting, ui.chatfrag.chatOpen(),
-                requests,
-                Core.camera.position.x, Core.camera.position.y,
-                Core.camera.width * viewScale, Core.camera.height * viewScale);
+            player.pointerX, player.pointerY, player.rotation, player.baseRotation,
+            player.velocity().x, player.velocity().y,
+            player.getMineTile(),
+            player.isBoosting, player.isShooting, ui.chatfrag.chatOpen(),
+            requests,
+            Core.camera.position.x, Core.camera.position.y,
+            Core.camera.width * viewScale, Core.camera.height * viewScale);
         }
 
         if(timer.get(1, 60)){

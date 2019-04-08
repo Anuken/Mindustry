@@ -46,7 +46,7 @@ public class TechTreeDialog extends FloatingDialog{
         hidden(ui.deploy::setup);
         addCloseButton();
 
-        buttons.addImageTextButton("$database", "icon-database", 14*2, () -> {
+        buttons.addImageTextButton("$database", "icon-database", 14 * 2, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -94,7 +94,7 @@ public class TechTreeDialog extends FloatingDialog{
         table.setName("toast");
         table.update(() -> {
             table.toFront();
-            table.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight() - 21, Align.top);
+            table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
         });
         Core.scene.add(table);
     }
@@ -172,10 +172,10 @@ public class TechTreeDialog extends FloatingDialog{
                 button.setSize(nodeSize);
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
-                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f + offset, Align.center);
+                    button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "content-background" : "content-background-locked");
                     ((TextureRegionDrawable)button.getStyle().imageUp)
-                        .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));
+                    .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));
                     button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
                 });
                 addChild(button);
@@ -222,7 +222,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             infoTable.margin(0).left().defaults().left();
 
-            infoTable.addImageButton("icon-info", "node", 14*2, () -> ui.content.show(node.block)).growY().width(50f);
+            infoTable.addImageButton("icon-info", "node", 14 * 2, () -> ui.content.show(node.block)).growY().width(50f);
 
             infoTable.add().grow();
 
@@ -251,7 +251,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             if(mobile && locked(node)){
                 infoTable.row();
-                infoTable.addImageTextButton("$research", "icon-check", "node", 16*2, () -> unlock(node))
+                infoTable.addImageTextButton("$research", "icon-check", "node", 16 * 2, () -> unlock(node))
                 .disabled(b -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
             }
 
@@ -261,7 +261,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         @Override
         public void draw(){
-            float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
+            float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(TechTreeNode node : nodes){
                 if(!node.visible) continue;

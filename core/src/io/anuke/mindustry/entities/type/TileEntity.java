@@ -20,18 +20,11 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.Wall;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
@@ -39,7 +32,7 @@ import static io.anuke.mindustry.Vars.world;
 public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
-    /**This value is only used for debugging.*/
+    /** This value is only used for debugging. */
     public static int sleepingEntities = 0;
 
     public Tile tile;
@@ -53,7 +46,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public LiquidModule liquids;
     public ConsumeModule cons;
 
-    /**List of (cached) tiles with entities in proximity, used for outputting to*/
+    /** List of (cached) tiles with entities in proximity, used for outputting to */
     private Array<Tile> proximity = new Array<>(8);
     private boolean dead = false;
     private boolean sleeping;
@@ -76,7 +69,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tile.entity.onDeath();
     }
 
-    /**Sets this tile entity data to this tile, and adds it if necessary.*/
+    /** Sets this tile entity data to this tile, and adds it if necessary. */
     public TileEntity init(Tile tile, boolean shouldAdd){
         this.tile = tile;
         x = tile.drawx();
@@ -93,12 +86,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return this;
     }
 
-    /**Scaled delta.*/
+    /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;
     }
 
-    /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
+    /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
         sleepTime += Time.delta();
         if(!sleeping && sleepTime >= timeToSleep){
@@ -108,7 +101,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
     }
 
-    /**Call when this entity is updating. This wakes it up.*/
+    /** Call when this entity is updating. This wakes it up. */
     public void noSleep(){
         sleepTime = 0f;
         if(sleeping){
@@ -126,13 +119,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
-    public void write(DataOutput stream) throws IOException{}
+    public void write(DataOutput stream) throws IOException{
+    }
 
-    public void writeConfig(DataOutput stream) throws IOException{}
+    public void writeConfig(DataOutput stream) throws IOException{
+    }
 
-    public void read(DataInput stream) throws IOException{}
+    public void read(DataInput stream) throws IOException{
+    }
 
-    public void readConfig(DataInput stream) throws IOException{}
+    public void readConfig(DataInput stream) throws IOException{
+    }
 
     public boolean collide(Bullet other){
         return true;
@@ -269,7 +266,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void update(){
         //TODO better smoke effect, this one is awful
         if(health != 0 && health < block.health && !(block instanceof Wall) &&
-                Mathf.chance(0.009f * Time.delta() * (1f - health / block.health))){
+        Mathf.chance(0.009f * Time.delta() * (1f - health / block.health))){
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 

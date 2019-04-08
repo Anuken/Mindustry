@@ -1,17 +1,12 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.collection.Queue;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.WindowedMean;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.Consume;
-import io.anuke.mindustry.world.consumers.ConsumePower;
-import io.anuke.mindustry.world.consumers.Consumers;
+import io.anuke.mindustry.world.consumers.*;
 
 public class PowerGraph{
     private final static Queue<Tile> queue = new Queue<>();
@@ -269,12 +264,12 @@ public class PowerGraph{
     @Override
     public String toString(){
         return "PowerGraph{" +
-            "producers=" + producers +
-            ", consumers=" + consumers +
-            ", batteries=" + batteries +
-            ", all=" + all +
-            ", lastFrameUpdated=" + lastFrameUpdated +
-            ", graphID=" + graphID +
-            '}';
+        "producers=" + producers +
+        ", consumers=" + consumers +
+        ", batteries=" + batteries +
+        ", all=" + all +
+        ", lastFrameUpdated=" + lastFrameUpdated +
+        ", graphID=" + graphID +
+        '}';
     }
 }

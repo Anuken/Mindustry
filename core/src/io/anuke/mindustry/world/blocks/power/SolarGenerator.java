@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.collection.EnumSet;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.arc.collection.EnumSet;
 
 public class SolarGenerator extends PowerGenerator{
 

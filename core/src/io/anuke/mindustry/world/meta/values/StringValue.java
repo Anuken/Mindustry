@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.meta.values;
 
-import io.anuke.mindustry.world.meta.StatValue;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.world.meta.StatValue;
 
 public class StringValue implements StatValue{
     private final String value;

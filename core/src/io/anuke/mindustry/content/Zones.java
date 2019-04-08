@@ -4,9 +4,7 @@ import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
@@ -44,7 +42,7 @@ public class Zones implements ContentList{
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
-            .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
@@ -89,8 +87,8 @@ public class Zones implements ContentList{
         }};*/
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
-            .dist(0f, false)
-            .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
+        .dist(0f, false)
+        .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);

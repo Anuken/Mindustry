@@ -28,7 +28,7 @@ public class StaticWall extends Rock{
 
         if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Pos.get(rx, ry)) < 0.5){
             if(rx == tile.x && ry == tile.y){
-                Draw.rect(large, tile.worldx() + tilesize/2f, tile.worldy() + tilesize/2f);
+                Draw.rect(large, tile.worldx() + tilesize / 2f, tile.worldy() + tilesize / 2f);
             }
         }else if(variants > 0){
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
@@ -54,8 +54,8 @@ public class StaticWall extends Rock{
 
     boolean eq(int rx, int ry){
         return world.tile(rx + 1, ry).block() == this
-            && world.tile(rx, ry + 1).block() == this
-            && world.tile(rx, ry).block() == this
-            && world.tile(rx + 1, ry + 1).block() == this;
+        && world.tile(rx, ry + 1).block() == this
+        && world.tile(rx, ry).block() == this
+        && world.tile(rx + 1, ry + 1).block() == this;
     }
 }

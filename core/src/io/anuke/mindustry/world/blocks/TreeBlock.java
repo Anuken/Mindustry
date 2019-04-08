@@ -17,7 +17,8 @@ public class TreeBlock extends Block{
     }
 
     @Override
-    public void draw(Tile tile){}
+    public void draw(Tile tile){
+    }
 
     @Override
     public void drawLayer(Tile tile){

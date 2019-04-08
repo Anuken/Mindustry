@@ -3,9 +3,7 @@ package io.anuke.mindustry.world.blocks.units;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
@@ -26,9 +24,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -51,7 +47,7 @@ public class MechPad extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.productionTime, buildTime/60f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, buildTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null  || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
+        if(player == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         MechPad pad = (MechPad)tile.block();
@@ -87,7 +83,7 @@ public class MechPad extends Block{
 
         if(entity.player == null) return;
 
-        Mech result = ((MechPad) tile.block()).mech;
+        Mech result = ((MechPad)tile.block()).mech;
 
         if(entity.player.mech == result){
             Mech target = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
@@ -111,16 +107,16 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
-        return  Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
-                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
+        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
+        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
     }
 
     @Override
     public void drawSelect(Tile tile){
         Draw.color(Pal.accent);
-        for(int i = 0; i < 4; i ++){
-            float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
-            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
+        for(int i = 0; i < 4; i++){
+            float length = tilesize * size / 2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
+            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i + 2) * 90);
         }
         Draw.color();
     }
@@ -172,10 +168,10 @@ public class MechPad extends Block{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-                    tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-                    tile.drawy(),
-                    90,
-                    size * Vars.tilesize / 2f + 1f);
+            tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+            tile.drawy(),
+            90,
+            size * Vars.tilesize / 2f + 1f);
 
             Draw.reset();
         }

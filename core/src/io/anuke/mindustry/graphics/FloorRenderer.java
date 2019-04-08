@@ -2,20 +2,13 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
-import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.GL20;
-import io.anuke.arc.graphics.g2d.CacheBatch;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
-import io.anuke.arc.graphics.g2d.SpriteCache;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -45,8 +38,8 @@ public class FloorRenderer{
 
         Camera camera = Core.camera;
 
-        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
+        int crangex = (int)(camera.width / (chunksize * tilesize)) + 1;
+        int crangey = (int)(camera.height / (chunksize * tilesize)) + 1;
 
         int camx = (int)(camera.position.x / (chunksize * tilesize));
         int camy = (int)(camera.position.y / (chunksize * tilesize));
@@ -129,8 +122,8 @@ public class FloorRenderer{
 
         Camera camera = Core.camera;
 
-        int crangex = (int) (camera.width  / (chunksize * tilesize)) + 1;
-        int crangey = (int) (camera.height  / (chunksize * tilesize)) + 1;
+        int crangex = (int)(camera.width / (chunksize * tilesize)) + 1;
+        int crangey = (int)(camera.height / (chunksize * tilesize)) + 1;
 
         layer.begin();
 
@@ -183,7 +176,7 @@ public class FloorRenderer{
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex , tiley);
+                Tile tile = world.tile(tilex, tiley);
                 Floor floor;
 
                 if(tile == null){
@@ -194,7 +187,7 @@ public class FloorRenderer{
 
                 if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
                     tile.block().draw(tile);
-                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x,tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
+                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
                 }else if(floor.cacheLayer.ordinal() < layer.ordinal() && layer != CacheLayer.walls){
                     floor.drawNonLayer(tile);
@@ -208,8 +201,8 @@ public class FloorRenderer{
     public void clearTiles(){
         if(cbatch != null) cbatch.dispose();
 
-        int chunksx = Mathf.ceil((float) (world.width()) / chunksize),
-        chunksy = Mathf.ceil((float) (world.height()) / chunksize) ;
+        int chunksx = Mathf.ceil((float)(world.width()) / chunksize),
+        chunksy = Mathf.ceil((float)(world.height()) / chunksize);
         cache = new Chunk[chunksx][chunksy];
         SpriteCache sprites = new SpriteCache(world.width() * world.height() * 6, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
         cbatch = new CacheBatch(sprites);

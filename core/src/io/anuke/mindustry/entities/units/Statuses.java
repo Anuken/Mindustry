@@ -12,12 +12,11 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.StatusEffect;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
-/** Class for controlling status effects on an entity.*/
+
+/** Class for controlling status effects on an entity. */
 public class Statuses implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
     private static final Array<StatusEntry> removals = new Array<>();

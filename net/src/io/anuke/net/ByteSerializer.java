@@ -15,8 +15,8 @@ public class ByteSerializer implements Serialization{
     @Override
     public void write(ByteBuffer byteBuffer, Object o){
         if(o instanceof FrameworkMessage){
-            byteBuffer.put((byte) -2); //code for framework message
-            FrameworkSerializer.write(byteBuffer, (FrameworkMessage) o);
+            byteBuffer.put((byte)-2); //code for framework message
+            FrameworkSerializer.write(byteBuffer, (FrameworkMessage)o);
         }else{
             if(!(o instanceof Packet))
                 throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
@@ -24,7 +24,7 @@ public class ByteSerializer implements Serialization{
             if(id == -1)
                 throw new RuntimeException("Unregistered class: " + o.getClass());
             byteBuffer.put(id);
-            ((Packet) o).write(byteBuffer);
+            ((Packet)o).write(byteBuffer);
         }
     }
 
@@ -34,7 +34,7 @@ public class ByteSerializer implements Serialization{
         if(id == -2){
             return FrameworkSerializer.read(byteBuffer);
         }else{
-            Packet packet = Pools.obtain((Class<Packet>) Registrator.getByID(id).type, (Supplier<Packet>) Registrator.getByID(id).constructor);
+            Packet packet = Pools.obtain((Class<Packet>)Registrator.getByID(id).type, (Supplier<Packet>)Registrator.getByID(id).constructor);
             packet.read(byteBuffer);
             return packet;
         }
@@ -47,7 +47,7 @@ public class ByteSerializer implements Serialization{
 
     @Override
     public void writeLength(ByteBuffer byteBuffer, int i){
-        byteBuffer.putShort((short) i);
+        byteBuffer.putShort((short)i);
     }
 
     @Override

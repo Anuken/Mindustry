@@ -11,17 +11,10 @@ import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -30,12 +23,12 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.ui.IntFormat;
-import io.anuke.mindustry.ui.Minimap;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
+
+import java.lang.StringBuilder;
 
 public class HudFragment extends Fragment{
     public final PlacementFragment blockfrag = new PlacementFragment();
@@ -124,7 +117,7 @@ public class HudFragment extends Fragment{
                         });
                     }
 
-                    cont.add().size(dsize*4 + 3, dsize).left();
+                    cont.add().size(dsize * 4 + 3, dsize).left();
                 }
 
                 cont.row();
@@ -152,14 +145,14 @@ public class HudFragment extends Fragment{
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
-                    .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
+                .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
 
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize*4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
@@ -187,7 +180,7 @@ public class HudFragment extends Fragment{
             t.touchable(Touchable.disabled);
             t.visible(() -> !state.is(State.menu));
             t.table("flat", c -> c.add("")
-            .update(l ->{
+            .update(l -> {
                 l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
                 l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - player.destructTime) / 60f)));
             }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
@@ -237,7 +230,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$coreattack").pad(2)
-                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+            .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //launch button
@@ -270,10 +263,10 @@ public class HudFragment extends Fragment{
             button.getStyle().disabledFontColor = Color.WHITE;
             button.margin(16f);
             button.visible(() ->
-                world.isZone() &&
-                world.getZone().metCondition() &&
-                !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
+            world.isZone() &&
+            world.getZone().metCondition() &&
+            !Net.client() &&
+            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -282,10 +275,10 @@ public class HudFragment extends Fragment{
                 }
 
                 button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
-                    Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
+                Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
                 button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET,
-                    Mathf.absin(Time.time(), 2f, 1f)));
+                Mathf.absin(Time.time(), 2f, 1f)));
             });
 
             button.setDisabled(() -> state.enemies() > 0);
@@ -466,7 +459,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append(waitingf.get((int)(state.wavetime/60)));
+                builder.append(waitingf.get((int)(state.wavetime / 60)));
             }else if(state.enemies() == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

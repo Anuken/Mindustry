@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Log;
 

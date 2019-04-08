@@ -57,8 +57,8 @@ public class CrashHandler{
             dialog(() -> TinyFileDialogs.tinyfd_messageBox("oh no",
             e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers.\nReport this to the developer." :
             "Your graphics card does not support OpenGL 2.0!\n" +
-                "Try to update your graphics drivers.\n\n" +
-                "(If that doesn't work, your computer just doesn't support Mindustry.)", "ok", "error", true));
+            "Try to update your graphics drivers.\n\n" +
+            "(If that doesn't work, your computer just doesn't support Mindustry.)", "ok", "error", true));
             badGPU = true;
         }
 
@@ -93,12 +93,12 @@ public class CrashHandler{
 
         try{
             Path path = Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes",
-                "crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+            "crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
             Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
             Files.write(path, parseException(e).getBytes());
 
             if(!badGPU){
-                dialog(() ->  TinyFileDialogs.tinyfd_messageBox("oh no", "A crash has occured. It has been saved in:\n" + path.toAbsolutePath().toString(), "ok", "error", true));
+                dialog(() -> TinyFileDialogs.tinyfd_messageBox("oh no", "A crash has occured. It has been saved in:\n" + path.toAbsolutePath().toString(), "ok", "error", true));
             }
         }catch(Throwable t){
             Log.err("Failed to save local crash report.");
@@ -116,7 +116,10 @@ public class CrashHandler{
         });
 
         //sleep for 10 seconds or until crash report is sent
-        try{ Thread.sleep(10000); }catch(InterruptedException ignored){}
+        try{
+            Thread.sleep(10000);
+        }catch(InterruptedException ignored){
+        }
     }
 
     private static void dialog(Runnable r){

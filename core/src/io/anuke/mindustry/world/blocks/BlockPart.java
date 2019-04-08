@@ -41,8 +41,8 @@ public class BlockPart extends Block{
     @Override
     public boolean isSolidFor(Tile tile){
         return tile.getLinked() == null
-                || (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()
-                || tile.getLinked().block().isSolidFor(tile.getLinked()));
+        || (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()
+        || tile.getLinked().block().isSolidFor(tile.getLinked()));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BlockPart extends Block{
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         Block block = linked(tile);
         return block.hasLiquids
-                && block.acceptLiquid(tile.getLinked(), source, liquid, amount);
+        && block.acceptLiquid(tile.getLinked(), source, liquid, amount);
     }
 
     @Override

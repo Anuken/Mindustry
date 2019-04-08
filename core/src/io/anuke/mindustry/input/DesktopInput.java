@@ -21,34 +21,35 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
-    /**Current cursor type.*/
+    /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
 
-    /**Position where the player started dragging a line.*/
+    /** Position where the player started dragging a line. */
     private int selectX, selectY;
-    /**Whether selecting mode is active.*/
+    /** Whether selecting mode is active. */
     private PlaceMode mode;
-    /**Animation scale for line.*/
+    /** Animation scale for line. */
     private float selectScale;
 
     private int prevX, prevY, prevRotation;
 
-    /**Draws a placement icon for a specific block.*/
+    /** Draws a placement icon for a specific block. */
     void drawPlace(int x, int y, Block block, int rotation, int prevX, int prevY, int prevRotation){
         if(validPlace(x, y, block, rotation)){
             block.getPlaceDraw(placeDraw, rotation, prevX, prevY, prevRotation);
 
             Draw.color();
             Draw.rect(placeDraw.region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-                placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
-                placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
-                block.rotate ? placeDraw.rotation * 90 : 0);
+            placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
+            placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
+            block.rotate ? placeDraw.rotation * 90 : 0);
 
             Draw.color(Pal.accent);
             for(int i = 0; i < 4; i++){
                 Point2 p = Geometry.d8edge[i];
-                float offset = -Math.max(block.size-1, 0)/2f * tilesize;
-                if(i % 2 == 0)Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
+                float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+                if(i % 2 == 0)
+                    Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
             }
             Draw.color();
         }else{
@@ -98,7 +99,7 @@ public class DesktopInput extends InputHandler{
                     tile = tile.target();
 
                     Draw.color(Pal.removeBack);
-                    Lines.square(tile.drawx(), tile.drawy()-1, tile.block().size * tilesize / 2f - 1);
+                    Lines.square(tile.drawx(), tile.drawy() - 1, tile.block().size * tilesize / 2f - 1);
                     Draw.color(Pal.remove);
                     Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f - 1);
                 }
@@ -161,7 +162,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int) Core.input.axisTap(Binding.rotate), 4);
+        rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
@@ -206,8 +207,8 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if (!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
-                        !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()) {
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine

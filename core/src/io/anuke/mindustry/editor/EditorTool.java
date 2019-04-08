@@ -7,12 +7,8 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 public enum EditorTool{
     pick{
