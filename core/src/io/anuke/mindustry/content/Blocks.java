@@ -677,7 +677,7 @@ public class Blocks implements ContentList{
             size = 2;
             hasPower = hasItems = hasLiquids = true;
 
-            consumes.liquid(Liquids.oil, 3f);
+            consumes.liquid(Liquids.oil, 0.09f);
             consumes.power(0.5f);
         }};
 
