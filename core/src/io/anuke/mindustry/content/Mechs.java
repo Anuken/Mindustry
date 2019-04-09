@@ -80,7 +80,7 @@ public class Mechs implements ContentList{
                     reload = 40f;
                     shotDelay = 3f;
                     roundrobin = true;
-                    shots = 3;
+                    shots = 2;
                     inaccuracy = 0f;
                     ejectEffect = Fx.none;
                     bullet = Bullets.lightning;

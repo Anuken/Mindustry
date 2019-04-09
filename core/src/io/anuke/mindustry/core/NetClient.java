@@ -117,9 +117,14 @@ public class NetClient implements ApplicationListener{
 
     //called on all clients
     @Remote(called = Loc.server, targets = Loc.server)
-    public static void sendMessage(String message, String sender){
+    public static void sendMessage(String message, String sender, Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
+        }
+
+        if(playersender != null){
+            playersender.lastText = message;
+            playersender.textFadeTime = 1f;
         }
     }
 
@@ -143,7 +148,7 @@ public class NetClient implements ApplicationListener{
 
         //invoke event for all clients but also locally
         //this is required so other clients get the correct name even if they don't know who's sending it yet
-        Call.sendMessage(message, colorizeName(player.id, player.name));
+        Call.sendMessage(message, colorizeName(player.id, player.name), player);
     }
 
     private static String colorizeName(int id, String name){

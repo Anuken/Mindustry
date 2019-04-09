@@ -172,11 +172,12 @@ public class CoreBlock extends StorageBlock{
         float heat;
 
         @Override
-        public void updateSpawning(Player unit){
+        public void updateSpawning(Player player){
             if(!netServer.isWaitingForPlayers() && currentUnit == null){
-                currentUnit = unit;
+                currentUnit = player;
                 progress = 0f;
-                unit.set(tile.drawx(), tile.drawy());
+                player.mech = player.getStarterMech();
+                player.set(tile.drawx(), tile.drawy());
             }
         }
     }

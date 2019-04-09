@@ -2,13 +2,17 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.maps.generators.DesertThingGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
-    public static Zone groundZero, craters, frozenForest, ruinousShores, stainedMountains,
+    public static Zone
+    groundZero, desertThing,
+    craters, frozenForest, ruinousShores, stainedMountains,
+    overgrowth, infestedIslands,
     desolateRift, nuclearComplex;
 
     @Override
@@ -17,6 +21,19 @@ public class Zones implements ContentList{
         groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1).decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01))){{
             baseLaunchCost = ItemStack.with(Items.copper, -100);
             startingItems = ItemStack.list(Items.copper, 100);
+            alwaysUnlocked = true;
+            conditionWave = 5;
+            launchPeriod = 5;
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 60 * 2;
+            }};
+        }};
+
+        desertThing = new Zone("desertThing", new DesertThingGenerator(240, 240)){{
+            startingItems = ItemStack.list(Items.copper, 200);
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;

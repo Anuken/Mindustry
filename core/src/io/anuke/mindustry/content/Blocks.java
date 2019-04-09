@@ -40,7 +40,7 @@ public class Blocks implements ContentList{
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, sporePress, pulverizer, incinerator,
+    melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
@@ -593,10 +593,10 @@ public class Blocks implements ContentList{
         separator = new Separator("separator"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 60, Items.titanium, 50));
             results = ItemStack.with(
-            Items.copper, 5,
-            Items.lead, 3,
-            Items.graphite, 2,
-            Items.titanium, 2
+                Items.copper, 5,
+                Items.lead, 3,
+                Items.graphite, 2,
+                Items.titanium, 2
             );
             hasPower = true;
             craftTime = 35f;
@@ -667,6 +667,18 @@ public class Blocks implements ContentList{
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(rotatorRegion), tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
             };
+        }};
+
+        coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 40, Items.graphite, 80, Items.lead, 60));
+            craftEffect = Fx.smeltsmoke;
+            outputItem = new ItemStack(Items.coal, 1);
+            craftTime = 30f;
+            size = 2;
+            hasPower = hasItems = hasLiquids = true;
+
+            consumes.liquid(Liquids.oil, 3f);
+            consumes.power(0.5f);
         }};
 
         incinerator = new Incinerator("incinerator"){{
@@ -1244,10 +1256,10 @@ public class Blocks implements ContentList{
         duo = new DoubleTurret("duo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 70), true);
             ammo(
-            Items.copper, Bullets.standardCopper,
-            Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming
+                Items.copper, Bullets.standardCopper,
+                Items.graphite, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming
             );
             reload = 20f;
             restitution = 0.03f;
@@ -1262,8 +1274,8 @@ public class Blocks implements ContentList{
         scatter = new BurstTurret("scatter"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 170, Items.lead, 90));
             ammo(
-            Items.scrap, Bullets.flakScrap,
-            Items.lead, Bullets.flakLead
+                Items.scrap, Bullets.flakScrap,
+                Items.lead, Bullets.flakLead
             );
             reload = 15f;
             range = 180f;
@@ -1283,8 +1295,8 @@ public class Blocks implements ContentList{
         scorch = new ItemTurret("scorch"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 50, Items.graphite, 45));
             ammo(
-            Items.coal, Bullets.basicFlame,
-            Items.pyratite, Bullets.pyraFlame
+                Items.coal, Bullets.basicFlame,
+                Items.pyratite, Bullets.pyraFlame
             );
             recoil = 0f;
             reload = 4f;
@@ -1298,9 +1310,9 @@ public class Blocks implements ContentList{
         hail = new ArtilleryTurret("hail"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 80, Items.graphite, 35));
             ammo(
-            Items.graphite, Bullets.artilleryDense,
-            Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary
+                Items.graphite, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary
             );
             reload = 60f;
             recoil = 2f;
@@ -1313,10 +1325,10 @@ public class Blocks implements ContentList{
         wave = new LiquidTurret("wave"){{
             requirements(Category.turret, ItemStack.with(Items.metaglass, 90, Items.lead, 150));
             ammo(
-            Liquids.water, Bullets.waterShot,
-            Liquids.slag, Bullets.slagShot,
-            Liquids.cryofluid, Bullets.cryoShot,
-            Liquids.oil, Bullets.oilShot
+                Liquids.water, Bullets.waterShot,
+                Liquids.slag, Bullets.slagShot,
+                Liquids.cryofluid, Bullets.cryoShot,
+                Liquids.oil, Bullets.oilShot
             );
             size = 2;
             recoil = 0f;
@@ -1380,9 +1392,9 @@ public class Blocks implements ContentList{
         swarmer = new BurstTurret("swarmer"){{
             requirements(Category.turret, ItemStack.with(Items.graphite, 70, Items.titanium, 70, Items.plastanium, 90, Items.silicon, 60));
             ammo(
-            Items.blastCompound, Bullets.missileExplosive,
-            Items.pyratite, Bullets.missileIncendiary,
-            Items.surgealloy, Bullets.missileSurge
+                Items.blastCompound, Bullets.missileExplosive,
+                Items.pyratite, Bullets.missileIncendiary,
+                Items.surgealloy, Bullets.missileSurge
             );
             reload = 50f;
             shots = 4;
@@ -1397,11 +1409,11 @@ public class Blocks implements ContentList{
         salvo = new BurstTurret("salvo"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 210, Items.graphite, 190, Items.titanium, 120));
             ammo(
-            Items.copper, Bullets.standardCopper,
-            Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming,
-            Items.thorium, Bullets.standardThorium
+                Items.copper, Bullets.standardCopper,
+                Items.graphite, Bullets.standardDense,
+                Items.pyratite, Bullets.standardIncendiary,
+                Items.silicon, Bullets.standardHoming,
+                Items.thorium, Bullets.standardThorium
             );
 
             size = 2;
@@ -1421,11 +1433,11 @@ public class Blocks implements ContentList{
         ripple = new ArtilleryTurret("ripple"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 300, Items.graphite, 270, Items.titanium, 120));
             ammo(
-            Items.graphite, Bullets.artilleryDense,
-            Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artlleryIncendiary,
-            Items.blastCompound, Bullets.artilleryExplosive,
-            Items.plastanium, Bullets.arilleryPlastic
+                Items.graphite, Bullets.artilleryDense,
+                Items.silicon, Bullets.artilleryHoming,
+                Items.pyratite, Bullets.artlleryIncendiary,
+                Items.blastCompound, Bullets.artilleryExplosive,
+                Items.plastanium, Bullets.arilleryPlastic
             );
             size = 3;
             shots = 4;
@@ -1446,9 +1458,9 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 400, Items.titanium, 250, Items.plastanium, 160));
             ammo(
-            Items.blastCompound, Bullets.flakExplosive,
-            Items.plastanium, Bullets.flakPlastic,
-            Items.surgealloy, Bullets.flakSurge
+                Items.blastCompound, Bullets.flakExplosive,
+                Items.plastanium, Bullets.flakPlastic,
+                Items.surgealloy, Bullets.flakSurge
             );
             xRand = 4f;
             reload = 6f;
@@ -1478,9 +1490,9 @@ public class Blocks implements ContentList{
         spectre = new DoubleTurret("spectre"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 700, Items.graphite, 600, Items.surgealloy, 500, Items.plastanium, 350, Items.thorium, 500));
             ammo(
-            Items.graphite, Bullets.standardDenseBig,
-            Items.pyratite, Bullets.standardIncendiaryBig,
-            Items.thorium, Bullets.standardThoriumBig
+                Items.graphite, Bullets.standardDenseBig,
+                Items.pyratite, Bullets.standardIncendiaryBig,
+                Items.thorium, Bullets.standardThoriumBig
             );
             reload = 6f;
             coolantMultiplier = 0.5f;

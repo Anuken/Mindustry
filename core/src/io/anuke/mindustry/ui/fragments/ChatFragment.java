@@ -123,6 +123,7 @@ public class ChatFragment extends Table{
 
     @Override
     public void draw(){
+        float opacity = Core.settings.getInt("chatopacity") / 100f;
 
         Draw.color(shadowColor);
 
@@ -138,6 +139,7 @@ public class ChatFragment extends Table{
         fieldlabel.visible(chatOpen);
 
         Draw.color(shadowColor);
+        Draw.alpha(shadowColor.a * opacity);
 
         float theight = offsety + spacing + getMarginBottom();
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
@@ -150,12 +152,15 @@ public class ChatFragment extends Table{
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(!chatOpen && fadetime - i < 1f && fadetime - i >= 0f){
-                font.getCache().setAlphas(fadetime - i);
-                Draw.color(0, 0, 0, shadowColor.a * (fadetime - i));
+                font.getCache().setAlphas((fadetime - i) * opacity);
+                Draw.color(0, 0, 0, shadowColor.a * (fadetime - i) * opacity);
+            }else{
+                font.getCache().setAlphas(opacity);
             }
 
             Fill.crect(offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
+            Draw.alpha(opacity * shadowColor.a);
 
             font.getCache().draw();
         }

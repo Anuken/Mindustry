@@ -14,7 +14,6 @@ import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
 
 import java.util.Arrays;
@@ -38,7 +37,7 @@ public class Zone extends UnlockableContent{
     protected Array<ItemStack> startingItems = new Array<>();
     protected ItemStack[] launchCost = null;
 
-    public Zone(String name, MapGenerator generator){
+    public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
     }
