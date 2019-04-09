@@ -2,7 +2,6 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.maps.generators.DesertThingGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
 import io.anuke.mindustry.type.*;
@@ -32,6 +31,7 @@ public class Zones implements ContentList{
             }};
         }};
 
+        /*
         desertThing = new Zone("desertThing", new DesertThingGenerator(240, 240)){{
             startingItems = ItemStack.list(Items.copper, 200);
             alwaysUnlocked = true;
@@ -43,7 +43,7 @@ public class Zones implements ContentList{
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
             }};
-        }};
+        }};*/
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             startingItems = ItemStack.list(Items.copper, 200);
