@@ -2,13 +2,18 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.maps.zonegen.DesertWastesGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
+import io.anuke.mindustry.maps.zonegen.OvergrowthGenerator;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
-    public static Zone groundZero, craters, frozenForest, ruinousShores, stainedMountains,
+    public static Zone
+    groundZero, desertWastes,
+    craters, frozenForest, ruinousShores, stainedMountains,
+    overgrowth, infestedIslands,
     desolateRift, nuclearComplex;
 
     @Override
@@ -25,6 +30,32 @@ public class Zones implements ContentList{
                 waves = true;
                 waveTimer = true;
                 waveSpacing = 60 * 60 * 2;
+            }};
+        }};
+
+        desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
+            startingItems = ItemStack.list(Items.copper, 200);
+            conditionWave = 10;
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 60 * 1.5f;
+            }};
+        }};
+
+        overgrowth = new Zone("overgrowth", new OvergrowthGenerator(320, 320)){{
+            startingItems = ItemStack.list(Items.copper, 200);
+            conditionWave = 10;
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 60 * 1.5f;
             }};
         }};
 

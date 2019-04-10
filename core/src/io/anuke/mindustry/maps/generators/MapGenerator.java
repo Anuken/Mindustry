@@ -26,7 +26,6 @@ public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
     private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
-    private Loadout loadout;
     /** How much the landscape is randomly distorted. */
     public float distortion = 3;
     /**

@@ -192,6 +192,7 @@ public class CustomGameDialog extends FloatingDialog{
             number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, ()->true, Gamemode.attack, Gamemode.pvp, Gamemode.survival, Gamemode.sandbox);
             title("$rules.title.player");
             number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier, ()->true);
+            number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier, ()-> true);
             title("$rules.title.unit");
             check("$rules.unitdrops", b -> rules.unitDrops = b, () -> rules.unitDrops, ()->true);
             number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, ()->true);

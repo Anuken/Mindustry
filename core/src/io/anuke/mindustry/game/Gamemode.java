@@ -29,7 +29,8 @@ public enum Gamemode {
         respawnTime = 60 * 10;
         buildCostMultiplier = 0.5f;
         buildSpeedMultiplier = 2f;
-        playerDamageMultiplier = 0.5f;
+        playerDamageMultiplier = 0.45f;
+        playerHealthMultiplier = 0.8f;
         unitBuildSpeedMultiplier = 3f;
         unitHealthMultiplier = 2f;
     }});

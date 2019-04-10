@@ -62,6 +62,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public TargetTrait target;
     public TargetTrait moveTarget;
 
+    public String lastText;
+    public float textFadeTime;
+
     private float walktime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
@@ -176,7 +179,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public float maxHealth(){
-        return mech.health;
+        return mech.health * state.rules.playerHealthMultiplier;
     }
 
     @Override
@@ -380,24 +383,41 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void drawName(){
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        final float nameHeight = 11;
+        final float textHeight = 15;
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
-        Fill.rect(x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
+        Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
         Draw.color();
         font.setColor(color);
 
-        font.draw(name, x, y + 8, 0, Align.center, false);
+        font.draw(name, x, y + nameHeight, 0, Align.center, false);
 
         if(isAdmin){
             float s = 3f;
             Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
             Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 7f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+        }
+
+        if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){
+            String text = textFadeTime <= 0 || lastText == null ? "[LIGHT_GRAY]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+            float width = 100f;
+            float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
+            font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
+
+            layout.setText(font, text, Color.WHITE, width, Align.bottom, true);
+
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
+            Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
+            font.draw(text, x - width/2f, y + textHeight + layout.height, width, Align.center, true);
+
+            textFadeTime -= Time.delta() / (60 * 5);
         }
 
         Draw.reset();
@@ -553,6 +573,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             updateMech();
         }
+
+        isTyping = ui.chatfrag.chatOpen();
 
         updateBuilding();
 
@@ -762,9 +784,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
-        mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+        mech = getStarterMech();
         placeQueue.clear();
         respawns = state.rules.respawns;
+    }
+
+    public Mech getStarterMech(){
+        return (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     public boolean isShooting(){

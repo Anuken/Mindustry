@@ -5,6 +5,7 @@ import io.anuke.mindustry.world.Tile;
 
 public abstract class Generator{
     public int width, height;
+    protected Loadout loadout;
 
     public Generator(int width, int height){
         this.width = width;
@@ -15,7 +16,7 @@ public abstract class Generator{
     }
 
     public void init(Loadout loadout){
-
+        this.loadout = loadout;
     }
 
     public abstract void generate(Tile[][] tiles);
