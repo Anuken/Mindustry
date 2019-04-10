@@ -38,7 +38,7 @@ public class Zones implements ContentList{
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
             blockRequirements = new Block[]{Blocks.router};
-            resources = new Item[]{Items.copper, Items.lead, Items.coal};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;

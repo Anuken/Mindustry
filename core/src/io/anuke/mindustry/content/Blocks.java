@@ -1520,14 +1520,14 @@ public class Blocks implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 0.5f;
-            consumes.powerBuffered(1200f);
             range = 190f;
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
+            powerUsed = 1f / 2f;
 
             health = 200 * size * size;
+            consumes.powerBuffered(1200f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
