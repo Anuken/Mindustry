@@ -2,6 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.maps.generators.DesertWastesGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.maps.generators.MapGenerator.Decoration;
 import io.anuke.mindustry.type.*;
@@ -9,7 +10,7 @@ import io.anuke.mindustry.world.Block;
 
 public class Zones implements ContentList{
     public static Zone
-    groundZero, desertThing,
+    groundZero, desertWastes,
     craters, frozenForest, ruinousShores, stainedMountains,
     overgrowth, infestedIslands,
     desolateRift, nuclearComplex;
@@ -31,19 +32,18 @@ public class Zones implements ContentList{
             }};
         }};
 
-        /*
-        desertThing = new Zone("desertThing", new DesertThingGenerator(240, 240)){{
+        desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
             startingItems = ItemStack.list(Items.copper, 200);
-            alwaysUnlocked = true;
-            conditionWave = 5;
-            launchPeriod = 5;
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead};
+            conditionWave = 10;
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 2;
+                waveSpacing = 60 * 60 * 1.5f;
             }};
-        }};*/
+        }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             startingItems = ItemStack.list(Items.copper, 200);

@@ -11,10 +11,10 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Save16 extends SaveFileVersion{
+public class Save1 extends SaveFileVersion{
 
-    public Save16(){
-        super(16);
+    public Save1(){
+        super(1);
     }
 
     @Override
