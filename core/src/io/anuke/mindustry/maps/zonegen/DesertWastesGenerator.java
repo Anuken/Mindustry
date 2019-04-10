@@ -1,7 +1,8 @@
-package io.anuke.mindustry.maps.generators;
+package io.anuke.mindustry.maps.zonegen;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.maps.generators.BasicGenerator;
 import io.anuke.mindustry.world.Tile;
 
 public class DesertWastesGenerator extends BasicGenerator{
@@ -18,7 +19,7 @@ public class DesertWastesGenerator extends BasicGenerator{
     @Override
     public void decorate(Tile[][] tiles){
         ores(tiles);
-        terrain(tiles, Blocks.sandRocks, 1.5f, 0.9f);
+        terrain(tiles, Blocks.sandRocks, 60f, 1.5f, 0.9f);
 
         int rand = 40;
         int border = 25;

@@ -123,7 +123,6 @@ public class WaveSpawner{
 
                     //hide spawnpoints, they have served their purpose
                     world.tile(x, y).setBlock(Blocks.air);
-                    Log.info("Add spawn " + x + " " + y);
                 }
             }
         }

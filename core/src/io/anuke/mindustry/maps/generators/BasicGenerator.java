@@ -49,9 +49,9 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
-    public void terrain(Tile[][] tiles, Block dst, float mag, float cmag){
+    public void terrain(Tile[][] tiles, Block dst, float scl, float mag, float cmag){
         pass(tiles, (x, y) -> {
-            double rocks = sim.octaveNoise2D(5, 0.5, 1f / 60f, x, y) * mag
+            double rocks = sim.octaveNoise2D(5, 0.5, 1f / scl, x, y) * mag
             + Mathf.dst((float)x / width, (float)y / height, 0.5f, 0.5f) * cmag;
 
             double edgeDist = Math.min(x, Math.min(y, Math.min(Math.abs(x - (width - 1)), Math.abs(y - (height - 1)))));
