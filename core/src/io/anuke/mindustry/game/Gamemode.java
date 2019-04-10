@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.function.Supplier;
 
 /** Defines preset rule sets.. */
-public enum RulePreset{
+public enum Gamemode {
     survival(() -> new Rules(){{
         waveTimer = true;
         waves = true;
@@ -13,7 +13,7 @@ public enum RulePreset{
     }}),
     sandbox(() -> new Rules(){{
         infiniteResources = true;
-        waves = true;
+        waves = false;
         waveTimer = false;
         respawnTime = 0f;
         spawns = DefaultWaves.get();
@@ -21,6 +21,7 @@ public enum RulePreset{
     attack(() -> new Rules(){{
         enemyCheat = true;
         unitDrops = true;
+        waves = false;
     }}),
     pvp(() -> new Rules(){{
         pvp = true;
@@ -35,7 +36,7 @@ public enum RulePreset{
 
     private final Supplier<Rules> rules;
 
-    RulePreset(Supplier<Rules> rules){
+    Gamemode(Supplier<Rules> rules){
         this.rules = rules;
     }
 

@@ -204,11 +204,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            RulePreset preset = RulePreset.survival;
+            Gamemode preset = Gamemode.survival;
 
             if(arg.length > 1){
                 try{
-                    preset = RulePreset.valueOf(arg[1]);
+                    preset = Gamemode.valueOf(arg[1]);
                 }catch(IllegalArgumentException e){
                     err("No gamemode '{0}' found.", arg[1]);
                     return;
