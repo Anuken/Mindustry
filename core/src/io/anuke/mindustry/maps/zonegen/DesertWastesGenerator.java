@@ -34,7 +34,11 @@ public class DesertWastesGenerator extends BasicGenerator{
         distort(tiles, 20f, 4f);
         inverseFloodFill(tiles, tiles[spawnX][spawnY], Blocks.sandRocks);
 
+        noise(tiles, Blocks.salt, Blocks.sandRocks, 5, 0.6f, 200f, 0.55f);
         noise(tiles, Blocks.darksand, Blocks.duneRocks, 5, 0.7f, 120f, 0.5f);
+
+        tech(tiles);
+        //scatter(tiles, Blocks.sandRocks, Blocks.creeptree, 1f);
 
         tiles[endX][endY].setBlock(Blocks.spawn);
         loadout.setup(spawnX, spawnY);

@@ -35,6 +35,7 @@ public class OvergrowthGenerator extends BasicGenerator{
         inverseFloodFill(tiles, tiles[spawnX][spawnY], Blocks.sporerocks);
 
         noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
+        //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
         tiles[endX][endY].setBlock(Blocks.spawn);
         loadout.setup(spawnX, spawnY);

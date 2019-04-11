@@ -18,6 +18,7 @@ public class StaticWall extends Rock{
         super(name);
         breakable = alwaysReplace = false;
         solid = true;
+        variants = 2;
         cacheLayer = CacheLayer.walls;
     }
 
@@ -41,15 +42,6 @@ public class StaticWall extends Rock{
     public void load(){
         super.load();
         large = Core.atlas.find(name + "-large");
-    }
-
-    //two functions for calculating 2x2 tile brightness
-    int min(int rx, int ry){
-        return Math.min(world.tile(rx + 1, ry).getRotation(), Math.min(world.tile(rx, ry).getRotation(), Math.min(world.tile(rx + 1, ry + 1).getRotation(), world.tile(rx, ry + 1).getRotation())));
-    }
-
-    int avg(int rx, int ry){
-        return (world.tile(rx + 1, ry).getRotation() + world.tile(rx, ry).getRotation() + world.tile(rx + 1, ry + 1).getRotation() + world.tile(rx, ry + 1).getRotation()) / 4;
     }
 
     boolean eq(int rx, int ry){

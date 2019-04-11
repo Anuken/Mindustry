@@ -7,21 +7,19 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class TreeBlock extends Block{
-    static final float shadowOffset = 10f;
 
     public TreeBlock(String name){
         super(name);
         solid = true;
         layer = Layer.power;
+        //cacheLayer = CacheLayer.walls;
         expanded = true;
     }
 
     @Override
-    public void draw(Tile tile){
-    }
-
-    @Override
     public void drawLayer(Tile tile){
+        Draw.colorl(1f - tile.getRotation() / 4f);
         Draw.rect(region, tile.drawx(), tile.drawy(), Mathf.randomSeed(tile.pos(), 0, 4) * 90);
+        Draw.color();
     }
 }

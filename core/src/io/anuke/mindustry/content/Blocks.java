@@ -34,6 +34,8 @@ public class Blocks implements ContentList{
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+    creeptree,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -312,6 +314,10 @@ public class Blocks implements ContentList{
         whiteTree = new TreeBlock("white-tree"){{
         }};
 
+        creeptree = new TreeBlock("creeptree"){{
+        }};
+
+
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
         }};
@@ -358,6 +364,16 @@ public class Blocks implements ContentList{
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
+        }};
+
+        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
+        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
+        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
+        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
+        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
+        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+
+        darkMetal = new StaticWall("dark-metal"){{
         }};
 
         //endregion
