@@ -45,7 +45,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
-        Block previous = wall;
+        Block previous = block;
         if(previous == type) return;
         super.setBlock(type);
         op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));
@@ -84,8 +84,8 @@ public class EditorTile extends Tile{
     protected void changed(){
         entity = null;
 
-        if(wall == null){
-            wall = Blocks.air;
+        if(block == null){
+            block = Blocks.air;
         }
 
         if(floor == null){

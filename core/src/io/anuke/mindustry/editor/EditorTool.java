@@ -19,7 +19,7 @@ public enum EditorTool{
 
             byte link = tile.getLinkByte();
 
-            if(tile.block() instanceof BlockPart && link != 0){
+            if(tile.isLinked()){
                 x -= (Pack.leftByte(link) - 8);
                 y -= (Pack.rightByte(link) - 8);
 
@@ -27,7 +27,7 @@ public enum EditorTool{
             }
 
             //do not.
-            if(tile.block() instanceof BlockPart){
+            if(tile.isLinked()){
                 return;
             }
 

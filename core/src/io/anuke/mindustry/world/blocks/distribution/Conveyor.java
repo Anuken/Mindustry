@@ -167,6 +167,10 @@ public class Conveyor extends Block{
     public void unitOn(Tile tile, Unit unit){
         ConveyorEntity entity = tile.entity();
 
+        if(entity.clogHeat > 0.5f){
+            return;
+        }
+
         entity.noSleep();
 
         float speed = this.speed * tilesize / 2.4f;
