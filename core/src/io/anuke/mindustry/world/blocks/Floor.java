@@ -100,7 +100,7 @@ public class Floor extends Block{
 
         drawEdges(tile);
 
-        Floor floor = tile.ore();
+        Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.draw(tile);
         }

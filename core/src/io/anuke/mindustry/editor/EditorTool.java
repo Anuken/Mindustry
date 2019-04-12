@@ -31,7 +31,7 @@ public enum EditorTool{
                 return;
             }
 
-            editor.drawBlock = tile.block() == Blocks.air ? tile.ore() == Blocks.air ? tile.floor() : tile.ore() : tile.block();
+            editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
     pencil{
@@ -100,7 +100,7 @@ public enum EditorTool{
             boolean synth = editor.drawBlock.synthetic();
 
             Block draw = editor.drawBlock;
-            dest = draw instanceof OreBlock ? tile.ore() : isfloor ? floor : block;
+            dest = draw instanceof OverlayFloor ? tile.overlay() : isfloor ? floor : block;
 
             if(dest == draw || block == Blocks.part || block.isMultiblock()){
                 return;
@@ -115,10 +115,10 @@ public enum EditorTool{
                 Tile write = editor.tile(px, py);
 
                 if(isfloor){
-                    if(alt && !(draw instanceof OreBlock)){
-                        Block ore = write.ore();
+                    if(alt && !(draw instanceof OverlayFloor)){
+                        Block ore = write.overlay();
                         write.setFloor((Floor)draw);
-                        write.setOre(ore);
+                        write.setOverlay(ore);
                     }else{
                         write.setFloor((Floor)draw);
                     }
@@ -197,7 +197,7 @@ public enum EditorTool{
         boolean eq(int px, int py){
             Tile tile = data.tile(px, py);
 
-            return (data.drawBlock instanceof OreBlock ? tile.ore() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OreBlock && tile.floor().isLiquid);
+            return (data.drawBlock instanceof OverlayFloor ? tile.overlay() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OverlayFloor && tile.floor().isLiquid);
         }
     },
     zoom;

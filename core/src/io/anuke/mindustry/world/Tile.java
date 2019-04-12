@@ -37,7 +37,7 @@ public class Tile implements Position, TargetTrait{
     /** Team ordinal. */
     private byte team;
     /** Ore that is on top of this (floor) block. */
-    private byte ore = 0;
+    private byte overlay = 0;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -136,6 +136,10 @@ public class Tile implements Position, TargetTrait{
         return wall;
     }
 
+    public Floor overlay(){
+        return (Floor)content.block(overlay);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends Block> T cblock(){
         return (T)wall;
@@ -178,9 +182,10 @@ public class Tile implements Position, TargetTrait{
         changed();
     }
 
+    /**This resets the overlay!*/
     public void setFloor(Floor type){
         this.floor = type;
-        this.ore = 0;
+        this.overlay = 0;
     }
 
     public byte getRotation(){
@@ -197,6 +202,22 @@ public class Tile implements Position, TargetTrait{
 
     public void setDump(byte dump){
         this.rotation = dump;
+    }
+
+    public byte getOverlayID(){
+        return overlay;
+    }
+
+    public void setOverlayID(byte ore){
+        this.overlay = ore;
+    }
+
+    public void setOverlay(Block block){
+        setOverlayID(block.id);
+    }
+
+    public void clearOverlay(){
+        this.overlay = 0;
     }
 
     public boolean passable(){
@@ -350,28 +371,8 @@ public class Tile implements Position, TargetTrait{
         return getTeam() == Team.none || team == getTeam();
     }
 
-    public byte getOreByte(){
-        return ore;
-    }
-
-    public void setOreByte(byte ore){
-        this.ore = ore;
-    }
-
-    public void setOre(Block block){
-        setOreByte(block.id);
-    }
-
-    public void clearOre(){
-        this.ore = 0;
-    }
-
-    public Floor ore(){
-        return (Floor)content.block(ore);
-    }
-
     public Item drop(){
-        return ore == 0 ? floor.itemDrop : ((Floor)content.block(ore)).itemDrop;
+        return overlay == 0 || ((Floor)content.block(overlay)).itemDrop == null ? floor.itemDrop : ((Floor)content.block(overlay)).itemDrop;
     }
 
     public void updateOcclusion(){
@@ -481,7 +482,7 @@ public class Tile implements Position, TargetTrait{
         Block block = block();
         Block floor = floor();
 
-        return floor.name + ":" + block.name + ":" + content.block(ore) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
+        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (link != 0 ? " link=[" + (Pack.leftByte(link) - 8) + ", " + (Pack.rightByte(link) - 8) + "]" : "");
     }
 }

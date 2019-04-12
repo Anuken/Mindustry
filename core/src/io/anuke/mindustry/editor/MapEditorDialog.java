@@ -26,7 +26,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.OverlayFloor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
@@ -486,7 +486,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(core != 0) return core;
             int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
             if(synth != 0) return synth;
-            int ore = Boolean.compare(b1 instanceof OreBlock, b2 instanceof OreBlock);
+            int ore = Boolean.compare(b1 instanceof OverlayFloor, b2 instanceof OverlayFloor);
             if(ore != 0) return ore;
             return Integer.compare(b1.id, b2.id);
         });

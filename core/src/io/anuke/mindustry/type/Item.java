@@ -100,7 +100,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         }
     }
 
-    /** Allocates a new array containing all items the generate ores. */
+    /** Allocates a new array containing all items that generate ores. */
     public static Array<Item> getAllOres(){
         return content.blocks().select(b -> b instanceof OreBlock).map(b -> ((Floor)b).itemDrop);
     }

@@ -74,7 +74,7 @@ public class Loadout extends Content{
             tile.setRotation((byte)entry.value.rotation);
             if(entry.value.ore != null){
                 for(Tile t : tile.getLinkedTiles(outArray)){
-                    t.setOre(entry.value.ore);
+                    t.setOverlay(entry.value.ore);
                 }
             }
         }

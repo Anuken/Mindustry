@@ -75,7 +75,7 @@ public class MapIO{
             }
 
             @Override
-            public void setOreByte(byte b){
+            public void setOverlayID(byte b){
                 if(b != 0)
                     floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
@@ -105,7 +105,7 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles[x][y];
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.ore(), tile.getTeam()));
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
             }
         }
         return pixmap;
@@ -144,13 +144,13 @@ public class MapIO{
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = tiles[i % width][i / width];
                 stream.writeByte(tile.getFloorID());
-                stream.writeByte(tile.getOreByte());
+                stream.writeByte(tile.getOverlayID());
                 int consecutives = 0;
 
                 for(int j = i + 1; j < width * height && consecutives < 255; j++){
                     Tile nextTile = tiles[j % width][j / width];
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOreByte() != tile.getOreByte()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOverlayID() != tile.getOverlayID()){
                         break;
                     }
 
@@ -272,13 +272,13 @@ public class MapIO{
 
                         Tile tile = tiles.get(x, y);
                         tile.setFloor((Floor)content.block(floorid));
-                        tile.setOre(content.block(oreid));
+                        tile.setOverlay(content.block(oreid));
 
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
                             int newx = j % width, newy = j / width;
                             Tile newTile = tiles.get(newx, newy);
                             newTile.setFloor((Floor)content.block(floorid));
-                            newTile.setOre(content.block(oreid));
+                            newTile.setOverlay(content.block(oreid));
                         }
 
                         i += consecutives;
@@ -337,7 +337,7 @@ public class MapIO{
 
                 tile.setFloor(block.floor);
                 tile.setBlock(block.wall);
-                if(block.ore != null) tile.setOre(block.ore);
+                if(block.ore != null) tile.setOverlay(block.ore);
 
                 //place core
                 if(color == Color.rgba8888(Color.GREEN)){
@@ -437,7 +437,7 @@ public class MapIO{
                     }
 
                     if(oreMap.containsKey(floorb)){
-                        tile.setOre(content.block(oreMap.get(floorb, 0)));
+                        tile.setOverlay(content.block(oreMap.get(floorb, 0)));
                     }
                 }
             }

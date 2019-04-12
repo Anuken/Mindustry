@@ -145,10 +145,10 @@ public abstract class BasicGenerator extends RandomGenerator{
             for(int y = 0; y < height; y++){
                 floor = tiles[x][y].floor();
                 block = tiles[x][y].block();
-                ore = tiles[x][y].ore();
+                ore = tiles[x][y].overlay();
                 r.accept(x, y);
                 tiles[x][y] = new Tile(x, y, floor.id, block.id);
-                tiles[x][y].setOre(ore);
+                tiles[x][y].setOverlay(ore);
             }
         }
     }

@@ -44,13 +44,13 @@ public abstract class SaveFileVersion{
         for(int i = 0; i < world.width() * world.height(); i++){
             Tile tile = world.tile(i % world.width(), i / world.width());
             stream.writeByte(tile.getFloorID());
-            stream.writeByte(tile.getOreByte());
+            stream.writeByte(tile.getOverlayID());
             int consecutives = 0;
 
             for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                 Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOreByte() != tile.getOreByte()){
+                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOverlayID() != tile.getOverlayID()){
                     break;
                 }
 
@@ -116,12 +116,12 @@ public abstract class SaveFileVersion{
             Block ore = content.block(oreid);
 
             tiles[x][y] = new Tile(x, y, floorid, (byte)0);
-            tiles[x][y].setOre(ore);
+            tiles[x][y].setOverlay(ore);
 
             for(int j = i + 1; j < i + 1 + consecutives; j++){
                 int newx = j % width, newy = j / width;
                 Tile newTile = new Tile(newx, newy, floorid, (byte)0);
-                newTile.setOre(ore);
+                newTile.setOverlay(ore);
                 tiles[newx][newy] = newTile;
             }
 

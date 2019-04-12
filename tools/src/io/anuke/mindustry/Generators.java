@@ -147,7 +147,6 @@ public class Generators{
 
         ImagePacker.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
-
                 mech.load();
                 mech.weapon.load();
 
@@ -171,9 +170,7 @@ public class Generators{
         });
 
         ImagePacker.generate("unit-icons", () -> {
-            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                if(type.isFlying) continue;
-
+            content.<UnitType>getBy(ContentType.unit).each(type -> type.isFlying, type -> {
                 type.load();
                 type.weapon.load();
 
@@ -192,14 +189,11 @@ public class Generators{
                 }
 
                 image.save("unit-icon-" + type.name);
-            }
+            });
         });
 
         ImagePacker.generate("ore-icons", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof OreBlock)) continue;
-
-                OreBlock ore = (OreBlock)block;
+            content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
                 Item item = ore.itemDrop;
 
                 for(int i = 0; i < 3; i++){
@@ -226,25 +220,22 @@ public class Generators{
                     image.save("../editor/editor-ore-" + item.name + (i + 1));
 
                     //save icons
-                    image.save(block.name + "-icon-full");
+                    image.save(ore.name + "-icon-full");
                     for(Icon icon : Icon.values()){
                         if(icon.size == 0) continue;
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save(block.name + "-icon-" + icon.name());
+                        scaled.save(ore.name + "-icon-" + icon.name());
                     }
                 }
-            }
+            });
         });
 
         ImagePacker.generate("edges", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof Floor)) continue;
-
-                Floor floor = (Floor)block;
+            content.blocks().<Floor>each(b -> b instanceof Floor, floor -> {
 
                 if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
-                    continue;
+                    return;
                 }
 
                 try{
@@ -260,9 +251,8 @@ public class Generators{
 
                     result.save("../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){
-                }
-            }
+                }catch(Exception ignored){}
+            });
         });
     }
 

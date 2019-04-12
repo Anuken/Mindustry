@@ -9,15 +9,14 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.updateEditorOnChange;
 
 public abstract class FilterOption{
-    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OreBlock)) && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full));
     public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
-    public static final Predicate<Block> oresOnly = b -> b instanceof OreBlock && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(Icon.full));
 
     public abstract void build(Table table);
 
