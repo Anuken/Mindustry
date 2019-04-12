@@ -89,7 +89,7 @@ public abstract class BasicGenerator extends RandomGenerator{
                 if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
                     floor = Structs.random(blocks);
                     if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
-                        floor = Blocks.darkPanel5;
+                        floor = Blocks.darkPanel4;
                     }
                 }
 
