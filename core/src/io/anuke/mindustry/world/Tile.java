@@ -383,6 +383,9 @@ public class Tile implements Position, TargetTrait{
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null && tile.floor.isLiquid){
+                cost += 3;
+            }
             if(tile != null && tile.solid()){
                 occluded = true;
                 break;

@@ -35,6 +35,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
+    protected static final int timerTarget2 = timerIndex++;
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
