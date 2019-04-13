@@ -38,7 +38,7 @@ public class DesertWastesGenerator extends BasicGenerator{
         noise(tiles, Blocks.darksand, Blocks.duneRocks, 5, 0.7f, 120f, 0.5f);
 
         tech(tiles);
-        overlay(tiles, Blocks.sand, Blocks.pebbles, 5, 0.8f, 30f, 0.6f);
+        overlay(tiles, Blocks.sand, Blocks.pebbles, 0.15f, 5, 0.8f, 30f, 0.62f);
         //scatter(tiles, Blocks.sandRocks, Blocks.creeptree, 1f);
 
         tiles[endX][endY].setBlock(Blocks.spawn);
