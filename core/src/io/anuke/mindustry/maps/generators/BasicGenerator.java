@@ -79,6 +79,15 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
+    public void overlay(Tile[][] tiles, Block floor, Block block, int octaves, float falloff, float scl, float threshold){
+        sim.setSeed(Mathf.random(99999));
+        pass(tiles, (x, y) -> {
+            if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold && tiles[x][y].floor() == floor){
+                ore = block;
+            }
+        });
+    }
+
     public void tech(Tile[][] tiles){
         Block[] blocks = {Blocks.darkPanel3};
         int secSize = 20;

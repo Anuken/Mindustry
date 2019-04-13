@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
-    public int variants;
+    public int variants = 3;
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
@@ -61,7 +61,6 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
-        variants = 3;
     }
 
     @Override

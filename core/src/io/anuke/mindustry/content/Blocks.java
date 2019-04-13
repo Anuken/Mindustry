@@ -33,9 +33,10 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
     creeptree,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    pebbles,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -300,6 +301,9 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        saltRocks = new StaticWall("saltrocks"){{
+        }};
+
         sporePine = new StaticWall("spore-pine"){{
             variants = 0;
         }};
@@ -375,6 +379,8 @@ public class Blocks implements ContentList{
 
         darkMetal = new StaticWall("dark-metal"){{
         }};
+
+        pebbles = new OverlayFloor("pebbles");
 
         //endregion
         //region ore

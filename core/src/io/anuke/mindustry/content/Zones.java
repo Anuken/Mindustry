@@ -13,7 +13,7 @@ public class Zones implements ContentList{
     public static Zone
     groundZero, desertWastes,
     craters, frozenForest, ruinousShores, stainedMountains,
-    overgrowth, infestedIslands,
+    saltFlats, overgrowth, infestedIslands,
     desolateRift, nuclearComplex;
 
     @Override
@@ -34,6 +34,19 @@ public class Zones implements ContentList{
         }};
 
         desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
+            startingItems = ItemStack.list(Items.copper, 200);
+            conditionWave = 10;
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 60 * 1.5f;
+            }};
+        }};
+
+        saltFlats = new Zone("saltFlats", new DesertWastesGenerator(260, 260)){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(groundZero, 10);

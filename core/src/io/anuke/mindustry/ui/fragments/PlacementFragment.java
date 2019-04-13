@@ -11,7 +11,6 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
@@ -337,6 +336,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.overlay() != Blocks.air ? hoverTile.overlay() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : null;
     }
 }
