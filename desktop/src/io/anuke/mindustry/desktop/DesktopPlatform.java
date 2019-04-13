@@ -13,6 +13,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 
 import java.net.NetworkInterface;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import static io.anuke.mindustry.Vars.*;
@@ -40,6 +41,12 @@ public class DesktopPlatform extends Platform{
         new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
     }
 
+    private String getUTF8MapName() {
+        String capitalized = Strings.capitalize(world.getMap().name());
+        byte[] utf8bytes = capitalized.getBytes(StandardCharsets.UTF_8);
+        return new String(utf8bytes, StandardCharsets.UTF_8);
+    }
+
     @Override
     public void updateRPC(){
 
@@ -51,11 +58,13 @@ public class DesktopPlatform extends Platform{
             presence.state = state.rules.waves ? "Survival" : "Attack";
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
-            }else if(!state.rules.waves){
-                presence.details = Strings.capitalize(world.getMap().name());
-            }else{
-                presence.details = Strings.capitalize(world.getMap().name()) + " | Wave " + state.wave;
-                presence.largeImageText = "Wave " + state.wave;
+            }else {
+                String details = getUTF8MapName();
+                if (state.rules.waves) {
+                    details += " | Wave " + state.wave;
+                    presence.largeImageText = "Wave " + state.wave;
+                }
+                presence.details = details;
             }
 
             presence.state = unitGroups[player.getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
