@@ -129,7 +129,7 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
     }
 }
 
