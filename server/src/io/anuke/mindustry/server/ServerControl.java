@@ -545,12 +545,16 @@ public class ServerControl implements ApplicationListener{
             int slot = Strings.parseInt(arg[0]);
 
             if(!SaveIO.isSaveValid(slot)){
-                err("No save data found for slot.");
+                err("No (valid) save data found for slot.");
                 return;
             }
 
             Core.app.post(() -> {
-                SaveIO.loadFromSlot(slot);
+                try{
+                    SaveIO.loadFromSlot(slot);
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
                 info("Save loaded.");
                 host();
                 state.set(State.playing);
