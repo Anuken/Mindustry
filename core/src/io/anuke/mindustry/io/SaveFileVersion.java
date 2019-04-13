@@ -67,7 +67,7 @@ public abstract class SaveFileVersion{
             stream.writeByte(tile.getBlockID());
 
             if(tile.block() == Blocks.part){
-                stream.writeByte(tile.link);
+                stream.writeByte(tile.getLinkByte());
             }else if(tile.entity != null){
                 stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                 stream.writeShort((short)tile.entity.health); //health
@@ -136,7 +136,7 @@ public abstract class SaveFileVersion{
             tile.setBlock(block);
 
             if(block == Blocks.part){
-                tile.link = stream.readByte();
+                tile.setLinkByte(stream.readByte());
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
                 short health = stream.readShort();

@@ -51,8 +51,7 @@ public class BuildBlock extends Block{
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
         if(tile == null) return;
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
-        tile.setRotation(rotation);
-        world.setBlock(tile, block, team);
+        world.setBlock(tile, block, team, rotation);
         if(tile.entity != null){
             tile.entity.health = block.health * healthf;
         }

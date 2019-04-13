@@ -167,7 +167,7 @@ public class MapIO{
                 stream.writeByte(tile.getBlockID());
 
                 if(tile.block() instanceof BlockPart){
-                    stream.writeByte(tile.link);
+                    stream.writeByte(tile.getLinkByte());
                 }else if(tile.entity != null){
                     stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                     stream.writeShort(/*(short)tile.entity.health*/tile.block().health); //health
@@ -293,7 +293,7 @@ public class MapIO{
                         tile.setBlock(block);
 
                         if(block == Blocks.part){
-                            tile.link = stream.readByte();
+                            tile.setLinkByte(stream.readByte());
                         }else if(tile.entity != null){
                             byte tr = stream.readByte();
                             short health = stream.readShort();
