@@ -1112,7 +1112,7 @@ public class Blocks implements ContentList{
             powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
-            consumes.item(Items.blastCompound).optional(true, false);
+            consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.3f);
         }};
 
