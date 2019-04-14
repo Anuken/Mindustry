@@ -50,7 +50,7 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                player.healBy(Time.delta() * 0.1f);
+                player.healBy(Time.delta() * 0.09f);
             }
 
             @Override
