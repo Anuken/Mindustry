@@ -50,10 +50,10 @@ public class Rules{
     public byte zone = -1;
     /** Spawn layout. Since only zones modify this, it should be assigned on save load. */
     public transient Array<SpawnGroup> spawns = DefaultWaves.get();
-    /**Determines if there should be limited respawns**/
+    /** Determines if there should be limited respawns. */
     public boolean limitedRespawns = false;
-    /**How many times player can respawn during one wave**/
+    /** How many times player can respawn during one wave. */
     public int respawns = 5;
-    /**Hold wave timer until all enemies are destroyed**/
+    /** Hold wave timer until all enemies are destroyed. */
     public boolean waitForWaveToEnd = false;
 }
