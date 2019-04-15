@@ -27,11 +27,13 @@ public class ImpactReactor extends PowerGenerator{
     protected int plasmas = 4;
     protected float warmupSpeed = 0.001f;
     protected float itemDuration = 60f;
-    protected int explosionRadius = 30;
-    protected int explosionDamage = 180;
+    protected int explosionRadius = 50;
+    protected int explosionDamage = 2000;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
     protected Color ind1 = Color.valueOf("858585"), ind2 = Color.valueOf("fea080");
+    protected int bottomRegion, topRegion, lightRegion;
+    protected int[] plasmaRegions;
 
     public ImpactReactor(String name){
         super(name);
@@ -40,6 +42,14 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+
+        bottomRegion = reg("-bottom");
+        topRegion = reg("-top");
+        lightRegion = reg("-light");
+        plasmaRegions = new int[plasmas];
+        for(int i = 0; i < plasmas; i++){
+            plasmaRegions[i] = reg("-plasma-" + i);
+        }
     }
 
     @Override
@@ -86,7 +96,7 @@ public class ImpactReactor extends PowerGenerator{
     public void draw(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
-        Draw.rect(name + "-bottom", tile.drawx(), tile.drawy());
+        Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
 
         for(int i = 0; i < plasmas; i++){
             float r = 29f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
@@ -94,7 +104,7 @@ public class ImpactReactor extends PowerGenerator{
             Draw.color(plasma1, plasma2, (float)i / plasmas);
             Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * entity.warmup);
             Draw.blend(Blending.additive);
-            Draw.rect(name + "-plasma-" + i, tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
+            Draw.rect(reg(plasmaRegions[i]), tile.drawx(), tile.drawy(), r, r, Time.time() * (12 + i * 6f) * entity.warmup);
             Draw.blend();
         }
 
@@ -102,10 +112,10 @@ public class ImpactReactor extends PowerGenerator{
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.rect(name + "-top", tile.drawx(), tile.drawy());
+        Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
 
         Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.productionEfficiency, 3f, entity.warmup * 0.5f));
-        Draw.rect(name + "-light", tile.drawx(), tile.drawy());
+        Draw.rect(reg(lightRegion), tile.drawx(), tile.drawy());
 
         Draw.color();
     }

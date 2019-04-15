@@ -83,8 +83,7 @@ public class DesktopPlatform extends Platform{
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement())
-                ;
+            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement());
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];

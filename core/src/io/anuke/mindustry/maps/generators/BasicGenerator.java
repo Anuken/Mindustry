@@ -67,12 +67,43 @@ public abstract class BasicGenerator extends RandomGenerator{
     }
 
     public void noise(Tile[][] tiles, Block floor, Block block, int octaves, float falloff, float scl, float threshold){
+        sim.setSeed(Mathf.random(99999));
         pass(tiles, (x, y) -> {
             if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold){
                 Tile tile = tiles[x][y];
                 this.floor = floor;
                 if(tile.block().solid){
                     this.block = block;
+                }
+            }
+        });
+    }
+
+    public void overlay(Tile[][] tiles, Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
+        sim.setSeed(Mathf.random(99999));
+        pass(tiles, (x, y) -> {
+            if(sim.octaveNoise2D(octaves, falloff, 1f / scl, x, y) > threshold && Mathf.chance(chance) && tiles[x][y].floor() == floor){
+                ore = block;
+            }
+        });
+    }
+
+    public void tech(Tile[][] tiles){
+        Block[] blocks = {Blocks.darkPanel3};
+        int secSize = 20;
+        pass(tiles, (x, y) -> {
+            int mx = x % secSize, my = y % secSize;
+            int sclx = x / secSize, scly = y / secSize;
+            if(noise(sclx, scly, 10f, 1f) > 0.63f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
+                if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
+                    floor = Structs.random(blocks);
+                    if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
+                        floor = Blocks.darkPanel4;
+                    }
+                }
+
+                if(block.solid && Mathf.chance(0.7)){
+                    block = Blocks.darkMetal;
                 }
             }
         });
@@ -95,6 +126,17 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
+    public void scatter(Tile[][] tiles, Block target, Block dst, float chance){
+        pass(tiles, (x, y) -> {
+            if(!Mathf.chance(chance)) return;
+            if(floor == target){
+                floor = dst;
+            }else if(block == target){
+                block = dst;
+            }
+        });
+    }
+
     public void each(IntPositionConsumer r){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -112,10 +154,10 @@ public abstract class BasicGenerator extends RandomGenerator{
             for(int y = 0; y < height; y++){
                 floor = tiles[x][y].floor();
                 block = tiles[x][y].block();
-                ore = tiles[x][y].ore();
+                ore = tiles[x][y].overlay();
                 r.accept(x, y);
                 tiles[x][y] = new Tile(x, y, floor.id, block.id);
-                tiles[x][y].setOre(ore);
+                tiles[x][y].setOverlay(ore);
             }
         }
     }

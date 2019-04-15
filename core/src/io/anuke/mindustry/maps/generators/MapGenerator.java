@@ -125,7 +125,7 @@ public class MapGenerator extends Generator{
 
                     if(distortFloor){
                         tile.setFloor(tiles[newX][newY].floor());
-                        tile.setOre(tiles[newX][newY].ore());
+                        tile.setOverlay(tiles[newX][newY].overlay());
                     }
 
                     for(Decoration decor : decorations){
@@ -168,7 +168,7 @@ public class MapGenerator extends Generator{
                             double dst = Mathf.dst(x, y);
                             if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
                                 Tile tile = tiles[wx][wy];
-                                tile.clearOre();
+                                tile.clearOverlay();
                             }
                         }
                     }

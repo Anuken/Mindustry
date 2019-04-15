@@ -305,7 +305,11 @@ public class World implements ApplicationListener{
     }
 
     public void setBlock(Tile tile, Block block, Team team){
-        tile.setBlock(block, team);
+        setBlock(tile, block, team, 0);
+    }
+
+    public void setBlock(Tile tile, Block block, Team team, int rotation){
+        tile.setBlock(block, team, rotation);
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;

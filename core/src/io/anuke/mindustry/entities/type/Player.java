@@ -646,8 +646,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
-        mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && ((TileEntity)target).isAdded() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
 

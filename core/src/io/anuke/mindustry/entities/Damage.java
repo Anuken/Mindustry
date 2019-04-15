@@ -224,10 +224,12 @@ public class Damage{
             //apply damage to entity if needed
             if(tile.entity != null && tile.getTeam() != team){
                 int health = (int)tile.entity.health;
-                tile.entity.damage(scaledDamage);
-                scaledDamage -= health;
+                if(tile.entity.health > 0){
+                    tile.entity.damage(scaledDamage);
+                    scaledDamage -= health;
 
-                if(scaledDamage <= 0) continue;
+                    if(scaledDamage <= 0) continue;
+                }
             }
 
             for(Point2 p : Geometry.d4){

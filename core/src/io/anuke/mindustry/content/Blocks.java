@@ -33,7 +33,10 @@ public class Blocks implements ContentList{
     air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
+    creeptree,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    pebbles,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -298,6 +301,9 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        saltRocks = new StaticWall("saltrocks"){{
+        }};
+
         sporePine = new StaticWall("spore-pine"){{
             variants = 0;
         }};
@@ -311,6 +317,10 @@ public class Blocks implements ContentList{
 
         whiteTree = new TreeBlock("white-tree"){{
         }};
+
+        creeptree = new TreeBlock("creeptree"){{
+        }};
+
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
@@ -359,6 +369,18 @@ public class Blocks implements ContentList{
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
         }};
+
+        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
+        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
+        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
+        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
+        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
+        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+
+        darkMetal = new StaticWall("dark-metal"){{
+        }};
+
+        pebbles = new OverlayFloor("pebbles");
 
         //endregion
         //region ore
@@ -1090,7 +1112,7 @@ public class Blocks implements ContentList{
             powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
-            consumes.item(Items.blastCompound).optional(true, false);
+            consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.3f);
         }};
 
@@ -1520,14 +1542,14 @@ public class Blocks implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 0.5f;
-            consumes.powerBuffered(1200f);
             range = 190f;
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
+            powerUsed = 1f / 2f;
 
             health = 200 * size * size;
+            consumes.powerBuffered(1200f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 

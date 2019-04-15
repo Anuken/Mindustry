@@ -81,7 +81,7 @@ public class PowerTestFixture{
             // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
             // through reflections and then simulate part of what the changed() method does.
 
-            Field field = Tile.class.getDeclaredField("wall");
+            Field field = Tile.class.getDeclaredField("block");
             field.setAccessible(true);
             field.set(tile, block);
 

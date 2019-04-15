@@ -113,6 +113,7 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
+        jcenter()
     }
 }
 
@@ -129,7 +130,7 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
     }
 }
 
