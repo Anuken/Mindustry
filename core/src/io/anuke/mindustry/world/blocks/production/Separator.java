@@ -20,8 +20,6 @@ import io.anuke.mindustry.world.meta.values.ItemFilterValue;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
-    protected final int timerDump = timers++;
-
     protected ItemStack[] results;
     protected float craftTime;
     protected float spinnerRadius = 2.5f;
@@ -116,7 +114,7 @@ public class Separator extends Block{
             }
         }
 
-        if(entity.timer.get(timerDump, 5)){
+        if(entity.timer.get(timerDump, dumpTime)){
             tryDump(tile);
         }
     }

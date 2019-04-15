@@ -27,7 +27,6 @@ import static io.anuke.mindustry.Vars.content;
 
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
-    protected final int timerDump = timers++;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
@@ -192,7 +191,7 @@ public class Drill extends Block{
 
         float totalHardness = entity.dominantItems * entity.dominantItem.hardness;
 
-        if(entity.timer.get(timerDump, 5)){
+        if(entity.timer.get(timerDump, dumpTime)){
             tryDump(tile, entity.dominantItem);
         }
 

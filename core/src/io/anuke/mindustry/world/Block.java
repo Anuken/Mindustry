@@ -113,6 +113,11 @@ public class Block extends BlockStorage{
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
 
+    /** Dump timer ID.*/
+    protected final int timerDump = timers++;
+    /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
+    protected final int dumpTime = 5;
+
     public Block(String name){
         super(name);
         this.description = Core.bundle.getOrNull("block." + name + ".description");
