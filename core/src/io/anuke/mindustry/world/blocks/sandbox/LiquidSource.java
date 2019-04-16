@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
@@ -16,14 +17,13 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.control;
 
 public class LiquidSource extends Block{
+    private static Liquid lastLiquid;
 
     public LiquidSource(String name){
         super(name);
@@ -33,6 +33,11 @@ public class LiquidSource extends Block{
         liquidCapacity = 100f;
         configurable = true;
         outputsLiquid = true;
+    }
+
+    @Override
+    public void playerPlaced(Tile tile){
+        if(lastLiquid != null) Core.app.post(() -> Call.setLiquidSourceLiquid(null, tile, lastLiquid));
     }
 
     @Override
@@ -74,7 +79,8 @@ public class LiquidSource extends Block{
             final int f = i;
             ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> {
                 Call.setLiquidSourceLiquid(null, tile, items.get(f));
-                control.input(0).frag.config.hideConfig();
+                control.input().frag.config.hideConfig();
+                lastLiquid = items.get(f);
             }).size(38).group(group).get();
             button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
             button.setChecked(entity.source.id == f);

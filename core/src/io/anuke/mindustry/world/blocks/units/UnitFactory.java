@@ -4,35 +4,25 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.meta.BlockFlag;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
-import io.anuke.mindustry.world.modules.ItemModule;
+import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.meta.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class UnitFactory extends Block{
     //for attack mode
@@ -44,7 +34,8 @@ public class UnitFactory extends Block{
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
-    protected int maxSpawn = 2;
+    protected int maxSpawn = 4;
+    protected int[] capacities;
 
     public UnitFactory(String name){
         super(name);
@@ -53,8 +44,6 @@ public class UnitFactory extends Block{
         hasItems = true;
         solid = false;
         flags = EnumSet.of(BlockFlag.producer);
-
-        consumes.require(ConsumeItems.class);
     }
 
     @Remote(called = Loc.server)
@@ -62,7 +51,7 @@ public class UnitFactory extends Block{
         if(!(tile.entity instanceof UnitFactoryEntity) || !(tile.block() instanceof UnitFactory)) return;
 
         UnitFactoryEntity entity = tile.entity();
-        UnitFactory factory = (UnitFactory) tile.block();
+        UnitFactory factory = (UnitFactory)tile.block();
 
         entity.buildTime = 0f;
         entity.spawned = spawns;
@@ -80,6 +69,19 @@ public class UnitFactory extends Block{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        capacities = new int[Vars.content.items().size];
+        if(consumes.has(ConsumeType.item)){
+            ConsumeItems cons = consumes.get(ConsumeType.item);
+            for(ItemStack stack : cons.items){
+                capacities[stack.item.id] = stack.amount * 2;
+            }
+        }
+    }
+
+    @Override
     public void load(){
         super.load();
 
@@ -89,8 +91,8 @@ public class UnitFactory extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("blocks.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
-        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("blocks.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((UnitFactoryEntity)entity).buildTime / produceTime));
+        bars.add("spawned", entity -> new Bar(() -> Core.bundle.format("bar.spawned", ((UnitFactoryEntity)entity).spawned, maxSpawn), () -> Pal.command, () -> (float)((UnitFactoryEntity)entity).spawned / maxSpawn));
     }
 
     @Override
@@ -102,14 +104,16 @@ public class UnitFactory extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.craftSpeed, produceTime / 60f, StatUnit.seconds);
+        stats.remove(BlockStat.itemCapacity);
+        stats.add(BlockStat.productionTime, produceTime / 60f, StatUnit.seconds);
         stats.add(BlockStat.maxUnits, maxSpawn, StatUnit.none);
     }
 
     @Override
     public void unitRemoved(Tile tile, Unit unit){
         UnitFactoryEntity entity = tile.entity();
-        entity.spawned --;
+        entity.spawned--;
+        entity.spawned = Math.max(entity.spawned, 0);
     }
 
     @Override
@@ -138,10 +142,10 @@ public class UnitFactory extends Block{
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 2f * size - 2f),
-                tile.drawy(),
-                90,
-                size * Vars.tilesize - 4f);
+        tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 2f * size - 2f),
+        tile.drawy(),
+        90,
+        size * Vars.tilesize - 4f);
 
         Draw.reset();
 
@@ -162,15 +166,15 @@ public class UnitFactory extends Block{
 
         if(!tile.isEnemyCheat()){
             //player-made spawners have default behavior
-            if(hasRequirements(entity.items, entity.buildTime / produceTime) && entity.cons.valid()){
-                entity.time += entity.delta() * entity.speedScl;
-                entity.buildTime += entity.delta() * entity.power.satisfaction;
+            if(entity.cons.valid()){
+                entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+                entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
             }else{
                 entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
             }
             //check if grace period had passed
-        }else if(entity.warmup > produceTime*gracePeriodMultiplier){
+        }else if(entity.warmup > produceTime * gracePeriodMultiplier){
             float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, maxSpeedup);
             entity.time += entity.delta() * entity.speedScl;
             //otherwise, it's an enemy, cheat by not requiring resources
@@ -186,30 +190,13 @@ public class UnitFactory extends Block{
             Call.onUnitFactorySpawn(tile, entity.spawned + 1);
             useContent(tile, type);
 
-            for(ItemStack stack : consumes.items()){
-                entity.items.remove(stack.item, stack.amount);
-            }
+            entity.cons.trigger();
         }
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item && tile.entity.items.get(item) < stack.amount * 2){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
-        for(ItemStack stack : consumes.items()){
-            if(item == stack.item){
-                return stack.amount * 2;
-            }
-        }
-        return 0;
+        return capacities[item.id];
     }
 
     @Override
@@ -223,21 +210,12 @@ public class UnitFactory extends Block{
         return entity.spawned < maxSpawn;
     }
 
-    protected boolean hasRequirements(ItemModule inv, float fraction){
-        for(ItemStack stack : consumes.items()){
-            if(!inv.has(stack.item, (int) (fraction * stack.amount))){
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static class UnitFactoryEntity extends TileEntity{
-        public float buildTime;
-        public float time;
-        public float speedScl;
-        public float warmup; //only for enemy spawners
-        public int spawned;
+        float buildTime;
+        float time;
+        float speedScl;
+        float warmup; //only for enemy spawners
+        int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{

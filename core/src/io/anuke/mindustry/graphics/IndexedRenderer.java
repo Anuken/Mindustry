@@ -16,35 +16,35 @@ public class IndexedRenderer implements Disposable{
     private final static int vsize = 5;
 
     private Shader program = new Shader(
-        Strings.join("\n",
-        "attribute vec4 " + Shader.POSITION_ATTRIBUTE + ";",
-        "attribute vec4 " + Shader.COLOR_ATTRIBUTE + ";",
-        "attribute vec2 " + Shader.TEXCOORD_ATTRIBUTE + "0;",
-        "uniform mat4 u_projTrans;",
-        "varying vec4 v_color;",
-        "varying vec2 v_texCoords;",
-        "",
-        "void main(){",
-        "   v_color = " + Shader.COLOR_ATTRIBUTE + ";",
-        "   v_color.a = v_color.a * (255.0/254.0);",
-        "   v_texCoords = " + Shader.TEXCOORD_ATTRIBUTE + "0;",
-        "   gl_Position = u_projTrans * " + Shader.POSITION_ATTRIBUTE + ";",
-        "}"),
-        Strings.join("\n",
-        "#ifdef GL_ES",
-        "#define LOWP lowp",
-        "precision mediump float;",
-        "#else",
-        "#define LOWP ",
-        "#endif",
-        "",
-        "varying LOWP vec4 v_color;",
-        "varying vec2 v_texCoords;",
-        "uniform sampler2D u_texture;",
-        "",
-        "void main(){",
-        "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
-        "}"
+    Strings.join("\n",
+    "attribute vec4 " + Shader.POSITION_ATTRIBUTE + ";",
+    "attribute vec4 " + Shader.COLOR_ATTRIBUTE + ";",
+    "attribute vec2 " + Shader.TEXCOORD_ATTRIBUTE + "0;",
+    "uniform mat4 u_projTrans;",
+    "varying vec4 v_color;",
+    "varying vec2 v_texCoords;",
+    "",
+    "void main(){",
+    "   v_color = " + Shader.COLOR_ATTRIBUTE + ";",
+    "   v_color.a = v_color.a * (255.0/254.0);",
+    "   v_texCoords = " + Shader.TEXCOORD_ATTRIBUTE + "0;",
+    "   gl_Position = u_projTrans * " + Shader.POSITION_ATTRIBUTE + ";",
+    "}"),
+    Strings.join("\n",
+    "#ifdef GL_ES",
+    "#define LOWP lowp",
+    "precision mediump float;",
+    "#else",
+    "#define LOWP ",
+    "#endif",
+    "",
+    "varying LOWP vec4 v_color;",
+    "varying vec2 v_texCoords;",
+    "uniform sampler2D u_texture;",
+    "",
+    "void main(){",
+    "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
+    "}"
     ));
     private Mesh mesh;
     private float[] tmpVerts = new float[vsize * 6];
@@ -226,9 +226,9 @@ public class IndexedRenderer implements Disposable{
         if(mesh != null) mesh.dispose();
 
         mesh = new Mesh(true, 6 * sprites, 0,
-                new VertexAttribute(Usage.Position, 2, "a_position"),
-                new VertexAttribute(Usage.ColorPacked, 4, "a_color"),
-                new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"));
+        new VertexAttribute(Usage.Position, 2, "a_position"),
+        new VertexAttribute(Usage.ColorPacked, 4, "a_color"),
+        new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"));
         vertices = new float[6 * sprites * vsize];
         mesh.setVertices(vertices);
     }

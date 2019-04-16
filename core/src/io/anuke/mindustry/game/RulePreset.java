@@ -3,7 +3,7 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.Core;
 import io.anuke.arc.function.Supplier;
 
-/**Defines preset rule sets..*/
+/** Defines preset rule sets.. */
 public enum RulePreset{
     survival(() -> new Rules(){{
         waveTimer = true;
@@ -15,6 +15,7 @@ public enum RulePreset{
         infiniteResources = true;
         waves = true;
         waveTimer = false;
+        respawnTime = 0f;
         spawns = DefaultWaves.get();
     }}),
     attack(() -> new Rules(){{
@@ -25,6 +26,12 @@ public enum RulePreset{
         pvp = true;
         enemyCoreBuildRadius = 600f;
         respawnTime = 60 * 10;
+        buildCostMultiplier = 0.5f;
+        buildSpeedMultiplier = 2f;
+        playerDamageMultiplier = 0.45f;
+        playerHealthMultiplier = 0.8f;
+        unitBuildSpeedMultiplier = 3f;
+        unitHealthMultiplier = 2f;
     }});
 
     private final Supplier<Rules> rules;

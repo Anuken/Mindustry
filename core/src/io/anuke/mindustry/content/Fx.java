@@ -2,9 +2,7 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
@@ -32,25 +30,26 @@ public class Fx implements ContentList{
     plasticExplosion, artilleryTrail, incendTrail, missileTrail, absorb, flakExplosionBig, plasticExplosionFlak, burning, fire,
     fireSmoke, steam, fireballsmoke, ballfire, freezing, melting, wet, oily, overdriven, dropItem, shockwave,
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
-    shootBigSmoke2, shootSmallFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
+    shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch;
 
     @Override
     public void load(){
 
-        none = new Effect(0, 0f, e -> {});
+        none = new Effect(0, 0f, e -> {
+        });
 
         unitSpawn = new Effect(30f, e -> {
             if(!(e.data instanceof BaseUnit)) return;
 
             Draw.alpha(e.fin());
 
-            float scl = 1f + e.fout()*2f;
+            float scl = 1f + e.fout() * 2f;
 
             BaseUnit unit = (BaseUnit)e.data;
             Draw.rect(unit.getIconRegion(), e.x, e.y,
-                unit.getIconRegion().getWidth() * Draw.scl * scl, unit.getIconRegion().getWidth() * Draw.scl * scl, 180f);
+            unit.getIconRegion().getWidth() * Draw.scl * scl, unit.getIconRegion().getWidth() * Draw.scl * scl, 180f);
 
             Draw.reset();
         });
@@ -74,7 +73,7 @@ public class Fx implements ContentList{
             Lines.stroke(3f - e.fin() * 2f);
             Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
 
-            Angles.randLenVectors(e.id, 3 + (int) (e.rotation * 3), e.rotation * 2f + (tilesize * e.rotation) * e.finpow(), (x, y) -> {
+            Angles.randLenVectors(e.id, 3 + (int)(e.rotation * 3), e.rotation * 2f + (tilesize * e.rotation) * e.finpow(), (x, y) -> {
                 Fill.square(e.x + x, e.y + y, 1f + e.fout() * (3f + e.rotation));
             });
             Draw.reset();
@@ -106,7 +105,14 @@ public class Fx implements ContentList{
             Lines.poly(e.x, e.y, 4, 5f + e.fin() * 12f);
             Draw.reset();
         });
-        
+
+        padlaunch = new Effect(10, e -> {
+            Lines.stroke(4f * e.fout());
+            Draw.color(Pal.accent);
+            Lines.poly(e.x, e.y, 4, 5f + e.fin() * 60f);
+            Draw.reset();
+        });
+
         vtolHover = new Effect(40f, e -> {
             float len = e.finpow() * 10f;
             float ang = e.rotation + Mathf.randomSeedRange(e.id, 30f);
@@ -172,7 +178,7 @@ public class Fx implements ContentList{
 
             e.scaled(7f, s -> {
                 Lines.stroke(0.5f + s.fout());
-                Lines.circle(e.x, e.y, s.fin()*5f);
+                Lines.circle(e.x, e.y, s.fin() * 5f);
             });
 
 
@@ -191,7 +197,7 @@ public class Fx implements ContentList{
 
             e.scaled(7f, s -> {
                 Lines.stroke(0.5f + s.fout());
-                Lines.circle(e.x, e.y, s.fin()*7f);
+                Lines.circle(e.x, e.y, s.fin() * 7f);
             });
 
 
@@ -221,7 +227,7 @@ public class Fx implements ContentList{
             Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
             Lines.stroke(0.5f + e.fout());
 
-            Angles.randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+            Angles.randLenVectors(e.id, 2, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
                 float ang = Mathf.angle(x, y);
                 Lines.lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
             });
@@ -266,7 +272,7 @@ public class Fx implements ContentList{
         hitLaser = new Effect(8, e -> {
             Draw.color(Color.WHITE, Pal.heal, e.fin());
             Lines.stroke(0.5f + e.fout());
-            Lines.circle(e.x, e.y, e.fin()*5f);
+            Lines.circle(e.x, e.y, e.fin() * 5f);
             Draw.reset();
         });
 
@@ -532,7 +538,7 @@ public class Fx implements ContentList{
             Draw.color(Pal.accent);
 
             Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-                Fill.square(e.x + x, e.y + y, e.fout() * 2.3f+0.5f);
+                Fill.square(e.x + x, e.y + y, e.fout() * 2.3f + 0.5f);
             });
 
             Draw.color();
@@ -542,7 +548,7 @@ public class Fx implements ContentList{
             float length = 20f * e.finpow();
             float size = 7f * e.fout();
 
-            Draw.rect(((Item) e.data).icon(Icon.large), e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
+            Draw.rect(((Item)e.data).icon(Icon.large), e.x + Angles.trnsx(e.rotation, length), e.y + Angles.trnsy(e.rotation, length), size, size);
         });
 
 
@@ -607,23 +613,23 @@ public class Fx implements ContentList{
         dynamicExplosion = new Effect(30, e -> {
             float intensity = e.rotation;
 
-            e.scaled(5 + intensity*2, i -> {
+            e.scaled(5 + intensity * 2, i -> {
                 Lines.stroke(3.1f * i.fout());
                 Lines.poly(e.x, e.y, (int)(20 * intensity), (3f + i.fin() * 14f) * intensity);
             });
 
             Draw.color(Color.GRAY);
 
-            Angles.randLenVectors(e.id, e.finpow(), (int)(6 * intensity), 21f*intensity, (x, y, in, out) -> {
-                Fill.circle(e.x + x, e.y + y, out * (2f+intensity) * 3 + 0.5f);
+            Angles.randLenVectors(e.id, e.finpow(), (int)(6 * intensity), 21f * intensity, (x, y, in, out) -> {
+                Fill.circle(e.x + x, e.y + y, out * (2f + intensity) * 3 + 0.5f);
                 Fill.circle(e.x + x / 2f, e.y + y / 2f, out * (intensity) * 3);
             });
 
             Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.GRAY, e.fin());
             Lines.stroke((1.7f * e.fout()) * (1f + (intensity - 1f) / 2f));
 
-            Angles.randLenVectors(e.id + 1, e.finpow(), (int)(9*intensity), 40f*intensity, (x, y, in, out) -> {
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (3f+intensity));
+            Angles.randLenVectors(e.id + 1, e.finpow(), (int)(9 * intensity), 40f * intensity, (x, y, in, out) -> {
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (3f + intensity));
             });
 
             Draw.reset();
@@ -736,6 +742,16 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
+        shootPyraFlame = new Effect(33f, e -> {
+            Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.GRAY, e.fin());
+
+            Angles.randLenVectors(e.id, 10, e.finpow() * 50f, e.rotation, 10f, (x, y) -> {
+                Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
+            });
+
+            Draw.reset();
+        });
+
         shootLiquid = new Effect(40f, e -> {
             Draw.color(e.color, Color.WHITE, e.fout() / 6f + Mathf.randomSeedRange(e.id, 0.1f));
 
@@ -755,8 +771,8 @@ public class Fx implements ContentList{
             float len = (2f + e.finpow() * 6f) * i;
             float lr = rot + e.fin() * 30f * i;
             Fill.rect(e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
-                    e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-                    1f, 2f, rot + e.fin() * 50f * i);
+            e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+            1f, 2f, rot + e.fin() * 50f * i);
 
             Draw.color();
         });
@@ -768,9 +784,9 @@ public class Fx implements ContentList{
                 float len = (2f + e.finpow() * 10f) * i;
                 float lr = rot + e.fin() * 20f * i;
                 Draw.rect(Core.atlas.find("casing"),
-                        e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
-                        e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-                        2f, 3f, rot);
+                e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+                e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+                2f, 3f, rot);
             }
 
             Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
@@ -791,10 +807,10 @@ public class Fx implements ContentList{
                 float len = (4f + e.finpow() * 8f) * i;
                 float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
                 Draw.rect(Core.atlas.find("casing"),
-                        e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
-                        e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-                        2.5f, 4f,
-                        rot + e.fin() * 30f * i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.fin()));
+                e.x + Angles.trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+                e.y + Angles.trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+                2.5f, 4f,
+                rot + e.fin() * 30f * i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.fin()));
             }
 
             Draw.color(Color.LIGHT_GRAY);
@@ -1161,7 +1177,7 @@ public class Fx implements ContentList{
         healBlock = new Effect(20, e -> {
             Draw.color(Pal.heal);
             Lines.stroke(2f * e.fout() + 0.5f);
-            Lines.square(e.x, e.y, 1f + (e.fin() * e.rotation * tilesize/2f-1f));
+            Lines.square(e.x, e.y, 1f + (e.fin() * e.rotation * tilesize / 2f - 1f));
             Draw.color();
         });
 

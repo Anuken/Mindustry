@@ -22,13 +22,11 @@ public class ThermalGenerator extends PowerGenerator{
         if(entity.productionEfficiency > 0.1f && Mathf.chance(0.05 * entity.delta())){
             Effects.effect(generateEffect, tile.drawx() + Mathf.range(3f), tile.drawy() + Mathf.range(3f));
         }
-
-        super.update(tile);
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatDouble("blocks.efficiency", sumAttribute(Attribute.heat, x, y)*100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 100, 1), x, y, valid);
     }
 
     @Override

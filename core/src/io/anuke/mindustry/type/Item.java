@@ -16,22 +16,22 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     public final Color color;
     private TextureRegion[] regions;
 
-    /**type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}.*/
+    /** type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}. */
     public ItemType type = ItemType.resource;
-    /**how explosive this item is.*/
+    /** how explosive this item is. */
     public float explosiveness = 0f;
-    /**flammability above 0.3 makes this eleigible for item burners.*/
+    /** flammability above 0.3 makes this eleigible for item burners. */
     public float flammability = 0f;
-    /**how radioactive this item is. 0=none, 1=chernobyl ground zero*/
+    /** how radioactive this item is. 0=none, 1=chernobyl ground zero */
     public float radioactivity;
-    /**drill hardness of the item*/
+    /** drill hardness of the item */
     public int hardness = 0;
     /**
      * base material cost of this item, used for calculating place times
      * 1 cost = 1 tick added to build time
      */
     public float cost = 3f;
-    /**If true, item is always unlocked.*/
+    /** If true, item is always unlocked. */
     public boolean alwaysUnlocked = false;
 
     public Item(String name, Color color){
@@ -53,7 +53,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     @Override
-    public boolean alwaysUnlocked() {
+    public boolean alwaysUnlocked(){
         return alwaysUnlocked;
     }
 
@@ -69,7 +69,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.large);
+        return icon(Icon.xlarge);
     }
 
     @Override
@@ -88,10 +88,10 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     public enum Icon{
-        small(8*2),
-        medium(8*3),
-        large(8*4),
-        xlarge(8*5);
+        small(8 * 2),
+        medium(8 * 3),
+        large(8 * 4),
+        xlarge(8 * 5);
 
         public final int size;
 
@@ -100,7 +100,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         }
     }
 
-    /**Allocates a new array containing all items the generate ores.*/
+    /** Allocates a new array containing all items that generate ores. */
     public static Array<Item> getAllOres(){
         return content.blocks().select(b -> b instanceof OreBlock).map(b -> ((Floor)b).itemDrop);
     }

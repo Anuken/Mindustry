@@ -12,7 +12,8 @@ public class ItemVoid extends Block{
     }
 
     @Override
-    public void handleItem(Item item, Tile tile, Tile source){}
+    public void handleItem(Item item, Tile tile, Tile source){
+    }
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){

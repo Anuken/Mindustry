@@ -1,11 +1,10 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
-public class OreBlock extends Floor{
+/**An overlay ore for a specific item type.*/
+public class OreBlock extends OverlayFloor{
 
     public OreBlock(Item ore){
         super("ore-" + ore.name);
@@ -23,10 +22,5 @@ public class OreBlock extends Floor{
     @Override
     public String getDisplayName(Tile tile){
         return itemDrop.localizedName();
-    }
-
-    @Override
-    public void draw(Tile tile){
-        Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
     }
 }

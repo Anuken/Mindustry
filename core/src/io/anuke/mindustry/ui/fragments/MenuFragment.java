@@ -34,18 +34,18 @@ public class MenuFragment extends Fragment{
 
         //discord icon in top right
         parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
-                .visible(() -> state.is(State.menu)));
+        .visible(() -> state.is(State.menu)));
 
         //info icon
         if(mobile){
             parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
-                    .visible(() -> state.is(State.menu)));
+            .visible(() -> state.is(State.menu)));
         }
 
         //version info
         parent.fill(c -> c.bottom().left().add(Strings.format("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
-                (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
-                .visible(() -> state.is(State.menu)));
+        (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
+        .visible(() -> state.is(State.menu)));
     }
 
     private void buildMobile(){
@@ -57,13 +57,13 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
-            maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
-            custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
-            join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
-            editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
-            tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-            donate = new MobileButton("icon-donate", isize, "$donate", Platform.instance::openDonations);
+        play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
+        maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
+        custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
+        join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
+        editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
+        tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
+        donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL));
 
         if(Core.graphics.getWidth() > Core.graphics.getHeight()){
             container.add(play);

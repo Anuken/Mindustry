@@ -1,28 +1,25 @@
 package io.anuke.annotations;
 
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import io.anuke.annotations.Annotations.Struct;
 import io.anuke.annotations.Annotations.StructField;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic.Kind;
 import java.util.List;
 import java.util.Set;
 
-/**Generates ""value types"" classes that are packed into integer primitives of the most aproppriate size.
- * It would be nice if Java didn't make crazy hacks like this necessary.*/
+/**
+ * Generates ""value types"" classes that are packed into integer primitives of the most aproppriate size.
+ * It would be nice if Java didn't make crazy hacks like this necessary.
+ */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-    "io.anuke.annotations.Annotations.Struct"
+"io.anuke.annotations.Annotations.Struct"
 })
 public class StructAnnotationProcessor extends AbstractProcessor{
     /** Name of the base package to put all the generated classes. */
@@ -57,7 +54,7 @@ public class StructAnnotationProcessor extends AbstractProcessor{
                 String structParam = structName.toLowerCase();
 
                 TypeSpec.Builder classBuilder = TypeSpec.classBuilder(structName)
-                    .addModifiers(Modifier.FINAL, Modifier.PUBLIC);
+                .addModifiers(Modifier.FINAL, Modifier.PUBLIC);
 
                 try{
                     List<VariableElement> variables = ElementFilter.fieldsIn(elem.getEnclosedElements());
@@ -92,14 +89,14 @@ public class StructAnnotationProcessor extends AbstractProcessor{
 
                         //[get] field(structType) : fieldType
                         MethodSpec.Builder getter = MethodSpec.methodBuilder(var.getSimpleName().toString())
-                            .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                            .returns(varType)
-                            .addParameter(structType, structParam);
+                        .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                        .returns(varType)
+                        .addParameter(structType, structParam);
                         //[set] field(structType, fieldType) : structType
                         MethodSpec.Builder setter = MethodSpec.methodBuilder(var.getSimpleName().toString())
-                            .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                            .returns(structType)
-                            .addParameter(structType, structParam).addParameter(varType, "value");
+                        .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                        .returns(structType)
+                        .addParameter(structType, structParam).addParameter(varType, "value");
 
                         //[getter]
                         if(varType == TypeName.BOOLEAN){
@@ -129,7 +126,7 @@ public class StructAnnotationProcessor extends AbstractProcessor{
                             //floats: need conversion
                             setter.addStatement("return ($T)(($L & $L) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
                         }else{
-                            cons.append(" | (").append("(").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)");
+                            cons.append(" | (((").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)").append(" & ").append(bitString(offset, size, structTotalSize)).append(")");
 
                             //bytes, shorts, chars, ints
                             setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
@@ -209,7 +206,7 @@ public class StructAnnotationProcessor extends AbstractProcessor{
         throw new IllegalArgumentException("Too many fields, must fit in 64 bits. Curent size: " + size);
     }
 
-    /**returns a type's element size in bits.*/
+    /** returns a type's element size in bits. */
     static int typeSize(TypeKind kind) throws IllegalArgumentException{
         switch(kind){
             case BOOLEAN:

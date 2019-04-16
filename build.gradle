@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.5'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.6'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
         classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
     }
@@ -25,15 +25,15 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.9'
-        roboVMVersion = '2.3.0'
+        roboVMVersion = '2.3.6'
         arcHash = null
-        
+
         debugged = {
-            return new File(projectDir.parent, '../debug').exists() && System.properties["release"] == null
+            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release")
         }
 
         localArc = {
-            return (System.properties["release"] == null || System.properties["release"] == "false") && new File(projectDir.parent, '../Arc').exists()
+            return (!project.hasProperty("release")) && new File(projectDir.parent, '../Arc').exists()
         }
 
         getArcHash = {
@@ -43,7 +43,7 @@ allprojects{
                     arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
                 }catch(e){
                     e.printStackTrace()
-                    arcHash = "-SNAPSHOT";
+                    arcHash = "-SNAPSHOT"
                 }
             }
             return arcHash
@@ -89,7 +89,8 @@ allprojects{
 
             try{
                 pfile.createNewFile()
-            }catch(Exception ignored){}
+            }catch(Exception ignored){
+            }
 
             if(pfile.exists()){
                 props.load(new FileInputStream(pfile))
@@ -112,6 +113,7 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
+        jcenter()
     }
 }
 
@@ -121,14 +123,14 @@ project(":desktop"){
     dependencies{
         compile project(":core")
         compile project(":net")
-        
+
         if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
     }
 }
 
@@ -156,9 +158,10 @@ project(":ios"){
     dependencies{
         compile project(":core")
         compile project(":net")
+        compileOnly project(":annotations")
 
         compile arcModule("backends:backend-robovm")
-        
+
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
@@ -199,6 +202,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
+        //compile arcModule("extensions:postprocessing")
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")

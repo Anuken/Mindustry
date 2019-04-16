@@ -47,7 +47,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation
-                && dst(target) < Math.max(getWeapon().bullet.range(), type.range)){
+                && dst(target) < getWeapon().bullet.range()){
                     BulletType ammo = getWeapon().bullet;
 
                     if(type.rotateWeapon){
@@ -75,8 +75,9 @@ public abstract class FlyingUnit extends BaseUnit{
                 targetClosest();
                 targetClosestEnemyFlag(BlockFlag.target);
 
-                if(target != null){
+                if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
+                    return;
                 }
 
                 target = getClosestCore();
@@ -126,11 +127,11 @@ public abstract class FlyingUnit extends BaseUnit{
     public void drawEngine(){
         Draw.color(Pal.engine);
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset), y + Angles.trnsy(rotation + 180, type.engineOffset),
-                type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize/4f));
+        type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f));
 
         Draw.color(Color.WHITE);
-        Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset-1f), y + Angles.trnsy(rotation + 180, type.engineOffset-1f),
-        (type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize/4f)) / 2f);
+        Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset - 1f), y + Angles.trnsy(rotation + 180, type.engineOffset - 1f),
+        (type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f)) / 2f);
         Draw.color();
     }
 
@@ -140,7 +141,7 @@ public abstract class FlyingUnit extends BaseUnit{
         if(Units.invalidateTarget(target, this)){
             for(boolean left : Mathf.booleans){
                 int wi = Mathf.num(left);
-                weaponAngles[wi] = Mathf.slerpDelta(weaponAngles[wi],rotation, 0.1f);
+                weaponAngles[wi] = Mathf.slerpDelta(weaponAngles[wi], rotation, 0.1f);
             }
         }
     }
@@ -153,8 +154,8 @@ public abstract class FlyingUnit extends BaseUnit{
     protected void wobble(){
         if(Net.client()) return;
 
-        x += Mathf.sin(Time.time() + id * 999, 25f, 0.05f)*Time.delta();
-        y += Mathf.cos(Time.time() + id * 999, 25f, 0.05f)*Time.delta();
+        x += Mathf.sin(Time.time() + id * 999, 25f, 0.05f) * Time.delta();
+        y += Mathf.cos(Time.time() + id * 999, 25f, 0.05f) * Time.delta();
 
         if(velocity.len() <= 0.05f){
             //rotation += Mathf.sin(Time.time() + id * 99, 10f, 2f * type.speed)*Time.delta();

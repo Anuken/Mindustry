@@ -44,9 +44,11 @@ public class Mech extends UnlockableContent{
         return Core.bundle.get("mech." + name + ".name");
     }
 
-    public void updateAlt(Player player){}
+    public void updateAlt(Player player){
+    }
 
-    public void draw(Player player){}
+    public void draw(Player player){
+    }
 
     public float getExtraArmor(Player player){
         return 0f;
@@ -56,13 +58,16 @@ public class Mech extends UnlockableContent{
         return 0f;
     }
 
-    public float getRotationAlpha(Player player){return 1f;}
+    public float getRotationAlpha(Player player){
+        return 1f;
+    }
 
     public boolean canShoot(Player player){
         return true;
     }
 
-    public void onLand(Player player){}
+    public void onLand(Player player){
+    }
 
     @Override
     public void displayInfo(Table table){

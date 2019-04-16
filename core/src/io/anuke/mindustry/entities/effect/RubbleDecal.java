@@ -11,7 +11,7 @@ public class RubbleDecal extends Decal{
     private static final TextureRegion[][] regions = new TextureRegion[16][0];
     private TextureRegion region;
 
-    /**Creates a rubble effect at a position. Provide a block size to use.*/
+    /** Creates a rubble effect at a position. Provide a block size to use. */
     public static void create(float x, float y, int size){
         if(headless) return;
 

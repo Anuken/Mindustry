@@ -6,10 +6,8 @@ import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Teams;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.TeamData;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
@@ -71,8 +69,6 @@ public class NetworkIO{
 
     public static void loadWorld(InputStream is){
 
-        Player player = players[0];
-
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
 
@@ -127,7 +123,7 @@ public class NetworkIO{
                     state.teams.get(team).cores.add(world.tile(stream.readInt()));
                 }
 
-                if(team == players[0].getTeam() && cores > 0){
+                if(team == player.getTeam() && cores > 0){
                     Core.camera.position.set(state.teams.get(team).cores.first().drawx(), state.teams.get(team).cores.first().drawy());
                 }
             }
@@ -140,7 +136,7 @@ public class NetworkIO{
     public static ByteBuffer writeServerData(){
         int maxlen = 32;
 
-        String host = (headless ? "Server" : players[0].name);
+        String host = (headless ? "Server" : player.name);
         String map = world.getMap() == null ? "None" : world.getMap().name();
 
         host = host.substring(0, Math.min(host.length(), maxlen));
@@ -148,10 +144,10 @@ public class NetworkIO{
 
         ByteBuffer buffer = ByteBuffer.allocate(128);
 
-        buffer.put((byte) host.getBytes(charset).length);
+        buffer.put((byte)host.getBytes(charset).length);
         buffer.put(host.getBytes(charset));
 
-        buffer.put((byte) map.getBytes(charset).length);
+        buffer.put((byte)map.getBytes(charset).length);
         buffer.put(map.getBytes(charset));
 
         buffer.putInt(playerGroup.size());

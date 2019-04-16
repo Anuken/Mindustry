@@ -2,9 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.mindustry.net.Packets.StreamBegin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class Streamable implements Packet{
     public transient ByteArrayInputStream stream;
@@ -36,7 +34,7 @@ public class Streamable implements Packet{
         }
 
         public Streamable build(){
-            Streamable s = (Streamable) Registrator.getByID(type).constructor.get();
+            Streamable s = (Streamable)Registrator.getByID(type).constructor.get();
             s.stream = new ByteArrayInputStream(stream.toByteArray());
             return s;
         }

@@ -7,7 +7,6 @@ import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.MapIO;
@@ -19,11 +18,11 @@ import java.io.StringWriter;
 import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
-    /** List of all built-in maps. Filenames only.*/
+    /** List of all built-in maps. Filenames only. */
     private static final String[] defaultMapNames = {"fortress"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
-    /** Serializer for meta.*/
+    /** Serializer for meta. */
     private Json json = new Json();
 
     public Maps(){
@@ -65,7 +64,6 @@ public class Maps implements Disposable{
 
     /** Load all maps. Should be called at application start. */
     public void load(){
-        Time.mark();
         try{
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
@@ -76,11 +74,17 @@ public class Maps implements Disposable{
         }
 
         loadCustomMaps();
-        Log.info("Time to load maps: {0}", Time.elapsed());
     }
 
-    /** Save a custom map to the directory. This updates all values and stored data necessary.
-     * The tags are copied to prevent mutation later.*/
+    public void reload(){
+        dispose();
+        load();
+    }
+
+    /**
+     * Save a custom map to the directory. This updates all values and stored data necessary.
+     * The tags are copied to prevent mutation later.
+     */
     public void saveMap(ObjectMap<String, String> baseTags, Tile[][] data){
 
         try{
@@ -160,12 +164,12 @@ public class Maps implements Disposable{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
-    /** Find a new filename to put a map to.*/
+    /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
         int i = maps.size;
         while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
-            i ++;
+            i++;
         }
         return customMapDirectory.child("map_" + i + "." + mapExtension);
     }

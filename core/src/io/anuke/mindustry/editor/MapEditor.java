@@ -68,7 +68,7 @@ public class MapEditor{
     //adds missing blockparts
     public void checkLinkedTiles(){
         //clear block parts first
-        for(int x = 0; x < width(); x ++){
+        for(int x = 0; x < width(); x++){
             for(int y = 0; y < height(); y++){
                 if(tiles[x][y].block() == Blocks.part){
                     tiles[x][y].setBlock(Blocks.air);
@@ -78,8 +78,8 @@ public class MapEditor{
         }
 
         //set up missing blockparts
-        for(int x = 0; x < width(); x ++){
-            for(int y = 0; y < height(); y ++){
+        for(int x = 0; x < width(); x++){
+            for(int y = 0; y < height(); y++){
                 Block drawBlock = tiles[x][y].block();
                 if(drawBlock.isMultiblock()){
                     int offsetx = -(drawBlock.size - 1) / 2;
@@ -92,7 +92,7 @@ public class MapEditor{
                             if(Structs.inBounds(worldx, worldy, width(), height()) && !(dx + offsetx == 0 && dy + offsety == 0)){
                                 Tile tile = tiles[worldx][worldy];
                                 tile.setBlock(Blocks.part);
-                                tile.setLinkByte(Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
                             }
                         }
                     }
@@ -107,7 +107,7 @@ public class MapEditor{
         loading = false;
     }
 
-    /**Creates a 2-D array of EditorTiles with stone as the floor block.*/
+    /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     public Tile[][] createTiles(int width, int height){
         tiles = new Tile[width][height];
 
@@ -146,6 +146,27 @@ public class MapEditor{
         return tiles[0].length;
     }
 
+    public void updateLinks(Block block, int x, int y){
+        int offsetx = -(block.size - 1) / 2;
+        int offsety = -(block.size - 1) / 2;
+
+        for(int dx = 0; dx < block.size; dx++){
+            for(int dy = 0; dy < block.size; dy++){
+                int worldx = dx + offsetx + x;
+                int worldy = dy + offsety + y;
+
+                if(Structs.inBounds(worldx, worldy, width(), height())){
+                    Tile tile = tiles[worldx][worldy];
+
+                    if(!(worldx == x && worldy == y)){
+                        tile.setBlock(Blocks.part);
+                        tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
+                    }
+                }
+            }
+        }
+    }
+
     public void draw(int x, int y, boolean paint){
         draw(x, y, paint, drawBlock);
     }
@@ -158,9 +179,9 @@ public class MapEditor{
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
 
         if(drawBlock.isMultiblock()){
-            
-            x = Mathf.clamp(x, (drawBlock.size-1)/2, width() - drawBlock.size/2 - 1);
-            y = Mathf.clamp(y, (drawBlock.size-1)/2, height() - drawBlock.size/2 - 1);
+
+            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
 
             int offsetx = -(drawBlock.size - 1) / 2;
             int offsety = -(drawBlock.size - 1) / 2;
@@ -176,7 +197,7 @@ public class MapEditor{
 
                             if(i == 1){
                                 tile.setBlock(Blocks.part);
-                                tile.setLinkByte(Pack.byteByte((byte) (dx + offsetx + 8), (byte) (dy + offsety + 8)));
+                                tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
                             }else{
                                 byte link = tile.getLinkByte();
                                 Block block = tile.block();
@@ -258,7 +279,7 @@ public class MapEditor{
         clearOp();
 
         Tile[][] previous = tiles;
-        int offsetX = -(width - width())/2, offsetY = -(height - height())/2;
+        int offsetX = -(width - width()) / 2, offsetY = -(height - height()) / 2;
         loading = true;
 
         tiles = new Tile[width][height];

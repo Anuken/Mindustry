@@ -1,19 +1,23 @@
 package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.LiquidDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.content;
 
 public class LiquidFilterValue implements StatValue{
     private final Predicate<Liquid> filter;
+    private final float amount;
+    private final boolean perSecond;
 
-    public LiquidFilterValue(Predicate<Liquid> filter){
+    public LiquidFilterValue(Predicate<Liquid> filter, float amount, boolean perSecond){
         this.filter = filter;
+        this.amount = amount;
+        this.perSecond = perSecond;
     }
 
     @Override
@@ -25,7 +29,7 @@ public class LiquidFilterValue implements StatValue{
         }
 
         for(int i = 0; i < list.size; i++){
-            table.add(new LiquidDisplay(list.get(i))).padRight(5);
+            table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
 
             if(i != list.size - 1){
                 table.add("/");

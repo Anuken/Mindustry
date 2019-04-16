@@ -3,13 +3,12 @@ package io.anuke.mindustry.world;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 
-/**A tile which does not trigger change events and whose entity types are cached.
- * Prevents garbage when loading previews.*/
+/**
+ * A tile which does not trigger change events and whose entity types are cached.
+ * Prevents garbage when loading previews.
+ */
 public class CachedTile extends Tile{
     private static IntMap<TileEntity> entities = new IntMap<>();
 

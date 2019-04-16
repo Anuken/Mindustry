@@ -3,17 +3,16 @@ package io.anuke.mindustry.world.blocks.production;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Liquids;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
@@ -22,41 +21,34 @@ import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.content;
 
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;
-    protected final int timerDump = timers++;
 
-    protected final Array<Tile> drawTiles = new Array<>();
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
     protected final Array<Item> itemArray = new Array<>();
 
-    /**Maximum tier of blocks this drill can mine.*/
+    /** Maximum tier of blocks this drill can mine. */
     protected int tier;
-    /**Base time to drill one ore, in frames.*/
+    /** Base time to drill one ore, in frames. */
     protected float drillTime = 300;
-    /**Whether the liquid is required to drill. If false, then it will be used as a speed booster.*/
-    protected boolean liquidRequired = false;
-    /**How many times faster the drill will progress when boosted by liquid.*/
+    /** How many times faster the drill will progress when boosted by liquid. */
     protected float liquidBoostIntensity = 1.6f;
-    /**Speed at which the drill speeds up.*/
+    /** Speed at which the drill speeds up. */
     protected float warmupSpeed = 0.02f;
 
-    /**Whether to draw the item this drill is mining.*/
+    /** Whether to draw the item this drill is mining. */
     protected boolean drawMineItem = false;
-    /**Effect played when an item is produced. This is colored.*/
+    /** Effect played when an item is produced. This is colored. */
     protected Effect drillEffect = Fx.mine;
-    /**Speed the drill bit rotates at.*/
+    /** Speed the drill bit rotates at. */
     protected float rotateSpeed = 2f;
-    /**Effect randomly played while drilling.*/
+    /** Effect randomly played while drilling. */
     protected Effect updateEffect = Fx.pulverizeSmall;
-    /**Chance the update effect will appear.*/
+    /** Chance the update effect will appear. */
     protected float updateEffectChance = 0.02f;
 
     protected boolean drawRim = false;
@@ -75,8 +67,6 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-
-        consumes.liquid(Liquids.water, 0.05f).optional(true);
     }
 
     @Override
@@ -86,7 +76,7 @@ public class Drill extends Block{
         bars.add("drillspeed", e -> {
             DrillEntity entity = (DrillEntity)e;
 
-            return new Bar(() -> Core.bundle.format("blocks.outputspeed", Strings.toFixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
+            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale, 2)), () -> Pal.ammo, () -> entity.warmup);
         });
     }
 
@@ -162,6 +152,7 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        stats.add(BlockStat.boostEffect, liquidBoostIntensity, StatUnit.timesSpeed);
     }
 
     @Override
@@ -182,8 +173,13 @@ public class Drill extends Block{
                 itemArray.add(item);
             }
 
-            itemArray.sort((item1, item2) -> Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0)));
-            itemArray.sort((item1, item2) -> Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material));
+            itemArray.sort((item1, item2) -> {
+                int type = Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material);
+                if(type != 0) return type;
+                int count = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+                if(count != 0) return count;
+                return Integer.compare(item1.id, item2.id);
+            });
 
             if(itemArray.size == 0){
                 return;
@@ -195,8 +191,8 @@ public class Drill extends Block{
 
         float totalHardness = entity.dominantItems * entity.dominantItem.hardness;
 
-        if(entity.timer.get(timerDump, 15)){
-            tryDump(tile);
+        if(entity.timer.get(timerDump, dumpTime)){
+            tryDump(tile, entity.dominantItem);
         }
 
         entity.drillTime += entity.warmup * entity.delta();
@@ -205,9 +201,10 @@ public class Drill extends Block{
 
             float speed = 1f;
 
-            if(entity.consumed(ConsumeLiquid.class) && !liquidRequired){
+            if(entity.cons.optionalValid()){
                 speed = liquidBoostIntensity;
             }
+
             if(hasPower){
                 speed *= entity.power.satisfaction; // Drill slower when not at full power
             }
@@ -226,7 +223,7 @@ public class Drill extends Block{
         }
 
         if(entity.dominantItems > 0 && entity.progress >= drillTime + hardnessDrillMultiplier * Math.max(totalHardness, 1f) / entity.dominantItems
-                && tile.entity.items.total() < itemCapacity){
+        && tile.entity.items.total() < itemCapacity){
 
             offloadNear(tile, entity.dominantItem);
 
@@ -236,7 +233,7 @@ public class Drill extends Block{
             entity.progress = 0f;
 
             Effects.effect(drillEffect, entity.dominantItem.color,
-                    entity.x + Mathf.range(size), entity.y + Mathf.range(size));
+            entity.x + Mathf.range(size), entity.y + Mathf.range(size));
         }
     }
 
@@ -270,14 +267,14 @@ public class Drill extends Block{
     }
 
     public static class DrillEntity extends TileEntity{
-        public float progress;
-        public int index;
-        public float warmup;
-        public float drillTime;
-        public float lastDrillSpeed;
+        float progress;
+        int index;
+        float warmup;
+        float drillTime;
+        float lastDrillSpeed;
 
-        public int dominantItems;
-        public Item dominantItem;
+        int dominantItems;
+        Item dominantItem;
     }
 
 }

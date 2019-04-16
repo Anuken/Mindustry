@@ -6,8 +6,9 @@ sourceSets.main.java.srcDirs = ["src/"]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-import com.badlogicgames.packr.PackrConfig
+
 import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.PackrConfig
 
 def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/sprites/icon.icns")
@@ -83,6 +84,8 @@ task packrCmd(){
             outDir = file("packr-out/")
             mainClass = project.ext.mainClassName
             classpath = ["desktop/build/libs/desktop-release.jar"]
+            removePlatformLibs = ["desktop/build/libs/desktop-release.jar"]
+
             vmArgs = ["Djava.net.preferIPv4Stack=true"]
             minimizeJre = "desktop/packr_minimize.json"
             jdk = JDK_DIR + "jdk-${getPlatform().toString().toLowerCase()}.zip"
@@ -93,6 +96,20 @@ task packrCmd(){
         }
 
         new Packr().pack(config)
+    }
+}
+
+task copyTemplate(){
+    doLast{
+        copy{
+            into "packr-out/"
+            from "${JDK_DIR}/templates/${getPlatform().toString().toLowerCase()}"
+        }
+
+        copy{
+            into "packr-out/"
+            from "build/libs/desktop-release.jar"
+        }
     }
 }
 
@@ -130,18 +147,23 @@ task packrZip(){
             }
         }
     }
-    
-    dependsOn "packrCmd"
+
     finalizedBy "clearOut"
 
     if(project.hasProperty("platform")){
+        def plat = getPlatform()
+        if(plat == PackrConfig.Platform.Windows32 || plat == PackrConfig.Platform.Windows64){
+            dependsOn "copyTemplate"
+        }else{
+            dependsOn "packrCmd"
 
-        if(getPlatform() == "mac"){
-            dependsOn "fixMac"
-        }
+            if(getPlatform() == PackrConfig.Platform.MacOS){
+                dependsOn "fixMac"
+            }
 
-        if(getPlatform() == "windows32"){
-            dependsOn "fixWindows32"
+            if(getPlatform() == PackrConfig.Platform.Windows32){
+                dependsOn "fixWindows32"
+            }
         }
 
         task rzip(type: Zip){

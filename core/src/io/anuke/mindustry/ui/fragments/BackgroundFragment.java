@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.core.GameState.State;
@@ -23,13 +21,13 @@ public class BackgroundFragment extends Fragment{
             Draw.shader();
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
-            float logoscl = (int) Unit.dp.scl(1);
+            float logoscl = (int)Unit.dp.scl(1);
             TextureRegion logo = Core.atlas.find("logotext");
             float logow = logo.getWidth() * logoscl;
             float logoh = logo.getHeight() * logoscl;
 
             Draw.color();
-            Draw.rect(logo, (int) (w / 2), (int) (h - 10 - logoh - Unit.dp.scl(portrait ? 30f : 0)) + logoh/2, logow, logoh);
+            Draw.rect(logo, (int)(w / 2), (int)(h - 10 - logoh - Unit.dp.scl(portrait ? 30f : 0)) + logoh / 2, logow, logoh);
         }).visible(() -> state.is(State.menu)).grow();
     }
 }

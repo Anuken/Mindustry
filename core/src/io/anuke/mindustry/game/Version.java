@@ -9,15 +9,15 @@ import io.anuke.arc.util.io.PropertiesUtils;
 import java.io.IOException;
 
 public class Version{
-    /**Build type. 'official' for official releases; 'custom' or 'bleeding edge' are also used.*/
+    /** Build type. 'official' for official releases; 'custom' or 'bleeding edge' are also used. */
     public static String type;
-    /**Build modifier, e.g. 'alpha' or 'release'*/
+    /** Build modifier, e.g. 'alpha' or 'release' */
     public static String modifier;
-    /**Number specifying the major version, e.g. '4'*/
+    /** Number specifying the major version, e.g. '4' */
     public static int number;
-    /**Build number, e.g. '43'. set to '-1' for custom builds.*/
+    /** Build number, e.g. '43'. set to '-1' for custom builds. */
     public static int build = 0;
-    /**Revision number. Used for hotfixes. Does not affect server compatibility.*/
+    /** Revision number. Used for hotfixes. Does not affect server compatibility. */
     public static int revision = 0;
 
     public static void init(){

@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class Image {
+class Image{
     private static ArrayList<Image> toDispose = new ArrayList<>();
 
     private BufferedImage image;
@@ -63,31 +63,31 @@ class Image {
         graphics.fillRect(x, y, 1, 1);
     }
 
-    /**Draws a region at the top left corner.*/
+    /** Draws a region at the top left corner. */
     void draw(TextureRegion region){
         draw(region, 0, 0, false, false);
     }
 
-    /**Draws a region at the center.*/
+    /** Draws a region at the center. */
     void drawCenter(TextureRegion region){
-        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, false, false);
+        draw(region, (width() - region.getWidth()) / 2, (height() - region.getHeight()) / 2, false, false);
     }
 
-    /**Draws a region at the center.*/
+    /** Draws a region at the center. */
     void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
+        draw(region, (width() - region.getWidth()) / 2, (height() - region.getHeight()) / 2, flipx, flipy);
     }
 
     void drawScaled(Image image){
         graphics.drawImage(image.image.getScaledInstance(width(), height(), java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width(), height(), null);
     }
 
-    /**Draws an image at the top left corner.*/
+    /** Draws an image at the top left corner. */
     void draw(Image image){
         draw(image, 0, 0);
     }
 
-    /**Draws an image at the coordinates specified.*/
+    /** Draws an image at the coordinates specified. */
     void draw(Image image, int x, int y){
         graphics.drawImage(image.image, x, y, null);
     }
@@ -102,21 +102,21 @@ class Image {
         int ofx = 0, ofy = 0;
 
         graphics.drawImage(ImagePacker.get(region).image,
-                x, y,
-                x + region.getWidth(),
-                y + region.getHeight(),
-                (flipx ? region.getWidth() : 0) + ofx,
-                (flipy ? region.getHeight() : 0) + ofy,
-                (flipx ? 0 : region.getWidth()) + ofx,
-                (flipy ? 0 : region.getHeight()) + ofy,
-                null);
+        x, y,
+        x + region.getWidth(),
+        y + region.getHeight(),
+        (flipx ? region.getWidth() : 0) + ofx,
+        (flipy ? region.getHeight() : 0) + ofy,
+        (flipx ? 0 : region.getWidth()) + ofx,
+        (flipy ? 0 : region.getHeight()) + ofy,
+        null);
     }
 
-    /** @param name Name of texture file name to create, without any extensions.*/
+    /** @param name Name of texture file name to create, without any extensions. */
     void save(String name){
-        try {
+        try{
             ImageIO.write(image, "png", new File(name + ".png"));
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }

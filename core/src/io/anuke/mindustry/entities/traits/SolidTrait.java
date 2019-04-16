@@ -1,11 +1,9 @@
 package io.anuke.mindustry.entities.traits;
 
 
-import io.anuke.mindustry.entities.EntityQuery;
-import io.anuke.arc.math.geom.Position;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.math.geom.QuadTree.QuadTreeObject;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.mindustry.entities.EntityQuery;
 
 public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, Entity, Position{
 
@@ -35,7 +33,8 @@ public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, En
         return true;
     }
 
-    default void collision(SolidTrait other, float x, float y){}
+    default void collision(SolidTrait other, float x, float y){
+    }
 
     default void move(float x, float y){
         EntityQuery.collisions().move(this, x, y);

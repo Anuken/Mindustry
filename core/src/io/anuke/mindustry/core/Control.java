@@ -1,30 +1,23 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureAtlas;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.scene.ui.Dialog;
+import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.GlobalData;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.Saves;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.Binding;
-import io.anuke.mindustry.input.DesktopInput;
-import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.input.MobileInput;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -32,6 +25,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
+import java.nio.IntBuffer;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -48,9 +42,13 @@ public class Control implements ApplicationListener{
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
-    private InputHandler[] inputs = {};
+    private InputHandler input;
 
     public Control(){
+        IntBuffer buf = BufferUtils.newIntBuffer(1);
+        Core.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
+        int maxSize = buf.get(0);
+
         saves = new Saves();
         data = new GlobalData();
 
@@ -59,7 +57,7 @@ public class Control implements ApplicationListener{
         Effects.setShakeFalloff(10000f);
 
         content.initialize(Content::init);
-        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
+        Core.atlas = new TextureAtlas(maxSize < 2048 ? "sprites/sprites_fallback.atlas" : "sprites/sprites.atlas");
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load);
 
@@ -76,7 +74,7 @@ public class Control implements ApplicationListener{
             "lastBuild", 0
         );
 
-        addPlayer(0);
+        createPlayer();
 
         saves.load();
 
@@ -87,21 +85,17 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, event -> {
-            for(Player player : players){
-                player.add();
-            }
+            player.add();
 
             state.set(State.playing);
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.camera.position.set(players[0]));
+            Core.app.post(() -> Core.app.post(() -> Core.camera.position.set(player)));
         });
 
         Events.on(ResetEvent.class, event -> {
-            for(Player player : players){
-                player.reset();
-            }
+            player.reset();
 
             hiscore = false;
 
@@ -135,7 +129,7 @@ public class Control implements ApplicationListener{
             if(state.rules.pvp && !Net.active()){
                 try{
                     Net.host(port);
-                    players[0].isAdmin = true;
+                    player.isAdmin = true;
                 }catch(IOException e){
                     ui.showError(Core.bundle.format("server.error", Strings.parseException(e, false)));
                     Core.app.post(() -> state.set(State.menu));
@@ -146,29 +140,29 @@ public class Control implements ApplicationListener{
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == players[0].getTeam()){
+            if(e.team == player.getTeam()){
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
-                    state.stats.buildingsBuilt ++;
+                    state.stats.buildingsBuilt++;
                 }
             }
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.getTeam() == players[0].getTeam()){
-                state.stats.buildingsDestroyed ++;
+            if(e.tile.getTeam() == player.getTeam()){
+                state.stats.buildingsDestroyed++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.getTeam() != players[0].getTeam()){
-                state.stats.enemyUnitsDestroyed ++;
+            if(e.unit.getTeam() != player.getTeam()){
+                state.stats.enemyUnitsDestroyed++;
             }
         });
 
-        Events.on(ZoneCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.complete", e.zone.conditionWave));
+        Events.on(ZoneRequireCompleteEvent.class, e -> {
+            ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", state.wave, e.zone.localizedName));
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
@@ -176,65 +170,29 @@ public class Control implements ApplicationListener{
         });
     }
 
-    public void addPlayer(int index){
-        if(players.length != index + 1){
-            Player[] old = players;
-            players = new Player[index + 1];
-            System.arraycopy(old, 0, players, 0, old.length);
-        }
-
-        if(inputs.length != index + 1){
-            InputHandler[] oldi = inputs;
-            inputs = new InputHandler[index + 1];
-            System.arraycopy(oldi, 0, inputs, 0, oldi.length);
-        }
-
-        Player setTo = (index == 0 ? null : players[0]);
-
-        Player player = new Player();
+    void createPlayer(){
+        player = new Player();
         player.name = Core.settings.getString("name");
         player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
-        player.color.set(Core.settings.getInt("color-" + index));
+        player.color.set(Core.settings.getInt("color-0"));
         player.isLocal = true;
-        player.playerIndex = index;
         player.isMobile = mobile;
-        players[index] = player;
 
-        if(setTo != null){
-            player.set(setTo.x, setTo.y);
+        if(mobile){
+            input = new MobileInput();
+        }else{
+            input = new DesktopInput();
         }
 
         if(!state.is(State.menu)){
             player.add();
         }
 
-        InputHandler input;
-
-        if(mobile){
-            input = new MobileInput(player);
-        }else{
-            input = new DesktopInput(player);
-        }
-
-        inputs[index] = input;
         Core.input.addProcessor(input);
     }
 
-    public void removePlayer(){
-        players[players.length - 1].remove();
-        inputs[inputs.length - 1].remove();
-
-        Player[] old = players;
-        players = new Player[players.length - 1];
-        System.arraycopy(old, 0, players, 0, players.length);
-
-        InputHandler[] oldi = inputs;
-        inputs = new InputHandler[inputs.length - 1];
-        System.arraycopy(oldi, 0, inputs, 0, inputs.length);
-    }
-
-    public InputHandler input(int index){
-        return inputs[index];
+    public InputHandler input(){
+        return input;
     }
 
     public void playMap(Map map, Rules rules){
@@ -255,8 +213,6 @@ public class Control implements ApplicationListener{
         content.dispose();
         Net.dispose();
         ui.editor.dispose();
-        inputs = new InputHandler[]{};
-        players = new Player[]{};
     }
 
     @Override
@@ -288,9 +244,9 @@ public class Control implements ApplicationListener{
                     Core.settings.save();
                 }).size(100f, 60f);
                 dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final v4 release.[]\n\n " +
-                        "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
-                        "All current art and UI is unfinished, and will be changed before release. " +
-                        "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
+                "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
+                "All current art and UI is unfinished, and will be changed before release. " +
+                "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
         }
@@ -300,20 +256,16 @@ public class Control implements ApplicationListener{
     public void update(){
         saves.update();
 
-        for(InputHandler inputHandler : inputs){
-            inputHandler.updateController();
-        }
+        input.updateController();
 
         //autosave global data if it's modified
         data.checkSave();
 
         if(!state.is(State.menu)){
-            for(InputHandler input : inputs){
-                input.update();
-            }
+            input.update();
 
             if(world.isZone()){
-                for(Tile tile : state.teams.get(players[0].getTeam()).cores){
+                for(Tile tile : state.teams.get(player.getTeam()).cores){
                     for(Item item : content.items()){
                         if(tile.entity.items.has(item)){
                             data.unlockContent(item);
@@ -340,9 +292,17 @@ public class Control implements ApplicationListener{
                 }
             }
 
+            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !ui.chatfrag.chatOpen()){
+                renderer.takeMapScreenshot();
+            }
+
         }else{
             if(!state.isPaused()){
                 Time.update();
+            }
+
+            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
+                Platform.instance.hide();
             }
         }
     }

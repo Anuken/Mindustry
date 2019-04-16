@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.bullet.BulletType;
@@ -11,11 +12,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.ItemFilterValue;
+import io.anuke.mindustry.world.meta.values.AmmoListValue;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 30;
@@ -26,9 +25,9 @@ public class ItemTurret extends CooledTurret{
         hasItems = true;
     }
 
-    /**Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...]*/
+    /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     protected void ammo(Object... objects){
-        ammo = ObjectMap.of(objects);
+        ammo = OrderedMap.of(objects);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class ItemTurret extends CooledTurret{
         super.setStats();
 
         stats.remove(BlockStat.itemCapacity);
-        stats.add(BlockStat.inputItems, new ItemFilterValue(item -> ammo.containsKey(item)));
+        stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
     }
 
 
@@ -58,7 +57,7 @@ public class ItemTurret extends CooledTurret{
 
         if(type == null) return 0;
 
-        return Math.min((int) ((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
+        return Math.min((int)((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class ItemTurret extends CooledTurret{
         }
 
         //must not be found
-        entity.ammo.add(new ItemEntry(item, (int) type.ammoMultiplier));
+        entity.ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
     }
 
     @Override

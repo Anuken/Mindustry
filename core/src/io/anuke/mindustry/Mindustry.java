@@ -1,8 +1,6 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.ApplicationCore;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.*;
@@ -55,7 +53,7 @@ public class Mindustry extends ApplicationCore{
         int fpsCap = Core.settings.getInt("fpscap", 125);
 
         if(fpsCap <= 120){
-            long target = (1000 * 1000000)/fpsCap; //target in nanos
+            long target = (1000 * 1000000) / fpsCap; //target in nanos
             long elapsed = Time.timeSinceNanos(lastFrameTime);
             if(elapsed < target){
                 try{

@@ -74,7 +74,7 @@ public class EntityQuery{
         float cdist = 0f;
         Array<SolidTrait> entities = getNearby(group, x, y, range * 2f);
         for(int i = 0; i < entities.size; i++){
-            T e = (T) entities.get(i);
+            T e = (T)entities.get(i);
             if(!pred.test(e))
                 continue;
 

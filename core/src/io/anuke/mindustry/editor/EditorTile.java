@@ -6,12 +6,8 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.ui;
 
@@ -28,19 +24,19 @@ public class EditorTile extends Tile{
 
     @Override
     public void setFloor(Floor type){
-        if(type instanceof OreBlock){
+        if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(!floor().isLiquid) setOreByte(type.id);
+            setOverlayID(type.id);
             return;
         }
 
         Block previous = floor();
-        Block ore = ore();
+        Block ore = overlay();
         if(previous == type && ore == Blocks.air) return;
         super.setFloor(type);
         //ore may get nullified so make sure to save editrs
-        if(ore() != ore){
-            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, ore().id));
+        if(overlay() != ore){
+            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, overlay().id));
         }
         if(previous != type){
             op(TileOp.get(x, y, (byte)OpType.floor.ordinal(), previous.id, type.id));
@@ -49,10 +45,15 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
-        Block previous = block();
+        Block previous = block;
+        byte pteam = getTeamID();
         if(previous == type) return;
         super.setBlock(type);
+        if(pteam != getTeamID()){
+            op(TileOp.get(x, y, (byte)OpType.team.ordinal(), pteam, getTeamID()));
+        }
         op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));
+
     }
 
     @Override
@@ -72,10 +73,10 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setOreByte(byte ore){
-        byte previous = getOreByte();
+    public void setOverlayID(byte ore){
+        byte previous = getOverlayID();
         if(previous == ore) return;
-        super.setOreByte(ore);
+        super.setOverlayID(ore);
         op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), previous, ore));
     }
 
@@ -87,6 +88,14 @@ public class EditorTile extends Tile{
     @Override
     protected void changed(){
         entity = null;
+
+        if(block == null){
+            block = Blocks.air;
+        }
+
+        if(floor == null){
+            floor = (Floor)Blocks.air;
+        }
 
         Block block = block();
 

@@ -24,7 +24,7 @@ public class SolidPump extends Pump{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
     protected float rotateSpeed = 1f;
-    /**Attribute that is checked when calculating output.*/
+    /** Attribute that is checked when calculating output. */
     protected Attribute attribute;
 
     public SolidPump(String name){
@@ -42,7 +42,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatDouble("blocks.efficiency", (sumAttribute(attribute, x, y) + 1f)*100, 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100, 1), x, y, valid);
         }
     }
 
@@ -50,7 +50,7 @@ public class SolidPump extends Pump{
     public void setBars(){
         super.setBars();
         bars.add("efficiency", entity -> new Bar(() ->
-        Core.bundle.formatDouble("blocks.efficiency",
+        Core.bundle.formatFloat("bar.efficiency",
         ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100, 1),
         () -> Pal.ammo,
         () -> ((SolidPumpEntity)entity).warmup));
@@ -60,7 +60,8 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.liquidOutput, result);
+        stats.remove(BlockStat.output);
+        stats.add(BlockStat.output, result, 60f * pumpAmount, true);
     }
 
     @Override

@@ -1,18 +1,16 @@
 package io.anuke.mindustry.graphics;
 
 public enum Layer{
-    /**Drawn under everything.*/
-    shadow,
-    /**Base block layer.*/
+    /** Base block layer. */
     block,
-    /**for placement*/
+    /** for placement */
     placement,
-    /**First overlay. Stuff like conveyor items.*/
+    /** First overlay. Stuff like conveyor items. */
     overlay,
-    /**"High" blocks, like turrets.*/
+    /** "High" blocks, like turrets. */
     turret,
-    /**Power lasers.*/
+    /** Power lasers. */
     power,
-    /**Extra lasers, like healing turrets.*/
+    /** Extra lasers, like healing turrets. */
     laser
 }

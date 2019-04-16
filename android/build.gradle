@@ -1,35 +1,32 @@
-buildscript {
-    repositories {
+buildscript{
+    repositories{
         mavenLocal()
         mavenCentral()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
-    
-    dependencies {
+
+    dependencies{
         classpath 'com.android.tools.build:gradle:3.3.2'
     }
 }
 
 apply plugin: "com.android.application"
 
-configurations { natives }
+configurations{ natives }
 
-repositories {
-	mavenCentral()
+repositories{
+    mavenCentral()
     jcenter()
-    maven {
-    	url "https://maven.google.com"
+    maven{
+        url "https://maven.google.com"
     }
 }
 
-dependencies {
+dependencies{
     implementation project(":core")
     implementation project(":net")
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'org.sufficientlysecure:donations:2.5'
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
     implementation arcModule("backends:backend-android")
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -47,16 +44,16 @@ dependencies {
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/google/release/android-google-release.apk"
+    from "build/outputs/apk/release/android-release.apk"
     into "../deploy/"
-    rename ("android-google-release.apk", appName + "-android-" + getVersionString() + ".apk")
+    rename("android-release.apk", appName + "-android-" + getVersionString() + ".apk")
 }
 
-android {
+android{
     buildToolsVersion '28.0.3'
     compileSdkVersion 28
-    sourceSets {
-        main {
+    sourceSets{
+        main{
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs = ['src']
             aidl.srcDirs = ['src']
@@ -68,11 +65,11 @@ android {
 
         androidTest.setRoot('tests')
     }
-    packagingOptions {
+    packagingOptions{
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
 
-    defaultConfig {
+    defaultConfig{
         def vfile = file('../core/assets/version.properties')
 
         def code = 0
@@ -96,22 +93,16 @@ android {
         versionName versionNameResult
     }
 
-    compileOptions {
+    compileOptions{
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
     flavorDimensions "google"
 
-    productFlavors {
-        google {
-            buildConfigField "boolean", "DONATIONS_GOOGLE", "true"
-        }
-    }
-
-    signingConfigs {
-        release {
-            if(project.hasProperty("RELEASE_STORE_FILE")) {
+    signingConfigs{
+        release{
+            if(project.hasProperty("RELEASE_STORE_FILE")){
                 storeFile file(RELEASE_STORE_FILE)
                 storePassword RELEASE_STORE_PASSWORD
                 keyAlias RELEASE_KEY_ALIAS
@@ -122,8 +113,8 @@ android {
         }
     }
 
-    buildTypes {
-        release {
+    buildTypes{
+        release{
             signingConfig signingConfigs.release
         }
     }
@@ -131,22 +122,22 @@ android {
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
-task copyAndroidNatives() {
+task copyAndroidNatives(){
     file("libs/armeabi/").mkdirs()
     file("libs/armeabi-v7a/").mkdirs()
     file("libs/arm64-v8a/").mkdirs()
     file("libs/x86_64/").mkdirs()
     file("libs/x86/").mkdirs()
 
-    configurations.natives.files.each { jar ->
+    configurations.natives.files.each{ jar ->
         def outputDir = null
-        if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-        if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-        if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-        if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-        if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-        if (outputDir != null) {
-            copy {
+        if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+        if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+        if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+        if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+        if(outputDir != null){
+            copy{
                 from zipTree(jar)
                 into outputDir
                 include "*.so"
@@ -155,21 +146,21 @@ task copyAndroidNatives() {
     }
 }
 
-task run(type: Exec) {
+task run(type: Exec){
     def path
     def localProperties = project.file("../local.properties")
-    if (localProperties.exists()) {
+    if(localProperties.exists()){
         Properties properties = new Properties()
-        localProperties.withInputStream { instr ->
+        localProperties.withInputStream{ instr ->
             properties.load(instr)
         }
         def sdkDir = properties.getProperty('sdk.dir')
-        if (sdkDir) {
+        if(sdkDir){
             path = sdkDir
-        } else {
+        }else{
             path = "$System.env.ANDROID_HOME"
         }
-    } else {
+    }else{
         path = "$System.env.ANDROID_HOME"
     }
 
@@ -178,19 +169,19 @@ task run(type: Exec) {
 }
 
 // sets up the Android Idea project, using the old Ant based build.
-idea {
-    module {
+idea{
+    module{
         sourceDirs += file("src")
         scopes = [COMPILE: [plus: [project.configurations.compile]]]
 
-        iml {
-            withXml {
+        iml{
+            withXml{
                 def node = it.asNode()
                 def builder = NodeBuilder.newInstance()
                 builder.current = node
-                builder.component(name: "FacetManager") {
-                    facet(type: "android", name: "Android") {
-                        configuration {
+                builder.component(name: "FacetManager"){
+                    facet(type: "android", name: "Android"){
+                        configuration{
                             option(name: "UPDATE_PROPERTY_FILES", value: "true")
                         }
                     }

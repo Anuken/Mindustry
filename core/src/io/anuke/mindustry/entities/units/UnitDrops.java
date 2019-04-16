@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities.units;
 
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
-import io.anuke.arc.math.Mathf;
 
 public class UnitDrops{
     private static Item[] dropTable;
@@ -37,7 +37,8 @@ public class UnitDrops{
                 if(Mathf.chance(0.03)){
                     int amount = Mathf.random(20, 40);
                     amount = core.tile.block().acceptStack(item, amount, core.tile, null);
-                    if (amount > 0) Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
+                    if(amount > 0)
+                        Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), core.tile);
                 }
             }
         }

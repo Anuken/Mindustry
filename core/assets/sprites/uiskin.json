@@ -283,6 +283,7 @@
       disabledFontColor: gray,
       selection: selection,
       background: underline,
+      invalidBackground: underline-red,
       cursor: cursor,
       messageFont: default-font,
       messageFontColor: gray

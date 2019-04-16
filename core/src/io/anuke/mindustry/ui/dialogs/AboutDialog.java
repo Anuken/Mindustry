@@ -1,21 +1,19 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.layout.Cell;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
@@ -27,7 +25,9 @@ public class AboutDialog extends FloatingDialog{
     public AboutDialog(){
         super("$about.button");
 
-        Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
+        if(!ios){
+            Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
+        }
 
         shown(this::setup);
         onResize(this::setup);

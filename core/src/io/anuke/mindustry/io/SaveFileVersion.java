@@ -5,21 +5,14 @@ import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.mindustry.entities.traits.SaveTrait;
-import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
@@ -36,7 +29,7 @@ public abstract class SaveFileVersion{
         long playtime = stream.readLong();
         int build = stream.readInt();
 
-        Rules rules = Serialization.readRules(stream);
+        Rules rules = Serialization.readRulesStreamJson(stream);
         String map = stream.readUTF();
         int wave = stream.readInt();
         return new SaveMeta(version, time, playtime, build, map, wave, rules);
@@ -51,13 +44,13 @@ public abstract class SaveFileVersion{
         for(int i = 0; i < world.width() * world.height(); i++){
             Tile tile = world.tile(i % world.width(), i / world.width());
             stream.writeByte(tile.getFloorID());
-            stream.writeByte(tile.getOreByte());
+            stream.writeByte(tile.getOverlayID());
             int consecutives = 0;
 
             for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                 Tile nextTile = world.tile(j % world.width(), j / world.width());
 
-                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOreByte() != tile.getOreByte()){
+                if(nextTile.getFloorID() != tile.getFloorID() || nextTile.getOverlayID() != tile.getOverlayID()){
                     break;
                 }
 
@@ -74,10 +67,10 @@ public abstract class SaveFileVersion{
             stream.writeByte(tile.getBlockID());
 
             if(tile.block() == Blocks.part){
-                stream.writeByte(tile.link);
+                stream.writeByte(tile.getLinkByte());
             }else if(tile.entity != null){
                 stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
-                stream.writeShort((short) tile.entity.health); //health
+                stream.writeShort((short)tile.entity.health); //health
 
                 if(tile.entity.items != null) tile.entity.items.write(stream);
                 if(tile.entity.power != null) tile.entity.power.write(stream);
@@ -123,12 +116,12 @@ public abstract class SaveFileVersion{
             Block ore = content.block(oreid);
 
             tiles[x][y] = new Tile(x, y, floorid, (byte)0);
-            tiles[x][y].setOre(ore);
+            tiles[x][y].setOverlay(ore);
 
             for(int j = i + 1; j < i + 1 + consecutives; j++){
                 int newx = j % width, newy = j / width;
                 Tile newTile = new Tile(newx, newy, floorid, (byte)0);
-                newTile.setOre(ore);
+                newTile.setOverlay(ore);
                 tiles[newx][newy] = newTile;
             }
 
@@ -143,7 +136,7 @@ public abstract class SaveFileVersion{
             tile.setBlock(block);
 
             if(block == Blocks.part){
-                tile.link = stream.readByte();
+                tile.setLinkByte(stream.readByte());
             }else if(tile.entity != null){
                 byte tr = stream.readByte();
                 short health = stream.readShort();
@@ -193,8 +186,8 @@ public abstract class SaveFileVersion{
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){
-                    stream.writeByte(((SaveTrait) entity).getTypeID());
-                    ((SaveTrait) entity).writeSave(stream);
+                    stream.writeByte(((SaveTrait)entity).getTypeID());
+                    ((SaveTrait)entity).writeSave(stream);
                 }
             }
         }
@@ -207,7 +200,7 @@ public abstract class SaveFileVersion{
             int amount = stream.readInt();
             for(int j = 0; j < amount; j++){
                 byte typeid = stream.readByte();
-                SaveTrait trait = (SaveTrait) TypeTrait.getTypeByID(typeid).get();
+                SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
                 trait.readSave(stream);
             }
         }
@@ -219,12 +212,12 @@ public abstract class SaveFileVersion{
 
         MappableContent[][] map = new MappableContent[ContentType.values().length][0];
 
-        for (int i = 0; i < mapped; i++) {
+        for(int i = 0; i < mapped; i++){
             ContentType type = ContentType.values()[stream.readByte()];
             short total = stream.readShort();
             map[type.ordinal()] = new MappableContent[total];
 
-            for (int j = 0; j < total; j++) {
+            for(int j = 0; j < total; j++){
                 String name = stream.readUTF();
                 map[type.ordinal()][j] = content.getByName(type, name);
             }
@@ -249,7 +242,7 @@ public abstract class SaveFileVersion{
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);
                 for(Content c : arr){
-                    stream.writeUTF(((MappableContent) c).name);
+                    stream.writeUTF(((MappableContent)c).name);
                 }
             }
         }

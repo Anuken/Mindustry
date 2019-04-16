@@ -180,7 +180,7 @@ public class EntityGroup<T extends Entity>{
         return null;
     }
 
-    /**Returns the logic-only array for iteration.*/
+    /** Returns the logic-only array for iteration. */
     public Array<T> all(){
         return entityArray;
     }

@@ -5,34 +5,26 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.BaseEntity;
-import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.impl.BaseEntity;
+import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.Wall;
-import io.anuke.mindustry.world.consumers.Consume;
-import io.anuke.mindustry.world.modules.ConsumeModule;
-import io.anuke.mindustry.world.modules.ItemModule;
-import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.mindustry.world.modules.PowerModule;
+import io.anuke.mindustry.world.modules.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tileGroup;
 import static io.anuke.mindustry.Vars.world;
@@ -40,10 +32,11 @@ import static io.anuke.mindustry.Vars.world;
 public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
-    /**This value is only used for debugging.*/
+    /** This value is only used for debugging. */
     public static int sleepingEntities = 0;
 
     public Tile tile;
+    public Block block;
     public Interval timer;
     public float health;
     public float timeScale = 1f, timeScaleDuration;
@@ -53,7 +46,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public LiquidModule liquids;
     public ConsumeModule cons;
 
-    /**List of (cached) tiles with entities in proximity, used for outputting to*/
+    /** List of (cached) tiles with entities in proximity, used for outputting to */
     private Array<Tile> proximity = new Array<>(8);
     private boolean dead = false;
     private boolean sleeping;
@@ -63,6 +56,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
             tile.entity.health = health;
+
+            if(tile.entity.damaged()){
+                world.indexer.notifyTileDamaged(tile.entity);
+            }
         }
     }
 
@@ -72,15 +69,15 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tile.entity.onDeath();
     }
 
-    /**Sets this tile entity data to this tile, and adds it if necessary.*/
+    /** Sets this tile entity data to this tile, and adds it if necessary. */
     public TileEntity init(Tile tile, boolean shouldAdd){
         this.tile = tile;
         x = tile.drawx();
         y = tile.drawy();
+        block = tile.block();
 
-        health = tile.block().health;
-
-        timer = new Interval(tile.block().timers);
+        health = block.health;
+        timer = new Interval(block.timers);
 
         if(shouldAdd){
             add();
@@ -89,12 +86,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return this;
     }
 
-    /**Scaled delta.*/
+    /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;
     }
 
-    /**Call when nothing is happening to the entity. This increments the internal sleep timer.*/
+    /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
         sleepTime += Time.delta();
         if(!sleeping && sleepTime >= timeToSleep){
@@ -104,7 +101,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
     }
 
-    /**Call when this entity is updating. This wakes it up.*/
+    /** Call when this entity is updating. This wakes it up. */
     public void noSleep(){
         sleepTime = 0f;
         if(sleeping){
@@ -122,20 +119,24 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
-    public void write(DataOutput stream) throws IOException{}
+    public void write(DataOutput stream) throws IOException{
+    }
 
-    public void writeConfig(DataOutput stream) throws IOException{}
+    public void writeConfig(DataOutput stream) throws IOException{
+    }
 
-    public void read(DataInput stream) throws IOException{}
+    public void read(DataInput stream) throws IOException{
+    }
 
-    public void readConfig(DataInput stream) throws IOException{}
+    public void readConfig(DataInput stream) throws IOException{
+    }
 
     public boolean collide(Bullet other){
         return true;
     }
 
     public void collision(Bullet other){
-        tile.block().handleBulletHit(this, other);
+        block.handleBulletHit(this, other);
     }
 
     public void kill(){
@@ -147,11 +148,13 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         float preHealth = health;
 
-        Call.onTileDamage(tile, health - tile.block().handleDamage(tile, damage));
+        Call.onTileDamage(tile, health - block.handleDamage(tile, damage));
 
         if(health <= 0){
             Call.onTileDestroyed(tile);
-        }else if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
+        }
+
+        if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
             world.indexer.notifyTileDamaged(this);
         }
     }
@@ -164,14 +167,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return tile;
     }
 
-    public boolean consumed(Class<? extends Consume> type){
-        return tile.block().consumes.get(type).valid(tile.block(), this);
-    }
-
     public void removeFromProximity(){
-        tile.block().onProximityRemoved(tile);
+        block.onProximityRemoved(tile);
 
-        Point2[] nearby = Edges.getEdges(tile.block().size);
+        Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
@@ -189,7 +188,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         tmpTiles.clear();
         proximity.clear();
 
-        Point2[] nearby = Edges.getEdges(tile.block().size);
+        Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Tile other = world.tile(tile.x + point.x, tile.y + point.y);
 
@@ -212,8 +211,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             proximity.add(tile);
         }
 
-        tile.block().onProximityAdded(tile);
-        tile.block().onProximityUpdate(tile);
+        block.onProximityAdded(tile);
+        block.onProximityUpdate(tile);
     }
 
     public Array<Tile> proximity(){
@@ -232,7 +231,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @Override
     public float maxHealth(){
-        return tile.block().health;
+        return block.health;
     }
 
     @Override
@@ -244,7 +243,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public void onDeath(){
         if(!dead){
             dead = true;
-            Block block = tile.block();
 
             Events.fire(new BlockDestroyEvent(tile));
             block.onDestroyed(tile);
@@ -267,23 +265,29 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     @Override
     public void update(){
         //TODO better smoke effect, this one is awful
-        if(health != 0 && health < tile.block().health && !(tile.block() instanceof Wall) &&
-                Mathf.chance(0.009f * Time.delta() * (1f - health / tile.block().health))){
+        if(health != 0 && health < block.health && !(block instanceof Wall) &&
+        Mathf.chance(0.009f * Time.delta() * (1f - health / block.health))){
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
         }
 
         timeScaleDuration -= Time.delta();
-        if(timeScaleDuration <= 0f || !tile.block().canOverdrive){
+        if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
         }
 
         if(health <= 0){
             onDeath();
+            return; //no need to update anymore
         }
-        Block previous = tile.block();
-        tile.block().update(tile);
-        if(tile.block() == previous && cons != null){
+
+        Block previous = block;
+        block.update(tile);
+        if(block == previous && cons != null){
             cons.update();
+        }
+
+        if(block == previous && power != null){
+            power.graph.update();
         }
     }
 

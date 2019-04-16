@@ -156,11 +156,11 @@ public class Effects{
         }
     }
 
-    public static interface EffectProvider{
+    public interface EffectProvider{
         void createEffect(Effect effect, Color color, float x, float y, float rotation, Object data);
     }
 
-    public static interface EffectRenderer{
+    public interface EffectRenderer{
         void render(EffectContainer effect);
     }
 }

@@ -9,9 +9,9 @@ public abstract class NetConnection{
     public boolean modclient;
     public boolean mobile;
 
-    /**ID of last recieved client snapshot.*/
+    /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;
-    /**Timestamp of last recieved snapshot.*/
+    /** Timestamp of last recieved snapshot. */
     public long lastRecievedClientTime;
 
     public boolean hasConnected = false;

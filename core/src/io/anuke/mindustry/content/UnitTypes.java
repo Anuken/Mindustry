@@ -8,9 +8,9 @@ import io.anuke.mindustry.type.Weapon;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-        spirit, phantom,
-        wraith, ghoul, revenant, lich, reaper,
-        dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
+    spirit, phantom,
+    wraith, ghoul, revenant, lich, reaper,
+    dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){
@@ -91,7 +91,7 @@ public class UnitTypes implements ContentList{
             hitsize = 10f;
             rotatespeed = 0.06f;
             targetAir = false;
-            health = 800;
+            health = 750;
             weapon = new Weapon("artillery"){{
                 length = 1f;
                 reload = 60f;
@@ -178,8 +178,9 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             mass = 1.5f;
             isFlying = true;
-            health = 70;
+            health = 75;
             engineOffset = 5.5f;
+            range = 140f;
             weapon = new Weapon("chain-blaster"){{
                 length = 1.5f;
                 reload = 28f;
@@ -190,7 +191,7 @@ public class UnitTypes implements ContentList{
         }};
 
         ghoul = new UnitType("ghoul", Ghoul.class, Ghoul::new){{
-            health = 250;
+            health = 220;
             speed = 0.2f;
             maxVelocity = 1.4f;
             mass = 3f;
@@ -198,6 +199,7 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             targetAir = false;
             engineOffset = 7.8f;
+            range = 140f;
             weapon = new Weapon("bomber"){{
                 length = 0f;
                 width = 2f;

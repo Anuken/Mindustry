@@ -14,7 +14,7 @@ public class GameOverDialog extends FloatingDialog{
 
     public GameOverDialog(){
         super("$gameover");
-        setFillParent(false);
+        setFillParent(true);
         shown(this::rebuild);
     }
 
@@ -31,7 +31,7 @@ public class GameOverDialog extends FloatingDialog{
         buttons.margin(10);
 
         if(state.rules.pvp){
-            cont.add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
+            cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
             buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
@@ -43,36 +43,37 @@ public class GameOverDialog extends FloatingDialog{
                 cont.row();
             }
 
-            cont.table(t -> {
-                cont.left().defaults().left();
-                cont.add(Core.bundle.format("stat.wave", state.stats.wavesLasted));
-                cont.row();
-                cont.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed));
-                cont.row();
-                cont.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt));
-                cont.row();
-                cont.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed));
-                cont.row();
-                cont.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
-                cont.row();
+            cont.pane(t -> {
+                t.margin(13f);
+                t.left().defaults().left();
+                t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted));
+                t.row();
+                t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed));
+                t.row();
+                t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt));
+                t.row();
+                t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed));
+                t.row();
+                t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
+                t.row();
                 if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
-                    cont.add("$stat.delivered");
-                    cont.row();
+                    t.add("$stat.delivered");
+                    t.row();
                     for(Item item : content.items()){
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
-                            cont.table(items -> {
+                            t.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Icon.medium)).size(8 *3).pad(4);
+                                items.addImage(item.icon(Icon.medium)).size(8 * 3).pad(4);
                             }).left();
-                            cont.row();
+                            t.row();
                         }
                     }
                 }
 
                 if(world.isZone()){
                     RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
-                    cont.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
-                    cont.row();
+                    t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
+                    t.row();
                 }
             }).pad(12);
 

@@ -11,18 +11,11 @@ import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.PlayEvent;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
@@ -30,9 +23,10 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.ui.IntFormat;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+
+import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -49,16 +43,6 @@ public class HudFragment extends Fragment{
     private float coreAttackTime;
     private float lastCoreHP;
     private float coreAttackOpacity = 0f;
-    private Table goshDarnHeckingFlippedTableWhyDoesThisHappen;
-
-    {
-        Events.on(PlayEvent.class, event -> {
-            if(goshDarnHeckingFlippedTableWhyDoesThisHappen != null){
-                goshDarnHeckingFlippedTableWhyDoesThisHappen.invalidateHierarchy();
-                goshDarnHeckingFlippedTableWhyDoesThisHappen.pack();
-            }
-        });
-    }
 
     public void build(Group parent){
 
@@ -67,8 +51,11 @@ public class HudFragment extends Fragment{
             cont.top().left().visible(() -> !state.is(State.menu));
 
             if(mobile){
-                cont.table(select -> {
-                    goshDarnHeckingFlippedTableWhyDoesThisHappen = select;
+
+                {
+                    Table select = new Table();
+
+                    select.visible(() -> !state.is(State.menu));
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -111,7 +98,27 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImage("blank").color(Pal.accent).width(3f).fillY();
-                }).left();
+
+                    float size = Unit.dp.scl(dsize);
+                    Array<Element> children = new Array<>(select.getChildren());
+
+                    int index = 0;
+                    for(Element elem : children){
+                        int fi = index++;
+                        Core.scene.add(elem);
+                        elem.visible(() -> {
+                            if(fi < 4){
+                                elem.setSize(size);
+                            }else{
+                                elem.setSize(3f, size);
+                            }
+                            elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
+                            return !state.is(State.menu);
+                        });
+                    }
+
+                    cont.add().size(dsize * 4 + 3, dsize).left();
+                }
 
                 cont.row();
                 cont.addImage("blank").height(3f).color(Pal.accent).fillX();
@@ -138,21 +145,25 @@ public class HudFragment extends Fragment{
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
-                    .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
+                .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();
             }).visible(() -> shown);
+
+            //fps display
+            cont.table(info -> {
+                info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
+                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                IntFormat fps = new IntFormat("fps");
+                IntFormat ping = new IntFormat("ping");
+
+                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left();
+                info.row();
+                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left();
+            }).top().left();
         });
 
-
-        //fps display
-        parent.fill(info -> {
-            info.top().right().margin(4).visible(() -> Core.settings.getBool("fps") && !state.is(State.menu));
-            IntFormat fps = new IntFormat("fps");
-            IntFormat ping = new IntFormat("ping");
-            info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).right();
-            info.row();
-            info.label(() -> ping.get(Net.getPing())).visible(Net::client).right();
-        });
+        //minimap
+        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
 
         //spawner warning
         parent.fill(t -> {
@@ -169,11 +180,11 @@ public class HudFragment extends Fragment{
             t.touchable(Touchable.disabled);
             t.visible(() -> !state.is(State.menu));
             t.table("flat", c -> c.add("")
-            .update(l ->{
+            .update(l -> {
                 l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
-                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - players[0].destructTime) / 60f)));
+                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - player.destructTime) / 60f)));
             }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(players[0].isOutOfBounds()), 0.1f);
+                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(player.isOutOfBounds()), 0.1f);
             }).get().color.a = 0f;
         });
 
@@ -184,6 +195,7 @@ public class HudFragment extends Fragment{
 
         //'core is under attack' table
         parent.fill(t -> {
+            t.touchable(Touchable.disabled);
             float notifDuration = 240f;
 
             Events.on(StateChangeEvent.class, event -> {
@@ -194,13 +206,13 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || state.teams.get(players[0].getTeam()).cores.size == 0 ||
-                state.teams.get(players[0].getTeam()).cores.first().entity == null){
+                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 ||
+                state.teams.get(player.getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }
 
-                float curr = state.teams.get(players[0].getTeam()).cores.first().entity.health;
+                float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
                 if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
                     coreAttackTime = notifDuration;
                 }
@@ -218,14 +230,13 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table("button", top -> top.add("$coreattack").pad(2)
-                .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f))));
+            .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //launch button
         parent.fill(t -> {
-            t.top().visible(() -> !state.is(State.menu));
+            t.top().right().visible(() -> !state.is(State.menu));
             TextButton[] testb = {null};
-
             TextButton button = Elements.newButton("$launch", () -> {
                 FloatingDialog dialog = new FloatingDialog("$launch");
                 dialog.update(() -> {
@@ -250,11 +261,12 @@ public class HudFragment extends Fragment{
             testb[0] = button;
 
             button.getStyle().disabledFontColor = Color.WHITE;
+            button.margin(16f);
             button.visible(() ->
-                world.isZone() &&
-                world.getZone().metCondition() &&
-                !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
+            world.isZone() &&
+            world.getZone().metCondition() &&
+            !Net.client() &&
+            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -263,17 +275,15 @@ public class HudFragment extends Fragment{
                 }
 
                 button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
-                    Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
+                Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
 
-                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Pal.accent,
-                    Mathf.absin(Time.time(), 7f, 1f)));
+                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET,
+                Mathf.absin(Time.time(), 2f, 1f)));
             });
 
             button.setDisabled(() -> state.enemies() > 0);
-
             button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
-
-            t.add(button).size(350f, 80f);
+            t.add(button).size(250f, 80f);
         });
 
         //paused table
@@ -439,15 +449,18 @@ public class HudFragment extends Fragment{
             builder.append(wavef.get(state.wave));
             builder.append("\n");
 
-            if(state.enemies() > 0 && !state.rules.waveTimer){
+            if(state.enemies() > 0){
                 if(state.enemies() == 1){
                     builder.append(enemyf.get(state.enemies()));
                 }else{
                     builder.append(enemiesf.get(state.enemies()));
                 }
-            }else if(state.rules.waveTimer){
-                builder.append(waitingf.get((int)(state.wavetime/60)));
-            }else{
+                builder.append("\n");
+            }
+
+            if(state.rules.waveTimer){
+                builder.append(waitingf.get((int)(state.wavetime / 60)));
+            }else if(state.enemies() == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
 
@@ -460,13 +473,13 @@ public class HudFragment extends Fragment{
 
     private void addPlayButton(Table table){
         table.right().addImageButton("icon-play", "right", 30f, () -> {
-            if(Net.client() && players[0].isAdmin){
-                Call.onAdminRequest(players[0], AdminAction.wave);
+            if(Net.client() && player.isAdmin){
+                Call.onAdminRequest(player, AdminAction.wave);
             }else{
                 state.wavetime = 0f;
             }
         }).growY().fillX().right().width(40f)
-        .visible(() -> state.rules.waves && ((Net.server() || players[0].isAdmin) || !Net.active()) && state.enemies() == 0
-        && (!world.spawner.isSpawning() || !state.rules.waveTimer));
+        .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0
+        && !world.spawner.isSpawning());
     }
 }

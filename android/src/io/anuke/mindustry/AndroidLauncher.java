@@ -10,11 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
 import io.anuke.arc.Core;
 import io.anuke.arc.backends.android.surfaceview.AndroidApplication;
 import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration;
@@ -23,18 +18,15 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
+import io.anuke.net.KryoClient;
+import io.anuke.net.KryoServer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 import static io.anuke.mindustry.Vars.*;
@@ -53,8 +45,8 @@ public class AndroidLauncher extends AndroidApplication{
         Platform.instance = new Platform(){
 
             @Override
-            public void openDonations(){
-                showDonations();
+            public void hide(){
+                moveTaskToBack(true);
             }
 
             @Override
@@ -64,7 +56,7 @@ public class AndroidLauncher extends AndroidApplication{
                     int len = s.length();
                     byte[] data = new byte[len / 2];
                     for(int i = 0; i < len; i += 2){
-                        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                        data[i / 2] = (byte)((Character.digit(s.charAt(i), 16) << 4)
                         + Character.digit(s.charAt(i + 1), 16));
                     }
                     String result = new String(Base64Coder.encode(data));
@@ -94,7 +86,7 @@ public class AndroidLauncher extends AndroidApplication{
                     if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
                     }
-                    requestPermissions(perms.toArray(new String[perms.size()]), PERMISSION_REQUEST_CODE);
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }
             }
 
@@ -114,17 +106,10 @@ public class AndroidLauncher extends AndroidApplication{
             }
         };
 
-        try{
-            ProviderInstaller.installIfNeeded(this);
-        }catch(GooglePlayServicesRepairableException e){
-            GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-            apiAvailability.getErrorDialog(this, e.getConnectionStatusCode(), 0).show();
-        }catch(GooglePlayServicesNotAvailableException e){
-            Log.e("SecurityException", "Google Play Services not available.");
-        }
         if(doubleScaleTablets && isTablet(this.getContext())){
             Unit.dp.addition = 0.5f;
         }
+
         config.hideStatusBar = true;
         Net.setClientProvider(new KryoClient());
         Net.setServerProvider(new KryoServer());
@@ -133,7 +118,7 @@ public class AndroidLauncher extends AndroidApplication{
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
         if(requestCode == PERMISSION_REQUEST_CODE){
             for(int i : grantResults){
                 if(i != PackageManager.PERMISSION_GRANTED) return;
@@ -195,22 +180,8 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private boolean isPackageInstalled(String packagename){
-        try{
-            getPackageManager().getPackageInfo(packagename, 0);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-
     private boolean isTablet(Context context){
-        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        return manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
-    }
-
-    private void showDonations(){
-        Intent intent = new Intent(this, DonationsActivity.class);
-        startActivity(intent);
+        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        return manager != null && manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
     }
 }

@@ -3,9 +3,7 @@ package io.anuke.mindustry.world.blocks.units;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
@@ -13,7 +11,6 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -23,10 +20,10 @@ import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.type.Mech;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 import static io.anuke.mindustry.Vars.tilesize;
@@ -41,8 +38,15 @@ public class MechPad extends Block{
     public MechPad(String name){
         super(name);
         update = true;
-        solidifes = true;
+        solid = false;
         hasPower = true;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.productionTime, buildTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class MechPad extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
-        if(player == null  || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
+        if(player == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
         MechPad pad = (MechPad)tile.block();
@@ -78,7 +82,7 @@ public class MechPad extends Block{
 
         if(entity.player == null) return;
 
-        Mech result = ((MechPad) tile.block()).mech;
+        Mech result = ((MechPad)tile.block()).mech;
 
         if(entity.player.mech == result){
             Mech target = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
@@ -94,7 +98,6 @@ public class MechPad extends Block{
         entity.progress = 0;
         entity.player.heal();
         entity.player.endRespawning();
-        entity.open = true;
         entity.player.setDead(false);
         entity.player.clearItem();
         entity.player = null;
@@ -102,32 +105,27 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
-        return  Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
-                Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
+        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
+        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
     }
 
     @Override
     public void drawSelect(Tile tile){
         Draw.color(Pal.accent);
-        for(int i = 0; i < 4; i ++){
-            float length = tilesize * size/2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
-            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i+2) * 90);
+        for(int i = 0; i < 4; i++){
+            float length = tilesize * size / 2f + 3 + Mathf.absin(Time.time(), 5f, 2f);
+            Draw.rect("transfer-arrow", tile.drawx() + Geometry.d4[i].x * length, tile.drawy() + Geometry.d4[i].y * length, (i + 2) * 90);
         }
         Draw.color();
     }
 
     @Override
-    public boolean isSolidFor(Tile tile){
-        MechFactoryEntity entity = tile.entity();
-        return !entity.open;
-    }
-
-    @Override
     public void tapped(Tile tile, Player player){
+        MechFactoryEntity entity = tile.entity();
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead()){
+        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
             player.moveTarget = tile.entity;
         }
     }
@@ -142,7 +140,7 @@ public class MechPad extends Block{
     public void draw(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy(), entity.open ? 180f : 0f);
+        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy());
 
         if(entity.player != null){
             TextureRegion region = mech.iconRegion;
@@ -163,10 +161,10 @@ public class MechPad extends Block{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-                    tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-                    tile.drawy(),
-                    90,
-                    size * Vars.tilesize / 2f + 1f);
+            tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+            tile.drawy(),
+            90,
+            size * Vars.tilesize / 2f + 1f);
 
             Draw.reset();
         }
@@ -175,14 +173,6 @@ public class MechPad extends Block{
     @Override
     public void update(Tile tile){
         MechFactoryEntity entity = tile.entity();
-
-        if(entity.open){
-            if(!Units.anyEntities(tile)){
-                entity.open = false;
-            }else{
-                entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
-            }
-        }
 
         if(entity.player != null){
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
@@ -194,10 +184,6 @@ public class MechPad extends Block{
                 Call.onMechFactoryDone(tile);
             }
         }else{
-            if(entity.cons.valid() && Units.anyEntities(tile, 4f, unit -> unit.getTeam() == entity.getTeam() && unit instanceof Player)){
-                entity.open = true;
-            }
-
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
     }
@@ -212,7 +198,6 @@ public class MechPad extends Block{
         float progress;
         float time;
         float heat;
-        boolean open;
 
         @Override
         public void updateSpawning(Player unit){

@@ -22,6 +22,9 @@ public class Pal{
     lightFlame = Color.valueOf("ffdd55"),
     darkFlame = Color.valueOf("db401c"),
 
+    lightPyraFlame = Color.valueOf("ffb855"),
+    darkPyraFlame = Color.valueOf("db661c"),
+
     turretHeat = Color.valueOf("ab3400"),
 
     lightOrange = Color.valueOf("f68021"),
@@ -45,6 +48,7 @@ public class Pal{
     heal = Color.valueOf("98ffa9"),
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),
+    stat = Color.valueOf("ffd37f"),
     locked = Color.valueOf("989aa4"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),

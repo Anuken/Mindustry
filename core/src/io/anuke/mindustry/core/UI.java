@@ -1,8 +1,6 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.freetype.FreeTypeFontGenerator;
@@ -13,19 +11,13 @@ import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.graphics.g2d.BitmapFont;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.Scene;
-import io.anuke.arc.scene.Skin;
+import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
-import io.anuke.arc.scene.ui.TooltipManager;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
@@ -63,11 +55,11 @@ public class UI implements ApplicationListener{
     public AdminsDialog admins;
     public TraceDialog traces;
     public ChangelogDialog changelog;
-    public LocalPlayerDialog localplayers;
     public DatabaseDialog database;
     public ContentInfoDialog content;
     public DeployDialog deploy;
     public TechTreeDialog tech;
+    public MinimapDialog minimap;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -84,21 +76,21 @@ public class UI implements ApplicationListener{
         Core.input.addProcessor(Core.scene);
 
         Dialog.setShowAction(() -> sequence(
-            alpha(0f),
-            originCenter(),
-            moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
-            scaleTo(0.0f, 1f),
-            parallel(
-                scaleTo(1f, 1f, 0.1f, Interpolation.fade),
-                fadeIn(0.1f, Interpolation.fade)
-            )
+        alpha(0f),
+        originCenter(),
+        moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
+        scaleTo(0.0f, 1f),
+        parallel(
+        scaleTo(1f, 1f, 0.1f, Interpolation.fade),
+        fadeIn(0.1f, Interpolation.fade)
+        )
         ));
 
         Dialog.setHideAction(() -> sequence(
-            parallel(
-                scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
-                fadeOut(0.1f, Interpolation.fade)
-            )
+        parallel(
+        scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
+        fadeOut(0.1f, Interpolation.fade)
+        )
         ));
 
         TooltipManager.getInstance().animations = false;
@@ -109,6 +101,7 @@ public class UI implements ApplicationListener{
         });
 
         Colors.put("accent", Pal.accent);
+        Colors.put("stat", Pal.stat);
 
         loadCursors();
     }
@@ -125,11 +118,11 @@ public class UI implements ApplicationListener{
 
         Core.graphics.restoreCursor();
     }
-    
+
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(9*2 * Math.max(Unit.dp.scl(1f), 0.5f));
+        param.size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
         param.shadowColor = Color.DARK_GRAY;
         param.shadowOffsetY = 2;
         param.incremental = true;
@@ -175,15 +168,15 @@ public class UI implements ApplicationListener{
         admins = new AdminsDialog();
         traces = new TraceDialog();
         maps = new MapsDialog();
-        localplayers = new LocalPlayerDialog();
         content = new ContentInfoDialog();
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
+        minimap = new MinimapDialog();
 
         Group group = Core.scene.root;
 
         backfrag.build(group);
-        control.input(0).getFrag().build(group);
+        control.input().getFrag().build(group);
         hudfrag.build(group);
         menufrag.build(group);
         chatfrag.container().build(group);
@@ -219,7 +212,7 @@ public class UI implements ApplicationListener{
             cont.margin(30).add(text).padRight(6f);
             TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
-            field.setTextFieldFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
+            field.setFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
             buttons.defaults().size(120, 54).pad(4);
             buttons.addButton("$ok", () -> {
@@ -288,11 +281,11 @@ public class UI implements ApplicationListener{
 
     public String formatAmount(int number){
         if(number >= 1000000){
-            return Strings.toFixed(number / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(number / 1000000f, 1) + "[gray]mil[]";
         }else if(number >= 10000){
             return number / 1000 + "[gray]k[]";
         }else if(number >= 1000){
-            return Strings.toFixed(number / 1000f, 1) + "[gray]k[]";
+            return Strings.fixed(number / 1000f, 1) + "[gray]k[]";
         }else{
             return number + "";
         }

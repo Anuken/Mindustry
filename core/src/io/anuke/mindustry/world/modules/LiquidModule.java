@@ -2,9 +2,8 @@ package io.anuke.mindustry.world.modules;
 
 import io.anuke.mindustry.type.Liquid;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
+
 import static io.anuke.mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
@@ -12,12 +11,12 @@ public class LiquidModule extends BlockModule{
     private float total;
     private Liquid current = content.liquid(0);
 
-    /**Returns total amount of liquids.*/
+    /** Returns total amount of liquids. */
     public float total(){
         return total;
     }
 
-    /**Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid.*/
+    /** Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
     public Liquid current(){
         return current;
     }

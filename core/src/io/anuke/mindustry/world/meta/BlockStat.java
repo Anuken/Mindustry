@@ -4,43 +4,33 @@ import io.anuke.arc.Core;
 
 import java.util.Locale;
 
-/**Describes one type of stat for a block.*/
+/** Describes one type of stat for a block. */
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
 
     itemCapacity(StatCategory.items),
-    inputItemCapacity(StatCategory.items),
-    outputItemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
+    launchTime(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
-    liquidOutput(StatCategory.liquids),
-    liquidOutputSpeed(StatCategory.liquids),
-    coolant(StatCategory.liquids),
-    coolantUse(StatCategory.liquids),
 
     powerCapacity(StatCategory.power),
     powerUse(StatCategory.power),
     powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
-    powerTransferSpeed(StatCategory.power),
     basePowerGeneration(StatCategory.power),
-    inputLiquidFuel(StatCategory.power),
-    liquidFuelUse(StatCategory.power),
 
-    inputLiquid(StatCategory.crafting),
-    liquidUse(StatCategory.crafting),
-    inputItem(StatCategory.crafting),
-    inputItems(StatCategory.crafting),
-    inputFuel(StatCategory.crafting),
-    fuelBurnTime(StatCategory.crafting),
-    craftSpeed(StatCategory.crafting),
-    outputItem(StatCategory.crafting),
+    input(StatCategory.crafting),
+    output(StatCategory.crafting),
+    productionTime(StatCategory.crafting),
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
 
+    speedIncrease(StatCategory.shooting),
+    repairTime(StatCategory.shooting),
+    range(StatCategory.shooting),
     shootRange(StatCategory.shooting),
     inaccuracy(StatCategory.shooting),
     shots(StatCategory.shooting),
@@ -48,9 +38,10 @@ public enum BlockStat{
     powerShot(StatCategory.shooting),
     targetsAir(StatCategory.shooting),
     targetsGround(StatCategory.shooting),
+    ammo(StatCategory.shooting),
 
-    boostItem(StatCategory.optional),
-    boostLiquid(StatCategory.optional),;
+    booster(StatCategory.optional),
+    boostEffect(StatCategory.optional);
 
     public final StatCategory category;
 

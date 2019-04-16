@@ -11,14 +11,9 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.HandCursorListener;
-import io.anuke.arc.scene.event.InputEvent;
-import io.anuke.arc.scene.event.InputListener;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
@@ -31,7 +26,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 40f;
+    private final static float holdWithdraw = 20f;
 
     private Table table;
     private Tile tile;
@@ -86,8 +81,6 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void rebuild(boolean actions){
-
-        Player player = input.player;
 
         IntSet container = new IntSet();
 
@@ -182,18 +175,18 @@ public class BlockInventoryFragment extends Fragment{
 
         if(actions){
             table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                    Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+            Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
         }
     }
 
     private String round(float f){
-        f = (int) f;
+        f = (int)f;
         if(f >= 1000000){
-            return Strings.toFixed(f / 1000000f, 1) + "[gray]mil[]";
+            return Strings.fixed(f / 1000000f, 1) + "[gray]mil[]";
         }else if(f >= 1000){
-            return Strings.toFixed(f / 1000, 1) + "k";
+            return Strings.fixed(f / 1000, 1) + "k";
         }else{
-            return (int) f + "";
+            return (int)f + "";
         }
     }
 

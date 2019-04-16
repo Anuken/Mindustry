@@ -5,9 +5,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{
@@ -25,6 +23,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
+    public ConsumeType type(){
+        return ConsumeType.power;
+    }
+
+    @Override
     public void build(Tile tile, Table table){
         //No tooltip for power, for now
     }
@@ -35,12 +38,12 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void update(Block block, TileEntity entity){
+    public void update(TileEntity entity){
         // Nothing to do since PowerGraph directly updates entity.power.satisfaction
     }
 
     @Override
-    public boolean valid(Block block, TileEntity entity){
+    public boolean valid(TileEntity entity){
         if(isBuffered){
             return true;
         }else{

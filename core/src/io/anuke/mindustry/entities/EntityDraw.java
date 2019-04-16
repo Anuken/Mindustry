@@ -6,6 +6,7 @@ import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.Entity;
 
 public class EntityDraw{
     private static final Rectangle viewport = new Rectangle();
@@ -42,15 +43,12 @@ public class EntityDraw{
             viewport.set(cam.position.x - cam.width / 2, cam.position.y - cam.height / 2, cam.width, cam.height);
         }
 
-        group.forEach(e -> {
-            if(!(e instanceof DrawTrait)) return;
-            T t = (T) e;
+        for(Entity e : group.all()){
+            if(!(e instanceof DrawTrait) || !toDraw.test((T)e) || !e.isAdded()) continue;
 
-            if(!toDraw.test(t) || !e.isAdded()) return;
-
-            if(!clip || rect.setSize(((DrawTrait) e).drawSize()).setCenter(e.getX(), e.getY()).overlaps(viewport)){
-                cons.accept(t);
+            if(!clip || rect.setSize(((DrawTrait)e).drawSize()).setCenter(e.getX(), e.getY()).overlaps(viewport)){
+                cons.accept((T)e);
             }
-        });
+        }
     }
 }

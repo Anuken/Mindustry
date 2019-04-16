@@ -3,18 +3,14 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.ScissorStack;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.GestureDetector;
 import io.anuke.arc.input.GestureDetector.GestureListener;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.event.InputEvent;
-import io.anuke.arc.scene.event.InputListener;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Tmp;
@@ -69,6 +65,7 @@ public class MapView extends Element implements GestureListener{
 
                 return false;
             }
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 if(pointer != 0){
@@ -196,7 +193,7 @@ public class MapView extends Element implements GestureListener{
         super.act(delta);
 
         if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) &&
-                !Core.input.keyDown(KeyCode.CONTROL_LEFT)){
+        !Core.input.keyDown(KeyCode.CONTROL_LEFT)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
             offsetx -= ax * 15f / zoom;
@@ -224,7 +221,7 @@ public class MapView extends Element implements GestureListener{
     }
 
     private Point2 project(float x, float y){
-        float ratio = 1f / ((float) editor.width() / editor.height());
+        float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
@@ -232,26 +229,26 @@ public class MapView extends Element implements GestureListener{
         y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.height();
 
         if(editor.drawBlock.size % 2 == 0 && tool != EditorTool.eraser){
-            return Tmp.g1.set((int) (x - 0.5f), (int) (y - 0.5f));
+            return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
         }else{
-            return Tmp.g1.set((int) x, (int) y);
+            return Tmp.g1.set((int)x, (int)y);
         }
     }
 
     private Vector2 unproject(int x, int y){
-        float ratio = 1f / ((float) editor.width() / editor.height());
+        float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
-        float px = ((float) x / editor.width()) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
-        float py = ((float) (y) / editor.height()) * sclheight
-                + offsety * zoom - sclheight / 2 + getHeight() / 2;
+        float px = ((float)x / editor.width()) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
+        float py = ((float)(y) / editor.height()) * sclheight
+        + offsety * zoom - sclheight / 2 + getHeight() / 2;
         return vec.set(px, py);
     }
 
     @Override
     public void draw(){
-        float ratio = 1f / ((float) editor.width() / editor.height());
+        float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
@@ -317,9 +314,9 @@ public class MapView extends Element implements GestureListener{
                 Vector2 v = unproject(p.x, p.y).add(x, y);
                 float offset = (editor.drawBlock.size % 2 == 0 ? scaling / 2f : 0f);
                 Lines.square(
-                        v.x + scaling / 2f + offset,
-                        v.y + scaling / 2f + offset,
-                        scaling * editor.drawBlock.size / 2f);
+                v.x + scaling / 2f + offset,
+                v.y + scaling / 2f + offset,
+                scaling * editor.drawBlock.size / 2f);
             }
         }
 
@@ -334,9 +331,9 @@ public class MapView extends Element implements GestureListener{
 
     private boolean active(){
         return Core.scene.getKeyboardFocus() != null
-                && Core.scene.getKeyboardFocus().isDescendantOf(ui.editor)
-                && ui.editor.isShown() && tool == EditorTool.zoom &&
-                Core.scene.hit(Core.input.mouse().x, Core.input.mouse().y, true) == this;
+        && Core.scene.getKeyboardFocus().isDescendantOf(ui.editor)
+        && ui.editor.isShown() && tool == EditorTool.zoom &&
+        Core.scene.hit(Core.input.mouse().x, Core.input.mouse().y, true) == this;
     }
 
     @Override

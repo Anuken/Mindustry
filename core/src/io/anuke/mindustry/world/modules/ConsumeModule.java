@@ -3,12 +3,10 @@ package io.anuke.mindustry.world.modules;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.consumers.Consume;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class ConsumeModule extends BlockModule{
-    private boolean valid;
+    private boolean valid, optionalValid;
     private final TileEntity entity;
 
     public ConsumeModule(TileEntity entity){
@@ -18,27 +16,40 @@ public class ConsumeModule extends BlockModule{
     public void update(){
         boolean prevValid = valid();
         valid = true;
-        boolean docons = entity.tile.block().shouldConsume(entity.tile);
+        optionalValid = true;
+        boolean docons = entity.block.shouldConsume(entity.tile);
 
-        for(Consume cons : entity.tile.block().consumes.all()){
-            if(docons && cons.isUpdate() && prevValid && cons.valid(entity.getTile().block(), entity)){
-                cons.update(entity.getTile().block(), entity);
+        for(Consume cons : entity.block.consumes.all()){
+            if(cons.isOptional()) continue;
+
+            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
+                cons.update(entity);
             }
 
-            if(!cons.isOptional()){
-                valid &= cons.valid(entity.getTile().block(), entity);
+            valid &= cons.valid(entity);
+        }
+
+        for(Consume cons : entity.block.consumes.optionals()){
+            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
+                cons.update(entity);
             }
+
+            optionalValid &= cons.valid(entity);
         }
     }
 
     public void trigger(){
-        for(Consume cons : entity.tile.block().consumes.all()){
-            cons.trigger(entity.tile.block(), entity);
+        for(Consume cons : entity.block.consumes.all()){
+            cons.trigger(entity);
         }
     }
 
     public boolean valid(){
-        return valid && entity.tile.block().canProduce(entity.tile);
+        return valid && entity.block.canProduce(entity.tile);
+    }
+
+    public boolean optionalValid(){
+        return valid() && optionalValid;
     }
 
     @Override

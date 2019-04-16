@@ -1,18 +1,16 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Mathf;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class Conduit extends LiquidBlock{
     protected final int timerFlow = timers++;
@@ -108,7 +106,7 @@ public class Conduit extends LiquidBlock{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.noSleep();
-        return super.acceptLiquid(tile, source, liquid, amount) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
     }
 
     @Override

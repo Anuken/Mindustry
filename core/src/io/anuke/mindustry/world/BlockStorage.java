@@ -12,15 +12,10 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.consumers.ConsumeItem;
-import io.anuke.mindustry.world.consumers.ConsumeItems;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.BlockBars;
 import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.Producers;
 
 public abstract class BlockStorage extends UnlockableContent{
     public boolean hasItems;
@@ -28,7 +23,6 @@ public abstract class BlockStorage extends UnlockableContent{
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
-    public boolean singleLiquid = true;
     public boolean consumesPower = true;
     public boolean outputsPower = false;
 
@@ -39,7 +33,6 @@ public abstract class BlockStorage extends UnlockableContent{
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
-    public final Producers produces = new Producers();
 
     public BlockStorage(String name){
         super(name);
@@ -53,7 +46,7 @@ public abstract class BlockStorage extends UnlockableContent{
         return 0f;
     }
 
-    /**Returns the amount of items this block can accept.*/
+    /** Returns the amount of items this block can accept. */
     public int acceptStack(Item item, int amount, Tile tile, Unit source){
         if(acceptItem(item, tile, tile) && hasItems && (source == null || source.getTeam() == tile.getTeam())){
             return Math.min(getMaximumAccepted(tile, item) - tile.entity.items.get(item), amount);
@@ -66,15 +59,16 @@ public abstract class BlockStorage extends UnlockableContent{
         return itemCapacity;
     }
 
-    /**Remove a stack from this inventory, and return the amount removed.*/
+    /** Remove a stack from this inventory, and return the amount removed. */
     public int removeStack(Tile tile, Item item, int amount){
+        if(tile.entity == null || tile.entity.items == null) return 0;
         amount = Math.min(amount, tile.entity.items.get(item));
         tile.entity.noSleep();
         tile.entity.items.remove(item, amount);
         return amount;
     }
 
-    /**Handle a stack input.*/
+    /** Handle a stack input. */
     public void handleStack(Item item, int amount, Tile tile, Unit source){
         tile.entity.noSleep();
         tile.entity.items.add(item, amount);
@@ -84,7 +78,7 @@ public abstract class BlockStorage extends UnlockableContent{
         return hasItems;
     }
 
-    /**Returns offset for stack placement.*/
+    /** Returns offset for stack placement. */
     public void getStackOffset(Item item, Tile tile, Vector2 trns){
 
     }
@@ -98,21 +92,11 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.entity != null && consumes.has(ConsumeItems.class)){
-            for(ItemStack stack : consumes.items()){
-                if(stack.item == item){
-                    return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
-                }
-            }
-        }
-        return tile.entity != null && consumes.has(ConsumeItem.class) && consumes.item() == item &&
-            tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        return consumes.itemFilters[item.id] && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity &&
-                (!singleLiquid || (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)) &&
-                (!consumes.has(ConsumeLiquid.class) || consumes.liquid() == liquid);
+        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity && consumes.liquidfilters[liquid.id];
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
@@ -128,7 +112,7 @@ public abstract class BlockStorage extends UnlockableContent{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.getTeamID() == tile.getTeamID() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
+            if(other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid)){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -156,7 +140,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
         next = next.target();
 
-        if(next.getTeamID() == tile.getTeamID() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
+        if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
@@ -171,14 +155,14 @@ public abstract class BlockStorage extends UnlockableContent{
                 }else if(ofract > 0.1f && fract > 0.1f){
                     Liquid other = next.entity.liquids.current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                            (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                    (liquid.flammability > 0.3f && other.temperature > 0.7f)){
                         tile.entity.damage(1 * Time.delta());
                         next.entity.damage(1 * Time.delta());
                         if(Mathf.chance(0.1 * Time.delta())){
                             Effects.effect(Fx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
-                            (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                    (other.temperature > 0.7f && liquid.temperature < 0.55f)){
                         tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Time.delta()));
                         if(Mathf.chance(0.2f * Time.delta())){
                             Effects.effect(Fx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
@@ -206,7 +190,7 @@ public abstract class BlockStorage extends UnlockableContent{
             incrementDump(tile, proximity.size);
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
-            if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+            if(other.getTeam() == tile.getTeam() && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                 other.block().handleItem(item, other, in);
                 return;
             }
@@ -215,16 +199,13 @@ public abstract class BlockStorage extends UnlockableContent{
         handleItem(item, tile, tile);
     }
 
-    /**
-     * Try dumping any item near the tile.
-     */
+    /** Try dumping any item near the tile. */
     public boolean tryDump(Tile tile){
         return tryDump(tile, null);
     }
 
     /**
      * Try dumping a specific item near the tile.
-     *
      * @param todump Item to dump. Can be null to dump anything.
      */
     public boolean tryDump(Tile tile, Item todump){
@@ -246,7 +227,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 for(int ii = 0; ii < Vars.content.items().size; ii++){
                     Item item = Vars.content.item(ii);
 
-                    if(other.getTeamID() == tile.getTeamID() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
+                    if(other.getTeam() == tile.getTeam() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);
                         tile.entity.items.remove(item, 1);
                         incrementDump(tile, proximity.size);
@@ -255,7 +236,7 @@ public abstract class BlockStorage extends UnlockableContent{
                 }
             }else{
 
-                if(other.getTeamID() == tile.getTeamID() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
+                if(other.getTeam() == tile.getTeam() && other.block().acceptItem(todump, other, in) && canDump(tile, other, todump)){
                     other.block().handleItem(todump, other, in);
                     tile.entity.items.remove(todump, 1);
                     incrementDump(tile, proximity.size);
@@ -270,15 +251,15 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     protected void incrementDump(Tile tile, int prox){
-        tile.setDump((byte) ((tile.getDump() + 1) % prox));
+        tile.setDump((byte)((tile.getDump() + 1) % prox));
     }
 
-    /** Used for dumping items.*/
+    /** Used for dumping items. */
     public boolean canDump(Tile tile, Tile to, Item item){
         return true;
     }
 
-    /** Try offloading an item to a nearby container in its facing direction. Returns true if success.*/
+    /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean offloadDir(Tile tile, Item item){
         Tile other = tile.getNearby(tile.getRotation());
         if(other != null && other.target().getTeamID() == tile.getTeamID() && other.block().acceptItem(item, other, tile)){
@@ -288,7 +269,7 @@ public abstract class BlockStorage extends UnlockableContent{
         return false;
     }
 
-    /** Returns whether this block's inventory has space and is ready for production.*/
+    /** Returns whether this block's inventory has space and is ready for production. */
     public boolean canProduce(Tile tile){
         return true;
     }

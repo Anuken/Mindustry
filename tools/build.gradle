@@ -1,20 +1,19 @@
 apply plugin: "java"
 
 sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
-import java.awt.image.BufferedImage 
+import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
-def packFile = "../core/assets-raw/sprites/pack.json"
 def doAntialias = !project.hasProperty("disableAntialias")
 
-def antialias = {File file ->
+def antialias = { File file ->
     if(!doAntialias || file.lastModified() <= 1000) return
 
     def image = ImageIO.read(file)
@@ -29,7 +28,7 @@ def antialias = {File file ->
     def sum = new Color()
     def suma = new Color()
 
-    for (int x = 0; x < image.getWidth(); x++){
+    for(int x = 0; x < image.getWidth(); x++){
         for(int y = 0; y < image.getHeight(); y++){
             int A =
                     getRGB(x - 1, y + 1),
@@ -42,28 +41,28 @@ def antialias = {File file ->
                 H = getRGB(x, y - 1),
                 I = getRGB(x + 1, y - 1)
 
-            int p1=E, p2=E, p3=E, p4=E, p5=E, p6=E, p7=E, p8=E, p9=E
-            if (D==B && D!=H && B!=F) p1=D
-            if ((D==B && D!=H && B!=F && E!=C) || (B==F && B!=D && F!=H && E!=A)) p2=B
-            if (B==F && B!=D && F!=H) p3=F
-            if ((H==D && H!=F && D!=B && E!=A) || (D==B && D!=H && B!=F && E!=G)) p4=D
-            p5=E
-            if ((B==F && B!=D && F!=H && E!=I) || (F==H && F!=B && H!=D && E!=C)) p6=F
-            if (H==D && H!=F && D!=B) p7=D
-            if ((F==H && F!=B && H!=D && E!=G) || (H==D && H!=F && D!=B && E!=I)) p8=H
-            if (F==H && F!=B && H!=D) p9=F
+            int p1 = E, p2 = E, p3 = E, p4 = E, p5 = E, p6 = E, p7 = E, p8 = E, p9 = E
+            if(D == B && D != H && B != F) p1 = D
+            if((D == B && D != H && B != F && E != C) || (B == F && B != D && F != H && E != A)) p2 = B
+            if(B == F && B != D && F != H) p3 = F
+            if((H == D && H != F && D != B && E != A) || (D == B && D != H && B != F && E != G)) p4 = D
+            p5 = E
+            if((B == F && B != D && F != H && E != I) || (F == H && F != B && H != D && E != C)) p6 = F
+            if(H == D && H != F && D != B) p7 = D
+            if((F == H && F != B && H != D && E != G) || (H == D && H != F && D != B && E != I)) p8 = H
+            if(F == H && F != B && H != D) p9 = F
 
             suma.set(0)
 
             [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
                 Color.argb8888ToColor(color, val)
-                suma.r += color.r*color.a
-                suma.g += color.g*color.a
-                suma.b += color.b*color.a
+                suma.r += color.r * color.a
+                suma.g += color.g * color.a
+                suma.b += color.b * color.a
                 suma.a += color.a
             }
 
-            suma.mul(suma.a <= 0.001f ? 0f : (float)(1f / suma.a))
+            suma.mul(suma.a <= 0.001f ? 0f : (float) (1f / suma.a))
 
             float total = 0
             sum.set(0)
@@ -71,7 +70,7 @@ def antialias = {File file ->
             [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
                 Color.argb8888ToColor(color, val)
                 float a = color.a
-                color.lerp(suma, (float)(1f - a))
+                color.lerp(suma, (float) (1f - a))
                 sum.r += color.r
                 sum.g += color.g
                 sum.b += color.b
@@ -79,7 +78,7 @@ def antialias = {File file ->
                 total += 1f
             }
 
-            sum.mul((float)(1f / total))
+            sum.mul((float) (1f / total))
             int result = Color.argb8888(sum)
             out.setRGB(x, y, result)
             sum.set(0)
@@ -91,25 +90,25 @@ def antialias = {File file ->
 
 task swapColors(){
     doLast{
-        if (project.hasProperty("colors")) {
+        if(project.hasProperty("colors")){
             def carr = new File(getProperty("colors")).text.split("\n")
             def map = [:]
             def swaps = 0
-            carr.each{str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1]))}
+            carr.each{ str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1])) }
             def tmpc = new Color()
 
-            fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit { file ->
+            fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
                 if(file.isDirectory()) return
-                swaps ++
+                swaps++
 
                 def img = ImageIO.read(file.file)
-                for (x in (0..img.getWidth()-1)) {
-                    for (y in (0..img.getHeight()-1)) {
+                for(x in (0..img.getWidth() - 1)){
+                    for(y in (0..img.getHeight() - 1)){
                         def c = img.getRGB(x, y)
                         Color.argb8888ToColor(tmpc, c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
-                            img.setRGB(x, y, (int)map.get(c))
+                            img.setRGB(x, y, (int) map.get(c))
                         }
                     }
                 }
@@ -124,10 +123,10 @@ task swapColors(){
 
 task scaleSprites4x(){
     doLast{
-        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit { file ->
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
             if(file.isDirectory() || file.toString().contains("/ui/")) return
 
-            for(int iteration in 0..1) {
+            for(int iteration in 0..1){
                 def image = ImageIO.read(file.file)
                 def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
 
@@ -136,8 +135,8 @@ task scaleSprites4x(){
                     return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
                 }
 
-                for (int x = 0; x < image.getWidth(); x++) {
-                    for (int y = 0; y < image.getHeight(); y++) {
+                for(int x = 0; x < image.getWidth(); x++){
+                    for(int y = 0; y < image.getHeight(); y++){
                         int p = image.getRGB(x, y)
                         int p1 = p, p2 = p, p3 = p, p4 = p
 
@@ -149,16 +148,16 @@ task scaleSprites4x(){
                             F = getRGB(x + 1, y),
                             G = getRGB(x - 1, y - 1),
                             H = getRGB(x, y - 1),
-                            I = getRGB(x +  1, y - 1),
+                            I = getRGB(x + 1, y - 1),
                             J = getRGB(x, y + 2),
                             K = getRGB(x - 2, y),
                             L = getRGB(x + 2, y),
-                            M = getRGB(x, y - 2);
+                            M = getRGB(x, y - 2)
 
-                        if (B==D && B!=F && D!=H && (E!=A || E==C || E==G || A==J || A==K)) p1 = B
-                        if (B==F & B!=D & F!=H && (E!=C || E==A || E==I || C==J || C==L)) p2 = F
-                        if (D==H & B!=D & F!=H && (E!=G || E==A || E==I || G==K || G==M)) p3 = D
-                        if (F==H & B!=F & D!=H && (E!=I || E==C || E==G || I==L || I==M)) p4 = H
+                        if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
+                        if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
+                        if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
+                        if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
 
                         scaled.setRGB(x * 2, y * 2 + 1, p1)
                         scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
@@ -184,7 +183,7 @@ task scaleSprites(){
             into "../core/assets-raw/sprites_out/"
         }
     }
-    
+
     dependsOn 'scaleSprites4x'
 }
 
@@ -201,13 +200,26 @@ task pack(){
         }
 
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+
+        delete{
+            delete fileTree(dir: '../core/assets-raw/sprites_out/', include: '**/pack.json')
+        }
+
+        copy{
+            from '../core/assets-raw/sprites_out/'
+            into '../core/assets-raw/sprites_out/'
+            include '**/*.json'
+            rename 'pack_fallback.json', "pack.json"
+        }
+
+        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites_fallback.atlas")
     }
-    
+
 }
 
 task cleanup(){
-    doLast {
-        delete {
+    doLast{
+        delete{
             delete genFolder
             delete outFolder
         }
@@ -238,16 +250,16 @@ task antialiasGen(){
     }
 }
 
-task genSprites(dependsOn: classes, type: JavaExec) {
+task genSprites(dependsOn: classes, type: JavaExec){
     finalizedBy 'antialiasGen'
-    
+
     main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = genFolder
 }
 
-task updateBundles(dependsOn: classes, type: JavaExec) {
+task updateBundles(dependsOn: classes, type: JavaExec){
     file(genFolder).mkdirs()
 
     main = "io.anuke.mindustry.BundleLauncher"

@@ -6,10 +6,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.ImagePacker.GenRegion;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -22,7 +19,7 @@ import java.nio.file.Paths;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.tilesize;
 
-public class Generators {
+public class Generators{
 
     public static void generate(){
 
@@ -54,16 +51,15 @@ public class Generators {
                     Image last = null;
                     if(block.outlineIcon){
                         int radius = 3;
-                        GenRegion region = (GenRegion)regions[regions.length-1];
+                        GenRegion region = (GenRegion)regions[regions.length - 1];
                         Image base = ImagePacker.get(region);
                         Image out = last = new Image(region.getWidth(), region.getHeight());
                         for(int x = 0; x < out.width(); x++){
                             for(int y = 0; y < out.height(); y++){
 
                                 Color color = base.getColor(x, y);
-                                if(color.a >= 0.01f){
-                                    out.draw(x, y, color);
-                                }else{
+                                out.draw(x, y, color);
+                                if(color.a < 1f){
                                     boolean found = false;
                                     outer:
                                     for(int rx = -radius; rx <= radius; rx++){
@@ -94,7 +90,7 @@ public class Generators {
 
                     int i = 0;
                     for(TextureRegion region : regions){
-                        i ++;
+                        i++;
                         if(i != regions.length || last == null){
                             image.draw(region);
                         }else{
@@ -125,6 +121,11 @@ public class Generators {
                         }
                     }
                     average.mul(1f / (image.width() * image.height()));
+                    if(block instanceof Floor){
+                        average.mul(0.8f);
+                    }else{
+                        average.mul(1.1f);
+                    }
                     average.a = 1f;
                     colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
@@ -151,7 +152,6 @@ public class Generators {
 
         ImagePacker.generate("mech-icons", () -> {
             for(Mech mech : content.<Mech>getBy(ContentType.mech)){
-
                 mech.load();
                 mech.weapon.load();
 
@@ -164,7 +164,7 @@ public class Generators {
                     image.drawCenter(mech.region);
                 }
 
-                int off = image.width()/2 - mech.weapon.region.getWidth()/2;
+                int off = image.width() / 2 - mech.weapon.region.getWidth() / 2;
 
                 image.draw(mech.weapon.region, -(int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, false, false);
                 image.draw(mech.weapon.region, (int)mech.weaponOffsetX + off, (int)mech.weaponOffsetY + off, true, false);
@@ -175,9 +175,7 @@ public class Generators {
         });
 
         ImagePacker.generate("unit-icons", () -> {
-            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                if(type.isFlying) continue;
-
+            content.<UnitType>getBy(ContentType.unit).each(type -> !type.isFlying, type -> {
                 type.load();
                 type.weapon.load();
 
@@ -190,31 +188,28 @@ public class Generators {
 
                 for(boolean b : Mathf.booleans){
                     image.draw(type.weapon.region,
-                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width()/2 - type.weapon.region.getWidth()/2),
-                    (int)(type.weaponOffsetY / Draw.scl + image.height()/2f - type.weapon.region.getHeight()/2f),
+                    (int)(Mathf.sign(b) * type.weapon.width / Draw.scl + image.width() / 2 - type.weapon.region.getWidth() / 2),
+                    (int)(type.weaponOffsetY / Draw.scl + image.height() / 2f - type.weapon.region.getHeight() / 2f),
                     b, false);
                 }
 
                 image.save("unit-icon-" + type.name);
-            }
+            });
         });
 
         ImagePacker.generate("ore-icons", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof OreBlock)) continue;
-
-                OreBlock ore = (OreBlock)block;
+            content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
                 Item item = ore.itemDrop;
 
-                for (int i = 0; i < 3; i++) {
+                for(int i = 0; i < 3; i++){
                     //get base image to draw on
                     Image image = new Image(32, 32);
-                    Image shadow = ImagePacker.get(item.name + (i+1));
+                    Image shadow = ImagePacker.get(item.name + (i + 1));
 
-                    int offset = image.width()/tilesize;
+                    int offset = image.width() / tilesize;
 
-                    for (int x = 0; x < image.width(); x++) {
-                        for (int y = offset; y < image.height(); y++) {
+                    for(int x = 0; x < image.width(); x++){
+                        for(int y = offset; y < image.height(); y++){
                             Color color = shadow.getColor(x, y - offset);
 
                             //draw semi transparent background
@@ -225,30 +220,27 @@ public class Generators {
                         }
                     }
 
-                    image.draw(ImagePacker.get(item.name + (i+1)));
-                    image.save("../blocks/environment/ore-" + item.name + (i+1));
-                    image.save("../editor/editor-ore-" + item.name + (i+1));
+                    image.draw(ImagePacker.get(item.name + (i + 1)));
+                    image.save("../blocks/environment/ore-" + item.name + (i + 1));
+                    image.save("../editor/editor-ore-" + item.name + (i + 1));
 
                     //save icons
-                    image.save(block.name + "-icon-full");
+                    image.save(ore.name + "-icon-full");
                     for(Icon icon : Icon.values()){
                         if(icon.size == 0) continue;
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save(block.name + "-icon-" + icon.name());
+                        scaled.save(ore.name + "-icon-" + icon.name());
                     }
                 }
-            }
+            });
         });
 
         ImagePacker.generate("edges", () -> {
-            for(Block block : content.blocks()){
-                if(!(block instanceof Floor)) continue;
-
-                Floor floor = (Floor)block;
+            content.blocks().<Floor>each(b -> b instanceof Floor, floor -> {
 
                 if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
-                    continue;
+                    return;
                 }
 
                 try{
@@ -265,7 +257,7 @@ public class Generators {
                     result.save("../blocks/environment/" + floor.name + "-edge");
 
                 }catch(Exception ignored){}
-            }
+            });
         });
     }
 

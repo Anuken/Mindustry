@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
@@ -8,6 +7,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.type.Liquid;
@@ -20,7 +20,7 @@ public class LiquidBulletType extends BulletType{
     Liquid liquid;
 
     public LiquidBulletType(Liquid liquid){
-        super(2.8f, 0);
+        super(3.5f, 0);
         this.liquid = liquid;
 
         lifetime = 74f;
@@ -35,11 +35,11 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public float range(){
-        return speed * lifetime /2f;
+        return speed * lifetime / 2f;
     }
 
     @Override
-    public void update(Bullet b) {
+    public void update(Bullet b){
         super.update(b);
 
         if(liquid.canExtinguish()){

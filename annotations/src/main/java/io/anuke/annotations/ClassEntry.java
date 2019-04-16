@@ -1,7 +1,5 @@
 package io.anuke.annotations;
 
-import io.anuke.annotations.MethodEntry;
-
 import java.util.ArrayList;
 
 /** Represents a class witha list method entries to include in it. */

@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 
@@ -49,7 +50,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         title.setAlignment(Align.center);
         titleTable.row();
         titleTable.add(new Image("white"))
-                .growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        .growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
@@ -177,8 +178,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
 
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
+
 
         if(!mobile){
+            graphics.sliderPref("antialias", 0, 0, 5, 1, s -> (s == 0 ? 0 : (1 << s)) + "x");
+
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){
@@ -192,12 +197,28 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("fullscreen")){
                 Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
             }
+        }else{
+            graphics.checkPref("landscape", false, b -> {
+                if(b){
+                    Platform.instance.beginForceLandscape();
+                }else{
+                    Platform.instance.endForceLandscape();
+                }
+            });
+
+            if(Core.settings.getBool("landscape")){
+                Platform.instance.beginForceLandscape();
+            }
         }
 
+        graphics.checkPref("playerchat", true);
+        graphics.checkPref("minimap", !mobile);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", !mobile);
+        graphics.checkPref("animatedwater", false);
+        graphics.checkPref("animatedshields", !mobile);
         graphics.checkPref("lasers", true);
+        graphics.checkPref("pixelate", false);
     }
 
     private void back(){

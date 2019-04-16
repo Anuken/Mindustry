@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.util.NumberUtils;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.type.Item;
 
 import static io.anuke.mindustry.Vars.content;
@@ -24,11 +22,11 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Pack.longInt(NumberUtils.floatToIntBits(Time.time()), Pack.shortInt((short) item.id, data));
+        buffer[index++] = Pack.longInt(NumberUtils.floatToIntBits(Time.time()), Pack.shortInt((short)item.id, data));
     }
 
     public void accept(Item item){
-        accept(item, (short) -1);
+        accept(item, (short)-1);
     }
 
     public Item poll(){

@@ -2,36 +2,31 @@ package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Queue;
-import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.FlyingUnit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
-import static io.anuke.mindustry.Vars.unitGroups;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
+
+
     protected Item targetItem;
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new Queue<>();
@@ -48,7 +43,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         }
 
         public void update(){
-            BuildEntity entity = (BuildEntity) target;
+            BuildEntity entity = (BuildEntity)target;
             TileEntity core = getClosestCore();
 
             if(entity == null){
@@ -58,24 +53,12 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(core == null) return;
 
-            if((entity.progress() < 1f || entity.progress() > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
+            if((entity.progress < 1f || entity.progress > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
                 if(!isBuilding() && dst(target) < placeDistance * 0.9f){ //within distance, begin placing
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.block));
-                    }
-                }
-
-                //if it's missing requirements, try and mine them
-                if(entity.block != null){
-                    for(ItemStack stack : entity.block.buildRequirements){
-                        if(!core.items.has(stack.item, stack.amount) && type.toMine.contains(stack.item)){
-                            targetItem = stack.item;
-                            getPlaceQueue().clear();
-                            setState(mine);
-                            return;
-                        }
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.cblock));
                     }
                 }
 
@@ -105,7 +88,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             if(target == null) return;
 
             if(target.dst(Drone.this) > type.range){
-                circle(type.range*0.9f);
+                circle(type.range * 0.9f);
             }else{
                 getWeapon().update(Drone.this, target.getX(), target.getY());
             }
@@ -127,7 +110,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             }
 
             //core full
-            if(targetItem != null && entity.tile.block().acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
+            if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, Drone.this) == 0){
                 setState(repair);
                 return;
             }
@@ -155,10 +138,10 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                     moveTo(type.range / 1.5f);
 
                     if(dst(target) < type.range && mineTile != target){
-                        setMineTile((Tile) target);
+                        setMineTile((Tile)target);
                     }
 
-                    if(((Tile) target).block() != Blocks.air){
+                    if(((Tile)target).block() != Blocks.air){
                         setState(drop);
                     }
                 }
@@ -190,7 +173,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
             if(target == null) return;
 
-            TileEntity tile = (TileEntity) target;
+            TileEntity tile = (TileEntity)target;
 
             if(dst(target) < type.range){
                 if(tile.tile.block().acceptStack(item.item, item.amount, tile.tile, Drone.this) == item.amount){
@@ -229,7 +212,6 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
             if(!(event.builder instanceof Player) || !(event.tile.entity instanceof BuildEntity)) return;
-            BuildEntity entity = event.tile.entity();
 
             for(BaseUnit unit : group.all()){
                 if(unit instanceof Drone){
@@ -242,21 +224,9 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                             drone.setState(drone.repair);
                         }
                     }
-
-                    drone.notifyPlaced(entity, event.breaking);
                 }
             }
         });
-    }
-
-    private void notifyPlaced(BuildEntity entity, boolean isBreaking){
-        float dist = Math.min(entity.dst(x, y) - placeDistance, 0);
-
-        if(!state.is(build) && dist / type.maxVelocity < entity.buildCost * 0.9f){
-            target = entity;
-            this.isBreaking = isBreaking;
-            setState(build);
-        }
     }
 
     @Override
@@ -297,6 +267,25 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             target = null;
         }
 
+        if(!state.is(build) && timer.get(timerTarget2, 15)){
+            for(Player player : playerGroup.all()){
+                if(player.getTeam() == team && player.getCurrentRequest() != null){
+                    BuildRequest req = player.getCurrentRequest();
+                    Tile tile = world.tile(req.x, req.y);
+                    if(tile != null && tile.entity instanceof BuildEntity){
+                        BuildEntity b = tile.entity();
+                        float dist = Math.min(b.dst(x, y) - placeDistance, 0);
+                        if(dist / type.maxVelocity < b.buildCost * 0.9f){
+                            target = b;
+                            this.isBreaking = req.breaking;
+                            setState(build);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         updateBuilding();
     }
 
@@ -312,7 +301,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
     @Override
     public void behavior(){
         if(health <= health * type.retreatPercent &&
-                Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
+        Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }
@@ -337,7 +326,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         if(entity == null){
             return;
         }
-        targetItem = Structs.findMin(type.toMine, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = Structs.findMin(type.toMine, world.indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 
     @Override

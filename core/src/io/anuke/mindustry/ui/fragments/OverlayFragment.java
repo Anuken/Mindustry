@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.mindustry.input.InputHandler;
 import io.anuke.arc.scene.Group;
+import io.anuke.mindustry.input.InputHandler;
 
-/**Fragment for displaying overlays such as block inventories. One is created for each input handler.*/
+/** Fragment for displaying overlays such as block inventories. One is created for each input handler. */
 public class OverlayFragment extends Fragment{
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;

@@ -26,15 +26,16 @@ public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
     private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
-    private Loadout loadout;
-    /**How much the landscape is randomly distorted.*/
+    /** How much the landscape is randomly distorted. */
     public float distortion = 3;
-    /**The amount of final enemy spawns used. -1 to use everything in the map.
-     * This amount of enemy spawns is selected randomly from the map.*/
+    /**
+     * The amount of final enemy spawns used. -1 to use everything in the map.
+     * This amount of enemy spawns is selected randomly from the map.
+     */
     public int enemySpawns = -1;
-    /**Whether floor is distorted along with blocks.*/
+    /** Whether floor is distorted along with blocks. */
     public boolean distortFloor = false;
-    /**Items randomly added to containers and vaults.*/
+    /** Items randomly added to containers and vaults. */
     public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
 
     public MapGenerator(String mapName){
@@ -95,7 +96,7 @@ public class MapGenerator extends Generator{
                         tiles[x][y].setBlock(Blocks.air);
                     }
 
-                    if(tiles[x][y].block() == Blocks.spawn){
+                    if(tiles[x][y].block() == Blocks.spawn && enemySpawns != -1){
                         enemies.add(new Point2(x, y));
                         tiles[x][y].setBlock(Blocks.air);
                     }
@@ -124,7 +125,7 @@ public class MapGenerator extends Generator{
 
                     if(distortFloor){
                         tile.setFloor(tiles[newX][newY].floor());
-                        tile.setOre(tiles[newX][newY].ore());
+                        tile.setOverlay(tiles[newX][newY].overlay());
                     }
 
                     for(Decoration decor : decorations){
@@ -167,7 +168,7 @@ public class MapGenerator extends Generator{
                             double dst = Mathf.dst(x, y);
                             if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
                                 Tile tile = tiles[wx][wy];
-                                tile.clearOre();
+                                tile.clearOverlay();
                             }
                         }
                     }

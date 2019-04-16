@@ -10,17 +10,12 @@ import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.CachedTile;
-import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -32,7 +27,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.bufferSize;
 import static io.anuke.mindustry.Vars.content;
 
-/** Reads and writes map files.*/
+/** Reads and writes map files. */
 public class MapIO{
     public static final int version = 1;
 
@@ -44,13 +39,13 @@ public class MapIO{
 
         //stainedRocks, stainedRocksRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
         missingBlocks = ObjectMap.of(
-            "stained-stone", Blocks.shale,
-            "stained-stone-red", Blocks.shale,
-            "stained-stone-yellow", Blocks.shale,
-            "stained-rocks", Blocks.shaleRocks,
-            "stained-boulder", Blocks.shaleBoulder,
-            "stained-rocks-red", Blocks.shaleRocks,
-            "stained-rocks-yellow", Blocks.shaleRocks
+        "stained-stone", Blocks.shale,
+        "stained-stone-red", Blocks.shale,
+        "stained-stone-yellow", Blocks.shale,
+        "stained-rocks", Blocks.shaleRocks,
+        "stained-boulder", Blocks.shaleBoulder,
+        "stained-rocks-red", Blocks.shaleRocks,
+        "stained-rocks-yellow", Blocks.shaleRocks
         );
     }
 
@@ -69,25 +64,30 @@ public class MapIO{
 
     public static Pixmap generatePreview(Map map) throws IOException{
         Time.mark();
-        Pixmap floor = new Pixmap(map.width, map.height, Format.RGBA8888);
-        Pixmap wall = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
+        Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
         int black = Color.rgba8888(Color.BLACK);
+        int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
         CachedTile tile = new CachedTile(){
             @Override
             public void setFloor(Floor type){
-                floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
+                floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
             }
 
             @Override
-            public void setOreByte(byte b){
-                if(b != 0) floor.drawPixel(x, floor.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
+            public void setOverlayID(byte b){
+                if(b != 0)
+                    floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, content.block(b), getTeam()));
             }
 
             @Override
             protected void changed(){
                 super.changed();
                 int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
-                if(c != black) wall.drawPixel(x, floor.getHeight() - 1 - y, c);
+                if(c != black){
+                    walls.drawPixel(x, floors.getHeight() - 1 - y, c);
+                    floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+                }
             }
         };
         readTiles(map, (x, y) -> {
@@ -95,9 +95,9 @@ public class MapIO{
             tile.y = (short)y;
             return tile;
         });
-        floor.drawPixmap(wall, 0, 0);
-        wall.dispose();
-        return floor;
+        floors.drawPixmap(walls, 0, 0);
+        walls.dispose();
+        return floors;
     }
 
     public static Pixmap generatePreview(Tile[][] tiles){
@@ -105,7 +105,7 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles[x][y];
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.ore(), tile.getTeam()));
+                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
             }
         }
         return pixmap;
@@ -144,13 +144,13 @@ public class MapIO{
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = tiles[i % width][i / width];
                 stream.writeByte(tile.getFloorID());
-                stream.writeByte(tile.getOreByte());
+                stream.writeByte(tile.getOverlayID());
                 int consecutives = 0;
 
                 for(int j = i + 1; j < width * height && consecutives < 255; j++){
                     Tile nextTile = tiles[j % width][j / width];
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOreByte() != tile.getOreByte()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOverlayID() != tile.getOverlayID()){
                         break;
                     }
 
@@ -167,7 +167,7 @@ public class MapIO{
                 stream.writeByte(tile.getBlockID());
 
                 if(tile.block() instanceof BlockPart){
-                    stream.writeByte(tile.link);
+                    stream.writeByte(tile.getLinkByte());
                 }else if(tile.entity != null){
                     stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                     stream.writeShort(/*(short)tile.entity.health*/tile.block().health); //health
@@ -216,12 +216,12 @@ public class MapIO{
         }
     }
 
-    /**Reads tiles from a map, version-agnostic.*/
+    /** Reads tiles from a map, version-agnostic. */
     public static void readTiles(Map map, Tile[][] tiles) throws IOException{
         readTiles(map, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads tiles from a map, version-agnostic.*/
+    /** Reads tiles from a map, version-agnostic. */
     public static void readTiles(Map map, TileProvider tiles) throws IOException{
         if(map.version == 0){
             readLegacyMmapTiles(map.file, tiles);
@@ -232,12 +232,12 @@ public class MapIO{
         }
     }
 
-    /**Reads tiles from a map in the new build-65 format.*/
+    /** Reads tiles from a map in the new build-65 format. */
     private static void readTiles(FileHandle file, int width, int height, Tile[][] tiles) throws IOException{
         readTiles(file, width, height, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads tiles from a map in the new build-65 format.*/
+    /** Reads tiles from a map in the new build-65 format. */
     private static void readTiles(FileHandle file, int width, int height, TileProvider tiles) throws IOException{
         try(BufferedInputStream input = file.read(bufferSize)){
 
@@ -272,13 +272,13 @@ public class MapIO{
 
                         Tile tile = tiles.get(x, y);
                         tile.setFloor((Floor)content.block(floorid));
-                        tile.setOre(content.block(oreid));
+                        tile.setOverlay(content.block(oreid));
 
                         for(int j = i + 1; j < i + 1 + consecutives; j++){
                             int newx = j % width, newy = j / width;
                             Tile newTile = tiles.get(newx, newy);
                             newTile.setFloor((Floor)content.block(floorid));
-                            newTile.setOre(content.block(oreid));
+                            newTile.setOverlay(content.block(oreid));
                         }
 
                         i += consecutives;
@@ -293,7 +293,7 @@ public class MapIO{
                         tile.setBlock(block);
 
                         if(block == Blocks.part){
-                            tile.link = stream.readByte();
+                            tile.setLinkByte(stream.readByte());
                         }else if(tile.entity != null){
                             byte tr = stream.readByte();
                             short health = stream.readShort();
@@ -327,7 +327,7 @@ public class MapIO{
 
     //region legacy IO
 
-    /**Reads a pixmap in the 3.5 pixmap format.*/
+    /** Reads a pixmap in the 3.5 pixmap format. */
     public static void readLegacyPixmap(Pixmap pixmap, Tile[][] tiles){
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
@@ -337,7 +337,7 @@ public class MapIO{
 
                 tile.setFloor(block.floor);
                 tile.setBlock(block.wall);
-                if(block.ore != null) tile.setOre(block.ore);
+                if(block.ore != null) tile.setOverlay(block.ore);
 
                 //place core
                 if(color == Color.rgba8888(Color.GREEN)){
@@ -351,7 +351,7 @@ public class MapIO{
                                 Tile write = tiles[worldx][worldy];
                                 write.setBlock(Blocks.part);
                                 write.setTeam(Team.blue);
-                                write.setLinkByte(Pack.byteByte((byte) (dx - 1 + 8), (byte) (dy - 1 + 8)));
+                                write.setLinkByte(Pack.byteByte((byte)(dx - 1 + 8), (byte)(dy - 1 + 8)));
                             }
                         }
                     }
@@ -364,12 +364,12 @@ public class MapIO{
         }
     }
 
-    /**Reads a pixmap in the old 4.0 .mmap format.*/
+    /** Reads a pixmap in the old 4.0 .mmap format. */
     private static void readLegacyMmapTiles(FileHandle file, Tile[][] tiles) throws IOException{
         readLegacyMmapTiles(file, (x, y) -> tiles[x][y]);
     }
 
-    /**Reads a mmap in the old 4.0 .mmap format.*/
+    /** Reads a mmap in the old 4.0 .mmap format. */
     private static void readLegacyMmapTiles(FileHandle file, TileProvider tiles) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(bufferSize))){
             stream.readInt(); //version
@@ -437,7 +437,7 @@ public class MapIO{
                     }
 
                     if(oreMap.containsKey(floorb)){
-                        tile.setOre(content.block(oreMap.get(floorb, 0)));
+                        tile.setOverlay(content.block(oreMap.get(floorb, 0)));
                     }
                 }
             }

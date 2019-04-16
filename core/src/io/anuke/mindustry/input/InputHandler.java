@@ -29,22 +29,19 @@ import io.anuke.mindustry.net.ValidateException;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.fragments.OverlayFragment;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Build;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class InputHandler implements InputProcessor{
-    /**Used for dropping items.*/
+    /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
-    /**Maximum line length.*/
+    /** Maximum line length. */
     final static int maxLength = 100;
     final static Vector2 stackTrns = new Vector2();
-    /**Distance on the back from where items originate.*/
+    /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
-    public final Player player;
     public final OverlayFragment frag = new OverlayFragment(this);
 
     public Block block;
@@ -53,10 +50,6 @@ public abstract class InputHandler implements InputProcessor{
 
     protected PlaceDraw placeDraw = new PlaceDraw();
     private PlaceLine line = new PlaceLine();
-
-    public InputHandler(Player player){
-        this.player = player;
-    }
 
     //methods to override
 
@@ -96,17 +89,17 @@ public abstract class InputHandler implements InputProcessor{
                 tile.block().getStackOffset(item, tile, stackTrns);
 
                 ItemTransfer.create(item,
-                        player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
-                        new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
-                            if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
+                player.x + Angles.trnsx(player.rotation + 180f, backTrns), player.y + Angles.trnsy(player.rotation + 180f, backTrns),
+                new Vector2(tile.drawx() + stackTrns.x, tile.drawy() + stackTrns.y), () -> {
+                    if(tile.block() != block || tile.entity == null || tile.entity.items == null) return;
 
-                            tile.block().handleStack(item, removed, tile, player);
-                            remaining[1] -= removed;
+                    tile.block().handleStack(item, removed, tile, player);
+                    remaining[1] -= removed;
 
-                            if(end && remaining[1] > 0){
-                                tile.block().handleStack(item, remaining[1], tile, player);
-                            }
-                        });
+                    if(end && remaining[1] > 0){
+                        tile.block().handleStack(item, remaining[1], tile, player);
+                    }
+                });
 
                 remaining[0] -= removed;
 
@@ -159,7 +152,7 @@ public abstract class InputHandler implements InputProcessor{
         return false;
     }
 
-    /**Handles tile tap events that are not platform specific.*/
+    /** Handles tile tap events that are not platform specific. */
     boolean tileTapped(Tile tile){
         tile = tile.target();
 
@@ -169,8 +162,8 @@ public abstract class InputHandler implements InputProcessor{
         if(tile.block().configurable && tile.interactable(player.getTeam())){
             consumed = true;
             if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
-                    //alternatively, the current selected block can 'agree' to switch config tiles
-                    || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
+            //alternatively, the current selected block can 'agree' to switch config tiles
+            || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
                 frag.config.showConfig(tile);
             }
             //otherwise...
@@ -215,7 +208,7 @@ public abstract class InputHandler implements InputProcessor{
         return consumed;
     }
 
-    /**Tries to select the player to drop off items, returns true if successful.*/
+    /** Tries to select the player to drop off items, returns true if successful. */
     boolean tryTapPlayer(float x, float y){
         if(canTapPlayer(x, y)){
             droppingItem = true;
@@ -228,7 +221,7 @@ public abstract class InputHandler implements InputProcessor{
         return Mathf.dst(x, y, player.x, player.y) <= playerSelectRange && player.item().amount > 0;
     }
 
-    /**Tries to begin mining a tile, returns true if successful.*/
+    /** Tries to begin mining a tile, returns true if successful. */
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
@@ -240,13 +233,13 @@ public abstract class InputHandler implements InputProcessor{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-                && tile.drop() != null && tile.drop().hardness <= player.mech.drillPower
-                && !tile.floor().playerUnmineable
-                && player.acceptsItem(tile.drop())
-                && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+        && tile.drop() != null && tile.drop().hardness <= player.mech.drillPower
+        && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
+        && player.acceptsItem(tile.drop())
+        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
     }
 
-    /**Returns the tile at the specified MOUSE coordinates.*/
+    /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
     }
@@ -313,25 +306,20 @@ public abstract class InputHandler implements InputProcessor{
         }
     }
 
-    public boolean cursorNear(){
-        return true;
-    }
-
     public void tryPlaceBlock(int x, int y){
-        if(block != null && validPlace(x, y, block, rotation) && cursorNear()){
+        if(block != null && validPlace(x, y, block, rotation)){
             placeBlock(x, y, block, rotation);
         }
     }
 
     public void tryBreakBlock(int x, int y){
-        if(cursorNear() && validBreak(x, y)){
+        if(validBreak(x, y)){
             breakBlock(x, y);
         }
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation){
-        return Build.validPlace(player.getTeam(), x, y, type, rotation) &&
-        Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validPlace(player.getTeam(), x, y, type, rotation);
     }
 
     public boolean validBreak(int x, int y){
@@ -384,7 +372,7 @@ public abstract class InputHandler implements InputProcessor{
         for(int i = 0; i < points.size; i++){
             Point2 point = points.get(i);
 
-            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x*tilesize + block.offset(), point.y*tilesize + block.offset()).overlaps(Tmp.r3)){
+            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset()).overlaps(Tmp.r3)){
                 continue;
             }
 
@@ -395,7 +383,7 @@ public abstract class InputHandler implements InputProcessor{
             line.last = next == null;
             cons.accept(line);
 
-            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x*tilesize + block.offset(), point.y*tilesize + block.offset());
+            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
         }
     }
 

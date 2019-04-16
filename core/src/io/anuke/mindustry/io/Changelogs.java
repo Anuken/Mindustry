@@ -44,11 +44,11 @@ public class Changelogs{
         @Override
         public String toString(){
             return "VersionInfo{" +
-                    "name='" + name + '\'' +
-                    ", description='" + description + '\'' +
-                    ", id=" + id +
-                    ", build=" + build +
-                    '}';
+            "name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", id=" + id +
+            ", build=" + build +
+            '}';
         }
     }
 }

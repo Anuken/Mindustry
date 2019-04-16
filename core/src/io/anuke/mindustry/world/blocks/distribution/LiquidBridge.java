@@ -1,11 +1,12 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import io.anuke.arc.collection.IntSet.IntSetIterator;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.math.Mathf;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -27,7 +28,7 @@ public class LiquidBridge extends ItemBridge{
         entity.time2 += (entity.cycleSpeed - 1f) * Time.delta();
 
         Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other) ){
+        if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
             if(entity.cons.valid()){
@@ -57,12 +58,42 @@ public class LiquidBridge extends ItemBridge{
     }
 
     @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        if(tile.getTeam() != source.target().getTeam()) return false;
+
+        ItemBridgeEntity entity = tile.entity();
+        Tile other = world.tile(entity.link);
+
+        if(linkValid(tile, other)){
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(source.x, source.y);
+
+            if(rel == rel2) return false;
+        }else if(!(source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos())){
+            return false;
+        }
+
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+    }
+
+    @Override
     public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
         ItemBridgeEntity entity = tile.entity();
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            return !(to.block() instanceof LiquidBridge);
+            Tile edge = Edges.getFacingEdge(to, tile);
+            int i = tile.absoluteRelativeTo(edge.x, edge.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
+                    return false;
+                }
+            }
+            return true;
         }
 
         int rel = tile.absoluteRelativeTo(other.x, other.y);

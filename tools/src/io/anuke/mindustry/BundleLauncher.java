@@ -4,18 +4,13 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.function.BiFunction;
 import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.io.PropertiesUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 
-public class BundleLauncher {
+public class BundleLauncher{
 
     public static void main(String[] args) throws Exception{
         File file = new File("bundle.properties");
@@ -24,13 +19,14 @@ public class BundleLauncher {
         Array<String> removals = new Array<>();
 
         Files.walk(Paths.get("")).forEach(child -> {
-            try {
-                if (child.getFileName().toString().equals("bundle.properties") || Files.isDirectory(child) || child.toString().contains("output")) return;
+            try{
+                if(child.getFileName().toString().equals("bundle.properties") || Files.isDirectory(child) || child.toString().contains("output"))
+                    return;
 
                 Log.info("Parsing bundle: {0}", child);
 
                 OrderedMap<String, String> other = new OrderedMap<>();
-                PropertiesUtils.load(other, Files.newBufferedReader(child, StandardCharsets.UTF_8));
+                PropertiesUtils.load(other, Files.newBufferedReader(child, Strings.utf8));
                 removals.clear();
 
                 for(String key : other.orderedKeys()){
@@ -49,7 +45,7 @@ public class BundleLauncher {
                 for(String key : base.orderedKeys()){
                     if(!other.containsKey(key) || other.get(key).trim().isEmpty()){
                         other.put(key, base.get(key));
-                        added ++;
+                        added++;
                         Log.info("&lc- Adding missing key '{0}'...", key);
                     }
                 }
@@ -68,9 +64,9 @@ public class BundleLauncher {
                     other.remove(key);
                 }
 
-                Files.write(child, result.toString().getBytes(StandardCharsets.UTF_8));
+                Files.write(child, result.toString().getBytes(Strings.utf8));
 
-            }catch (IOException e){
+            }catch(IOException e){
                 throw new RuntimeException(e);
             }
         });

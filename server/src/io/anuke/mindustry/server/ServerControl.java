@@ -1,18 +1,15 @@
 package io.anuke.mindustry.server;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Array.ArrayIterable;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.CommandHandler.Command;
-import io.anuke.arc.util.CommandHandler.Response;
-import io.anuke.arc.util.CommandHandler.ResponseType;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
@@ -49,13 +46,13 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         Core.settings.defaults(
-            "shufflemode", "normal",
-            "bans", "",
-            "admins", "",
-            "shuffle", true,
-            "crashreport", false,
-            "port", port,
-            "logging", true
+        "shufflemode", "normal",
+        "bans", "",
+        "admins", "",
+        "shuffle", true,
+        "crashreport", false,
+        "port", port,
+        "logging", true
         );
 
         Log.setLogger(new LogHandler(){
@@ -93,8 +90,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
-        Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
+        Effects.setScreenShakeProvider((a, b) -> {
+        });
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {
+        });
 
         registerCommands();
 
@@ -143,8 +142,8 @@ public class ServerControl implements ApplicationListener{
 
                     Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                    + "\nNext selected map:[accent] "+map.name()+"[]"
-                    + (map.author() != null ? " by[accent] " + map.author() + "[]" : "") + "."+
+                    + "\nNext selected map:[accent] " + map.name() + "[]"
+                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
                     "\nNew game begins in " + roundExtraTime + " seconds.");
 
                     info("Selected next map to be {0}.", map.name());
@@ -198,7 +197,7 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0]));
+            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
             if(result == null){
                 err("No map with name &y'{0}'&lr found.", arg[0]);
@@ -259,6 +258,16 @@ public class ServerControl implements ApplicationListener{
             info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
+        handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
+            int beforeMaps = world.maps.all().size;
+            world.maps.reload();
+            if(world.maps.all().size > beforeMaps){
+                info("&lc{0}&ly new map(s) found and reloaded.", world.maps.all().size - beforeMaps);
+            }else{
+                info("&lyMaps reloaded.");
+            }
+        });
+
         handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
                 info("Status: &rserver closed");
@@ -269,10 +278,10 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.waves){
                     info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
-                    info("&ly  {0} seconds until next wave.", (int) (state.wavetime / 60));
+                    info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
 
-                info("  &ly{0} FPS, {1} MB used.", (int)(60f/Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
+                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(playerGroup.size() > 0){
                     info("  &lyPlayers: {0}", playerGroup.size());
@@ -298,7 +307,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime;
+                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
@@ -310,7 +319,7 @@ public class ServerControl implements ApplicationListener{
                 err("Not playing. Host first.");
                 return;
             }
-            
+
             try{
                 Team team = arg.length == 0 ? Team.blue : Team.valueOf(arg[0]);
 
@@ -318,13 +327,13 @@ public class ServerControl implements ApplicationListener{
                     err("That team has no cores.");
                     return;
                 }
-                
+
                 for(Item item : content.items()){
                     if(item.type == ItemType.material){
                         state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
                     }
                 }
-                
+
                 info("Core filled.");
             }catch(IllegalArgumentException ignored){
                 err("No such team exists.");
@@ -346,9 +355,9 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
-           boolean value = arg[0].equalsIgnoreCase("on");
-           netServer.admins.setStrict(value);
-           info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
+            boolean value = arg[0].equalsIgnoreCase("on");
+            netServer.admins.setStrict(value);
+            info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
         });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
@@ -536,12 +545,16 @@ public class ServerControl implements ApplicationListener{
             int slot = Strings.parseInt(arg[0]);
 
             if(!SaveIO.isSaveValid(slot)){
-                err("No save data found for slot.");
+                err("No (valid) save data found for slot.");
                 return;
             }
 
             Core.app.post(() -> {
-                SaveIO.loadFromSlot(slot);
+                try{
+                    SaveIO.loadFromSlot(slot);
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
                 info("Save loaded.");
                 host();
                 state.set(State.playing);
@@ -584,7 +597,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i ++, info.lastName, info.id);
+                    info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i++, info.lastName, info.id);
                     info("  &lyall names used: {0}", info.names);
                     info("  &lyIP: {0}", info.lastIP);
                     info("  &lyall IPs used: {0}", info.ips);
@@ -652,6 +665,9 @@ public class ServerControl implements ApplicationListener{
             logic.play();
             for(Player p : players){
                 p.reset();
+                if(state.rules.pvp){
+                    p.setTeam(netServer.assignTeam(new ArrayIterable<>(players)));
+                }
                 netServer.sendWorldData(p, p.con.id);
             }
             inExtraRound = false;
@@ -682,6 +698,7 @@ public class ServerControl implements ApplicationListener{
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            state.set(State.menu);
         }catch(IOException e){
             err(e);
             state.set(State.menu);
@@ -691,14 +708,14 @@ public class ServerControl implements ApplicationListener{
     private void logToFile(String text){
         if(currentLogFile != null && currentLogFile.length() > maxLogLength){
             String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
-            currentLogFile.writeString("[End of log file. Date: "+ date + "]\n", true);
+            currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
             currentLogFile = null;
         }
 
         if(currentLogFile == null){
             int i = 0;
             while(logFolder.child("log-" + i + ".txt").length() >= maxLogLength){
-                i ++;
+                i++;
             }
 
             currentLogFile = logFolder.child("log-" + i + ".txt");

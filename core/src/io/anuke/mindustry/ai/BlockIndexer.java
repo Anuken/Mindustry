@@ -17,31 +17,33 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Class used for indexing special target blocks for AI.*/
+/** Class used for indexing special target blocks for AI. */
 @SuppressWarnings("unchecked")
 public class BlockIndexer{
-    /**Size of one ore quadrant.*/
+    /** Size of one ore quadrant. */
     private final static int oreQuadrantSize = 20;
-    /**Size of one structure quadrant.*/
+    /** Size of one structure quadrant. */
     private final static int structQuadrantSize = 12;
 
-    /**Set of all ores that are being scanned.*/
+    /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
-    /**Stores all ore quadtrants on the map.*/
+    /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores;
-    /**Tags all quadrants.*/
+    /** Tags all quadrants. */
     private Bits[] structQuadrants;
-    /**Stores all damaged tile entities by team.*/
+    /** Stores all damaged tile entities by team. */
     private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all.length];
+    /**All ores available on this map.*/
+    private ObjectSet<Item> allOres = new ObjectSet<>();
 
-    /**Maps teams to a map of flagged tiles by type.*/
+    /** Maps teams to a map of flagged tiles by type. */
     private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
-    /**Maps tile positions to their last known tile index data.*/
+    /** Maps tile positions to their last known tile index data. */
     private IntMap<TileIndex> typeMap = new IntMap<>();
-    /**Empty set used for returning.*/
+    /** Empty set used for returning. */
     private ObjectSet<Tile> emptySet = new ObjectSet<>();
-    /**Array used for returning and reusing.*/
+    /** Array used for returning and reusing. */
     private Array<Tile> returnArray = new Array<>();
 
     public BlockIndexer(){
@@ -67,12 +69,13 @@ public class BlockIndexer{
             }
 
             typeMap.clear();
+            allOres.clear();
             ores = null;
 
             //create bitset for each team type that contains each quadrant
             structQuadrants = new Bits[Team.all.length];
             for(int i = 0; i < Team.all.length; i++){
-                structQuadrants[i] = new Bits(Mathf.ceil(world.width() / (float) structQuadrantSize) * Mathf.ceil(world.height() / (float) structQuadrantSize));
+                structQuadrants[i] = new Bits(Mathf.ceil(world.width() / (float)structQuadrantSize) * Mathf.ceil(world.height() / (float)structQuadrantSize));
             }
 
             for(int x = 0; x < world.width(); x++){
@@ -84,6 +87,8 @@ public class BlockIndexer{
                     if(tile.entity != null && tile.entity.damaged()){
                         notifyTileDamaged(tile.entity);
                     }
+
+                    if(tile.drop() != null) allOres.add(tile.drop());
                 }
             }
 
@@ -101,7 +106,12 @@ public class BlockIndexer{
         return flagMap[team.ordinal()];
     }
 
-    /**Returns all damaged tiles by team.*/
+    /** @return whether this item is present on this map.*/
+    public boolean hasOre(Item item){
+        return allOres.contains(item);
+    }
+
+    /** Returns all damaged tiles by team. */
     public ObjectSet<Tile> getDamaged(Team team){
         returnArray.clear();
 
@@ -123,12 +133,12 @@ public class BlockIndexer{
         return set;
     }
 
-    /**Get all allied blocks with a flag.*/
+    /** Get all allied blocks with a flag. */
     public ObjectSet<Tile> getAllied(Team team, BlockFlag type){
         return flagMap[team.ordinal()][type.ordinal()];
     }
 
-    /**Get all enemy blocks with a flag.*/
+    /** Get all enemy blocks with a flag. */
     public Array<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
         for(Team enemy : state.teams.enemiesOf(team)){
@@ -154,8 +164,8 @@ public class BlockIndexer{
         TileEntity closest = null;
         float dst = 0;
 
-        for(int rx = Math.max((int) ((x - range) / tilesize / structQuadrantSize), 0); rx <= (int) ((x + range) / tilesize / structQuadrantSize) && rx < quadWidth(); rx++){
-            for(int ry = Math.max((int) ((y - range) / tilesize / structQuadrantSize), 0); ry <= (int) ((y + range) / tilesize / structQuadrantSize) && ry < quadHeight(); ry++){
+        for(int rx = Math.max((int)((x - range) / tilesize / structQuadrantSize), 0); rx <= (int)((x + range) / tilesize / structQuadrantSize) && rx < quadWidth(); rx++){
+            for(int ry = Math.max((int)((y - range) / tilesize / structQuadrantSize), 0); ry <= (int)((y + range) / tilesize / structQuadrantSize) && ry < quadHeight(); ry++){
 
                 if(!getQuad(team, rx, ry)) continue;
 
@@ -167,7 +177,8 @@ public class BlockIndexer{
 
                         other = other.target();
 
-                        if(other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable) continue;
+                        if(other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable)
+                            continue;
 
                         TileEntity e = other.entity;
 
@@ -194,7 +205,7 @@ public class BlockIndexer{
         return ores.get(item, emptySet);
     }
 
-    /**Find the closest ore block relative to a position.*/
+    /** Find the closest ore block relative to a position. */
     public Tile findClosestOre(float xp, float yp, Item item){
         Tile tile = Geometry.findClosest(xp, yp, world.indexer.getOrePositions(item));
 
@@ -214,7 +225,7 @@ public class BlockIndexer{
 
     private void process(Tile tile){
         if(tile.block().flags.size() > 0 &&
-                tile.getTeam() != Team.none){
+        tile.getTeam() != Team.none){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
             for(BlockFlag flag : tile.block().flags){
@@ -235,13 +246,13 @@ public class BlockIndexer{
         itemSet.clear();
 
         Tile rounded = world.tile(Mathf.clamp(quadrantX * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
-                Mathf.clamp(quadrantY * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1));
+        Mathf.clamp(quadrantY * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1));
 
         //find all items that this quadrant contains
         for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
             for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
                 Tile result = world.tile(x, y);
-                if( result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
+                if(result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
 
                 itemSet.add(result.drop());
             }
@@ -261,6 +272,8 @@ public class BlockIndexer{
     }
 
     private void updateQuadrant(Tile tile){
+        if(structQuadrants == null) return;
+
         //this quadrant is now 'dirty', re-scan the whole thing
         int quadrantX = tile.x / structQuadrantSize;
         int quadrantY = tile.y / structQuadrantSize;
@@ -292,16 +305,16 @@ public class BlockIndexer{
     }
 
     private boolean getQuad(Team team, int quadrantX, int quadrantY){
-        int index = quadrantX + quadrantY * Mathf.ceil(world.width() / (float) structQuadrantSize);
+        int index = quadrantX + quadrantY * Mathf.ceil(world.width() / (float)structQuadrantSize);
         return structQuadrants[team.ordinal()].get(index);
     }
 
     private int quadWidth(){
-        return Mathf.ceil(world.width() / (float) structQuadrantSize);
+        return Mathf.ceil(world.width() / (float)structQuadrantSize);
     }
 
     private int quadHeight(){
-        return Mathf.ceil(world.height() / (float) structQuadrantSize);
+        return Mathf.ceil(world.height() / (float)structQuadrantSize);
     }
 
     private void scanOres(){
@@ -322,9 +335,9 @@ public class BlockIndexer{
                 //add position of quadrant to list when an ore is found
                 if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
                     ores.get(tile.drop()).add(world.tile(
-                            //make sure to clamp quadrant middle position, since it might go off bounds
-                            Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
-                            Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1)));
+                    //make sure to clamp quadrant middle position, since it might go off bounds
+                    Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
+                    Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1)));
                 }
             }
         }

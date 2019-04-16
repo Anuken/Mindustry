@@ -2,23 +2,22 @@ package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -28,12 +27,12 @@ public class MendProjector extends Block{
     private static Color phase = Color.valueOf("ffd59e");
     private static IntSet healed = new IntSet();
 
-    protected int timerUse = timers ++;
+    protected int timerUse = timers++;
 
     protected TextureRegion topRegion;
     protected float reload = 250f;
-    protected float range = 50f;
-    protected float healPercent = 6f;
+    protected float range = 60f;
+    protected float healPercent = 12f;
     protected float phaseBoost = 12f;
     protected float phaseRangeBoost = 50f;
     protected float useTime = 400f;
@@ -53,15 +52,26 @@ public class MendProjector extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
+        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+
+        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+    }
+
+    @Override
     public void update(Tile tile){
         MendEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
 
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, (float)entity.items.get(consumes.item()) / itemCapacity, 0.1f);
+        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.cons.valid() && entity.timer.get(timerUse, useTime) && entity.items.total() > 0){
-            entity.items.remove(consumes.item(), 1);
+        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime)){
+            entity.cons.trigger();
         }
 
         if(entity.charge >= reload){
@@ -73,7 +83,7 @@ public class MendProjector extends Block{
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Mathf.dst(x, y, tile.x, tile.y) > realRange) continue;
+                    if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
 
                     Tile other = world.tile(x, y);
 
@@ -81,13 +91,20 @@ public class MendProjector extends Block{
                     other = other.target();
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat*phaseBoost)/100f * entity.power.satisfaction);
+                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
                         Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Pal.accent);
+        Lines.dashCircle(x * tilesize, y * tilesize, range);
+        Draw.color();
     }
 
     @Override
@@ -114,8 +131,8 @@ public class MendProjector extends Block{
         Draw.blend();
 
         Draw.alpha(1f);
-        Lines.stroke((2f  * f + 0.2f)* entity.heat);
-        Lines.circle(tile.drawx(), tile.drawy(), (1f-f) * 9f);
+        Lines.stroke((2f * f + 0.2f) * entity.heat);
+        Lines.circle(tile.drawx(), tile.drawy(), ((1f - f) * 8f) * size / 2f);
 
         Draw.reset();
     }
