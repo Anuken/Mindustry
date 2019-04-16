@@ -121,6 +121,11 @@ public class Generators{
                         }
                     }
                     average.mul(1f / (image.width() * image.height()));
+                    if(block instanceof Floor){
+                        average.mul(0.8f);
+                    }else{
+                        average.mul(1.1f);
+                    }
                     average.a = 1f;
                     colors.draw(block.id, 0, average);
                 }catch(IllegalArgumentException e){
