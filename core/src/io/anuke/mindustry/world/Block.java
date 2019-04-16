@@ -34,6 +34,8 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
+    public static final int crackRegions = 8, maxCrackSize = 5;
+
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -112,6 +114,8 @@ public class Block extends BlockStorage{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
+
+    protected static TextureRegion[][] cracks;
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -200,6 +204,15 @@ public class Block extends BlockStorage{
     }
 
     public void drawLayer2(Tile tile){
+    }
+
+    public void drawCracks(Tile tile){
+        if(!tile.entity.damaged()) return;
+        int id = tile.pos();
+        TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
+        Draw.colorl(0.1f, 0.1f + (1f - tile.entity.healthf())* 0.7f);
+        Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
+        Draw.color();
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
@@ -332,6 +345,15 @@ public class Block extends BlockStorage{
         cacheRegions = new TextureRegion[cacheRegionStrings.size];
         for(int i = 0; i < cacheRegions.length; i++){
             cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
+        }
+
+        if(cracks == null){
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
         }
     }
 

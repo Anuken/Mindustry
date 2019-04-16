@@ -234,6 +234,9 @@ public class BlockRenderer{
 
             if(req.layer == Layer.block){
                 block.draw(req.tile);
+                if(req.tile.entity != null && req.tile.entity.damaged()){
+                    block.drawCracks(req.tile);
+                }
                 if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
                     block.drawTeam(req.tile);
                 }
