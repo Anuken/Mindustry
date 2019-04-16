@@ -201,7 +201,7 @@ public class Blocks implements ContentList{
         }};
 
         craters = new Floor("craters"){{
-            variants = 6;
+            variants = 3;
             blendGroup = stone;
         }};
 
