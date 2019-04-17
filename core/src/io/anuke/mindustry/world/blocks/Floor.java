@@ -153,7 +153,7 @@ public class Floor extends Block{
     }
 
     protected boolean doEdge(Floor other, boolean sameLayer){
-        return (other != this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
+        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
     }
 
     protected boolean edgeOnto(Floor other){
