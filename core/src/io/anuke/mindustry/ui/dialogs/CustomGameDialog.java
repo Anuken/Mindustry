@@ -28,13 +28,14 @@ public class CustomGameDialog extends FloatingDialog{
     public CustomGameDialog(){
         super("$customgame");
         addCloseButton();
-        selectedGamemode = Gamemode.survival;
-        rules = selectedGamemode.get();
         shown(this::setup);
         onResize(this::setup);
     }
 
     void setup(){
+        selectedGamemode = Gamemode.survival;
+        rules = selectedGamemode.get();
+
         cont.clear();
 
         Table maps = new Table();
@@ -57,6 +58,8 @@ public class CustomGameDialog extends FloatingDialog{
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
                 rules = mode.get();
+                dialog.selectedGamemode = null;
+                dialog.rules = null;
             }).update(b -> b.setChecked(selectedGamemode == mode)).group(group).size(140f, 54f);
         }
         selmode.add(modes);
@@ -122,7 +125,7 @@ public class CustomGameDialog extends FloatingDialog{
 
             image.clicked(() -> {
                 hide();
-                control.playMap(map, (dialog.selectedGamemode == null) ? selectedGamemode.get() : dialog.rules);
+                control.playMap(map, (dialog.rules == null) ? rules : dialog.rules);
             });
 
             maps.add(image);

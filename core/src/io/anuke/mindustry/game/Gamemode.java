@@ -16,12 +16,12 @@ public enum Gamemode {
         waves = false;
         waveTimer = false;
         respawnTime = 0f;
-        spawns = DefaultWaves.get();
     }}),
     attack(() -> new Rules(){{
         enemyCheat = true;
         unitDrops = true;
         waves = false;
+        manyCores = true;
     }}),
     pvp(() -> new Rules(){{
         pvp = true;
@@ -33,6 +33,7 @@ public enum Gamemode {
         playerHealthMultiplier = 0.8f;
         unitBuildSpeedMultiplier = 3f;
         unitHealthMultiplier = 2f;
+        manyCores = true;
     }});
 
     private final Supplier<Rules> rules;

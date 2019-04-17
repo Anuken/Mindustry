@@ -263,7 +263,7 @@ public class World implements ApplicationListener{
                 if(invalidMap){
                     ui.showError("$map.nospawn.pvp");
                 }
-            }else if(!state.rules.waves){ //pvp maps need two cores to be valid
+            }else if(state.rules.manyCores){ //pvp maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
                     ui.showError("$map.nospawn.attack");
