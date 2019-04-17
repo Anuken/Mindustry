@@ -52,7 +52,6 @@ public class CustomGameDialog extends FloatingDialog{
         int i = 0;
 
         Table modes = new Table();
-        modes.marginBottom(5);
 
         for(Gamemode mode : Gamemode.values()){
             modes.addButton(mode.toString(), "toggle", () -> {
