@@ -255,13 +255,11 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
-            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -351,7 +349,6 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -359,7 +356,7 @@ public class Blocks implements ContentList{
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 6;
+            variants = 3;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
@@ -1117,7 +1114,7 @@ public class Blocks implements ContentList{
             itemDuration = 40f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.cryofluid, 0.3f);
+            consumes.liquid(Liquids.cryofluid, 0.26f);
         }};
 
         //endregion power

@@ -210,7 +210,7 @@ public class Block extends BlockStorage{
         if(!tile.entity.damaged()) return;
         int id = tile.pos();
         TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
-        Draw.colorl(0.1f, 0.1f + (1f - tile.entity.healthf())* 0.7f);
+        Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
         Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
         Draw.color();
     }

@@ -25,7 +25,7 @@ public class Generators{
     public static void generate(){
 
         ImagePacker.generate("cracks", () -> {
-            RidgedPerlin r = new RidgedPerlin(1, 2);
+            RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= Block.maxCrackSize; size++){
                 int dim = size * 32;
                 int steps = Block.crackRegions;
@@ -291,7 +291,7 @@ public class Generators{
 
                 try{
                     Image image = ImagePacker.get(floor.generateIcons()[0]);
-                    Image edge = ImagePacker.get("edge-stencil-" + floor.edgeStyle);
+                    Image edge = ImagePacker.get("edge-stencil");
                     Image result = new Image(edge.width, edge.height);
 
                     for(int x = 0; x < edge.width; x++){

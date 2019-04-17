@@ -45,8 +45,6 @@ public class Floor extends Block{
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Style of the edge stencil. Loaded by looking up "edge-stencil-{name}". */
-    public String edgeStyle = "smooth";
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
     /** Effect displayed when randomly updated. */
@@ -155,7 +153,7 @@ public class Floor extends Block{
     }
 
     protected boolean doEdge(Floor other, boolean sameLayer){
-        return (other.blendGroup.id > blendGroup.id || edges() == null) && other.edgeOnto(this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
+        return (other != this) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer);
     }
 
     protected boolean edgeOnto(Floor other){
