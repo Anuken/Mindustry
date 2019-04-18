@@ -21,7 +21,7 @@ public enum Gamemode {
         enemyCheat = true;
         unitDrops = true;
         waves = false;
-        manyCores = true;
+        attackMode = true;
     }}),
     pvp(() -> new Rules(){{
         pvp = true;
@@ -33,7 +33,7 @@ public enum Gamemode {
         playerHealthMultiplier = 0.8f;
         unitBuildSpeedMultiplier = 3f;
         unitHealthMultiplier = 2f;
-        manyCores = true;
+        attackMode = true;
     }});
 
     private final Supplier<Rules> rules;

@@ -51,6 +51,6 @@ public class Rules{
     public int respawns = 5;
     /** Hold wave timer until all enemies are destroyed. */
     public boolean waitForWaveToEnd = false;
-    /** Determinates if gamemode requires more than 1 cores to play */
-    public boolean manyCores = false;
+    /** Determinates if gamemode is attack mode */
+    public boolean attackMode = false;
 }
