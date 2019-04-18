@@ -14,7 +14,6 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
 
 import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.ui;
 
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;

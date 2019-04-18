@@ -519,7 +519,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
-            updateRespawning();
+            if(respawns!=0){
+                updateRespawning();
+            }
             return;
         }else{
             spawner = null;
