@@ -1,16 +1,14 @@
-package io.anuke.net;
+package io.anuke.mindustry.net;
 
-import com.esotericsoftware.kryonet.FrameworkMessage;
-import com.esotericsoftware.kryonet.serialization.Serialization;
+import io.anuke.arc.net.FrameworkMessage;
+import io.anuke.arc.net.NetSerializer;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.net.Packet;
-import io.anuke.mindustry.net.Registrator;
 
 import java.nio.ByteBuffer;
 
 @SuppressWarnings("unchecked")
-public class ByteSerializer implements Serialization{
+public class PacketSerializer implements NetSerializer{
 
     @Override
     public void write(ByteBuffer byteBuffer, Object o){
@@ -38,20 +36,5 @@ public class ByteSerializer implements Serialization{
             packet.read(byteBuffer);
             return packet;
         }
-    }
-
-    @Override
-    public int getLengthLength(){
-        return 2;
-    }
-
-    @Override
-    public void writeLength(ByteBuffer byteBuffer, int i){
-        byteBuffer.putShort((short)i);
-    }
-
-    @Override
-    public int readLength(ByteBuffer byteBuffer){
-        return byteBuffer.getShort();
     }
 }

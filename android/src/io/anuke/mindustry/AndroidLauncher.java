@@ -23,8 +23,8 @@ import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
+import io.anuke.mindustry.net.ArcNetClient;
+import io.anuke.mindustry.net.ArcNetServer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -111,8 +111,8 @@ public class AndroidLauncher extends AndroidApplication{
         }
 
         config.hideStatusBar = true;
-        Net.setClientProvider(new KryoClient());
-        Net.setServerProvider(new KryoServer());
+        Net.setClientProvider(new ArcNetClient());
+        Net.setServerProvider(new ArcNetServer());
         initialize(new Mindustry(), config);
         checkFiles(getIntent());
     }

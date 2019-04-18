@@ -1,7 +1,7 @@
-package io.anuke.net;
+package io.anuke.mindustry.net;
 
-import com.esotericsoftware.kryonet.FrameworkMessage;
-import com.esotericsoftware.kryonet.FrameworkMessage.*;
+import io.anuke.arc.net.FrameworkMessage;
+import io.anuke.arc.net.FrameworkMessage.*;
 
 import java.nio.ByteBuffer;
 
@@ -15,12 +15,8 @@ public class FrameworkSerializer{
             buffer.putInt(p.id);
             buffer.put(p.isReply ? 1 : (byte)0);
         }else if(message instanceof DiscoverHost){
-            DiscoverHost p = (DiscoverHost)message;
-
             buffer.put((byte)1);
         }else if(message instanceof KeepAlive){
-            KeepAlive p = (KeepAlive)message;
-
             buffer.put((byte)2);
         }else if(message instanceof RegisterUDP){
             RegisterUDP p = (RegisterUDP)message;

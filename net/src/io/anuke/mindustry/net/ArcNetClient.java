@@ -1,11 +1,10 @@
-package io.anuke.net;
+package io.anuke.mindustry.net;
 
-import com.esotericsoftware.kryonet.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.net.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.ClientProvider;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.Connect;
@@ -21,24 +20,22 @@ import java.nio.channels.ClosedSelectorException;
 import static io.anuke.mindustry.Vars.netClient;
 import static io.anuke.mindustry.Vars.port;
 
-public class KryoClient implements ClientProvider{
+public class ArcNetClient implements ClientProvider{
     final Client client;
     final Array<InetAddress> foundAddresses = new Array<>();
     final ClientDiscoveryHandler handler;
     final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     Consumer<Host> lastCallback;
 
-    public KryoClient(){
-        KryoCore.init();
-
+    public ArcNetClient(){
         handler = new ClientDiscoveryHandler(){
             @Override
-            public DatagramPacket onRequestNewDatagramPacket(){
+            public DatagramPacket newDatagramPacket(){
                 return new DatagramPacket(new byte[128], 128);
             }
 
             @Override
-            public void onDiscoveredHost(DatagramPacket datagramPacket){
+            public void discoveredHost(DatagramPacket datagramPacket){
                 ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
                 Host host = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
                 for(InetAddress address : foundAddresses){
@@ -51,15 +48,15 @@ public class KryoClient implements ClientProvider{
             }
 
             @Override
-            public void onFinally(){
+            public void finish(){
 
             }
         };
 
-        client = new Client(8192, 4096, connection -> new ByteSerializer());
+        client = new Client(8192, 4096, new PacketSerializer());
         client.setDiscoveryHandler(handler);
 
-        Listener listener = new Listener(){
+        NetListener listener = new NetListener(){
             @Override
             public void connected(Connection connection){
                 Connect c = new Connect();
@@ -95,11 +92,7 @@ public class KryoClient implements ClientProvider{
             }
         };
 
-        if(KryoCore.fakeLag){
-            client.addListener(new Listener.LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
-        }else{
-            client.addListener(listener);
-        }
+        client.addListener(listener);
     }
 
     private static boolean isLocal(InetAddress addr){
@@ -133,7 +126,7 @@ public class KryoClient implements ClientProvider{
                     }catch(Exception e){
                         if(!(e instanceof ClosedSelectorException)) handleException(e);
                     }
-                }, "Kryonet Client");
+                }, "Net Client");
                 updateThread.setDaemon(true);
                 updateThread.start();
 
@@ -188,7 +181,7 @@ public class KryoClient implements ClientProvider{
 
                     lastCallback = valid;
 
-                    DatagramPacket packet = handler.onRequestNewDatagramPacket();
+                    DatagramPacket packet = handler.newDatagramPacket();
 
                     socket.receive(packet);
 
@@ -231,7 +224,7 @@ public class KryoClient implements ClientProvider{
     }
 
     private void handleException(Exception e){
-        if(e instanceof KryoNetException){
+        if(e instanceof ArcNetException){
             Core.app.post(() -> Net.showError(new IOException("mismatch")));
         }else{
             Core.app.post(() -> Net.showError(e));

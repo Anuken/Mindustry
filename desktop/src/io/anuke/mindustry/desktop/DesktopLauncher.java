@@ -10,8 +10,8 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
+import io.anuke.mindustry.net.ArcNetClient;
+import io.anuke.mindustry.net.ArcNetServer;
 
 public class DesktopLauncher extends Lwjgl3Application{
 
@@ -45,8 +45,8 @@ public class DesktopLauncher extends Lwjgl3Application{
 
             Platform.instance = new DesktopPlatform(arg);
 
-            Net.setClientProvider(new KryoClient());
-            Net.setServerProvider(new KryoServer());
+            Net.setClientProvider(new ArcNetClient());
+            Net.setServerProvider(new ArcNetServer());
             new DesktopLauncher(new Mindustry(), config);
         }catch(Throwable e){
             CrashHandler.handle(e);
