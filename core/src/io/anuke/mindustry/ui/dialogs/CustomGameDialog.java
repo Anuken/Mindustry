@@ -60,9 +60,10 @@ public class CustomGameDialog extends FloatingDialog{
                 dialog.selectedGamemode = null;
                 dialog.rules = null;
             }).update(b -> b.setChecked(selectedGamemode == mode)).group(group).size(140f, 54f);
+            if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
-        selmode.addButton("?", this::displayGameModeHelp).size(50f, 54f).padLeft(18f);
+        selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         cont.add(selmode);
         cont.row();
@@ -92,11 +93,9 @@ public class CustomGameDialog extends FloatingDialog{
             difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
             state.wavetime = difficulty.waveTime;
         }).width(s);
+        sdif.addButton("$customize", () -> dialog.show(rules, selectedGamemode)).width(140).padLeft(10);
 
         cont.add(sdif);
-        cont.row();
-
-        cont.addButton("$rules.modifyRules", () -> dialog.show(rules, selectedGamemode)).width(280).padTop(10);
         cont.row();
 
         float images = 146f;

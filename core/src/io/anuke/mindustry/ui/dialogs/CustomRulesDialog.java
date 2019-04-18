@@ -28,13 +28,17 @@ public class CustomRulesDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Rules rules, Gamemode gamemode){this.rules = rules; this.selectedGamemode = gamemode; show();}
+    public void show(Rules rules, Gamemode gamemode){
+        this.rules = rules;
+        this.selectedGamemode = gamemode;
+        show();
+    }
 
     void setup(){
         cont.clear();
         cont.pane(m -> main = m);
         main.margin(10f);
-        main.addButton("$rules.restoreDefault", () -> {rules = selectedGamemode.get(); setup();}).size(300f, 50f);
+        main.addButton("$settings.reset", () -> {rules = selectedGamemode.get(); setup();}).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
         main.row();
         title("$rules.title.waves", Gamemode.survival);
@@ -99,7 +103,7 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     void title(String text){
-        main.add(text).color(Pal.accent).fontScale(1.5f).padTop(40).padBottom(20).padRight(100f);
+        main.add(text).color(Pal.accent).padTop(20).padBottom(20).padRight(100f);
         main.row();
     }
 }
