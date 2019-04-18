@@ -93,7 +93,7 @@ public class CustomGameDialog extends FloatingDialog{
             state.wavetime = difficulty.waveTime;
         }).width(s);
 
-        cont.add(sdif);//.visible(() -> lastPreset != null);
+        cont.add(sdif);
         cont.row();
 
         cont.addButton("$rules.modifyRules", () -> dialog.show(rules, selectedGamemode)).width(280).padTop(10);

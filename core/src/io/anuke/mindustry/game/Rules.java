@@ -2,11 +2,6 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.BooleanConsumer;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.Function;
-
-import java.util.function.Predicate;
 
 /**
  * Defines current rules on how the game should function.

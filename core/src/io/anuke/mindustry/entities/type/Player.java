@@ -493,11 +493,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void update(){
-
-        if((unitGroups[waveTeam.ordinal()].size() == 0) && state.rules.limitedRespawns){
-            respawns = state.rules.respawns;
-        }
-
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
