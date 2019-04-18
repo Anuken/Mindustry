@@ -281,12 +281,11 @@ public class ArcNetServer implements ServerProvider{
                 }
             }catch(Exception e){
                 Log.err(e);
-                Log.info("Disconnecting invalid client!");
+                Log.info("Error sending packet. Disconnecting invalid client!");
                 connection.close();
 
                 KryoConnection k = getByKryoID(connection.getID());
                 if(k != null) connections.remove(k);
-                Log.info("Connection removed {0}", k);
             }
         }
 
