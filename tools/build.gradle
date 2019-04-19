@@ -24,14 +24,12 @@ def antialias = { File file ->
     }
 
     def color = new Color()
-    def color2 = new Color()
     def sum = new Color()
     def suma = new Color()
 
     for(int x = 0; x < image.getWidth(); x++){
         for(int y = 0; y < image.getHeight(); y++){
-            int A =
-                    getRGB(x - 1, y + 1),
+            int A = getRGB(x - 1, y + 1),
                 B = getRGB(x, y + 1),
                 C = getRGB(x + 1, y + 1),
                 D = getRGB(x - 1, y),

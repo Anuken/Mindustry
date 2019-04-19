@@ -46,9 +46,14 @@ public class EditorTile extends Tile{
     @Override
     public void setBlock(Block type){
         Block previous = block;
+        byte pteam = getTeamID();
         if(previous == type) return;
         super.setBlock(type);
+        if(pteam != getTeamID()){
+            op(TileOp.get(x, y, (byte)OpType.team.ordinal(), pteam, getTeamID()));
+        }
         op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));
+
     }
 
     @Override

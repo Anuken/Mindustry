@@ -5,8 +5,8 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
 import io.anuke.mindustry.net.Net;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
+import io.anuke.mindustry.net.ArcNetClient;
+import io.anuke.mindustry.net.ArcNetServer;
 
 public class ServerLauncher extends HeadlessApplication{
 
@@ -17,8 +17,8 @@ public class ServerLauncher extends HeadlessApplication{
     public static void main(String[] args){
         try{
 
-            Net.setClientProvider(new KryoClient());
-            Net.setServerProvider(new KryoServer());
+            Net.setClientProvider(new ArcNetClient());
+            Net.setServerProvider(new ArcNetServer());
 
             HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
             new ServerLauncher(new MindustryServer(args), config);

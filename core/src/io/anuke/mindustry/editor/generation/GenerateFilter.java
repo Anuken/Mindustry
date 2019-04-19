@@ -5,6 +5,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.MapEditor;
 import io.anuke.mindustry.editor.MapGenerateDialog.DummyTile;
 import io.anuke.mindustry.world.Block;
@@ -50,6 +51,10 @@ public abstract class GenerateFilter{
     public final void apply(GenerateInput in){
         this.in = in;
         apply();
+        //remove extra ores on liquids
+        if(((Floor)in.floor).isLiquid){
+            in.ore = Blocks.air;
+        }
     }
 
     public static class GenerateInput{
