@@ -13,7 +13,7 @@ public enum Gamemode {
     }}),
     sandbox(() -> new Rules(){{
         infiniteResources = true;
-        waves = false;
+        waves = true;
         waveTimer = false;
         respawnTime = 0f;
     }}),
