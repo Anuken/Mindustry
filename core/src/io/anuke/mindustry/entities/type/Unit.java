@@ -8,8 +8,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
@@ -250,6 +249,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         final int rad = 2;
 
+        //TODO fix units getting trapped on tile corners
         moveVector.setZero();
         for(int cx = -rad; cx <= rad; cx++){
             for(int cy = -rad; cy <= rad; cy++){
