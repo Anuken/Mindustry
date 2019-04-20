@@ -9,6 +9,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -32,6 +33,9 @@ public class Logic implements ApplicationListener{
         Events.on(WaveEvent.class, event -> {
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
+            }
+            for (Player p : playerGroup.all()) {
+                p.respawns = state.rules.respawns;
             }
         });
     }
@@ -88,7 +92,7 @@ public class Logic implements ApplicationListener{
         if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(!state.rules.waves){
+        }else if(state.rules.attackMode){
             Team alive = null;
 
             for(Team team : Team.all){
@@ -144,7 +148,9 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    if(!state.rules.waitForWaveToEnd || unitGroups[waveTeam.ordinal()].size() == 0){
+                        state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    }
                 }
 
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
