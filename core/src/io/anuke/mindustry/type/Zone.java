@@ -24,7 +24,6 @@ public class Zone extends UnlockableContent{
     public final Generator generator;
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
-    //TODO debug verify resources.
     public Item[] resources = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;

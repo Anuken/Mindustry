@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
     creeptree,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
-    pebbles,
+    pebbles, tendrils,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -378,6 +378,8 @@ public class Blocks implements ContentList{
         darkMetal = new StaticWall("dark-metal");
 
         pebbles = new OverlayFloor("pebbles");
+
+        tendrils = new OverlayFloor("tendrils");
 
         //endregion
         //region ore

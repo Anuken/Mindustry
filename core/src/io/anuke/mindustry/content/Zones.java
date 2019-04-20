@@ -36,7 +36,7 @@ public class Zones implements ContentList{
         desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            zoneRequirements = ZoneRequirement.with(groundZero, 15);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
@@ -49,7 +49,7 @@ public class Zones implements ContentList{
         saltFlats = new Zone("saltFlats", new DesertWastesGenerator(260, 260)){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            zoneRequirements = ZoneRequirement.with(desertWastes, 25);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
@@ -62,7 +62,7 @@ public class Zones implements ContentList{
         overgrowth = new Zone("overgrowth", new OvergrowthGenerator(320, 320)){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(groundZero, 10);
+            zoneRequirements = ZoneRequirement.with(craters, 15);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
             rules = () -> new Rules(){{
@@ -106,7 +106,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
             launchPeriod = 20;
-            zoneRequirements = ZoneRequirement.with(frozenForest, 10, craters, 15);
+            zoneRequirements = ZoneRequirement.with(desertWastes, 10, craters, 15);
             blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{

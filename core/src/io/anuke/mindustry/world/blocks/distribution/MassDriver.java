@@ -152,9 +152,9 @@ public class MassDriver extends Block{
 
                 entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(waiter), rotateSpeed);
             }else if(tile.entity.items.total() >= minDistribute &&
-            linkValid(tile) && //only fire when at 100% power capacity
-            tile.entity.power.satisfaction >= powerPercentageUsed &&
-            link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
+                linkValid(tile) &&
+                tile.entity.power.satisfaction >= powerPercentageUsed &&
+                link.block().itemCapacity - link.entity.items.total() >= minDistribute && entity.reload <= 0.0001f){
 
                 MassDriverEntity other = link.entity();
                 other.waiting.add(tile);
@@ -185,6 +185,13 @@ public class MassDriver extends Block{
         Draw.rect(region,
         tile.drawx() + Angles.trnsx(entity.rotation + 180f, entity.reload * knockback),
         tile.drawy() + Angles.trnsy(entity.rotation + 180f, entity.reload * knockback), entity.rotation - 90);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Draw.color(Pal.accent);
+        Lines.dashCircle(x * tilesize, y*tilesize, range);
+        Draw.color();
     }
 
     @Override
