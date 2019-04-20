@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.function.Supplier;
 
 /** Defines preset rule sets.. */
-public enum Gamemode {
+public enum Gamemode{
     survival(() -> new Rules(){{
         waveTimer = true;
         waves = true;
