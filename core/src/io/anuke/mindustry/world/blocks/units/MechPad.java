@@ -31,7 +31,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
-    protected float requiredSatisfaction = 1f;
+    protected float requiredSatisfaction = 0.999f;
 
     protected TextureRegion openRegion;
 
@@ -125,7 +125,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
+        }else if(player.isLocal && mobile && !player.isDead() && (entity.power.satisfaction >= requiredSatisfaction) && entity.player == null){
             player.moveTarget = tile.entity;
         }
     }
