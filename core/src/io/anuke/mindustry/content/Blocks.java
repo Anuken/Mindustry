@@ -112,10 +112,7 @@ public class Blocks implements ContentList{
 
         part = new BlockPart();
 
-        spawn = new Block("spawn"){
-            public void drawShadow(Tile tile){
-            }
-        };
+        spawn = new Block("spawn");
 
         //Registers build blocks from size 1-6
         //no reference is needed here since they can be looked up by name later
@@ -378,8 +375,7 @@ public class Blocks implements ContentList{
         darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
         darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
 
-        darkMetal = new StaticWall("dark-metal"){{
-        }};
+        darkMetal = new StaticWall("dark-metal");
 
         pebbles = new OverlayFloor("pebbles");
 
