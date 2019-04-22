@@ -49,7 +49,7 @@ public class DesktopLauncher extends Lwjgl3Application{
             Net.setServerProvider(new ArcNetServer());
             new DesktopLauncher(new Mindustry(), config);
         }catch(Throwable e){
-            CrashHandler.handle(e);
+            DesktopPlatform.handleCrash(e);
         }
     }
 }
