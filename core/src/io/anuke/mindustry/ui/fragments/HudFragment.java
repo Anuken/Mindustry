@@ -143,7 +143,7 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                btable.right().addImageButton("icon-tools", "right", 30f, ()->ui.wavespawner.show()).growY().fillX().right().width(40f);
+                btable.right().addImageButton("icon-tools", "right", 30f, ()->ui.wavespawner.show()).growY().fillX().right().width(40f).visible(() -> state.rules.waves);
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.addButton("$sandbox.options", ()->ui.sandbox.show()).growX();
