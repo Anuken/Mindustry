@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Block;
 public class Zones implements ContentList{
     public static Zone
     groundZero, desertWastes,
-    craters, frozenForest, ruinousShores, stainedMountains,
+    craters, frozenForest, ruinousShores, stainedMountains, tarFields,
     saltFlats, overgrowth, infestedIslands,
     desolateRift, nuclearComplex;
 
@@ -132,13 +132,29 @@ public class Zones implements ContentList{
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
         .dist(0f, false)
-        .decor(new Decoration(Blocks.moss, Blocks.shaleBoulder, 0.02))){{
+        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
-            baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400, Items.lead, 100);
             conditionWave = 10;
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
+            blockRequirements = new Block[]{Blocks.pneumaticDrill};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
+            rules = () -> new Rules(){{
+                waves = true;
+                waveTimer = true;
+                waveSpacing = 60 * 60 * 2;
+            }};
+        }};
+
+        tarFields = new Zone("tarFields", new MapGenerator("tarFields", 1)
+        .dist(0f, false)
+        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
+            loadout = Loadouts.basicFoundation;
+            startingItems = ItemStack.list(Items.copper, 500, Items.lead, 200);
+            conditionWave = 15;
+            launchPeriod = 10;
+            zoneRequirements = ZoneRequirement.with(ruinousShores, 20);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
@@ -154,7 +170,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 1500);
             conditionWave = 10;
             launchPeriod = 20;
-            zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
+            zoneRequirements = ZoneRequirement.with(tarFields, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
             rules = () -> new Rules(){{
@@ -172,7 +188,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 2500, Items.lead, 3000, Items.silicon, 800, Items.metaglass, 400);
             conditionWave = 30;
             launchPeriod = 15;
-            zoneRequirements = ZoneRequirement.with(desolateRift, 20);
+            zoneRequirements = ZoneRequirement.with(frozenForest, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
             rules = () -> new Rules(){{

@@ -45,7 +45,7 @@ public class Rules{
     public float waveSpacing = 60 * 60 * 2;
     /** Zone ID, -1 for invalid zone. */
     public byte zone = -1;
-    /** Spawn layout. Since only zones modify this, it should be assigned on save load. */
+    /** Spawn layout. Should be assigned on save load based on map or zone. */
     public transient Array<SpawnGroup> spawns = DefaultWaves.get();
     /** Determines if there should be limited respawns. */
     public boolean limitedRespawns = false;

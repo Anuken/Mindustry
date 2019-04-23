@@ -97,7 +97,7 @@ public abstract class Turret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range, StatUnit.blocks);
+        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(BlockStat.reload, 60f / reload * shots, StatUnit.none);
         stats.add(BlockStat.shots, shots, StatUnit.none);

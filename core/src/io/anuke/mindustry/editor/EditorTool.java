@@ -11,6 +11,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 public enum EditorTool{
+    zoom,
     pick{
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
@@ -34,6 +35,7 @@ public enum EditorTool{
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
+    line,
     pencil{
         {
             edit = true;
@@ -54,22 +56,6 @@ public enum EditorTool{
         @Override
         public void touched(MapEditor editor, int x, int y){
             editor.draw(x, y, isPaint(), Blocks.air);
-        }
-    },
-    spray{
-        {
-            edit = true;
-            draggable = true;
-        }
-
-        @Override
-        public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, isPaint(), editor.drawBlock, 0.012);
-        }
-    },
-    line{
-        {
-
         }
     },
     fill{
@@ -200,7 +186,17 @@ public enum EditorTool{
             return (data.drawBlock instanceof OverlayFloor ? tile.overlay() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OverlayFloor && tile.floor().isLiquid);
         }
     },
-    zoom;
+    spray{
+        {
+            edit = true;
+            draggable = true;
+        }
+
+        @Override
+        public void touched(MapEditor editor, int x, int y){
+            editor.draw(x, y, isPaint(), editor.drawBlock, 0.012);
+        }
+    };
 
     boolean edit, draggable;
 
