@@ -284,7 +284,8 @@ public class Block extends BlockStorage{
 
     /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
-        if(!headless && tile.getTeam() == player.getTeam()){
+        //only unlocks content in zones
+        if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
             logic.handleContent(content);
         }
     }

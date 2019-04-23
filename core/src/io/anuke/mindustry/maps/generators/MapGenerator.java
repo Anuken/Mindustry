@@ -152,7 +152,7 @@ public class MapGenerator extends Generator{
 
             if(enemySpawns != -1){
                 if(enemySpawns > enemies.size){
-                    throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number.");
+                    throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number for map: " + mapName);
                 }
 
                 enemies.shuffle();

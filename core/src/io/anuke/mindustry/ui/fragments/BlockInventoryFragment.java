@@ -5,22 +5,25 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.function.BooleanProvider;
+import io.anuke.arc.function.Supplier;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.ui.ItemImage;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -30,14 +33,9 @@ public class BlockInventoryFragment extends Fragment{
 
     private Table table;
     private Tile tile;
-    private InputHandler input;
     private float holdTime = 0f;
     private boolean holding;
     private Item lastItem;
-
-    public BlockInventoryFragment(InputHandler input){
-        this.input = input;
-    }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
@@ -133,7 +131,7 @@ public class BlockInventoryFragment extends Fragment{
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                ItemImage image = new ItemImage(item.icon(Icon.xlarge), () -> {
+                Element image = itemImage(item.icon(Icon.xlarge), () -> {
                     if(tile == null || tile.entity == null){
                         return "";
                     }
@@ -182,9 +180,9 @@ public class BlockInventoryFragment extends Fragment{
     private String round(float f){
         f = (int)f;
         if(f >= 1000000){
-            return Strings.fixed(f / 1000000f, 1) + "[gray]mil[]";
+            return (int)(f / 1000000f) + "[gray]mil[]";
         }else if(f >= 1000){
-            return Strings.fixed(f / 1000, 1) + "k";
+            return (int)(f / 1000) + "k";
         }else{
             return (int)f + "";
         }
@@ -194,5 +192,16 @@ public class BlockInventoryFragment extends Fragment{
         Vector2 v = Core.input.mouseScreen(tile.drawx() + tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
+    }
+
+    private Element itemImage(TextureRegion region, Supplier<CharSequence> text){
+        Stack stack = new Stack();
+
+        Table t = new Table().left().bottom();
+        t.label(text);
+
+        stack.add(new Image(region));
+        stack.add(t);
+        return stack;
     }
 }

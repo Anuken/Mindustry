@@ -126,6 +126,13 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    @Override
+    public void dispose(){
+        minimap.dispose();
+        shieldBuffer.dispose();
+        blocks.dispose();
+    }
+
     void updateShake(float scale){
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;

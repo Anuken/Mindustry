@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -20,7 +21,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
 
-public class BlockRenderer{
+public class BlockRenderer implements Disposable{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 9;
     private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
@@ -292,6 +293,14 @@ public class BlockRenderer{
         r.tile = tile;
         r.layer = layer;
         requestidx++;
+    }
+
+    @Override
+    public void dispose(){
+        shadows.dispose();
+        fog.dispose();
+        shadows = fog = null;
+        floor.dispose();
     }
 
     private class BlockRequest implements Comparable<BlockRequest>{

@@ -10,7 +10,6 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -18,13 +17,8 @@ import static io.anuke.mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
-    private InputHandler input;
     private Tile configTile;
     private Block configBlock;
-
-    public BlockConfigFragment(InputHandler input){
-        this.input = input;
-    }
 
     @Override
     public void build(Group parent){

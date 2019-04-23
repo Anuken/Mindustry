@@ -147,7 +147,7 @@ public class Zones implements ContentList{
             }};
         }};
 
-        tarFields = new Zone("tarFields", new MapGenerator("tarFields", 1)
+        tarFields = new Zone("tarFields", new MapGenerator("tarFields")
         .dist(0f, false)
         .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
             loadout = Loadouts.basicFoundation;
