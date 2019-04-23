@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
@@ -80,11 +81,16 @@ public class Logic implements ApplicationListener{
     }
 
     public void runWave(){
-        world.spawner.spawnEnemies();
+        world.spawner.spawnEnemies(state.rules.spawns);
         state.wave++;
         state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
 
+        Events.fire(new WaveEvent());
+    }
+
+    public void runTestWave(Array<SpawnGroup> g){
+        world.spawner.spawnEnemies(g);
         Events.fire(new WaveEvent());
     }
 

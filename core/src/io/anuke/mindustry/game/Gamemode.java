@@ -16,6 +16,7 @@ public enum Gamemode{
         waves = true;
         waveTimer = false;
         respawnTime = 0f;
+        sandobx = true;
     }}),
     attack(() -> new Rules(){{
         enemyCheat = true;

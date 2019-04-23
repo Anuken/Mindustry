@@ -58,10 +58,10 @@ public class WaveSpawner{
         return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius) > 0;
     }
 
-    public void spawnEnemies(){
+    public void spawnEnemies(Array<SpawnGroup> spgroup){
         spawning = true;
 
-        for(SpawnGroup group : state.rules.spawns){
+        for(SpawnGroup group : spgroup){
             int spawned = group.getUnitsSpawned(state.wave);
 
             float spawnX, spawnY;

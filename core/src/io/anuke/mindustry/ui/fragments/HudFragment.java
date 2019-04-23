@@ -21,6 +21,7 @@ import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.*;
@@ -142,6 +143,7 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
+                btable.right().addImageButton("icon-tools", "right", 30f, ()->ui.wavespawner.show()).growY().fillX().right().width(40f);
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
