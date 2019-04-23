@@ -146,6 +146,8 @@ public class HudFragment extends Fragment{
                 btable.right().addImageButton("icon-tools", "right", 30f, ()->ui.wavespawner.show()).growY().fillX().right().width(40f);
                 stuff.add(stack).width(dsize * 4 + 3f);
                 stuff.row();
+                stuff.addButton("$sandbox.options", ()->ui.sandbox.show()).growX();
+                stuff.row();
                 stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 stuff.row();

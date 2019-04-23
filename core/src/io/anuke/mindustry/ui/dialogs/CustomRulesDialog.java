@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.Platform;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.game.Gamemode;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class CustomRulesDialog extends FloatingDialog{
@@ -27,7 +29,13 @@ public class CustomRulesDialog extends FloatingDialog{
     public void show(Rules rules, Gamemode gamemode){
         this.rules = rules;
         this.selectedGamemode = gamemode;
-        show();
+        super.show();
+    }
+
+    @Override
+    public Dialog show(){
+        this.rules = state.rules;
+        return super.show();
     }
 
     void setup(){
@@ -35,7 +43,8 @@ public class CustomRulesDialog extends FloatingDialog{
         cont.pane(m -> main = m);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
-            rules = selectedGamemode.get(); 
+            state.rules = selectedGamemode.get();
+            rules = selectedGamemode.get();
             setup();
         }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);

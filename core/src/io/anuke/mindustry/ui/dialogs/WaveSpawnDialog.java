@@ -72,15 +72,17 @@ public class WaveSpawnDialog extends FloatingDialog{
             }).width(340f).pad(5);
             table.row();
         }
+        table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent).padTop(25).visible(()->groups.size!=0);
+        table.row();
         table.addButton("$add", ()->{
             groups.add(new SpawnGroup(lastType));
             setup();
-        }).width(400f).padTop(50f);
+        }).width(400f).padTop(25f);
         table.row();
         table.addButton("$sandbox.waves.run", ()->{
             logic.runTestWave(groups);
             this.hide();
-        }).width(200f).padTop(30f);
+        }).width(200f).padTop(5).update(a -> a.setDisabled(groups.size==0));
     }
 
     void showUpdate(SpawnGroup group){

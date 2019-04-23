@@ -123,6 +123,7 @@ public class CustomGameDialog extends FloatingDialog{
 
             image.clicked(() -> {
                 hide();
+                dialog.selectedGamemode = selectedGamemode;
                 control.playMap(map, (dialog.rules == null) ? rules : dialog.rules);
             });
 

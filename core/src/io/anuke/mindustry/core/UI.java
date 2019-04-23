@@ -61,6 +61,7 @@ public class UI implements ApplicationListener{
     public TechTreeDialog tech;
     public MinimapDialog minimap;
     public WaveSpawnDialog wavespawner;
+    public SandboxDialog sandbox;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -174,6 +175,7 @@ public class UI implements ApplicationListener{
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
         wavespawner = new WaveSpawnDialog();
+        sandbox = new SandboxDialog();
 
         Group group = Core.scene.root;
 
