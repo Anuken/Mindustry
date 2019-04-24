@@ -25,7 +25,7 @@ public class MinimapRenderer implements Disposable{
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
-    private Rectangle rect = new Rectangle(), scissor = new Rectangle();
+    private Rectangle rect = new Rectangle();
     private float zoom = 4;
 
     public MinimapRenderer(){
@@ -60,6 +60,7 @@ public class MinimapRenderer implements Disposable{
             pixmap.dispose();
             texture.dispose();
         }
+        setZoom(4f);
         pixmap = new Pixmap(world.width(), world.height(), Format.RGBA8888);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
