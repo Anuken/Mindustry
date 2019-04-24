@@ -33,6 +33,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
     public final MapEditor editor;
+
     private MapView view;
     private MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;

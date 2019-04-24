@@ -24,11 +24,7 @@ import static io.anuke.mindustry.Vars.ui;
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
     private EditorTool tool = EditorTool.pencil;
-    //private OperationStack stack = new OperationStack();
-    //private DrawOperation op;
-    //private GridBits used;
     private Bresenham2 br = new Bresenham2();
-    private boolean updated = false;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -84,8 +80,6 @@ public class MapView extends Element implements GestureListener{
                 mousex = x;
                 mousey = y;
 
-                updated = false;
-
                 Point2 p = project(x, y);
                 lastx = p.x;
                 lasty = p.y;
@@ -95,7 +89,6 @@ public class MapView extends Element implements GestureListener{
                 firstTouch.set(p);
 
                 if(tool.edit){
-                    updated = true;
                     ui.editor.resetSaved();
                 }
 
@@ -127,7 +120,6 @@ public class MapView extends Element implements GestureListener{
                     for(Point2 point : points){
                         editor.draw(point.x, point.y, EditorTool.isPaint());
                     }
-                    updated = true;
                 }
 
                 editor.flushOp();
@@ -153,7 +145,6 @@ public class MapView extends Element implements GestureListener{
                     for(Point2 point : points){
                         tool.touched(editor, point.x, point.y);
                     }
-                    updated = true;
                 }
 
                 if(tool == EditorTool.line && Core.input.keyDown(KeyCode.TAB)){
