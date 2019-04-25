@@ -8,8 +8,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.*;
@@ -207,18 +206,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
-    public void avoidOthers(float scaling){
-        float size = getSize()/1.5f;
+    public void avoidOthers(){
+        float radScl = 1.5f;
         moveVector.setZero();
 
-        Units.getNearby(Tmp.r1.setSize(size*2f).setCenter(x, y), en -> {
+        Units.getNearby(Tmp.r3.setSize(getSize()/radScl).setCenter(x, y), en -> {
             if(en == this || en.isFlying() != isFlying()) return;
             float dst = dst(en);
-
-            if(dst < size){
-                float scl = Mathf.clamp(1f - dst / size) * mass() * 1f/en.mass();
-                moveVector.add((x - en.x) * scl, (y - en.y) * scl);
-            }
+            float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));
+            moveVector.add(Tmp.v1.set((x - en.x) * scl, (y - en.y) * scl).limit(0.4f));
         });
 
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());

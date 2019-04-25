@@ -527,7 +527,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             spawner = null;
         }
 
-        avoidOthers(1f);
+        avoidOthers();
 
         Tile tile = world.tileWorld(x, y);
 
