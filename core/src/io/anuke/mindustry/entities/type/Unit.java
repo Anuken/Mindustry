@@ -8,11 +8,11 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.impl.DestructibleEntity;
 import io.anuke.mindustry.entities.traits.*;
@@ -42,9 +42,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     public static final int noSpawner = Pos.get(-1, 1);
 
     private static final Vector2 moveVector = new Vector2();
-
-    private int lastWeightTile = Pos.invalid, lastWeightDelta;
-    private boolean wasFlying = false;
 
     public float rotation;
 
@@ -132,22 +129,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public void removed(){
-        if(lastWeightTile != Pos.invalid){
-            Tile tile = world.tile(lastWeightTile);
-
-            if(tile != null){
-                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
-                if(!wasFlying){
-                    tile.weight -= dec;
-                }else{
-                    tile.airWeight -= dec;
-                }
-            }
-        }
-    }
-
-    @Override
     public boolean isValid(){
         return !isDead() && isAdded();
     }
@@ -227,55 +208,20 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void avoidOthers(float scaling){
-        boolean flying = isFlying();
-
-        if(lastWeightTile != Pos.invalid){
-            Tile tile = world.tile(lastWeightTile);
-
-            if(tile != null){
-                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
-                if(!wasFlying){
-                    tile.weight -= dec;
-                }else{
-                    tile.airWeight -= dec;
-                }
-            }
-        }
-
-        final int rad = 2;
-
-        //TODO fix units getting trapped on tile corners
+        float size = getSize()/1.5f;
         moveVector.setZero();
-        for(int cx = -rad; cx <= rad; cx++){
-            for(int cy = -rad; cy <= rad; cy++){
-                Tile tile = world.tileWorld(x + cx * tilesize, y + cy * tilesize);
-                if(tile == null) continue;
-                int weight = flying ? tile.airWeight : tile.weight;
-                float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y) / (8f * 1.2f * Mathf.sqrt2)) * 0.1f;
 
-                moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * weight * scl, Mathf.sign(y - tile.worldy()) * scaling * weight * scl);
+        Units.getNearby(Tmp.r1.setSize(size*2f).setCenter(x, y), en -> {
+            if(en == this || en.isFlying() != isFlying()) return;
+            float dst = dst(en);
+
+            if(dst < size){
+                float scl = Mathf.clamp(1f - dst / size) * mass() * 1f/en.mass();
+                moveVector.add((x - en.x) * scl, (y - en.y) * scl);
             }
-        }
-
-        moveVector.limit(flying ? 0.1f : 0.2f);
+        });
 
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
-
-        Tile tile = world.tileWorld(x, y);
-
-        if(tile != null){
-            int tw = flying ? tile.airWeight : tile.weight;
-            lastWeightDelta = Math.min((int)(mass()), 127 - tw);
-            lastWeightTile = tile.pos();
-            if(!flying){
-                tile.weight += lastWeightDelta;
-            }else{
-                tile.airWeight += lastWeightDelta;
-            }
-        }else{
-            lastWeightTile = Pos.invalid;
-        }
-        wasFlying = flying;
     }
 
     public TileEntity getClosestCore(){

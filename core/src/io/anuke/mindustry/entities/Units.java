@@ -250,7 +250,7 @@ public class Units{
             }
         }
 
-        //now check all enemy players
+        //now check all players
         EntityQuery.getNearby(playerGroup, rect, player -> cons.accept((Unit)player));
     }
 
