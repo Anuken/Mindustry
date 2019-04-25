@@ -208,9 +208,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     public void avoidOthers(){
         float radScl = 1.5f;
+        float fsize = getSize() / radScl;
         moveVector.setZero();
 
-        Units.getNearby(Tmp.r3.setSize(getSize()/radScl).setCenter(x, y), en -> {
+        Units.nearby(x - fsize/2f, y - fsize/2f, fsize, fsize, en -> {
             if(en == this || en.isFlying() != isFlying()) return;
             float dst = dst(en);
             float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));

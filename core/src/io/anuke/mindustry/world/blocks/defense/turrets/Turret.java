@@ -195,7 +195,7 @@ public abstract class Turret extends Block{
     protected void findTarget(Tile tile){
         TurretEntity entity = tile.entity();
 
-        entity.target = Units.getClosestTarget(tile.getTeam(),
+        entity.target = Units.closestTarget(tile.getTeam(),
         tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
     }
 

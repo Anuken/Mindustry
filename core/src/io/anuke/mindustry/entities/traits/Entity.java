@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 
 public interface Entity extends MoveTrait{
@@ -18,9 +17,7 @@ public interface Entity extends MoveTrait{
     default void added(){
     }
 
-    default EntityGroup targetGroup(){
-        return Entities.defaultGroup();
-    }
+    EntityGroup targetGroup();
 
     @SuppressWarnings("unchecked")
     default void add(){

@@ -131,7 +131,7 @@ public class Damage{
             }
         };
 
-        Units.getNearbyEnemies(team, rect, cons);
+        Units.nearbyEnemies(team, rect, cons);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
@@ -149,9 +149,9 @@ public class Damage{
 
         rect.setSize(size * 2).setCenter(x, y);
         if(team != null){
-            Units.getNearbyEnemies(team, rect, cons);
+            Units.nearbyEnemies(team, rect, cons);
         }else{
-            Units.getNearby(rect, cons);
+            Units.nearby(rect, cons);
         }
     }
 
@@ -180,9 +180,9 @@ public class Damage{
 
         rect.setSize(radius * 2).setCenter(x, y);
         if(team != null){
-            Units.getNearbyEnemies(team, rect, cons);
+            Units.nearbyEnemies(team, rect, cons);
         }else{
-            Units.getNearby(rect, cons);
+            Units.nearby(rect, cons);
         }
 
         if(!complete){

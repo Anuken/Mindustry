@@ -112,7 +112,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void move(float x, float y){
         if(!mech.flying){
-            EntityQuery.collisions().move(this, x, y);
+            collisions.move(this, x, y);
         }else{
             moveBy(x, y);
         }
@@ -687,7 +687,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         rect.width += expansion * 2f;
         rect.height += expansion * 2f;
 
-        isBoosting = EntityQuery.collisions().overlapsTile(rect) || dst(targetX, targetY) > 85f;
+        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
 
         velocity.add(movement.scl(Time.delta()));
 
@@ -715,7 +715,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));

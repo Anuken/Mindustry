@@ -12,7 +12,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -230,8 +229,6 @@ public class Control implements ApplicationListener{
 
     @Override
     public void init(){
-        EntityQuery.init();
-
         Platform.instance.updateRPC();
 
         if(!Core.settings.getBool("4.0-warning-2", false)){

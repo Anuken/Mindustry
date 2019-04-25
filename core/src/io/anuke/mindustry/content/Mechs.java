@@ -6,7 +6,6 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
@@ -103,7 +102,6 @@ public class Mechs implements ContentList{
             float healRange = 60f;
             float healAmount = 10f;
             float healReload = 160f;
-            Rectangle rect = new Rectangle();
             boolean wasHealed;
 
             {
@@ -137,15 +135,12 @@ public class Mechs implements ContentList{
                 if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
 
-                    rect.setSize(healRange * 2f).setCenter(player.x, player.y);
-                    Units.getNearby(player.getTeam(), rect, unit -> {
-                        if(unit.dst(player) <= healRange){
-                            if(unit.health < unit.maxHealth()){
-                                Effects.effect(Fx.heal, unit);
-                                wasHealed = true;
-                            }
-                            unit.healBy(healAmount);
+                    Units.nearby(player.getTeam(), player.x, player.y, healRange, unit -> {
+                        if(unit.health < unit.maxHealth()){
+                            Effects.effect(Fx.heal, unit);
+                            wasHealed = true;
                         }
+                        unit.healBy(healAmount);
                     });
 
                     if(wasHealed){

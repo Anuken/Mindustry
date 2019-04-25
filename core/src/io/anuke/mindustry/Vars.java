@@ -6,8 +6,7 @@ import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Puddle;
@@ -70,22 +69,22 @@ public class Vars{
     public static final int tilesize = 8;
     /** all choosable player colors in join/host dialog */
     public static final Color[] playerColors = {
-    Color.valueOf("82759a"),
-    Color.valueOf("c0c1c5"),
-    Color.valueOf("fff0e7"),
-    Color.valueOf("7d2953"),
-    Color.valueOf("ff074e"),
-    Color.valueOf("ff072a"),
-    Color.valueOf("ff76a6"),
-    Color.valueOf("a95238"),
-    Color.valueOf("ffa108"),
-    Color.valueOf("feeb2c"),
-    Color.valueOf("ffcaa8"),
-    Color.valueOf("008551"),
-    Color.valueOf("00e339"),
-    Color.valueOf("423c7b"),
-    Color.valueOf("4b5ef1"),
-    Color.valueOf("2cabfe"),
+        Color.valueOf("82759a"),
+        Color.valueOf("c0c1c5"),
+        Color.valueOf("fff0e7"),
+        Color.valueOf("7d2953"),
+        Color.valueOf("ff074e"),
+        Color.valueOf("ff072a"),
+        Color.valueOf("ff76a6"),
+        Color.valueOf("a95238"),
+        Color.valueOf("ffa108"),
+        Color.valueOf("feeb2c"),
+        Color.valueOf("ffcaa8"),
+        Color.valueOf("008551"),
+        Color.valueOf("00e339"),
+        Color.valueOf("423c7b"),
+        Color.valueOf("4b5ef1"),
+        Color.valueOf("2cabfe"),
     };
     /** default server port */
     public static final int port = 6567;
@@ -120,6 +119,7 @@ public class Vars{
     public static ContentLoader content;
     public static GameState state;
     public static GlobalData data;
+    public static EntityCollisions collisions;
 
     public static Control control;
     public static Logic logic;
@@ -164,6 +164,8 @@ public class Vars{
         if(!headless){
             content.setVerbose();
         }
+
+        collisions = new EntityCollisions();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();
         tileGroup = Entities.addGroup(TileEntity.class, false);

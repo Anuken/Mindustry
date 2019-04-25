@@ -5,8 +5,11 @@ import io.anuke.arc.util.pooling.Pool.Poolable;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.Entity;
+
+import static io.anuke.mindustry.Vars.effectGroup;
 
 public class EffectEntity extends TimedEntity implements Poolable, DrawTrait{
     public Effect effect;
@@ -25,6 +28,12 @@ public class EffectEntity extends TimedEntity implements Poolable, DrawTrait{
         this.parent = parent;
         this.poffsetx = x - parent.getX();
         this.poffsety = y - parent.getY();
+    }
+
+    @Override
+    public EntityGroup targetGroup(){
+        //this should never actually be called
+        return effectGroup;
     }
 
     @Override

@@ -42,8 +42,7 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void init(){
-        EntityQuery.init();
-        EntityQuery.collisions().setCollider(tilesize, (x, y) -> {
+        collisions.setCollider(tilesize, (x, y) -> {
             Tile tile = world.tile(x, y);
             return tile != null && tile.solid();
         });
@@ -157,10 +156,6 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
-                if(!Entities.defaultGroup().isEmpty()){
-                    throw new IllegalArgumentException("Do not add anything to the default group!");
-                }
-
                 if(!headless){
                     Entities.update(effectGroup);
                     Entities.update(groundEffectGroup);
@@ -185,11 +180,11 @@ public class Logic implements ApplicationListener{
                 for(EntityGroup group : unitGroups){
                     if(group.isEmpty()) continue;
 
-                    EntityQuery.collideGroups(bulletGroup, group);
+                    collisions.collideGroups(bulletGroup, group);
                 }
 
-                EntityQuery.collideGroups(bulletGroup, playerGroup);
-                EntityQuery.collideGroups(playerGroup, playerGroup);
+                collisions.collideGroups(bulletGroup, playerGroup);
+                collisions.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder.update();
             }
