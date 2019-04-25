@@ -56,11 +56,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected float drownTime, hitTime;
 
     @Override
-    public boolean movable(){
-        return !isDead();
-    }
-
-    @Override
     public boolean collidesGrid(int x, int y){
         return !isFlying();
     }

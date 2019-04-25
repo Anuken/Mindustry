@@ -25,10 +25,6 @@ public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, En
         return getY() - lastPosition().y;
     }
 
-    default boolean movable(){
-        return false;
-    }
-
     default boolean collides(SolidTrait other){
         return true;
     }
