@@ -135,9 +135,11 @@ public class MinimapRenderer implements Disposable{
 
     @Override
     public void dispose(){
-        pixmap.dispose();
-        texture.dispose();
-        texture = null;
-        pixmap = null;
+        if(pixmap != null && texture != null){
+            pixmap.dispose();
+            texture.dispose();
+            texture = null;
+            pixmap = null;
+        }
     }
 }
