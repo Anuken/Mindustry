@@ -123,7 +123,7 @@ public class Control implements ApplicationListener{
             }
         });
 
-        //autohost for pvp sectors
+        //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
             if(state.rules.pvp && !Net.active()){
                 try{

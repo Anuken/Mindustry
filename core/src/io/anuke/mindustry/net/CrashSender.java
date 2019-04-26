@@ -122,7 +122,6 @@ public class CrashSender{
         }
     }
 
-
     private static String parseException(Throwable e){
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

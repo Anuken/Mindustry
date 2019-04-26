@@ -85,13 +85,11 @@ public class World implements ApplicationListener{
         return tiles == null ? 0 : tiles[0].length;
     }
 
-    public @Nullable
-    Tile tile(int pos){
+    public @Nullable Tile tile(int pos){
         return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
-    public @Nullable
-    Tile tile(int x, int y){
+    public @Nullable Tile tile(int x, int y){
         if(tiles == null){
             return null;
         }
@@ -103,8 +101,7 @@ public class World implements ApplicationListener{
         return tiles[x][y];
     }
 
-    public @Nullable
-    Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 

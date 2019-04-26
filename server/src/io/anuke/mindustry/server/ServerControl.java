@@ -46,13 +46,13 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         Core.settings.defaults(
-        "shufflemode", "normal",
-        "bans", "",
-        "admins", "",
-        "shuffle", true,
-        "crashreport", false,
-        "port", port,
-        "logging", true
+            "shufflemode", "normal",
+            "bans", "",
+            "admins", "",
+            "shuffle", true,
+            "crashreport", false,
+            "port", port,
+            "logging", true
         );
 
         Log.setLogger(new LogHandler(){
@@ -90,10 +90,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
-        Effects.setScreenShakeProvider((a, b) -> {
-        });
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {
-        });
+        Effects.setScreenShakeProvider((a, b) -> {});
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 

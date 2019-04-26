@@ -21,7 +21,9 @@ public interface Entity extends MoveTrait{
 
     @SuppressWarnings("unchecked")
     default void add(){
-        targetGroup().add(this);
+        if(targetGroup() != null){
+            targetGroup().add(this);
+        }
     }
 
     @SuppressWarnings("unchecked")

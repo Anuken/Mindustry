@@ -27,7 +27,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private ItemLiquidGenerator generator;
     private Tile tile;
     private ItemLiquidGenerator.ItemLiquidGeneratorEntity entity;
-    private final float fakeItemDuration = 60f; // 60 ticks
+    private final float fakeItemDuration = 60f; //ticks
     private final float maximumLiquidUsage = 0.5f;
 
     public void createGenerator(InputType inputType){
