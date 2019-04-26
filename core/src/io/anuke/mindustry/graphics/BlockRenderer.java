@@ -194,11 +194,11 @@ public class BlockRenderer implements Disposable{
 
                     if(block.expanded || !expanded){
 
-                        if(block.layer != null && block.isLayer(tile)){
+                        if(block.layer != null){
                             addRequest(tile, block.layer);
                         }
 
-                        if(block.layer2 != null && block.isLayer2(tile)){
+                        if(block.layer2 != null){
                             addRequest(tile, block.layer2);
                         }
 

@@ -243,7 +243,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             Events.fire(new BlockDestroyEvent(tile));
             block.onDestroyed(tile);
             world.removeBlock(tile);
-            block.afterDestroyed(tile, this);
             remove();
         }
     }

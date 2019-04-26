@@ -4,8 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.IntPositionConsumer;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -143,7 +142,6 @@ public enum EditorTool{
             }else{
                 //normal fill
                 int x1;
-                boolean spanAbove, spanBelow;
 
                 stack.clear();
 
@@ -157,21 +155,21 @@ public enum EditorTool{
                     x1 = x;
                     while(x1 >= 0 && eq(x1, y)) x1--;
                     x1++;
-                    spanAbove = spanBelow = false;
+                    boolean spanAbove = false, spanBelow = false;
                     while(x1 < width && eq(x1, y)){
                         writer.accept(x1, y);
 
                         if(!spanAbove && y > 0 && eq(x1, y - 1)){
                             stack.add(Pos.get(x1, y - 1));
                             spanAbove = true;
-                        }else if(spanAbove && eq(x1, y - 1)){
+                        }else if(spanAbove && !eq(x1, y - 1)){
                             spanAbove = false;
                         }
 
                         if(!spanBelow && y < height - 1 && eq(x1, y + 1)){
                             stack.add(Pos.get(x1, y + 1));
                             spanBelow = true;
-                        }else if(spanBelow && y < height - 1 && eq(x1, y + 1)){
+                        }else if(spanBelow && y < height - 1 && !eq(x1, y + 1)){
                             spanBelow = false;
                         }
                         x1++;

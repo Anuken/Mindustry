@@ -192,14 +192,6 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
-    public boolean isLayer(Tile tile){
-        return true;
-    }
-
-    public boolean isLayer2(Tile tile){
-        return true;
-    }
-
     public void drawLayer(Tile tile){
     }
 
@@ -274,7 +266,6 @@ public class Block extends BlockStorage{
 
     /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Tile tile, Unit unit){
-
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -474,11 +465,6 @@ public class Block extends BlockStorage{
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
-    }
-
-    /** Called after the block is destroyed and removed. */
-    public void afterDestroyed(Tile tile, TileEntity entity){
-
     }
 
     /** Called when the block is destroyed. */
