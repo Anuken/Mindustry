@@ -436,7 +436,7 @@ public class Block extends BlockStorage{
             float capacity = consumes.getPower().powerCapacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
 
         if(hasItems && configurable){
