@@ -187,7 +187,7 @@ project(":core"){
     task copyGen{
         doLast{
             copy{
-                from("../core/build/classes/java/main/io/anuke/mindustry/gen/"){
+                from("../core/build/generated/sources/annotationProcessor/java/main/io/anuke/mindustry/gen"){
                     include "**/*.java"
                 }
 
