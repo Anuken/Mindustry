@@ -794,10 +794,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(lastSpawner != null && lastSpawner.isValid()){
-                this.spawner = lastSpawner;
-            }else if(getClosestCore() != null){
-                this.spawner = (SpawnerTrait)getClosestCore();
+            if(!Net.client()){
+                if(lastSpawner != null && lastSpawner.isValid()){
+                    this.spawner = lastSpawner;
+                }else if(getClosestCore() != null){
+                    this.spawner = (SpawnerTrait)getClosestCore();
+                }
             }
         }else if(getClosestCore() != null){
             set(getClosestCore().getX(), getClosestCore().getY());
@@ -898,12 +900,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            Tile tile = world.tile(spawner);
-            if(tile != null && tile.entity instanceof SpawnerTrait){
-                this.spawner = (SpawnerTrait)tile.entity;
-            }else{
-                this.spawner = null;
-            }
+        }
+
+        Tile tile = world.tile(spawner);
+        if(tile != null && tile.entity instanceof SpawnerTrait){
+            this.spawner = (SpawnerTrait)tile.entity;
+        }else{
+            this.spawner = null;
         }
     }
 

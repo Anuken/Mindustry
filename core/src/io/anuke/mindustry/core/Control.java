@@ -89,7 +89,15 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.app.post(() -> Core.camera.position.set(player)));
+            Core.app.post(() -> Core.app.post(() -> {
+                if(Net.active() && player.getClosestCore() != null){
+                    //set to closest core since that's where the player will probably respawn; prevents camera jumps
+                    Core.camera.position.set(player.getClosestCore());
+                }else{
+                    //locally, set to player position since respawning occurs immediately
+                    Core.camera.position.set(player);
+                }
+            }));
         });
 
         Events.on(ResetEvent.class, event -> {
