@@ -1,7 +1,6 @@
 package io.anuke.mindustry.desktop;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Settings;
+import io.anuke.arc.*;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3Application;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.anuke.arc.files.FileHandle;
@@ -10,8 +9,7 @@ import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.ArcNetClient;
-import io.anuke.mindustry.net.ArcNetServer;
+import io.anuke.mindustry.net.*;
 
 public class DesktopLauncher extends Lwjgl3Application{
 

@@ -130,6 +130,14 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap)){
+            if(!ui.minimap.isShown()){
+                ui.minimap.show();
+            }else{
+                ui.minimap.hide();
+            }
+        }
+
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom and rotate things

@@ -9,7 +9,6 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.Player;
@@ -172,7 +171,6 @@ public class Control implements ApplicationListener{
     void createPlayer(){
         player = new Player();
         player.name = Core.settings.getString("name");
-        player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
         player.color.set(Core.settings.getInt("color-0"));
         player.isLocal = true;
         player.isMobile = mobile;

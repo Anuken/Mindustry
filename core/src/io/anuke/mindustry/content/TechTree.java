@@ -250,7 +250,7 @@ public class TechTree implements ContentList{
                         node(phantomFactory);
                     });
 
-                    node(alphaDartPad, () -> {
+                    node(dartPad, () -> {
                         node(deltaPad, () -> {
 
                             node(javelinPad, () -> {
