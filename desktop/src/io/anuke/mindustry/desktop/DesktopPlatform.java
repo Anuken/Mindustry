@@ -81,7 +81,7 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = state.rules.waves ? "Survival" : "Attack";
+            presence.state = state.rules.pvp ? "PvP" : state.rules.waves ? "Survival" : "Attack";
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
             }else if(!state.rules.waves){
@@ -91,12 +91,13 @@ public class DesktopPlatform extends Platform{
                 presence.largeImageText = "Wave " + state.wave;
             }
 
-            presence.state = unitGroups[player.getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
-            (unitGroups[player.getTeam().ordinal()].size() + " Units Active");
-
-            if(Net.active()){
-                presence.partyMax = 100;
-                presence.partySize = playerGroup.size();
+            if(Net.active() && playerGroup.size() > 1){
+                presence.state = playerGroup.size() + " Players";
+            }else if(state.rules.waves){
+                presence.state = "Wave " + state.wave;
+            }else{
+                presence.state = unitGroups[player.getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
+                        (unitGroups[player.getTeam().ordinal()].size() + " Units Active");
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){

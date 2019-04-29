@@ -206,7 +206,7 @@ public class Zones implements ContentList{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 1500);
-            conditionWave = 3;
+            conditionWave = 2;
             launchPeriod = 1;
             zoneRequirements = ZoneRequirement.with(tarFields, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
@@ -214,7 +214,7 @@ public class Zones implements ContentList{
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 2.5f;
+                waveSpacing = 60 * 60 * 3.5f;
             }};
         }};
 
