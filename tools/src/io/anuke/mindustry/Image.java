@@ -19,6 +19,8 @@ class Image{
     private Graphics2D graphics;
     private Color color = new Color();
 
+    public final int width, height;
+
     Image(TextureRegion region){
         this(ImagePacker.buf(region));
     }
@@ -27,6 +29,8 @@ class Image{
         this.image = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
         this.graphics.drawImage(src, 0, 0, null);
+        this.width = image.getWidth();
+        this.height = image.getHeight();
 
         toDispose.add(this);
     }
@@ -35,16 +39,8 @@ class Image{
         this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
-    int width(){
-        return image.getWidth();
-    }
-
-    int height(){
-        return image.getHeight();
-    }
-
     boolean isEmpty(int x, int y){
-        if(!Structs.inBounds(x, y, width(), height())){
+        if(!Structs.inBounds(x, y, width, height)){
             return true;
         }
         Color color = getColor(x, y);
@@ -52,7 +48,7 @@ class Image{
     }
 
     Color getColor(int x, int y){
-        if(!Structs.inBounds(x, y, width(), height())) return color.set(0, 0, 0, 0);
+        if(!Structs.inBounds(x, y, width, height)) return color.set(0, 0, 0, 0);
         int i = image.getRGB(x, y);
         Color.argb8888ToColor(color, i);
         return color;
@@ -70,16 +66,16 @@ class Image{
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region){
-        draw(region, (width() - region.getWidth()) / 2, (height() - region.getHeight()) / 2, false, false);
+        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, false, false);
     }
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width() - region.getWidth()) / 2, (height() - region.getHeight()) / 2, flipx, flipy);
+        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, flipx, flipy);
     }
 
     void drawScaled(Image image){
-        graphics.drawImage(image.image.getScaledInstance(width(), height(), java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width(), height(), null);
+        graphics.drawImage(image.image.getScaledInstance(width, height, java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width, height, null);
     }
 
     /** Draws an image at the top left corner. */

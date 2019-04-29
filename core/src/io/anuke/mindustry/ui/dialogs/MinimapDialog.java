@@ -8,8 +8,8 @@ import io.anuke.arc.scene.event.InputEvent;
 import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.layout.Unit;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.renderer;
+import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.world;
 
 public class MinimapDialog extends FloatingDialog{
 
@@ -54,7 +54,8 @@ public class MinimapDialog extends FloatingDialog{
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
                 if(mobile){
-                    renderer.minimap.zoomBy(Core.input.deltaY(pointer) / 30f / Unit.dp.scl(1f));
+                    float max = Math.min(world.width(), world.height()) / 16f / 2f;
+                    renderer.minimap.setZoom(1f + y / cont.getHeight() * (max - 1f));
                 }
             }
         });

@@ -37,15 +37,14 @@ public class MapIO{
     private static void initBlocks(){
         if(missingBlocks != null) return;
 
-        //stainedRocks, stainedRocksRed, stainedRocksYellow, stainedStoneYellow, stainedBoulder,
         missingBlocks = ObjectMap.of(
-        "stained-stone", Blocks.shale,
-        "stained-stone-red", Blocks.shale,
-        "stained-stone-yellow", Blocks.shale,
-        "stained-rocks", Blocks.shaleRocks,
-        "stained-boulder", Blocks.shaleBoulder,
-        "stained-rocks-red", Blocks.shaleRocks,
-        "stained-rocks-yellow", Blocks.shaleRocks
+            "stained-stone", Blocks.shale,
+            "stained-stone-red", Blocks.shale,
+            "stained-stone-yellow", Blocks.shale,
+            "stained-rocks", Blocks.shaleRocks,
+            "stained-boulder", Blocks.shaleBoulder,
+            "stained-rocks-red", Blocks.shaleRocks,
+            "stained-rocks-yellow", Blocks.shaleRocks
         );
     }
 

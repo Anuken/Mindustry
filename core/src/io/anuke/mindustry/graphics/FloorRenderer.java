@@ -18,7 +18,7 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
 
-public class FloorRenderer{
+public class FloorRenderer implements Disposable{
     private final static int chunksize = 64;
 
     private Chunk[][] cache;
@@ -219,6 +219,14 @@ public class FloorRenderer{
         }
 
         Log.info("Time to cache: {0}", Time.elapsed());
+    }
+
+    @Override
+    public void dispose(){
+        if(cbatch != null){
+            cbatch.dispose();
+            cbatch = null;
+        }
     }
 
     private class Chunk{

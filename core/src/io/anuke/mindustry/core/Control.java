@@ -9,10 +9,8 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.EntityQuery;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -91,7 +89,15 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.app.post(() -> Core.camera.position.set(player)));
+            Core.app.post(() -> Core.app.post(() -> {
+                if(Net.active() && player.getClosestCore() != null){
+                    //set to closest core since that's where the player will probably respawn; prevents camera jumps
+                    Core.camera.position.set(player.getClosestCore());
+                }else{
+                    //locally, set to player position since respawning occurs immediately
+                    Core.camera.position.set(player);
+                }
+            }));
         });
 
         Events.on(ResetEvent.class, event -> {
@@ -124,7 +130,7 @@ public class Control implements ApplicationListener{
             }
         });
 
-        //autohost for pvp sectors
+        //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
             if(state.rules.pvp && !Net.active()){
                 try{
@@ -173,7 +179,6 @@ public class Control implements ApplicationListener{
     void createPlayer(){
         player = new Player();
         player.name = Core.settings.getString("name");
-        player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
         player.color.set(Core.settings.getInt("color-0"));
         player.isLocal = true;
         player.isMobile = mobile;
@@ -230,8 +235,6 @@ public class Control implements ApplicationListener{
 
     @Override
     public void init(){
-        EntityQuery.init();
-
         Platform.instance.updateRPC();
 
         if(!Core.settings.getBool("4.0-warning-2", false)){

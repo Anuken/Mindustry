@@ -25,10 +25,6 @@ public class Maps implements Disposable{
     /** Serializer for meta. */
     private Json json = new Json();
 
-    public Maps(){
-
-    }
-
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
         return maps;

@@ -188,7 +188,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
         //effects-only code
         if(amount >= maxLiquid / 2f && updateTime <= 0f){
-            Units.getNearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
+            Units.nearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
                 if(unit.isFlying()) return;
 
                 unit.hitbox(rect2);

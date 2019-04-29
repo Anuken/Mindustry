@@ -148,7 +148,7 @@ public abstract class BulletType extends Content{
     public void update(Bullet b){
 
         if(homingPower > 0.0001f){
-            TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
+            TargetTrait target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
                 b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
             }

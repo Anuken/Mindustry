@@ -43,7 +43,7 @@ public class EntityCollisions{
 
         while(Math.abs(deltax) > 0 || !movedx){
             movedx = true;
-            moveInternal(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true);
+            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true);
 
             if(Math.abs(deltax) >= seg){
                 deltax -= seg * Mathf.sign(deltax);
@@ -56,7 +56,7 @@ public class EntityCollisions{
 
         while(Math.abs(deltay) > 0 || !movedy){
             movedy = true;
-            moveInternal(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false);
+            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false);
 
             if(Math.abs(deltay) >= seg){
                 deltay -= seg * Mathf.sign(deltay);
@@ -66,7 +66,7 @@ public class EntityCollisions{
         }
     }
 
-    public void moveInternal(SolidTrait entity, float deltax, float deltay, boolean x){
+    public void moveDelta(SolidTrait entity, float deltax, float deltay, boolean x){
         if(collider == null)
             throw new IllegalArgumentException("No tile collider specified! Call setCollider() first.");
 
@@ -124,6 +124,7 @@ public class EntityCollisions{
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Entity> void updatePhysics(EntityGroup<T> group){
         collided.clear();
 
@@ -218,6 +219,7 @@ public class EntityCollisions{
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void collideGroups(EntityGroup<?> groupa, EntityGroup<?> groupb){
         collided.clear();
 

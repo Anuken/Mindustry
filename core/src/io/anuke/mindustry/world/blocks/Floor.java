@@ -45,8 +45,6 @@ public class Floor extends Block{
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Style of the edge stencil. Loaded by looking up "edge-stencil-{name}". */
-    public String edgeStyle = "smooth";
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
     /** Effect displayed when randomly updated. */

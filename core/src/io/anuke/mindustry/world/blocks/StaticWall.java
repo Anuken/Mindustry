@@ -45,7 +45,8 @@ public class StaticWall extends Rock{
     }
 
     boolean eq(int rx, int ry){
-        return world.tile(rx + 1, ry).block() == this
+        return rx < world.width() - 1 && ry < world.height() - 1
+        && world.tile(rx + 1, ry).block() == this
         && world.tile(rx, ry + 1).block() == this
         && world.tile(rx, ry).block() == this
         && world.tile(rx + 1, ry + 1).block() == this;

@@ -1,15 +1,12 @@
-package io.anuke.net;
+package io.anuke.mindustry.net;
 
 import com.dosse.upnp.UPnP;
-import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.kryonet.Listener.LagListener;
-import com.esotericsoftware.kryonet.util.InputStreamSender;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.net.*;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Net.ServerProvider;
 import io.anuke.mindustry.net.Packets.*;
@@ -22,7 +19,7 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public class KryoServer implements ServerProvider{
+public class ArcNetServer implements ServerProvider{
     final Server server;
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArraySet<Integer> missing = new CopyOnWriteArraySet<>();
@@ -32,18 +29,15 @@ public class KryoServer implements ServerProvider{
 
     int lastconnection = 0;
 
-    public KryoServer(){
-        KryoCore.init();
-
-        server = new Server(4096 * 2, 4096, connection -> new ByteSerializer());
+    public ArcNetServer(){
+        server = new Server(4096 * 2, 4096, new PacketSerializer());
         server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
             datagramChannel.send(buffer, fromAddress);
-            return true;
         });
 
-        Listener listener = new Listener(){
+        NetListener listener = new NetListener(){
 
             @Override
             public void connected(Connection connection){
@@ -83,8 +77,13 @@ public class KryoServer implements ServerProvider{
                 Core.app.post(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
-                    }catch(ValidateException e){
-                        Log.err("Validation failed: {0} ({1})", e.player.name, e.getMessage());
+                    }catch(RuntimeException e){
+                        if(e.getCause() instanceof ValidateException){
+                            ValidateException v = (ValidateException)e.getCause();
+                            Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
+                        }else{
+                            e.printStackTrace();
+                        }
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -92,11 +91,7 @@ public class KryoServer implements ServerProvider{
             }
         };
 
-        if(KryoCore.fakeLag){
-            server.addListener(new LagListener(KryoCore.fakeLagMin, KryoCore.fakeLagMax, listener));
-        }else{
-            server.addListener(listener);
-        }
+        server.addListener(listener);
     }
 
     @Override
@@ -150,7 +145,7 @@ public class KryoServer implements ServerProvider{
             }catch(Throwable e){
                 if(!(e instanceof ClosedSelectorException)) handleException(e);
             }
-        }, "Kryonet Server");
+        }, "Net Server");
         serverThread.setDaemon(true);
         serverThread.start();
     }
@@ -291,12 +286,11 @@ public class KryoServer implements ServerProvider{
                 }
             }catch(Exception e){
                 Log.err(e);
-                Log.info("Disconnecting invalid client!");
+                Log.info("Error sending packet. Disconnecting invalid client!");
                 connection.close();
 
                 KryoConnection k = getByKryoID(connection.getID());
                 if(k != null) connections.remove(k);
-                Log.info("Connection removed {0}", k);
             }
         }
 

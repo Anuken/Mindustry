@@ -37,12 +37,26 @@ public class Rules{
     public float buildSpeedMultiplier = 1f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** Radius around enemy wave drop zones.*/
+    public float dropZoneRadius = 380f;
     /** Player respawn time in ticks. */
     public float respawnTime = 60 * 4;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
+    /** How many times longer a boss wave takes. */
+    public float bossWaveMultiplier = 3f;
+    /** How many times longer a launch wave takes. */
+    public float launchWaveMultiplier = 2f;
     /** Zone ID, -1 for invalid zone. */
     public byte zone = -1;
-    /** Spawn layout. Since only zones modify this, it should be assigned on save load. */
+    /** Spawn layout. Should be assigned on save load based on map or zone. */
     public transient Array<SpawnGroup> spawns = DefaultWaves.get();
+    /** Determines if there should be limited respawns. */
+    public boolean limitedRespawns = false;
+    /** How many times player can respawn during one wave. */
+    public int respawns = 5;
+    /** Hold wave timer until all enemies are destroyed. */
+    public boolean waitForWaveToEnd = false;
+    /** Determinates if gamemode is attack mode */
+    public boolean attackMode = false;
 }

@@ -36,7 +36,7 @@ public class Blocks implements ContentList{
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
     creeptree,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
-    pebbles,
+    pebbles, tendrils,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    alphaDartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -112,10 +112,7 @@ public class Blocks implements ContentList{
 
         part = new BlockPart();
 
-        spawn = new Block("spawn"){
-            public void drawShadow(Tile tile){
-            }
-        };
+        spawn = new Block("spawn");
 
         //Registers build blocks from size 1-6
         //no reference is needed here since they can be looked up by name later
@@ -255,13 +252,11 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
-            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -351,7 +346,6 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -359,7 +353,7 @@ public class Blocks implements ContentList{
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 6;
+            variants = 3;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
@@ -381,10 +375,11 @@ public class Blocks implements ContentList{
         darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
         darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
 
-        darkMetal = new StaticWall("dark-metal"){{
-        }};
+        darkMetal = new StaticWall("dark-metal");
 
         pebbles = new OverlayFloor("pebbles");
+
+        tendrils = new OverlayFloor("tendrils");
 
         //endregion
         //region ore
@@ -902,8 +897,8 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
-            capacity = 32;
-            health = 25;
+            capacity = 15;
+            health = 30;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -1117,7 +1112,7 @@ public class Blocks implements ContentList{
             itemDuration = 40f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.cryofluid, 0.3f);
+            consumes.liquid(Liquids.cryofluid, 0.26f);
         }};
 
         //endregion power
@@ -1652,9 +1647,9 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        alphaDartPad = new MechPad("alpha-dart-mech-pad"){{
+        dartPad = new MechPad("dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
-            mech = Mechs.alpha;
+            mech = Mechs.dart;
             size = 2;
             consumes.powerBuffered(50f);
         }};

@@ -89,6 +89,9 @@ public class Drill extends Block{
     }
 
     @Override
+    public void drawCracks(Tile tile){}
+
+    @Override
     public void draw(Tile tile){
         float s = 0.3f;
         float ts = 0.6f;
@@ -96,6 +99,7 @@ public class Drill extends Block{
         DrillEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
+        super.drawCracks(tile);
 
         if(drawRim){
             Draw.color(heatColor);

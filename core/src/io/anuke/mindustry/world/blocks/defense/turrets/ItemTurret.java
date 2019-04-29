@@ -38,6 +38,15 @@ public class ItemTurret extends CooledTurret{
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
     }
 
+    @Override
+    public void onProximityAdded(Tile tile){
+        super.onProximityAdded(tile);
+
+        //add first ammo item to cheaty blocks so they can shoot properly
+        if(tile.isEnemyCheat() && ammo.size > 0){
+            handleItem(ammo.entries().next().key, tile, tile);
+        }
+    }
 
     @Override
     public void displayBars(Tile tile, Table bars){

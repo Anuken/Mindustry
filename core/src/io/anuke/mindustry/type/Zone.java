@@ -24,7 +24,6 @@ public class Zone extends UnlockableContent{
     public final Generator generator;
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
-    //TODO debug verify resources.
     public Item[] resources = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
@@ -128,6 +127,7 @@ public class Zone extends UnlockableContent{
         generator.init(loadout);
         Arrays.sort(resources);
 
+        @SuppressWarnings("unchecked")
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;

@@ -9,7 +9,6 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.Player;
@@ -31,9 +30,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
-    protected float requiredSatisfaction = 1f;
-
-    protected TextureRegion openRegion;
+    protected float requiredSatisfaction = 0.999f;
 
     public MechPad(String name){
         super(name);
@@ -47,11 +44,6 @@ public class MechPad extends Block{
         super.setStats();
 
         stats.add(BlockStat.productionTime, buildTime / 60f, StatUnit.seconds);
-    }
-
-    @Override
-    public void init(){
-        super.init();
     }
 
     @Override
@@ -81,25 +73,10 @@ public class MechPad extends Block{
         Effects.effect(Fx.spawn, entity);
 
         if(entity.player == null) return;
-
-        Mech result = ((MechPad)tile.block()).mech;
-
-        if(entity.player.mech == result){
-            Mech target = (entity.player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
-            if(entity.player.mech == target){
-                entity.player.mech = (entity.player.isMobile ? Mechs.starterDesktop : Mechs.starterMobile);
-            }else{
-                entity.player.mech = target;
-            }
-        }else{
-            entity.player.mech = result;
-        }
+        entity.player.mech = ((MechPad)tile.block()).mech;
 
         entity.progress = 0;
-        entity.player.heal();
-        entity.player.endRespawning();
-        entity.player.setDead(false);
-        entity.player.clearItem();
+        entity.player.onRespawn(tile);
         entity.player = null;
     }
 
@@ -125,15 +102,10 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
-            player.moveTarget = tile.entity;
+        }else if(player.isLocal && mobile && !player.isDead() && (entity.power.satisfaction >= requiredSatisfaction) && entity.player == null){
+            //deselect on double taps
+            player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        openRegion = Core.atlas.find(name + "-open");
     }
 
     @Override
@@ -144,10 +116,6 @@ public class MechPad extends Block{
 
         if(entity.player != null){
             TextureRegion region = mech.iconRegion;
-
-            if(entity.player.mech == mech){
-                region = (entity.player.mech == Mechs.starterDesktop ? Mechs.starterMobile : Mechs.starterDesktop).iconRegion;
-            }
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
@@ -175,6 +143,7 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.entity();
 
         if(entity.player != null){
+            entity.player.set(tile.drawx(), tile.drawy());
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.progress += 1f / buildTime * entity.delta();
 
@@ -205,9 +174,6 @@ public class MechPad extends Block{
                 progress = 0f;
                 player = unit;
 
-                player.rotation = 90f;
-                player.baseRotation = 90f;
-                player.setNet(x, y);
                 player.beginRespawning(this);
             }
         }

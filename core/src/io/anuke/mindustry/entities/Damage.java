@@ -86,6 +86,7 @@ public class Damage{
         tr.trns(angle, length);
         world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
             Tile tile = world.tile(cx, cy);
+            if(tile != null) tile = tile.target();
             if(tile != null && tile.entity != null && tile.target().getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
@@ -113,7 +114,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Consumer<io.anuke.mindustry.entities.type.Unit> cons = e -> {
+        Consumer<Unit> cons = e -> {
             e.hitbox(hitrect);
             Rectangle other = hitrect;
             other.y -= expand;
@@ -130,12 +131,12 @@ public class Damage{
             }
         };
 
-        Units.getNearbyEnemies(team, rect, cons);
+        Units.nearbyEnemies(team, rect, cons);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<io.anuke.mindustry.entities.type.Unit> predicate, Consumer<io.anuke.mindustry.entities.type.Unit> acceptor){
-        Consumer<io.anuke.mindustry.entities.type.Unit> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor){
+        Consumer<Unit> cons = entity -> {
             if(!predicate.test(entity)) return;
 
             entity.hitbox(hitrect);
@@ -148,9 +149,9 @@ public class Damage{
 
         rect.setSize(size * 2).setCenter(x, y);
         if(team != null){
-            Units.getNearbyEnemies(team, rect, cons);
+            Units.nearbyEnemies(team, rect, cons);
         }else{
-            Units.getNearby(rect, cons);
+            Units.nearby(rect, cons);
         }
     }
 
@@ -179,9 +180,9 @@ public class Damage{
 
         rect.setSize(radius * 2).setCenter(x, y);
         if(team != null){
-            Units.getNearbyEnemies(team, rect, cons);
+            Units.nearbyEnemies(team, rect, cons);
         }else{
-            Units.getNearby(rect, cons);
+            Units.nearby(rect, cons);
         }
 
         if(!complete){

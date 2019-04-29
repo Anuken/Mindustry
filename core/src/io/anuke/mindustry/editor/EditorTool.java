@@ -4,13 +4,13 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.function.IntPositionConsumer;
 import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 public enum EditorTool{
+    zoom,
     pick{
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
@@ -34,6 +34,7 @@ public enum EditorTool{
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
+    line,
     pencil{
         {
             edit = true;
@@ -54,22 +55,6 @@ public enum EditorTool{
         @Override
         public void touched(MapEditor editor, int x, int y){
             editor.draw(x, y, isPaint(), Blocks.air);
-        }
-    },
-    spray{
-        {
-            edit = true;
-            draggable = true;
-        }
-
-        @Override
-        public void touched(MapEditor editor, int x, int y){
-            editor.draw(x, y, isPaint(), editor.drawBlock, 0.012);
-        }
-    },
-    line{
-        {
-
         }
     },
     fill{
@@ -157,7 +142,6 @@ public enum EditorTool{
             }else{
                 //normal fill
                 int x1;
-                boolean spanAbove, spanBelow;
 
                 stack.clear();
 
@@ -171,21 +155,21 @@ public enum EditorTool{
                     x1 = x;
                     while(x1 >= 0 && eq(x1, y)) x1--;
                     x1++;
-                    spanAbove = spanBelow = false;
+                    boolean spanAbove = false, spanBelow = false;
                     while(x1 < width && eq(x1, y)){
                         writer.accept(x1, y);
 
                         if(!spanAbove && y > 0 && eq(x1, y - 1)){
                             stack.add(Pos.get(x1, y - 1));
                             spanAbove = true;
-                        }else if(spanAbove && eq(x1, y - 1)){
+                        }else if(spanAbove && !eq(x1, y - 1)){
                             spanAbove = false;
                         }
 
                         if(!spanBelow && y < height - 1 && eq(x1, y + 1)){
                             stack.add(Pos.get(x1, y + 1));
                             spanBelow = true;
-                        }else if(spanBelow && y < height - 1 && eq(x1, y + 1)){
+                        }else if(spanBelow && y < height - 1 && !eq(x1, y + 1)){
                             spanBelow = false;
                         }
                         x1++;
@@ -200,7 +184,17 @@ public enum EditorTool{
             return (data.drawBlock instanceof OverlayFloor ? tile.overlay() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OverlayFloor && tile.floor().isLiquid);
         }
     },
-    zoom;
+    spray{
+        {
+            edit = true;
+            draggable = true;
+        }
+
+        @Override
+        public void touched(MapEditor editor, int x, int y){
+            editor.draw(x, y, isPaint(), editor.drawBlock, 0.012);
+        }
+    };
 
     boolean edit, draggable;
 

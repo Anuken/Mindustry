@@ -52,8 +52,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
-    public Mech mech;
+    public Mech mech = Mechs.starter;
     public SpawnerTrait spawner, lastSpawner;
+    public int respawns;
 
     public NetConnection con;
     public boolean isLocal = false;
@@ -81,7 +82,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         player.dead = true;
         player.placeQueue.clear();
         player.onDeath();
-        player.mech = (player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     @Override
@@ -101,23 +101,27 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void onRespawn(Tile tile){
+        velocity.setZero();
         boostHeat = 1f;
         achievedFlight = true;
+        rotation = 90f;
+        baseRotation = 90f;
+        dead = false;
+        spawner = null;
+        respawns --;
+
+        setNet(tile.drawx(), tile.drawy());
+        clearItem();
+        heal();
     }
 
     @Override
     public void move(float x, float y){
         if(!mech.flying){
-            EntityQuery.collisions().move(this, x, y);
+            collisions.move(this, x, y);
         }else{
             moveBy(x, y);
         }
-    }
-
-    @Override
-    public boolean collidesGrid(int x, int y){
-        Tile tile = world.tile(x, y);
-        return !isFlying() || (!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid);
     }
 
     @Override
@@ -489,7 +493,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void update(){
-
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
@@ -516,13 +519,15 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
-            updateRespawning();
+            if(respawns > 0 || !state.rules.limitedRespawns){
+                updateRespawning();
+            }
             return;
         }else{
             spawner = null;
         }
 
-        avoidOthers(1f);
+        avoidOthers();
 
         Tile tile = world.tileWorld(x, y);
 
@@ -682,7 +687,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         rect.width += expansion * 2f;
         rect.height += expansion * 2f;
 
-        isBoosting = EntityQuery.collisions().overlapsTile(rect) || dst(targetX, targetY) > 85f;
+        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
 
         velocity.add(movement.scl(Time.delta()));
 
@@ -710,7 +715,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
@@ -775,12 +780,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
-        mech = getStarterMech();
+        mech = Mechs.starter;
         placeQueue.clear();
-    }
-
-    public Mech getStarterMech(){
-        return (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+        respawns = state.rules.respawns;
     }
 
     public boolean isShooting(){
@@ -792,10 +794,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(lastSpawner != null && lastSpawner.isValid()){
-                this.spawner = lastSpawner;
-            }else if(getClosestCore() != null){
-                this.spawner = (SpawnerTrait)getClosestCore();
+            if(!Net.client()){
+                if(lastSpawner != null && lastSpawner.isValid()){
+                    this.spawner = lastSpawner;
+                }else if(getClosestCore() != null){
+                    this.spawner = (SpawnerTrait)getClosestCore();
+                }
             }
         }else if(getClosestCore() != null){
             set(getClosestCore().getX(), getClosestCore().getY());
@@ -806,16 +810,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         this.spawner = spawner;
         this.lastSpawner = spawner;
         this.dead = true;
-    }
-
-    public void endRespawning(){
-        spawner = null;
+        setNet(spawner.getX(), spawner.getY());
     }
 
     //endregion
 
     //region read and write methods
-
 
     @Override
     public boolean isClipped(){
@@ -900,12 +900,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            Tile tile = world.tile(spawner);
-            if(tile != null && tile.entity instanceof SpawnerTrait){
-                this.spawner = (SpawnerTrait)tile.entity;
-            }else{
-                this.spawner = null;
-            }
+        }
+
+        Tile tile = world.tile(spawner);
+        if(tile != null && tile.entity instanceof SpawnerTrait){
+            this.spawner = (SpawnerTrait)tile.entity;
+        }else{
+            this.spawner = null;
         }
     }
 

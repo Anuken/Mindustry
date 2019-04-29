@@ -46,13 +46,13 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         Core.settings.defaults(
-        "shufflemode", "normal",
-        "bans", "",
-        "admins", "",
-        "shuffle", true,
-        "crashreport", false,
-        "port", port,
-        "logging", true
+            "shufflemode", "normal",
+            "bans", "",
+            "admins", "",
+            "shuffle", true,
+            "crashreport", false,
+            "port", port,
+            "logging", true
         );
 
         Log.setLogger(new LogHandler(){
@@ -90,10 +90,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
-        Effects.setScreenShakeProvider((a, b) -> {
-        });
-        Effects.setEffectProvider((a, b, c, d, e, f) -> {
-        });
+        Effects.setScreenShakeProvider((a, b) -> {});
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 
@@ -138,6 +136,8 @@ public class ServerControl implements ApplicationListener{
                     Map map = previous;
                     if(maps.size > 1){
                         while(map == previous) map = maps.random();
+                    }else if(!previous.custom && !world.maps.customMaps().isEmpty()){
+                        map = maps.first();
                     }
 
                     Call.onInfoMessage((state.rules.pvp
@@ -204,11 +204,11 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            RulePreset preset = RulePreset.survival;
+            Gamemode preset = Gamemode.survival;
 
             if(arg.length > 1){
                 try{
-                    preset = RulePreset.valueOf(arg[1]);
+                    preset = Gamemode.valueOf(arg[1]);
                 }catch(IllegalArgumentException e){
                     err("No gamemode '{0}' found.", arg[1]);
                     return;
