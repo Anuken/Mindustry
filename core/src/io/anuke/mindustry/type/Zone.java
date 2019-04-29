@@ -127,6 +127,7 @@ public class Zone extends UnlockableContent{
         generator.init(loadout);
         Arrays.sort(resources);
 
+        @SuppressWarnings("unchecked")
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;

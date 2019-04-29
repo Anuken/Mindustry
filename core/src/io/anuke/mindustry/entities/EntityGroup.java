@@ -109,6 +109,7 @@ public class EntityGroup<T extends Entity>{
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void intersect(float x, float y, float width, float height, Consumer<? super T> out){
         //don't waste time for empty groups
         if(isEmpty()) return;

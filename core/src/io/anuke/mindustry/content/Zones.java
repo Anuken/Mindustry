@@ -37,14 +37,13 @@ public class Zones implements ContentList{
             conditionWave = 20;
             launchPeriod = 10;
             loadout = Loadouts.advancedShard;
-            zoneRequirements = ZoneRequirement.with(groundZero, 15);
-            blockRequirements = new Block[]{Blocks.router};
+            zoneRequirements = ZoneRequirement.with(groundZero, 20);
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
                 launchWaveMultiplier = 3f;
-                waveSpacing = 60 * 30f;
+                waveSpacing = 60 * 50f;
                 spawns = Array.with(
                     new SpawnGroup(UnitTypes.crawler){{
                         unitScaling = 3f;
@@ -59,13 +58,19 @@ public class Zones implements ContentList{
                         begin = 11;
                         spacing = 3;
                     }},
-                    new SpawnGroup(UnitTypes.ghoul){{
+                    new SpawnGroup(UnitTypes.eruptor){{
                         unitScaling = 3f;
                         begin = 22;
                         unitAmount = 1;
-                        spacing = 3;
+                        spacing = 4;
                     }},
-                    new SpawnGroup(UnitTypes.lich){{
+                    new SpawnGroup(UnitTypes.titan){{
+                        unitScaling = 3f;
+                        begin = 37;
+                        unitAmount = 2;
+                        spacing = 4;
+                    }},
+                    new SpawnGroup(UnitTypes.fortress){{
                         unitScaling = 2f;
                         effect = StatusEffects.boss;
                         begin = 41;
@@ -139,7 +144,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 20;
             launchPeriod = 20;
-            zoneRequirements = ZoneRequirement.with(desertWastes, 30, craters, 15);
+            zoneRequirements = ZoneRequirement.with(desertWastes, 20, craters, 15);
             blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
@@ -157,7 +162,7 @@ public class Zones implements ContentList{
             zoneRequirements = new Zone[]{frozenForest};
             blockRequirements = new Block[]{Blocks.copperWall};
             rules = () -> new Rules(){{
-                waves = true;
+                waves = true;]
                 waveTimer = true;
                 waveSpacing = 60 * 80;
             }};
