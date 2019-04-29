@@ -26,7 +26,6 @@ public class Mechs implements ContentList{
     public void load(){
 
         alpha = new Mech("alpha-mech", false){
-
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
@@ -224,9 +223,9 @@ public class Mechs implements ContentList{
             {
                 drillPower = 1;
                 mineSpeed = 0.9f;
-                speed = 0.45f;
-                drag = 0.1f;
-                health = 180f;
+                speed = 0.5f;
+                drag = 0.09f;
+                health = 200f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
@@ -234,16 +233,11 @@ public class Mechs implements ContentList{
                 buildPower = 1.1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
-                    reload = 20f;
+                    reload = 15f;
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
-            }
-
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
             }
         };
 

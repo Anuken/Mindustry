@@ -6,10 +6,9 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -35,8 +34,6 @@ public class MapGenerator extends Generator{
     public int enemySpawns = -1;
     /** Whether floor is distorted along with blocks. */
     public boolean distortFloor = false;
-    /** Items randomly added to containers and vaults. */
-    public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
@@ -45,11 +42,6 @@ public class MapGenerator extends Generator{
     public MapGenerator(String mapName, int enemySpawns){
         this.mapName = mapName;
         this.enemySpawns = enemySpawns;
-    }
-
-    public MapGenerator drops(ItemStack[] drops){
-        this.storageDrops = drops;
-        return this;
     }
 
     public MapGenerator decor(Decoration... decor){
@@ -140,10 +132,10 @@ public class MapGenerator extends Generator{
                         }
                     }
 
-                    if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock)){
-                        for(ItemStack stack : storageDrops){
+                    if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
+                        for(Item item : world.getZone().resources){
                             if(Mathf.chance(0.3)){
-                                tile.entity.items.add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));
+                                tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
                             }
                         }
                     }

@@ -47,10 +47,6 @@ public class Vars{
     public static final Team defaultTeam = Team.blue;
     /** team of the enemy in waves/sectors */
     public static final Team waveTeam = Team.red;
-    /** how many times longer a boss wave takes */
-    public static final float bossWaveMultiplier = 3f;
-    /** how many times longer a launch wave takes */
-    public static final float launchWaveMultiplier = 2f;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
