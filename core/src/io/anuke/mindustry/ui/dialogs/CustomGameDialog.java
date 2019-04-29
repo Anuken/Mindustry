@@ -9,6 +9,7 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.game.Difficulty;
@@ -43,7 +44,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = (Core.graphics.getHeight() > Core.graphics.getHeight() ? 2 : 4);
+        int maxwidth = (UIUtils.portrait() ? 2 : 4);
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
