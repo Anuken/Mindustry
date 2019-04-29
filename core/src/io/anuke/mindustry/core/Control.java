@@ -108,8 +108,6 @@ public class Control implements ApplicationListener{
             saves.resetSave();
         });
 
-        //todo high scores for custom maps, as well as other statistics
-
         Events.on(WaveEvent.class, event -> {
             if(world.getMap().getHightScore() < state.wave){
                 hiscore = true;
