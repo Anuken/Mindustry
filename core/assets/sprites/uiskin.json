@@ -281,6 +281,7 @@
       font: default-font-chat,
       fontColor: white,
       disabledFontColor: gray,
+      disabledBackground: underline-disabled,
       selection: selection,
       background: underline,
       invalidBackground: underline-red,
@@ -305,9 +306,12 @@
       checkboxOff: check-off,
       checkboxOnOver: check-on-over,
       checkboxOver: check-over,
+      checkboxOnDisabled: check-on-disabled,
+      checkboxOffDisabled: check-disabled,
       font: default-font,
       fontColor: white,
-      disabledFontColor: gray
+      disabledFontColor: gray,
+
     }
   }
 }

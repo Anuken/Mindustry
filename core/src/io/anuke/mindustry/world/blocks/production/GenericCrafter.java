@@ -20,8 +20,6 @@ import io.anuke.mindustry.world.meta.StatUnit;
 import java.io.*;
 
 public class GenericCrafter extends Block{
-    protected final int timerDump = timers++;
-
     protected ItemStack outputItem;
     protected LiquidStack outputLiquid;
 
@@ -110,7 +108,7 @@ public class GenericCrafter extends Block{
             entity.progress = 0f;
         }
 
-        if(outputItem != null && tile.entity.timer.get(timerDump, 5)){
+        if(outputItem != null && tile.entity.timer.get(timerDump, dumpTime)){
             tryDump(tile, outputItem.item);
         }
 

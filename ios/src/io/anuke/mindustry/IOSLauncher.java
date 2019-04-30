@@ -10,8 +10,8 @@ import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.net.Net;
-import io.anuke.net.KryoClient;
-import io.anuke.net.KryoServer;
+import io.anuke.mindustry.net.ArcNetClient;
+import io.anuke.mindustry.net.ArcNetServer;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.*;
@@ -27,8 +27,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     protected IOSApplication createApplication(){
-        Net.setClientProvider(new KryoClient());
-        Net.setServerProvider(new KryoServer());
+        Net.setClientProvider(new ArcNetClient());
+        Net.setServerProvider(new ArcNetServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             Unit.dp.addition = 0.5f;

@@ -24,14 +24,12 @@ def antialias = { File file ->
     }
 
     def color = new Color()
-    def color2 = new Color()
     def sum = new Color()
     def suma = new Color()
 
     for(int x = 0; x < image.getWidth(); x++){
         for(int y = 0; y < image.getHeight(); y++){
-            int A =
-                    getRGB(x - 1, y + 1),
+            int A = getRGB(x - 1, y + 1),
                 B = getRGB(x, y + 1),
                 C = getRGB(x + 1, y + 1),
                 D = getRGB(x - 1, y),
@@ -88,6 +86,52 @@ def antialias = { File file ->
     ImageIO.write(out, "png", file)
 }
 
+def scaleImage = { File file ->
+    def image = ImageIO.read(file)
+    for(int iteration in 0..1){
+        def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
+
+        def getRGB = { int ix, int iy ->
+            //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
+            return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+        }
+
+        for(int x = 0; x < image.getWidth(); x++){
+            for(int y = 0; y < image.getHeight(); y++){
+                int p = image.getRGB(x, y)
+                int p1 = p, p2 = p, p3 = p, p4 = p
+
+                int A = getRGB(x - 1, y + 1),
+                    B = getRGB(x, y + 1),
+                    C = getRGB(x + 1, y + 1),
+                    D = getRGB(x - 1, y),
+                    E = getRGB(x, y),
+                    F = getRGB(x + 1, y),
+                    G = getRGB(x - 1, y - 1),
+                    H = getRGB(x, y - 1),
+                    I = getRGB(x + 1, y - 1),
+                    J = getRGB(x, y + 2),
+                    K = getRGB(x - 2, y),
+                    L = getRGB(x + 2, y),
+                    M = getRGB(x, y - 2)
+
+                if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
+                if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
+                if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
+                if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
+
+                scaled.setRGB(x * 2, y * 2 + 1, p1)
+                scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
+                scaled.setRGB(x * 2, y * 2, p3)
+                scaled.setRGB(x * 2 + 1, y * 2, p4)
+            }
+        }
+        image = scaled
+    }
+
+    ImageIO.write(image, "png", file)
+}
+
 task swapColors(){
     doLast{
         if(project.hasProperty("colors")){
@@ -126,49 +170,7 @@ task scaleSprites4x(){
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
             if(file.isDirectory() || file.toString().contains("/ui/")) return
 
-            for(int iteration in 0..1){
-                def image = ImageIO.read(file.file)
-                def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
-
-                def getRGB = { int ix, int iy ->
-                    //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
-                    return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
-                }
-
-                for(int x = 0; x < image.getWidth(); x++){
-                    for(int y = 0; y < image.getHeight(); y++){
-                        int p = image.getRGB(x, y)
-                        int p1 = p, p2 = p, p3 = p, p4 = p
-
-                        int A = getRGB(x - 1, y + 1),
-                            B = getRGB(x, y + 1),
-                            C = getRGB(x + 1, y + 1),
-                            D = getRGB(x - 1, y),
-                            E = getRGB(x, y),
-                            F = getRGB(x + 1, y),
-                            G = getRGB(x - 1, y - 1),
-                            H = getRGB(x, y - 1),
-                            I = getRGB(x + 1, y - 1),
-                            J = getRGB(x, y + 2),
-                            K = getRGB(x - 2, y),
-                            L = getRGB(x + 2, y),
-                            M = getRGB(x, y - 2)
-
-                        if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
-                        if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
-                        if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
-                        if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
-
-                        scaled.setRGB(x * 2, y * 2 + 1, p1)
-                        scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
-                        scaled.setRGB(x * 2, y * 2, p3)
-                        scaled.setRGB(x * 2 + 1, y * 2, p4)
-                    }
-                }
-
-                ImageIO.write(scaled, "png", file.file)
-            }
-
+            scaleImage(file.file)
             antialias(file.file)
         }
     }
@@ -185,6 +187,15 @@ task scaleSprites(){
     }
 
     dependsOn 'scaleSprites4x'
+}
+
+task scaleImages(){
+    doLast{
+        for(def img : project.getProperty("images").split(",")){
+            println(project.getProperty("startdir") + "/" + img)
+            scaleImage(new File(project.getProperty("startdir") + "/" + img))
+        }
+    }
 }
 
 task pack(){

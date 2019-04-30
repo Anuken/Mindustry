@@ -70,7 +70,7 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
             if(hit.size < maxChain){
-                Units.getNearbyEnemies(team, rect, u -> {
+                Units.nearbyEnemies(team, rect, u -> {
                     if(!hit.contains(u.getID())){
                         entities.add(u);
                     }

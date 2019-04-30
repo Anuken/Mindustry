@@ -25,7 +25,7 @@ public class MinimapRenderer implements Disposable{
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
-    private Rectangle rect = new Rectangle(), scissor = new Rectangle();
+    private Rectangle rect = new Rectangle();
     private float zoom = 4;
 
     public MinimapRenderer(){
@@ -60,6 +60,7 @@ public class MinimapRenderer implements Disposable{
             pixmap.dispose();
             texture.dispose();
         }
+        setZoom(4f);
         pixmap = new Pixmap(world.width(), world.height(), Format.RGBA8888);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
@@ -123,21 +124,22 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
 
-        rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
         units.clear();
-        Units.getNearby(rect, units::add);
+        Units.nearby((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize, units::add);
     }
 
     private int colorFor(Tile tile){
         tile = tile.target();
-        return MapIO.colorFor(tile.floor(), tile.block(), tile.ore(), tile.getTeam());
+        return MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam());
     }
 
     @Override
     public void dispose(){
-        pixmap.dispose();
-        texture.dispose();
-        texture = null;
-        pixmap = null;
+        if(pixmap != null && texture != null){
+            pixmap.dispose();
+            texture.dispose();
+            texture = null;
+            pixmap = null;
+        }
     }
 }

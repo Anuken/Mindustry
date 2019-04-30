@@ -26,9 +26,9 @@ import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
-import static io.anuke.mindustry.Vars.*;
-
 import java.lang.StringBuilder;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
     public final PlacementFragment blockfrag = new PlacementFragment();
@@ -459,7 +459,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append(waitingf.get((int)(state.wavetime / 60)));
+                builder.append((state.rules.waitForWaveToEnd && unitGroups[waveTeam.ordinal()].size() > 0) ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60))));
             }else if(state.enemies() == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
@@ -480,6 +480,6 @@ public class HudFragment extends Fragment{
             }
         }).growY().fillX().right().width(40f)
         .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0
-        && (!world.spawner.isSpawning() || !state.rules.waveTimer));
+        && !world.spawner.isSpawning());
     }
 }

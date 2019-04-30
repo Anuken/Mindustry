@@ -130,14 +130,20 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !ui.chatfrag.chatOpen()){
+            if(!ui.minimap.isShown()){
+                ui.minimap.show();
+            }else{
+                ui.minimap.hide();
+            }
+        }
+
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom and rotate things
         if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
-
-        //renderer.minimap.zoomBy(-Core.input.axisTap(Binding.zoom_minimap));
 
         if(player.isDead()){
             cursorType = SystemCursor.arrow;

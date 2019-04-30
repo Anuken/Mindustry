@@ -113,6 +113,7 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
+        jcenter()
     }
 }
 
@@ -129,7 +130,7 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
         compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.0'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
     }
 }
 
@@ -186,7 +187,7 @@ project(":core"){
     task copyGen{
         doLast{
             copy{
-                from("../core/build/classes/java/main/io/anuke/mindustry/gen/"){
+                from("../core/build/generated/sources/annotationProcessor/java/main/io/anuke/mindustry/gen"){
                     include "**/*.java"
                 }
 
@@ -201,7 +202,7 @@ project(":core"){
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
-        //compile arcModule("extensions:postprocessing")
+        compile arcModule("extensions:arcnet")
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -258,7 +259,6 @@ project(":net"){
     dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:kryonet:a64d2280880e80566ca1bdaffa55de43e51cad38'
         compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }

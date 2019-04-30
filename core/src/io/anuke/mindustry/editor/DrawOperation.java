@@ -50,7 +50,7 @@ public class DrawOperation{
             }else if(type == OpType.team.ordinal()){
                 tile.setTeam(Team.all[to]);
             }else if(type == OpType.ore.ordinal()){
-                tile.setOreByte(to);
+                tile.setOverlayID(to);
             }
         });
         editor.renderer().updatePoint(tile.x, tile.y);

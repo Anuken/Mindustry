@@ -11,7 +11,6 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
@@ -41,15 +40,15 @@ public class PlacementFragment extends Fragment{
 
     //TODO make this configurable
     final KeyCode[] inputGrid = {
-    KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
-    KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,
-    KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
-    KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
+        KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
+        KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,
+        KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
     }, inputCatGrid = {
-    KeyCode.NUM_1, KeyCode.NUM_2,
-    KeyCode.Q, KeyCode.W,
-    KeyCode.A, KeyCode.S,
-    KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
+        KeyCode.NUM_1, KeyCode.NUM_2,
+        KeyCode.Q, KeyCode.W,
+        KeyCode.A, KeyCode.S,
+        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
     };
 
     public PlacementFragment(){
@@ -337,6 +336,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.ore() != Blocks.air ? hoverTile.ore() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : null;
     }
 }

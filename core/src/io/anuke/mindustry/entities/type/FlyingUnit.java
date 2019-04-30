@@ -84,7 +84,7 @@ public abstract class FlyingUnit extends BaseUnit{
             });
 
             if(target != null){
-                circle(60f + Mathf.absin(Time.time() + id * 23525, 70f, 1200f));
+                circle(60f + Mathf.absin(Time.time() + Mathf.randomSeed(id) * 1200f, 70f, 1200f));
             }
         }
     };

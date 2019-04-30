@@ -93,6 +93,7 @@ public class NetClient implements ApplicationListener{
         Net.handleClient(Disconnect.class, packet -> {
             state.set(State.menu);
             connecting = false;
+            logic.reset();
             Platform.instance.updateRPC();
 
             if(quiet) return;

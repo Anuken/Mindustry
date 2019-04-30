@@ -31,9 +31,12 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
-    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
+    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
+    creeptree,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    pebbles, tendrils,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
@@ -74,7 +77,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    alphaDartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -109,10 +112,7 @@ public class Blocks implements ContentList{
 
         part = new BlockPart();
 
-        spawn = new Block("spawn"){
-            public void drawShadow(Tile tile){
-            }
-        };
+        spawn = new Block("spawn");
 
         //Registers build blocks from size 1-6
         //no reference is needed here since they can be looked up by name later
@@ -198,7 +198,7 @@ public class Blocks implements ContentList{
         }};
 
         craters = new Floor("craters"){{
-            variants = 6;
+            variants = 3;
             blendGroup = stone;
         }};
 
@@ -252,13 +252,11 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
-            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -298,6 +296,9 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        saltRocks = new StaticWall("saltrocks"){{
+        }};
+
         sporePine = new StaticWall("spore-pine"){{
             variants = 0;
         }};
@@ -306,11 +307,19 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
+        shrubs = new StaticWall("shrubs"){{
+
+        }};
+
         whiteTreeDead = new TreeBlock("white-tree-dead"){{
         }};
 
         whiteTree = new TreeBlock("white-tree"){{
         }};
+
+        creeptree = new TreeBlock("creeptree"){{
+        }};
+
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
@@ -337,7 +346,6 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -345,7 +353,7 @@ public class Blocks implements ContentList{
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 6;
+            variants = 3;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
@@ -359,6 +367,19 @@ public class Blocks implements ContentList{
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
         }};
+
+        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
+        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
+        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
+        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
+        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
+        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+
+        darkMetal = new StaticWall("dark-metal");
+
+        pebbles = new OverlayFloor("pebbles");
+
+        tendrils = new OverlayFloor("tendrils");
 
         //endregion
         //region ore
@@ -876,8 +897,8 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
-            capacity = 32;
-            health = 25;
+            capacity = 15;
+            health = 30;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -1090,8 +1111,8 @@ public class Blocks implements ContentList{
             powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
-            consumes.item(Items.blastCompound).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.3f);
+            consumes.item(Items.blastCompound);
+            consumes.liquid(Liquids.cryofluid, 0.26f);
         }};
 
         //endregion power
@@ -1520,14 +1541,14 @@ public class Blocks implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 0.5f;
-            consumes.powerBuffered(1200f);
             range = 190f;
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
+            powerUsed = 1f / 2f;
 
             health = 200 * size * size;
+            consumes.powerBuffered(1200f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
@@ -1626,9 +1647,9 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        alphaDartPad = new MechPad("alpha-dart-mech-pad"){{
+        dartPad = new MechPad("dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
-            mech = Mechs.alpha;
+            mech = Mechs.dart;
             size = 2;
             consumes.powerBuffered(50f);
         }};

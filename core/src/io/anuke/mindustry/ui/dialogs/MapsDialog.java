@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
@@ -110,7 +109,7 @@ public class MapsDialog extends FloatingDialog{
         dialog = new FloatingDialog("$editor.mapinfo");
         dialog.addCloseButton();
 
-        float mapsize = UIUtils.portrait() ? 160f : 300f;
+        float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
         Table table = dialog.cont;
 
         table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);

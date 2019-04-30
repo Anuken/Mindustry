@@ -34,6 +34,8 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
+    public static final int crackRegions = 8, maxCrackSize = 5;
+
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -113,6 +115,13 @@ public class Block extends BlockStorage{
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
 
+    protected static TextureRegion[][] cracks;
+
+    /** Dump timer ID.*/
+    protected final int timerDump = timers++;
+    /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
+    protected final int dumpTime = 5;
+
     public Block(String name){
         super(name);
         this.description = Core.bundle.getOrNull("block." + name + ".description");
@@ -183,18 +192,19 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
-    public boolean isLayer(Tile tile){
-        return true;
-    }
-
-    public boolean isLayer2(Tile tile){
-        return true;
-    }
-
     public void drawLayer(Tile tile){
     }
 
     public void drawLayer2(Tile tile){
+    }
+
+    public void drawCracks(Tile tile){
+        if(!tile.entity.damaged()) return;
+        int id = tile.pos();
+        TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
+        Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
+        Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
+        Draw.color();
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
@@ -256,7 +266,6 @@ public class Block extends BlockStorage{
 
     /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Tile tile, Unit unit){
-
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -266,7 +275,8 @@ public class Block extends BlockStorage{
 
     /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
-        if(!headless && tile.getTeam() == player.getTeam()){
+        //only unlocks content in zones
+        if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
             logic.handleContent(content);
         }
     }
@@ -327,6 +337,15 @@ public class Block extends BlockStorage{
         cacheRegions = new TextureRegion[cacheRegionStrings.size];
         for(int i = 0; i < cacheRegions.length; i++){
             cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
+        }
+
+        if(cracks == null){
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
         }
     }
 
@@ -417,7 +436,7 @@ public class Block extends BlockStorage{
             float capacity = consumes.getPower().powerCapacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
 
         if(hasItems && configurable){
@@ -446,11 +465,6 @@ public class Block extends BlockStorage{
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
-    }
-
-    /** Called after the block is destroyed and removed. */
-    public void afterDestroyed(Tile tile, TileEntity entity){
-
     }
 
     /** Called when the block is destroyed. */

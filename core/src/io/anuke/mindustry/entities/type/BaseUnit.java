@@ -35,6 +35,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
+    protected static final int timerTarget2 = timerIndex++;
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
@@ -135,7 +136,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        TargetTrait newTarget = Units.getClosestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
+        TargetTrait newTarget = Units.closestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
         if(newTarget != null){
             target = newTarget;
         }
@@ -259,7 +260,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             kill();
         }
 
-        avoidOthers(1.25f);
+        avoidOthers();
 
         if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
             kill();

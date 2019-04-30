@@ -117,8 +117,7 @@ public class Build{
             return false;
         }
 
-        if((type.solid || type.solidifes) &&
-        Units.anyEntities(rect.setSize(tilesize * type.size).setCenter(x * tilesize + type.offset(), y * tilesize + type.offset()))){
+        if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset() - type.size*tilesize/2f, y * tilesize + type.offset() - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
             return false;
         }
 

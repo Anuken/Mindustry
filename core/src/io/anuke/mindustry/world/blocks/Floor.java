@@ -18,7 +18,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
-    public int variants;
+    public int variants = 3;
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
@@ -45,8 +45,6 @@ public class Floor extends Block{
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Style of the edge stencil. Loaded by looking up "edge-stencil-{name}". */
-    public String edgeStyle = "smooth";
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
     /** Effect displayed when randomly updated. */
@@ -61,7 +59,6 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
-        variants = 3;
     }
 
     @Override
@@ -100,7 +97,7 @@ public class Floor extends Block{
 
         drawEdges(tile);
 
-        Floor floor = tile.ore();
+        Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.draw(tile);
         }

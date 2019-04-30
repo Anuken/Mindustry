@@ -5,13 +5,10 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.impl.BaseEntity;
@@ -21,7 +18,6 @@ import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
@@ -247,7 +243,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             Events.fire(new BlockDestroyEvent(tile));
             block.onDestroyed(tile);
             world.removeBlock(tile);
-            block.afterDestroyed(tile, this);
             remove();
         }
     }
@@ -265,10 +260,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     @Override
     public void update(){
         //TODO better smoke effect, this one is awful
-        if(health != 0 && health < block.health && !(block instanceof Wall) &&
+        /*if(health != 0 && health < block.health && !(block instanceof Wall) &&
         Mathf.chance(0.009f * Time.delta() * (1f - health / block.health))){
             Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
-        }
+        }*/
 
         timeScaleDuration -= Time.delta();
         if(timeScaleDuration <= 0f || !block.canOverdrive){

@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.*;
@@ -43,14 +44,8 @@ public class CoreBlock extends StorageBlock{
         entity.progress = 0;
         entity.currentUnit = player;
         entity.currentUnit.onRespawn(tile);
-        entity.currentUnit.heal();
-        entity.currentUnit.rotation = 90f;
         entity.currentUnit.applyImpulse(0, 8f);
-        entity.currentUnit.setNet(tile.drawx(), tile.drawy());
-        entity.currentUnit.add();
         entity.currentUnit = null;
-
-        player.endRespawning();
     }
 
     @Override
@@ -124,10 +119,10 @@ public class CoreBlock extends StorageBlock{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-            tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-            tile.drawy(),
-            90,
-            size * Vars.tilesize / 2f);
+                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+                tile.drawy(),
+                90,
+                size * Vars.tilesize / 2f);
 
             Draw.reset();
         }
@@ -148,6 +143,7 @@ public class CoreBlock extends StorageBlock{
                 return;
             }
 
+            entity.currentUnit.set(tile.drawx(), tile.drawy());
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / state.rules.respawnTime * entity.delta();
@@ -176,8 +172,8 @@ public class CoreBlock extends StorageBlock{
             if(!netServer.isWaitingForPlayers() && currentUnit == null){
                 currentUnit = player;
                 progress = 0f;
-                player.mech = player.getStarterMech();
-                player.set(tile.drawx(), tile.drawy());
+                player.mech = Mechs.starter;
+                player.beginRespawning(this);
             }
         }
     }

@@ -16,46 +16,38 @@ import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-
 public class Tile implements Position, TargetTrait{
-    /**
-     * The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
-     * This is relative to the block it is linked to; negate coords to find the link.
-     */
-    public byte link = 0;
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Weight of [ground] units on this tile. */
-    public byte weight, airWeight = 0;
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;
-    protected Block wall;
+    protected Block block;
     protected Floor floor;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
     private byte rotation;
     /** Team ordinal. */
     private byte team;
     /** Ore that is on top of this (floor) block. */
-    private byte ore = 0;
+    private byte overlay = 0;
 
     public Tile(int x, int y){
         this.x = (short)x;
         this.y = (short)y;
-        wall = floor = (Floor)Blocks.air;
+        block = floor = (Floor)Blocks.air;
     }
 
-    public Tile(int x, int y, byte floor, byte wall){
+    public Tile(int x, int y, byte floor, byte block){
         this(x, y);
         this.floor = (Floor)content.block(floor);
-        this.wall = content.block(wall);
+        this.block = content.block(block);
         changed();
     }
 
-    public Tile(int x, int y, byte floor, byte wall, byte rotation, byte team){
+    public Tile(int x, int y, byte floor, byte block, byte rotation, byte team){
         this(x, y);
         this.floor = (Floor)content.block(floor);
-        this.wall = content.block(wall);
+        this.block = content.block(block);
         this.rotation = rotation;
         changed();
         this.team = team;
@@ -67,7 +59,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public byte getBlockID(){
-        return wall.id;
+        return block.id;
     }
 
     public byte getFloorID(){
@@ -133,12 +125,16 @@ public class Tile implements Position, TargetTrait{
     }
 
     public Block block(){
-        return wall;
+        return block;
+    }
+
+    public Floor overlay(){
+        return (Floor)content.block(overlay);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Block> T cblock(){
-        return (T)wall;
+        return (T)block;
     }
 
     @Override
@@ -154,33 +150,42 @@ public class Tile implements Position, TargetTrait{
         return team;
     }
 
+    public void setBlock(Block type, Team team, int rotation){
+        preChanged();
+        this.block = type;
+        this.team = (byte)team.ordinal();
+        this.rotation = 0;
+        this.rotation = (byte)Mathf.mod(rotation, 4);
+        changed();
+    }
+
     public void setBlock(Block type, int rotation){
         preChanged();
-        if(rotation < 0) rotation = (-rotation + 2);
-        this.wall = type;
-        this.link = 0;
-        setRotation((byte)(rotation % 4));
+        this.block = type;
+        this.rotation = 0;
+        this.rotation = (byte)Mathf.mod(rotation, 4);
         changed();
     }
 
     public void setBlock(Block type, Team team){
         preChanged();
-        this.wall = type;
+        this.block = type;
         this.team = (byte)team.ordinal();
-        this.link = 0;
+        this.rotation = 0;
         changed();
     }
 
     public void setBlock(Block type){
         preChanged();
-        this.wall = type;
-        this.link = 0;
+        this.block = type;
+        this.rotation = 0;
         changed();
     }
 
+    /**This resets the overlay!*/
     public void setFloor(Floor type){
         this.floor = type;
-        this.ore = 0;
+        this.overlay = 0;
     }
 
     public byte getRotation(){
@@ -197,6 +202,22 @@ public class Tile implements Position, TargetTrait{
 
     public void setDump(byte dump){
         this.rotation = dump;
+    }
+
+    public byte getOverlayID(){
+        return overlay;
+    }
+
+    public void setOverlayID(byte ore){
+        this.overlay = ore;
+    }
+
+    public void setOverlay(Block block){
+        setOverlayID(block.id);
+    }
+
+    public void clearOverlay(){
+        this.overlay = 0;
     }
 
     public boolean passable(){
@@ -220,7 +241,7 @@ public class Tile implements Position, TargetTrait{
 
     public boolean breakable(){
         Block block = block();
-        if(link == 0){
+        if(!isLinked()){
             return (block.destructible || block.breakable || block.update);
         }else{
             return getLinked() != this && getLinked().getLinked() == null && getLinked().breakable();
@@ -232,21 +253,21 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isLinked(){
-        return link != 0;
+        return block == Blocks.part;
     }
 
     public byte getLinkByte(){
-        return link;
+        return rotation;
     }
 
     public void setLinkByte(byte b){
-        this.link = b;
+        this.rotation = b;
     }
 
     /** Sets this to a linked tile, which sets the block to a part. dx and dy can only be -8-7. */
     public void setLinked(byte dx, byte dy){
         setBlock(Blocks.part);
-        link = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
+        rotation = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
     }
 
     /**
@@ -294,12 +315,10 @@ public class Tile implements Position, TargetTrait{
 
     /** Returns the block the multiblock is linked to, or null if it is not linked to any block. */
     public Tile getLinked(){
-        if(link == 0){
+        if(!isLinked()){
             return null;
         }else{
-            byte dx = Pack.leftByte(link);
-            byte dy = Pack.rightByte(link);
-            return world.tile(x - (dx - 8), y - (dy - 8));
+            return world.tile(x + linkX(rotation), y + linkY(rotation));
         }
     }
 
@@ -350,28 +369,8 @@ public class Tile implements Position, TargetTrait{
         return getTeam() == Team.none || team == getTeam();
     }
 
-    public byte getOreByte(){
-        return ore;
-    }
-
-    public void setOreByte(byte ore){
-        this.ore = ore;
-    }
-
-    public void setOre(Block block){
-        setOreByte(block.id);
-    }
-
-    public void clearOre(){
-        this.ore = 0;
-    }
-
-    public Floor ore(){
-        return (Floor)content.block(ore);
-    }
-
     public Item drop(){
-        return ore == 0 ? floor.itemDrop : ((Floor)content.block(ore)).itemDrop;
+        return overlay == 0 || ((Floor)content.block(overlay)).itemDrop == null ? floor.itemDrop : ((Floor)content.block(overlay)).itemDrop;
     }
 
     public void updateOcclusion(){
@@ -382,6 +381,9 @@ public class Tile implements Position, TargetTrait{
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null && tile.floor.isLiquid){
+                cost += 3;
+            }
             if(tile != null && tile.solid()){
                 occluded = true;
                 break;
@@ -448,7 +450,7 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public boolean isDead(){
-        return false; //tiles never die
+        return entity == null;
     }
 
     @Override
@@ -481,7 +483,17 @@ public class Tile implements Position, TargetTrait{
         Block block = block();
         Block floor = floor();
 
-        return floor.name + ":" + block.name + ":" + content.block(ore) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
-        (link != 0 ? " link=[" + (Pack.leftByte(link) - 8) + ", " + (Pack.rightByte(link) - 8) + "]" : "");
+        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
+        (isLinked() ? " link=[" + linkX(rotation) + ", " + linkY(rotation) + "]" : "");
+    }
+
+    /**Returns the relative X from a link byte.*/
+    public static int linkX(byte value){
+        return -((byte)((value >> 4) & (byte)0x0F) - 8);
+    }
+
+    /**Returns the relative Y from a link byte.*/
+    public static int linkY(byte value){
+        return -((byte)(value & 0x0F) - 8);
     }
 }

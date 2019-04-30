@@ -250,7 +250,7 @@ public class TechTree implements ContentList{
                         node(phantomFactory);
                     });
 
-                    node(alphaDartPad, () -> {
+                    node(dartPad, () -> {
                         node(deltaPad, () -> {
 
                             node(javelinPad, () -> {
@@ -281,8 +281,7 @@ public class TechTree implements ContentList{
     }
 
     private TechNode node(Block block){
-        return node(block, () -> {
-        });
+        return node(block, () -> {});
     }
 
     public static class TechNode{

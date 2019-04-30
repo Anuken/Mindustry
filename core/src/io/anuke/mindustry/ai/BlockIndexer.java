@@ -34,6 +34,8 @@ public class BlockIndexer{
     private Bits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
     private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all.length];
+    /**All ores available on this map.*/
+    private ObjectSet<Item> allOres = new ObjectSet<>();
 
     /** Maps teams to a map of flagged tiles by type. */
     private ObjectSet<Tile>[][] flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
@@ -67,6 +69,7 @@ public class BlockIndexer{
             }
 
             typeMap.clear();
+            allOres.clear();
             ores = null;
 
             //create bitset for each team type that contains each quadrant
@@ -84,6 +87,8 @@ public class BlockIndexer{
                     if(tile.entity != null && tile.entity.damaged()){
                         notifyTileDamaged(tile.entity);
                     }
+
+                    if(tile.drop() != null) allOres.add(tile.drop());
                 }
             }
 
@@ -99,6 +104,11 @@ public class BlockIndexer{
 
     private ObjectSet<Tile>[] getFlagged(Team team){
         return flagMap[team.ordinal()];
+    }
+
+    /** @return whether this item is present on this map.*/
+    public boolean hasOre(Item item){
+        return allOres.contains(item);
     }
 
     /** Returns all damaged tiles by team. */
