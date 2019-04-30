@@ -9,7 +9,6 @@ import io.anuke.arc.scene.style.Drawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Cell;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
@@ -302,7 +301,7 @@ public class JoinDialog extends FloatingDialog{
     }
 
     float targetWidth(){
-        return UIUtils.portrait() ? 350f : 500f;
+        return Core.graphics.isPortrait() ? 350f : 500f;
     }
 
     @SuppressWarnings("unchecked")

@@ -100,7 +100,7 @@ public class ServerControl implements ApplicationListener{
 
             if(args.length > 0){
                 commands = Strings.join(" ", args).split(",");
-                info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
+                info("&lmFound {0} command-line arguments to parse.", commands.length);
             }
 
             for(String s : commands){
@@ -136,6 +136,8 @@ public class ServerControl implements ApplicationListener{
                     Map map = previous;
                     if(maps.size > 1){
                         while(map == previous) map = maps.random();
+                    }else if(!previous.custom && !world.maps.customMaps().isEmpty()){
+                        map = maps.first();
                     }
 
                     Call.onInfoMessage((state.rules.pvp

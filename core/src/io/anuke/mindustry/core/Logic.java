@@ -58,7 +58,11 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
-        state.rules.spawns = world.getMap().getWaves();
+
+        //sometimes a map has no waves defined, they're defined in the zone rules
+        if(world.getMap().getWaves() != DefaultWaves.get() || !world.isZone()){
+            state.rules.spawns = world.getMap().getWaves();
+        }
 
         Events.fire(new PlayEvent());
     }
@@ -81,8 +85,8 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
-        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
+        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }

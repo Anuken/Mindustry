@@ -43,7 +43,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = (Core.graphics.getHeight() > Core.graphics.getHeight() ? 2 : 4);
+        int maxwidth = (Core.graphics.isPortrait() ? 2 : 4);
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();

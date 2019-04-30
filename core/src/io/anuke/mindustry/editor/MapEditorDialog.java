@@ -15,7 +15,6 @@ import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
@@ -445,7 +444,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         //ctrl keys (undo, redo, save)
-        if(UIUtils.ctrl()){
+        if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.Z)){
                 editor.undo();
             }

@@ -730,7 +730,7 @@ public class Bullets implements ContentList{
         explode = new BombBulletType(2f, 3f, "clear"){
             {
                 hitEffect = Fx.pulverize;
-                lifetime = 23f;
+                lifetime = 30f;
                 speed = 1f;
                 splashDamageRadius = 50f;
                 splashDamage = 28f;

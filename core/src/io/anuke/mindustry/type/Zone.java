@@ -36,6 +36,8 @@ public class Zone extends UnlockableContent{
     protected Array<ItemStack> startingItems = new Array<>();
     protected ItemStack[] launchCost = null;
 
+    private Array<ItemStack> defaultStartingItems = new Array<>();
+
     public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
@@ -58,6 +60,11 @@ public class Zone extends UnlockableContent{
 
     public Array<ItemStack> getStartingItems(){
         return startingItems;
+    }
+
+    public void resetStartingItems(){
+        startingItems.clear();
+        defaultStartingItems.each(stack -> startingItems.add(new ItemStack(stack.item, stack.amount)));
     }
 
     public void updateWave(int wave){
@@ -127,6 +134,11 @@ public class Zone extends UnlockableContent{
         generator.init(loadout);
         Arrays.sort(resources);
 
+        for(ItemStack stack : startingItems){
+            defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
+        }
+
+        @SuppressWarnings("unchecked")
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;

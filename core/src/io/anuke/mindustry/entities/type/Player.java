@@ -52,7 +52,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
-    public Mech mech;
+    public Mech mech = Mechs.starter;
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
@@ -82,7 +82,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         player.dead = true;
         player.placeQueue.clear();
         player.onDeath();
-        player.mech = (player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     @Override
@@ -102,11 +101,18 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void onRespawn(Tile tile){
+        velocity.setZero();
         boostHeat = 1f;
         achievedFlight = true;
-        if(state.rules.limitedRespawns){
-            respawns--;
-        }
+        rotation = 90f;
+        baseRotation = 90f;
+        dead = false;
+        spawner = null;
+        respawns --;
+
+        setNet(tile.drawx(), tile.drawy());
+        clearItem();
+        heal();
     }
 
     @Override
@@ -116,12 +122,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             moveBy(x, y);
         }
-    }
-
-    @Override
-    public boolean collidesGrid(int x, int y){
-        Tile tile = world.tile(x, y);
-        return !isFlying() || (!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid);
     }
 
     @Override
@@ -519,7 +519,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
-            if(respawns!=0){
+            if(respawns > 0 || !state.rules.limitedRespawns){
                 updateRespawning();
             }
             return;
@@ -780,13 +780,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
-        mech = getStarterMech();
+        mech = Mechs.starter;
         placeQueue.clear();
         respawns = state.rules.respawns;
-    }
-
-    public Mech getStarterMech(){
-        return (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     public boolean isShooting(){
@@ -798,10 +794,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(lastSpawner != null && lastSpawner.isValid()){
-                this.spawner = lastSpawner;
-            }else if(getClosestCore() != null){
-                this.spawner = (SpawnerTrait)getClosestCore();
+            if(!Net.client()){
+                if(lastSpawner != null && lastSpawner.isValid()){
+                    this.spawner = lastSpawner;
+                }else if(getClosestCore() != null){
+                    this.spawner = (SpawnerTrait)getClosestCore();
+                }
             }
         }else if(getClosestCore() != null){
             set(getClosestCore().getX(), getClosestCore().getY());
@@ -812,16 +810,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         this.spawner = spawner;
         this.lastSpawner = spawner;
         this.dead = true;
-    }
-
-    public void endRespawning(){
-        spawner = null;
+        setNet(spawner.getX(), spawner.getY());
     }
 
     //endregion
 
     //region read and write methods
-
 
     @Override
     public boolean isClipped(){
@@ -906,12 +900,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            Tile tile = world.tile(spawner);
-            if(tile != null && tile.entity instanceof SpawnerTrait){
-                this.spawner = (SpawnerTrait)tile.entity;
-            }else{
-                this.spawner = null;
-            }
+        }
+
+        Tile tile = world.tile(spawner);
+        if(tile != null && tile.entity instanceof SpawnerTrait){
+            this.spawner = (SpawnerTrait)tile.entity;
+        }else{
+            this.spawner = null;
         }
     }
 

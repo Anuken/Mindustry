@@ -43,6 +43,10 @@ public class Rules{
     public float respawnTime = 60 * 4;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
+    /** How many times longer a boss wave takes. */
+    public float bossWaveMultiplier = 3f;
+    /** How many times longer a launch wave takes. */
+    public float launchWaveMultiplier = 2f;
     /** Zone ID, -1 for invalid zone. */
     public byte zone = -1;
     /** Spawn layout. Should be assigned on save load based on map or zone. */

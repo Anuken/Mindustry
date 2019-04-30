@@ -9,7 +9,6 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.Player;
@@ -90,7 +89,15 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> Core.app.post(() -> Core.camera.position.set(player)));
+            Core.app.post(() -> Core.app.post(() -> {
+                if(Net.active() && player.getClosestCore() != null){
+                    //set to closest core since that's where the player will probably respawn; prevents camera jumps
+                    Core.camera.position.set(player.getClosestCore());
+                }else{
+                    //locally, set to player position since respawning occurs immediately
+                    Core.camera.position.set(player);
+                }
+            }));
         });
 
         Events.on(ResetEvent.class, event -> {
@@ -100,8 +107,6 @@ public class Control implements ApplicationListener{
 
             saves.resetSave();
         });
-
-        //todo high scores for custom maps, as well as other statistics
 
         Events.on(WaveEvent.class, event -> {
             if(world.getMap().getHightScore() < state.wave){
@@ -172,7 +177,6 @@ public class Control implements ApplicationListener{
     void createPlayer(){
         player = new Player();
         player.name = Core.settings.getString("name");
-        player.mech = mobile ? Mechs.starterMobile : Mechs.starterDesktop;
         player.color.set(Core.settings.getInt("color-0"));
         player.isLocal = true;
         player.isMobile = mobile;

@@ -22,6 +22,7 @@ public enum Binding implements KeyBind{
     zoom(new Axis(KeyCode.SCROLL)),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),
     pause(KeyCode.SPACE),
+    minimap(KeyCode.M),
     toggle_menus(KeyCode.C),
     screenshot(KeyCode.P),
     player_list(KeyCode.TAB, "multiplayer"),

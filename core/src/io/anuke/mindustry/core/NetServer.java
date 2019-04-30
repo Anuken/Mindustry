@@ -4,7 +4,8 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.math.Mathf;
@@ -14,7 +15,6 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.ByteBufferOutput;
 import io.anuke.arc.util.io.CountableByteArrayOutputStream;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
@@ -33,7 +33,6 @@ import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
-import java.lang.StringBuilder;
 import java.nio.ByteBuffer;
 import java.util.zip.DeflaterOutputStream;
 
@@ -161,7 +160,6 @@ public class NetServer implements ApplicationListener{
             player.name = packet.name;
             player.uuid = uuid;
             player.isMobile = packet.mobile;
-            player.mech = packet.mobile ? Mechs.starterMobile : Mechs.starterDesktop;
             player.dead = true;
             player.setNet(player.x, player.y);
             player.color.set(packet.color);

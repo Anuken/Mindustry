@@ -20,20 +20,18 @@ import io.anuke.mindustry.type.Weapon;
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
-    /** These are not new mechs, just re-assignments for convenience. */
-    public static Mech starterDesktop, starterMobile;
+    public static Mech starter;
 
     @Override
     public void load(){
 
         alpha = new Mech("alpha-mech", false){
-
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
                 mass = 1.2f;
                 speed = 0.5f;
-                boostSpeed = 0.85f;
+                boostSpeed = 0.95f;
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
                 health = 300f;
@@ -225,9 +223,9 @@ public class Mechs implements ContentList{
             {
                 drillPower = 1;
                 mineSpeed = 0.9f;
-                speed = 0.4f;
-                drag = 0.1f;
-                health = 180f;
+                speed = 0.5f;
+                drag = 0.09f;
+                health = 200f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
@@ -235,16 +233,11 @@ public class Mechs implements ContentList{
                 buildPower = 1.1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
-                    reload = 20f;
+                    reload = 15f;
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
-            }
-
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
             }
         };
 
@@ -366,7 +359,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starterDesktop = alpha;
-        starterMobile = dart;
+        starter = alpha;
     }
 }
