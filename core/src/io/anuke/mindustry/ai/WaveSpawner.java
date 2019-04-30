@@ -62,7 +62,7 @@ public class WaveSpawner{
         spawning = true;
 
         for(SpawnGroup group : state.rules.spawns){
-            int spawned = group.getUnitsSpawned(state.wave);
+            int spawned = group.getUnitsSpawned(state.wave - 1);
 
             float spawnX, spawnY;
             float spread;

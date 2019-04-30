@@ -108,10 +108,10 @@ public class MapGenerator extends Generator{
                     int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, width - 1);
                     int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, height - 1);
 
-                    if((tile.block() instanceof StaticWall
+                    if(((tile.block() instanceof StaticWall
                     && tiles[newX][newY].block() instanceof StaticWall)
                     || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
-                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)){
+                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)) && tiles[newX][newY].block() != Blocks.spawn){
                         tile.setBlock(tiles[newX][newY].block());
                     }
 

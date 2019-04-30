@@ -205,16 +205,16 @@ public class Zones implements ContentList{
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
-            startingItems = ItemStack.list(Items.copper, 1500);
-            conditionWave = 2;
-            launchPeriod = 1;
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
+            conditionWave = 3;
+            launchPeriod = 2;
             zoneRequirements = ZoneRequirement.with(tarFields, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 3.5f;
+                waveSpacing = 60 * 60 * 2.5f;
             }};
         }};
 
