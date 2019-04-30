@@ -155,6 +155,27 @@ public class DefaultWaves{
                 spacing = 3;
             }},
 
+            new SpawnGroup(UnitTypes.chaosArray){{
+                begin = 41;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 30;
+            }},
+
+            new SpawnGroup(UnitTypes.eradicator){{
+                begin = 81;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 40;
+            }},
+
+            new SpawnGroup(UnitTypes.lich){{
+                begin = 131;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 40;
+            }},
+
             new SpawnGroup(UnitTypes.ghoul){{
                 begin = 90;
                 unitAmount = 2;

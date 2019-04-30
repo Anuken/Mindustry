@@ -181,8 +181,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 
         if(!mobile){
-            graphics.sliderPref("antialias", 0, 0, 5, 1, s -> (s == 0 ? 0 : (1 << s)) + "x");
-
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){
