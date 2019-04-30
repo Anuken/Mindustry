@@ -72,7 +72,7 @@ public class GlobalData{
 
     /** Returns whether or not this piece of content is unlocked yet. */
     public boolean isUnlocked(UnlockableContent content){
-        return true;//content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
+        return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
     }
 
     /**
