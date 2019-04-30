@@ -19,8 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class Tile implements Position, TargetTrait{
     /** Tile traversal cost. */
     public byte cost = 1;
-    /** Weight of [ground] units on this tile. */
-    public byte weight, airWeight = 0;
     /** Tile entity, usually null. */
     public TileEntity entity;
     public short x, y;

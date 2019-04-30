@@ -154,15 +154,13 @@ public abstract class BlockStorage extends UnlockableContent{
                     return flow;
                 }else if(ofract > 0.1f && fract > 0.1f){
                     Liquid other = next.entity.liquids.current();
-                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) ||
-                    (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
                         tile.entity.damage(1 * Time.delta());
                         next.entity.damage(1 * Time.delta());
                         if(Mathf.chance(0.1 * Time.delta())){
                             Effects.effect(Fx.fire, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);
                         }
-                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) ||
-                    (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
                         tile.entity.liquids.remove(liquid, Math.min(tile.entity.liquids.get(liquid), 0.7f * Time.delta()));
                         if(Mathf.chance(0.2f * Time.delta())){
                             Effects.effect(Fx.steam, (tile.worldx() + next.worldx()) / 2f, (tile.worldy() + next.worldy()) / 2f);

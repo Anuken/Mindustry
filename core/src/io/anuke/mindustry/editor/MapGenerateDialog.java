@@ -79,7 +79,9 @@ public class MapGenerateDialog extends FloatingDialog{
         cont.clear();
         cont.table("flat", t -> {
             t.margin(8f);
-            t.stack(new BorderImage(texture), new Stack(){{
+            t.stack(new BorderImage(texture){{
+                setScaling(Scaling.fit);
+            }}, new Stack(){{
                 add(new Image("loadDim"));
                 add(new Image("icon-refresh"){{
                     setScaling(Scaling.none);

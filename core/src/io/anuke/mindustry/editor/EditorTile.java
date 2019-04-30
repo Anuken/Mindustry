@@ -26,7 +26,9 @@ public class EditorTile extends Tile{
     public void setFloor(Floor type){
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            setOverlayID(type.id);
+            if(!floor.isLiquid){
+                setOverlayID(type.id);
+            }
             return;
         }
 
@@ -34,7 +36,7 @@ public class EditorTile extends Tile{
         Block ore = overlay();
         if(previous == type && ore == Blocks.air) return;
         super.setFloor(type);
-        //ore may get nullified so make sure to save editrs
+        //ore may get nullified so make sure to save edits
         if(overlay() != ore){
             op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, overlay().id));
         }

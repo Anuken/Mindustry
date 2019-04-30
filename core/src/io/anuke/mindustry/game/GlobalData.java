@@ -77,7 +77,7 @@ public class GlobalData{
 
     /**
      * Makes this piece of content 'unlocked', if possible.
-     * If this piece of content is already unlocked or cannot be unlocked due to dependencies, nothing changes.
+     * If this piece of content is already unlocked, nothing changes.
      * Results are not saved until you call {@link #save()}.
      */
     public void unlockContent(UnlockableContent content){

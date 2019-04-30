@@ -8,12 +8,10 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.ScorchDecal;
 import io.anuke.mindustry.entities.impl.DestructibleEntity;
 import io.anuke.mindustry.entities.traits.*;
@@ -44,9 +42,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     private static final Vector2 moveVector = new Vector2();
 
-    private int lastWeightTile = Pos.invalid, lastWeightDelta;
-    private boolean wasFlying = false;
-
     public float rotation;
 
     protected final Interpolator interpolator = new Interpolator();
@@ -55,11 +50,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     protected Team team = Team.blue;
     protected float drownTime, hitTime;
-
-    @Override
-    public boolean movable(){
-        return !isDead();
-    }
 
     @Override
     public boolean collidesGrid(int x, int y){
@@ -134,22 +124,6 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             super.move(x, y);
         }else{
             moveBy(x, y);
-        }
-    }
-
-    @Override
-    public void removed(){
-        if(lastWeightTile != Pos.invalid){
-            Tile tile = world.tile(lastWeightTile);
-
-            if(tile != null){
-                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
-                if(!wasFlying){
-                    tile.weight -= dec;
-                }else{
-                    tile.airWeight -= dec;
-                }
-            }
         }
     }
 
@@ -232,55 +206,19 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return status.hasEffect(effect);
     }
 
-    public void avoidOthers(float scaling){
-        boolean flying = isFlying();
-
-        if(lastWeightTile != Pos.invalid){
-            Tile tile = world.tile(lastWeightTile);
-
-            if(tile != null){
-                int dec = Math.min(lastWeightDelta, wasFlying ? tile.airWeight : tile.weight);
-                if(!wasFlying){
-                    tile.weight -= dec;
-                }else{
-                    tile.airWeight -= dec;
-                }
-            }
-        }
-
-        final int rad = 2;
-
+    public void avoidOthers(){
+        float radScl = 1.5f;
+        float fsize = getSize() / radScl;
         moveVector.setZero();
-        for(int cx = -rad; cx <= rad; cx++){
-            for(int cy = -rad; cy <= rad; cy++){
-                Tile tile = world.tileWorld(x + cx * tilesize, y + cy * tilesize);
-                if(tile == null) continue;
-                int weight = flying ? tile.airWeight : tile.weight;
-                float scl = (rad - Mathf.dst(tile.worldx(), tile.worldy(), x, y) / (8f * 1.2f * Mathf.sqrt2)) * 0.1f;
 
-                moveVector.add(Mathf.sign(x - tile.worldx()) * scaling * weight * scl, Mathf.sign(y - tile.worldy()) * scaling * weight * scl);
-            }
-        }
-
-        moveVector.limit(flying ? 0.1f : 0.2f);
+        Units.nearby(x - fsize/2f, y - fsize/2f, fsize, fsize, en -> {
+            if(en == this || en.isFlying() != isFlying()) return;
+            float dst = dst(en);
+            float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));
+            moveVector.add(Tmp.v1.set((x - en.x) * scl, (y - en.y) * scl).limit(0.4f));
+        });
 
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
-
-        Tile tile = world.tileWorld(x, y);
-
-        if(tile != null){
-            int tw = flying ? tile.airWeight : tile.weight;
-            lastWeightDelta = Math.min((int)(mass()), 127 - tw);
-            lastWeightTile = tile.pos();
-            if(!flying){
-                tile.weight += lastWeightDelta;
-            }else{
-                tile.airWeight += lastWeightDelta;
-            }
-        }else{
-            lastWeightTile = Pos.invalid;
-        }
-        wasFlying = flying;
     }
 
     public TileEntity getClosestCore(){
@@ -416,7 +354,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
+        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
     }

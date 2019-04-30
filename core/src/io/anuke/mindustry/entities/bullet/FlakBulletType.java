@@ -24,7 +24,7 @@ public abstract class FlakBulletType extends BasicBulletType{
         if(b.getData() instanceof Integer) return;
 
         if(b.timer.get(2, 6)){
-            Units.getNearbyEnemies(b.getTeam(), rect.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
+            Units.nearbyEnemies(b.getTeam(), rect.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
                 if(b.getData() instanceof Float) return;
 
                 if(unit.dst(b) < explodeRange){

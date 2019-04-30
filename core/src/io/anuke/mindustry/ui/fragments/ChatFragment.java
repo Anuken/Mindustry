@@ -34,7 +34,6 @@ public class ChatFragment extends Table{
     private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Unit.dp.scl(4), offsety = Unit.dp.scl(4), fontoffsetx = Unit.dp.scl(2), chatspace = Unit.dp.scl(50);
-    private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Unit.dp.scl(10);
     private Array<String> history = new Array<>();
@@ -124,6 +123,7 @@ public class ChatFragment extends Table{
     @Override
     public void draw(){
         float opacity = Core.settings.getInt("chatopacity") / 100f;
+        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, Unit.dp.scl(700f));
 
         Draw.color(shadowColor);
 

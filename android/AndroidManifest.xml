@@ -60,10 +60,6 @@
             </intent-filter>
         </activity>
 
-
-        <activity android:name=".DonationsActivity"
-                  android:theme="@style/GdxTheme"/>
-
     </application>
 
 </manifest>

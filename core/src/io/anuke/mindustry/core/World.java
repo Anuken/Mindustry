@@ -11,7 +11,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -85,13 +85,11 @@ public class World implements ApplicationListener{
         return tiles == null ? 0 : tiles[0].length;
     }
 
-    public @Nullable
-    Tile tile(int pos){
+    public @Nullable Tile tile(int pos){
         return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
-    public @Nullable
-    Tile tile(int x, int y){
+    public @Nullable Tile tile(int x, int y){
         if(tiles == null){
             return null;
         }
@@ -103,8 +101,7 @@ public class World implements ApplicationListener{
         return tiles[x][y];
     }
 
-    public @Nullable
-    Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
@@ -176,7 +173,7 @@ public class World implements ApplicationListener{
 
         addDarkness(tiles);
 
-        EntityQuery.resizeTree(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2);
+        Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -263,7 +260,7 @@ public class World implements ApplicationListener{
                 if(invalidMap){
                     ui.showError("$map.nospawn.pvp");
                 }
-            }else if(!state.rules.waves){ //pvp maps need two cores to be valid
+            }else if(state.rules.attackMode){ //pvp maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
                     ui.showError("$map.nospawn.attack");

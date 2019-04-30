@@ -52,7 +52,7 @@ public class OverdriveProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Draw.color(Pal.accent);
-        Lines.dashCircle(x * tilesize, y * tilesize, range);
+        Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
         Draw.color();
     }
 
@@ -90,7 +90,7 @@ public class OverdriveProjector extends Block{
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Mathf.dst(x, y, tile.x, tile.y) > realRange) continue;
+                    if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
 
                     Tile other = world.tile(x, y);
 

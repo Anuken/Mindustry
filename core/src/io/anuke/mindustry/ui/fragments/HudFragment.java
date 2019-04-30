@@ -459,7 +459,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append(waitingf.get((int)(state.wavetime / 60)));
+                builder.append((state.rules.waitForWaveToEnd && unitGroups[waveTeam.ordinal()].size() > 0) ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60))));
             }else if(state.enemies() == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

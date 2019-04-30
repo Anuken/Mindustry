@@ -15,7 +15,6 @@ import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
@@ -33,6 +32,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
     public final MapEditor editor;
+
     private MapView view;
     private MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;
@@ -85,49 +85,50 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.row();
 
             t.addImageTextButton("$editor.import", "icon-load-map", isize, () ->
-            createDialog("$editor.import",
-            "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
-            "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
-            Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
-                try{
-                    //TODO what if it's an image? users should be warned for their stupidity
-                    editor.beginEdit(MapIO.readMap(file, true));
-                }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                    Log.err(e);
-                }
-            }), true, mapExtension),
-
-            "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
-            Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
-            ui.loadAnd(() -> {
-                try{
-                    Pixmap pixmap = new Pixmap(file);
-                    Tile[][] tiles = editor.createTiles(pixmap.getWidth(), pixmap.getHeight());
-                    editor.load(() -> MapIO.readLegacyPixmap(pixmap, tiles));
-                    editor.beginEdit(tiles);
-                }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                    Log.err(e);
-                }
-            }), true, "png")));
-
-            t.addImageTextButton("$editor.export", "icon-save-map", isize, () ->
-            Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
-                file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-                FileHandle result = file;
-                ui.loadAnd(() -> {
+                createDialog("$editor.import",
+                "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
+                "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
+                Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
                     try{
-                        if(!editor.getTags().containsKey("name")){
-                            editor.getTags().put("name", result.nameWithoutExtension());
-                        }
-                        MapIO.writeMap(result, editor.createMap(result), editor.tiles());
+                        //TODO what if it's an image? users should be warned for their stupidity
+                        editor.beginEdit(MapIO.readMap(file, true));
                     }catch(Exception e){
-                        ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
                         Log.err(e);
                     }
-                });
-            }, false, mapExtension));
+                }), true, mapExtension),
+
+                "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
+                Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
+                ui.loadAnd(() -> {
+                    try{
+                        Pixmap pixmap = new Pixmap(file);
+                        Tile[][] tiles = editor.createTiles(pixmap.getWidth(), pixmap.getHeight());
+                        editor.load(() -> MapIO.readLegacyPixmap(pixmap, tiles));
+                        editor.beginEdit(tiles);
+                    }catch(Exception e){
+                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                        Log.err(e);
+                    }
+                }), true, "png"))
+            );
+
+            t.addImageTextButton("$editor.export", "icon-save-map", isize, () ->
+                Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
+                    file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+                    FileHandle result = file;
+                    ui.loadAnd(() -> {
+                        try{
+                            if(!editor.getTags().containsKey("name")){
+                                editor.getTags().put("name", result.nameWithoutExtension());
+                            }
+                            MapIO.writeMap(result, editor.createMap(result), editor.tiles());
+                        }catch(Exception e){
+                            ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
+                            Log.err(e);
+                        }
+                    });
+                }, false, mapExtension));
         });
 
         menu.cont.row();
@@ -443,7 +444,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         //ctrl keys (undo, redo, save)
-        if(UIUtils.ctrl()){
+        if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.Z)){
                 editor.undo();
             }

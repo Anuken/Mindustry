@@ -192,14 +192,6 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
-    public boolean isLayer(Tile tile){
-        return true;
-    }
-
-    public boolean isLayer2(Tile tile){
-        return true;
-    }
-
     public void drawLayer(Tile tile){
     }
 
@@ -274,7 +266,6 @@ public class Block extends BlockStorage{
 
     /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Tile tile, Unit unit){
-
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -284,7 +275,8 @@ public class Block extends BlockStorage{
 
     /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
-        if(!headless && tile.getTeam() == player.getTeam()){
+        //only unlocks content in zones
+        if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
             logic.handleContent(content);
         }
     }
@@ -444,7 +436,7 @@ public class Block extends BlockStorage{
             float capacity = consumes.getPower().powerCapacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
         }
 
         if(hasItems && configurable){
@@ -473,11 +465,6 @@ public class Block extends BlockStorage{
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
-    }
-
-    /** Called after the block is destroyed and removed. */
-    public void afterDestroyed(Tile tile, TileEntity entity){
-
     }
 
     /** Called when the block is destroyed. */

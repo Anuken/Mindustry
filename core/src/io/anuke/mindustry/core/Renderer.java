@@ -126,6 +126,13 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    @Override
+    public void dispose(){
+        minimap.dispose();
+        shieldBuffer.dispose();
+        blocks.dispose();
+    }
+
     void updateShake(float scale){
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
@@ -195,13 +202,13 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
 
-        if(EntityDraw.countInBounds(shieldGroup) > 0){
+        if(Entities.countInBounds(shieldGroup) > 0){
             if(settings.getBool("animatedshields")){
                 Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.CLEAR);
-                EntityDraw.draw(shieldGroup);
-                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                Entities.draw(shieldGroup);
+                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
                 Draw.flush();
                 shieldBuffer.end();
                 Draw.shader(Shaders.shield);
@@ -210,7 +217,7 @@ public class Renderer implements ApplicationListener{
                 Draw.color();
                 Draw.shader();
             }else{
-                EntityDraw.drawWith(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
             }
         }
 
@@ -289,7 +296,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        EntityDraw.drawWith(group, toDraw, drawer);
+        Entities.draw(group, toDraw, drawer);
     }
 
     public void scaleCamera(float amount){

@@ -88,7 +88,6 @@ public class MassDriverBolt extends BulletType{
         if(!(b.getData() instanceof DriverBulletData)) return;
 
         DriverBulletData data = (DriverBulletData)b.getData();
-        data.to.isRecieving = false;
 
         for(int i = 0; i < data.items.length; i++){
             int amountDropped = Mathf.random(0, data.items[i]);

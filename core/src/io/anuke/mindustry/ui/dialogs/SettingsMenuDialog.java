@@ -49,8 +49,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image("white"))
-        .growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        titleTable.add(new Image("white")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
@@ -182,8 +181,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
 
         if(!mobile){
-            graphics.sliderPref("antialias", 0, 0, 5, 1, s -> (s == 0 ? 0 : (1 << s)) + "x");
-
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b){

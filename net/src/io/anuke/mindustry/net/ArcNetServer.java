@@ -77,8 +77,13 @@ public class ArcNetServer implements ServerProvider{
                 Core.app.post(() -> {
                     try{
                         Net.handleServerReceived(k.id, object);
-                    }catch(ValidateException e){
-                        Log.err("Validation failed: {0} ({1})", e.player.name, e.getMessage());
+                    }catch(RuntimeException e){
+                        if(e.getCause() instanceof ValidateException){
+                            ValidateException v = (ValidateException)e.getCause();
+                            Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
+                        }else{
+                            e.printStackTrace();
+                        }
                     }catch(Exception e){
                         e.printStackTrace();
                     }

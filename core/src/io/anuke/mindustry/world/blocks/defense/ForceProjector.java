@@ -41,8 +41,7 @@ public class ForceProjector extends Block{
     private static Tile paramTile;
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
-    private static Consumer<SolidTrait> shieldConsumer = bullet -> {
-        AbsorbTrait trait = (AbsorbTrait)bullet;
+    private static Consumer<AbsorbTrait> shieldConsumer = trait -> {
         if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && paramBlock.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Effects.effect(Fx.absorb, trait);
@@ -173,7 +172,7 @@ public class ForceProjector extends Block{
         paramTile = tile;
         paramEntity = entity;
         paramBlock = this;
-        EntityQuery.getNearby(bulletGroup, tile.drawx(), tile.drawy(), realRadius * 2f, shieldConsumer);
+        bulletGroup.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
     }
 
     float realRadius(ForceEntity entity){

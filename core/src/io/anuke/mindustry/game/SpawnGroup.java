@@ -48,9 +48,7 @@ public class SpawnGroup implements Serializable{
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }
-        float scaling = this.unitScaling;
-
-        return Math.min(unitAmount - 1 + Math.max((int)(((wave - begin + 1) / spacing) / scaling), 1), max);
+        return Math.min(unitAmount + (int)(((wave - begin) / spacing) / unitScaling), max);
     }
 
     /**

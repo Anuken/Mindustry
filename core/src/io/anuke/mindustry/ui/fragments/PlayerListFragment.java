@@ -68,8 +68,7 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
 
         playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
-
-        playerGroup.forEach(user -> {
+        playerGroup.all().each(user -> {
             NetConnection connection = user.con;
 
             if(connection == null && Net.server() && !user.isLocal) return;
