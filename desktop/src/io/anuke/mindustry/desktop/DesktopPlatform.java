@@ -92,12 +92,9 @@ public class DesktopPlatform extends Platform{
             }
 
             if(Net.active() && playerGroup.size() > 1){
-                presence.state = playerGroup.size() + " Players";
+                presence.state = (state.rules.pvp ? "PvP | " : "") + playerGroup.size() + " Players";
             }else if(state.rules.waves){
-                presence.state = "Wave " + state.wave;
-            }else{
-                presence.state = unitGroups[player.getTeam().ordinal()].size() == 1 ? "1 Unit Active" :
-                        (unitGroups[player.getTeam().ordinal()].size() + " Units Active");
+                presence.state = "Survival";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
