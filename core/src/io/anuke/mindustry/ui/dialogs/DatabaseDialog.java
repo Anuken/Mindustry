@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.*;
