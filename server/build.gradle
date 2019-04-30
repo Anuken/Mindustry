@@ -1,7 +1,7 @@
 apply plugin: "java"
 
 sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets")
@@ -10,18 +10,18 @@ ext.getServerFolder = {
     return "../deploy/${appName}-server-${getVersionString()}"
 }
 
-task run(dependsOn: classes, type: JavaExec) {
+task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
     ignoreExitValue = true
-    if (project.hasProperty("appArgs")) {
+    if(project.hasProperty("appArgs")){
         args Eval.me(appArgs)
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
+task debug(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -30,10 +30,10 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
-task dist(type: Jar) {
+task dist(type: Jar){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+    from{ configurations.compile.collect{ zipTree(it) } }
     from files(project.assetsDir)
     exclude("sprites/**")
     exclude("fonts/**")
@@ -41,8 +41,8 @@ task dist(type: Jar) {
     exclude("bundles/**")
 
     writeVersion()
- 
-    manifest {
+
+    manifest{
         attributes 'Main-Class': project.mainClassName
     }
 }

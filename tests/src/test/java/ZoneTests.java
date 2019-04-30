@@ -1,6 +1,7 @@
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Zone;
@@ -21,7 +22,7 @@ public class ZoneTests{
 
     @BeforeEach
     void resetWorld(){
-        Time.setDeltaProvider(() ->  1f);
+        Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
     }
@@ -32,6 +33,7 @@ public class ZoneTests{
 
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
+                zone.generator.init(zone.loadout);
                 logic.reset();
                 world.loadGenerator(zone.generator);
                 ObjectSet<Item> resources = new ObjectSet<>();

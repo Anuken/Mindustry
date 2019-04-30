@@ -1,9 +1,7 @@
 package io.anuke.mindustry.entities.impl;
 
 
-import io.anuke.mindustry.entities.traits.DamageTrait;
-import io.anuke.mindustry.entities.traits.HealthTrait;
-import io.anuke.mindustry.entities.traits.SolidTrait;
+import io.anuke.mindustry.entities.traits.*;
 
 public abstract class DestructibleEntity extends SolidEntity implements HealthTrait{
     public transient boolean dead;
@@ -18,7 +16,7 @@ public abstract class DestructibleEntity extends SolidEntity implements HealthTr
     public void collision(SolidTrait other, float x, float y){
         if(other instanceof DamageTrait){
             onHit(other);
-            damage(((DamageTrait) other).damage());
+            damage(((DamageTrait)other).damage());
         }
     }
 

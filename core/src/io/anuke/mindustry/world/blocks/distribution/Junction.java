@@ -1,8 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.util.NumberUtils;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -38,7 +36,7 @@ public class Junction extends Block{
             if(buffer.index > 0){
                 if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
                 long l = buffer.items[0];
-                float time = NumberUtils.intBitsToFloat(Pack.leftInt(l));
+                float time = Float.intBitsToFloat(Pack.leftInt(l));
 
                 if(Time.time() >= time + speed || Time.time() < time){
 
@@ -61,7 +59,7 @@ public class Junction extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.entity();
-        long value = Pack.longInt(NumberUtils.floatToIntBits(Time.time()), item.id);
+        long value = Pack.longInt(Float.floatToIntBits(Time.time()), item.id);
         int relative = source.relativeTo(tile.x, tile.y);
         entity.buffers[relative].add(value);
     }

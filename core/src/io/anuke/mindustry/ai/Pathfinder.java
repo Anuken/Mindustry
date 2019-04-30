@@ -65,9 +65,9 @@ public class Pathfinder{
             Tile other = world.tile(dx, dy);
             if(other == null) continue;
 
-            if(values[dx][dy] < value && (target == null || values[dx][dy]< tl) &&
-                    !other.solid() &&
-                    !(point.x != 0 && point.y != 0 && (world.solid(tile.x + point.x, tile.y) || world.solid(tile.x, tile.y + point.y)))){ //diagonal corner trap
+            if(values[dx][dy] < value && (target == null || values[dx][dy] < tl) &&
+            !other.solid() &&
+            !(point.x != 0 && point.y != 0 && (world.solid(tile.x + point.x, tile.y) || world.solid(tile.x, tile.y + point.y)))){ //diagonal corner trap
                 target = other;
                 tl = values[dx][dy];
             }
@@ -86,8 +86,10 @@ public class Pathfinder{
         return (!tile.solid()) || (tile.breakable() && (tile.target().getTeam() != team));
     }
 
-    /**Clears the frontier, increments the search and sets up all flow sources.
-     * This only occurs for active teams.*/
+    /**
+     * Clears the frontier, increments the search and sets up all flow sources.
+     * This only occurs for active teams.
+     */
     private void update(Tile tile, Team team){
         //make sure team exists
         if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
@@ -126,7 +128,7 @@ public class Pathfinder{
                 Tile tile = world.tile(x, y);
 
                 if(state.teams.areEnemies(tile.getTeam(), team)
-                        && tile.block().flags.contains(BlockFlag.target)){
+                && tile.block().flags.contains(BlockFlag.target)){
                     path.frontier.addFirst(tile.pos());
                     path.weights[x][y] = 0;
                     path.searches[x][y] = (short)path.search;
@@ -162,7 +164,7 @@ public class Pathfinder{
                     Tile other = world.tile(dx, dy);
 
                     if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search)
-                            && passable(other, team)){
+                    && passable(other, team)){
                         if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
                         path.frontier.addFirst(Pos.get(dx, dy));
                         path.weights[dx][dy] = cost + other.cost;

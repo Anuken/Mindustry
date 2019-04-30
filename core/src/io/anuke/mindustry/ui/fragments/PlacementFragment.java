@@ -9,11 +9,8 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.ImageButton;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
@@ -21,9 +18,7 @@ import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
-import io.anuke.mindustry.type.Category;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
@@ -292,7 +287,7 @@ public class PlacementFragment extends Fragment{
         returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
         return returnCatArray;
     }
-    
+
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
@@ -341,6 +336,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.ore() != Blocks.air ? hoverTile.ore() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : null;
     }
 }

@@ -1,14 +1,12 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Table;
 
 import static io.anuke.mindustry.Vars.world;
 

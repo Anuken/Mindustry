@@ -34,7 +34,6 @@ public class ChatFragment extends Table{
     private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Unit.dp.scl(4), offsety = Unit.dp.scl(4), fontoffsetx = Unit.dp.scl(2), chatspace = Unit.dp.scl(50);
-    private float textWidth = Unit.dp.scl(600);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Unit.dp.scl(10);
     private Array<String> history = new Array<>();
@@ -81,7 +80,7 @@ public class ChatFragment extends Table{
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int) Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 
@@ -123,6 +122,8 @@ public class ChatFragment extends Table{
 
     @Override
     public void draw(){
+        float opacity = Core.settings.getInt("chatopacity") / 100f;
+        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, Unit.dp.scl(700f));
 
         Draw.color(shadowColor);
 
@@ -138,6 +139,7 @@ public class ChatFragment extends Table{
         fieldlabel.visible(chatOpen);
 
         Draw.color(shadowColor);
+        Draw.alpha(shadowColor.a * opacity);
 
         float theight = offsety + spacing + getMarginBottom();
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
@@ -150,12 +152,15 @@ public class ChatFragment extends Table{
             font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(!chatOpen && fadetime - i < 1f && fadetime - i >= 0f){
-                font.getCache().setAlphas(fadetime - i);
-                Draw.color(0, 0, 0, shadowColor.a * (fadetime - i));
+                font.getCache().setAlphas((fadetime - i) * opacity);
+                Draw.color(0, 0, 0, shadowColor.a * (fadetime - i) * opacity);
+            }else{
+                font.getCache().setAlphas(opacity);
             }
 
             Fill.crect(offsetx, theight - layout.height - 2, textWidth + Unit.dp.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
+            Draw.alpha(opacity * shadowColor.a);
 
             font.getCache().draw();
         }
@@ -174,7 +179,7 @@ public class ChatFragment extends Table{
 
         history.insert(1, message);
 
-        Call.sendMessage(player, message);
+        Call.sendChatMessage(message);
     }
 
     public void toggle(){

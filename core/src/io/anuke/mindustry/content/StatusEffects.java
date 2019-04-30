@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.type.StatusEffect;
 

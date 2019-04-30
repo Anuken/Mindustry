@@ -33,7 +33,7 @@ public class ItemsDisplay extends Table{
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     t.label(() -> format.format(items.get(item, 0))).left();
-                    t.addImage(item.icon(Icon.medium)).size(8*3).padLeft(4).padRight(4);
+                    t.addImage(item.icon(Icon.medium)).size(8 * 3).padLeft(4).padRight(4);
                     t.add(item.localizedName()).color(Color.LIGHT_GRAY).left();
                     t.row();
                 }

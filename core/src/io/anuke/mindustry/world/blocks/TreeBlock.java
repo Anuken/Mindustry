@@ -7,7 +7,6 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 public class TreeBlock extends Block{
-    static final float shadowOffset = 10f;
 
     public TreeBlock(String name){
         super(name);

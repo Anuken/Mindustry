@@ -4,7 +4,8 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.editor.generation.FilterOption.*;
+import static io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
+import static io.anuke.mindustry.editor.generation.FilterOption.oresOnly;
 
 public class OreFilter extends GenerateFilter{
     float scl = 40, threshold = 0.8f, octaves = 3f, falloff = 0.5f;
@@ -24,7 +25,7 @@ public class OreFilter extends GenerateFilter{
     public void apply(){
         float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
 
-        if(noise > threshold && !in.srcfloor.isLiquid){
+        if(noise > threshold){
             in.ore = ore;
         }
     }

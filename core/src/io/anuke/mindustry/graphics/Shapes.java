@@ -1,10 +1,7 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.CapStyle;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 
@@ -34,6 +31,6 @@ public class Shapes{
 
     public static void tri(float x, float y, float width, float length, float rotation){
         float oy = 17f / 63f * length;
-        Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length/2f, width, length, width / 2f, oy, rotation - 90);
+        Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
     }
 }

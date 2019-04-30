@@ -14,9 +14,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ItemSelection;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -66,8 +64,8 @@ public class Unloader extends Block{
         if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
                 if(other.interactable(tile.getTeam()) && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
-                ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock) other.block()).hasItem(other, entity.sortItem))){
-                    offloadNear(tile, ((StorageBlock) other.block()).removeItem(other, entity.sortItem));
+                ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock)other.block()).hasItem(other, entity.sortItem))){
+                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, entity.sortItem));
                 }
             }
         }

@@ -8,15 +8,10 @@ import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.EntityQuery;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.EventType.PlayEvent;
-import io.anuke.mindustry.game.EventType.ResetEvent;
-import io.anuke.mindustry.game.EventType.WaveEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
@@ -39,19 +34,21 @@ public class Logic implements ApplicationListener{
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
             }
+            for (Player p : playerGroup.all()) {
+                p.respawns = state.rules.respawns;
+            }
         });
     }
 
     @Override
     public void init(){
-        EntityQuery.init();
-        EntityQuery.collisions().setCollider(tilesize, (x, y) -> {
+        collisions.setCollider(tilesize, (x, y) -> {
             Tile tile = world.tile(x, y);
             return tile != null && tile.solid();
         });
     }
 
-    /**Handles the event of content being used by either the player or some block.*/
+    /** Handles the event of content being used by either the player or some block. */
     public void handleContent(UnlockableContent content){
         if(!headless){
             data.unlockContent(content);
@@ -61,7 +58,11 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
-        state.rules.spawns = world.getMap().getWaves();
+
+        //sometimes a map has no waves defined, they're defined in the zone rules
+        if(world.getMap().getWaves() != DefaultWaves.get() || !world.isZone()){
+            state.rules.spawns = world.getMap().getWaves();
+        }
 
         Events.fire(new PlayEvent());
     }
@@ -84,8 +85,8 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         world.spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * bossWaveMultiplier :
-                         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
+        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -94,7 +95,7 @@ public class Logic implements ApplicationListener{
         if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
-        }else if(!state.rules.waves){
+        }else if(state.rules.attackMode){
             Team alive = null;
 
             for(Team team : Team.all){
@@ -150,15 +151,13 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    if(!state.rules.waitForWaveToEnd || unitGroups[waveTeam.ordinal()].size() == 0){
+                        state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                    }
                 }
 
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
-                }
-
-                if(!Entities.defaultGroup().isEmpty()){
-                    throw new IllegalArgumentException("Do not add anything to the default group!");
                 }
 
                 if(!headless){
@@ -185,11 +184,11 @@ public class Logic implements ApplicationListener{
                 for(EntityGroup group : unitGroups){
                     if(group.isEmpty()) continue;
 
-                    EntityQuery.collideGroups(bulletGroup, group);
+                    collisions.collideGroups(bulletGroup, group);
                 }
 
-                EntityQuery.collideGroups(bulletGroup, playerGroup);
-                EntityQuery.collideGroups(playerGroup, playerGroup);
+                collisions.collideGroups(bulletGroup, playerGroup);
+                collisions.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder.update();
             }

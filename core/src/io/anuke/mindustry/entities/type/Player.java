@@ -8,22 +8,14 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -37,9 +29,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -62,14 +52,18 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
-    public Mech mech;
+    public Mech mech = Mechs.starter;
     public SpawnerTrait spawner, lastSpawner;
+    public int respawns;
 
     public NetConnection con;
     public boolean isLocal = false;
     public Interval timer = new Interval(4);
     public TargetTrait target;
     public TargetTrait moveTarget;
+
+    public String lastText;
+    public float textFadeTime;
 
     private float walktime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
@@ -88,7 +82,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         player.dead = true;
         player.placeQueue.clear();
         player.onDeath();
-        player.mech = (player.isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
     }
 
     @Override
@@ -108,23 +101,27 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void onRespawn(Tile tile){
+        velocity.setZero();
         boostHeat = 1f;
         achievedFlight = true;
+        rotation = 90f;
+        baseRotation = 90f;
+        dead = false;
+        spawner = null;
+        respawns --;
+
+        setNet(tile.drawx(), tile.drawy());
+        clearItem();
+        heal();
     }
 
     @Override
     public void move(float x, float y){
         if(!mech.flying){
-            EntityQuery.collisions().move(this, x, y);
+            collisions.move(this, x, y);
         }else{
             moveBy(x, y);
         }
-    }
-
-    @Override
-    public boolean collidesGrid(int x, int y){
-        Tile tile = world.tile(x, y);
-        return !isFlying() || (!mech.flying && tile != null && !tile.block().synthetic() && tile.block().solid);
     }
 
     @Override
@@ -182,7 +179,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public float maxHealth(){
-        return mech.health;
+        return mech.health * state.rules.playerHealthMultiplier;
     }
 
     @Override
@@ -375,35 +372,52 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
-        size + Mathf.absin(Time.time(), 2f, size/4f));
+        size + Mathf.absin(Time.time(), 2f, size / 4f));
 
         Draw.color(Color.WHITE);
-        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset-1f), y + Angles.trnsy(rotation + 180, mech.engineOffset-1f),
-        (size + Mathf.absin(Time.time(), 2f, size/4f)) / 2f);
+        Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
+        (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
     }
 
     public void drawName(){
         BitmapFont font = Core.scene.skin.getFont("default-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        final float nameHeight = 11;
+        final float textHeight = 15;
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
-        Fill.rect(x, y + 8 - layout.height / 2, layout.width + 2, layout.height + 3);
+        Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
         Draw.color();
         font.setColor(color);
 
-        font.draw(name, x, y + 8, 0, Align.center, false);
+        font.draw(name, x, y + nameHeight, 0, Align.center, false);
 
         if(isAdmin){
             float s = 3f;
             Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 6.5f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
             Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + 7f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+        }
+
+        if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){
+            String text = textFadeTime <= 0 || lastText == null ? "[LIGHT_GRAY]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+            float width = 100f;
+            float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
+            font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
+
+            layout.setText(font, text, Color.WHITE, width, Align.bottom, true);
+
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
+            Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
+            font.draw(text, x - width/2f, y + textHeight + layout.height, width, Align.center, true);
+
+            textFadeTime -= Time.delta() / (60 * 5);
         }
 
         Draw.reset();
@@ -453,15 +467,16 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 TextureRegion region = draw.region;
 
                 Draw.rect(region,
-                    request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                    region.getWidth() * 1f * Draw.scl * draw.scalex,
-                    region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
+                request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
+                region.getWidth() * 1f * Draw.scl * draw.scalex,
+                region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
 
                 Draw.color(Pal.accent);
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(request.block.size-1, 0)/2f * tilesize;
-                    if(i % 2 == 0) Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
+                    if(i % 2 == 0)
+                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 
@@ -478,7 +493,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public void update(){
-
         hitTime -= Time.delta();
 
         if(Float.isNaN(x) || Float.isNaN(y)){
@@ -505,13 +519,15 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(isDead()){
             isBoosting = false;
             boostHeat = 0f;
-            updateRespawning();
+            if(respawns > 0 || !state.rules.limitedRespawns){
+                updateRespawning();
+            }
             return;
         }else{
             spawner = null;
         }
 
-        avoidOthers(1f);
+        avoidOthers();
 
         Tile tile = world.tileWorld(x, y);
 
@@ -554,6 +570,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             updateMech();
         }
+
+        isTyping = ui.chatfrag.chatOpen();
 
         updateBuilding();
 
@@ -625,8 +643,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
-        mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && ((TileEntity)target).isAdded() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
 
@@ -645,7 +662,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
             if(dst(moveTarget) < 2f){
                 if(tapping){
-                    Tile tile = ((TileEntity) moveTarget).tile;
+                    Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
 
@@ -670,7 +687,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         rect.width += expansion * 2f;
         rect.height += expansion * 2f;
 
-        isBoosting = EntityQuery.collisions().overlapsTile(rect) || dst(targetX, targetY) > 85f;
+        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
 
         velocity.add(movement.scl(Time.delta()));
 
@@ -698,14 +715,14 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.getClosestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
 
                         if(mech.canHeal && target == null){
                             target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
-                                target = ((Tile) target).entity;
+                                target = ((Tile)target).entity;
                             }
                         }
 
@@ -713,7 +730,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                             setMineTile(null);
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity) target).damaged() && target.getTeam() == team &&
+                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
                 mech.canHeal && dst(target) < getWeapon().bullet.range())){
                     //rotate toward and shoot the target
                     if(mech.turnCursor){
@@ -763,8 +780,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         spawner = lastSpawner = null;
         health = maxHealth();
         boostHeat = drownTime = hitTime = 0f;
-        mech = (isMobile ? Mechs.starterMobile : Mechs.starterDesktop);
+        mech = Mechs.starter;
         placeQueue.clear();
+        respawns = state.rules.respawns;
     }
 
     public boolean isShooting(){
@@ -776,10 +794,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(lastSpawner != null && lastSpawner.isValid()){
-                this.spawner = lastSpawner;
-            }else if(getClosestCore() != null){
-                this.spawner = (SpawnerTrait)getClosestCore();
+            if(!Net.client()){
+                if(lastSpawner != null && lastSpawner.isValid()){
+                    this.spawner = lastSpawner;
+                }else if(getClosestCore() != null){
+                    this.spawner = (SpawnerTrait)getClosestCore();
+                }
             }
         }else if(getClosestCore() != null){
             set(getClosestCore().getX(), getClosestCore().getY());
@@ -790,16 +810,12 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         this.spawner = spawner;
         this.lastSpawner = spawner;
         this.dead = true;
-    }
-
-    public void endRespawning(){
-        spawner = null;
+        setNet(spawner.getX(), spawner.getY());
     }
 
     //endregion
 
     //region read and write methods
-
 
     @Override
     public boolean isClipped(){
@@ -821,22 +837,17 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void readSave(DataInput stream) throws IOException{
         boolean local = stream.readBoolean();
 
-        if(local && !headless){
+        if(local){
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
-            if(world.tile(spawner) != null && world.tile(spawner).entity != null && world.tile(spawner).entity instanceof SpawnerTrait){
-                lastSpawner = (SpawnerTrait)(world.tile(spawner).entity);
+            Tile stile = world.tile(spawner);
+            if(stile != null && stile.entity instanceof SpawnerTrait){
+                lastSpawner = (SpawnerTrait)stile.entity;
             }
+            Player player = headless ? this : Vars.player;
             player.readSaveSuper(stream);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
-        }else if(local){
-            byte mechid = stream.readByte();
-            stream.readByte();
-            stream.readInt();
-            readSaveSuper(stream);
-            mech = content.getByID(ContentType.mech, mechid);
-            dead = false;
         }
     }
 
@@ -855,7 +866,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
         buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
-        buffer.writeShort((short) (baseRotation * 2));
+        buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);
     }
@@ -889,12 +900,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }else{
             mining = world.tile(mine);
             isBoosting = boosting;
-            Tile tile = world.tile(spawner);
-            if(tile != null && tile.entity instanceof SpawnerTrait){
-                this.spawner = (SpawnerTrait)tile.entity;
-            }else{
-                this.spawner = null;
-            }
+        }
+
+        Tile tile = world.tile(spawner);
+        if(tile != null && tile.entity instanceof SpawnerTrait){
+            this.spawner = (SpawnerTrait)tile.entity;
+        }else{
+            this.spawner = null;
         }
     }
 

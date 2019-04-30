@@ -33,7 +33,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         MultiReqImage image = new MultiReqImage();
         list.each(liquid -> image.add(new ReqImage(liquid.getContentIcon(), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.entity))));
 
-        table.add(image).size(8*4);
+        table.add(image).size(8 * 4);
     }
 
     @Override

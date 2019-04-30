@@ -9,9 +9,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.LiquidStack;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
@@ -19,13 +17,9 @@ import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class GenericCrafter extends Block{
-    protected final int timerDump = timers++;
-
     protected ItemStack outputItem;
     protected LiquidStack outputLiquid;
 
@@ -114,7 +108,7 @@ public class GenericCrafter extends Block{
             entity.progress = 0f;
         }
 
-        if(outputItem != null && tile.entity.timer.get(timerDump, 5)){
+        if(outputItem != null && tile.entity.timer.get(timerDump, dumpTime)){
             tryDump(tile, outputItem.item);
         }
 

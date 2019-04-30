@@ -2,23 +2,17 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Log;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.LogHandler;
 import io.anuke.arc.util.Log.NoopLogHandler;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.ContentLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
@@ -91,12 +85,12 @@ public class ImagePacker{
             }
 
             @Override
-            public boolean has(String s) {
+            public boolean has(String s){
                 return regionCache.containsKey(s);
             }
         };
 
-        Draw.scl = 1f/Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
         Time.mark();
         Generators.generate();

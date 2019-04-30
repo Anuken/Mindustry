@@ -12,12 +12,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class Image {
+class Image{
     private static ArrayList<Image> toDispose = new ArrayList<>();
 
     private BufferedImage image;
     private Graphics2D graphics;
     private Color color = new Color();
+
+    public final int width, height;
 
     Image(TextureRegion region){
         this(ImagePacker.buf(region));
@@ -27,6 +29,8 @@ class Image {
         this.image = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
         this.graphics.drawImage(src, 0, 0, null);
+        this.width = image.getWidth();
+        this.height = image.getHeight();
 
         toDispose.add(this);
     }
@@ -35,16 +39,8 @@ class Image {
         this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
-    int width(){
-        return image.getWidth();
-    }
-
-    int height(){
-        return image.getHeight();
-    }
-
     boolean isEmpty(int x, int y){
-        if(!Structs.inBounds(x, y, width(), height())){
+        if(!Structs.inBounds(x, y, width, height)){
             return true;
         }
         Color color = getColor(x, y);
@@ -52,7 +48,7 @@ class Image {
     }
 
     Color getColor(int x, int y){
-        if(!Structs.inBounds(x, y, width(), height())) return color.set(0, 0, 0, 0);
+        if(!Structs.inBounds(x, y, width, height)) return color.set(0, 0, 0, 0);
         int i = image.getRGB(x, y);
         Color.argb8888ToColor(color, i);
         return color;
@@ -63,31 +59,31 @@ class Image {
         graphics.fillRect(x, y, 1, 1);
     }
 
-    /**Draws a region at the top left corner.*/
+    /** Draws a region at the top left corner. */
     void draw(TextureRegion region){
         draw(region, 0, 0, false, false);
     }
 
-    /**Draws a region at the center.*/
+    /** Draws a region at the center. */
     void drawCenter(TextureRegion region){
-        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, false, false);
+        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, false, false);
     }
 
-    /**Draws a region at the center.*/
+    /** Draws a region at the center. */
     void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width() - region.getWidth())/2, (height() - region.getHeight())/2, flipx, flipy);
+        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, flipx, flipy);
     }
 
     void drawScaled(Image image){
-        graphics.drawImage(image.image.getScaledInstance(width(), height(), java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width(), height(), null);
+        graphics.drawImage(image.image.getScaledInstance(width, height, java.awt.Image.SCALE_AREA_AVERAGING), 0, 0, width, height, null);
     }
 
-    /**Draws an image at the top left corner.*/
+    /** Draws an image at the top left corner. */
     void draw(Image image){
         draw(image, 0, 0);
     }
 
-    /**Draws an image at the coordinates specified.*/
+    /** Draws an image at the coordinates specified. */
     void draw(Image image, int x, int y){
         graphics.drawImage(image.image, x, y, null);
     }
@@ -102,21 +98,21 @@ class Image {
         int ofx = 0, ofy = 0;
 
         graphics.drawImage(ImagePacker.get(region).image,
-                x, y,
-                x + region.getWidth(),
-                y + region.getHeight(),
-                (flipx ? region.getWidth() : 0) + ofx,
-                (flipy ? region.getHeight() : 0) + ofy,
-                (flipx ? 0 : region.getWidth()) + ofx,
-                (flipy ? 0 : region.getHeight()) + ofy,
-                null);
+        x, y,
+        x + region.getWidth(),
+        y + region.getHeight(),
+        (flipx ? region.getWidth() : 0) + ofx,
+        (flipy ? region.getHeight() : 0) + ofy,
+        (flipx ? 0 : region.getWidth()) + ofx,
+        (flipy ? 0 : region.getHeight()) + ofy,
+        null);
     }
 
-    /** @param name Name of texture file name to create, without any extensions.*/
+    /** @param name Name of texture file name to create, without any extensions. */
     void save(String name){
-        try {
+        try{
             ImageIO.write(image, "png", new File(name + ".png"));
-        }catch (IOException e){
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }

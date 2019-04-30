@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 
 import java.util.Locale;
 
-/**Describes one type of stat for a block.*/
+/** Describes one type of stat for a block. */
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
@@ -41,8 +41,7 @@ public enum BlockStat{
     ammo(StatCategory.shooting),
 
     booster(StatCategory.optional),
-    boostEffect(StatCategory.optional)
-    ;
+    boostEffect(StatCategory.optional);
 
     public final StatCategory category;
 

@@ -29,12 +29,13 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-/**Base class for AI units.*/
+/** Base class for AI units. */
 public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
+    protected static final int timerTarget2 = timerIndex++;
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
@@ -45,7 +46,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     protected int spawner = noSpawner;
 
-    /**internal constructor used for deserialization, DO NOT USE*/
+    /** internal constructor used for deserialization, DO NOT USE */
     public BaseUnit(){
     }
 
@@ -78,7 +79,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.drag;
     }
 
-    /**Initialize the type and team of this unit. Only call once!*/
+    /** Initialize the type and team of this unit. Only call once! */
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
 
@@ -99,7 +100,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean targetHasFlag(BlockFlag flag){
-        return target instanceof TileEntity && ((TileEntity) target).tile.block().flags.contains(flag);
+        return target instanceof TileEntity && ((TileEntity)target).tile.block().flags.contains(flag);
     }
 
     public void setState(UnitState state){
@@ -112,14 +113,14 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    /**Only runs when the unit has a target.*/
+    /** Only runs when the unit has a target. */
     public void behavior(){
 
     }
 
     public void updateTargeting(){
         if(target == null || (target instanceof Unit && (target.isDead() || target.getTeam() == team))
-        || (target instanceof TileEntity && ((TileEntity) target).tile.entity == null)){
+        || (target instanceof TileEntity && ((TileEntity)target).tile.entity == null)){
             target = null;
         }
     }
@@ -135,7 +136,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosest(){
-        TargetTrait newTarget = Units.getClosestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
+        TargetTrait newTarget = Units.closestTarget(team, x, y, Math.max(getWeapon().bullet.range(), type.range), u -> type.targetAir || !u.isFlying());
         if(newTarget != null){
             target = newTarget;
         }
@@ -166,9 +167,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
                 float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
                 float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
                 Draw.rect(item.item.icon(Item.Icon.large),
-                    x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                    y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                    itemSize, itemSize, rotation);
+                x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
+                y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
+                itemSize, itemSize, rotation);
             }
         }
     }
@@ -259,7 +260,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             kill();
         }
 
-        avoidOthers(1.25f);
+        avoidOthers();
 
         if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
             kill();

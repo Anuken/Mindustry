@@ -6,17 +6,11 @@ import io.anuke.arc.collection.OrderedMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.Mech;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.StatCategory;
-import io.anuke.mindustry.world.meta.StatValue;
+import io.anuke.mindustry.world.meta.*;
 
 public class ContentDisplay{
 
@@ -93,11 +87,11 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Core.bundle.format("item.explosiveness", (int) (item.explosiveness * 100)));
+        table.add(Core.bundle.format("item.explosiveness", (int)(item.explosiveness * 100)));
         table.row();
-        table.add(Core.bundle.format("item.flammability", (int) (item.flammability * 100)));
+        table.add(Core.bundle.format("item.flammability", (int)(item.flammability * 100)));
         table.row();
-        table.add(Core.bundle.format("item.radioactivity", (int) (item.radioactivity * 100)));
+        table.add(Core.bundle.format("item.radioactivity", (int)(item.radioactivity * 100)));
         table.row();
     }
 
@@ -124,15 +118,15 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Core.bundle.format("item.explosiveness", (int) (liquid.explosiveness * 100)));
+        table.add(Core.bundle.format("item.explosiveness", (int)(liquid.explosiveness * 100)));
         table.row();
-        table.add(Core.bundle.format("item.flammability", (int) (liquid.flammability * 100)));
+        table.add(Core.bundle.format("item.flammability", (int)(liquid.flammability * 100)));
         table.row();
-        table.add(Core.bundle.format("liquid.heatcapacity", (int) (liquid.heatCapacity * 100)));
+        table.add(Core.bundle.format("liquid.heatcapacity", (int)(liquid.heatCapacity * 100)));
         table.row();
-        table.add(Core.bundle.format("liquid.temperature", (int) (liquid.temperature * 100)));
+        table.add(Core.bundle.format("liquid.temperature", (int)(liquid.temperature * 100)));
         table.row();
-        table.add(Core.bundle.format("liquid.viscosity", (int) (liquid.viscosity * 100)));
+        table.add(Core.bundle.format("liquid.viscosity", (int)(liquid.viscosity * 100)));
         table.row();
     }
 

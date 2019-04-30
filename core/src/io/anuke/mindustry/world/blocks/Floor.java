@@ -8,13 +8,9 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -22,7 +18,7 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class Floor extends Block{
     /** number of different variant regions to use */
-    public int variants;
+    public int variants = 3;
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
@@ -49,13 +45,11 @@ public class Floor extends Block{
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /**Style of the edge stencil. Loaded by looking up "edge-stencil-{name}".*/
-    public String edgeStyle = "smooth";
-    /**Group of blocks that this block does not draw edges on.*/
+    /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
-    /**Effect displayed when randomly updated.*/
+    /** Effect displayed when randomly updated. */
     public Effect updateEffect = Fx.none;
-    /**Array of affinities to certain things.*/
+    /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
 
     protected TextureRegion[][] edges;
@@ -65,7 +59,6 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
-        variants = 3;
     }
 
     @Override
@@ -104,7 +97,7 @@ public class Floor extends Block{
 
         drawEdges(tile);
 
-        Floor floor = tile.ore();
+        Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.draw(tile);
         }
@@ -147,7 +140,7 @@ public class Floor extends Block{
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.getNearby(point);
                 if(other != null && other.floor() == block){
-                    TextureRegion region = edge((Floor)block, type(i), 2-(point.x + 1), 2-(point.y + 1));
+                    TextureRegion region = edge((Floor)block, type(i), 2 - (point.x + 1), 2 - (point.y + 1));
                     Draw.rect(region, tile.worldx(), tile.worldy());
                 }
             }
@@ -188,7 +181,7 @@ public class Floor extends Block{
     }
 
     TextureRegion edge(Floor block, int type, int x, int y){
-        return block.edges()[x + type*3][2-y];
+        return block.edges()[x + type * 3][2 - y];
     }
 
 }

@@ -88,7 +88,6 @@ public class TechTree implements ContentList{
                 });
 
 
-
                 node(copperWall, () -> {
                     node(copperWallLarge);
                     node(titaniumWall, () -> {
@@ -138,6 +137,9 @@ public class TechTree implements ContentList{
                     node(siliconSmelter, () -> {
 
                         node(sporePress, () -> {
+                            node(coalCentrifuge, () -> {
+
+                            });
                             node(multiPress, () -> {
 
                             });
@@ -170,7 +172,6 @@ public class TechTree implements ContentList{
                         });
                     });
                 });
-
 
 
                 node(mechanicalPump, () -> {
@@ -249,7 +250,7 @@ public class TechTree implements ContentList{
                         node(phantomFactory);
                     });
 
-                    node(alphaDartPad, () -> {
+                    node(dartPad, () -> {
                         node(deltaPad, () -> {
 
                             node(javelinPad, () -> {
@@ -275,7 +276,7 @@ public class TechTree implements ContentList{
         for(int i = 0; i < requirements.length; i++){
             requirements[i] = new ItemStack(block.buildRequirements[i].item, block.buildRequirements[i].amount * 5);
         }
-        
+
         return new TechNode(block, requirements, children);
     }
 

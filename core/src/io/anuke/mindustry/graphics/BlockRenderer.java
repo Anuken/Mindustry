@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Fill;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
@@ -20,7 +21,7 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
 
-public class BlockRenderer{
+public class BlockRenderer implements Disposable{
     private final static int initialRequests = 32 * 32;
     private final static int expandr = 9;
     private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
@@ -76,8 +77,14 @@ public class BlockRenderer{
             for(int x = 0; x < world.width(); x++){
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
-                    if(tile.getRotation() > 0 && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
-                        Draw.color(0f, 0f, 0f, Math.min((tile.getRotation() + 0.5f)/4f, 1f));
+                    int edgeBlend = 2;
+                    float rot = tile.getRotation();
+                    int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
+                    if(edgeDst <= edgeBlend){
+                        rot = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), rot);
+                    }
+                    if(rot > 0 && ((tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()) || edgeDst <= edgeBlend)){
+                        Draw.color(0f, 0f, 0f, Math.min((rot + 0.5f) / 4f, 1f));
                         Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                     }
                 }
@@ -92,9 +99,9 @@ public class BlockRenderer{
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);
-            int avgy = (int)(camera.position. y / tilesize);
-            int rangex = (int) (camera.width / tilesize / 2) + 2;
-            int rangey = (int) (camera.height / tilesize / 2) + 2;
+            int avgy = (int)(camera.position.y / tilesize);
+            int rangex = (int)(camera.width / tilesize / 2) + 2;
+            int rangey = (int)(camera.height / tilesize / 2) + 2;
 
             if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
@@ -104,11 +111,11 @@ public class BlockRenderer{
 
     public void drawFog(){
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
-        float u = (x - camera.width/2f) / ww,
-        v = (y - camera.height/2f) / wh,
-        u2 = (x + camera.width/2f) / ww,
-        v2 = (y + camera.height/2f) / wh;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
 
         Tmp.tr1.set(fog.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
@@ -144,11 +151,11 @@ public class BlockRenderer{
         }
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float x = camera.position.x + tilesize/2f, y = camera.position.y + tilesize/2f;
-        float u = (x - camera.width/2f) / ww,
-        v = (y - camera.height/2f) / wh,
-        u2 = (x + camera.width/2f) / ww,
-        v2 = (y + camera.height/2f) / wh;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
 
         Tmp.tr1.set(shadows.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
@@ -158,15 +165,15 @@ public class BlockRenderer{
         Draw.shader();
     }
 
-    /**Process all blocks to draw.*/
+    /** Process all blocks to draw. */
     public void processBlocks(){
         iterateidx = 0;
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
 
-        int rangex = (int) (camera.width / tilesize / 2) + 3;
-        int rangey = (int) (camera.height / tilesize / 2) + 3;
+        int rangex = (int)(camera.width / tilesize / 2) + 3;
+        int rangey = (int)(camera.height / tilesize / 2) + 3;
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;
@@ -193,11 +200,11 @@ public class BlockRenderer{
 
                     if(block.expanded || !expanded){
 
-                        if(block.layer != null && block.isLayer(tile)){
+                        if(block.layer != null){
                             addRequest(tile, block.layer);
                         }
 
-                        if(block.layer2 != null && block.isLayer2(tile)){
+                        if(block.layer2 != null){
                             addRequest(tile, block.layer2);
                         }
 
@@ -234,6 +241,9 @@ public class BlockRenderer{
 
             if(req.layer == Layer.block){
                 block.draw(req.tile);
+                if(req.tile.entity != null && req.tile.entity.damaged()){
+                    block.drawCracks(req.tile);
+                }
                 if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
                     block.drawTeam(req.tile);
                 }
@@ -289,6 +299,14 @@ public class BlockRenderer{
         r.tile = tile;
         r.layer = layer;
         requestidx++;
+    }
+
+    @Override
+    public void dispose(){
+        shadows.dispose();
+        fog.dispose();
+        shadows = fog = null;
+        floor.dispose();
     }
 
     private class BlockRequest implements Comparable<BlockRequest>{

@@ -1,10 +1,10 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Lightning;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.arc.math.Mathf;
 
 public class SurgeWall extends Wall{
     protected float lightningChance = 0.05f;

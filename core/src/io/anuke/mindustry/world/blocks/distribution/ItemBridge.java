@@ -17,15 +17,10 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 import static io.anuke.mindustry.Vars.world;
@@ -117,8 +112,8 @@ public class ItemBridge extends Block{
             int rot = link.absoluteRelativeTo(x, y);
             float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);
             float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
-            Lines.rect((x + link.x)/2f * tilesize - w/2f, (y + link.y)/2f * tilesize - h/2f, w, h);
-            Fill.poly(link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, 3, 2.8f, link.absoluteRelativeTo(x, y)*90);
+            Lines.rect((x + link.x) / 2f * tilesize - w / 2f, (y + link.y) / 2f * tilesize - h / 2f, w, h);
+            Fill.poly(link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, 3, 2.8f, link.absoluteRelativeTo(x, y) * 90);
         }
         Draw.reset();
     }
@@ -130,7 +125,7 @@ public class ItemBridge extends Block{
         Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(),
-                tile.block().size * tilesize / 2f + 1f);
+        tile.block().size * tilesize / 2f + 1f);
 
         for(int i = 1; i <= range; i++){
             for(int j = 0; j < 4; j++){
@@ -140,7 +135,7 @@ public class ItemBridge extends Block{
                     Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
                     Lines.square(other.drawx(), other.drawy(),
-                            other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
+                    other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
                 }
             }
         }
@@ -234,10 +229,10 @@ public class ItemBridge extends Block{
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
-                tile.worldx(),
-                tile.worldy(),
-                other.worldx(),
-                other.worldy(), CapStyle.none, -tilesize / 2f);
+        tile.worldx(),
+        tile.worldy(),
+        other.worldx(),
+        other.worldy(), CapStyle.none, -tilesize / 2f);
 
         int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
@@ -247,10 +242,10 @@ public class ItemBridge extends Block{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float) arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
             Draw.rect(arrowRegion,
-                    tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-                    tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
+            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
+            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
         }
         Draw.reset();
     }

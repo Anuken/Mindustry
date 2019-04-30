@@ -1,12 +1,12 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.tilesize;

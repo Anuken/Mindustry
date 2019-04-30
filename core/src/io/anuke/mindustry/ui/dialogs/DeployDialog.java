@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
@@ -10,6 +11,7 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -97,6 +99,17 @@ public class DeployDialog extends FloatingDialog{
             }).growX().height(50f).pad(-12).padTop(10);
 
         }}, new ItemsDisplay()).grow();
+
+        //set up direct and indirect children
+        for(ZoneNode node : nodes){
+            node.allChildren.clear();
+            node.allChildren.addAll(node.children);
+            for(ZoneNode other : new ObjectSetIterator<>(nodes)){
+                if(Structs.contains(other.zone.zoneRequirements, req -> req.zone == node.zone)){
+                    node.allChildren.add(other);
+                }
+            }
+        }
     }
 
     boolean hidden(Zone zone){
@@ -137,7 +150,7 @@ public class DeployDialog extends FloatingDialog{
                 TextButton button = new TextButton("", "node");
                 button.setSize(node.width, node.height);
                 button.update(() -> {
-                    button.setPosition(node.x + panX + width/2f, node.y + panY + height/2f, Align.center);
+                    button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center);
                 });
                 button.clearChildren();
                 buildButton(node.zone, button);
@@ -152,10 +165,10 @@ public class DeployDialog extends FloatingDialog{
 
         @Override
         public void draw(){
-            float offsetX = panX + width/2f + x, offsetY = panY + height/2f + y;
+            float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(ZoneNode node : nodes){
-                for(ZoneNode child : node.children){
+                for(ZoneNode child : node.allChildren){
                     Lines.stroke(Unit.dp.scl(3f), node.zone.locked() || child.zone.locked() ? Pal.locked : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
@@ -168,6 +181,7 @@ public class DeployDialog extends FloatingDialog{
 
     class ZoneNode extends TreeNode<ZoneNode>{
         final Array<Zone> arr = new Array<>();
+        final Array<ZoneNode> allChildren = new Array<>();
         final Zone zone;
 
         ZoneNode(Zone zone, ZoneNode parent){

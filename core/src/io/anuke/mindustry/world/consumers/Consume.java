@@ -5,22 +5,26 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStats;
 
-/**An abstract class that defines a type of resource that a block can consume.*/
+/** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{
-    /**If true, this consumer will not influence consumer validity.*/
+    /** If true, this consumer will not influence consumer validity. */
     protected boolean optional;
-    /**If true, this consumer will be displayed as a boost input.*/
+    /** If true, this consumer will be displayed as a boost input. */
     protected boolean booster;
     protected boolean update = true;
 
-    /**Apply a filter to items accepted.
-     * This should set all item IDs that are present in the filter to true.*/
+    /**
+     * Apply a filter to items accepted.
+     * This should set all item IDs that are present in the filter to true.
+     */
     public void applyItemFilter(boolean[] filter){
 
     }
 
-    /**Apply a filter to liquids accepted.
-     * This should set all liquid IDs that are present in the filter to true.*/
+    /**
+     * Apply a filter to liquids accepted.
+     * This should set all liquid IDs that are present in the filter to true.
+     */
     public void applyLiquidFilter(boolean[] filter){
 
     }
@@ -52,7 +56,7 @@ public abstract class Consume{
 
     public abstract void build(Tile tile, Table table);
 
-    /**Called when a consumption is triggered manually.*/
+    /** Called when a consumption is triggered manually. */
     public void trigger(TileEntity entity){
 
     }

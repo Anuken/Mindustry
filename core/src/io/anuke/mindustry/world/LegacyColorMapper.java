@@ -45,7 +45,7 @@ public class LegacyColorMapper implements ContentList{
     private void map(String color, Block block, Block wall, Block ore){
         blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall, ore));
     }
-    
+
     private void map(String color, Block block, Block wall){
         blockMap.put(Color.rgba8888(Color.valueOf(color)), new LegacyBlock(block, wall));
     }
@@ -60,13 +60,13 @@ public class LegacyColorMapper implements ContentList{
         public final Block ore;
 
         public LegacyBlock(Block floor, Block wall){
-            this.floor = (Floor) floor;
+            this.floor = (Floor)floor;
             this.wall = wall;
             this.ore = null;
         }
 
         public LegacyBlock(Block floor, Block wall, Block ore){
-            this.floor = (Floor) floor;
+            this.floor = (Floor)floor;
             this.wall = wall;
             this.ore = ore;
         }

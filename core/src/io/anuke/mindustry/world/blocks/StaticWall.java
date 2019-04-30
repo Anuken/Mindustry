@@ -18,6 +18,7 @@ public class StaticWall extends Rock{
         super(name);
         breakable = alwaysReplace = false;
         solid = true;
+        variants = 2;
         cacheLayer = CacheLayer.walls;
     }
 
@@ -28,7 +29,7 @@ public class StaticWall extends Rock{
 
         if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Pos.get(rx, ry)) < 0.5){
             if(rx == tile.x && ry == tile.y){
-                Draw.rect(large, tile.worldx() + tilesize/2f, tile.worldy() + tilesize/2f);
+                Draw.rect(large, tile.worldx() + tilesize / 2f, tile.worldy() + tilesize / 2f);
             }
         }else if(variants > 0){
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
@@ -43,19 +44,11 @@ public class StaticWall extends Rock{
         large = Core.atlas.find(name + "-large");
     }
 
-    //two functions for calculating 2x2 tile brightness
-    int min(int rx, int ry){
-        return Math.min(world.tile(rx + 1, ry).getRotation(), Math.min(world.tile(rx, ry).getRotation(), Math.min(world.tile(rx + 1, ry + 1).getRotation(), world.tile(rx, ry + 1).getRotation())));
-    }
-
-    int avg(int rx, int ry){
-        return (world.tile(rx + 1, ry).getRotation() + world.tile(rx, ry).getRotation() + world.tile(rx + 1, ry + 1).getRotation() + world.tile(rx, ry + 1).getRotation()) / 4;
-    }
-
     boolean eq(int rx, int ry){
-        return world.tile(rx + 1, ry).block() == this
-            && world.tile(rx, ry + 1).block() == this
-            && world.tile(rx, ry).block() == this
-            && world.tile(rx + 1, ry + 1).block() == this;
+        return rx < world.width() - 1 && ry < world.height() - 1
+        && world.tile(rx + 1, ry).block() == this
+        && world.tile(rx, ry + 1).block() == this
+        && world.tile(rx, ry).block() == this
+        && world.tile(rx + 1, ry + 1).block() == this;
     }
 }

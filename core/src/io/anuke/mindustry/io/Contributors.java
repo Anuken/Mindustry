@@ -36,8 +36,8 @@ public class Contributors{
         @Override
         public String toString(){
             return "Contributor{" +
-                    "login='" + login + '\'' +
-                    '}';
+            "login='" + login + '\'' +
+            '}';
         }
     }
 }

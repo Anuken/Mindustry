@@ -4,10 +4,8 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.Content;
@@ -26,39 +24,39 @@ public abstract class BulletType extends Content{
     public boolean pierce;
     public Effect hitEffect, despawnEffect;
 
-    /**Effect created when shooting.*/
+    /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
-    /**Extra smoke effect created when shooting.*/
+    /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
-    /**Extra inaccuracy when firing.*/
+    /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
-    /**How many bullets get created per ammo item/liquid.*/
+    /** How many bullets get created per ammo item/liquid. */
     public float ammoMultiplier = 1f;
-    /**Multiplied by turret reload speed to get final shoot speed.*/
+    /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
-    /**Recoil from shooter entities.*/
+    /** Recoil from shooter entities. */
     public float recoil;
 
     public float splashDamage = 0f;
-    /**Knockback in velocity.*/
+    /** Knockback in velocity. */
     public float knockback;
-    /**Whether this bullet hits tiles.*/
+    /** Whether this bullet hits tiles. */
     public boolean hitTiles = true;
-    /**Status effect applied on hit.*/
+    /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
-    /**Intensity of applied status effect in terms of duration.*/
+    /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 1f;
-    /**Whether to sync this bullet to clients.*/
+    /** Whether to sync this bullet to clients. */
     public boolean syncable;
-    /**Whether this bullet type collides with tiles.*/
+    /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
-    /**Whether this bullet type collides with tiles that are of the same team.*/
+    /** Whether this bullet type collides with tiles that are of the same team. */
     public boolean collidesTeam = false;
-    /**Whether this bullet type collides with air units.*/
+    /** Whether this bullet type collides with air units. */
     public boolean collidesAir = true;
-    /**Whether this bullet types collides with anything at all.*/
+    /** Whether this bullet types collides with anything at all. */
     public boolean collides = true;
-    /**Whether velocity is inherited from the shooter.*/
+    /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
 
     //additional effects
@@ -67,7 +65,7 @@ public abstract class BulletType extends Content{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     public BulletType fragBullet = null;
 
-    /**Use a negative value to disable splash damage.*/
+    /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
 
     public int incendAmount = 0;
@@ -90,7 +88,7 @@ public abstract class BulletType extends Content{
         despawnEffect = Fx.hitBulletSmall;
     }
 
-    /**Returns maximum distance the bullet this bullet type has can travel.*/
+    /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
         return speed * lifetime * (1f - drag);
     }
@@ -136,7 +134,7 @@ public abstract class BulletType extends Content{
             hit(b);
         }
 
-        for (int i = 0; i < lightining; i++) {
+        for(int i = 0; i < lightining; i++){
             Lightning.create(b.getTeam(), Pal.surge, damage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
@@ -150,7 +148,7 @@ public abstract class BulletType extends Content{
     public void update(Bullet b){
 
         if(homingPower > 0.0001f){
-            TargetTrait target = Units.getClosestTarget(b.getTeam(), b.x, b.y, homingRange);
+            TargetTrait target = Units.closestTarget(b.getTeam(), b.x, b.y, homingRange);
             if(target != null){
                 b.velocity().setAngle(Mathf.slerpDelta(b.velocity().angle(), b.angleTo(target), 0.08f));
             }

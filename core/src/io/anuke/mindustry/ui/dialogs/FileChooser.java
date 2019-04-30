@@ -10,25 +10,18 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
 public class FileChooser extends FloatingDialog{
-    public static Predicate<FileHandle> pngFilter = file -> file.extension().equalsIgnoreCase("png");
-    public static Predicate<FileHandle> mapFilter = file -> file.extension().equalsIgnoreCase(Vars.mapExtension);
-    public static Predicate<FileHandle> jpegFilter = file -> file.extension().equalsIgnoreCase("png") || file.extension().equalsIgnoreCase("jpg") || file.extension().equalsIgnoreCase("jpeg");
-    public static Predicate<FileHandle> defaultFilter = file -> true;
+    private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
+    private static FileHandle lastDirectory = homeDirectory;
+
     private Table files;
-    private FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" :
-            Core.files.getExternalStoragePath());
-    private FileHandle directory = homeDirectory;
+    private FileHandle directory = lastDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
     private TextButton ok;
@@ -119,6 +112,7 @@ public class FileChooser extends FloatingDialog{
         home.resizeImage(isize);
         home.clicked(() -> {
             directory = homeDirectory;
+            lastDirectory = directory;
             updateFiles(true);
         });
 
@@ -141,7 +135,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(UIUtils.portrait() ? Core.graphics.getWidth() / Unit.dp.scl(1) : Core.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).width(Core.graphics.isPortrait() ? Core.graphics.getWidth() / Unit.dp.scl(1) : Core.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
         content.row();
 
         if(!open){
@@ -200,6 +194,7 @@ public class FileChooser extends FloatingDialog{
             TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
             upbutton.clicked(() -> {
                 directory = directory.parent();
+                lastDirectory = directory;
                 updateFiles(true);
             });
 
@@ -228,6 +223,7 @@ public class FileChooser extends FloatingDialog{
                     updateFileFieldStatus();
                 }else{
                     directory = directory.child(filename);
+                    lastDirectory = directory;
                     updateFiles(true);
                 }
             });
@@ -241,7 +237,7 @@ public class FileChooser extends FloatingDialog{
             button.add(image).padRight(4f).size(14 * 2f);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
-                    .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
+            .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
             button.getLabel().setAlignment(Align.left);
             files.row();
         }
@@ -298,12 +294,14 @@ public class FileChooser extends FloatingDialog{
             if(!canBack()) return;
             index--;
             directory = history.get(index - 1);
+            lastDirectory = directory;
             updateFiles(false);
         }
 
         public void forward(){
             if(!canForward()) return;
             directory = history.get(index);
+            lastDirectory = directory;
             index++;
             updateFiles(false);
         }

@@ -18,7 +18,7 @@ public class PausedDialog extends FloatingDialog{
         shown(this::rebuild);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK) {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
                 hide();
             }
         });
@@ -37,7 +37,7 @@ public class PausedDialog extends FloatingDialog{
             float dw = 210f;
             cont.defaults().width(dw).height(50).pad(5f);
 
-            cont.addButton("$back", this::hide).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$back", this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
             if(world.isZone()){
@@ -55,7 +55,7 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw*2 + 20f);
+            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
 
@@ -97,7 +97,7 @@ public class PausedDialog extends FloatingDialog{
 
     public void runExitSave(){
         if(control.saves.getCurrent() == null ||
-                !control.saves.getCurrent().isAutosave()){
+        !control.saves.getCurrent().isAutosave()){
             state.set(State.menu);
             return;
         }
@@ -107,7 +107,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-               ui.showError("[accent]" + Core.bundle.get("savefail"));
+                ui.showError("[accent]" + Core.bundle.get("savefail"));
             }
             state.set(State.menu);
         });

@@ -25,6 +25,10 @@ public class EntityGroup<T extends Entity>{
         this.useTree = useTree;
         this.id = lastid++;
         this.type = type;
+
+        if(useTree){
+            tree = new QuadTree<>(Entities.maxLeafObjects, new Rectangle(0, 0, 0, 0));
+        }
     }
 
     public boolean useTree(){
@@ -105,12 +109,23 @@ public class EntityGroup<T extends Entity>{
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public void intersect(float x, float y, float width, float height, Consumer<? super T> out){
+        //don't waste time for empty groups
+        if(isEmpty()) return;
+        tree().getIntersect(out, x, y, width, height);
+    }
+
     public QuadTree tree(){
+        if(!useTree) throw new RuntimeException("This group does not support quadtrees! Enable quadtrees when creating it.");
         return tree;
     }
 
-    public void setTree(float x, float y, float w, float h){
-        tree = new QuadTree<>(Entities.maxLeafObjects, new Rectangle(x, y, w, h));
+    /** Resizes the internal quadtree, if it is enabled.*/
+    public void resize(float x, float y, float w, float h){
+        if(useTree){
+            tree = new QuadTree<>(Entities.maxLeafObjects, new Rectangle(x, y, w, h));
+        }
     }
 
     public boolean isEmpty(){
@@ -180,15 +195,8 @@ public class EntityGroup<T extends Entity>{
         return null;
     }
 
-    /**Returns the logic-only array for iteration.*/
+    /** Returns the logic-only array for iteration. */
     public Array<T> all(){
         return entityArray;
-    }
-
-    public void forEach(Consumer<T> cons){
-
-        for(T t : entityArray){
-            cons.accept(t);
-        }
     }
 }

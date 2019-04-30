@@ -1,9 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;

@@ -2,14 +2,12 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 
-/**A GenericCrafter with a new glowing region drawn on top.*/
+/** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
     protected Color flameColor = Color.valueOf("ffc999");
     protected TextureRegion topRegion;

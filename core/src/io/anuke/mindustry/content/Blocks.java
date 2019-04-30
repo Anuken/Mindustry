@@ -2,18 +2,12 @@ package io.anuke.mindustry.content;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.CacheLayer;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.type.Category;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.LiquidStack;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
@@ -23,13 +17,8 @@ import io.anuke.mindustry.world.blocks.distribution.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
-import io.anuke.mindustry.world.blocks.storage.LaunchPad;
-import io.anuke.mindustry.world.blocks.storage.Unloader;
-import io.anuke.mindustry.world.blocks.storage.Vault;
-import io.anuke.mindustry.world.blocks.units.MechPad;
-import io.anuke.mindustry.world.blocks.units.RepairPoint;
-import io.anuke.mindustry.world.blocks.units.UnitFactory;
+import io.anuke.mindustry.world.blocks.storage.*;
+import io.anuke.mindustry.world.blocks.units.*;
 import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.Attribute;
 import io.anuke.mindustry.world.modules.LiquidModule;
@@ -42,16 +31,19 @@ public class Blocks implements ContentList{
 
     //environment
     air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
-    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, whiteTree, whiteTreeDead, sporeCluster,
+    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
+    creeptree,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    pebbles, tendrils,
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, sporePress, pulverizer, incinerator,
+    melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
     powerVoid, powerSource, itemSource, liquidSource, itemVoid,
@@ -85,21 +77,31 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    alphaDartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
         //region environment
 
-        air = new Floor("air"){{
+        air = new Floor("air"){
+            {
                 alwaysReplace = true;
                 hasShadow = false;
             }
 
-            public void draw(Tile tile){}
-            public void load(){}
-            public void init(){}
-            public boolean isHidden(){ return true; }
+            public void draw(Tile tile){
+            }
+
+            public void load(){
+            }
+
+            public void init(){
+            }
+
+            public boolean isHidden(){
+                return true;
+            }
+
             public TextureRegion[] variantRegions(){
                 if(variantRegions == null){
                     variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
@@ -110,9 +112,7 @@ public class Blocks implements ContentList{
 
         part = new BlockPart();
 
-        spawn = new Block("spawn"){
-            public void drawShadow(Tile tile){}
-        };
+        spawn = new Block("spawn");
 
         //Registers build blocks from size 1-6
         //no reference is needed here since they can be looked up by name later
@@ -198,7 +198,7 @@ public class Blocks implements ContentList{
         }};
 
         craters = new Floor("craters"){{
-            variants = 6;
+            variants = 3;
             blendGroup = stone;
         }};
 
@@ -252,13 +252,11 @@ public class Blocks implements ContentList{
             dragMultiplier = 1f;
             speedMultiplier = 1f;
             attributes.set(Attribute.water, 0.4f);
-            edgeStyle = "blocky";
         }};
 
         iceSnow = new Floor("ice-snow"){{
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         cliffs = new StaticWall("cliffs"){{
@@ -298,6 +296,9 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        saltRocks = new StaticWall("saltrocks"){{
+        }};
+
         sporePine = new StaticWall("spore-pine"){{
             variants = 0;
         }};
@@ -306,11 +307,19 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
+        shrubs = new StaticWall("shrubs"){{
+
+        }};
+
         whiteTreeDead = new TreeBlock("white-tree-dead"){{
         }};
 
         whiteTree = new TreeBlock("white-tree"){{
         }};
+
+        creeptree = new TreeBlock("creeptree"){{
+        }};
+
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
@@ -337,7 +346,6 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            edgeStyle = "blocky";
         }};
 
         metalFloor = new Floor("metal-floor"){{
@@ -345,7 +353,7 @@ public class Blocks implements ContentList{
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 6;
+            variants = 3;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
@@ -359,6 +367,19 @@ public class Blocks implements ContentList{
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
         }};
+
+        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
+        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
+        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
+        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
+        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
+        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+
+        darkMetal = new StaticWall("dark-metal");
+
+        pebbles = new OverlayFloor("pebbles");
+
+        tendrils = new OverlayFloor("tendrils");
 
         //endregion
         //region ore
@@ -630,7 +651,7 @@ public class Blocks implements ContentList{
             }
 
             int liquidRegion = reg("-liquid");
-            int topRegion =reg("-top");
+            int topRegion = reg("-top");
 
             drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
 
@@ -638,7 +659,7 @@ public class Blocks implements ContentList{
                 GenericCrafterEntity entity = tile.entity();
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
-                Draw.rect(reg(frameRegions[(int) Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
+                Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
                 Draw.color(Color.CLEAR, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
@@ -667,6 +688,18 @@ public class Blocks implements ContentList{
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(rotatorRegion), tile.drawx(), tile.drawy(), entity.totalProgress * 2f);
             };
+        }};
+
+        coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 40, Items.graphite, 80, Items.lead, 60));
+            craftEffect = Fx.smeltsmoke;
+            outputItem = new ItemStack(Items.coal, 1);
+            craftTime = 30f;
+            size = 2;
+            hasPower = hasItems = hasLiquids = true;
+
+            consumes.liquid(Liquids.oil, 0.09f);
+            consumes.power(0.5f);
         }};
 
         incinerator = new Incinerator("incinerator"){{
@@ -864,8 +897,8 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 3), true);
             speed = 26;
-            capacity = 32;
-            health = 25;
+            capacity = 15;
+            health = 30;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -1078,8 +1111,8 @@ public class Blocks implements ContentList{
             powerProduction = 110f;
             itemDuration = 40f;
             consumes.power(25f);
-            consumes.item(Items.blastCompound).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.3f);
+            consumes.item(Items.blastCompound);
+            consumes.liquid(Liquids.cryofluid, 0.26f);
         }};
 
         //endregion power
@@ -1277,7 +1310,7 @@ public class Blocks implements ContentList{
             inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 260*size*size;
+            health = 260 * size * size;
         }};
 
         scorch = new ItemTurret("scorch"){{
@@ -1325,7 +1358,7 @@ public class Blocks implements ContentList{
             shootCone = 50f;
             shootEffect = Fx.shootLiquid;
             range = 110f;
-            health = 250*size*size;
+            health = 250 * size * size;
 
             drawer = (tile, entity) -> {
                 Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -1356,7 +1389,7 @@ public class Blocks implements ContentList{
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.RED;
             size = 2;
-            health = 280*size*size;
+            health = 280 * size * size;
             targetAir = false;
         }};
 
@@ -1391,7 +1424,7 @@ public class Blocks implements ContentList{
             range = 140f;
             xRand = 6f;
             size = 2;
-            health = 300*size*size;
+            health = 300 * size * size;
         }};
 
         salvo = new BurstTurret("salvo"){{
@@ -1508,14 +1541,14 @@ public class Blocks implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            powerUsed = 0.5f;
-            consumes.powerBuffered(1200f);
             range = 190f;
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
+            powerUsed = 1f / 2f;
 
             health = 200 * size * size;
+            consumes.powerBuffered(1200f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
@@ -1614,9 +1647,9 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        alphaDartPad = new MechPad("alpha-dart-mech-pad"){{
+        dartPad = new MechPad("dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
-            mech = Mechs.alpha;
+            mech = Mechs.dart;
             size = 2;
             consumes.powerBuffered(50f);
         }};

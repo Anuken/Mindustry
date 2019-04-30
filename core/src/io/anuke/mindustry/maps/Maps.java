@@ -18,16 +18,12 @@ import java.io.StringWriter;
 import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
-    /** List of all built-in maps. Filenames only.*/
+    /** List of all built-in maps. Filenames only. */
     private static final String[] defaultMapNames = {"fortress"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
-    /** Serializer for meta.*/
+    /** Serializer for meta. */
     private Json json = new Json();
-
-    public Maps(){
-
-    }
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -81,8 +77,10 @@ public class Maps implements Disposable{
         load();
     }
 
-    /** Save a custom map to the directory. This updates all values and stored data necessary.
-     * The tags are copied to prevent mutation later.*/
+    /**
+     * Save a custom map to the directory. This updates all values and stored data necessary.
+     * The tags are copied to prevent mutation later.
+     */
     public void saveMap(ObjectMap<String, String> baseTags, Tile[][] data){
 
         try{
@@ -162,12 +160,12 @@ public class Maps implements Disposable{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
-    /** Find a new filename to put a map to.*/
+    /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
         int i = maps.size;
         while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
-            i ++;
+            i++;
         }
         return customMapDirectory.child("map_" + i + "." + mapExtension);
     }

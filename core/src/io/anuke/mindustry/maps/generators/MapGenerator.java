@@ -6,10 +6,9 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -26,16 +25,15 @@ public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
     private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
-    private Loadout loadout;
-    /**How much the landscape is randomly distorted.*/
+    /** How much the landscape is randomly distorted. */
     public float distortion = 3;
-    /**The amount of final enemy spawns used. -1 to use everything in the map.
-     * This amount of enemy spawns is selected randomly from the map.*/
+    /**
+     * The amount of final enemy spawns used. -1 to use everything in the map.
+     * This amount of enemy spawns is selected randomly from the map.
+     */
     public int enemySpawns = -1;
-    /**Whether floor is distorted along with blocks.*/
+    /** Whether floor is distorted along with blocks. */
     public boolean distortFloor = false;
-    /**Items randomly added to containers and vaults.*/
-    public ItemStack[] storageDrops = ItemStack.with(Items.copper, 300, Items.lead, 300, Items.silicon, 200, Items.graphite, 200, Items.blastCompound, 200);
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
@@ -44,11 +42,6 @@ public class MapGenerator extends Generator{
     public MapGenerator(String mapName, int enemySpawns){
         this.mapName = mapName;
         this.enemySpawns = enemySpawns;
-    }
-
-    public MapGenerator drops(ItemStack[] drops){
-        this.storageDrops = drops;
-        return this;
     }
 
     public MapGenerator decor(Decoration... decor){
@@ -115,16 +108,16 @@ public class MapGenerator extends Generator{
                     int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, width - 1);
                     int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, height - 1);
 
-                    if((tile.block() instanceof StaticWall
+                    if(((tile.block() instanceof StaticWall
                     && tiles[newX][newY].block() instanceof StaticWall)
                     || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
-                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)){
+                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)) && tiles[newX][newY].block() != Blocks.spawn && tile.block() != Blocks.spawn){
                         tile.setBlock(tiles[newX][newY].block());
                     }
 
                     if(distortFloor){
                         tile.setFloor(tiles[newX][newY].floor());
-                        tile.setOre(tiles[newX][newY].ore());
+                        tile.setOverlay(tiles[newX][newY].overlay());
                     }
 
                     for(Decoration decor : decorations){
@@ -139,10 +132,10 @@ public class MapGenerator extends Generator{
                         }
                     }
 
-                    if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock)){
-                        for(ItemStack stack : storageDrops){
+                    if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
+                        for(Item item : world.getZone().resources){
                             if(Mathf.chance(0.3)){
-                                tile.entity.items.add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));
+                                tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
                             }
                         }
                     }
@@ -151,7 +144,7 @@ public class MapGenerator extends Generator{
 
             if(enemySpawns != -1){
                 if(enemySpawns > enemies.size){
-                    throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number.");
+                    throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number for map: " + mapName);
                 }
 
                 enemies.shuffle();
@@ -167,7 +160,7 @@ public class MapGenerator extends Generator{
                             double dst = Mathf.dst(x, y);
                             if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
                                 Tile tile = tiles[wx][wy];
-                                tile.clearOre();
+                                tile.clearOverlay();
                             }
                         }
                     }

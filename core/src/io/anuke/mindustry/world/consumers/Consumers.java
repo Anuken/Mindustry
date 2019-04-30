@@ -2,9 +2,7 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.meta.BlockStats;
 
 public class Consumers{
@@ -57,7 +55,7 @@ public class Consumers{
     /**
      * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
      * @param powerCapacity The maximum capacity in power units.
-     * @param ticksToFill   The number of ticks it shall take to fill the buffer.
+     * @param ticksToFill The number of ticks it shall take to fill the buffer.
      */
     public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
         return add(new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true));
@@ -93,7 +91,7 @@ public class Consumers{
         if(map[type.ordinal()] == null){
             throw new IllegalArgumentException("Block does not contain consumer of type '" + type + "'!");
         }
-        return (T) map[type.ordinal()];
+        return (T)map[type.ordinal()];
     }
 
     public Consume[] all(){

@@ -16,14 +16,11 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Pos;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float shockwaveBase = 380f, shockwaveRand = 0f, maxShockwaveDst = shockwaveBase + shockwaveRand;
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
     private IntArray loadedSpawns = new IntArray();
@@ -56,16 +53,16 @@ public class WaveSpawner{
         return groundSpawns.size;
     }
 
-    /**@return true if the player is near a ground spawn point.*/
+    /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < maxShockwaveDst) > 0;
+        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius) > 0;
     }
 
     public void spawnEnemies(){
         spawning = true;
 
         for(SpawnGroup group : state.rules.spawns){
-            int spawned = group.getUnitsSpawned(state.wave);
+            int spawned = group.getUnitsSpawned(state.wave - 1);
 
             float spawnX, spawnY;
             float spread;
@@ -88,7 +85,7 @@ public class WaveSpawner{
                 for(GroundSpawn spawn : groundSpawns){
                     spawnX = spawn.x * tilesize;
                     spawnY = spawn.y * tilesize;
-                    spread = tilesize*2;
+                    spread = tilesize * 2;
 
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
@@ -96,11 +93,11 @@ public class WaveSpawner{
                         BaseUnit unit = group.createUnit(waveTeam);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
 
-                        Time.run(Math.min(i*5, 60*2), () -> shockwave(unit));
+                        Time.run(Math.min(i * 5, 60 * 2), () -> shockwave(unit));
                     }
                     Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
                     //would be interesting to see player structures survive this without hacks
-                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, shockwaveBase + Mathf.random(shockwaveRand), 99999999f, true));
+                    Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, state.rules.dropZoneRadius, 99999999f, true));
                 }
             }
         }
@@ -125,7 +122,6 @@ public class WaveSpawner{
 
                     //hide spawnpoints, they have served their purpose
                     world.tile(x, y).setBlock(Blocks.air);
-                    Log.info("Add spawn "+ x + " " + y);
                 }
             }
         }
@@ -145,7 +141,7 @@ public class WaveSpawner{
         groundSpawns.add(spawn);
 
         FlyerSpawn fspawn = new FlyerSpawn();
-        fspawn.angle = Angles.angle(world.width()/2f, world.height()/2f, x, y);
+        fspawn.angle = Angles.angle(world.width() / 2f, world.height() / 2f, x, y);
         flySpawns.add(fspawn);
     }
 

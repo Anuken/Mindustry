@@ -50,7 +50,7 @@ public class OverlayRenderer{
                 }
             }
 
-            Units.allUnits(unit -> {
+            Units.all(unit -> {
                 if(unit != player && unit.getTeam() != player.getTeam() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
                     Tmp.v1.set(unit.x, unit.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
@@ -76,7 +76,7 @@ public class OverlayRenderer{
         buildFadeTime = Mathf.lerpDelta(buildFadeTime, input.isPlacing() ? 1f : 0f, 0.06f);
 
         Draw.reset();
-        Lines.stroke(buildFadeTime*2f);
+        Lines.stroke(buildFadeTime * 2f);
 
         if(buildFadeTime > 0.005f){
             for(Team enemy : state.teams.enemiesOf(player.getTeam())){

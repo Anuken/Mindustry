@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities.effect;
 
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Time;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.Effects.EffectRenderer;
 import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 
 /**
@@ -17,7 +17,7 @@ public class GroundEffectEntity extends EffectEntity{
 
     @Override
     public void update(){
-        GroundEffect effect = (GroundEffect) this.effect;
+        GroundEffect effect = (GroundEffect)this.effect;
 
         if(effect.isStatic){
             time += Time.delta();
@@ -41,7 +41,7 @@ public class GroundEffectEntity extends EffectEntity{
 
     @Override
     public void draw(){
-        GroundEffect effect = (GroundEffect) this.effect;
+        GroundEffect effect = (GroundEffect)this.effect;
 
         if(once && effect.isStatic)
             Effects.renderEffect(id, effect, color, lifetime(), rotation, x, y, data);

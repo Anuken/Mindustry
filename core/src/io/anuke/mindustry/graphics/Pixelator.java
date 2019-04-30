@@ -2,6 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Blending;
+import io.anuke.arc.graphics.Texture.TextureFilter;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.Disposable;
@@ -14,6 +15,10 @@ import static io.anuke.mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer(2, 2);
+
+    {
+        buffer.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+    }
 
     public void drawPixelate(){
         float pre = renderer.getScale();

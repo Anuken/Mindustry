@@ -3,6 +3,9 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -11,13 +14,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.ItemSelection;
 import io.anuke.mindustry.world.meta.BlockGroup;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.math.Mathf;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -90,9 +88,9 @@ public class Sorter extends Block{
             Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
             Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
             boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
-                    a.block().acceptItem(item, a, dest);
+            a.block().acceptItem(item, a, dest);
             boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
-                    b.block().acceptItem(item, b, dest);
+            b.block().acceptItem(item, b, dest);
 
             if(ac && !bc){
                 to = a;
@@ -104,11 +102,11 @@ public class Sorter extends Block{
                 if(dest.getDump() == 0){
                     to = a;
                     if(flip)
-                        dest.setDump((byte) 1);
+                        dest.setDump((byte)1);
                 }else{
                     to = b;
                     if(flip)
-                        dest.setDump((byte) 0);
+                        dest.setDump((byte)0);
                 }
             }
         }

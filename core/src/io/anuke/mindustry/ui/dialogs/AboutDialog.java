@@ -1,21 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.OS;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.layout.Cell;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
 
 import static io.anuke.mindustry.Vars.ios;
 import static io.anuke.mindustry.Vars.ui;
@@ -39,8 +38,8 @@ public class AboutDialog extends FloatingDialog{
         cont.clear();
         buttons.clear();
 
-        float h = UIUtils.portrait() ? 90f : 80f;
-        float w = UIUtils.portrait() ? 330f : 600f;
+        float h = Core.graphics.isPortrait() ? 90f : 80f;
+        float w = Core.graphics.isPortrait() ? 330f : 600f;
 
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
@@ -91,7 +90,7 @@ public class AboutDialog extends FloatingDialog{
             buttons.addButton("$changelog.title", ui.changelog::show).size(200f, 64f);
         }
 
-        if(UIUtils.portrait()){
+        if(Core.graphics.isPortrait()){
             for(Cell<?> cell : buttons.getCells()){
                 cell.width(140f);
             }

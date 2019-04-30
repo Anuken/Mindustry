@@ -9,9 +9,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidBase;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -35,7 +33,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         super.update(tile);
 
         LaserTurretEntity entity = tile.entity();
@@ -72,8 +70,8 @@ public class LaserTurret extends PowerTurret{
             Liquid liquid = entity.liquids.current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity));
-            entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
+            float used = Math.min(entity.liquids.get(liquid), maxUsed * Time.delta());
+            entity.reload += used;
             entity.liquids.remove(liquid, used);
 
             if(Mathf.chance(0.06 * used)){

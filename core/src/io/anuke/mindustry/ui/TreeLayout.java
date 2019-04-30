@@ -1,5 +1,3 @@
-
-
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.collection.FloatArray;
@@ -108,7 +106,7 @@ public class TreeLayout{
     }
 
     private TreeNode getAncestor(TreeNode node){
-        return  node.ancestor != null ? node.ancestor : node;
+        return node.ancestor != null ? node.ancestor : node;
     }
 
     private float getDistance(TreeNode v, TreeNode w){
@@ -211,7 +209,7 @@ public class TreeLayout{
         float shift = 0;
         float change = 0;
 
-        for(int i = v.children.length - 1; i >= 0; i --){
+        for(int i = v.children.length - 1; i >= 0; i--){
             TreeNode w = v.children[i];
             change = change + w.change;
             w.prelim += shift;
@@ -236,7 +234,7 @@ public class TreeLayout{
                 previousChild = w;
             }
             executeShifts(v);
-            float midpoint = (v.children[0].prelim + v.children[v.children.length-1].prelim) / 2f;
+            float midpoint = (v.children[0].prelim + v.children[v.children.length - 1].prelim) / 2f;
             if(leftSibling != null){
                 v.prelim = leftSibling.prelim + getDistance(v, leftSibling);
                 v.mode = v.prelim - midpoint;

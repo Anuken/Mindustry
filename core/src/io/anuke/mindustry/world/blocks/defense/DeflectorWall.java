@@ -4,12 +4,10 @@ import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
@@ -56,7 +54,7 @@ public class DeflectorWall extends Wall{
         bullet.hitbox(rect2);
 
         Vector2 position = Geometry.raycastRect(bullet.x, bullet.y, bullet.x + bullet.velocity().x, bullet.y + bullet.velocity().y,
-                rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
+        rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
 
         if(position != null){
             bullet.set(position.x, position.y);
@@ -73,7 +71,7 @@ public class DeflectorWall extends Wall{
         bullet.scaleTime(1f);
         bullet.supress();
 
-        ((DeflectorEntity) entity).hit = 1f;
+        ((DeflectorEntity)entity).hit = 1f;
     }
 
     @Override

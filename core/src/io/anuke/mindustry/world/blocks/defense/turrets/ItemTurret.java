@@ -14,9 +14,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.values.AmmoListValue;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 30;
@@ -27,7 +25,7 @@ public class ItemTurret extends CooledTurret{
         hasItems = true;
     }
 
-    /**Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...]*/
+    /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     protected void ammo(Object... objects){
         ammo = OrderedMap.of(objects);
     }
@@ -40,6 +38,15 @@ public class ItemTurret extends CooledTurret{
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
     }
 
+    @Override
+    public void onProximityAdded(Tile tile){
+        super.onProximityAdded(tile);
+
+        //add first ammo item to cheaty blocks so they can shoot properly
+        if(tile.isEnemyCheat() && ammo.size > 0){
+            handleItem(ammo.entries().next().key, tile, tile);
+        }
+    }
 
     @Override
     public void displayBars(Tile tile, Table bars){
@@ -59,7 +66,7 @@ public class ItemTurret extends CooledTurret{
 
         if(type == null) return 0;
 
-        return Math.min((int) ((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
+        return Math.min((int)((maxAmmo - entity.totalAmmo) / ammo.get(item).ammoMultiplier), amount);
     }
 
     @Override
@@ -96,7 +103,7 @@ public class ItemTurret extends CooledTurret{
         }
 
         //must not be found
-        entity.ammo.add(new ItemEntry(item, (int) type.ammoMultiplier));
+        entity.ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
     }
 
     @Override

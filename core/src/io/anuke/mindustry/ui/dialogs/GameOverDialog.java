@@ -31,7 +31,7 @@ public class GameOverDialog extends FloatingDialog{
         buttons.margin(10);
 
         if(state.rules.pvp){
-            cont.add(Core.bundle.format("gameover.pvp",winner.localized())).pad(6);
+            cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
             buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
@@ -63,7 +63,7 @@ public class GameOverDialog extends FloatingDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Icon.medium)).size(8 *3).pad(4);
+                                items.addImage(item.icon(Icon.medium)).size(8 * 3).pad(4);
                             }).left();
                             t.row();
                         }

@@ -1,9 +1,7 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.math.geom.*;
 
 import java.util.Arrays;
 
@@ -22,8 +20,8 @@ public class Edges{
         }
 
         for(int i = 0; i < maxSize; i++){
-            int bot = -(int) (i / 2f) - 1;
-            int top = (int) (i / 2f + 0.5f) + 1;
+            int bot = -(int)(i / 2f) - 1;
+            int top = (int)(i / 2f + 0.5f) + 1;
             edges[i] = new Point2[(i + 1) * 4];
 
             int idx = 0;
@@ -45,8 +43,8 @@ public class Edges{
 
             for(int j = 0; j < edges[i].length; j++){
                 Point2 point = edges[i][j];
-                edgeInside[i][j] = new Point2(Mathf.clamp(point.x, -(int) ((i) / 2f), (int) (i / 2f + 0.5f)),
-                        Mathf.clamp(point.y, -(int) ((i) / 2f), (int) (i / 2f + 0.5f)));
+                edgeInside[i][j] = new Point2(Mathf.clamp(point.x, -(int)((i) / 2f), (int)(i / 2f + 0.5f)),
+                Mathf.clamp(point.y, -(int)((i) / 2f), (int)(i / 2f + 0.5f)));
             }
         }
     }
@@ -55,13 +53,13 @@ public class Edges{
         if(!tile.block().isMultiblock()) return tile;
         int size = tile.block().size;
         return world.tile(tile.x + Mathf.clamp(other.x - tile.x, -(size - 1) / 2, (size / 2)),
-                tile.y + Mathf.clamp(other.y - tile.y, -(size - 1) / 2, (size / 2)));
+        tile.y + Mathf.clamp(other.y - tile.y, -(size - 1) / 2, (size / 2)));
     }
 
     public static Vector2[] getPixelPolygon(float radius){
         if(radius < 1 || radius > maxRadius)
             throw new RuntimeException("Polygon size must be between 1 and " + maxRadius);
-        return polygons[(int) (radius * 2) - 1];
+        return polygons[(int)(radius * 2) - 1];
     }
 
     public static Point2[] getEdges(int size){

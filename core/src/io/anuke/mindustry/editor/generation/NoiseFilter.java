@@ -14,12 +14,12 @@ public class NoiseFilter extends GenerateFilter{
 
     {
         options(
-            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-            new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
-            new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
-            new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-            new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
-            new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
+        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+        new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
+        new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
+        new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+        new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
         );
     }
 

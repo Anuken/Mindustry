@@ -6,7 +6,6 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
@@ -21,20 +20,18 @@ import io.anuke.mindustry.type.Weapon;
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
-    /**These are not new mechs, just re-assignments for convenience.*/
-    public static Mech starterDesktop, starterMobile;
+    public static Mech starter;
 
     @Override
     public void load(){
 
         alpha = new Mech("alpha-mech", false){
-
             {
                 drillPower = 1;
                 mineSpeed = 1.5f;
                 mass = 1.2f;
                 speed = 0.5f;
-                boostSpeed = 0.85f;
+                boostSpeed = 0.95f;
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
                 health = 300f;
@@ -50,7 +47,7 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                player.healBy(Time.delta() * 0.1f);
+                player.healBy(Time.delta() * 0.09f);
             }
 
             @Override
@@ -80,7 +77,7 @@ public class Mechs implements ContentList{
                     reload = 40f;
                     shotDelay = 3f;
                     roundrobin = true;
-                    shots = 3;
+                    shots = 2;
                     inaccuracy = 0f;
                     ejectEffect = Fx.none;
                     bullet = Bullets.lightning;
@@ -103,7 +100,6 @@ public class Mechs implements ContentList{
             float healRange = 60f;
             float healAmount = 10f;
             float healReload = 160f;
-            Rectangle rect = new Rectangle();
             boolean wasHealed;
 
             {
@@ -137,15 +133,12 @@ public class Mechs implements ContentList{
                 if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
 
-                    rect.setSize(healRange*2f).setCenter(player.x, player.y);
-                    Units.getNearby(player.getTeam(), rect, unit -> {
-                        if(unit.dst(player) <= healRange){
-                            if(unit.health < unit.maxHealth()){
-                                Effects.effect(Fx.heal, unit);
-                                wasHealed = true;
-                            }
-                            unit.healBy(healAmount);
+                    Units.nearby(player.getTeam(), player.x, player.y, healRange, unit -> {
+                        if(unit.health < unit.maxHealth()){
+                            Effects.effect(Fx.heal, unit);
+                            wasHealed = true;
                         }
+                        unit.healBy(healAmount);
                     });
 
                     if(wasHealed){
@@ -192,7 +185,7 @@ public class Mechs implements ContentList{
 
             @Override
             public float spreadX(Player player){
-                return player.shootHeat*2f;
+                return player.shootHeat * 2f;
             }
 
             @Override
@@ -203,7 +196,7 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                float scl = 1f - player.shootHeat/2f;
+                float scl = 1f - player.shootHeat / 2f;
                 player.velocity().scl(scl);
             }
 
@@ -230,9 +223,9 @@ public class Mechs implements ContentList{
             {
                 drillPower = 1;
                 mineSpeed = 0.9f;
-                speed = 0.4f;
-                drag = 0.1f;
-                health = 180f;
+                speed = 0.5f;
+                drag = 0.09f;
+                health = 200f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
@@ -240,16 +233,11 @@ public class Mechs implements ContentList{
                 buildPower = 1.1f;
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
-                    reload = 20f;
+                    reload = 15f;
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
-            }
-
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
             }
         };
 
@@ -257,6 +245,7 @@ public class Mechs implements ContentList{
             float minV = 3.6f;
             float maxV = 6f;
             TextureRegion shield;
+
             {
                 drillPower = -1;
                 speed = 0.11f;
@@ -292,7 +281,7 @@ public class Mechs implements ContentList{
             @Override
             public void updateAlt(Player player){
                 float scl = scld(player);
-                if(Mathf.chance(Time.delta() * (0.15*scl))){
+                if(Mathf.chance(Time.delta() * (0.15 * scl))){
                     Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);
                     Lightning.create(player.getTeam(), Pal.lancerLaser, 10f,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
@@ -304,9 +293,9 @@ public class Mechs implements ContentList{
                 float scl = scld(player);
                 if(scl < 0.01f) return;
                 Draw.color(Pal.lancerLaser);
-                Draw.alpha(scl/2f);
+                Draw.alpha(scl / 2f);
                 Draw.blend(Blending.additive);
-                Draw.rect(shield, player.x + Mathf.range(scl/2f), player.y + Mathf.range(scl/2f), player.rotation - 90);
+                Draw.rect(shield, player.x + Mathf.range(scl / 2f), player.y + Mathf.range(scl / 2f), player.rotation - 90);
                 Draw.blend();
             }
 
@@ -370,7 +359,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starterDesktop = alpha;
-        starterMobile = dart;
+        starter = alpha;
     }
 }

@@ -62,7 +62,7 @@ public class MapGenerateDialog extends FloatingDialog{
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", "icon-add", 14*2, this::showAdd).height(64f).width(140f);
+        buttons.addImageTextButton("$add", "icon-add", 14 * 2, this::showAdd).height(64f).width(140f);
     }
 
     void setup(){
@@ -79,7 +79,9 @@ public class MapGenerateDialog extends FloatingDialog{
         cont.clear();
         cont.table("flat", t -> {
             t.margin(8f);
-            t.stack(new BorderImage(texture), new Stack(){{
+            t.stack(new BorderImage(texture){{
+                setScaling(Scaling.fit);
+            }}, new Stack(){{
                 add(new Image("loadDim"));
                 add(new Image("icon-refresh"){{
                     setScaling(Scaling.none);
@@ -120,24 +122,24 @@ public class MapGenerateDialog extends FloatingDialog{
                 t.table(b -> {
                     b.left();
                     b.defaults().size(50f);
-                    b.addImageButton("icon-refresh", 14*2, () -> {
+                    b.addImageButton("icon-refresh", 14 * 2, () -> {
                         filter.randomize();
                         update();
                     });
 
-                    b.addImageButton("icon-arrow-up", 10*2, () -> {
+                    b.addImageButton("icon-arrow-up", 10 * 2, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.max(0, idx - 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-arrow-down", 10*2, () -> {
+                    b.addImageButton("icon-arrow-down", 10 * 2, () -> {
                         int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.min(filters.size-1, idx + 1));
+                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-trash", 14*2, () -> {
+                    b.addImageButton("icon-trash", 14 * 2, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
@@ -220,7 +222,7 @@ public class MapGenerateDialog extends FloatingDialog{
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
                     Tile tile = editor.tile(x, y);
-                    input.begin(editor, x, y, tile.floor(), tile.block(), tile.ore());
+                    input.begin(editor, x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
                     writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.getRotation());
                 }
@@ -237,7 +239,7 @@ public class MapGenerateDialog extends FloatingDialog{
                         tile.setFloor((Floor)content.block(write.floor));
                         tile.setBlock(content.block(write.block));
                         tile.setTeam(Team.all[write.team]);
-                        tile.setOre(content.block(write.ore));
+                        tile.setOverlay(content.block(write.ore));
                     }
                 }
             });
@@ -295,7 +297,7 @@ public class MapGenerateDialog extends FloatingDialog{
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
                         if(filters.isEmpty()){
                             Tile tile = editor.tile(px * scaling, py * scaling);
-                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.ore(), Team.none);
+                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), Team.none);
                         }else{
                             DummyTile tile = buffer1[px][py];
                             color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.none);
@@ -339,7 +341,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         void set(Tile other){
-            set(other.floor(), other.block(), other.ore(), other.getTeam(), other.getRotation());
+            set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.getRotation());
         }
 
     }

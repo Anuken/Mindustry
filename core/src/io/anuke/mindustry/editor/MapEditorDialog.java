@@ -15,7 +15,6 @@ import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
@@ -26,13 +25,14 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.OverlayFloor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
     public final MapEditor editor;
+
     private MapView view;
     private MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;
@@ -85,49 +85,50 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.row();
 
             t.addImageTextButton("$editor.import", "icon-load-map", isize, () ->
-                    createDialog("$editor.import",
-                            "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable) loadDialog::show,
-                            "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable) () ->
-                                Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
-                                    try{
-                                        //TODO what if it's an image? users should be warned for their stupidity
-                                        editor.beginEdit(MapIO.readMap(file, true));
-                                    }catch(Exception e){
-                                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                                        Log.err(e);
-                                    }
-                                }), true, mapExtension),
+                createDialog("$editor.import",
+                "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
+                "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
+                Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
+                    try{
+                        //TODO what if it's an image? users should be warned for their stupidity
+                        editor.beginEdit(MapIO.readMap(file, true));
+                    }catch(Exception e){
+                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                        Log.err(e);
+                    }
+                }), true, mapExtension),
 
-						"$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
-                            Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
-                                ui.loadAnd(() -> {
-                                    try{
-                                        Pixmap pixmap = new Pixmap(file);
-                                        Tile[][] tiles = editor.createTiles(pixmap.getWidth(), pixmap.getHeight());
-                                        editor.load(() -> MapIO.readLegacyPixmap(pixmap, tiles));
-                                        editor.beginEdit(tiles);
-                                    }catch (Exception e){
-                                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                                        Log.err(e);
-                                    }
-                                }), true, "png")));
+                "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
+                Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
+                ui.loadAnd(() -> {
+                    try{
+                        Pixmap pixmap = new Pixmap(file);
+                        Tile[][] tiles = editor.createTiles(pixmap.getWidth(), pixmap.getHeight());
+                        editor.load(() -> MapIO.readLegacyPixmap(pixmap, tiles));
+                        editor.beginEdit(tiles);
+                    }catch(Exception e){
+                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                        Log.err(e);
+                    }
+                }), true, "png"))
+            );
 
             t.addImageTextButton("$editor.export", "icon-save-map", isize, () ->
-                        Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
-                            file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-                            FileHandle result = file;
-                            ui.loadAnd(() -> {
-                                try{
-                                    if(!editor.getTags().containsKey("name")){
-                                        editor.getTags().put("name", result.nameWithoutExtension());
-                                    }
-                                    MapIO.writeMap(result, editor.createMap(result), editor.tiles());
-                                }catch(Exception e){
-                                    ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
-                                    Log.err(e);
-                                }
-                            });
-                        }, false, mapExtension));
+                Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
+                    file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+                    FileHandle result = file;
+                    ui.loadAnd(() -> {
+                        try{
+                            if(!editor.getTags().containsKey("name")){
+                                editor.getTags().put("name", result.nameWithoutExtension());
+                            }
+                            MapIO.writeMap(result, editor.createMap(result), editor.tiles());
+                        }catch(Exception e){
+                            ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
+                            Log.err(e);
+                        }
+                    });
+                }, false, mapExtension));
         });
 
         menu.cont.row();
@@ -146,14 +147,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         loadDialog = new MapLoadDialog(map ->
-            ui.loadAnd(() -> {
-                try{
-                    editor.beginEdit(map);
-                }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                    Log.err(e);
-                }
-            }));
+        ui.loadAnd(() -> {
+            try{
+                editor.beginEdit(map);
+            }catch(Exception e){
+                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                Log.err(e);
+            }
+        }));
 
         setFillParent(true);
 
@@ -239,10 +240,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
         dialog.cont.defaults().size(360f, h).padBottom(5).padRight(5).padLeft(5);
 
         for(int i = 0; i < arguments.length; i += 4){
-            String name = (String) arguments[i];
-            String description = (String) arguments[i + 1];
-            String iconname = (String) arguments[i + 2];
-            Runnable listenable = (Runnable) arguments[i + 3];
+            String name = (String)arguments[i];
+            String description = (String)arguments[i + 1];
+            String iconname = (String)arguments[i + 2];
+            Runnable listenable = (Runnable)arguments[i + 3];
 
             TextButton button = dialog.cont.addButton(name, () -> {
                 listenable.run();
@@ -306,8 +307,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public void build(){
         float amount = 10f, baseSize = 60f;
 
-        float size = mobile ? (int) (Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
-                Math.min(Core.graphics.getDisplayMode().height / amount, baseSize);
+        float size = mobile ? (int)(Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
+        Math.min(Core.graphics.getDisplayMode().height / amount, baseSize);
 
         clearChildren();
         table(cont -> {
@@ -374,7 +375,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 tools.row();
 
                 tools.table("underline", t -> t.add("$editor.teams"))
-                        .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
+                .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
 
@@ -401,7 +402,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.table("underline", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
-                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int) (float) f]);
+                    slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)(float)f]);
 
                     t.top();
                     t.add("$editor.brush");
@@ -443,7 +444,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         //ctrl keys (undo, redo, save)
-        if(UIUtils.ctrl()){
+        if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.Z)){
                 editor.undo();
             }
@@ -486,7 +487,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(core != 0) return core;
             int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
             if(synth != 0) return synth;
-            int ore = Boolean.compare(b1 instanceof OreBlock, b2 instanceof OreBlock);
+            int ore = Boolean.compare(b1 instanceof OverlayFloor, b2 instanceof OverlayFloor);
             if(ore != 0) return ore;
             return Integer.compare(b1.id, b2.id);
         });

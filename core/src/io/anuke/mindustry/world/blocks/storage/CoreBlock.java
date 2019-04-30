@@ -4,17 +4,14 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
@@ -47,14 +44,8 @@ public class CoreBlock extends StorageBlock{
         entity.progress = 0;
         entity.currentUnit = player;
         entity.currentUnit.onRespawn(tile);
-        entity.currentUnit.heal();
-        entity.currentUnit.rotation = 90f;
         entity.currentUnit.applyImpulse(0, 8f);
-        entity.currentUnit.setNet(tile.drawx(), tile.drawy());
-        entity.currentUnit.add();
         entity.currentUnit = null;
-
-        player.endRespawning();
     }
 
     @Override
@@ -63,7 +54,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void onProximityUpdate(Tile tile) {
+    public void onProximityUpdate(Tile tile){
         for(Tile other : state.teams.get(tile.getTeam()).cores){
             if(other != tile){
                 tile.entity.items = other.entity.items;
@@ -128,10 +119,10 @@ public class CoreBlock extends StorageBlock{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-                    tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-                    tile.drawy(),
-                    90,
-                    size * Vars.tilesize / 2f);
+                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+                tile.drawy(),
+                90,
+                size * Vars.tilesize / 2f);
 
             Draw.reset();
         }
@@ -152,6 +143,7 @@ public class CoreBlock extends StorageBlock{
                 return;
             }
 
+            entity.currentUnit.set(tile.drawx(), tile.drawy());
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / state.rules.respawnTime * entity.delta();
@@ -176,11 +168,12 @@ public class CoreBlock extends StorageBlock{
         float heat;
 
         @Override
-        public void updateSpawning(Player unit){
+        public void updateSpawning(Player player){
             if(!netServer.isWaitingForPlayers() && currentUnit == null){
-                currentUnit = unit;
+                currentUnit = player;
                 progress = 0f;
-                unit.set(tile.drawx(), tile.drawy());
+                player.mech = Mechs.starter;
+                player.beginRespawning(this);
             }
         }
     }

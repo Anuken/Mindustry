@@ -14,7 +14,6 @@ import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.maps.generators.MapGenerator;
 import io.anuke.mindustry.world.Block;
 
 import java.util.Arrays;
@@ -25,7 +24,6 @@ public class Zone extends UnlockableContent{
     public final Generator generator;
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
-    //TODO debug verify resources.
     public Item[] resources = {};
     public Supplier<Rules> rules = Rules::new;
     public boolean alwaysUnlocked;
@@ -38,7 +36,9 @@ public class Zone extends UnlockableContent{
     protected Array<ItemStack> startingItems = new Array<>();
     protected ItemStack[] launchCost = null;
 
-    public Zone(String name, MapGenerator generator){
+    private Array<ItemStack> defaultStartingItems = new Array<>();
+
+    public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
     }
@@ -60,6 +60,11 @@ public class Zone extends UnlockableContent{
 
     public Array<ItemStack> getStartingItems(){
         return startingItems;
+    }
+
+    public void resetStartingItems(){
+        startingItems.clear();
+        defaultStartingItems.each(stack -> startingItems.add(new ItemStack(stack.item, stack.amount)));
     }
 
     public void updateWave(int wave){
@@ -115,7 +120,7 @@ public class Zone extends UnlockableContent{
         data.modified();
     }
 
-    /**Whether this zone has met its condition; if true, the player can leave.*/
+    /** Whether this zone has met its condition; if true, the player can leave. */
     public boolean metCondition(){
         return state.wave >= conditionWave;
     }
@@ -129,6 +134,11 @@ public class Zone extends UnlockableContent{
         generator.init(loadout);
         Arrays.sort(resources);
 
+        for(ItemStack stack : startingItems){
+            defaultStartingItems.add(new ItemStack(stack.item, stack.amount));
+        }
+
+        @SuppressWarnings("unchecked")
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;
@@ -147,14 +157,17 @@ public class Zone extends UnlockableContent{
 
     //neither of these are implemented, as zones are not displayed in a normal fashion... yet
     @Override
-    public void displayInfo(Table table){}
+    public void displayInfo(Table table){
+    }
 
     @Override
-    public TextureRegion getContentIcon(){ return null; }
+    public TextureRegion getContentIcon(){
+        return null;
+    }
 
     @Override
     public String localizedName(){
-        return Core.bundle.get("zone."+name+".name");
+        return Core.bundle.get("zone." + name + ".name");
     }
 
     @Override
@@ -172,9 +185,9 @@ public class Zone extends UnlockableContent{
         }
 
         public static ZoneRequirement[] with(Object... objects){
-            ZoneRequirement[] out = new ZoneRequirement[objects.length/2];
-            for(int i = 0; i < objects.length; i+= 2){
-                out[i/2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
+            ZoneRequirement[] out = new ZoneRequirement[objects.length / 2];
+            for(int i = 0; i < objects.length; i += 2){
+                out[i / 2] = new ZoneRequirement((Zone)objects[i], (Integer)objects[i + 1]);
             }
             return out;
         }

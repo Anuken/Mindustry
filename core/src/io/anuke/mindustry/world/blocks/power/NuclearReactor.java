@@ -34,8 +34,8 @@ public class NuclearReactor extends PowerGenerator{
     protected int itemDuration = 120; //time to consume 1 fuel
     protected float heating = 0.01f; //heating per frame * fullness
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    protected int explosionRadius = 19;
-    protected int explosionDamage = 135;
+    protected int explosionRadius = 40;
+    protected int explosionDamage = 1350;
     protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
     protected float coolantPower = 0.5f;
 
@@ -80,7 +80,7 @@ public class NuclearReactor extends PowerGenerator{
         Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
 
         int fuel = entity.items.get(item);
-        float fullness = (float) fuel / itemCapacity;
+        float fullness = (float)fuel / itemCapacity;
         entity.productionEfficiency = fullness;
 
         if(fuel > 0){
@@ -104,7 +104,7 @@ public class NuclearReactor extends PowerGenerator{
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
                 Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
-                        tile.worldy() + Mathf.random(size * tilesize / 2f));
+                tile.worldy() + Mathf.random(size * tilesize / 2f));
             }
         }
 
@@ -132,7 +132,6 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Damage.damage(tile.worldx(), tile.worldy(), explosionRadius * tilesize, explosionDamage * 4);
-
 
         for(int i = 0; i < 20; i++){
             Time.run(Mathf.random(50), () -> {

@@ -4,10 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.function.FloatProvider;
 import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.BitmapFont;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.graphics.g2d.ScissorStack;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.scene.Element;
@@ -79,7 +76,7 @@ public class Bar extends Element{
         lay.setText(font, name);
 
         font.setColor(Color.WHITE);
-        font.draw(name, x + width/2f - lay.width/2f, y + height/2f + lay.height/2f + 1);
+        font.draw(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
 
         Pools.free(lay);
     }

@@ -19,20 +19,14 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.effect.RubbleDecal;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.graphics.CacheLayer;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.mindustry.world.consumers.Consume;
-import io.anuke.mindustry.world.consumers.ConsumeLiquid;
-import io.anuke.mindustry.world.consumers.ConsumeType;
+import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.util.Arrays;
@@ -40,6 +34,8 @@ import java.util.Arrays;
 import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
+    public static final int crackRegions = 8, maxCrackSize = 5;
+
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -68,7 +64,7 @@ public class Block extends BlockStorage{
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
     public CacheLayer cacheLayer = CacheLayer.normal;
-    /**Special flag; if false, floor will be drawn under this block even if it is cached.*/
+    /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
     /** Layer to draw extra stuff on. */
     public Layer layer = null;
@@ -86,25 +82,27 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
-    /** The color of this block when displayed on the minimap or map preview.
-     *  Do not set manually! This is overriden when loading for most blocks.*/
+    /**
+     * The color of this block when displayed on the minimap or map preview.
+     * Do not set manually! This is overriden when loading for most blocks.
+     */
     public Color color = new Color(0, 0, 0, 1);
-    /**Whether units target this block.*/
+    /** Whether units target this block. */
     public boolean targetable = true;
-    /**Whether the overdrive core has any effect on this block.*/
+    /** Whether the overdrive core has any effect on this block. */
     public boolean canOverdrive = true;
-    /**Whether the icon region has an outline added.*/
+    /** Whether the icon region has an outline added. */
     public boolean outlineIcon = false;
-    /**Whether this block has a shadow under it.*/
+    /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
 
-    /**Cost of constructing this block.*/
+    /** Cost of constructing this block. */
     public ItemStack[] buildRequirements = new ItemStack[]{};
-    /**Category in place menu.*/
+    /** Category in place menu. */
     public Category buildCategory = Category.distribution;
-    /**Cost of building this block; do not modify directly!*/
+    /** Cost of building this block; do not modify directly! */
     public float buildCost;
-    /**Whether this block is visible and can currently be built.*/
+    /** Whether this block is visible and can currently be built. */
     public BooleanProvider buildVisibility = () -> false;
     public boolean alwaysUnlocked = false;
 
@@ -116,6 +114,13 @@ public class Block extends BlockStorage{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
+
+    protected static TextureRegion[][] cracks;
+
+    /** Dump timer ID.*/
+    protected final int timerDump = timers++;
+    /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
+    protected final int dumpTime = 5;
 
     public Block(String name){
         super(name);
@@ -167,7 +172,7 @@ public class Block extends BlockStorage{
 
         for(Tile other : tile.entity.proximity()){
             if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
-                    && !tile.entity.power.links.contains(other.pos())){
+            && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
         }
@@ -187,18 +192,19 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
-    public boolean isLayer(Tile tile){
-        return true;
-    }
-
-    public boolean isLayer2(Tile tile){
-        return true;
-    }
-
     public void drawLayer(Tile tile){
     }
 
     public void drawLayer2(Tile tile){
+    }
+
+    public void drawCracks(Tile tile){
+        if(!tile.entity.damaged()) return;
+        int id = tile.pos();
+        TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
+        Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
+        Draw.rect(region, tile.drawx(), tile.drawy(), (id%4)*90);
+        Draw.color();
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
@@ -221,10 +227,10 @@ public class Block extends BlockStorage{
         layout.setText(font, text);
 
         font.setColor(color);
-        float dx = x*tilesize + offset(), dy = y*tilesize + offset() + size*tilesize/2f + 2;
+        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 2;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         Lines.stroke(1f, color);
-        Lines.line(dx - layout.width/2f - 2f, dy, dx + layout.width/2f + 2f, dy);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 2f, dy);
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.WHITE);
@@ -239,7 +245,7 @@ public class Block extends BlockStorage{
 
     public void drawTeam(Tile tile){
         Draw.color(tile.getTeam().color);
-        Draw.rect("block-border", tile.drawx() - size * tilesize/2f + 4, tile.drawy() - size * tilesize/2f + 4);
+        Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);
         Draw.color();
     }
 
@@ -258,9 +264,8 @@ public class Block extends BlockStorage{
     public void unitOn(Tile tile, Unit unit){
     }
 
-    /** Called when a unit that spawned at this tile is removed.*/
+    /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Tile tile, Unit unit){
-
     }
 
     /** Returns whether ot not this block can be place on the specified tile. */
@@ -268,9 +273,10 @@ public class Block extends BlockStorage{
         return true;
     }
 
-    /**Call when some content is produced. This unlocks the content if it is applicable.*/
+    /** Call when some content is produced. This unlocks the content if it is applicable. */
     public void useContent(Tile tile, UnlockableContent content){
-        if(!headless && tile.getTeam() == player.getTeam()){
+        //only unlocks content in zones
+        if(!headless && tile.getTeam() == player.getTeam() && world.isZone()){
             logic.handleContent(content);
         }
     }
@@ -332,15 +338,24 @@ public class Block extends BlockStorage{
         for(int i = 0; i < cacheRegions.length; i++){
             cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
         }
+
+        if(cracks == null){
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
+        }
     }
 
-    /**Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}.*/
+    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #reg(int)}. */
     protected int reg(String suffix){
         cacheRegionStrings.add(name + suffix);
         return cacheRegionStrings.size - 1;
     }
 
-    /**Returns an internally cached region by ID.*/
+    /** Returns an internally cached region by ID. */
     protected TextureRegion reg(int id){
         return cacheRegions[id];
     }
@@ -450,11 +465,6 @@ public class Block extends BlockStorage{
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
-    }
-
-    /** Called after the block is destroyed and removed. */
-    public void afterDestroyed(Tile tile, TileEntity entity){
-
     }
 
     /** Called when the block is destroyed. */
@@ -577,18 +587,18 @@ public class Block extends BlockStorage{
         draw.rotation = rotation;
     }
 
-    /**Never use outside of the editor!*/
+    /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
         if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
         return editorIcon;
     }
 
-    /**Never use outside of the editor!*/
+    /** Never use outside of the editor! */
     public TextureRegion[] editorVariantRegions(){
         if(editorVariantRegions == null){
             variantRegions();
             editorVariantRegions = new TextureRegion[variantRegions.length];
-            for(int i = 0; i < variantRegions.length; i ++){
+            for(int i = 0; i < variantRegions.length; i++){
                 AtlasRegion region = (AtlasRegion)variantRegions[i];
                 editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
             }
@@ -654,7 +664,7 @@ public class Block extends BlockStorage{
         requirements(cat, () -> true, stacks);
     }
 
-    /**Sets up requirements. Use only this method to set up requirements.*/
+    /** Sets up requirements. Use only this method to set up requirements. */
     protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
         this.buildCategory = cat;
         this.buildRequirements = stacks;
@@ -667,7 +677,7 @@ public class Block extends BlockStorage{
         small(8 * 3),
         medium(8 * 4),
         large(8 * 6),
-        /**uses whatever the size of the block is*/
+        /** uses whatever the size of the block is */
         full(0);
 
         public final int size;

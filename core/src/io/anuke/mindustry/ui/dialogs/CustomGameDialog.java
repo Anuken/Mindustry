@@ -12,7 +12,8 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.RulePreset;
+import io.anuke.mindustry.game.Gamemode;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 
@@ -20,21 +21,21 @@ import static io.anuke.mindustry.Vars.*;
 
 public class CustomGameDialog extends FloatingDialog{
     Difficulty difficulty = Difficulty.normal;
-    RulePreset lastPreset = RulePreset.survival;
     CustomRulesDialog dialog = new CustomRulesDialog();
+    Rules rules;
+    Gamemode selectedGamemode;
 
     public CustomGameDialog(){
         super("$customgame");
         addCloseButton();
         shown(this::setup);
-
         onResize(this::setup);
     }
 
     void setup(){
-        if(lastPreset == null){
-            lastPreset = RulePreset.survival;
-        }
+        selectedGamemode = Gamemode.survival;
+        rules = selectedGamemode.get();
+
         cont.clear();
 
         Table maps = new Table();
@@ -42,7 +43,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = (Core.graphics.getHeight() > Core.graphics.getHeight() ? 2 : 4);
+        int maxwidth = (Core.graphics.isPortrait() ? 2 : 4);
 
         Table selmode = new Table();
         ButtonGroup<TextButton> group = new ButtonGroup<>();
@@ -51,20 +52,17 @@ public class CustomGameDialog extends FloatingDialog{
         int i = 0;
 
         Table modes = new Table();
-        modes.marginBottom(5);
 
-        for(RulePreset mode : RulePreset.values()){
+        for(Gamemode mode : Gamemode.values()){
             modes.addButton(mode.toString(), "toggle", () -> {
-                lastPreset = mode;
-            }).update(b -> b.setChecked(lastPreset == mode)).group(group).size(140f, 54f);
+                selectedGamemode = mode;
+                rules = mode.get();
+                dialog.selectedGamemode = null;
+                dialog.rules = null;
+            }).update(b -> b.setChecked(selectedGamemode == mode)).group(group).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
-        selmode.addButton("$mode.custom", "toggle", () -> {})
-        .update(b -> b.setChecked(lastPreset == null)).size(108f).group(group).get().tapped(() -> {
-            lastPreset = null;
-            dialog.show();
-        });
         selmode.addButton("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         cont.add(selmode);
@@ -84,7 +82,8 @@ public class CustomGameDialog extends FloatingDialog{
             state.wavetime = difficulty.waveTime;
         }).width(s);
 
-        sdif.addButton("", () -> {})
+        sdif.addButton("", () -> {
+        })
         .update(t -> {
             t.setText(difficulty.toString());
             t.touchable(Touchable.disabled);
@@ -94,8 +93,9 @@ public class CustomGameDialog extends FloatingDialog{
             difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
             state.wavetime = difficulty.waveTime;
         }).width(s);
+        sdif.addButton("$customize", () -> dialog.show(rules, selectedGamemode)).width(140).padLeft(10);
 
-        cont.add(sdif).visible(() -> lastPreset != null);
+        cont.add(sdif);
         cont.row();
 
         float images = 146f;
@@ -123,7 +123,7 @@ public class CustomGameDialog extends FloatingDialog{
 
             image.clicked(() -> {
                 hide();
-                control.playMap(map, lastPreset == null ? dialog.rules : lastPreset.get());
+                control.playMap(map, (dialog.rules == null) ? rules : dialog.rules);
             });
 
             maps.add(image);
@@ -146,7 +146,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
         table.row();
-        for(RulePreset mode : RulePreset.values()){
+        for(Gamemode mode : Gamemode.values()){
             table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }
@@ -155,5 +155,4 @@ public class CustomGameDialog extends FloatingDialog{
         d.buttons.addButton("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
-
 }
