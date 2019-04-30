@@ -130,7 +130,7 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap)){
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !ui.chatfrag.chatOpen()){
             if(!ui.minimap.isShown()){
                 ui.minimap.show();
             }else{
