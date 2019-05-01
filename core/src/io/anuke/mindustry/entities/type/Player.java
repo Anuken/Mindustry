@@ -265,7 +265,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     @Override
     public float drawSize(){
-        return isLocal ? Float.MAX_VALUE : 40;
+        return isLocal ? Float.MAX_VALUE : 40 + placeDistance;
     }
 
     @Override

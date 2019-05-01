@@ -37,6 +37,7 @@ public class MapIO{
     private static void initBlocks(){
         if(missingBlocks != null) return;
 
+        //only for legacy maps
         missingBlocks = ObjectMap.of(
             "stained-stone", Blocks.shale,
             "stained-stone-red", Blocks.shale,
