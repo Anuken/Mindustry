@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.utils.UIUtils;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Content;
@@ -45,7 +45,7 @@ public class DatabaseDialog extends FloatingDialog{
             table.table(list -> {
                 list.left();
 
-                int maxWidth = UIUtils.portrait() ? 7 : 13;
+                int maxWidth = Core.graphics.isPortrait() ? 7 : 13;
                 int size = 8 * 5;
 
                 int count = 0;

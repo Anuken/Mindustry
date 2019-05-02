@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Entities;
@@ -19,6 +20,9 @@ import static io.anuke.mindustry.Vars.world;
 
 public abstract class SaveFileVersion{
     public final int version;
+    private final ObjectMap<String, String> fallback = ObjectMap.of(
+        "alpha-dart-mech-pad", "dart-mech-pad"
+    );
 
     public SaveFileVersion(int version){
         this.version = version;
@@ -219,7 +223,7 @@ public abstract class SaveFileVersion{
 
             for(int j = 0; j < total; j++){
                 String name = stream.readUTF();
-                map[type.ordinal()][j] = content.getByName(type, name);
+                map[type.ordinal()][j] = content.getByName(type, fallback.get(name, name));
             }
         }
 

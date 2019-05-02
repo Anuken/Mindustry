@@ -259,12 +259,6 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @Override
     public void update(){
-        //TODO better smoke effect, this one is awful
-        /*if(health != 0 && health < block.health && !(block instanceof Wall) &&
-        Mathf.chance(0.009f * Time.delta() * (1f - health / block.health))){
-            Effects.effect(Fx.smoke, x + Mathf.range(4), y + Mathf.range(4));
-        }*/
-
         timeScaleDuration -= Time.delta();
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;

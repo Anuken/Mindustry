@@ -205,9 +205,9 @@ public class Zones implements ContentList{
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
-            startingItems = ItemStack.list(Items.copper, 1500);
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
             conditionWave = 3;
-            launchPeriod = 1;
+            launchPeriod = 2;
             zoneRequirements = ZoneRequirement.with(tarFields, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};

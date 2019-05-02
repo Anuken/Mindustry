@@ -8,14 +8,11 @@ public interface Entity extends MoveTrait{
 
     void resetID(int id);
 
-    default void update(){
-    }
+    default void update(){}
 
-    default void removed(){
-    }
+    default void removed(){}
 
-    default void added(){
-    }
+    default void added(){}
 
     EntityGroup targetGroup();
 

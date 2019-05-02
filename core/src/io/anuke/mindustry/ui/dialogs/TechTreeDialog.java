@@ -45,7 +45,9 @@ public class TechTreeDialog extends FloatingDialog{
             checkNodes(root);
             treeLayout();
         });
+
         hidden(ui.deploy::setup);
+
         addCloseButton();
 
         buttons.addImageTextButton("$database", "icon-database", 14 * 2, () -> {
@@ -200,7 +202,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             if(mobile){
                 tapped(() -> {
-                    Element e = hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                    Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                     if(e == this){
                         hoverNode = null;
                         rebuild();
