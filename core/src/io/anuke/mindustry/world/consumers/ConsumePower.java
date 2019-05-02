@@ -47,7 +47,7 @@ public class ConsumePower extends Consume{
         if(isBuffered){
             return true;
         }else{
-            return entity.power.satisfaction >= 0.9999f;
+            return entity.power.satisfaction > 0f;
         }
     }
 

@@ -57,7 +57,6 @@ public class BundleLoader{
 
             Locale locale = getLocale();
             Locale.setDefault(locale);
-            if(!headless) Log.info("Got locale: {0}", locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
     }
