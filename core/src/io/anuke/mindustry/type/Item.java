@@ -30,7 +30,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
      * base material cost of this item, used for calculating place times
      * 1 cost = 1 tick added to build time
      */
-    public float cost = 3f;
+    public float cost = 1f;
     /** If true, item is always unlocked. */
     public boolean alwaysUnlocked = false;
 

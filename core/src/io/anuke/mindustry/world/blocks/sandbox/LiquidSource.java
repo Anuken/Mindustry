@@ -51,8 +51,12 @@ public class LiquidSource extends Block{
     public void update(Tile tile){
         LiquidSourceEntity entity = tile.entity();
 
-        tile.entity.liquids.add(entity.source, liquidCapacity);
-        tryDumpLiquid(tile, entity.source);
+        if(entity.source == null){
+            tile.entity.liquids.clear();
+        }else{
+            tile.entity.liquids.add(entity.source, liquidCapacity);
+            tryDumpLiquid(tile, entity.source);
+        }
     }
 
     @Override
@@ -61,9 +65,11 @@ public class LiquidSource extends Block{
 
         LiquidSourceEntity entity = tile.entity();
 
-        Draw.color(entity.source.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
-        Draw.color();
+        if(entity.source != null){
+            Draw.color(entity.source.color);
+            Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+            Draw.color();
+        }
     }
 
     @Override
@@ -73,17 +79,19 @@ public class LiquidSource extends Block{
         Array<Liquid> items = content.liquids();
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
+        group.setMinCheckCount(0);
         Table cont = new Table();
 
         for(int i = 0; i < items.size; i++){
             final int f = i;
-            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> {
-                Call.setLiquidSourceLiquid(null, tile, items.get(f));
+            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> control.input().frag.config.hideConfig()).size(38).group(group).get();
+            button.changed(() -> {
+                Call.setLiquidSourceLiquid(null, tile, button.isChecked() ? items.get(f) : null);
                 control.input().frag.config.hideConfig();
                 lastLiquid = items.get(f);
-            }).size(38).group(group).get();
+            });
             button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
-            button.setChecked(entity.source.id == f);
+            button.setChecked(entity.source == items.get(i));
 
             if(i % 4 == 3){
                 cont.row();
@@ -105,16 +113,17 @@ public class LiquidSource extends Block{
     }
 
     class LiquidSourceEntity extends TileEntity{
-        public Liquid source = Liquids.water;
+        public Liquid source = null;
 
         @Override
         public void writeConfig(DataOutput stream) throws IOException{
-            stream.writeByte(source.id);
+            stream.writeByte(source == null ? -1 : source.id);
         }
 
         @Override
         public void readConfig(DataInput stream) throws IOException{
-            source = content.liquid(stream.readByte());
+            byte id = stream.readByte();
+            source = id == -1 ? null : content.liquid(id);
         }
     }
 }

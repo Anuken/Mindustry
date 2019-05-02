@@ -180,8 +180,6 @@ public class Drill extends Block{
             itemArray.sort((item1, item2) -> {
                 int type = Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material);
                 if(type != 0) return type;
-                int count = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
-                if(count != 0) return count;
                 return Integer.compare(item1.id, item2.id);
             });
 

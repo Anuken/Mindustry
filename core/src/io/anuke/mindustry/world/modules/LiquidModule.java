@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.modules;
 import io.anuke.mindustry.type.Liquid;
 
 import java.io.*;
+import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -36,6 +37,11 @@ public class LiquidModule extends BlockModule{
 
     public float get(Liquid liquid){
         return liquids[liquid.id];
+    }
+
+    public void clear(){
+        total = 0;
+        Arrays.fill(liquids, 0);
     }
 
     public void add(Liquid liquid, float amount){
