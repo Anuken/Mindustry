@@ -161,7 +161,7 @@ public class UnitFactory extends Block{
 
         //player-made spawners have default behavior
         if(entity.cons.valid() || tile.isEnemyCheat()){
-            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
             entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
@@ -199,6 +199,7 @@ public class UnitFactory extends Block{
         float buildTime;
         float time;
         float speedScl;
+        //TODO remove next breaking release
         float warmup; //only for enemy spawners
         int spawned;
 

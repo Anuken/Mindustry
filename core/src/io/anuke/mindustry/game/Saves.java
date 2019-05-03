@@ -224,7 +224,7 @@ public class Saves{
         }
 
         public Zone getZone(){
-            return content.getByID(ContentType.zone, meta.rules.zone);
+            return meta == null || meta.rules == null ? null : content.getByID(ContentType.zone, meta.rules.zone);
         }
 
         public int getBuild(){
