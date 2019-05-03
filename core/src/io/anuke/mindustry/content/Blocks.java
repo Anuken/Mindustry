@@ -1644,7 +1644,7 @@ public class Blocks implements ContentList{
 
         dartPad = new MechPad("dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
-            mech = Mechs.dart;
+            mech = Mechs.alpha;
             size = 2;
             consumes.powerBuffered(50f);
         }};
