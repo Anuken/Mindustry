@@ -25,11 +25,6 @@ import io.anuke.mindustry.world.meta.*;
 import java.io.*;
 
 public class UnitFactory extends Block{
-    //for attack mode
-    protected float gracePeriodMultiplier = 15f;
-    protected float speedupTime = 60f * 60f * 20;
-    protected float maxSpeedup = 2f;
-
     protected UnitType type;
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
@@ -164,25 +159,15 @@ public class UnitFactory extends Block{
             entity.warmup += entity.delta();
         }
 
-        if(!tile.isEnemyCheat()){
-            //player-made spawners have default behavior
-            if(entity.cons.valid()){
-                entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
-                entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
-            }else{
-                entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
-            }
-            //check if grace period had passed
-        }else if(entity.warmup > produceTime * gracePeriodMultiplier){
-            float speedMultiplier = Math.min(0.1f + (entity.warmup - produceTime * gracePeriodMultiplier) / speedupTime, maxSpeedup);
-            entity.time += entity.delta() * entity.speedScl;
-            //otherwise, it's an enemy, cheat by not requiring resources
-            entity.buildTime += entity.delta() * speedMultiplier;
+        //player-made spawners have default behavior
+        if(entity.cons.valid() || tile.isEnemyCheat()){
+            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
+            entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
         }
+
 
         if(entity.buildTime >= produceTime){
             entity.buildTime = 0f;

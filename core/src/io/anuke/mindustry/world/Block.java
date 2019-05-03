@@ -409,6 +409,7 @@ public class Block extends BlockStorage{
     public void setStats(){
         stats.add(BlockStat.size, "{0}x{0}", size);
         stats.add(BlockStat.health, health, StatUnit.none);
+        stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
 
         consumes.display(stats);
 

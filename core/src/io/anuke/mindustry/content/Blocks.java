@@ -899,7 +899,7 @@ public class Blocks implements ContentList{
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 8, Items.copper, 8));
             range = 4;
-            speed = 60f;
+            speed = 70f;
             bufferCapacity = 15;
         }};
 
@@ -1104,7 +1104,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 110f;
-            itemDuration = 40f;
+            itemDuration = 60f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.26f);

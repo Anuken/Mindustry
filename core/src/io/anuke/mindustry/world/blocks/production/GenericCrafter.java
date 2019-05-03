@@ -135,6 +135,14 @@ public class GenericCrafter extends Block{
         return itemCapacity;
     }
 
+    public Item outputItem(){
+        return outputItem == null ? null : outputItem.item;
+    }
+
+    public Liquid outputLiquid(){
+        return outputLiquid == null ? null : outputLiquid.liquid;
+    }
+
     public static class GenericCrafterEntity extends TileEntity{
         public float progress;
         public float totalProgress;
