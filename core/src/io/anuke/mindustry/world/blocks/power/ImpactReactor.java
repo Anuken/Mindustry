@@ -76,7 +76,7 @@ public class ImpactReactor extends PowerGenerator{
     public void update(Tile tile){
         FusionReactorEntity entity = tile.entity();
 
-        if(entity.cons.valid()){
+        if(entity.cons.valid() && entity.power.satisfaction >= 0.99f){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
