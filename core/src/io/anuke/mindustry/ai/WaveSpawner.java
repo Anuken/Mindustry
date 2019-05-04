@@ -95,7 +95,7 @@ public class WaveSpawner{
 
                         Time.run(Math.min(i * 5, 60 * 2), () -> shockwave(unit));
                     }
-                    Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize));
+                    Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawn.x * tilesize, spawn.y * tilesize, state.rules.dropZoneRadius));
                     //would be interesting to see player structures survive this without hacks
                     Time.run(40f, () -> Damage.damage(waveTeam, spawn.x * tilesize, spawn.y * tilesize, state.rules.dropZoneRadius, 99999999f, true));
                 }

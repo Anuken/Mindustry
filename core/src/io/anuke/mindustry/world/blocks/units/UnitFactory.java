@@ -204,6 +204,7 @@ public class UnitFactory extends Block{
         @Override
         public void read(DataInput stream) throws IOException{
             buildTime = stream.readFloat();
+            stream.readFloat(); //unneeded information, will remove later
             spawned = stream.readInt();
         }
     }
