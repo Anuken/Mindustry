@@ -777,7 +777,7 @@ public class ServerControl implements ApplicationListener{
                         }
                     }
                 }catch(IOException e){
-                    err("Terminating socket.");
+                    err("Terminating socket server.");
                     e.printStackTrace();
                 }
             });
