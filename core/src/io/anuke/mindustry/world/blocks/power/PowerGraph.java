@@ -135,7 +135,7 @@ public class PowerGraph{
                     if(otherConsumersAreValid(consumer, consumePower)){
                         consumer.entity.power.satisfaction = coverage;
                     }else{ //invalid consumers get an estimate, if they were to activate
-                        consumer.entity.power.satisfaction = Math.min(1, produced / (needed + consumePower.usage));
+                        consumer.entity.power.satisfaction = Math.min(1, produced / (needed + consumePower.usage * consumer.entity.delta()));
                         //just in case
                         if(Float.isNaN(consumer.entity.power.satisfaction)){
                             consumer.entity.power.satisfaction = 0f;
