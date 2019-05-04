@@ -23,8 +23,8 @@ import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 
-import java.io.IOException;
-import java.net.BindException;
+import java.io.*;
+import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -36,6 +36,7 @@ public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
     //in bytes: 512 kb is max
     private static final int maxLogLength = 1024 * 512;
+    private static final int commandSocketPort = 6859;
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.files.local("logs/");
@@ -43,6 +44,9 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
+
+    private Thread socketThread;
+    private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -52,7 +56,8 @@ public class ServerControl implements ApplicationListener{
             "shuffle", true,
             "crashreport", false,
             "port", port,
-            "logging", true
+            "logging", true,
+            "socket", false
         );
 
         Log.setLogger(new LogHandler(){
@@ -85,6 +90,14 @@ public class ServerControl implements ApplicationListener{
 
                 if(Core.settings.getBool("logging")){
                     logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
+                }
+
+                if(socketOutput != null){
+                    try{
+                        socketOutput.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
+                    }catch(Throwable e){
+                        err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
+                    }
                 }
             }
         });
@@ -161,6 +174,10 @@ public class ServerControl implements ApplicationListener{
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
         System.out.print("> ");
+
+        if(Core.settings.getBool("socket")){
+            toggleSocket(true);
+        }
     }
 
     private void registerCommands(){
@@ -358,6 +375,19 @@ public class ServerControl implements ApplicationListener{
             boolean value = arg[0].equalsIgnoreCase("on");
             netServer.admins.setStrict(value);
             info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
+        });
+
+        handler.register("socketinput", "[on/off]", "Disables or enables a local TCP socket at port "+commandSocketPort+" to recieve commands from other applications", arg -> {
+            if(arg.length == 0){
+                info("Socket input is currently &lc{0}.", Core.settings.getBool("socket") ? "on" : "off");
+                return;
+            }
+
+            boolean value = arg[0].equalsIgnoreCase("on");
+            toggleSocket(value);
+            Core.settings.put("socket", value);
+            Core.settings.save();
+            info("Socket input is now &lc{0}.", value ? "on" : "off");
         });
 
         handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
@@ -615,37 +645,38 @@ public class ServerControl implements ApplicationListener{
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
             String line = scan.nextLine();
-
-            Core.app.post(() -> {
-                Response response = handler.handleMessage(line);
-
-                if(response.type == ResponseType.unknownCommand){
-
-                    int minDst = 0;
-                    Command closest = null;
-
-                    for(Command command : handler.getCommandList()){
-                        int dst = Strings.levenshtein(command.text, response.runCommand);
-                        if(dst < 3 && (closest == null || dst < minDst)){
-                            minDst = dst;
-                            closest = command;
-                        }
-                    }
-
-                    if(closest != null){
-                        err("Command not found. Did you mean \"" + closest.text + "\"?");
-                    }else{
-                        err("Invalid command. Type 'help' for help.");
-                    }
-                }else if(response.type == ResponseType.fewArguments){
-                    err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-                }else if(response.type == ResponseType.manyArguments){
-                    err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-                }
-
-                System.out.print("> ");
-            });
+            Core.app.post(() -> handleCommandString(line));
         }
+    }
+
+    private void handleCommandString(String line){
+        Response response = handler.handleMessage(line);
+
+        if(response.type == ResponseType.unknownCommand){
+
+            int minDst = 0;
+            Command closest = null;
+
+            for(Command command : handler.getCommandList()){
+                int dst = Strings.levenshtein(command.text, response.runCommand);
+                if(dst < 3 && (closest == null || dst < minDst)){
+                    minDst = dst;
+                    closest = command;
+                }
+            }
+
+            if(closest != null){
+                err("Command not found. Did you mean \"" + closest.text + "\"?");
+            }else{
+                err("Invalid command. Type 'help' for help.");
+            }
+        }else if(response.type == ResponseType.fewArguments){
+            err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }else if(response.type == ResponseType.manyArguments){
+            err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }
+
+        System.out.print("> ");
     }
 
     private void play(boolean wait, Runnable run){
@@ -722,5 +753,40 @@ public class ServerControl implements ApplicationListener{
         }
 
         currentLogFile.writeString(text + "\n", true);
+    }
+
+    private void toggleSocket(boolean on){
+        if(on && socketThread == null){
+            socketThread = new Thread(() -> {
+                try{
+                    try(ServerSocket socket = new ServerSocket()){
+                        socket.bind(new InetSocketAddress("localhost", commandSocketPort));
+                        while(true){
+                            Socket client = socket.accept();
+                            info("&lmRecieved command socket connection: &lb{0}", socket.getLocalSocketAddress());
+                            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            socketOutput = new PrintWriter(client.getOutputStream(), true);
+                            String line;
+                            while(client.isConnected() && (line = in.readLine()) != null){
+                                info("&lmRecieved remote command: &lb'{0}'", line);
+                                String result = line;
+                                Core.app.post(() -> handleCommandString(result));
+                            }
+                            info("&lmLost command socket connection: &lb{0}", socket.getLocalSocketAddress());
+                            socketOutput = null;
+                        }
+                    }
+                }catch(IOException e){
+                    err("Terminating socket.");
+                    e.printStackTrace();
+                }
+            });
+            socketThread.setDaemon(true);
+            socketThread.start();
+        }else if(socketThread != null){
+            socketThread.interrupt();
+            socketThread = null;
+            socketOutput = null;
+        }
     }
 }
