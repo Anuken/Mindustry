@@ -1376,7 +1376,7 @@ public class Blocks implements ContentList{
             recoil = 2f;
             reload = 90f;
             cooldown = 0.03f;
-            powerUse = 3f;
+            powerUse = 2.5f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.lancerLaserShootSmoke;
@@ -1394,7 +1394,7 @@ public class Blocks implements ContentList{
             reload = 24f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 1f;
+            powerUse = 0.9f;
             targetAir = false;
             range = 95f;
             shootEffect = Fx.lightningShoot;
