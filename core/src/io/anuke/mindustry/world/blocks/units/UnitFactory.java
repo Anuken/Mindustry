@@ -155,11 +155,6 @@ public class UnitFactory extends Block{
             return;
         }
 
-        if(tile.isEnemyCheat()){
-            entity.warmup += entity.delta();
-        }
-
-        //player-made spawners have default behavior
         if(entity.cons.valid() || tile.isEnemyCheat()){
             entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
             entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
@@ -167,7 +162,6 @@ public class UnitFactory extends Block{
         }else{
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
         }
-
 
         if(entity.buildTime >= produceTime){
             entity.buildTime = 0f;
@@ -199,21 +193,17 @@ public class UnitFactory extends Block{
         float buildTime;
         float time;
         float speedScl;
-        //TODO remove next breaking release
-        float warmup; //only for enemy spawners
         int spawned;
 
         @Override
         public void write(DataOutput stream) throws IOException{
             stream.writeFloat(buildTime);
-            stream.writeFloat(warmup);
             stream.writeInt(spawned);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
             buildTime = stream.readFloat();
-            warmup = stream.readFloat();
             spawned = stream.readInt();
         }
     }

@@ -72,7 +72,7 @@ public class PowerTests extends PowerTestFixture{
         @TestFactory
         DynamicTest[] bufferedConsumerSatisfactionIsAsExpected(){
             return new DynamicTest[]{
-            // Note: powerPerTick may not be 0 in any of the test cases. This would equal a "ticksToFill" of infinite.
+            // Note: usage may not be 0 in any of the test cases. This would equal a "ticksToFill" of infinite.
             // Note: Due to a fixed delta of 0.5, only half of what is defined here will in fact be produced/consumed. Keep this in mind when defining expectedSatisfaction!
             dynamicTest("01", () -> simulateBufferedConsumption(0.0f, 0.0f, 0.1f, 0.0f, 0.0f, "Empty Buffer, No power anywhere")),
             dynamicTest("02", () -> simulateBufferedConsumption(0.0f, 1.0f, 0.1f, 0.0f, 0.0f, "Empty Buffer, No power provided")),

@@ -41,7 +41,6 @@ public class MassDriver extends Block{
     protected Effect smokeEffect = Fx.shootBigSmoke2;
     protected Effect recieveEffect = Fx.mineBig;
     protected float shake = 3f;
-    protected float powerPercentageUsed = 0.95f;
     protected TextureRegion baseRegion;
 
     public MassDriver(String name){
@@ -52,7 +51,6 @@ public class MassDriver extends Block{
         hasItems = true;
         layer = Layer.turret;
         hasPower = true;
-        consumes.powerBuffered(30f);
         outlineIcon = true;
     }
 
@@ -72,13 +70,6 @@ public class MassDriver extends Block{
         super.load();
 
         baseRegion = Core.atlas.find(name + "-base");
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        stats.add(BlockStat.powerShot, consumes.getPower().powerCapacity * powerPercentageUsed, StatUnit.powerUnits);
     }
 
     @Override
@@ -112,6 +103,11 @@ public class MassDriver extends Block{
             tryDump(tile);
         }
 
+        //skip when there's no power
+        if(!entity.cons.valid()){
+            return;
+        }
+
         if(entity.state == DriverState.accepting){
             //if there's nothing shooting at this, bail
             if(entity.currentShooter() == null){
@@ -132,7 +128,6 @@ public class MassDriver extends Block{
 
             if(
                 tile.entity.items.total() >= minDistribute && //must shoot minimum amount of items
-                tile.entity.power.satisfaction >= powerPercentageUsed && //must have power
                 link.block().itemCapacity - link.entity.items.total() >= minDistribute && //must have minimum amount of space
                 entity.reload <= 0.0001f //must have reloaded
             ){
@@ -235,7 +230,6 @@ public class MassDriver extends Block{
 
         //reset reload, use power.
         entity.reload = 1f;
-        entity.power.satisfaction -= Math.min(entity.power.satisfaction, powerPercentageUsed);
 
         DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
         data.from = entity;

@@ -9,6 +9,7 @@ import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.Player;
@@ -30,7 +31,6 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class MechPad extends Block{
     protected Mech mech;
     protected float buildTime = 60 * 5;
-    protected float requiredSatisfaction = 0.999f;
 
     public MechPad(String name){
         super(name);
@@ -56,11 +56,8 @@ public class MechPad extends Block{
         if(player == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
 
         MechFactoryEntity entity = tile.entity();
-        MechPad pad = (MechPad)tile.block();
 
-        if(entity.power.satisfaction < pad.requiredSatisfaction) return;
-
-        entity.power.satisfaction -= Math.min(entity.power.satisfaction, pad.requiredSatisfaction);
+        if(!entity.cons.valid()) return;
         player.beginRespawning(entity);
     }
 
@@ -73,7 +70,8 @@ public class MechPad extends Block{
         Effects.effect(Fx.spawn, entity);
 
         if(entity.player == null) return;
-        entity.player.mech = ((MechPad)tile.block()).mech;
+        Mech mech = ((MechPad)tile.block()).mech;
+        entity.player.mech = entity.player.mech == mech ? Mechs.starter : mech;
 
         entity.progress = 0;
         entity.player.onRespawn(tile);
@@ -102,7 +100,7 @@ public class MechPad extends Block{
 
         if(checkValidTap(tile, player)){
             Call.onMechFactoryTap(player, tile);
-        }else if(player.isLocal && mobile && !player.isDead() && (entity.power.satisfaction >= requiredSatisfaction) && entity.player == null){
+        }else if(player.isLocal && mobile && !player.isDead() && entity.cons.valid() && entity.player == null){
             //deselect on double taps
             player.moveTarget = player.moveTarget == tile.entity ? null : tile.entity;
         }
@@ -115,7 +113,7 @@ public class MechPad extends Block{
         Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy());
 
         if(entity.player != null){
-            TextureRegion region = mech.iconRegion;
+            TextureRegion region = (entity.player.mech == mech ? Mechs.starter.iconRegion : mech.iconRegion);
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
