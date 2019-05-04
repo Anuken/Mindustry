@@ -65,7 +65,7 @@ public class ServerControl implements ApplicationListener{
 
             @Override
             public void debug(String text, Object... args){
-                print("&lc&fb" + "[DEBUG] " + text, args);
+                print("&lc&fb" + "[DEBG] " + text, args);
             }
 
             @Override
@@ -94,7 +94,7 @@ public class ServerControl implements ApplicationListener{
 
                 if(socketOutput != null){
                     try{
-                        socketOutput.println(format(text + "&fr", false, args));
+                        socketOutput.println(format(text + "&fr", false, args).replace("[DEBG] ", "").replace("[WARN] ", "").replace("[INFO] ", "").replace("[ERR!] ", ""));
                     }catch(Throwable e){
                         err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                     }
