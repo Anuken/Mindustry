@@ -328,6 +328,10 @@ public class Block extends BlockStorage{
         setBars();
 
         consumes.init();
+
+        if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
+            throw new IllegalArgumentException("Consumer using buffered power: " + name);
+        }
     }
 
     @Override
@@ -409,6 +413,7 @@ public class Block extends BlockStorage{
     public void setStats(){
         stats.add(BlockStat.size, "{0}x{0}", size);
         stats.add(BlockStat.health, health, StatUnit.none);
+        stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
 
         consumes.display(stats);
 
@@ -432,8 +437,8 @@ public class Block extends BlockStorage{
         }
 
         if(hasPower && consumes.hasPower()){
-            boolean buffered = consumes.getPower().isBuffered;
-            float capacity = consumes.getPower().powerCapacity;
+            boolean buffered = consumes.getPower().buffered;
+            float capacity = consumes.getPower().capacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
                 Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
@@ -487,8 +492,8 @@ public class Block extends BlockStorage{
             explosiveness += tile.entity.liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
         }
 
-        if(consumes.hasPower() && consumes.getPower().isBuffered){
-            power += tile.entity.power.satisfaction * consumes.getPower().powerCapacity;
+        if(consumes.hasPower() && consumes.getPower().buffered){
+            power += tile.entity.power.satisfaction * consumes.getPower().capacity;
         }
 
         if(hasLiquids){

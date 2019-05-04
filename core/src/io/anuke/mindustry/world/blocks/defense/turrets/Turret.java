@@ -58,8 +58,7 @@ public abstract class Turret extends Block{
 
     protected TextureRegion baseRegion, heatRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) ->
-    Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
     protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
         Draw.color(heatColor, entity.heat);
@@ -195,8 +194,7 @@ public abstract class Turret extends Block{
     protected void findTarget(Tile tile){
         TurretEntity entity = tile.entity();
 
-        entity.target = Units.closestTarget(tile.getTeam(),
-        tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+        entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
     }
 
     protected void turnToTarget(Tile tile, float targetRot){
@@ -248,7 +246,7 @@ public abstract class Turret extends Block{
 
             entity.reload = 0f;
         }else{
-            entity.reload += tile.entity.delta() * peekAmmo(tile).reloadMultiplier;
+            entity.reload += tile.entity.delta() * peekAmmo(tile).reloadMultiplier * baseReloadSpeed(tile);
         }
     }
 
@@ -294,6 +292,10 @@ public abstract class Turret extends Block{
 
         Effects.effect(ammoUseEffect, tile.drawx() - Angles.trnsx(entity.rotation, ammoEjectBack),
         tile.drawy() - Angles.trnsy(entity.rotation, ammoEjectBack), entity.rotation);
+    }
+
+    protected float baseReloadSpeed(Tile tile){
+        return 1f;
     }
 
     protected boolean isTurret(Tile tile){

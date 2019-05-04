@@ -590,7 +590,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
-        clampCamera();
         if(state.is(State.menu) || player.isDead()){
             selection.clear();
             removals.clear();
@@ -728,17 +727,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
         lastDistance = distance;
         return true;
-    }
-
-    void clampCamera(){
-        if(player.isDead()) return;
-
-        Vector2 v = Core.camera.position;
-        //change to 1/2 to clamp to viewport
-        float scaling = 1f;
-
-        v.x = clerp(v.x, player.x - Core.camera.width*scaling, player.x + Core.camera.width*scaling);
-        v.y = clerp(v.y, player.y - Core.camera.height*scaling, player.y + Core.camera.height*scaling);
     }
 
     float clerp(float value, float min, float max){

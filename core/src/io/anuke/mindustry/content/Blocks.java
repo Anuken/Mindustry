@@ -899,7 +899,7 @@ public class Blocks implements ContentList{
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 8, Items.copper, 8));
             range = 4;
-            speed = 60f;
+            speed = 70f;
             bufferCapacity = 15;
         }};
 
@@ -935,6 +935,7 @@ public class Blocks implements ContentList{
             itemCapacity = 120;
             reloadTime = 200f;
             range = 440f;
+            consumes.power(2f);
         }};
 
         //endregion
@@ -1029,13 +1030,13 @@ public class Blocks implements ContentList{
 
         battery = new Battery("battery"){{
             requirements(Category.power, ItemStack.with(Items.copper, 8, Items.lead, 40));
-            consumes.powerBuffered(4000f, 1f);
+            consumes.powerBuffered(4000f);
         }};
 
         batteryLarge = new Battery("battery-large"){{
             requirements(Category.power, ItemStack.with(Items.titanium, 40, Items.lead, 80, Items.silicon, 40));
             size = 3;
-            consumes.powerBuffered(50000f, 1f);
+            consumes.powerBuffered(50000f);
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
@@ -1104,7 +1105,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 110f;
-            itemDuration = 40f;
+            itemDuration = 60f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.26f);
@@ -1375,8 +1376,7 @@ public class Blocks implements ContentList{
             recoil = 2f;
             reload = 90f;
             cooldown = 0.03f;
-            powerUsed = 1 / 3f;
-            consumes.powerBuffered(600f);
+            powerUse = 2.5f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.lancerLaserShootSmoke;
@@ -1394,9 +1394,8 @@ public class Blocks implements ContentList{
             reload = 24f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUsed = 1f / 2f;
+            powerUse = 0.9f;
             targetAir = false;
-            consumes.powerBuffered(60f, 60f);
             range = 95f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.RED;
@@ -1540,10 +1539,9 @@ public class Blocks implements ContentList{
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUsed = 1f / 2f;
+            powerUse = 8f;
 
             health = 200 * size * size;
-            consumes.powerBuffered(1200f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
@@ -1637,6 +1635,7 @@ public class Blocks implements ContentList{
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 30, Items.copper, 30, Items.silicon, 30));
             repairSpeed = 0.1f;
+            powerUse = 1f;
         }};
 
         //endregion
@@ -1644,51 +1643,51 @@ public class Blocks implements ContentList{
 
         dartPad = new MechPad("dart-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 200, Items.graphite, 100, Items.copper, 150));
-            mech = Mechs.dart;
+            mech = Mechs.alpha;
             size = 2;
-            consumes.powerBuffered(50f);
+            consumes.power(0.5f);
         }};
 
         deltaPad = new MechPad("delta-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 350, Items.titanium, 350, Items.copper, 400, Items.silicon, 450, Items.thorium, 300));
             mech = Mechs.delta;
             size = 2;
-            consumes.powerBuffered(70f);
+            consumes.power(0.7f);
         }};
 
         tauPad = new MechPad("tau-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 250, Items.titanium, 250, Items.copper, 250, Items.silicon, 250));
             mech = Mechs.tau;
             size = 2;
-            consumes.powerBuffered(100f);
+            consumes.power(1f);
         }};
 
         omegaPad = new MechPad("omega-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 450, Items.graphite, 550, Items.silicon, 650, Items.thorium, 600, Items.surgealloy, 240));
             mech = Mechs.omega;
             size = 3;
-            consumes.powerBuffered(120f);
+            consumes.power(1.2f);
         }};
 
         javelinPad = new MechPad("javelin-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 350, Items.silicon, 450, Items.titanium, 500, Items.plastanium, 400, Items.phasefabric, 200));
             mech = Mechs.javelin;
             size = 2;
-            consumes.powerBuffered(80f);
+            consumes.power(0.8f);
         }};
 
         tridentPad = new MechPad("trident-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 250, Items.copper, 250, Items.silicon, 250, Items.titanium, 300, Items.plastanium, 200));
             mech = Mechs.trident;
             size = 2;
-            consumes.powerBuffered(100f);
+            consumes.power(1f);
         }};
 
         glaivePad = new MechPad("glaive-ship-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 450, Items.silicon, 650, Items.titanium, 700, Items.plastanium, 600, Items.surgealloy, 200));
             mech = Mechs.glaive;
             size = 3;
-            consumes.powerBuffered(120f);
+            consumes.power(1.2f);
         }};
 
         //endregion
