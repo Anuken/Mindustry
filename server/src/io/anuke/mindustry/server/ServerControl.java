@@ -94,7 +94,7 @@ public class ServerControl implements ApplicationListener{
 
                 if(socketOutput != null){
                     try{
-                        socketOutput.println("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
+                        socketOutput.println(format(text + "&fr", false, args));
                     }catch(Throwable e){
                         err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
                     }
@@ -768,7 +768,6 @@ public class ServerControl implements ApplicationListener{
                             socketOutput = new PrintWriter(client.getOutputStream(), true);
                             String line;
                             while(client.isConnected() && (line = in.readLine()) != null){
-                                info("&lmRecieved remote command: &lb'{0}'", line);
                                 String result = line;
                                 Core.app.post(() -> handleCommandString(result));
                             }
