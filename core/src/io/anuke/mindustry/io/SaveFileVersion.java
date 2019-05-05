@@ -1,8 +1,9 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.util.Pack;
+import io.anuke.arc.util.io.ReusableByteOutStream;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
@@ -18,14 +19,63 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
+/**
+ * Format:
+ *
+ * Everything is compressed. Use a DeflaterStream to begin reading.
+ *
+ * 1. version of format / int
+ * 2. meta tags
+ *  - length / short
+ *  - continues with (string, string) pairs indicating key, value
+ */
 public abstract class SaveFileVersion{
     public final int version;
+
+    private final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
+    private final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
     private final ObjectMap<String, String> fallback = ObjectMap.of(
         "alpha-dart-mech-pad", "dart-mech-pad"
     );
 
     public SaveFileVersion(int version){
         this.version = version;
+    }
+
+    /** Write a chunk of input to the stream. An integer of some length is written first, followed by the data. */
+    public void writeChunk(DataOutput output, boolean isByte, IORunner<DataOutput> runner) throws IOException{
+        //reset output position
+        byteOutput.position(0);
+        //writer the needed info
+        runner.accept(dataBytes);
+        int length = byteOutput.position();
+        //write length (either int or byte) followed by the output bytes
+        if(!isByte){
+            output.writeInt(length);
+        }else{
+            if(length > 255){
+                throw new IOException("Byte write length exceeded: " + length + " > 255");
+            }
+            output.writeByte(length);
+        }
+        output.write(byteOutput.getBytes(), 0, length);
+    }
+
+    /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
+    public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
+        int length = isByte ? input.readUnsignedByte() : input.readInt();
+        //TODO descriptive error with chunk name
+        runner.accept(input);
+        return length;
+    }
+
+    /** Skip a chunk completely. */
+    public void skipChunk(DataInput input, boolean isByte) throws IOException{
+        int length = readChunk(input, isByte, t -> {});
+        int skipped = input.skipBytes(length);
+        if(length != skipped){
+            throw new IOException("Could not skip bytes. Expected length: " + length + "; Actual length: " + skipped);
+        }
     }
 
     public SaveMeta getData(DataInputStream stream) throws IOException{
@@ -37,6 +87,23 @@ public abstract class SaveFileVersion{
         String map = stream.readUTF();
         int wave = stream.readInt();
         return new SaveMeta(version, time, playtime, build, map, wave, rules);
+    }
+
+    public void writeMeta(DataOutputStream stream, ObjectMap<String, String> map) throws IOException{
+        stream.writeShort(map.size);
+        for(Entry<String, String> entry : map.entries()){
+            stream.writeUTF(entry.key);
+            stream.writeUTF(entry.value);
+        }
+    }
+
+    public StringMap readMeta(DataInputStream stream) throws IOException{
+        StringMap map = new StringMap();
+        short size = stream.readShort();
+        for(int i = 0; i < size; i++){
+            map.put(stream.readUTF(), stream.readUTF());
+        }
+        return map;
     }
 
     public void writeMap(DataOutputStream stream) throws IOException{
@@ -81,7 +148,6 @@ public abstract class SaveFileVersion{
                 if(tile.entity.liquids != null) tile.entity.liquids.write(stream);
                 if(tile.entity.cons != null) tile.entity.cons.write(stream);
 
-                tile.entity.writeConfig(stream);
                 tile.entity.write(stream);
             }else{
                 //write consecutive non-entity blocks
@@ -157,7 +223,6 @@ public abstract class SaveFileVersion{
                 if(tile.entity.liquids != null) tile.entity.liquids.read(stream);
                 if(tile.entity.cons != null) tile.entity.cons.read(stream);
 
-                tile.entity.readConfig(stream);
                 tile.entity.read(stream);
             }else{
                 int consecutives = stream.readUnsignedByte();
@@ -255,4 +320,8 @@ public abstract class SaveFileVersion{
     public abstract void read(DataInputStream stream) throws IOException;
 
     public abstract void write(DataOutputStream stream) throws IOException;
+
+    public interface IORunner<T>{
+        void accept(T stream) throws IOException;
+    }
 }

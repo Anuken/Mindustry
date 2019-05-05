@@ -11,9 +11,7 @@ import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-//TODO load backup meta if possible
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(new Save1());
 
@@ -30,11 +28,11 @@ public class SaveIO{
     public static void saveToSlot(int slot){
         FileHandle file = fileFor(slot);
         boolean exists = file.exists();
-        if(exists) file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
+        if(exists) file.moveTo(backupFileFor(file));
         try{
             write(fileFor(slot));
         }catch(Exception e){
-            if(exists) file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
+            if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
         }
     }
@@ -47,12 +45,12 @@ public class SaveIO{
         return new DataInputStream(new InflaterInputStream(fileFor(slot).read(bufferSize)));
     }
 
+    public static DataInputStream getBackupSlotStream(int slot){
+        return new DataInputStream(new InflaterInputStream(backupFileFor(fileFor(slot)).read(bufferSize)));
+    }
+
     public static boolean isSaveValid(int slot){
-        try{
-            return isSaveValid(getSlotStream(slot));
-        }catch(Exception e){
-            return false;
-        }
+        return isSaveValid(getSlotStream(slot)) || isSaveValid(getBackupSlotStream(slot));
     }
 
     public static boolean isSaveValid(FileHandle file){
@@ -60,7 +58,6 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(DataInputStream stream){
-
         try{
             getData(stream);
             return true;
@@ -88,6 +85,10 @@ public class SaveIO{
 
     public static FileHandle fileFor(int slot){
         return saveDirectory.child(slot + "." + Vars.saveExtension);
+    }
+
+    public static FileHandle backupFileFor(FileHandle file){
+        return file.sibling(file.name() + "-backup." + file.extension());
     }
 
     public static void write(FileHandle file){

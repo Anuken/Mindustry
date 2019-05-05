@@ -132,12 +132,12 @@ public class Sorter extends Block{
         public Item sortItem;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             byte b = stream.readByte();
             sortItem = b == -1 ? null : content.items().get(b);
         }

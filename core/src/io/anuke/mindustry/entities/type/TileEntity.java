@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
@@ -115,16 +114,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
+    @CallSuper
     public void write(DataOutput stream) throws IOException{
     }
 
-    public void writeConfig(DataOutput stream) throws IOException{
-    }
-
+    @CallSuper
     public void read(DataInput stream) throws IOException{
-    }
-
-    public void readConfig(DataInput stream) throws IOException{
     }
 
     public boolean collide(Bullet other){

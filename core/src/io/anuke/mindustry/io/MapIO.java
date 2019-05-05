@@ -171,7 +171,9 @@ public class MapIO{
                 }else if(tile.entity != null){
                     stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
                     stream.writeShort(/*(short)tile.entity.health*/tile.block().health); //health
-                    tile.entity.writeConfig(stream);
+                    if(tile.block() == Blocks.liquidSource || tile.block() == Blocks.unloader || tile.block() == Blocks.sorter){
+                        stream.writeByte(-1); //write an meaningless byte here, just a fallback thing
+                    }
                 }else{
                     //write consecutive non-entity blocks
                     int consecutives = 0;
@@ -305,7 +307,9 @@ public class MapIO{
                             tile.entity.health = /*health*/tile.block().health;
                             tile.setRotation(rotation);
 
-                            tile.entity.readConfig(stream);
+                            if(tile.block() == Blocks.liquidSource || tile.block() == Blocks.unloader || tile.block() == Blocks.sorter){
+                                stream.readByte(); //these blocks have an extra config byte, read it
+                            }
                         }else{ //no entity/part, read consecutives
                             int consecutives = stream.readUnsignedByte();
 

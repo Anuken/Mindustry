@@ -24,9 +24,11 @@ public class Tile implements Position, TargetTrait{
     public short x, y;
     protected Block block;
     protected Floor floor;
-    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number. */
+    /** Rotation, 0-3. Also used to store offload location and link, in which case it can be any number.
+     * When saved in non-link form, this data is truncated to 4 bits = max 16.*/
     private byte rotation;
-    /** Team ordinal. */
+    /** Team ordinal. Keep in mind that this is written as 4 bits, which means that there are only 2^4 = 16 possible teams.
+     * Complications may arise from using signed bytes as well. Be careful.*/
     private byte team;
     /** Ore that is on top of this (floor) block. */
     private byte overlay = 0;

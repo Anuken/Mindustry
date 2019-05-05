@@ -7,7 +7,7 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.io.ReusableByteArrayInputStream;
+import io.anuke.arc.util.io.ReusableByteInStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
@@ -50,7 +50,7 @@ public class NetClient implements ApplicationListener{
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
     /** Byte stream for reading in snapshots. */
-    private ReusableByteArrayInputStream byteStream = new ReusableByteArrayInputStream();
+    private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
 
     public NetClient(){

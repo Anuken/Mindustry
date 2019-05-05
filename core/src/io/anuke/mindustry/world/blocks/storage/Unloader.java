@@ -104,12 +104,12 @@ public class Unloader extends Block{
         public Item sortItem = null;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

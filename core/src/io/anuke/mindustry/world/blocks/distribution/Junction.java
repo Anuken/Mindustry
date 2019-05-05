@@ -7,6 +7,8 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
+import java.io.*;
+
 import static io.anuke.mindustry.Vars.content;
 
 public class Junction extends Block{
@@ -82,6 +84,20 @@ public class Junction extends Block{
 
     class JunctionEntity extends TileEntity{
         Buffer[] buffers = {new Buffer(), new Buffer(), new Buffer(), new Buffer()};
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            for(Buffer b : buffers){
+                b.write(stream);
+            }
+        }
+
+        @Override
+        public void read(DataInput stream) throws IOException{
+            for(Buffer b : buffers){
+                b.read(stream);
+            }
+        }
     }
 
     class Buffer{
@@ -95,6 +111,25 @@ public class Junction extends Block{
 
         boolean full(){
             return index >= items.length - 1;
+        }
+
+        void write(DataOutput stream) throws IOException{
+            stream.writeByte((byte)index);
+            stream.writeByte((byte)items.length);
+            for(long l : items){
+                stream.writeLong(l);
+            }
+        }
+
+        void read(DataInput stream) throws IOException{
+            index = stream.readByte();
+            byte length = stream.readByte();
+            for(int i = 0; i < length; i++){
+                long l = stream.readLong();
+                if(i < items.length){
+                    items[i] = l;
+                }
+            }
         }
     }
 }

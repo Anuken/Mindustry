@@ -116,12 +116,12 @@ public class LiquidSource extends Block{
         public Liquid source = null;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
             stream.writeByte(source == null ? -1 : source.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
+        public void read(DataInput stream) throws IOException{
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }
