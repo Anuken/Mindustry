@@ -127,7 +127,6 @@ public class ForceProjector extends Block{
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw * Time.delta());
         }
 
         if(entity.buildup > 0){

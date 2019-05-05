@@ -492,6 +492,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void update(){
         hitTime -= Time.delta();
+        textFadeTime -= Time.delta() / (60 * 5);
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             velocity.set(0f, 0f);

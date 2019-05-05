@@ -862,6 +862,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 200, Items.titanium, 150, Items.silicon, 250));
             size = 3;
             consumes.item(Items.phasefabric).boost();
+            consumes.power(3f);
         }};
 
         shockMine = new ShockMine("shock-mine"){{
@@ -1539,7 +1540,7 @@ public class Blocks implements ContentList{
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUse = 8f;
+            powerUse = 10f;
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
