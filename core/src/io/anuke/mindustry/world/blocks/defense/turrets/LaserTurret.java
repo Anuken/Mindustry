@@ -60,7 +60,7 @@ public class LaserTurret extends PowerTurret{
             return;
         }
 
-        if(entity.reload >= reload && entity.cons.valid()){
+        if(entity.reload >= reload && (entity.cons.valid() || tile.isEnemyCheat())){
             BulletType type = peekAmmo(tile);
 
             shoot(tile, type);
@@ -70,7 +70,7 @@ public class LaserTurret extends PowerTurret{
             Liquid liquid = entity.liquids.current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = Math.min(entity.liquids.get(liquid), maxUsed * Time.delta());
+            float used = tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta());
             entity.reload += used;
             entity.liquids.remove(liquid, used);
 
