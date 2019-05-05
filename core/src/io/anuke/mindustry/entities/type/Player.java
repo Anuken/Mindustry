@@ -432,7 +432,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             if(getCurrentRequest() == request && request.progress > 0.001f) continue;
 
             if(request.breaking){
-                Block block = world.tile(request.x, request.y).target().block();
+                Block block = world.ltile(request.x, request.y).block();
 
                 //draw removal request
                 Lines.stroke(2f, Pal.removeBack);

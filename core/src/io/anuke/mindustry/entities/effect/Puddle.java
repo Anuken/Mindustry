@@ -201,7 +201,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
                 }
             });
 
-            if(liquid.temperature > 0.7f && (tile.target().entity != null) && Mathf.chance(0.3 * Time.delta())){
+            if(liquid.temperature > 0.7f && (tile.link().entity != null) && Mathf.chance(0.3 * Time.delta())){
                 Fire.create(tile);
             }
 

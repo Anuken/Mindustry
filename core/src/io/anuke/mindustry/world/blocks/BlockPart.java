@@ -24,6 +24,7 @@ public class BlockPart extends Block{
     }
 
     public static BlockPart get(int dx, int dy){
+        if(dx == -maxSize/2 && dy == -maxSize/2) throw new IllegalArgumentException("Why are you getting a [0,0] blockpart? Stop it.");
         return parts[dx + maxSize/2][dy + maxSize/2];
     }
 

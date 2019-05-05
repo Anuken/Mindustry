@@ -2,12 +2,13 @@ package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.ReusableByteOutStream;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.Serialization;
+import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.MappableContent;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -19,25 +20,25 @@ import static io.anuke.mindustry.Vars.world;
 
 /**
  * Format:
- *
- * Everything is compressed. Use a DeflaterStream to begin reading.
- *
  * 1. version of format / int
- * 2. meta tags
- *  - length / short
- *  - continues with (string, string) pairs indicating key, value
+ * (begin deflating)
+ * 2. regions
  */
 public abstract class SaveFileVersion{
     public final int version;
 
     private final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
     private final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
-    private final ObjectMap<String, String> fallback = ObjectMap.of(
-        "alpha-dart-mech-pad", "dart-mech-pad"
-    );
+    private final Region[] regions;
+    private final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
 
-    public SaveFileVersion(int version){
+    public SaveFileVersion(int version, Region... regions){
         this.version = version;
+        this.regions = regions;
+    }
+
+    public void writeChunk(DataOutput output, IORunner<DataOutput> runner) throws IOException{
+        writeChunk(output, false, runner);
     }
 
     /** Write a chunk of input to the stream. An integer of some length is written first, followed by the data. */
@@ -59,6 +60,10 @@ public abstract class SaveFileVersion{
         output.write(byteOutput.getBytes(), 0, length);
     }
 
+    public int readChunk(DataInput input, IORunner<DataInput> runner) throws IOException{
+        return readChunk(input, false, runner);
+    }
+
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
         int length = isByte ? input.readUnsignedByte() : input.readInt();
@@ -76,18 +81,7 @@ public abstract class SaveFileVersion{
         }
     }
 
-    public SaveMeta getData(DataInputStream stream) throws IOException{
-        long time = stream.readLong();
-        long playtime = stream.readLong();
-        int build = stream.readInt();
-
-        Rules rules = Serialization.readRulesStreamJson(stream);
-        String map = stream.readUTF();
-        int wave = stream.readInt();
-        return new SaveMeta(version, time, playtime, build, map, wave, rules);
-    }
-
-    public void writeMeta(DataOutputStream stream, ObjectMap<String, String> map) throws IOException{
+    public void writeMeta(DataOutput stream, ObjectMap<String, String> map) throws IOException{
         stream.writeShort(map.size);
         for(Entry<String, String> entry : map.entries()){
             stream.writeUTF(entry.key);
@@ -95,7 +89,7 @@ public abstract class SaveFileVersion{
         }
     }
 
-    public StringMap readMeta(DataInputStream stream) throws IOException{
+    public StringMap readMeta(DataInput stream) throws IOException{
         StringMap map = new StringMap();
         short size = stream.readShort();
         for(int i = 0; i < size; i++){
@@ -104,7 +98,7 @@ public abstract class SaveFileVersion{
         return map;
     }
 
-    public void writeMap(DataOutputStream stream) throws IOException{
+    public void writeMap(DataOutput stream) throws IOException{
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());
@@ -185,7 +179,7 @@ public abstract class SaveFileVersion{
         //read blocks
         for(int i = 0; i < width * height; i++){
             int x = i % width, y = i / width;
-            Block block = content.block(stream.readByte());
+            Block block = content.block(stream.readShort());
             Tile tile = tiles[x][y];
             tile.setBlock(block);
 
@@ -208,6 +202,7 @@ public abstract class SaveFileVersion{
     }
 
     public void writeEntities(DataOutputStream stream) throws IOException{
+        //write entity chunk
         int groups = 0;
 
         for(EntityGroup<?> group : Entities.getAllGroups()){
@@ -222,8 +217,11 @@ public abstract class SaveFileVersion{
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){
-                    stream.writeByte(((SaveTrait)entity).getTypeID());
-                    ((SaveTrait)entity).writeSave(stream);
+                    //each entity is a separate chunk.
+                    writeChunk(stream, true, out -> {
+                        stream.writeByte(((SaveTrait)entity).getTypeID());
+                        ((SaveTrait)entity).writeSave(out);
+                    });
                 }
             }
         }
@@ -284,11 +282,45 @@ public abstract class SaveFileVersion{
         }
     }
 
-    public abstract void read(DataInputStream stream) throws IOException;
+    public final void read(DataInputStream stream, CounterInputStream counter) throws IOException{
+        for(Region region : regions){
+            counter.resetCount();
+            try{
+                int length = readChunk(stream, region.reader);
+                if(length != counter.count() + 4){
+                    throw new IOException("Error reading region \"" + region.name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() + 4));
+                }
+            }catch(Throwable e){
+                throw new IOException("Error reading region \"" + region.name + "\".", e);
+            }
+        }
+    }
 
-    public abstract void write(DataOutputStream stream) throws IOException;
+    public final void write(DataOutputStream stream) throws IOException{
+        for(Region region : regions){
+            try{
+                writeChunk(stream, region.writer);
+            }catch(Throwable e){
+                throw new IOException("Error writing region \"" + region.name + "\".", e);
+            }
+        }
+    }
 
-    public interface IORunner<T>{
+    /** A region of a save file that holds a specific category of information.
+     * Uses: simplify code reuse, provide better error messages, skip unnecessary data.*/
+    protected final class Region{
+        final IORunner<DataOutput> writer;
+        final IORunner<DataInput> reader;
+        final String name;
+
+        public Region(IORunner<DataOutput> writer, IORunner<DataInput> reader, String name){
+            this.writer = writer;
+            this.reader = reader;
+            this.name = name;
+        }
+    }
+
+    protected interface IORunner<T>{
         void accept(T stream) throws IOException;
     }
 }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
 
@@ -12,6 +13,8 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
+    /** Format header. This is the string 'MSAV' in ASCII. */
+    public static final byte[] header = {77, 83, 65, 86};
     public static final IntMap<SaveFileVersion> versions = new IntMap<>();
     public static final Array<SaveFileVersion> versionArray = Array.with(new Save1());
 
@@ -130,15 +133,16 @@ public class SaveIO{
     }
 
     public static void load(InputStream is) throws SaveException{
-        try(DataInputStream stream = new DataInputStream(is)){
+        try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
             int version = stream.readInt();
             SaveFileVersion ver = versions.get(version);
 
-            ver.read(stream);
+            ver.read(stream, counter);
         }catch(Exception e){
-            content.setTemporaryMapper(null);
             throw new SaveException(e);
+        }finally{
+            content.setTemporaryMapper(null);
         }
     }
 

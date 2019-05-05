@@ -98,7 +98,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             return;
         }
 
-        TileEntity entity = tile.target().entity;
+        TileEntity entity = tile.link().entity;
         boolean damage = entity != null;
 
         float flammability = baseFlammability + puddleFlammability;

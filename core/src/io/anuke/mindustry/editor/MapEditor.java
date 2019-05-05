@@ -246,7 +246,7 @@ public class MapEditor{
                                 tile.setTeam(drawTeam);
                             }
                             if(drawBlock.rotate){
-                                tile.setRotation((byte)rotation);
+                                tile.rotation((byte)rotation);
                             }
                         }
                     }

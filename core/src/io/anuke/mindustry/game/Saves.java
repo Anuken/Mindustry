@@ -12,14 +12,14 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.io.SaveIO.SaveException;
 import io.anuke.mindustry.io.SaveMeta;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Zone;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.saveExtension;
+import static io.anuke.mindustry.Vars.state;
 
 public class Saves{
     private int nextSlot;
@@ -224,7 +224,7 @@ public class Saves{
         }
 
         public Zone getZone(){
-            return meta == null || meta.rules == null ? null : content.getByID(ContentType.zone, meta.rules.zone);
+            return meta == null || meta.rules == null ? null : meta.rules.zone;
         }
 
         public int getBuild(){

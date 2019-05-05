@@ -116,7 +116,7 @@ public enum EditorTool{
                 }
 
                 if(draw.rotate){
-                    write.setRotation((byte)editor.rotation);
+                    write.rotation((byte)editor.rotation);
                 }
             };
 

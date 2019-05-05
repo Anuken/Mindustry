@@ -200,7 +200,7 @@ public abstract class BasicGenerator extends RandomGenerator{
                     Tile child = tiles[newx][newy];
                     if(!closed.get(child.x, child.y)){
                         closed.set(child.x, child.y);
-                        child.setRotation(child.relativeTo(next.x, next.y));
+                        child.rotation(child.relativeTo(next.x, next.y));
                         costs.put(child.pos(), th.cost(child) + baseCost);
                         queue.add(child);
                     }
@@ -215,7 +215,7 @@ public abstract class BasicGenerator extends RandomGenerator{
         Tile current = end;
         while(current != start){
             out.add(current);
-            Point2 p = Geometry.d4(current.getRotation());
+            Point2 p = Geometry.d4(current.rotation());
             current = tiles[current.x + p.x][current.y + p.y];
         }
 

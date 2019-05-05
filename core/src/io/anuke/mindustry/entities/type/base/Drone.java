@@ -58,7 +58,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.cblock));
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.rotation(), entity.cblock));
                     }
                 }
 

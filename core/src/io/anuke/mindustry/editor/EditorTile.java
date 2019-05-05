@@ -67,10 +67,10 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setRotation(byte rotation){
-        byte previous = getRotation();
+    public void rotation(byte rotation){
+        byte previous = rotation();
         if(previous == rotation) return;
-        super.setRotation(rotation);
+        super.rotation(rotation);
         op(TileOp.get(x, y, (byte)OpType.rotation.ordinal(), previous, rotation));
     }
 

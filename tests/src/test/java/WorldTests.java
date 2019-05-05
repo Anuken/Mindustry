@@ -31,7 +31,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                assertEquals(4, tiles[x][y].getRotation());
+                assertEquals(4, tiles[x][y].rotation());
             }
         }
     }
@@ -43,7 +43,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                assertEquals(0, tiles[x][y].getRotation());
+                assertEquals(0, tiles[x][y].rotation());
             }
         }
     }
@@ -55,7 +55,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                assertEquals(0, tiles[x][y].getRotation());
+                assertEquals(0, tiles[x][y].rotation());
             }
         }
     }
@@ -67,7 +67,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                assertEquals(0, tiles[x][y].getRotation());
+                assertEquals(0, tiles[x][y].rotation());
             }
         }
     }
@@ -80,7 +80,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                byte darkness = tiles[x][y].getRotation();
+                byte darkness = tiles[x][y].rotation();
                 int distance = Math.abs(x - 5) + Math.abs(y - 5);
                 assertEquals(Math.min(Math.max(distance - 1, 0), 4), darkness);
             }
@@ -95,7 +95,7 @@ public class WorldTests{
 
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                byte darkness = tiles[x][y].getRotation();
+                byte darkness = tiles[x][y].rotation();
                 int distance = Math.abs(x - 7) + Math.abs(y - 7);
                 assertEquals(Math.min(Math.max(distance - 1, 0), 4), darkness);
             }

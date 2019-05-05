@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Consumer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.Blocks;
@@ -120,7 +121,7 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public Team getTeam(){
-        return Team.all[target().team];
+        return Team.all[link().team];
     }
 
     public void setTeam(Team team){
@@ -169,20 +170,12 @@ public class Tile implements Position, TargetTrait{
         this.overlay = 0;
     }
 
-    public byte getRotation(){
+    public byte rotation(){
         return rotation;
     }
 
-    public void setRotation(byte rotation){
-        this.rotation = rotation;
-    }
-
-    public byte getDump(){
-        return rotation;
-    }
-
-    public void setDump(byte dump){
-        this.rotation = dump;
+    public void rotation(int rotation){
+        this.rotation = (byte)rotation;
     }
 
     public short overlayID(){
@@ -210,31 +203,24 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean passable(){
-        Block block = block();
-        Block floor = floor();
         return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
     }
 
     /** Whether this block was placed by a player/unit. */
     public boolean synthetic(){
-        Block block = block();
         return block.update || block.destructible;
     }
 
     public boolean solid(){
-        Block block = block();
-        Block floor = floor();
-        return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this)
-        || (isLinked() && getLinked().block().isSolidFor(getLinked()));
+        return block.solid || block.isSolidFor(this) || (isLinked() && link().solid());
     }
 
     public boolean breakable(){
-        Block block = block();
-        if(!isLinked()){
-            return (block.destructible || block.breakable || block.update);
-        }else{
-            return getLinked() != this && getLinked().getLinked() == null && getLinked().breakable();
-        }
+        return !isLinked() ? (block.destructible || block.breakable || block.update) : link().breakable();
+    }
+
+    public Tile link(){
+        return block.linked(this);
     }
 
     public boolean isEnemyCheat(){
@@ -249,21 +235,28 @@ public class Tile implements Position, TargetTrait{
      * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
-        Block block = block();
-        tmpArray.clear();
+    public void getLinkedTiles(Consumer<Tile> cons){
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
             for(int dx = 0; dx < block.size; dx++){
                 for(int dy = 0; dy < block.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other != null) tmpArray.add(other);
+                    if(other != null) cons.accept(other);
                 }
             }
         }else{
-            tmpArray.add(this);
+            cons.accept(this);
         }
+    }
+
+    /**
+     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+        tmpArray.clear();
+        getLinkedTiles(tmpArray::add);
         return tmpArray;
     }
 
@@ -355,8 +348,8 @@ public class Tile implements Position, TargetTrait{
 
         //+26
 
-        if(target().synthetic()){
-            cost += Mathf.clamp(target().block().health / 10f, 0, 20);
+        if(link().synthetic()){
+            cost += Mathf.clamp(link().block.health / 10f, 0, 20);
         }
 
         //+46
@@ -410,9 +403,8 @@ public class Tile implements Position, TargetTrait{
         }else if(!(block instanceof BlockPart) && !world.isGenerating()){
             //since the entity won't update proximity for us, update proximity for all nearby tiles manually
             for(Point2 p : Geometry.d4){
-                Tile tile = world.tile(x + p.x, y + p.y);
+                Tile tile = world.ltile(x + p.x, y + p.y);
                 if(tile != null){
-                    tile = tile.target();
                     tile.block().onProximityUpdate(tile);
                 }
             }
@@ -455,9 +447,6 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public String toString(){
-        Block block = block();
-        Block floor = floor();
-
         return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (isLinked() ? " link=[" + linkX(rotation) + ", " + linkY(rotation) + "]" : "");
     }

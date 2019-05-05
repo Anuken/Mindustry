@@ -46,7 +46,7 @@ public class DrawOperation{
                     editor.updateLinks(block, tile.x, tile.y);
                 }
             }else if(type == OpType.rotation.ordinal()){
-                tile.setRotation(to);
+                tile.rotation(to);
             }else if(type == OpType.team.ordinal()){
                 tile.setTeam(Team.all[to]);
             }else if(type == OpType.ore.ordinal()){

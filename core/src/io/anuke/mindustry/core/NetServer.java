@@ -289,7 +289,7 @@ public class NetServer implements ApplicationListener{
             //auto-skip done requests
             if(req.breaking && tile.block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.getRotation() == req.rotation)){
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);

@@ -112,16 +112,19 @@ public class Blocks implements ContentList{
         //create special blockpart variants
         for(int dx = 0; dx < BlockPart.maxSize; dx++){
             for(int dy = 0; dy < BlockPart.maxSize; dy++){
-                new BlockPart(dx - BlockPart.maxSize/2, dy - BlockPart.maxSize/2);
+                int fx = dx - BlockPart.maxSize/2, fy = dy - BlockPart.maxSize/2;
+                if(fx != 0 || fy != 0){
+                    new BlockPart(fx, fy);
+                }
             }
         }
 
         spawn = new Block("spawn");
 
-        //Registers build blocks from size 1-6
+        //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= 6; i++){
-            new BuildBlock("build" + i);
+        for(int i = 1; i <= BuildBlock.maxSize; i++){
+            new BuildBlock(i);
         }
 
         deepwater = new Floor("deepwater"){{
@@ -561,7 +564,7 @@ public class Blocks implements ContentList{
             drawer = tile -> {
                 LiquidModule mod = tile.entity.liquids;
 
-                int rotation = rotate ? tile.getRotation() * 90 : 0;
+                int rotation = rotate ? tile.rotation() * 90 : 0;
 
                 Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy(), rotation);
 

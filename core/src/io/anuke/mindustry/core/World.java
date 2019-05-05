@@ -20,6 +20,7 @@ import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -111,6 +112,10 @@ public class World implements ApplicationListener{
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
+    public @Nullable Tile ltileWorld(float x, float y){
+        return ltile(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
     public int toTile(float coord){
         return Math.round(coord / tilesize);
     }
@@ -194,14 +199,14 @@ public class World implements ApplicationListener{
     }
 
     public Zone getZone(){
-        return content.getByID(ContentType.zone, state.rules.zone);
+        return state.rules.zone;
     }
 
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
             state.rules = zone.rules.get();
-            state.rules.zone = zone.id;
+            state.rules.zone = zone;
             loadGenerator(zone.generator);
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){
@@ -295,16 +300,7 @@ public class World implements ApplicationListener{
     }
 
     public void removeBlock(Tile tile){
-        if(!tile.block().isMultiblock() && !tile.isLinked()){
-            tile.setBlock(Blocks.air);
-        }else{
-            Tile target = tile.target();
-            Array<Tile> removals = target.getLinkedTiles(tempTiles);
-            for(Tile toremove : removals){
-                //note that setting a new block automatically unlinks it
-                if(toremove != null) toremove.setBlock(Blocks.air);
-            }
-        }
+        tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
     }
 
     public void setBlock(Tile tile, Block block, Team team){
@@ -324,22 +320,12 @@ public class World implements ApplicationListener{
                     if(!(worldx == tile.x && worldy == tile.y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
                         }
                     }
                 }
             }
         }
-    }
-
-    public int transform(int packed, int oldWidth, int oldHeight, int newWidth, int shiftX, int shiftY){
-        int x = packed % oldWidth;
-        int y = packed / oldWidth;
-        if(!Structs.inBounds(x, y, oldWidth, oldHeight)) return -1;
-        x += shiftX;
-        y += shiftY;
-        return y * newWidth + x;
     }
 
     /**
@@ -462,7 +448,7 @@ public class World implements ApplicationListener{
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
                 if(tile.block().solid && !tile.block().synthetic()){
-                    tiles[x][y].setRotation(dark[x][y]);
+                    tiles[x][y].rotation(dark[x][y]);
                 }
             }
         }
@@ -509,8 +495,7 @@ public class World implements ApplicationListener{
                     if(!(worldx == x && worldy == y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
                         }
                     }
                 }

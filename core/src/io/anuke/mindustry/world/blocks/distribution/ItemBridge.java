@@ -252,7 +252,7 @@ public class ItemBridge extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        if(tile.getTeam() != source.target().getTeam()) return false;
+        if(tile.getTeam() != source.getTeam()) return false;
 
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);

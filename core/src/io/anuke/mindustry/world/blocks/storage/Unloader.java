@@ -35,8 +35,7 @@ public class Unloader extends Block{
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item){
-        Block block = to.target().block();
-        return !(block instanceof StorageBlock);
+        return !(to.block() instanceof StorageBlock);
     }
 
     @Override

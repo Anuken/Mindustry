@@ -28,15 +28,25 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class BuildBlock extends Block{
+    public static final int maxSize = 9;
+    private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
 
-    public BuildBlock(String name){
-        super(name);
+    public BuildBlock(int size){
+        super("build" + size);
+        this.size = size;
         update = true;
-        size = Integer.parseInt(name.charAt(name.length() - 1) + "");
         health = 20;
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
+
+        buildBlocks[size - 1] = this;
+    }
+
+    /** Returns a BuildBlock by size. */
+    public static BuildBlock get(int size){
+        if(size > maxSize) throw new IllegalArgumentException("No. Don't place BuildBlocks of size greater than " + maxSize);
+        return buildBlocks[size - 1];
     }
 
     @Remote(called = Loc.server)
@@ -102,7 +112,7 @@ public class BuildBlock extends Block{
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
             player.clearBuilding();
-            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.getRotation(), entity.cblock));
+            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock));
         }
     }
 
@@ -127,7 +137,7 @@ public class BuildBlock extends Block{
         if(entity.previous == null) return;
 
         if(Core.atlas.isFound(entity.previous.icon(Icon.full))){
-            Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }
 
@@ -146,7 +156,7 @@ public class BuildBlock extends Block{
             Shaders.blockbuild.region = region;
             Shaders.blockbuild.progress = entity.progress;
 
-            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.getRotation() * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
             Draw.flush();
         }
     }
@@ -198,7 +208,7 @@ public class BuildBlock extends Block{
             }
 
             if(progress >= 1f || state.rules.infiniteResources){
-                Call.onConstructFinish(tile, cblock, builderID, tile.getRotation(), builder.getTeam());
+                Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam());
             }
         }
 

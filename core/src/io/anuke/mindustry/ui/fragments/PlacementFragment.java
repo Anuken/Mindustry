@@ -78,7 +78,7 @@ public class PlacementFragment extends Fragment{
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(tile != null){
-                tile = tile.target();
+                tile = tile.link();
                 Block tryRecipe = tile.block();
                 if(tryRecipe.isVisible() && unlocked(tryRecipe)){
                     input.block = tryRecipe;
@@ -313,7 +313,7 @@ public class PlacementFragment extends Fragment{
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             if(tile != null){
-                hoverTile = tile.target();
+                hoverTile = tile.link();
             }else{
                 hoverTile = null;
             }

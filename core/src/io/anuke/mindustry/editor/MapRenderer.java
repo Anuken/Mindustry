@@ -116,7 +116,7 @@ public class MapRenderer implements Disposable{
             if(wall.rotate){
                 mesh.draw(idxWall, region,
                 wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.getRotation() * 90 - 90);
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.rotation() * 90 - 90);
             }else{
                 mesh.draw(idxWall, region,
                 wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl) / 2f,

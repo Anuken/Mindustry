@@ -99,14 +99,14 @@ public class Sorter extends Block{
             }else if(!bc){
                 return null;
             }else{
-                if(dest.getDump() == 0){
+                if(dest.rotation() == 0){
                     to = a;
                     if(flip)
-                        dest.setDump((byte)1);
+                        dest.rotation((byte)1);
                 }else{
                     to = b;
                     if(flip)
-                        dest.setDump((byte)0);
+                        dest.rotation((byte)0);
                 }
             }
         }

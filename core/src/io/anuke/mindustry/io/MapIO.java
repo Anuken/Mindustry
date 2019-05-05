@@ -1,26 +1,21 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.LegacyColorMapper.LegacyBlock;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -30,24 +25,7 @@ import static io.anuke.mindustry.Vars.content;
 /** Reads and writes map files. */
 public class MapIO{
     public static final int version = 1;
-
     private static final int[] pngHeader = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
-    private static ObjectMap<String, Block> missingBlocks;
-
-    private static void initBlocks(){
-        if(missingBlocks != null) return;
-
-        //only for legacy maps
-        missingBlocks = ObjectMap.of(
-            "stained-stone", Blocks.shale,
-            "stained-stone-red", Blocks.shale,
-            "stained-stone-yellow", Blocks.shale,
-            "stained-rocks", Blocks.shaleRocks,
-            "stained-boulder", Blocks.shaleBoulder,
-            "stained-rocks-red", Blocks.shaleRocks,
-            "stained-rocks-yellow", Blocks.shaleRocks
-        );
-    }
 
     public static boolean isImage(FileHandle file){
         try(InputStream stream = file.read(32)){
@@ -169,7 +147,7 @@ public class MapIO{
                 if(tile.block() instanceof BlockPart){
                     stream.writeByte(tile.getLinkByte());
                 }else if(tile.entity != null){
-                    stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+                    stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.rotation())); //team + rotation
                     stream.writeShort(/*(short)tile.entity.health*/tile.block().health); //health
                     if(tile.block() == Blocks.liquidSource || tile.block() == Blocks.unloader || tile.block() == Blocks.sorter){
                         stream.writeByte(-1); //write an meaningless byte here, just a fallback thing
@@ -294,9 +272,7 @@ public class MapIO{
                         Tile tile = tiles.get(x, y);
                         tile.setBlock(block);
 
-                        if(block == Blocks.part){
-                            tile.setLinkByte(stream.readByte());
-                        }else if(tile.entity != null){
+                        if(tile.entity != null){
                             byte tr = stream.readByte();
                             short health = stream.readShort();
 
@@ -305,7 +281,7 @@ public class MapIO{
 
                             tile.setTeam(Team.all[team]);
                             tile.entity.health = /*health*/tile.block().health;
-                            tile.setRotation(rotation);
+                            tile.rotation(rotation);
 
                             if(tile.block() == Blocks.liquidSource || tile.block() == Blocks.unloader || tile.block() == Blocks.sorter){
                                 stream.readByte(); //these blocks have an extra config byte, read it
@@ -353,9 +329,8 @@ public class MapIO{
                             //multiblock parts
                             if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
                                 Tile write = tiles[worldx][worldy];
-                                write.setBlock(Blocks.part);
+                                write.setBlock(BlockPart.get(dx - 1, dy - 1));
                                 write.setTeam(Team.blue);
-                                write.setLinkByte(Pack.byteByte((byte)(dx - 1 + 8), (byte)(dy - 1 + 8)));
                             }
                         }
                     }
@@ -365,112 +340,6 @@ public class MapIO{
                     tile.setTeam(Team.blue);
                 }
             }
-        }
-    }
-
-    /** Reads a pixmap in the old 4.0 .mmap format. */
-    private static void readLegacyMmapTiles(FileHandle file, Tile[][] tiles) throws IOException{
-        readLegacyMmapTiles(file, (x, y) -> tiles[x][y]);
-    }
-
-    /** Reads a mmap in the old 4.0 .mmap format. */
-    private static void readLegacyMmapTiles(FileHandle file, TileProvider tiles) throws IOException{
-        try(DataInputStream stream = new DataInputStream(file.read(bufferSize))){
-            stream.readInt(); //version
-            byte tagAmount = stream.readByte();
-
-            for(int i = 0; i < tagAmount; i++){
-                stream.readUTF(); //key
-                stream.readUTF(); //val
-            }
-
-            initBlocks();
-
-            //block id -> real id map
-            IntIntMap map = new IntIntMap();
-            IntIntMap oreMap = new IntIntMap();
-
-            short blocks = stream.readShort();
-            for(int i = 0; i < blocks; i++){
-                short id = stream.readShort();
-                String name = stream.readUTF();
-                Block block = content.getByName(ContentType.block, name);
-                if(block == null){
-                    //substitute for replacement in missingBlocks if possible
-                    if(missingBlocks.containsKey(name)){
-                        block = missingBlocks.get(name);
-                    }else if(name.startsWith("ore-")){ //an ore floor combination
-                        String[] split = name.split("-");
-                        String itemName = split[1], floorName = Strings.join("-", Arrays.copyOfRange(split, 2, split.length));
-                        Item item = content.getByName(ContentType.item, itemName);
-                        Block oreBlock = item == null ? null : content.getByName(ContentType.block, "ore-" + item.name);
-                        Block floor = missingBlocks.get(floorName, content.getByName(ContentType.block, floorName));
-                        if(oreBlock != null && floor != null){
-                            oreMap.put(id, oreBlock.id);
-                            block = floor;
-                        }else{
-                            block = Blocks.air;
-                        }
-                    }else{
-                        block = Blocks.air;
-                    }
-
-                }
-                map.put(id, block.id);
-            }
-            short width = stream.readShort(), height = stream.readShort();
-
-            for(int y = 0; y < height; y++){
-                for(int x = 0; x < width; x++){
-                    Tile tile = tiles.get(x, y);
-                    byte floorb = stream.readByte();
-                    byte blockb = stream.readByte();
-                    byte link = stream.readByte();
-                    byte rotTeamb = stream.readByte();
-                    stream.readByte();//unused stuff
-
-                    tile.setFloor((Floor)content.block(map.get(floorb, 0)));
-                    tile.setBlock(content.block(map.get(blockb, 0)));
-                    tile.setRotation(Pack.leftByte(rotTeamb));
-                    if(tile.block().synthetic()){
-                        tile.setTeam(Team.all[Mathf.clamp(Pack.rightByte(rotTeamb), 0, Team.all.length)]);
-                    }
-
-                    if(tile.block() == Blocks.part){
-                        tile.setLinkByte(link);
-                    }
-
-                    if(oreMap.containsKey(floorb)){
-                        tile.setOverlay(content.block(oreMap.get(floorb, 0)));
-                    }
-                }
-            }
-        }
-    }
-
-    private static Map readLegacyMap(FileHandle file, boolean custom) throws IOException{
-        try(DataInputStream stream = new DataInputStream(file.read(bufferSize))){
-            ObjectMap<String, String> tags = new ObjectMap<>();
-
-            int version = stream.readInt();
-            if(version != 0) throw new IOException("Attempted to read non-legacy map in legacy method!");
-            byte tagAmount = stream.readByte();
-
-            for(int i = 0; i < tagAmount; i++){
-                String name = stream.readUTF();
-                String value = stream.readUTF();
-                tags.put(name, value);
-            }
-
-            short blocks = stream.readShort();
-            for(int i = 0; i < blocks; i++){
-                stream.readShort();
-                stream.readUTF();
-            }
-            short width = stream.readShort(), height = stream.readShort();
-
-            //note that build 64 is the default build of all maps <65; while this can be inaccurate it's better than nothing
-            return new Map(file, width, height, tags, custom, 0, 64);
         }
     }
 
