@@ -26,8 +26,8 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     public boolean hasAmmo(Tile tile){
-        //only shoot if there's power
-        return tile.entity.cons.valid();
+        //you can always rotate, but never shoot if there's no power
+        return true;
     }
 
     @Override
@@ -37,6 +37,6 @@ public abstract class PowerTurret extends CooledTurret{
 
     @Override
     protected float baseReloadSpeed(Tile tile){
-        return tile.entity.power.satisfaction;
+        return tile.isEnemyCheat() ? 1f : tile.entity.power.satisfaction;
     }
 }

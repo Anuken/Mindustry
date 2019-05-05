@@ -433,15 +433,17 @@ public class Block extends BlockStorage{
             }else{
                 current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(), () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
+                    () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
-            boolean buffered = consumes.getPower().buffered;
-            float capacity = consumes.getPower().capacity;
+            ConsumePower cons = consumes.getPower();
+            boolean buffered = cons.buffered;
+            float capacity = cons.capacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> entity.power.satisfaction));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.isZero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.satisfaction));
         }
 
         if(hasItems && configurable){
