@@ -87,6 +87,7 @@ public class Junction extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             for(Buffer b : buffers){
                 b.write(stream);
             }
@@ -94,6 +95,7 @@ public class Junction extends Block{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             for(Buffer b : buffers){
                 b.read(stream);
             }

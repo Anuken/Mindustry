@@ -178,6 +178,7 @@ public class MechPad extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(progress);
             stream.writeFloat(time);
             stream.writeFloat(heat);
@@ -185,6 +186,7 @@ public class MechPad extends Block{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             progress = stream.readFloat();
             time = stream.readFloat();
             heat = stream.readFloat();

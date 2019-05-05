@@ -30,7 +30,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
+    air, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
@@ -109,7 +109,12 @@ public class Blocks implements ContentList{
             }
         };
 
-        part = new BlockPart();
+        //create special blockpart variants
+        for(int dx = 0; dx < BlockPart.maxSize; dx++){
+            for(int dy = 0; dy < BlockPart.maxSize; dy++){
+                new BlockPart(dx - BlockPart.maxSize/2, dy - BlockPart.maxSize/2);
+            }
+        }
 
         spawn = new Block("spawn");
 

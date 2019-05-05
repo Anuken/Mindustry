@@ -144,13 +144,13 @@ public class MapIO{
             for(int i = 0; i < tiles.length * tiles[0].length; i++){
                 Tile tile = tiles[i % width][i / width];
                 stream.writeByte(tile.getFloorID());
-                stream.writeByte(tile.getOverlayID());
+                stream.writeByte(tile.overlayID());
                 int consecutives = 0;
 
                 for(int j = i + 1; j < width * height && consecutives < 255; j++){
                     Tile nextTile = tiles[j % width][j / width];
 
-                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.getOverlayID() != tile.getOverlayID()){
+                    if(nextTile.getFloorID() != tile.getFloorID() || nextTile.block() != Blocks.air || nextTile.overlayID() != tile.overlayID()){
                         break;
                     }
 

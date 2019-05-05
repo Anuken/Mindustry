@@ -451,6 +451,10 @@ public class Block extends BlockStorage{
         }
     }
 
+    public Tile linked(Tile tile){
+        return tile;
+    }
+
     public boolean isSolidFor(Tile tile){
         return false;
     }

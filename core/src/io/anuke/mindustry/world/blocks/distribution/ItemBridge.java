@@ -327,6 +327,7 @@ public class ItemBridge extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeInt(link);
             stream.writeFloat(uptime);
             stream.writeByte(incoming.size);
@@ -340,6 +341,7 @@ public class ItemBridge extends Block{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             link = stream.readInt();
             uptime = stream.readFloat();
             byte links = stream.readByte();

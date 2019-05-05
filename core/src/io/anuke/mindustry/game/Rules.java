@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.type.Zone;
 
 /**
  * Defines current rules on how the game should function.
@@ -47,10 +48,10 @@ public class Rules{
     public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
-    /** Zone ID, -1 for invalid zone. */
-    public byte zone = -1;
+    /** Zone for saves that have them.*/
+    public Zone zone;
     /** Spawn layout. Should be assigned on save load based on map or zone. */
-    public transient Array<SpawnGroup> spawns = DefaultWaves.get();
+    public Array<SpawnGroup> spawns = DefaultWaves.get();
     /** Determines if there should be limited respawns. */
     public boolean limitedRespawns = false;
     /** How many times player can respawn during one wave. */

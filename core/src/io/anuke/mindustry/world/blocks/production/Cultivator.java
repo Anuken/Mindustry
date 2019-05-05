@@ -118,11 +118,13 @@ public class Cultivator extends GenericCrafter{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(warmup);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             warmup = stream.readFloat();
         }
     }

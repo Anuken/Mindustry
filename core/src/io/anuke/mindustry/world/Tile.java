@@ -1,10 +1,8 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.util.Pack;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -24,14 +22,12 @@ public class Tile implements Position, TargetTrait{
     public short x, y;
     protected Block block;
     protected Floor floor;
-    /** Rotation, 0-3. Also used to store offload location and link, in which case it can be any number.
-     * When saved in non-link form, this data is truncated to 4 bits = max 16.*/
+    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     private byte rotation;
-    /** Team ordinal. Keep in mind that this is written as 4 bits, which means that there are only 2^4 = 16 possible teams.
-     * Complications may arise from using signed bytes as well. Be careful.*/
+    /** Team ordinal. */
     private byte team;
     /** Ore that is on top of this (floor) block. */
-    private byte overlay = 0;
+    private short overlay = 0;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -39,33 +35,16 @@ public class Tile implements Position, TargetTrait{
         block = floor = (Floor)Blocks.air;
     }
 
-    public Tile(int x, int y, byte floor, byte block){
-        this(x, y);
+    public Tile(boolean __removeThisLater, int x, int y, short floor, short overlay){
+        this.x = (short)x;
+        this.y = (short)y;
         this.floor = (Floor)content.block(floor);
-        this.block = content.block(block);
-        changed();
-    }
-
-    public Tile(int x, int y, byte floor, byte block, byte rotation, byte team){
-        this(x, y);
-        this.floor = (Floor)content.block(floor);
-        this.block = content.block(block);
-        this.rotation = rotation;
-        changed();
-        this.team = team;
+        this.overlay = overlay;
     }
 
     /** Returns this tile's position as a {@link Pos}. */
     public int pos(){
         return Pos.get(x, y);
-    }
-
-    public byte getBlockID(){
-        return block.id;
-    }
-
-    public byte getFloorID(){
-        return floor.id;
     }
 
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
@@ -206,11 +185,19 @@ public class Tile implements Position, TargetTrait{
         this.rotation = dump;
     }
 
-    public byte getOverlayID(){
+    public short overlayID(){
         return overlay;
     }
 
-    public void setOverlayID(byte ore){
+    public short blockID(){
+        return block.id;
+    }
+
+    public short floorID(){
+        return floor.id;
+    }
+
+    public void setOverlayID(short ore){
         this.overlay = ore;
     }
 
@@ -255,21 +242,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean isLinked(){
-        return block == Blocks.part;
-    }
-
-    public byte getLinkByte(){
-        return rotation;
-    }
-
-    public void setLinkByte(byte b){
-        this.rotation = b;
-    }
-
-    /** Sets this to a linked tile, which sets the block to a part. dx and dy can only be -8-7. */
-    public void setLinked(byte dx, byte dy){
-        setBlock(Blocks.part);
-        rotation = Pack.byteByte((byte)(dx + 8), (byte)(dy + 8));
+        return block instanceof BlockPart;
     }
 
     /**
@@ -315,7 +288,7 @@ public class Tile implements Position, TargetTrait{
         return tmpArray;
     }
 
-    /** Returns the block the multiblock is linked to, or null if it is not linked to any block. */
+    /** Returns the block the multiblock is linked to, or null if it is not linked to any block.
     public Tile getLinked(){
         if(!isLinked()){
             return null;
@@ -324,28 +297,10 @@ public class Tile implements Position, TargetTrait{
         }
     }
 
-    public void allNearby(Consumer<Tile> cons){
-        for(Point2 point : Edges.getEdges(block().size)){
-            Tile tile = world.tile(x + point.x, y + point.y);
-            if(tile != null){
-                cons.accept(tile.target());
-            }
-        }
-    }
-
-    public void allInside(Consumer<Tile> cons){
-        for(Point2 point : Edges.getInsideEdges(block().size)){
-            Tile tile = world.tile(x + point.x, y + point.y);
-            if(tile != null){
-                cons.accept(tile);
-            }
-        }
-    }
-
     public Tile target(){
         Tile link = getLinked();
         return link == null ? this : link;
-    }
+    }*/
 
     public Rectangle getHitbox(Rectangle rect){
         return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
@@ -506,6 +461,8 @@ public class Tile implements Position, TargetTrait{
         return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
         (isLinked() ? " link=[" + linkX(rotation) + ", " + linkY(rotation) + "]" : "");
     }
+
+    //TODO remove these!
 
     /**Returns the relative X from a link byte.*/
     public static int linkX(byte value){

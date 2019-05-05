@@ -183,11 +183,13 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(heat);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
         }
     }

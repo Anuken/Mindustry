@@ -97,6 +97,12 @@ public class World implements ApplicationListener{
         return tiles[x][y];
     }
 
+    public @Nullable Tile ltile(int x, int y){
+        Tile tile = tile(x, y);
+        if(tile == null) return null;
+        return tile.block().linked(tile);
+    }
+
     public Tile rawTile(int x, int y){
         return tiles[x][y];
     }

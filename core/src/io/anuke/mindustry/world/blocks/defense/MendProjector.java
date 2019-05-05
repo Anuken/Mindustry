@@ -149,12 +149,14 @@ public class MendProjector extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(heat);
             stream.writeFloat(phaseHeat);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

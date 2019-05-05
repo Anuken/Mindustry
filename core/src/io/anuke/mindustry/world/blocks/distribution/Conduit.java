@@ -10,8 +10,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
 
-import java.io.*;
-
 public class Conduit extends LiquidBlock{
     protected final int timerFlow = timers++;
 
@@ -119,15 +117,5 @@ public class Conduit extends LiquidBlock{
 
         byte blendbits;
         int blendshadowrot;
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeFloat(smoothLiquid);
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            smoothLiquid = stream.readFloat();
-        }
     }
 }

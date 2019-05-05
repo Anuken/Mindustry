@@ -367,6 +367,7 @@ public class Conveyor extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeInt(convey.size);
 
             for(int i = 0; i < convey.size; i++){
@@ -376,6 +377,7 @@ public class Conveyor extends Block{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             convey.clear();
             int amount = stream.readInt();
             convey.ensureCapacity(Math.min(amount, 10));

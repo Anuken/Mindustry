@@ -150,12 +150,14 @@ public class GenericCrafter extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(progress);
             stream.writeFloat(warmup);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             progress = stream.readFloat();
             warmup = stream.readFloat();
         }

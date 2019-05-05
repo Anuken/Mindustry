@@ -121,6 +121,7 @@ public class ItemTurret extends CooledTurret{
     public class ItemTurretEntity extends TurretEntity{
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeByte(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
@@ -131,6 +132,7 @@ public class ItemTurret extends CooledTurret{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(stream.readByte());

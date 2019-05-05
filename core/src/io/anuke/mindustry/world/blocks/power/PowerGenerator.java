@@ -63,11 +63,13 @@ public class PowerGenerator extends PowerDistributor{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(productionEfficiency);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             productionEfficiency = stream.readFloat();
         }
     }

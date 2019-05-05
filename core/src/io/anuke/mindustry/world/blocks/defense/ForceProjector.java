@@ -203,6 +203,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeBoolean(broken);
             stream.writeFloat(buildup);
             stream.writeFloat(radscl);
@@ -212,6 +213,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             broken = stream.readBoolean();
             buildup = stream.readFloat();
             radscl = stream.readFloat();

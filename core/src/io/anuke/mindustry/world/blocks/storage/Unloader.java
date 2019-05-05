@@ -105,11 +105,13 @@ public class Unloader extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

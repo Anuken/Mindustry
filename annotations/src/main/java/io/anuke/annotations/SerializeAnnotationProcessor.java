@@ -48,14 +48,10 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
 
             TypeName jsonType = ClassName.bestGuess("io.anuke.arc.util.serialization.Json");
             TypeName jsonValueType = ClassName.bestGuess("io.anuke.arc.util.serialization.JsonValue");
-            TypeName ubJsonWriterType = ClassName.bestGuess("io.anuke.arc.util.serialization.UBJsonWriter");
-            TypeName ubJsonReaderType = ClassName.bestGuess("io.anuke.arc.util.serialization.UBJsonReader");
 
             classBuilder.addField(jsonType, "bjson", Modifier.STATIC, Modifier.PRIVATE);
-            classBuilder.addField(ubJsonReaderType, "bjsonReader", Modifier.STATIC, Modifier.PRIVATE);
             classBuilder.addStaticBlock(CodeBlock.builder()
             .addStatement("bjson = new " + jsonType + "()")
-            .addStatement("bjsonReader = new " + ubJsonReaderType + "()")
             .build());
 
             for(TypeElement elem : elements){

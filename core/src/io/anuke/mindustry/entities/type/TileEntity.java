@@ -6,8 +6,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.impl.BaseEntity;
@@ -116,10 +115,28 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     @CallSuper
     public void write(DataOutput stream) throws IOException{
+        stream.writeShort((short)health);
+        stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.getRotation())); //team + rotation
+        if(items != null) items.write(stream);
+        if(power != null) power.write(stream);
+        if(liquids != null) liquids.write(stream);
+        if(cons != null) cons.write(stream);
     }
 
     @CallSuper
     public void read(DataInput stream) throws IOException{
+        health = stream.readUnsignedShort();
+        byte tr = stream.readByte();
+        byte team = Pack.leftByte(tr);
+        byte rotation = Pack.rightByte(tr);
+
+        tile.setTeam(Team.all[team]);
+        tile.setRotation(rotation);
+
+        if(items != null) items.read(stream);
+        if(power != null) power.read(stream);
+        if(liquids != null) liquids.read(stream);
+        if(cons != null) cons.read(stream);
     }
 
     public boolean collide(Bullet other){

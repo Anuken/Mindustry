@@ -9,7 +9,6 @@ import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -117,11 +116,13 @@ public class LiquidSource extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeByte(source == null ? -1 : source.id);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }

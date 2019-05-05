@@ -85,11 +85,13 @@ public class Door extends Wall{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeBoolean(open);
         }
 
         @Override
         public void read(DataInput stream) throws IOException{
+            super.read(stream);
             open = stream.readBoolean();
         }
     }

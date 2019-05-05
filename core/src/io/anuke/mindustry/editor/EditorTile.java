@@ -76,7 +76,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setOverlayID(byte ore){
-        byte previous = getOverlayID();
+        byte previous = overlayID();
         if(previous == ore) return;
         super.setOverlayID(ore);
         op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), previous, ore));
