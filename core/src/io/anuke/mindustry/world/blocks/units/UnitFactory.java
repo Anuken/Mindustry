@@ -172,7 +172,6 @@ public class UnitFactory extends Block{
             entity.cons.trigger();
         }
     }
-
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return capacities[item.id];
@@ -198,6 +197,7 @@ public class UnitFactory extends Block{
         @Override
         public void write(DataOutput stream) throws IOException{
             stream.writeFloat(buildTime);
+            stream.writeFloat(0f);
             stream.writeInt(spawned);
         }
 

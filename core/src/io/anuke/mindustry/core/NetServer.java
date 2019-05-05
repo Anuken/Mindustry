@@ -13,7 +13,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.ByteBufferOutput;
-import io.anuke.arc.util.io.CountableByteArrayOutputStream;
+import io.anuke.arc.util.io.ReusableByteOutStream;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Entities;
@@ -56,7 +56,7 @@ public class NetServer implements ApplicationListener{
     private ByteBufferOutput outputBuffer = new ByteBufferOutput(writeBuffer);
 
     /** Stream for writing player sync data to. */
-    private CountableByteArrayOutputStream syncStream = new CountableByteArrayOutputStream();
+    private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
