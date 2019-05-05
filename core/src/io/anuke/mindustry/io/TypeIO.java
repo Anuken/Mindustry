@@ -214,12 +214,13 @@ public class TypeIO{
 
     @WriteClass(Liquid.class)
     public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
-        buffer.put(liquid.id);
+        buffer.put(liquid == null ? -1 : liquid.id);
     }
 
     @ReadClass(Liquid.class)
     public static Liquid readLiquid(ByteBuffer buffer){
-        return content.liquid(buffer.get());
+        byte id = buffer.get();
+        return id == -1 ? null : content.liquid(buffer.get());
     }
 
     @WriteClass(BulletType.class)

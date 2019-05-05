@@ -35,7 +35,6 @@ public class ForceProjector extends Block{
     protected float cooldownBrokenBase = 0.35f;
     protected float basePowerDraw = 0.2f;
     protected float powerDamage = 0.1f;
-    protected final ConsumeForceProjectorPower consumePower;
     protected TextureRegion topRegion;
 
     private static Tile paramTile;
@@ -45,13 +44,7 @@ public class ForceProjector extends Block{
         if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && paramBlock.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Effects.effect(Fx.absorb, trait);
-            float relativeDamagePowerDraw = trait.getShieldDamage() * paramBlock.powerDamage / paramBlock.consumePower.powerCapacity;
             paramEntity.hit = 1f;
-
-            paramEntity.power.satisfaction -= Math.min(relativeDamagePowerDraw, paramEntity.power.satisfaction);
-            if(paramEntity.power.satisfaction <= 0.0001f){
-                paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup * 2f;
-            }
             paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup;
         }
     };
@@ -65,8 +58,6 @@ public class ForceProjector extends Block{
         hasLiquids = true;
         hasItems = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
-        consumePower = new ConsumeForceProjectorPower(60f, 60f);
-        consumes.add(consumePower);
     }
 
     @Override
@@ -126,10 +117,7 @@ public class ForceProjector extends Block{
         // - There is not enough base power in the buffer => Draw all power and break shield
         // - The generator is in the AI base and uses cheat mode => Only draw power from shots being absorbed
 
-        float relativePowerDraw = 0.0f;
-        if(!cheat){
-            relativePowerDraw = basePowerDraw / consumePower.powerCapacity;
-        }
+        float relativePowerDraw = cheat ? 0f : 1f;
 
         if(entity.power.satisfaction < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
@@ -139,7 +127,6 @@ public class ForceProjector extends Block{
             }
         }else{
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.1f);
-            entity.power.satisfaction -= Math.min(entity.power.satisfaction, relativePowerDraw * Time.delta());
         }
 
         if(entity.buildup > 0){
@@ -271,7 +258,6 @@ public class ForceProjector extends Block{
 
         public void drawSimple(){
             if(realRadius(entity) < 0.5f) return;
-            ;
 
             float rad = realRadius(entity);
 
@@ -287,17 +273,6 @@ public class ForceProjector extends Block{
         @Override
         public EntityGroup targetGroup(){
             return shieldGroup;
-        }
-    }
-
-    public class ConsumeForceProjectorPower extends ConsumePower{
-        public ConsumeForceProjectorPower(float powerCapacity, float ticksToFill){
-            super(powerCapacity / ticksToFill, powerCapacity, true);
-        }
-
-        @Override
-        public boolean valid(TileEntity entity){
-            return entity.power.satisfaction >= basePowerDraw / powerCapacity && super.valid(entity);
         }
     }
 }

@@ -416,8 +416,6 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
             Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
             font.draw(text, x - width/2f, y + textHeight + layout.height, width, Align.center, true);
-
-            textFadeTime -= Time.delta() / (60 * 5);
         }
 
         Draw.reset();
@@ -494,6 +492,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void update(){
         hitTime -= Time.delta();
+        textFadeTime -= Time.delta() / (60 * 5);
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             velocity.set(0f, 0f);

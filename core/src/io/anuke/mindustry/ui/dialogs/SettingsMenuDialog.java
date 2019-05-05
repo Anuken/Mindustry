@@ -190,9 +190,15 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             });
 
+            graphics.checkPref("borderlesswindow", false, b -> Core.graphics.setUndecorated(b));
+
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
             if(Core.settings.getBool("fullscreen")){
                 Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
+            }
+
+            if(Core.settings.getBool("borderlesswindow")){
+                Core.graphics.setUndecorated(true);
             }
         }else{
             graphics.checkPref("landscape", false, b -> {

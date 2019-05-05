@@ -69,8 +69,6 @@ public class DefaultWaves{
                 begin = 16;
                 unitScaling = 1;
                 spacing = 2;
-
-                max = 12;
             }},
 
             new SpawnGroup(UnitTypes.dagger){{
@@ -119,8 +117,7 @@ public class DefaultWaves{
                 begin = 40;
                 unitAmount = 2;
                 spacing = 2;
-                unitScaling = 3;
-                max = 8;
+                unitScaling = 2;
             }},
 
             new SpawnGroup(UnitTypes.wraith){{
@@ -129,7 +126,6 @@ public class DefaultWaves{
                 unitScaling = 3;
                 spacing = 5;
                 effect = StatusEffects.overdrive;
-                max = 8;
             }},
 
             new SpawnGroup(UnitTypes.revenant){{
@@ -137,7 +133,7 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 5;
-                max = 8;
+                max = 16;
             }},
 
             new SpawnGroup(UnitTypes.ghoul){{
@@ -145,7 +141,6 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
-                max = 8;
             }},
 
             new SpawnGroup(UnitTypes.eruptor){{
@@ -181,7 +176,6 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
-                max = 8;
             }}
             );
         }

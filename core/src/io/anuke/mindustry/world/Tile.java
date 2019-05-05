@@ -382,7 +382,7 @@ public class Tile implements Position, TargetTrait{
             Point2 point = Geometry.d8[i];
             Tile tile = world.tile(x + point.x, y + point.y);
             if(tile != null && tile.floor.isLiquid){
-                cost += 3;
+                cost += 4;
             }
             if(tile != null && tile.solid()){
                 occluded = true;
@@ -390,16 +390,34 @@ public class Tile implements Position, TargetTrait{
             }
         }
 
+        //+24
+
         if(occluded){
             cost += 2;
         }
+
+        //+26
 
         if(target().synthetic()){
             cost += Mathf.clamp(target().block().health / 10f, 0, 20);
         }
 
+        //+46
+
         if(floor.isLiquid){
             cost += 10;
+        }
+
+        //+56
+
+        if(floor.drownTime > 0){
+            cost += 70;
+        }
+
+        //+126
+
+        if(cost < 0){
+            cost = Byte.MAX_VALUE;
         }
     }
 

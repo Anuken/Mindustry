@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.scene.ui.TextField;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.graphics.Pal;
@@ -17,6 +18,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
@@ -130,7 +132,7 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !ui.chatfrag.chatOpen()){
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !ui.chatfrag.chatOpen() && !(scene.getKeyboardFocus() instanceof TextField)){
             if(!ui.minimap.isShown()){
                 ui.minimap.show();
             }else{

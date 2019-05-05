@@ -632,7 +632,6 @@ public class Bullets implements ContentList{
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{
-            speed = 2f;
             drag = 0.03f;
         }};
 

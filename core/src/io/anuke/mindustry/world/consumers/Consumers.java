@@ -1,8 +1,11 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.blocks.power.ConditionalConsumePower;
 import io.anuke.mindustry.world.meta.BlockStats;
 
 public class Consumers{
@@ -35,7 +38,7 @@ public class Consumers{
     }
 
     /**
-     * Creates a consumer which directly uses power without buffering it. The module will work while the available power is greater than or equal to the minimumSatisfaction percentage (0..1).
+     * Creates a consumer which directly uses power without buffering it.
      * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
      * @return the created consumer object.
      */
@@ -43,22 +46,17 @@ public class Consumers{
         return add(new ConsumePower(powerPerTick, 0.0f, false));
     }
 
-    /**
-     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
-     * It will take 180 ticks (three second) to fill the buffer, given enough power supplied.
-     * @param powerCapacity The maximum capacity in power units.
-     */
-    public ConsumePower powerBuffered(float powerCapacity){
-        return powerBuffered(powerCapacity, 60f * 3);
+    /** Creates a consumer which only consumes power when the condition is met. */
+    public ConsumePower powerCond(float usage, Predicate<TileEntity> cons){
+        return add(new ConditionalConsumePower(usage, cons));
     }
 
     /**
-     * Creates a consumer which stores power and uses it only in case of certain events (e.g. a turret firing).
+     * Creates a consumer which stores power.
      * @param powerCapacity The maximum capacity in power units.
-     * @param ticksToFill The number of ticks it shall take to fill the buffer.
      */
-    public ConsumePower powerBuffered(float powerCapacity, float ticksToFill){
-        return add(new ConsumePower(powerCapacity / ticksToFill, powerCapacity, true));
+    public ConsumePower powerBuffered(float powerCapacity){
+        return add(new ConsumePower(0f, powerCapacity, true));
     }
 
     public ConsumeItems item(Item item){

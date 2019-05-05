@@ -67,7 +67,7 @@ public class Net{
             }else if(error.equals("alreadyconnected")){
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
-                error = Core.bundle.get("error.any");
+                error = Core.bundle.get("error.any") + "\n" + t.getClass().getSimpleName() + "\n" + (t.getMessage() == null ? "" : t.getMessage());
             }
 
             ui.showText("", Core.bundle.format("connectfail", error));

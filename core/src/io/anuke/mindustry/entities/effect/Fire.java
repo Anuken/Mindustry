@@ -1,7 +1,5 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
@@ -74,11 +72,6 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         }
     }
 
-    @Remote(called = Loc.server)
-    public static void onFireRemoved(int fireid){
-        fireGroup.removeByID(fireid);
-    }
-
     @Override
     public float lifetime(){
         return lifetime;
@@ -94,15 +87,14 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
             Effects.effect(Fx.fireSmoke, x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Net.client()){
-            return;
-        }
-
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());
 
         if(time >= lifetime() || tile == null){
-            Call.onFireRemoved(getID());
             remove();
+            return;
+        }
+
+        if(Net.client()){
             return;
         }
 

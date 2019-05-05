@@ -258,6 +258,10 @@ public class Drill extends Block{
         return new DrillEntity();
     }
 
+    public int tier(){
+        return tier;
+    }
+
     public Item getDrop(Tile tile){
         return tile.drop();
     }

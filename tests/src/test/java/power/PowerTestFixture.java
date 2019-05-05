@@ -43,21 +43,15 @@ public class PowerTestFixture{
         }};
     }
 
-    protected static Battery createFakeBattery(float capacity, float ticksToFill){
+    protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery"){{
-            consumes.powerBuffered(capacity, ticksToFill);
+            consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
             consumes.power(powerPerTick);
-        }};
-    }
-
-    protected static Block createFakeBufferedConsumer(float capacity, float ticksToFill){
-        return new PowerBlock("fakebufferedconsumer"){{
-            consumes.powerBuffered(capacity, ticksToFill);
         }};
     }
 
