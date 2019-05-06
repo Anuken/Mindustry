@@ -12,8 +12,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.StaticWall;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 
@@ -88,12 +87,12 @@ public class MapGenerator extends Generator{
                         tiles[x][y].setBlock(Blocks.air);
                     }
 
-                    if(tiles[x][y].block() == Blocks.spawn && enemySpawns != -1){
+                    if(tiles[x][y].overlay() == Blocks.spawn && enemySpawns != -1){
                         enemies.add(new Point2(x, y));
-                        tiles[x][y].setBlock(Blocks.air);
+                        tiles[x][y].setOverlay(Blocks.air);
                     }
 
-                    if(tiles[x][y].block() == Blocks.part){
+                    if(tiles[x][y].block() instanceof BlockPart){
                         tiles[x][y].setBlock(Blocks.air);
                     }
                 }
@@ -111,13 +110,15 @@ public class MapGenerator extends Generator{
                     if(((tile.block() instanceof StaticWall
                     && tiles[newX][newY].block() instanceof StaticWall)
                     || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
-                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)) && tiles[newX][newY].block() != Blocks.spawn && tile.block() != Blocks.spawn){
+                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall))){
                         tile.setBlock(tiles[newX][newY].block());
                     }
 
                     if(distortFloor){
                         tile.setFloor(tiles[newX][newY].floor());
-                        tile.setOverlay(tiles[newX][newY].overlay());
+                        if(tiles[newX][newY].overlay() != Blocks.spawn && tile.overlay() != Blocks.spawn){
+                            tile.setOverlay(tiles[newX][newY].overlay());
+                        }
                     }
 
                     for(Decoration decor : decorations){
@@ -150,7 +151,7 @@ public class MapGenerator extends Generator{
                 enemies.shuffle();
                 for(int i = 0; i < enemySpawns; i++){
                     Point2 point = enemies.get(i);
-                    tiles[point.x][point.y].setBlock(Blocks.spawn);
+                    tiles[point.x][point.y].setOverlay(Blocks.spawn);
 
                     int rad = 10, frad = 12;
 
@@ -160,7 +161,9 @@ public class MapGenerator extends Generator{
                             double dst = Mathf.dst(x, y);
                             if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
                                 Tile tile = tiles[wx][wy];
-                                tile.clearOverlay();
+                                if(tile.overlay() != Blocks.spawn){
+                                    tile.clearOverlay();
+                                }
                             }
                         }
                     }

@@ -36,10 +36,11 @@ public class Tile implements Position, TargetTrait{
         block = floor = (Floor)Blocks.air;
     }
 
-    public Tile(boolean __removeThisLater, int x, int y, short floor, short overlay){
+    public Tile(int x, int y, short floor, short overlay, short wall){
         this.x = (short)x;
         this.y = (short)y;
         this.floor = (Floor)content.block(floor);
+        this.block = content.block(wall);
         this.overlay = overlay;
     }
 

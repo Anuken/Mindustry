@@ -1,40 +1,50 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.ObjectMap.Entry;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.ReusableByteOutStream;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.MappableContent;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.world;
-
 /**
  * Format:
- * 1. version of format / int
+ * - version of format: int
  * (begin deflating)
- * 2. regions
+ * - regions begin
+ * 1. meta tags (short length, key-val UTF pairs)
+ * 2. map data
  */
 public abstract class SaveFileVersion{
     public final int version;
 
-    private final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
-    private final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
-    private final Region[] regions;
-    private final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
+    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
+    protected final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
 
-    public SaveFileVersion(int version, Region... regions){
+    public SaveFileVersion(int version){
         this.version = version;
-        this.regions = regions;
+    }
+
+    protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
+        int length;
+        try{
+            length = readChunk(stream, cons);
+        }catch(Throwable e){
+            throw new IOException("Error reading region \"" + name + "\".", e);
+        }
+        if(length != counter.count() + 4){
+            throw new IOException("Error reading region \"" + name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() + 4));
+        }
+    }
+
+    protected void region(String name, DataOutput stream, IORunner<DataOutput> cons) throws IOException{
+        try{
+            writeChunk(stream, cons);
+        }catch(Throwable e){
+            throw new IOException("Error writing region \"" + name + "\".", e);
+        }
     }
 
     public void writeChunk(DataOutput output, IORunner<DataOutput> runner) throws IOException{
@@ -67,7 +77,6 @@ public abstract class SaveFileVersion{
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
         int length = isByte ? input.readUnsignedByte() : input.readInt();
-        //TODO descriptive error with chunk name
         runner.accept(input);
         return length;
     }
@@ -81,7 +90,7 @@ public abstract class SaveFileVersion{
         }
     }
 
-    public void writeMeta(DataOutput stream, ObjectMap<String, String> map) throws IOException{
+    public void writeStringMap(DataOutput stream, ObjectMap<String, String> map) throws IOException{
         stream.writeShort(map.size);
         for(Entry<String, String> entry : map.entries()){
             stream.writeUTF(entry.key);
@@ -89,7 +98,7 @@ public abstract class SaveFileVersion{
         }
     }
 
-    public StringMap readMeta(DataInput stream) throws IOException{
+    public StringMap readStringMap(DataInput stream) throws IOException{
         StringMap map = new StringMap();
         short size = stream.readShort();
         for(int i = 0; i < size; i++){
@@ -98,227 +107,9 @@ public abstract class SaveFileVersion{
         return map;
     }
 
-    public void writeMap(DataOutput stream) throws IOException{
-        //write world size
-        stream.writeShort(world.width());
-        stream.writeShort(world.height());
+    public abstract void read(DataInputStream stream, CounterInputStream counter) throws IOException;
 
-        //floor + overlay
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
-            stream.writeShort(tile.floorID());
-            stream.writeShort(tile.overlayID());
-            int consecutives = 0;
-
-            for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                Tile nextTile = world.tile(j % world.width(), j / world.width());
-
-                if(nextTile.floorID() != tile.floorID() || nextTile.overlayID() != tile.overlayID()){
-                    break;
-                }
-
-                consecutives++;
-            }
-
-            stream.writeByte(consecutives);
-            i += consecutives;
-        }
-
-        //blocks
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
-            stream.writeShort(tile.blockID());
-
-            if(tile.entity != null){
-                tile.entity.write(stream);
-            }else{
-                //write consecutive non-entity blocks
-                int consecutives = 0;
-
-                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                    Tile nextTile = world.tile(j % world.width(), j / world.width());
-
-                    if(nextTile.blockID() != tile.blockID()){
-                        break;
-                    }
-
-                    consecutives++;
-                }
-
-                stream.writeByte(consecutives);
-                i += consecutives;
-            }
-        }
-    }
-
-    public void readMap(DataInputStream stream) throws IOException{
-        short width = stream.readShort();
-        short height = stream.readShort();
-
-        world.beginMapLoad();
-
-        Tile[][] tiles = world.createTiles(width, height);
-
-        //read floor and create tiles first
-        for(int i = 0; i < width * height; i++){
-            int x = i % width, y = i / width;
-            short floorid = stream.readShort();
-            short oreid = stream.readShort();
-            int consecutives = stream.readUnsignedByte();
-
-            tiles[x][y] = new Tile(false, x, y, floorid, oreid);
-
-            for(int j = i + 1; j < i + 1 + consecutives; j++){
-                int newx = j % width, newy = j / width;
-                tiles[newx][newy] = new Tile(false, newx, newy, floorid, oreid);
-            }
-
-            i += consecutives;
-        }
-
-        //read blocks
-        for(int i = 0; i < width * height; i++){
-            int x = i % width, y = i / width;
-            Block block = content.block(stream.readShort());
-            Tile tile = tiles[x][y];
-            tile.setBlock(block);
-
-            if(tile.entity != null){
-                tile.entity.read(stream);
-            }else{
-                int consecutives = stream.readUnsignedByte();
-
-                for(int j = i + 1; j < i + 1 + consecutives; j++){
-                    int newx = j % width, newy = j / width;
-                    tiles[newx][newy].setBlock(block);
-                }
-
-                i += consecutives;
-            }
-        }
-
-        content.setTemporaryMapper(null);
-        world.endMapLoad();
-    }
-
-    public void writeEntities(DataOutputStream stream) throws IOException{
-        //write entity chunk
-        int groups = 0;
-
-        for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                groups++;
-            }
-        }
-
-        stream.writeByte(groups);
-
-        for(EntityGroup<?> group : Entities.getAllGroups()){
-            if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
-                stream.writeInt(group.size());
-                for(Entity entity : group.all()){
-                    //each entity is a separate chunk.
-                    writeChunk(stream, true, out -> {
-                        stream.writeByte(((SaveTrait)entity).getTypeID());
-                        ((SaveTrait)entity).writeSave(out);
-                    });
-                }
-            }
-        }
-    }
-
-    public void readEntities(DataInputStream stream) throws IOException{
-        byte groups = stream.readByte();
-
-        for(int i = 0; i < groups; i++){
-            int amount = stream.readInt();
-            for(int j = 0; j < amount; j++){
-                byte typeid = stream.readByte();
-                SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
-                trait.readSave(stream);
-            }
-        }
-    }
-
-    public MappableContent[][] readContentHeader(DataInputStream stream) throws IOException{
-
-        byte mapped = stream.readByte();
-
-        MappableContent[][] map = new MappableContent[ContentType.values().length][0];
-
-        for(int i = 0; i < mapped; i++){
-            ContentType type = ContentType.values()[stream.readByte()];
-            short total = stream.readShort();
-            map[type.ordinal()] = new MappableContent[total];
-
-            for(int j = 0; j < total; j++){
-                String name = stream.readUTF();
-                map[type.ordinal()][j] = content.getByName(type, fallback.get(name, name));
-            }
-        }
-
-        return map;
-    }
-
-    public void writeContentHeader(DataOutputStream stream) throws IOException{
-        Array<Content>[] map = content.getContentMap();
-
-        int mappable = 0;
-        for(Array<Content> arr : map){
-            if(arr.size > 0 && arr.first() instanceof MappableContent){
-                mappable++;
-            }
-        }
-
-        stream.writeByte(mappable);
-        for(Array<Content> arr : map){
-            if(arr.size > 0 && arr.first() instanceof MappableContent){
-                stream.writeByte(arr.first().getContentType().ordinal());
-                stream.writeShort(arr.size);
-                for(Content c : arr){
-                    stream.writeUTF(((MappableContent)c).name);
-                }
-            }
-        }
-    }
-
-    public final void read(DataInputStream stream, CounterInputStream counter) throws IOException{
-        for(Region region : regions){
-            counter.resetCount();
-            try{
-                int length = readChunk(stream, region.reader);
-                if(length != counter.count() + 4){
-                    throw new IOException("Error reading region \"" + region.name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() + 4));
-                }
-            }catch(Throwable e){
-                throw new IOException("Error reading region \"" + region.name + "\".", e);
-            }
-        }
-    }
-
-    public final void write(DataOutputStream stream) throws IOException{
-        for(Region region : regions){
-            try{
-                writeChunk(stream, region.writer);
-            }catch(Throwable e){
-                throw new IOException("Error writing region \"" + region.name + "\".", e);
-            }
-        }
-    }
-
-    /** A region of a save file that holds a specific category of information.
-     * Uses: simplify code reuse, provide better error messages, skip unnecessary data.*/
-    protected final class Region{
-        final IORunner<DataOutput> writer;
-        final IORunner<DataInput> reader;
-        final String name;
-
-        public Region(IORunner<DataOutput> writer, IORunner<DataInput> reader, String name){
-            this.writer = writer;
-            this.reader = reader;
-            this.name = name;
-        }
-    }
+    public abstract void write(DataOutputStream stream) throws IOException;
 
     protected interface IORunner<T>{
         void accept(T stream) throws IOException;

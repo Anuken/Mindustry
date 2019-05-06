@@ -14,6 +14,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -110,7 +111,7 @@ public class MapRenderer implements Disposable{
         int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
         int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
 
-        if(wall != Blocks.air && (wall.synthetic() || wall == Blocks.part)){
+        if(wall != Blocks.air && (wall.synthetic() || wall instanceof BlockPart)){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
             if(wall.rotate){

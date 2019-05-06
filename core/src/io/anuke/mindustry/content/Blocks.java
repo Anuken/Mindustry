@@ -88,15 +88,9 @@ public class Blocks implements ContentList{
                 hasShadow = false;
             }
 
-            public void draw(Tile tile){
-            }
-
-            public void load(){
-            }
-
-            public void init(){
-            }
-
+            public void draw(Tile tile){}
+            public void load(){}
+            public void init(){}
             public boolean isHidden(){
                 return true;
             }
@@ -119,7 +113,9 @@ public class Blocks implements ContentList{
             }
         }
 
-        spawn = new Block("spawn");
+        spawn = new OverlayFloor("spawn"){
+            public void draw(Tile tile){}
+        };
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later

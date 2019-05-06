@@ -37,7 +37,7 @@ public class OvergrowthGenerator extends BasicGenerator{
         noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
         //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
-        tiles[endX][endY].setBlock(Blocks.spawn);
+        tiles[endX][endY].setOverlay(Blocks.spawn);
         loadout.setup(spawnX, spawnY);
     }
 }

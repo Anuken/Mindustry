@@ -69,6 +69,7 @@ public class Save1 extends SaveFileVersion{
         stream.writeFloat(state.wavetime); //wave countdown
 
         Serialization.writeStats(stream, state.stats);
+
         world.spawner.write(stream);
 
         writeContentHeader(stream);

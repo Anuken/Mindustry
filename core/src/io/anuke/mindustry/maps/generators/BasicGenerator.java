@@ -156,8 +156,7 @@ public abstract class BasicGenerator extends RandomGenerator{
                 block = tiles[x][y].block();
                 ore = tiles[x][y].overlay();
                 r.accept(x, y);
-                tiles[x][y] = new Tile(x, y, floor.id, block.id);
-                tiles[x][y].setOverlay(ore);
+                tiles[x][y] = new Tile(x, y, floor.id, ore.id, block.id);
             }
         }
     }

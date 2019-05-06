@@ -1,12 +1,14 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -110,6 +112,8 @@ public class SaveIO{
 
         try{
             stream = new DataOutputStream(os);
+            stream.write(header);
+            stream.writeInt(getVersion().version);
             getVersion().write(stream);
             stream.close();
         }catch(Exception e){
@@ -135,6 +139,7 @@ public class SaveIO{
     public static void load(InputStream is) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
+            readHeader(stream);
             int version = stream.readInt();
             SaveFileVersion ver = versions.get(version);
 
@@ -148,6 +153,14 @@ public class SaveIO{
 
     public static SaveFileVersion getVersion(){
         return versionArray.peek();
+    }
+
+    public static void readHeader(DataInput input) throws IOException{
+        byte[] bytes = new byte[header.length];
+        input.readFully(bytes);
+        if(!Arrays.equals(bytes, header)){
+            throw new IOException("Incorrect header! Expecting: " + Arrays.toString(header) + "; Actual: " + Arrays.toString(bytes));
+        }
     }
 
     public static class SaveException extends RuntimeException{
