@@ -11,10 +11,11 @@ import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.ui;
 
+//TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
-    public EditorTile(int x, int y, byte floor, byte wall){
-        super(x, y, floor, wall);
+    public EditorTile(int x, int y, short floor, short overlay, short wall){
+        super(x, y, floor, overlay, wall);
     }
 
     @Override

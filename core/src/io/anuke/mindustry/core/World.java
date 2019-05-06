@@ -202,24 +202,6 @@ public class World implements ApplicationListener{
         return state.rules.zone;
     }
 
-    //TODO move to Control
-    public void playZone(Zone zone){
-        ui.loadAnd(() -> {
-            logic.reset();
-            state.rules = zone.rules.get();
-            state.rules.zone = zone;
-            loadGenerator(zone.generator);
-            for(Tile core : state.teams.get(defaultTeam).cores){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.entity.items.add(stack.item, stack.amount);
-                }
-            }
-            state.set(State.playing);
-            control.saves.zoneSave();
-            logic.play();
-        });
-    }
-
     public void loadGenerator(Generator generator){
         beginMapLoad();
 
@@ -231,18 +213,9 @@ public class World implements ApplicationListener{
     }
 
     public void loadMap(Map map){
-        beginMapLoad();
-        this.currentMap = map;
 
         try{
-            createTiles(map.width, map.height);
-            for(int x = 0; x < map.width; x++){
-                for(int y = 0; y < map.height; y++){
-                    tiles[x][y] = new Tile(x, y);
-                }
-            }
-            MapIO.readTiles(map, tiles);
-            prepareTiles(tiles);
+            MapIO.loadMap(map);
         }catch(Exception e){
             Log.err(e);
             if(!headless){
@@ -254,7 +227,7 @@ public class World implements ApplicationListener{
             return;
         }
 
-        endMapLoad();
+        this.currentMap = map;
 
         invalidMap = false;
 
@@ -503,7 +476,7 @@ public class World implements ApplicationListener{
             }
         }
 
-        //update cliffs, occlusion data
+        //update occlusion data
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];

@@ -60,9 +60,8 @@ public class DrawOperation{
     class TileOpStruct{
         short x;
         short y;
+        short value;
         byte type;
-        byte from;
-        byte to;
     }
 
     public enum OpType{

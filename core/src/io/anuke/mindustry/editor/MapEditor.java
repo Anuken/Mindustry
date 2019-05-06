@@ -1,9 +1,9 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
@@ -12,16 +12,18 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.IOException;
 
+import static io.anuke.mindustry.Vars.world;
+
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
-    private ObjectMap<String, String> tags = new ObjectMap<>();
+    private StringMap tags = new StringMap();
     private MapRenderer renderer = new MapRenderer(this);
-    private Tile[][] tiles;
 
     private OperationStack stack = new OperationStack();
     private DrawOperation currentOp;
@@ -32,7 +34,7 @@ public class MapEditor{
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.blue;
 
-    public ObjectMap<String, String> getTags(){
+    public StringMap getTags(){
         return tags;
     }
 
@@ -40,7 +42,7 @@ public class MapEditor{
         reset();
 
         loading = true;
-        tiles = createTiles(width, height);
+        createTiles(width, height);
         renderer.resize(width(), height());
         loading = false;
     }
@@ -49,30 +51,25 @@ public class MapEditor{
         reset();
 
         loading = true;
-        tiles = createTiles(map.width, map.height);
+        //TODO redundant and does nothing since tiles are overwritten
+        createTiles(map.width, map.height);
         tags.putAll(map.tags);
-        MapIO.readTiles(map, tiles);
+        //TODO this actually creates the tiles, which are not editor tiles
+        MapIO.loadMap(map);
         checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
     }
 
-    public void beginEdit(Tile[][] tiles){
-        reset();
-
-        this.tiles = tiles;
-        checkLinkedTiles();
-        renderer.resize(width(), height());
-    }
-
     //adds missing blockparts
     public void checkLinkedTiles(){
+        Tile[][] tiles = world.getTiles();
+
         //clear block parts first
         for(int x = 0; x < width(); x++){
             for(int y = 0; y < height(); y++){
-                if(tiles[x][y].block() == Blocks.part){
+                if(tiles[x][y].block() instanceof BlockPart){
                     tiles[x][y].setBlock(Blocks.air);
-                    tiles[x][y].setLinkByte((byte)0);
                 }
             }
         }
@@ -80,22 +77,8 @@ public class MapEditor{
         //set up missing blockparts
         for(int x = 0; x < width(); x++){
             for(int y = 0; y < height(); y++){
-                Block drawBlock = tiles[x][y].block();
-                if(drawBlock.isMultiblock()){
-                    int offsetx = -(drawBlock.size - 1) / 2;
-                    int offsety = -(drawBlock.size - 1) / 2;
-                    for(int dx = 0; dx < drawBlock.size; dx++){
-                        for(int dy = 0; dy < drawBlock.size; dy++){
-                            int worldx = dx + offsetx + x;
-                            int worldy = dy + offsety + y;
-
-                            if(Structs.inBounds(worldx, worldy, width(), height()) && !(dx + offsetx == 0 && dy + offsety == 0)){
-                                Tile tile = tiles[worldx][worldy];
-                                tile.setBlock(Blocks.part);
-                                tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
-                            }
-                        }
-                    }
+                if(tiles[x][y].block().isMultiblock()){
+                    world.setBlock(tiles[x][y], tiles[x][y].block(), tiles[x][y].getTeam());
                 }
             }
         }
@@ -108,15 +91,14 @@ public class MapEditor{
     }
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
-    public Tile[][] createTiles(int width, int height){
-        tiles = new Tile[width][height];
+    private void createTiles(int width, int height){
+        Tile[][] tiles = world.createTiles(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (byte)0);
+                tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
             }
         }
-        return tiles;
     }
 
     public Map createMap(FileHandle file){
@@ -131,40 +113,19 @@ public class MapEditor{
     }
 
     public Tile[][] tiles(){
-        return tiles;
+        return world.getTiles();
     }
 
     public Tile tile(int x, int y){
-        return tiles[x][y];
+        return world.rawTile(x, y);
     }
 
     public int width(){
-        return tiles.length;
+        return world.width();
     }
 
     public int height(){
-        return tiles[0].length;
-    }
-
-    public void updateLinks(Block block, int x, int y){
-        int offsetx = -(block.size - 1) / 2;
-        int offsety = -(block.size - 1) / 2;
-
-        for(int dx = 0; dx < block.size; dx++){
-            for(int dy = 0; dy < block.size; dy++){
-                int worldx = dx + offsetx + x;
-                int worldy = dy + offsety + y;
-
-                if(Structs.inBounds(worldx, worldy, width(), height())){
-                    Tile tile = tiles[worldx][worldy];
-
-                    if(!(worldx == x && worldy == y)){
-                        tile.setBlock(Blocks.part);
-                        tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
-                    }
-                }
-            }
-        }
+        return world.height();
     }
 
     public void draw(int x, int y, boolean paint){
@@ -177,45 +138,34 @@ public class MapEditor{
 
     public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
+        Tile[][] tiles = world.getTiles();
 
         if(drawBlock.isMultiblock()){
-
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
 
             int offsetx = -(drawBlock.size - 1) / 2;
             int offsety = -(drawBlock.size - 1) / 2;
 
-            for(int i = 0; i < 2; i++){
-                for(int dx = 0; dx < drawBlock.size; dx++){
-                    for(int dy = 0; dy < drawBlock.size; dy++){
-                        int worldx = dx + offsetx + x;
-                        int worldy = dy + offsety + y;
+            for(int dx = 0; dx < drawBlock.size; dx++){
+                for(int dy = 0; dy < drawBlock.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
 
-                        if(Structs.inBounds(worldx, worldy, width(), height())){
-                            Tile tile = tiles[worldx][worldy];
+                    if(Structs.inBounds(worldx, worldy, width(), height())){
+                        Tile tile = tiles[worldx][worldy];
 
-                            if(i == 1){
-                                tile.setBlock(Blocks.part);
-                                tile.setLinkByte(Pack.byteByte((byte)(dx + offsetx + 8), (byte)(dy + offsety + 8)));
-                            }else{
-                                byte link = tile.getLinkByte();
-                                Block block = tile.block();
+                        Block block = tile.block();
 
-                                if(link != 0){
-                                    removeLinked(worldx - (Pack.leftByte(link) - 8), worldy - (Pack.rightByte(link) - 8));
-                                }else if(block.isMultiblock()){
-                                    removeLinked(worldx, worldy);
-                                }
-                            }
+                        //bail out if there's anything blocking the way
+                        if(block.isMultiblock() || block instanceof BlockPart){
+                            return;
                         }
                     }
                 }
             }
 
-            Tile tile = tiles[x][y];
-            tile.setBlock(drawBlock);
-            tile.setTeam(drawTeam);
+            world.setBlock(tiles[x][y], drawBlock, drawTeam);
         }else{
             for(int rx = -brushSize; rx <= brushSize; rx++){
                 for(int ry = -brushSize; ry <= brushSize; ry++){
@@ -228,14 +178,8 @@ public class MapEditor{
 
                         Tile tile = tiles[wx][wy];
 
-                        if(!isfloor){
-                            byte link = tile.getLinkByte();
-
-                            if(tile.block().isMultiblock()){
-                                removeLinked(wx, wy);
-                            }else if(link != 0 && tiles[wx][wy].block() == Blocks.part){
-                                removeLinked(wx - (Pack.leftByte(link) - 8), wy - (Pack.rightByte(link) - 8));
-                            }
+                        if(!isfloor && (tile.isLinked() || tile.block().isMultiblock())){
+                            world.removeBlock(tile.link());
                         }
 
                         if(isfloor){
@@ -255,22 +199,6 @@ public class MapEditor{
         }
     }
 
-    private void removeLinked(int x, int y){
-        Block block = tiles[x][y].block();
-
-        int offsetx = -(block.size - 1) / 2;
-        int offsety = -(block.size - 1) / 2;
-        for(int dx = 0; dx < block.size; dx++){
-            for(int dy = 0; dy < block.size; dy++){
-                int worldx = x + dx + offsetx, worldy = y + dy + offsety;
-                if(Structs.inBounds(worldx, worldy, width(), height())){
-                    tiles[worldx][worldy].setTeam(Team.none);
-                    tiles[worldx][worldy].setBlock(Blocks.air);
-                }
-            }
-        }
-    }
-
     public MapRenderer renderer(){
         return renderer;
     }
@@ -278,11 +206,11 @@ public class MapEditor{
     public void resize(int width, int height){
         clearOp();
 
-        Tile[][] previous = tiles;
+        Tile[][] previous = world.getTiles();
         int offsetX = -(width - width()) / 2, offsetY = -(height - height()) / 2;
         loading = true;
 
-        tiles = new Tile[width][height];
+        Tile[][] tiles = world.createTiles(width, height);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;
@@ -291,7 +219,7 @@ public class MapEditor{
                     tiles[x][y].x = (short)x;
                     tiles[x][y].y = (short)y;
                 }else{
-                    tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (byte)0);
+                    tiles[x][y] = new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0);
                 }
             }
         }

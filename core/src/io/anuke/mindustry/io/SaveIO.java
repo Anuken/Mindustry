@@ -30,6 +30,10 @@ public class SaveIO{
         return versionArray.peek();
     }
 
+    public static SaveVersion getSaveWriter(int version){
+        return versions.get(version);
+    }
+
     public static void saveToSlot(int slot){
         FileHandle file = fileFor(slot);
         boolean exists = file.exists();

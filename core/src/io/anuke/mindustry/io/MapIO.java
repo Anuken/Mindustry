@@ -1,18 +1,23 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.zip.InflaterInputStream;
+
+import static io.anuke.mindustry.Vars.bufferSize;
 
 /** Reads and writes map files. */
 public class MapIO{
@@ -29,6 +34,21 @@ public class MapIO{
         }catch(IOException e){
             return false;
         }
+    }
+
+    public static Map createMap(FileHandle file, boolean custom) throws IOException{
+        try(InputStream is = new InflaterInputStream(file.read(bufferSize)); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
+            SaveIO.readHeader(stream);
+            int version = stream.readInt();
+            SaveVersion ver = SaveIO.getSaveWriter(version);
+            StringMap tags = new StringMap();
+            ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
+            return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
+        }
+    }
+
+    public static void loadMap(Map map){
+        SaveIO.load(map.file);
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{

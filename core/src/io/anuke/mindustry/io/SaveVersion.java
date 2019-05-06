@@ -53,7 +53,9 @@ public abstract class SaveVersion extends SaveFileReader{
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", Serialization.writeStatsJson(state.stats),
-            "rules", Serialization.writeRulesJson(state.rules)
+            "rules", Serialization.writeRulesJson(state.rules),
+            "width", world.width(),
+            "height", world.height()
         ));
     }
 

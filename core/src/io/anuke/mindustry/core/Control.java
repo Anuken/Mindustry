@@ -18,7 +18,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Tile;
 
@@ -203,6 +203,23 @@ public class Control implements ApplicationListener{
             logic.reset();
             state.rules = rules;
             world.loadMap(map);
+            logic.play();
+        });
+    }
+
+    public void playZone(Zone zone){
+        ui.loadAnd(() -> {
+            logic.reset();
+            state.rules = zone.rules.get();
+            state.rules.zone = zone;
+            world.loadGenerator(zone.generator);
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.getStartingItems()){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+            state.set(State.playing);
+            control.saves.zoneSave();
             logic.play();
         });
     }

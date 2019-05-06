@@ -91,7 +91,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
                     try{
                         //TODO what if it's an image? users should be warned for their stupidity
-                        editor.beginEdit(MapIO.readMap(file, true));
+                        editor.beginEdit(MapIO.createMap(file, true));
                     }catch(Exception e){
                         ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
                         Log.err(e);
@@ -216,7 +216,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(map != null && !map.custom){
                 ui.showError("$editor.save.overwrite");
             }else{
-                world.maps.saveMap(editor.getTags(), editor.tiles());
+                world.maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
             }
         }

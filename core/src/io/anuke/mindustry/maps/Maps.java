@@ -52,7 +52,7 @@ public class Maps implements Disposable{
         FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
 
         try{
-            return MapIO.readMap(file, false);
+            return MapIO.createMap(file, false);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -81,13 +81,12 @@ public class Maps implements Disposable{
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public void saveMap(ObjectMap<String, String> baseTags, Tile[][] data){
+    public void saveMap(ObjectMap<String, String> baseTags){
 
         try{
             ObjectMap<String, String> tags = new ObjectMap<>(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
-            //FileHandle file = customMapDirectory.child(name + "." + mapExtension);
             FileHandle file;
 
             //find map with the same exact display name
@@ -106,7 +105,7 @@ public class Maps implements Disposable{
             }
 
             //create map, write it, etc etc etc
-            Map map = new Map(file, data.length, data[0].length, tags, true);
+            Map map = new Map(file, world.width(), world.height(), tags, true);
             MapIO.writeMap(file, map, data);
 
             if(!headless){
@@ -171,7 +170,7 @@ public class Maps implements Disposable{
     }
 
     private void loadMap(FileHandle file, boolean custom) throws IOException{
-        Map map = MapIO.readMap(file, custom);
+        Map map = MapIO.createMap(file, custom);
 
         if(map.name() == null){
             throw new IOException("Map name cannot be empty! File: " + file);
