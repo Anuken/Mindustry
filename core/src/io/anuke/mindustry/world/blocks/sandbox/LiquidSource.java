@@ -121,8 +121,8 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }

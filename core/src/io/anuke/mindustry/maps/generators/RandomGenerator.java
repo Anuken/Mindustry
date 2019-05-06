@@ -6,7 +6,6 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.customMapDirectory;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class RandomGenerator extends Generator{
@@ -32,7 +31,7 @@ public abstract class RandomGenerator extends Generator{
 
         decorate(tiles);
 
-        world.setMap(new Map(customMapDirectory.child("generated"), 0, 0, new ObjectMap<>(), true));
+        world.setMap(new Map(new ObjectMap<>()));
     }
 
     public abstract void decorate(Tile[][] tiles);

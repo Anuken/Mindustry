@@ -41,15 +41,6 @@ public interface SyncTrait extends Entity, TypeTrait{
         return true;
     }
 
-    /** Whether this entity is clipped and not synced when out of viewport. */
-    default boolean isClipped(){
-        return true;
-    }
-
-    default float clipSize(){
-        return (this instanceof DrawTrait ? ((DrawTrait)this).drawSize() : 8f);
-    }
-
     //Read and write sync data, usually position
     void write(DataOutput data) throws IOException;
 

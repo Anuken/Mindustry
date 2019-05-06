@@ -8,24 +8,10 @@ import io.anuke.arc.util.io.ReusableByteOutStream;
 
 import java.io.*;
 
-/**
- * Format:
- * - version of format: int
- * (begin deflating)
- * - regions begin
- * 1. meta tags (short length, key-val UTF pairs)
- * 2. map data
- */
-public abstract class SaveFileVersion{
-    public final int version;
-
+public abstract class SaveFileReader{
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
     protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
     protected final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
-
-    public SaveFileVersion(int version){
-        this.version = version;
-    }
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         int length;
@@ -62,10 +48,10 @@ public abstract class SaveFileVersion{
         if(!isByte){
             output.writeInt(length);
         }else{
-            if(length > 255){
-                throw new IOException("Byte write length exceeded: " + length + " > 255");
+            if(length > Short.MAX_VALUE){
+                throw new IOException("Byte write length exceeded: " + length + " > " + Short.MAX_VALUE);
             }
-            output.writeByte(length);
+            output.writeShort(length);
         }
         output.write(byteOutput.getBytes(), 0, length);
     }
@@ -76,7 +62,7 @@ public abstract class SaveFileVersion{
 
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isByte, IORunner<DataInput> runner) throws IOException{
-        int length = isByte ? input.readUnsignedByte() : input.readInt();
+        int length = isByte ? input.readUnsignedShort() : input.readInt();
         runner.accept(input);
         return length;
     }

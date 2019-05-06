@@ -138,7 +138,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         byte team = stream.readByte();
         boolean dead = stream.readBoolean();
         float x = stream.readFloat();
@@ -150,7 +150,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte itemID = stream.readByte();
         short itemAmount = stream.readShort();
 
-        this.status.readSave(stream);
+        this.status.readSave(stream, version);
         this.item.amount = itemAmount;
         this.item.item = content.item(itemID);
         this.dead = dead;

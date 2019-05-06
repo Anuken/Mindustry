@@ -328,8 +328,8 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             link = stream.readInt();
             rotation = stream.readFloat();
             state = DriverState.values()[stream.readByte()];

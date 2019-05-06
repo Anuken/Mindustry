@@ -9,7 +9,6 @@ import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.DefaultWaves;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.MapIO;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -44,7 +43,11 @@ public class Map implements Comparable<Map>{
     }
 
     public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
-        this(file, width, height, tags, custom, MapIO.version);
+        this(file, width, height, tags, custom, -1);
+    }
+
+    public Map(ObjectMap<String, String> tags){
+        this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
     public Array<SpawnGroup> getWaves(){

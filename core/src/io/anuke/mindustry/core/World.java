@@ -202,6 +202,7 @@ public class World implements ApplicationListener{
         return state.rules.zone;
     }
 
+    //TODO move to Control
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();

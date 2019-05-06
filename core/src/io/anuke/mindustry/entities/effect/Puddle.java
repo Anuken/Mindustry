@@ -144,6 +144,11 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
+    public byte version(){
+        return 0;
+    }
+
+    @Override
     public void hitbox(Rectangle rectangle){
         rectangle.setCenter(x, y).setSize(tilesize);
     }
@@ -245,7 +250,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         this.loadedPosition = stream.readInt();
         this.x = stream.readFloat();
         this.y = stream.readFloat();

@@ -123,8 +123,8 @@ public class Cultivator extends GenericCrafter{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             warmup = stream.readFloat();
         }
     }

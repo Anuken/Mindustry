@@ -376,8 +376,8 @@ public class Conveyor extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             convey.clear();
             int amount = stream.readInt();
             convey.ensureCapacity(Math.min(amount, 10));

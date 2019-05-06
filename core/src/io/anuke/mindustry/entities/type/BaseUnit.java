@@ -305,11 +305,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public float clipSize(){
-        return isBoss() ? 10000000000f : super.clipSize();
-    }
-
-    @Override
     public void onDeath(){
         Call.onUnitDeath(this);
     }
@@ -337,6 +332,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
+    public byte version(){
+        return 0;
+    }
+
+    @Override
     public void writeSave(DataOutput stream) throws IOException{
         super.writeSave(stream);
         stream.writeByte(type.id);
@@ -344,8 +344,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
-        super.readSave(stream);
+    public void readSave(DataInput stream, byte version) throws IOException{
+        super.readSave(stream, version);
         byte type = stream.readByte();
         this.spawner = stream.readInt();
 
@@ -363,7 +363,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void read(DataInput data) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation;
-        super.readSave(data);
+
+        super.readSave(data, version());
+
         this.type = content.getByID(ContentType.unit, data.readByte());
         this.spawner = data.readInt();
 

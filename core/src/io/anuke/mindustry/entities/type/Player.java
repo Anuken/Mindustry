@@ -817,8 +817,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     //region read and write methods
 
     @Override
-    public boolean isClipped(){
-        return false;
+    public byte version(){
+        return 0;
     }
 
     @Override
@@ -833,7 +833,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         boolean local = stream.readBoolean();
 
         if(local){
@@ -844,14 +844,14 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 lastSpawner = (SpawnerTrait)stile.entity;
             }
             Player player = headless ? this : Vars.player;
-            player.readSaveSuper(stream);
+            player.readSaveSuper(stream, version);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
         }
     }
 
-    private void readSaveSuper(DataInput stream) throws IOException{
-        super.readSave(stream);
+    private void readSaveSuper(DataInput stream, byte version) throws IOException{
+        super.readSave(stream, version);
 
         add();
     }
@@ -873,7 +873,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void read(DataInput buffer) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation, lastvx = velocity.x, lastvy = velocity.y;
-        super.readSave(buffer);
+
+        super.readSave(buffer, version());
+
         name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;

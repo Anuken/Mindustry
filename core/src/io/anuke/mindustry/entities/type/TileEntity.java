@@ -124,7 +124,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @CallSuper
-    public void read(DataInput stream) throws IOException{
+    public void read(DataInput stream, byte revision) throws IOException{
         health = stream.readUnsignedShort();
         byte tr = stream.readByte();
         byte team = Pack.leftByte(tr);
@@ -137,6 +137,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         if(power != null) power.read(stream);
         if(liquids != null) liquids.read(stream);
         if(cons != null) cons.read(stream);
+    }
+
+    /** Returns the version of this TileEntity IO code.*/
+    public byte version(){
+        return 0;
     }
 
     public boolean collide(Bullet other){

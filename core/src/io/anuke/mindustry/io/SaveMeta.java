@@ -5,6 +5,7 @@ import io.anuke.mindustry.maps.Map;
 
 import static io.anuke.mindustry.Vars.world;
 
+//TODO consider removing and replacing with a raw StringMap
 public class SaveMeta{
     public int version;
     public int build;

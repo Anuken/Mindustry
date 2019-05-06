@@ -94,8 +94,8 @@ public class Junction extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             for(Buffer b : buffers){
                 b.read(stream);
             }

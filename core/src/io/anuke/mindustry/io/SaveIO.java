@@ -17,16 +17,16 @@ import static io.anuke.mindustry.Vars.*;
 public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
     public static final byte[] header = {77, 83, 65, 86};
-    public static final IntMap<SaveFileVersion> versions = new IntMap<>();
-    public static final Array<SaveFileVersion> versionArray = Array.with(new Save1());
+    public static final IntMap<SaveVersion> versions = new IntMap<>();
+    public static final Array<SaveVersion> versionArray = Array.with(new Save1());
 
     static{
-        for(SaveFileVersion version : versionArray){
+        for(SaveVersion version : versionArray){
             versions.put(version.version, version);
         }
     }
 
-    public static SaveFileVersion getSaveWriter(){
+    public static SaveVersion getSaveWriter(){
         return versionArray.peek();
     }
 
@@ -64,7 +64,7 @@ public class SaveIO{
 
     public static boolean isSaveValid(DataInputStream stream){
         try{
-            getData(stream);
+            getMeta(stream);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -72,15 +72,15 @@ public class SaveIO{
         }
     }
 
-    public static SaveMeta getData(int slot){
-        return getData(getSlotStream(slot));
+    public static SaveMeta getMeta(int slot){
+        return getMeta(getSlotStream(slot));
     }
 
-    public static SaveMeta getData(DataInputStream stream){
+    public static SaveMeta getMeta(DataInputStream stream){
 
         try{
             int version = stream.readInt();
-            SaveMeta meta = versions.get(version).getData(stream);
+            SaveMeta meta = versions.get(version).getMeta(stream);
             stream.close();
             return meta;
         }catch(IOException e){
@@ -141,7 +141,7 @@ public class SaveIO{
             logic.reset();
             readHeader(stream);
             int version = stream.readInt();
-            SaveFileVersion ver = versions.get(version);
+            SaveVersion ver = versions.get(version);
 
             ver.read(stream, counter);
         }catch(Exception e){
@@ -151,7 +151,7 @@ public class SaveIO{
         }
     }
 
-    public static SaveFileVersion getVersion(){
+    public static SaveVersion getVersion(){
         return versionArray.peek();
     }
 

@@ -52,7 +52,7 @@ public class Saves{
                 SaveSlot slot = new SaveSlot(index);
                 saves.add(slot);
                 saveMap.put(slot.index, slot);
-                slot.meta = SaveIO.getData(index);
+                slot.meta = SaveIO.getMeta(index);
                 nextSlot = Math.max(index + 1, nextSlot);
             }
         }
@@ -134,7 +134,7 @@ public class Saves{
         slot.setName(file.nameWithoutExtension());
         saves.add(slot);
         saveMap.put(slot.index, slot);
-        slot.meta = SaveIO.getData(slot.index);
+        slot.meta = SaveIO.getMeta(slot.index);
         current = slot;
         saveSlots();
         return slot;
@@ -172,7 +172,7 @@ public class Saves{
         public void load() throws SaveException{
             try{
                 SaveIO.loadFromSlot(index);
-                meta = SaveIO.getData(index);
+                meta = SaveIO.getMeta(index);
                 current = this;
                 totalPlaytime = meta.timePlayed;
             }catch(Exception e){
@@ -186,7 +186,7 @@ public class Saves{
             totalPlaytime = time;
 
             SaveIO.saveToSlot(index);
-            meta = SaveIO.getData(index);
+            meta = SaveIO.getMeta(index);
             if(!state.is(State.menu)){
                 current = this;
             }

@@ -14,7 +14,8 @@ public class Administration{
 
     public Administration(){
         Core.settings.defaults(
-        "strict", true
+            "strict", true,
+            "servername", "Server"
         );
 
         load();

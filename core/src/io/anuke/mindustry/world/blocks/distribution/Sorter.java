@@ -134,14 +134,13 @@ public class Sorter extends Block{
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeByte(sortItem == null ? -1 : sortItem.id);
+            stream.writeShort(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
-            byte b = stream.readByte();
-            sortItem = b == -1 ? null : content.items().get(b);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            sortItem = content.item(stream.readShort());
         }
     }
 }

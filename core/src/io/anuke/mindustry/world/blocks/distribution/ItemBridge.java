@@ -340,8 +340,8 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             link = stream.readInt();
             uptime = stream.readFloat();
             byte links = stream.readByte();

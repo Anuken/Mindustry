@@ -73,6 +73,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     @Override
+    public byte version(){
+        return 0;
+    }
+
+    @Override
     public float lifetime(){
         return lifetime;
     }
@@ -151,7 +156,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         this.loadedPosition = stream.readInt();
         this.lifetime = stream.readFloat();
         this.time = stream.readFloat();

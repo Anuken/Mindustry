@@ -109,8 +109,8 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
-            super.read(stream);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

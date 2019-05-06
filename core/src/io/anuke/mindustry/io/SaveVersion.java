@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -16,10 +17,17 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class BaseSaveVersion extends SaveFileVersion{
+public abstract class SaveVersion extends SaveFileReader{
+    public final int version;
 
-    public BaseSaveVersion(int version){
-        super(version);
+    public SaveVersion(int version){
+        this.version = version;
+    }
+
+    public SaveMeta getMeta(DataInput stream) throws IOException{
+        stream.readInt(); //length of data, doesn't matter here
+        StringMap map = readStringMap(stream);
+        return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), Serialization.readRulesStringJson(map.get("rules", "{}")));
     }
 
     public void write(DataOutputStream stream) throws IOException{
@@ -34,6 +42,28 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
         region("content", stream, counter, this::readContentHeader);
         region("map", stream, counter, this::readMap);
         region("entities", stream, counter, this::readEntities);
+    }
+
+    public void writeMeta(DataOutput stream) throws IOException{
+        writeStringMap(stream, StringMap.of(
+            "saved", Time.millis(),
+            "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
+            "build", Version.build,
+            "mapname", world.getMap().name(),
+            "wave", state.wave,
+            "wavetime", state.wavetime,
+            "stats", Serialization.writeStatsJson(state.stats),
+            "rules", Serialization.writeRulesJson(state.rules)
+        ));
+    }
+
+    public void readMeta(DataInput stream) throws IOException{
+        StringMap map = readStringMap(stream);
+
+        state.wave = map.getInt("wave");
+        state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
+        state.stats = Serialization.readStatsStringJson(map.get("stats", "{}"));
+        state.rules = Serialization.readRulesStringJson(map.get("rules", "{}"));
     }
 
     public void writeMap(DataOutput stream) throws IOException{
@@ -68,8 +98,10 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
             stream.writeShort(tile.blockID());
 
             if(tile.entity != null){
-                //TODO chunks, backward compat
-                tile.entity.write(stream);
+                writeChunk(stream, true, out -> {
+                    out.writeByte(tile.entity.version());
+                    tile.entity.write(stream);
+                });
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -123,8 +155,10 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
             tile.setBlock(block);
 
             if(tile.entity != null){
-                //TODO chunks, backward compat
-                tile.entity.read(stream);
+                readChunk(stream, true, in -> {
+                    byte version = in.readByte();
+                    tile.entity.read(stream, version);
+                });
             }else{
                 int consecutives = stream.readUnsignedByte();
 
@@ -157,11 +191,12 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){
-                    //TODO chunks, backward compat
+                    SaveTrait save = (SaveTrait)entity;
                     //each entity is a separate chunk.
                     writeChunk(stream, true, out -> {
-                        stream.writeByte(((SaveTrait)entity).getTypeID());
-                        ((SaveTrait)entity).writeSave(out);
+                        stream.writeByte(save.getTypeID());
+                        stream.writeByte(save.version());
+                        save.writeSave(out);
                     });
                 }
             }
@@ -174,10 +209,13 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
         for(int i = 0; i < groups; i++){
             int amount = stream.readInt();
             for(int j = 0; j < amount; j++){
-                //TODO chunks, backwards compat
-                byte typeid = stream.readByte();
-                SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
-                trait.readSave(stream);
+                //TODO throw exception on read fail
+                readChunk(stream, true, in -> {
+                    byte typeid = stream.readByte();
+                    byte version = stream.readByte();
+                    SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
+                    trait.readSave(stream, version);
+                });
             }
         }
     }
@@ -222,27 +260,5 @@ public abstract class BaseSaveVersion extends SaveFileVersion{
                 }
             }
         }
-    }
-
-    public void writeMeta(DataOutput stream) throws IOException{
-        writeStringMap(stream, StringMap.of(
-        "saved", Time.millis(),
-        "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
-        "build", Version.build,
-        "mapname", world.getMap().name(),
-        "wave", state.wave,
-        "wavetime", state.wavetime//,
-        //"stats", Serialization.writeStatsStreamJson(state.stats),
-        //"rules", Serialization.writeRulesStreamJson(state.rules),
-        ));
-    }
-
-    public void readMeta(DataInput stream) throws IOException{
-        StringMap map = readStringMap(stream);
-
-        //TODO read rules, stats
-
-        state.wave = map.getInt("wave");
-        state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
     }
 }

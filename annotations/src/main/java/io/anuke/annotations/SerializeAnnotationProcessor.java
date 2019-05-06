@@ -143,9 +143,8 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 .addStatement("bjson.writeObjectEnd()")
                 .addStatement("stream.writeUTF(output.toString())");
 
-                MethodSpec.Builder binaryJsonWriteStringMethod = MethodSpec.methodBuilder("write" + simpleTypeName + "StringJson")
+                MethodSpec.Builder binaryJsonWriteStringMethod = MethodSpec.methodBuilder("write" + simpleTypeName + "Json")
                 .returns(String.class)
-                .addParameter(DataOutput.class, "stream")
                 .addParameter(type, "object")
                 .addException(IOException.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -163,9 +162,17 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addStatement("return read" + simpleTypeName + "Json(bjson.fromJson(null, stream.readUTF()))");
 
+                MethodSpec.Builder binaryJsonReadStringMethod = MethodSpec.methodBuilder("read" + simpleTypeName + "StringJson")
+                .returns(type)
+                .addParameter(String.class, "str")
+                .addException(IOException.class)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addStatement("return read" + simpleTypeName + "Json(bjson.fromJson(null, str))");
+
                 classBuilder.addMethod(binaryJsonWriteMethod.build());
                 classBuilder.addMethod(binaryJsonWriteStringMethod.build());
                 classBuilder.addMethod(binaryJsonReadMethod.build());
+                classBuilder.addMethod(binaryJsonReadStringMethod.build());
             }
 
             classBuilder.addMethod(method.build());

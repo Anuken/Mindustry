@@ -357,6 +357,16 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("name", "[name...]", "Change the server display name.", arg -> {
+            if(arg.length == 0){
+                info("Server name is currently &lc'{0}'.", Core.settings.getString("servername"));
+                return;
+            }
+            Core.settings.put("servername", arg[0]);
+            Core.settings.save();
+            info("Server name is now &lc'{0}'.", arg[0]);
+        });
+
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
             Core.settings.put("crashreport", value);
