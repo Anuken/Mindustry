@@ -30,14 +30,14 @@ public abstract class SaveVersion extends SaveFileReader{
         return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), Serialization.readRulesStringJson(map.get("rules", "{}")));
     }
 
-    public void write(DataOutputStream stream) throws IOException{
+    public final void write(DataOutputStream stream) throws IOException{
         region("meta", stream, this::writeMeta);
         region("content", stream, this::writeContentHeader);
         region("map", stream, this::writeMap);
         region("entities", stream, this::writeEntities);
     }
 
-    public void read(DataInputStream stream, CounterInputStream counter) throws IOException{
+    public final void read(DataInputStream stream, CounterInputStream counter) throws IOException{
         region("meta", stream, counter, this::readMeta);
         region("content", stream, counter, this::readContentHeader);
         region("map", stream, counter, this::readMap);

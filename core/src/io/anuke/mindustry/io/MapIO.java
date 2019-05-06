@@ -20,6 +20,7 @@ import java.util.zip.InflaterInputStream;
 import static io.anuke.mindustry.Vars.bufferSize;
 
 /** Reads and writes map files. */
+//TODO does this class even need to exist??? move to Maps
 public class MapIO{
     private static final int[] pngHeader = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
 
@@ -44,6 +45,13 @@ public class MapIO{
             StringMap tags = new StringMap();
             ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
             return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
+        }
+    }
+
+    public static void writeMap(FileHandle file, Map map) throws IOException{
+        SaveIO.write(file);
+        try(DataOutputStream out = new DataOutputStream(file.write(false, bufferSize))){
+
         }
     }
 

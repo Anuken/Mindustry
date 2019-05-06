@@ -19,6 +19,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -103,9 +104,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
-                        Tile[][] tiles = editor.createTiles(pixmap.getWidth(), pixmap.getHeight());
-                        editor.load(() -> MapIO.readLegacyPixmap(pixmap, tiles));
-                        editor.beginEdit(tiles);
+                        editor.beginEdit(pixmap);
+                        pixmap.dispose();
                     }catch(Exception e){
                         ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
                         Log.err(e);
@@ -281,9 +281,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public void beginEditMap(FileHandle file){
         ui.loadAnd(() -> {
             try{
-                Map map = MapIO.readMap(file, true);
                 shownWithMap = true;
-                editor.beginEdit(map);
+                editor.beginEdit(MapIO.createMap(file, true));
                 show();
             }catch(Exception e){
                 Log.err(e);

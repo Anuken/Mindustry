@@ -143,7 +143,7 @@ public class LegacyMapIO{
     }
 
     /** Reads a pixmap in the 3.5 pixmap format. */
-    public static void readLegacyPixmap(Pixmap pixmap, Tile[][] tiles){
+    public static void readPixmap(Pixmap pixmap, Tile[][] tiles){
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);

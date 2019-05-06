@@ -10,7 +10,6 @@ import io.anuke.arc.util.Log;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -106,10 +105,10 @@ public class Maps implements Disposable{
 
             //create map, write it, etc etc etc
             Map map = new Map(file, world.width(), world.height(), tags, true);
-            MapIO.writeMap(file, map, data);
+            MapIO.writeMap(file, map);
 
             if(!headless){
-                map.texture = new Texture(MapIO.generatePreview(data));
+                map.texture = new Texture(MapIO.generatePreview(world.getTiles()));
             }
             maps.add(map);
             maps.sort();

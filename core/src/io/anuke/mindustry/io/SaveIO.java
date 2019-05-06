@@ -4,12 +4,12 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.io.CounterInputStream;
+import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
@@ -101,14 +101,7 @@ public class SaveIO{
     }
 
     public static void write(FileHandle file){
-        write(new DeflaterOutputStream(file.write(false, bufferSize)){
-            byte[] tmp = {0};
-
-            public void write(int var1) throws IOException{
-                tmp[0] = (byte)(var1 & 255);
-                this.write(tmp, 0, 1);
-            }
-        });
+        write(new FastDeflaterOutputStream(file.write(false, bufferSize)));
     }
 
     public static void write(OutputStream os){

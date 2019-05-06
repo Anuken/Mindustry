@@ -3,19 +3,19 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
+import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
-
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -47,7 +47,7 @@ public class MapEditor{
         loading = false;
     }
 
-    public void beginEdit(Map map) throws IOException{
+    public void beginEdit(Map map){
         reset();
 
         loading = true;
@@ -59,6 +59,14 @@ public class MapEditor{
         checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
+    }
+
+    public void beginEdit(Pixmap pixmap){
+        reset();
+
+        createTiles(pixmap.getWidth(), pixmap.getHeight());
+        load(() -> LegacyMapIO.readPixmap(pixmap, tiles()));
+        renderer.resize(width(), height());
     }
 
     //adds missing blockparts
@@ -109,7 +117,7 @@ public class MapEditor{
         clearOp();
         brushSize = 1;
         drawBlock = Blocks.stone;
-        tags = new ObjectMap<>();
+        tags = new StringMap();
     }
 
     public Tile[][] tiles(){
