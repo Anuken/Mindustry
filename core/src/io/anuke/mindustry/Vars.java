@@ -104,8 +104,10 @@ public class Vars{
     public static FileHandle customMapDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
+    /** old map file extension, for conversion */
+    public static final String oldMapExtension = "mmap";
     /** map file extension */
-    public static final String mapExtension = "mmap";
+    public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
 

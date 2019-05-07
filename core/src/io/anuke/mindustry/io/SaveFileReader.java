@@ -11,17 +11,18 @@ import java.io.*;
 public abstract class SaveFileReader{
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
     protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
-    protected final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
+    protected final ObjectMap<String, String> fallback = ObjectMap.of();
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
+        counter.resetCount();
         int length;
         try{
             length = readChunk(stream, cons);
         }catch(Throwable e){
             throw new IOException("Error reading region \"" + name + "\".", e);
         }
-        if(length != counter.count() + 4){
-            throw new IOException("Error reading region \"" + name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() + 4));
+        if(length != counter.count() - 4){
+            throw new IOException("Error reading region \"" + name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() - 4));
         }
     }
 
@@ -40,10 +41,10 @@ public abstract class SaveFileReader{
     /** Write a chunk of input to the stream. An integer of some length is written first, followed by the data. */
     public void writeChunk(DataOutput output, boolean isByte, IORunner<DataOutput> runner) throws IOException{
         //reset output position
-        byteOutput.position(0);
-        //writer the needed info
+        byteOutput.reset();
+        //write the needed info
         runner.accept(dataBytes);
-        int length = byteOutput.position();
+        int length = byteOutput.size();
         //write length (either int or byte) followed by the output bytes
         if(!isByte){
             output.writeInt(length);

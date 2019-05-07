@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.Nullable;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
@@ -18,7 +17,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 
@@ -33,11 +32,10 @@ public class World implements ApplicationListener{
     private Map currentMap;
     private Tile[][] tiles;
 
-    private Array<Tile> tempTiles = new Array<>();
     private boolean generating, invalidMap;
 
     public World(){
-        maps.load();
+        Core.app.post(maps::load);
     }
 
     @Override

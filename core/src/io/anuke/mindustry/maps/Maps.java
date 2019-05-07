@@ -8,6 +8,7 @@ import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
 
 import java.io.IOException;
@@ -59,6 +60,15 @@ public class Maps implements Disposable{
     /** Load all maps. Should be called at application start. */
     public void load(){
         try{
+            //TODO remove, this is only for testing
+            for(FileHandle in : Core.files.absolute("/home/anuke/Projects/Mindustry/core/assets/maps").list()){
+                if(in.extension().equalsIgnoreCase(oldMapExtension)){
+                    Log.info("Converting {0}...", in);
+                    LegacyMapIO.convertMap(in, in.sibling(in.nameWithoutExtension() + "." + mapExtension));
+                    Log.info("Converted {0}", in);
+                }
+            }
+
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file, false);
@@ -183,6 +193,26 @@ public class Maps implements Disposable{
     }
 
     private void loadCustomMaps(){
+        boolean convertedAny = false;
+        for(FileHandle file : customMapDirectory.list()){
+            if(file.extension().equalsIgnoreCase(oldMapExtension)){
+                convertedAny = true;
+                try{
+                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
+                    //TODO delete so conversion doesn't happen again
+                    //file.delete();
+                }catch(IOException e){
+                    //don't convert
+                    Log.err(e);
+                }
+            }
+        }
+
+        //free up any potential memory that was used up during conversion
+        if(convertedAny){
+            world.createTiles(0, 0);
+        }
+
         for(FileHandle file : customMapDirectory.list()){
             try{
                 if(file.extension().equalsIgnoreCase(mapExtension)){

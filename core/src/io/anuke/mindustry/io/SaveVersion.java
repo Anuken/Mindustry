@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
@@ -52,7 +53,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
             "build", Version.build,
-            "mapname", world.getMap().name(),
+            "mapname", world.getMap() == null ? "unknown" : world.getMap().name(),
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", Serialization.writeStatsJson(state.stats),

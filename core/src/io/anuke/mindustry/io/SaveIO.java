@@ -58,11 +58,19 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(int slot){
-        return isSaveValid(getSlotStream(slot)) || isSaveValid(getBackupSlotStream(slot));
+        try{ //file may not even exist at all, so catch that too
+            return isSaveValid(getSlotStream(slot)) || isSaveValid(getBackupSlotStream(slot));
+        }catch(Exception e){
+            return false;
+        }
     }
 
     public static boolean isSaveValid(FileHandle file){
-        return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
+        try{
+            return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
+        }catch(Exception e){
+            return false;
+        }
     }
 
     public static boolean isSaveValid(DataInputStream stream){

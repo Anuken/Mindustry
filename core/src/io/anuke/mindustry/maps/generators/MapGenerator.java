@@ -60,9 +60,10 @@ public class MapGenerator extends Generator{
     @Override
     public void init(Loadout loadout){
         this.loadout = loadout;
-        map = world.maps.loadInternalMap(mapName);
-        width = map.width;
-        height = map.height;
+        //TODO uncomment once conversion works
+        //map = world.maps.loadInternalMap(mapName);
+        //width = map.width;
+        //height = map.height;
     }
 
     @Override
