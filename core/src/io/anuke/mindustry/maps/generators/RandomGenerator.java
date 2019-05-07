@@ -1,6 +1,6 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
@@ -31,7 +31,7 @@ public abstract class RandomGenerator extends Generator{
 
         decorate(tiles);
 
-        world.setMap(new Map(new ObjectMap<>()));
+        world.setMap(new Map(new StringMap()));
     }
 
     public abstract void decorate(Tile[][] tiles);

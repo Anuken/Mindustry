@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
@@ -100,18 +99,26 @@ public class SaveIO{
         return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(FileHandle file){
-        write(new FastDeflaterOutputStream(file.write(false, bufferSize)));
+    public static void write(FileHandle file, StringMap tags){
+        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), tags);
     }
 
-    public static void write(OutputStream os){
+    public static void write(FileHandle file){
+        write(file, null);
+    }
+
+    public static void write(OutputStream os, StringMap tags){
         DataOutputStream stream;
 
         try{
             stream = new DataOutputStream(os);
             stream.write(header);
             stream.writeInt(getVersion().version);
-            getVersion().write(stream);
+            if(tags == null){
+                getVersion().write(stream);
+            }else{
+                getVersion().write(stream, tags);
+            }
             stream.close();
         }catch(Exception e){
             throw new RuntimeException(e);

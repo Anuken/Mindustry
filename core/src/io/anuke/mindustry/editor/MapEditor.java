@@ -1,6 +1,5 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Pixmap;
@@ -110,7 +109,7 @@ public class MapEditor{
     }
 
     public Map createMap(FileHandle file){
-        return new Map(file, width(), height(), new ObjectMap<>(tags), true);
+        return new Map(file, width(), height(), new StringMap(tags), true);
     }
 
     private void reset(){

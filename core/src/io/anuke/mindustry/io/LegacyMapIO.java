@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
@@ -27,7 +27,7 @@ public class LegacyMapIO{
 
     public static Map readMap(FileHandle file, boolean custom) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(1024))){
-            ObjectMap<String, String> tags = new ObjectMap<>();
+            StringMap tags = new StringMap();
 
             //meta is uncompressed
             int version = stream.readInt();
@@ -107,7 +107,12 @@ public class LegacyMapIO{
                         Block block = content.block(stream.readByte());
 
                         Tile tile = tiles.get(x, y);
-                        tile.setBlock(block);
+                        //the spawn block is saved in the block tile layer in older maps, shift it to the overlay
+                        if(block != Blocks.spawn){
+                            tile.setBlock(block);
+                        }else{
+                            tile.setOverlay(block);
+                        }
 
                         if(tile.entity != null){
                             byte tr = stream.readByte();

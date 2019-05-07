@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.StringMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
@@ -31,10 +30,7 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public final void write(DataOutputStream stream) throws IOException{
-        region("meta", stream, this::writeMeta);
-        region("content", stream, this::writeContentHeader);
-        region("map", stream, this::writeMap);
-        region("entities", stream, this::writeEntities);
+        write(stream, new StringMap());
     }
 
     public final void read(DataInputStream stream, CounterInputStream counter) throws IOException{
@@ -44,7 +40,14 @@ public abstract class SaveVersion extends SaveFileReader{
         region("entities", stream, counter, this::readEntities);
     }
 
-    public void writeMeta(DataOutput stream) throws IOException{
+    public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
+        region("meta", stream, out -> writeMeta(out, extraTags));
+        region("content", stream, this::writeContentHeader);
+        region("map", stream, this::writeMap);
+        region("entities", stream, this::writeEntities);
+    }
+
+    public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         writeStringMap(stream, StringMap.of(
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
@@ -56,7 +59,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "rules", Serialization.writeRulesJson(state.rules),
             "width", world.width(),
             "height", world.height()
-        ));
+        ).merge(tags));
     }
 
     public void readMeta(DataInput stream) throws IOException{

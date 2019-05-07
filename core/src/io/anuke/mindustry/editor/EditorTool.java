@@ -15,21 +15,7 @@ public enum EditorTool{
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
-            Tile tile = editor.tile(x, y);
-
-            byte link = tile.getLinkByte();
-
-            if(tile.isLinked()){
-                x -= (Pack.leftByte(link) - 8);
-                y -= (Pack.rightByte(link) - 8);
-
-                tile = editor.tile(x, y);
-            }
-
-            //do not.
-            if(tile.isLinked()){
-                return;
-            }
+            Tile tile = editor.tile(x, y).link();
 
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
@@ -87,7 +73,7 @@ public enum EditorTool{
             Block draw = editor.drawBlock;
             dest = draw instanceof OverlayFloor ? tile.overlay() : isfloor ? floor : block;
 
-            if(dest == draw || block == Blocks.part || block.isMultiblock()){
+            if(dest == draw || block instanceof BlockPart || block.isMultiblock()){
                 return;
             }
 

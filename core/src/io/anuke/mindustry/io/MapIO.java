@@ -49,9 +49,10 @@ public class MapIO{
     }
 
     public static void writeMap(FileHandle file, Map map) throws IOException{
-        SaveIO.write(file);
-        try(DataOutputStream out = new DataOutputStream(file.write(false, bufferSize))){
-
+        try{
+            SaveIO.write(file, map.tags);
+        }catch(Exception e){
+            throw new IOException(e);
         }
     }
 

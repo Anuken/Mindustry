@@ -33,54 +33,43 @@ public class EditorTile extends Tile{
             return;
         }
 
-        Block previous = floor();
-        Block ore = overlay();
-        if(previous == type && ore == Blocks.air) return;
+        if(floor == type && overlayID() == 0) return;
+        if(overlayID() != 0) op(OpType.overlay, overlayID());
+        if(floor != type) op(OpType.floor, floor.id);
         super.setFloor(type);
-        //ore may get nullified so make sure to save edits
-        if(overlay() != ore){
-            op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), ore.id, overlay().id));
-        }
-        if(previous != type){
-            op(TileOp.get(x, y, (byte)OpType.floor.ordinal(), previous.id, type.id));
-        }
     }
 
     @Override
     public void setBlock(Block type){
-        Block previous = block;
-        byte pteam = getTeamID();
-        if(previous == type) return;
+        if(block == type) return;
+        op(OpType.block, block.id);
         super.setBlock(type);
-        if(pteam != getTeamID()){
-            op(TileOp.get(x, y, (byte)OpType.team.ordinal(), pteam, getTeamID()));
-        }
-        op(TileOp.get(x, y, (byte)OpType.block.ordinal(), previous.id, type.id));
 
+        //TODO check if this line is necessary
+        //if(pteam != getTeamID()){
+        //    op((byte)OpType.team.ordinal(), pteam, getTeamID());
+        //}
     }
 
     @Override
     public void setTeam(Team team){
-        byte previous = getTeamID();
-        if(previous == team.ordinal()) return;
+        if(getTeamID() == team.ordinal()) return;
+        op(OpType.team, getTeamID());
         super.setTeam(team);
-        op(TileOp.get(x, y, (byte)OpType.team.ordinal(), previous, (byte)team.ordinal()));
     }
 
     @Override
-    public void rotation(byte rotation){
-        byte previous = rotation();
-        if(previous == rotation) return;
+    public void rotation(int rotation){
+        if(rotation == rotation()) return;
+        op(OpType.rotation, rotation());
         super.rotation(rotation);
-        op(TileOp.get(x, y, (byte)OpType.rotation.ordinal(), previous, rotation));
     }
 
     @Override
-    public void setOverlayID(byte ore){
-        byte previous = overlayID();
-        if(previous == ore) return;
-        super.setOverlayID(ore);
-        op(TileOp.get(x, y, (byte)OpType.ore.ordinal(), previous, ore));
+    public void setOverlayID(short overlay){
+        if(overlayID() == overlay) return;
+        op(OpType.overlay, overlay);
+        super.setOverlayID(overlay);
     }
 
     @Override
@@ -112,7 +101,7 @@ public class EditorTile extends Tile{
         }
     }
 
-    private static void op(long op){
-        ui.editor.editor.addTileOp(op);
+    private void op(OpType type, short value){
+        ui.editor.editor.addTileOp(TileOp.get(x, y, (byte)type.ordinal(), value));
     }
 }

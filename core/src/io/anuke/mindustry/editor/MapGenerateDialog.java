@@ -322,7 +322,8 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     public static class DummyTile{
-        public byte block, floor, ore, team, rotation;
+        public byte team, rotation;
+        public short block, floor, ore;
 
         void set(Block floor, Block wall, Block ore, Team team, int rotation){
             this.floor = floor.id;

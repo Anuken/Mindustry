@@ -1,8 +1,7 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
@@ -83,7 +82,7 @@ public class Maps implements Disposable{
     public void saveMap(ObjectMap<String, String> baseTags){
 
         try{
-            ObjectMap<String, String> tags = new ObjectMap<>(baseTags);
+            StringMap tags = new StringMap(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
             FileHandle file;

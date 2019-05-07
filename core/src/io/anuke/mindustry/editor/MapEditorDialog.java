@@ -19,13 +19,11 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OverlayFloor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
@@ -122,7 +120,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             if(!editor.getTags().containsKey("name")){
                                 editor.getTags().put("name", result.nameWithoutExtension());
                             }
-                            MapIO.writeMap(result, editor.createMap(result), editor.tiles());
+                            MapIO.writeMap(result, editor.createMap(result));
                         }catch(Exception e){
                             ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
                             Log.err(e);
