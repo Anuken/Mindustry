@@ -30,7 +30,7 @@ public class BlockPart extends Block{
 
     @Override
     public Tile linked(Tile tile){
-        return tile.getNearby(dx, dy);
+        return tile.getNearby(-dx, -dy);
     }
 
     @Override
@@ -48,5 +48,11 @@ public class BlockPart extends Block{
     public boolean isHidden(){
         return true;
     }
+
+    @Override
+    public String toString(){
+        return "BlockPart[" + dx + ", " + dy + "]";
+    }
+
 
 }

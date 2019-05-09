@@ -238,10 +238,11 @@ public class Tile implements Position, TargetTrait{
      */
     public void getLinkedTiles(Consumer<Tile> cons){
         if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
-            for(int dx = 0; dx < block.size; dx++){
-                for(int dy = 0; dy < block.size; dy++){
+            int size = block.size;
+            int offsetx = -(size - 1) / 2;
+            int offsety = -(size - 1) / 2;
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if(other != null) cons.accept(other);
                 }

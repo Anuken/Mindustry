@@ -198,6 +198,7 @@ public class Conveyor extends Block{
         ConveyorEntity entity = tile.entity();
         entity.minitem = 1f;
         Tile next = tile.getNearby(tile.rotation());
+        if(next != null) next = next.link();
 
         float nextMax = next != null && next.block() instanceof Conveyor ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;

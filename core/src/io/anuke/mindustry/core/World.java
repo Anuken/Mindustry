@@ -174,6 +174,8 @@ public class World implements ApplicationListener{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        prepareTiles(tiles);
+
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
@@ -210,7 +212,6 @@ public class World implements ApplicationListener{
 
         createTiles(generator.width, generator.height);
         generator.generate(tiles);
-        prepareTiles(tiles);
 
         endMapLoad();
     }
@@ -382,11 +383,6 @@ public class World implements ApplicationListener{
         }
     }
 
-    /** Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
-    void loadTileData(Tile[][] tiles){
-        prepareTiles(tiles);
-    }
-
     public void addDarkness(Tile[][] tiles){
         byte[][] dark = new byte[tiles.length][tiles[0].length];
         byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
@@ -476,15 +472,6 @@ public class World implements ApplicationListener{
                         }
                     }
                 }
-            }
-        }
-
-        //update occlusion data
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-
-                tile.updateOcclusion();
             }
         }
     }
