@@ -18,6 +18,7 @@ import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -125,7 +126,7 @@ public class ApplicationTests{
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                tiles[x][y] = new Tile(x, y, (byte)0, (byte)0);
+                tiles[x][y] = new Tile(x, y);
             }
         }
         world.endMapLoad();
@@ -143,7 +144,7 @@ public class ApplicationTests{
                 if(x == bx && by == y){
                     assertEquals(world.tile(x, y).block(), Blocks.coreShard);
                 }else{
-                    assertTrue(world.tile(x, y).block() == Blocks.part && world.tile(x, y).getLinked() == world.tile(bx, by));
+                    assertTrue(world.tile(x, y).block() instanceof BlockPart && world.tile(x, y).link() == world.tile(bx, by));
                 }
             }
         }
@@ -262,7 +263,7 @@ public class ApplicationTests{
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.part, world.tile(1, 1).block());
+        assertTrue(world.tile(1, 1).block() instanceof BlockPart);
     }
 
     @Test
@@ -335,7 +336,7 @@ public class ApplicationTests{
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
-                tiles[x][y] = new Tile(x, y, Blocks.stone.id, (byte)0);
+                tiles[x][y] = new Tile(x, y, Blocks.stone.id, (byte)0, (byte)0);
             }
         }
         int i = 0;
@@ -379,8 +380,10 @@ public class ApplicationTests{
 
     void depositTest(Block block, Item item){
         BaseUnit unit = UnitTypes.spirit.create(Team.none);
-        Tile tile = new Tile(0, 0, Blocks.air.id, block.id);
+        Tile tile = new Tile(0, 0, Blocks.air.id, (byte)0, block.id);
         int capacity = tile.block().itemCapacity;
+
+        assertNotNull(tile.entity, "Tile should have an entity, but does not: " + tile);
 
         int deposited = tile.block().acceptStack(item, capacity - 1, tile, unit);
         assertEquals(capacity - 1, deposited);

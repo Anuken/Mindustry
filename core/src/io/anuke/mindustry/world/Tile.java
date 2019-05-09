@@ -42,6 +42,9 @@ public class Tile implements Position, TargetTrait{
         this.floor = (Floor)content.block(floor);
         this.block = content.block(wall);
         this.overlay = overlay;
+
+        //update entity and create it if needed
+        changed();
     }
 
     /** Returns this tile's position as a {@link Pos}. */
