@@ -452,19 +452,6 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) +
-        (isLinked() ? " link=[" + linkX(rotation) + ", " + linkY(rotation) + "]" : "");
-    }
-
-    //TODO remove these!
-
-    /**Returns the relative X from a link byte.*/
-    public static int linkX(byte value){
-        return -((byte)((value >> 4) & (byte)0x0F) - 8);
-    }
-
-    /**Returns the relative Y from a link byte.*/
-    public static int linkY(byte value){
-        return -((byte)(value & 0x0F) - 8);
+        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass()));
     }
 }

@@ -168,6 +168,8 @@ public class MapEditor{
                         if(block.isMultiblock() || block instanceof BlockPart){
                             return;
                         }
+
+                        renderer.updatePoint(worldx, worldy);
                     }
                 }
             }

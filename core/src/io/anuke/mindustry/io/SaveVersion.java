@@ -72,7 +72,6 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeMap(DataOutput stream) throws IOException{
-        //TODO something here messes up everything
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());

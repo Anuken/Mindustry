@@ -85,7 +85,6 @@ public class MapRenderer implements Disposable{
     }
 
     public void updatePoint(int x, int y){
-        //TODO spread out over multiple frames?
         updates.add(x + y * width);
     }
 

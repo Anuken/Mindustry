@@ -38,7 +38,7 @@ public class PlacementFragment extends Fragment{
     Table blockTable, toggler, topTable;
     boolean lastGround;
 
-    //TODO make this configurable
+    //not configurable, no plans to make it configurable
     final KeyCode[] inputGrid = {
         KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
         KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,

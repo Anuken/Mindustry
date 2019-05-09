@@ -859,7 +859,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
+        TypeIO.writeStringData(buffer, name);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);

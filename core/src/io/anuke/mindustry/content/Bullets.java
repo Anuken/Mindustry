@@ -424,7 +424,6 @@ public class Bullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                //TODO add color to the bullet depending on the color of the flame it came from
                 Draw.color(Pal.lightFlame, Pal.darkFlame, Color.GRAY, b.fin());
                 Fill.circle(b.x, b.y, 3f * b.fout());
                 Draw.reset();
