@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
 import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.maps.generators.Generator;
 import io.anuke.mindustry.world.Block;
 
@@ -37,6 +38,12 @@ public class Zone extends UnlockableContent{
     protected ItemStack[] launchCost = null;
 
     private Array<ItemStack> defaultStartingItems = new Array<>();
+
+    static{
+        Serialization.setSerializer(Zone.class,
+            (json, zone, name) -> json.writeValue(name, zone.name),
+            (json, name) -> content.getByName(ContentType.zone, json.getString(name)));
+    }
 
     public Zone(String name, Generator generator){
         super(name);

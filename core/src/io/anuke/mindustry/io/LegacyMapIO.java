@@ -6,7 +6,9 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO.TileProvider;
 import io.anuke.mindustry.maps.Map;
@@ -25,16 +27,22 @@ import static io.anuke.mindustry.Vars.*;
  * Differentiate between legacy maps and new maps by checking the extension (or the header).*/
 public class LegacyMapIO{
     private static final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
+    private static final Json json = new Json();
 
     /* Convert a map from the old format to the new format. */
     public static void convertMap(FileHandle in, FileHandle out) throws IOException{
         Map map = readMap(in, true);
+
+        String waves = map.tags.get("waves", "[]");
+        Array<SpawnGroup> groups = new Array<>(json.fromJson(SpawnGroup[].class, waves));
+
         Tile[][] tiles = world.createTiles(map.width, map.height);
         for(int x = 0; x < map.width; x++){
             for(int y = 0; y < map.height; y++){
-                tiles[x][y] = new Tile(x, y);
+                tiles[x][y] = new CachedTile();
             }
         }
+        state.rules.spawns = groups;
         readTiles(map, tiles);
         MapIO.writeMap(out, map);
     }

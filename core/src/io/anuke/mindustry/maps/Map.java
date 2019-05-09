@@ -1,15 +1,10 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.DefaultWaves;
-import io.anuke.mindustry.game.SpawnGroup;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
@@ -47,20 +42,6 @@ public class Map implements Comparable<Map>{
 
     public Map(StringMap tags){
         this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
-    }
-
-    public Array<SpawnGroup> getWaves(){
-        if(tags.containsKey("waves")){
-            try{
-                return world.maps.readWaves(tags.get("waves"));
-            }catch(Exception e){
-                Log.err("Malformed waves: {0}", tags.get("waves"));
-                e.printStackTrace();
-                return DefaultWaves.get();
-            }
-        }else{
-            return DefaultWaves.get();
-        }
     }
 
     public int getHightScore(){

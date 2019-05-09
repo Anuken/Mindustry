@@ -8,7 +8,6 @@ import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -27,7 +26,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public SaveMeta getMeta(DataInput stream) throws IOException{
         stream.readInt(); //length of data, doesn't matter here
         StringMap map = readStringMap(stream);
-        return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), Serialization.readRulesStringJson(map.get("rules", "{}")));
+        return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), JsonIO.read(Rules.class, map.get("rules", "{}")));
     }
 
     public final void write(DataOutputStream stream) throws IOException{
@@ -56,8 +55,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "mapname", world.getMap() == null ? "unknown" : world.getMap().name(),
             "wave", state.wave,
             "wavetime", state.wavetime,
-            "stats", Serialization.writeStatsJson(state.stats),
-            "rules", Serialization.writeRulesJson(state.rules),
+            "stats", JsonIO.write(state.stats),
+            "rules", JsonIO.write(state.rules),
             "width", world.width(),
             "height", world.height()
         ).merge(tags));
@@ -68,11 +67,12 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
-        state.stats = Serialization.readStatsStringJson(map.get("stats", "{}"));
-        state.rules = Serialization.readRulesStringJson(map.get("rules", "{}"));
+        state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
+        state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
     }
 
     public void writeMap(DataOutput stream) throws IOException{
+        //TODO something here messes up everything
         //write world size
         stream.writeShort(world.width());
         stream.writeShort(world.height());
@@ -106,7 +106,7 @@ public abstract class SaveVersion extends SaveFileReader{
             if(tile.entity != null){
                 writeChunk(stream, true, out -> {
                     out.writeByte(tile.entity.version());
-                    tile.entity.write(stream);
+                    tile.entity.write(out);
                 });
             }else{
                 //write consecutive non-entity blocks
@@ -129,10 +129,12 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readMap(DataInput stream) throws IOException{
-        short width = stream.readShort();
-        short height = stream.readShort();
+        int width = stream.readUnsignedShort();
+        int height = stream.readUnsignedShort();
 
-        world.beginMapLoad();
+        boolean generating = world.isGenerating();
+
+        if(!generating) world.beginMapLoad();
 
         Tile[][] tiles = world.createTiles(width, height);
 
@@ -163,7 +165,7 @@ public abstract class SaveVersion extends SaveFileReader{
             if(tile.entity != null){
                 readChunk(stream, true, in -> {
                     byte version = in.readByte();
-                    tile.entity.read(stream, version);
+                    tile.entity.read(in, version);
                 });
             }else{
                 int consecutives = stream.readUnsignedByte();
@@ -178,7 +180,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(null);
-        world.endMapLoad();
+        if(!generating) world.endMapLoad();
     }
 
     public void writeEntities(DataOutput stream) throws IOException{
@@ -200,8 +202,8 @@ public abstract class SaveVersion extends SaveFileReader{
                     SaveTrait save = (SaveTrait)entity;
                     //each entity is a separate chunk.
                     writeChunk(stream, true, out -> {
-                        stream.writeByte(save.getTypeID());
-                        stream.writeByte(save.version());
+                        out.writeByte(save.getTypeID());
+                        out.writeByte(save.version());
                         save.writeSave(out);
                     });
                 }
@@ -217,10 +219,10 @@ public abstract class SaveVersion extends SaveFileReader{
             for(int j = 0; j < amount; j++){
                 //TODO throw exception on read fail
                 readChunk(stream, true, in -> {
-                    byte typeid = stream.readByte();
-                    byte version = stream.readByte();
+                    byte typeid = in.readByte();
+                    byte version = in.readByte();
                     SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
-                    trait.readSave(stream, version);
+                    trait.readSave(in, version);
                 });
             }
         }

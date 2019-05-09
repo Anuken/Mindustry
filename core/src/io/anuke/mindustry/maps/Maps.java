@@ -8,8 +8,7 @@ import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.LegacyMapIO;
-import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.io.*;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -61,6 +60,7 @@ public class Maps implements Disposable{
     public void load(){
         try{
             //TODO remove, this is only for testing
+
             for(FileHandle in : Core.files.absolute("/home/anuke/Projects/Mindustry/core/assets/maps").list()){
                 if(in.extension().equalsIgnoreCase(oldMapExtension)){
                     Log.info("Converting {0}...", in);

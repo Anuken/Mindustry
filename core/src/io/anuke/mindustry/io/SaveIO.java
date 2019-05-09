@@ -90,6 +90,7 @@ public class SaveIO{
     public static SaveMeta getMeta(DataInputStream stream){
 
         try{
+            readHeader(stream);
             int version = stream.readInt();
             SaveMeta meta = versions.get(version).getMeta(stream);
             stream.close();
@@ -116,10 +117,7 @@ public class SaveIO{
     }
 
     public static void write(OutputStream os, StringMap tags){
-        DataOutputStream stream;
-
-        try{
-            stream = new DataOutputStream(os);
+        try(DataOutputStream stream = new DataOutputStream(os)){
             stream.write(header);
             stream.writeInt(getVersion().version);
             if(tags == null){
@@ -127,7 +125,6 @@ public class SaveIO{
             }else{
                 getVersion().write(stream, tags);
             }
-            stream.close();
         }catch(Exception e){
             throw new RuntimeException(e);
         }

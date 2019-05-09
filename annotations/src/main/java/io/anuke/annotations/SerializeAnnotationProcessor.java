@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({
-"io.anuke.annotations.Annotations.Serialize"
-})
+@SupportedAnnotationTypes("io.anuke.annotations.Annotations.Serialize")
 public class SerializeAnnotationProcessor extends AbstractProcessor{
     /** Target class name. */
     private static final String className = "Serialization";
@@ -44,6 +42,28 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
             classBuilder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             classBuilder.addJavadoc(RemoteMethodAnnotationProcessor.autogenWarning);
+
+
+            classBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.bestGuess("io.anuke.arc.collection.ObjectMap"),
+                ClassName.get(Class.class),
+                ClassName.bestGuess("io.anuke.mindustry.io.JsonTypeWriter")),
+                "writers", Modifier.PRIVATE, Modifier.STATIC).initializer("new io.anuke.arc.collection.ObjectMap<>()").build());
+
+            classBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.bestGuess("io.anuke.arc.collection.ObjectMap"),
+                ClassName.get(Class.class),
+                ClassName.bestGuess("io.anuke.mindustry.io.JsonTypeReader")),
+                "readers", Modifier.PRIVATE, Modifier.STATIC).initializer("new io.anuke.arc.collection.ObjectMap<>()").build());
+
+            classBuilder.addMethod(MethodSpec.methodBuilder("setSerializer")
+                .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                .addTypeVariable(TypeVariableName.get("T"))
+                .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "type")
+                .addParameter(ParameterizedTypeName.get(ClassName.bestGuess("io.anuke.mindustry.io.JsonTypeWriter"), TypeVariableName.get("T")), "writer")
+                .addParameter(ParameterizedTypeName.get(ClassName.bestGuess("io.anuke.mindustry.io.JsonTypeReader"), TypeVariableName.get("T")), "reader")
+                .addStatement("writers.put(type, writer)")
+                .addStatement("readers.put(type, reader)").build());
+
+
             MethodSpec.Builder method = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             TypeName jsonType = ClassName.bestGuess("io.anuke.arc.util.serialization.Json");
@@ -107,6 +127,32 @@ public class SerializeAnnotationProcessor extends AbstractProcessor{
                     }else{
                         writeMethod.addStatement("io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).write(stream, object." + name + ")");
                         readMethod.addStatement("object." + name + " = (" + typeName + ")io.anuke.arc.Core.settings.getSerializer(" + typeName + ".class).read(stream)");
+
+                        if(field.asType().toString().equalsIgnoreCase("java.lang.String")){
+                            jsonWriteMethod.addStatement("json.writeValue(\"" + name + "\", object." + name + ")");
+                            jsonReadMethod.addStatement("if(value.has(\"" + name + "\")) object." + name + "= value.getString(\"" + name + "\")");
+                        }else if(field.asType().toString().startsWith("io.anuke.arc.collection.Array")){ //oh boy here it begins
+                            String genericType = field.asType().toString().substring(field.asType().toString().indexOf('<') + 1, field.asType().toString().indexOf('>'));
+                            {
+                                jsonWriteMethod.addStatement("json.writeArrayStart($S)", name)
+                                .beginControlFlow("for(" + genericType + " item : object." + name + ")")
+                                .addStatement("json.writeValue(item)")
+                                .endControlFlow()
+                                .addStatement("json.writeArrayEnd()");
+                            }
+
+                            {
+                                //jsonWriteMethod.beginControlFlow("if(value.has($S))", name);
+                                //jsonWriteMethod.addStatement("io.anuke.arc.util.serialization.JsonValue list = value.get($S)", name);
+                                //jsonWriteMethod.endControlFlow();
+                            }
+                            //jsonWriteMethod.addStatement("for( ")
+                        }else{
+                            jsonWriteMethod.addStatement("if(object."+name+" != null) writers.getThrow("+typeName+".class, () -> new IllegalArgumentException(\"Class '"
+                                + typeName + "' does not have a serializer!\")).write(bjson, object."+name+", \"" + name+"\")");
+                            jsonReadMethod.addStatement("if(value.has(\"" + name + "\")) object." + name + " = ("+typeName+")readers.getThrow("+typeName+".class, () -> new IllegalArgumentException(\"Class '"
+                                + typeName + "' does not have a serializer!\")).read(value, \""+name+"\")");
+                        }
                     }
                 }
 
