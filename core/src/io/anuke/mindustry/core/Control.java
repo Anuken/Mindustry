@@ -210,9 +210,9 @@ public class Control implements ApplicationListener{
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
+            world.loadGenerator(zone.generator);
             state.rules = zone.rules.get();
             state.rules.zone = zone;
-            world.loadGenerator(zone.generator);
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){
                     core.entity.items.add(stack.item, stack.amount);

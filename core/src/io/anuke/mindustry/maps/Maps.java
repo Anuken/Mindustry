@@ -59,16 +59,6 @@ public class Maps implements Disposable{
     /** Load all maps. Should be called at application start. */
     public void load(){
         try{
-            //TODO remove, this is only for testing
-
-            for(FileHandle in : Core.files.absolute("/home/anuke/Projects/Mindustry/core/assets/maps").list()){
-                if(in.extension().equalsIgnoreCase(oldMapExtension)){
-                    Log.info("Converting {0}...", in);
-                    LegacyMapIO.convertMap(in, in.sibling(in.nameWithoutExtension() + "." + mapExtension));
-                    Log.info("Converted {0}", in);
-                }
-            }
-
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
                 loadMap(file, false);
@@ -167,6 +157,34 @@ public class Maps implements Disposable{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
+    public void loadLegacyMaps(){
+        boolean convertedAny = false;
+        for(FileHandle file : customMapDirectory.list()){
+            if(file.extension().equalsIgnoreCase(oldMapExtension)){
+                try{
+                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
+                    //delete old, converted file; it is no longer useful
+                    file.delete();
+                    convertedAny = true;
+                    Log.info("Converted file {0}", file);
+                }catch(IOException e){
+                    //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
+                    //but don't delete it
+                    file.copyTo(file.sibling(file.name() + "_conversion_failed"));
+                    file.delete();
+                    Log.err(e);
+                }
+            }
+        }
+
+        //free up any potential memory that was used up during conversion
+        if(convertedAny){
+            world.createTiles(0, 0);
+            //reload maps to load the converted ones
+            reload();
+        }
+    }
+
     /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
@@ -193,26 +211,6 @@ public class Maps implements Disposable{
     }
 
     private void loadCustomMaps(){
-        boolean convertedAny = false;
-        for(FileHandle file : customMapDirectory.list()){
-            if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                convertedAny = true;
-                try{
-                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
-                    //TODO delete so conversion doesn't happen again
-                    //file.delete();
-                }catch(IOException e){
-                    //don't convert
-                    Log.err(e);
-                }
-            }
-        }
-
-        //free up any potential memory that was used up during conversion
-        if(convertedAny){
-            world.createTiles(0, 0);
-        }
-
         for(FileHandle file : customMapDirectory.list()){
             try{
                 if(file.extension().equalsIgnoreCase(mapExtension)){

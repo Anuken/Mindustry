@@ -35,9 +35,12 @@ public class World implements ApplicationListener{
     private boolean generating, invalidMap;
 
     public World(){
-        //TODO swap
-        Core.app.post(maps::load);
-        //maps.load();
+        maps.load();
+    }
+
+    @Override
+    public void init(){
+        maps.loadLegacyMaps();
     }
 
     @Override
