@@ -775,6 +775,8 @@ public class ServerControl implements ApplicationListener{
                             socketOutput = null;
                         }
                     }
+                }catch(BindException b){
+                    err("Command input socket already in use. Is another instance of the server running?");
                 }catch(IOException e){
                     err("Terminating socket server.");
                     e.printStackTrace();

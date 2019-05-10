@@ -357,7 +357,6 @@ public class NetServer implements ApplicationListener{
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
-            //TODO implement
             if(player.con != null){
                 Call.onTraceInfo(player.con.id, other, info);
             }else{
