@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.*;
 
@@ -70,6 +71,12 @@ public abstract class SaveVersion extends SaveFileReader{
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
+        Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
+        world.setMap(worldmap == null ? new Map(StringMap.of(
+            "name", map.get("mapname", "Unknown"),
+            "width", 1,
+            "height", 1
+        )) : worldmap);
     }
 
     public void writeMap(DataOutput stream) throws IOException{
@@ -136,7 +143,6 @@ public abstract class SaveVersion extends SaveFileReader{
 
         if(!generating) context.begin();
 
-        //Tile[][] tiles = world.createTiles(width, height);
         context.resize(width, height);
 
         //read floor and create tiles first

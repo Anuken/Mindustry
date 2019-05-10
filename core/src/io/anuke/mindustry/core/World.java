@@ -494,7 +494,7 @@ public class World implements ApplicationListener{
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-            return new Tile(x, y, floorID, overlayID, wallID);
+            return (tiles[x][y] = new Tile(x, y, floorID, overlayID, wallID));
         }
 
         @Override

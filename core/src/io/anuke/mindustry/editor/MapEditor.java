@@ -286,7 +286,7 @@ public class MapEditor{
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-            return new EditorTile(x, y, floorID, overlayID, wallID);
+            return (tiles()[x][y] = new EditorTile(x, y, floorID, overlayID, wallID));
         }
 
         @Override
