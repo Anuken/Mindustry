@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Tile.TileConstructor;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.*;
@@ -58,6 +59,10 @@ public class MapIO{
 
     public static void loadMap(Map map){
         SaveIO.load(map.file);
+    }
+
+    public static void loadMap(Map map, TileConstructor cons){
+        SaveIO.load(map.file, cons);
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{

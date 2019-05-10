@@ -6,6 +6,8 @@ import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.Tile.TileConstructor;
 
 import java.io.*;
 import java.util.Arrays;
@@ -131,28 +133,33 @@ public class SaveIO{
     }
 
     public static void load(FileHandle file) throws SaveException{
+        load(file, Tile::new);
+    }
+
+    public static void load(FileHandle file, TileConstructor cons) throws SaveException{
         try{
             //try and load; if any exception at all occurs
-            load(new InflaterInputStream(file.read(bufferSize)));
+            load(new InflaterInputStream(file.read(bufferSize)), cons);
         }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
-                load(new InflaterInputStream(backup.read(bufferSize)));
+                load(new InflaterInputStream(backup.read(bufferSize)), cons);
             }else{
                 throw new SaveException(e.getCause());
             }
         }
     }
 
-    public static void load(InputStream is) throws SaveException{
+    /** Loads from a deflated (!) input stream.*/
+    public static void load(InputStream is, TileConstructor cons) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
             readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = versions.get(version);
 
-            ver.read(stream, counter);
+            ver.read(stream, counter, cons);
         }catch(Exception e){
             throw new SaveException(e);
         }finally{

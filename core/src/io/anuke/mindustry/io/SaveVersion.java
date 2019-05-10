@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.Tile.TileConstructor;
 
 import java.io.*;
 
@@ -29,18 +30,20 @@ public abstract class SaveVersion extends SaveFileReader{
         return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), JsonIO.read(Rules.class, map.get("rules", "{}")));
     }
 
+    @Override
     public final void write(DataOutputStream stream) throws IOException{
         write(stream, new StringMap());
     }
 
-    public final void read(DataInputStream stream, CounterInputStream counter) throws IOException{
+    @Override
+    public final void read(DataInputStream stream, CounterInputStream counter, TileConstructor tiles) throws IOException{
         region("meta", stream, counter, this::readMeta);
         region("content", stream, counter, this::readContentHeader);
-        region("map", stream, counter, this::readMap);
+        region("map", stream, counter, in -> readMap(in, tiles));
         region("entities", stream, counter, this::readEntities);
     }
 
-    public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
+    public final void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         region("meta", stream, out -> writeMeta(out, extraTags));
         region("content", stream, this::writeContentHeader);
         region("map", stream, this::writeMap);
@@ -127,7 +130,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readMap(DataInput stream) throws IOException{
+    public void readMap(DataInput stream, TileConstructor constructor) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -144,11 +147,11 @@ public abstract class SaveVersion extends SaveFileReader{
             short oreid = stream.readShort();
             int consecutives = stream.readUnsignedByte();
 
-            tiles[x][y] = new Tile(x, y, floorid, oreid, (short)0);
+            tiles[x][y] = constructor.construct(x, y, floorid, oreid, (short)0);
 
             for(int j = i + 1; j < i + 1 + consecutives; j++){
                 int newx = j % width, newy = j / width;
-                tiles[newx][newy] = new Tile(newx, newy, floorid, oreid, (short)0);
+                tiles[newx][newy] = constructor.construct(newx, newy, floorid, oreid, (short)0);
             }
 
             i += consecutives;

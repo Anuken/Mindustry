@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.ui;
 //TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
-    public EditorTile(int x, int y, short floor, short overlay, short wall){
+    public EditorTile(int x, int y, int floor, int overlay, int wall){
         super(x, y, floor, overlay, wall);
     }
 
@@ -93,6 +93,8 @@ public class EditorTile extends Tile{
 
         if(block.hasEntity()){
             entity = block.newEntity();
+            entity.tile = this;
+            entity.block = block;
             entity.health = block.health;
             entity.cons = new ConsumeModule(entity);
             if(block.hasItems) entity.items = new ItemModule();

@@ -5,6 +5,7 @@ import io.anuke.arc.collection.ObjectMap.Entry;
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.ReusableByteOutStream;
+import io.anuke.mindustry.world.Tile.TileConstructor;
 
 import java.io.*;
 
@@ -102,7 +103,7 @@ public abstract class SaveFileReader{
         return map;
     }
 
-    public abstract void read(DataInputStream stream, CounterInputStream counter) throws IOException;
+    public abstract void read(DataInputStream stream, CounterInputStream counter, TileConstructor tiles) throws IOException;
 
     public abstract void write(DataOutputStream stream) throws IOException;
 

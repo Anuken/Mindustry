@@ -50,11 +50,9 @@ public class MapEditor{
         reset();
 
         loading = true;
-        //TODO redundant and does nothing since tiles are overwritten
-        createTiles(map.width, map.height);
         tags.putAll(map.tags);
         //TODO this actually creates the tiles, which are not editor tiles
-        MapIO.loadMap(map);
+        MapIO.loadMap(map, EditorTile::new);
         checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;

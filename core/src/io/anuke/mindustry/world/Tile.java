@@ -36,12 +36,12 @@ public class Tile implements Position, TargetTrait{
         block = floor = (Floor)Blocks.air;
     }
 
-    public Tile(int x, int y, short floor, short overlay, short wall){
+    public Tile(int x, int y, int floor, int overlay, int wall){
         this.x = (short)x;
         this.y = (short)y;
         this.floor = (Floor)content.block(floor);
         this.block = content.block(wall);
-        this.overlay = overlay;
+        this.overlay = (short)overlay;
 
         //update entity and create it if needed
         changed();
@@ -453,5 +453,9 @@ public class Tile implements Position, TargetTrait{
     @Override
     public String toString(){
         return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass()));
+    }
+
+    public interface TileConstructor{
+        Tile construct(int x, int y, int floor, int overlay, int wall);
     }
 }
