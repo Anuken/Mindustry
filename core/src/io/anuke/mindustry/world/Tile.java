@@ -454,8 +454,4 @@ public class Tile implements Position, TargetTrait{
     public String toString(){
         return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass()));
     }
-
-    public interface TileConstructor{
-        Tile construct(int x, int y, int floor, int overlay, int wall);
-    }
 }

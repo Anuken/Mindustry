@@ -9,9 +9,7 @@ import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.Tile.TileConstructor;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -36,10 +34,10 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public final void read(DataInputStream stream, CounterInputStream counter, TileConstructor tiles) throws IOException{
+    public final void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         region("meta", stream, counter, this::readMeta);
         region("content", stream, counter, this::readContentHeader);
-        region("map", stream, counter, in -> readMap(in, tiles));
+        region("map", stream, counter, in -> readMap(in, context));
         region("entities", stream, counter, this::readEntities);
     }
 
@@ -130,15 +128,16 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readMap(DataInput stream, TileConstructor constructor) throws IOException{
+    public void readMap(DataInput stream, WorldContext context) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
-        boolean generating = world.isGenerating();
+        boolean generating = context.isGenerating();
 
-        if(!generating) world.beginMapLoad();
+        if(!generating) context.begin();
 
-        Tile[][] tiles = world.createTiles(width, height);
+        //Tile[][] tiles = world.createTiles(width, height);
+        context.resize(width, height);
 
         //read floor and create tiles first
         for(int i = 0; i < width * height; i++){
@@ -147,11 +146,11 @@ public abstract class SaveVersion extends SaveFileReader{
             short oreid = stream.readShort();
             int consecutives = stream.readUnsignedByte();
 
-            tiles[x][y] = constructor.construct(x, y, floorid, oreid, (short)0);
+            context.create(x, y, floorid, oreid, (short)0);
 
             for(int j = i + 1; j < i + 1 + consecutives; j++){
                 int newx = j % width, newy = j / width;
-                tiles[newx][newy] = constructor.construct(newx, newy, floorid, oreid, (short)0);
+                context.create(newx, newy, floorid, oreid, (short)0);
             }
 
             i += consecutives;
@@ -161,7 +160,7 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int i = 0; i < width * height; i++){
             int x = i % width, y = i / width;
             Block block = content.block(stream.readShort());
-            Tile tile = tiles[x][y];
+            Tile tile = context.tile(x, y);
             tile.setBlock(block);
 
             if(tile.entity != null){
@@ -174,7 +173,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
-                    tiles[newx][newy].setBlock(block);
+                    context.tile(newx, newy).setBlock(block);
                 }
 
                 i += consecutives;
@@ -182,7 +181,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(null);
-        if(!generating) world.endMapLoad();
+        if(!generating) context.end();
     }
 
     public void writeEntities(DataOutput stream) throws IOException{

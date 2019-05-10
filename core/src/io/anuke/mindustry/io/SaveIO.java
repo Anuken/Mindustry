@@ -6,8 +6,7 @@ import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.Tile.TileConstructor;
+import io.anuke.mindustry.world.WorldContext;
 
 import java.io.*;
 import java.util.Arrays;
@@ -133,18 +132,18 @@ public class SaveIO{
     }
 
     public static void load(FileHandle file) throws SaveException{
-        load(file, Tile::new);
+        load(file, world.context);
     }
 
-    public static void load(FileHandle file, TileConstructor cons) throws SaveException{
+    public static void load(FileHandle file, WorldContext context) throws SaveException{
         try{
             //try and load; if any exception at all occurs
-            load(new InflaterInputStream(file.read(bufferSize)), cons);
+            load(new InflaterInputStream(file.read(bufferSize)), context);
         }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
-                load(new InflaterInputStream(backup.read(bufferSize)), cons);
+                load(new InflaterInputStream(backup.read(bufferSize)), context);
             }else{
                 throw new SaveException(e.getCause());
             }
@@ -152,14 +151,14 @@ public class SaveIO{
     }
 
     /** Loads from a deflated (!) input stream.*/
-    public static void load(InputStream is, TileConstructor cons) throws SaveException{
+    public static void load(InputStream is, WorldContext context) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
             readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = versions.get(version);
 
-            ver.read(stream, counter, cons);
+            ver.read(stream, counter, context);
         }catch(Exception e){
             throw new SaveException(e);
         }finally{

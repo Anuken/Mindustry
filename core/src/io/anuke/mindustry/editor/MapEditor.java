@@ -11,8 +11,7 @@ import io.anuke.mindustry.gen.TileOp;
 import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import io.anuke.mindustry.world.blocks.Floor;
 
@@ -21,6 +20,7 @@ import static io.anuke.mindustry.Vars.world;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
+    private final Context context = new Context();
     private StringMap tags = new StringMap();
     private MapRenderer renderer = new MapRenderer(this);
 
@@ -51,8 +51,7 @@ public class MapEditor{
 
         loading = true;
         tags.putAll(map.tags);
-        //TODO this actually creates the tiles, which are not editor tiles
-        MapIO.loadMap(map, EditorTile::new);
+        MapIO.loadMap(map, context);
         checkLinkedTiles();
         renderer.resize(width(), height());
         loading = false;
@@ -272,5 +271,37 @@ public class MapEditor{
         currentOp.addOperation(data);
 
         renderer.updatePoint(TileOp.x(data), TileOp.y(data));
+    }
+
+    class Context implements WorldContext{
+        @Override
+        public Tile tile(int x, int y){
+            return world.tile(x, y);
+        }
+
+        @Override
+        public void resize(int width, int height){
+            world.createTiles(width, height);
+        }
+
+        @Override
+        public Tile create(int x, int y, int floorID, int overlayID, int wallID){
+            return new EditorTile(x, y, floorID, overlayID, wallID);
+        }
+
+        @Override
+        public boolean isGenerating(){
+            return world.isGenerating();
+        }
+
+        @Override
+        public void begin(){
+            world.beginMapLoad();
+        }
+
+        @Override
+        public void end(){
+            world.endMapLoad();
+        }
     }
 }

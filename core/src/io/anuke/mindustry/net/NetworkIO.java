@@ -8,7 +8,6 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -53,7 +52,7 @@ public class NetworkIO{
             player.resetID(id);
             player.add();
 
-            SaveIO.getSaveWriter().readMap(stream, Tile::new);
+            SaveIO.getSaveWriter().readMap(stream, world.context);
         }catch(IOException e){
             throw new RuntimeException(e);
         }

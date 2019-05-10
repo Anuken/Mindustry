@@ -62,7 +62,7 @@ public class FloorRenderer implements Disposable{
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers; i++){
-                    if(chunk.caches[i] != -1){
+                    if(chunk.caches[i] != -1 && i != CacheLayer.walls.ordinal()){
                         drawnLayerSet.add(i);
                     }
                 }

@@ -28,6 +28,7 @@ public class World implements ApplicationListener{
     public final BlockIndexer indexer = new BlockIndexer();
     public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
+    public final Context context = new Context();
 
     private Map currentMap;
     private Tile[][] tiles;
@@ -478,5 +479,37 @@ public class World implements ApplicationListener{
 
     public interface Raycaster{
         boolean accept(int x, int y);
+    }
+
+    class Context implements WorldContext{
+        @Override
+        public Tile tile(int x, int y){
+            return tiles[x][y];
+        }
+
+        @Override
+        public void resize(int width, int height){
+            createTiles(width, height);
+        }
+
+        @Override
+        public Tile create(int x, int y, int floorID, int overlayID, int wallID){
+            return new Tile(x, y, floorID, overlayID, wallID);
+        }
+
+        @Override
+        public boolean isGenerating(){
+            return World.this.isGenerating();
+        }
+
+        @Override
+        public void begin(){
+            beginMapLoad();
+        }
+
+        @Override
+        public void end(){
+            endMapLoad();
+        }
     }
 }

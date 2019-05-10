@@ -5,20 +5,18 @@ import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.Tile.TileConstructor;
-import io.anuke.mindustry.world.blocks.Floor;
 
 import java.io.*;
 import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.bufferSize;
+import static io.anuke.mindustry.Vars.content;
 
 /** Reads and writes map files. */
 //TODO does this class even need to exist??? move to Maps?
@@ -61,43 +59,64 @@ public class MapIO{
         SaveIO.load(map.file);
     }
 
-    public static void loadMap(Map map, TileConstructor cons){
+    public static void loadMap(Map map, WorldContext cons){
         SaveIO.load(map.file, cons);
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{
-        Time.mark();
-        Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
-        Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
-        int black = Color.rgba8888(Color.BLACK);
-        int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
-        CachedTile tile = new CachedTile(){
-            @Override
-            public void setFloor(Floor type){
-                floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(type, Blocks.air, Blocks.air, getTeam()));
-            }
+        try(InputStream is = new InflaterInputStream(map.file.read(bufferSize)); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
+            SaveIO.readHeader(stream);
+            int version = stream.readInt();
+            SaveVersion ver = SaveIO.getSaveWriter(version);
+            ver.region("meta", stream, counter, ver::readStringMap);
 
-            @Override
-            public void setOverlay(Block type){
-                if(type != Blocks.air)
-                    floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(floor(), Blocks.air, type, getTeam()));
-            }
-
-            @Override
-            protected void changed(){
-                super.changed();
-                int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
-                if(c != black){
-                    walls.drawPixel(x, floors.getHeight() - 1 - y, c);
-                    floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+            Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
+            Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
+            int black = Color.rgba8888(Color.BLACK);
+            int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+            CachedTile tile = new CachedTile(){
+                @Override
+                public void setBlock(Block type){
+                    super.setBlock(type);
+                    int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
+                    if(c != black){
+                        walls.drawPixel(x, floors.getHeight() - 1 - y, c);
+                        floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+                    }
                 }
-            }
-        };
+            };
 
-        floors.drawPixmap(walls, 0, 0);
-        walls.dispose();
-        //TODO actually generate the preview
-        return floors;
+            ver.region("content", stream, counter, ver::readContentHeader);
+            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+                @Override public void resize(int width, int height){}
+                @Override public boolean isGenerating(){return false;}
+                @Override public void begin(){}
+                @Override public void end(){}
+
+                @Override
+                public Tile tile(int x, int y){
+                    tile.x = (short)x;
+                    tile.y = (short)y;
+                    return tile;
+                }
+
+                @Override
+                public Tile create(int x, int y, int floorID, int overlayID, int wallID){
+                    if(overlayID != 0){
+                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.none));
+                    }else{
+                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.none));
+                    }
+                    return tile;
+                }
+            }));
+
+            floors.drawPixmap(walls, 0, 0);
+            walls.dispose();
+            return floors;
+        }finally{
+            content.setTemporaryMapper(null);
+        }
     }
 
     public static Pixmap generatePreview(Tile[][] tiles){
