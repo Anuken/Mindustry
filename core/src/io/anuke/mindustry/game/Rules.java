@@ -60,4 +60,6 @@ public class Rules{
     public boolean waitForWaveToEnd = false;
     /** Determinates if gamemode is attack mode */
     public boolean attackMode = false;
+    /** Whether this is the editor gamemode. */
+    public boolean editor = false;
 }

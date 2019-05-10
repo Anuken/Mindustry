@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.graphics.Color;
@@ -18,6 +19,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.Gamemode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
@@ -131,6 +133,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.cont.row();
 
+        menu.cont.addImageTextButton("$play", "icon-play", isize, this::playtest).padTop(-5).size(swidth * 2f + 10, 60f);
+
+        menu.cont.row();
+
         menu.cont.addImageTextButton("$quit", "icon-back", isize, () -> {
             tryExit();
             menu.hide();
@@ -201,6 +207,28 @@ public class MapEditorDialog extends Dialog implements Disposable{
     @Override
     protected void drawBackground(float x, float y){
         drawDefaultBackground(x, y);
+    }
+
+    public void resumeEditing(){
+        shownWithMap = true;
+        show();
+        editor.renderer().updateAll();
+    }
+
+    private void playtest(){
+        menu.hide();
+        ui.loadAnd(() -> {
+            hide();
+            //logic.reset();
+            state.rules = Gamemode.editor.get();
+            world.setMap(new Map(StringMap.of(
+                "name", "Editor Playtesting",
+                "width", editor.width(),
+                "height", editor.height()
+            )));
+            world.endMapLoad();
+            logic.play();
+        });
     }
 
     private void save(){

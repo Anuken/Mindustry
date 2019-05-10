@@ -54,6 +54,7 @@ public class CustomGameDialog extends FloatingDialog{
         Table modes = new Table();
 
         for(Gamemode mode : Gamemode.values()){
+            if(mode.hidden) continue;
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
                 rules = mode.get();
@@ -147,6 +148,7 @@ public class CustomGameDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
         table.row();
         for(Gamemode mode : Gamemode.values()){
+            if(mode.hidden) continue;
             table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }

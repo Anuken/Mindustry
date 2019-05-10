@@ -1,6 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.editor.DrawOperation.OpType;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.TileOp;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
+import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.ui;
 
 //TODO somehow remove or replace this class with a more flexible solution
@@ -19,12 +21,12 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public Team getTeam(){
-        return Team.all[getTeamID()];
-    }
-
-    @Override
     public void setFloor(Floor type){
+        if(state.is(State.playing)){
+            super.setFloor(type);
+            return;
+        }
+
         if(type instanceof OverlayFloor){
             //don't place on liquids
             if(!floor.isLiquid){
@@ -41,18 +43,37 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type){
+        if(state.is(State.playing)){
+            super.setBlock(type);
+            return;
+        }
+
         if(block == type) return;
         op(OpType.block, block.id);
+        if(rotation != 0) op(OpType.rotation, rotation);
+        if(team != 0) op(OpType.team, team);
         super.setBlock(type);
+    }
 
-        //TODO check if this line is necessary
-        //if(pteam != getTeamID()){
-        //    op((byte)OpType.team.ordinal(), pteam, getTeamID());
-        //}
+    @Override
+    public void setBlock(Block type, Team team, int rotation){
+        if(state.is(State.playing)){
+            super.setBlock(type, team, rotation);
+            return;
+        }
+
+        setBlock(type);
+        setTeam(team);
+        rotation(rotation);
     }
 
     @Override
     public void setTeam(Team team){
+        if(state.is(State.playing)){
+            super.setTeam(team);
+            return;
+        }
+
         if(getTeamID() == team.ordinal()) return;
         op(OpType.team, getTeamID());
         super.setTeam(team);
@@ -60,6 +81,11 @@ public class EditorTile extends Tile{
 
     @Override
     public void rotation(int rotation){
+        if(state.is(State.playing)){
+            super.rotation(rotation);
+            return;
+        }
+
         if(rotation == rotation()) return;
         op(OpType.rotation, rotation());
         super.rotation(rotation);
@@ -67,6 +93,11 @@ public class EditorTile extends Tile{
 
     @Override
     public void setOverlayID(short overlay){
+        if(state.is(State.playing)){
+            super.setOverlayID(overlay);
+            return;
+        }
+
         if(overlayID() == overlay) return;
         op(OpType.overlay, overlay);
         super.setOverlayID(overlay);
@@ -74,11 +105,21 @@ public class EditorTile extends Tile{
 
     @Override
     protected void preChanged(){
+        if(state.is(State.playing)){
+            super.preChanged();
+            return;
+        }
+
         super.setTeam(Team.none);
     }
 
     @Override
     protected void changed(){
+        if(state.is(State.playing)){
+            super.changed();
+            return;
+        }
+
         entity = null;
 
         if(block == null){

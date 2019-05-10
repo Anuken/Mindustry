@@ -24,11 +24,11 @@ public class Tile implements Position, TargetTrait{
     protected Block block;
     protected Floor floor;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
-    private byte rotation;
+    protected byte rotation;
     /** Team ordinal. */
-    private byte team;
+    protected byte team;
     /** Ore that is on top of this (floor) block. */
-    private short overlay = 0;
+    protected short overlay = 0;
 
     public Tile(int x, int y){
         this.x = (short)x;
@@ -140,25 +140,12 @@ public class Tile implements Position, TargetTrait{
         preChanged();
         this.block = type;
         this.team = (byte)team.ordinal();
-        this.rotation = 0;
-        this.rotation = (byte)Mathf.mod(rotation, 4);
-        changed();
-    }
-
-    public void setBlock(Block type, int rotation){
-        preChanged();
-        this.block = type;
-        this.rotation = 0;
         this.rotation = (byte)Mathf.mod(rotation, 4);
         changed();
     }
 
     public void setBlock(Block type, Team team){
-        preChanged();
-        this.block = type;
-        this.team = (byte)team.ordinal();
-        this.rotation = 0;
-        changed();
+        setBlock(type, team, 0);
     }
 
     public void setBlock(Block type){

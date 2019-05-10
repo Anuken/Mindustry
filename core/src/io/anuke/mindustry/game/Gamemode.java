@@ -34,12 +34,25 @@ public enum Gamemode{
         unitBuildSpeedMultiplier = 3f;
         unitHealthMultiplier = 2f;
         attackMode = true;
-    }});
+    }}),
+    editor(true, () -> new Rules(){{
+        infiniteResources = true;
+        editor = true;
+        waves = true;
+        waveTimer = false;
+        respawnTime = 0f;
+    }}),;
 
     private final Supplier<Rules> rules;
+    public final boolean hidden;
 
     Gamemode(Supplier<Rules> rules){
+        this(false, rules);
+    }
+
+    Gamemode(boolean hidden, Supplier<Rules> rules){
         this.rules = rules;
+        this.hidden = hidden;
     }
 
     public Rules get(){

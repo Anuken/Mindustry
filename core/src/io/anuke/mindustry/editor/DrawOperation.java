@@ -25,7 +25,7 @@ public class DrawOperation{
     public void undo(MapEditor editor){
         for(int i = array.size - 1; i >= 0; i--){
             long l = array.get(i);
-            array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), get(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
+            array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), get(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
             set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
         }
     }
@@ -33,12 +33,12 @@ public class DrawOperation{
     public void redo(MapEditor editor){
         for(int i = 0; i < array.size; i++){
             long l = array.get(i);
-            array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), get(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
+            array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), get(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
             set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
         }
     }
 
-    short get(MapEditor editor, Tile tile, byte type){
+    short get(Tile tile, byte type){
         if(type == OpType.floor.ordinal()){
             return tile.floorID();
         }else if(type == OpType.block.ordinal()){
