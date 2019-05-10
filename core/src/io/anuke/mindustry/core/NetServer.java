@@ -29,6 +29,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
 
@@ -355,11 +356,12 @@ public class NetServer implements ApplicationListener{
             netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
             //TODO implement
             if(player.con != null){
-                //Call.onTraceInfo(player.con.id, other.con.trace);
+                Call.onTraceInfo(player.con.id, other, info);
             }else{
-                //NetClient.onTraceInfo(other.con.trace);
+                NetClient.onTraceInfo(other, info);
             }
             Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
@@ -478,7 +480,7 @@ public class NetServer implements ApplicationListener{
 
                 sent++;
 
-                if(syncStream.position() > maxSnapshotSize){
+                if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
                     byte[] syncBytes = syncStream.toByteArray();
                     Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));

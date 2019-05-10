@@ -128,7 +128,7 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> ui.showError("Currently unimplemented.")/*Call.onAdminRequest(user, AdminAction.trace)*/);
+                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }

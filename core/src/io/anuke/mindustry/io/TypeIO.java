@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
 import io.anuke.mindustry.type.*;
@@ -279,6 +280,19 @@ public class TypeIO{
         byte[] bytes = new byte[length];
         buffer.get(bytes);
         return bytes;
+    }
+
+    @WriteClass(TraceInfo.class)
+    public static void writeTraceInfo(ByteBuffer buffer, TraceInfo trace){
+        writeString(buffer, trace.ip);
+        writeString(buffer, trace.uuid);
+        buffer.put(trace.modded ? (byte)1 : 0);
+        buffer.put(trace.mobile ? (byte)1 : 0);
+    }
+
+    @ReadClass(TraceInfo.class)
+    public static TraceInfo readTraceInfo(ByteBuffer buffer){
+        return new TraceInfo(readString(buffer), readString(buffer), buffer.get() == 1, buffer.get() == 1);
     }
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{

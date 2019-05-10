@@ -285,4 +285,16 @@ public class Administration{
         }
     }
 
+    public static class TraceInfo{
+        public String ip, uuid;
+        public boolean modded, mobile;
+
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile){
+            this.ip = ip;
+            this.uuid = uuid;
+            this.modded = modded;
+            this.mobile = mobile;
+        }
+    }
+
 }
