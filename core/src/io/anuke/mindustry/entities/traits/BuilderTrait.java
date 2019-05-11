@@ -292,7 +292,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         Tile tile = world.tile(request.x, request.y);
 
-        if(dst(tile) > placeDistance){
+        if(dst(tile) > placeDistance && !state.isEditor()){
             return;
         }
 

@@ -187,6 +187,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         shown(() -> {
+            //clear units, rules and other unnecessary stuff
+            logic.reset();
             saved = true;
             if(!Core.settings.getBool("landscape")) Platform.instance.beginForceLandscape();
             editor.clearOp();
@@ -222,7 +224,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.hide();
         ui.loadAnd(() -> {
             hide();
-            logic.reset();
+            //only reset the player; logic.reset() will clear entities, which we do not want
+            player.reset();
             state.rules = Gamemode.editor.get();
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",

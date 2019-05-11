@@ -166,15 +166,17 @@ public class Logic implements ApplicationListener{
                     Entities.update(groundEffectGroup);
                 }
 
-                for(EntityGroup group : unitGroups){
-                    Entities.update(group);
-                }
+                if(!state.isEditor()){
+                    for(EntityGroup group : unitGroups){
+                        Entities.update(group);
+                    }
 
-                Entities.update(puddleGroup);
-                Entities.update(shieldGroup);
-                Entities.update(bulletGroup);
-                Entities.update(tileGroup);
-                Entities.update(fireGroup);
+                    Entities.update(puddleGroup);
+                    Entities.update(shieldGroup);
+                    Entities.update(bulletGroup);
+                    Entities.update(tileGroup);
+                    Entities.update(fireGroup);
+                }
                 Entities.update(playerGroup);
 
                 //effect group only contains item transfers in the headless version, update it!
@@ -182,14 +184,16 @@ public class Logic implements ApplicationListener{
                     Entities.update(effectGroup);
                 }
 
-                for(EntityGroup group : unitGroups){
-                    if(group.isEmpty()) continue;
+                if(!state.isEditor()){
 
-                    collisions.collideGroups(bulletGroup, group);
+                    for(EntityGroup group : unitGroups){
+                        if(group.isEmpty()) continue;
+                        collisions.collideGroups(bulletGroup, group);
+                    }
+
+                    collisions.collideGroups(bulletGroup, playerGroup);
+                    collisions.collideGroups(playerGroup, playerGroup);
                 }
-
-                collisions.collideGroups(bulletGroup, playerGroup);
-                collisions.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder.update();
             }

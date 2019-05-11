@@ -38,7 +38,7 @@ public enum Gamemode{
     editor(true, () -> new Rules(){{
         infiniteResources = true;
         editor = true;
-        waves = true;
+        waves = false;
         enemyCoreBuildRadius = 0f;
         waveTimer = false;
         respawnTime = 0f;

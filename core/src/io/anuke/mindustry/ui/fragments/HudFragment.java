@@ -7,15 +7,18 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -24,6 +27,8 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
@@ -173,6 +178,40 @@ public class HudFragment extends Fragment{
                             }
                         }
                     }).left();
+                    t.row();
+                    t.addImageTextButton("$editor.spawn", "icon-add", 8*3, () -> {
+                        FloatingDialog dialog = new FloatingDialog("$editor.spawn");
+                        int i = 0;
+                        for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                            dialog.cont.addImageButton("white", 48, () -> {
+                                BaseUnit unit = type.create(player.getTeam());
+                                unit.set(player.x, player.y);
+                                unit.rotation = player.rotation;
+                                unit.add();
+                                //trigger the entity to become visible
+                                unitGroups[player.getTeam().ordinal()].updateEvents();
+                                dialog.hide();
+                            }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                            if(++i % 4 == 0) dialog.cont.row();
+                        }
+                        dialog.addCloseButton();
+                        dialog.setFillParent(false);
+                        dialog.show();
+                    }).fillX();
+
+                    t.row();
+                    t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8*3, () -> {
+
+                    }).fillX().update(b -> {
+                        if(b.isChecked() && Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(e == null){
+                                Vector2 world = Core.input.mouseWorld();
+
+                                //TODO check for unit removal, remove unit if needed
+                            }
+                        }
+                    });
                 }).width(dsize * 4 + 3f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
@@ -180,7 +219,7 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
