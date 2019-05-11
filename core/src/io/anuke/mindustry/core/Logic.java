@@ -194,7 +194,7 @@ public class Logic implements ApplicationListener{
                 world.pathfinder.update();
             }
 
-            if(!Net.client() && !world.isInvalidMap()){
+            if(!Net.client() && !world.isInvalidMap() && !state.isEditor()){
                 checkGameOver();
             }
         }

@@ -790,7 +790,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
     public void updateRespawning(){
 
-        if(spawner != null && spawner.isValid()){
+        if(state.isEditor()){
+            //instant respawn at center of map.
+            set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            setDead(false);
+        }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
             if(!Net.client()){
@@ -806,15 +810,10 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     public void beginRespawning(SpawnerTrait spawner){
-        if(state.isEditor()){
-            dead = false;
-            set(spawner.getX(), spawner.getY());
-        }else{
-            this.spawner = spawner;
-            this.lastSpawner = spawner;
-            this.dead = true;
-            setNet(spawner.getX(), spawner.getY());
-        }
+        this.spawner = spawner;
+        this.lastSpawner = spawner;
+        this.dead = true;
+        setNet(spawner.getX(), spawner.getY());
     }
 
     //endregion
