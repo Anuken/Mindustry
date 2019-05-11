@@ -39,6 +39,7 @@ public enum Gamemode{
         infiniteResources = true;
         editor = true;
         waves = true;
+        enemyCoreBuildRadius = 0f;
         waveTimer = false;
         respawnTime = 0f;
     }}),;

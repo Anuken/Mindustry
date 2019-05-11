@@ -18,7 +18,7 @@ public class Annotations{
     }
 
     /** Indicates that a method return or field can be null.*/
-    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Nullable{
 

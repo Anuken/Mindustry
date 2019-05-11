@@ -150,7 +150,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });

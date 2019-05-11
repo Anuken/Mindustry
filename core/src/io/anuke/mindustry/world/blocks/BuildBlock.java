@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.Graphics.Cursor;
@@ -185,13 +184,13 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public void construct(Unit builder, TileEntity core, float amount){
+        public void construct(Unit builder, @Nullable TileEntity core, float amount){
             if(cblock == null){
                 kill();
                 return;
             }
 
-            float maxProgress = checkRequired(core.items, amount, false);
+            float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
 
             for(int i = 0; i < cblock.buildRequirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.buildRequirements[i].amount);
@@ -199,7 +198,7 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = checkRequired(core.items, maxProgress, true);
+            maxProgress = core == null ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
 
@@ -212,7 +211,7 @@ public class BuildBlock extends Block{
             }
         }
 
-        public void deconstruct(Unit builder, TileEntity core, float amount){
+        public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){
             float deconstructMultiplier = 0.5f;
 
             if(cblock != null){
@@ -229,10 +228,13 @@ public class BuildBlock extends Block{
                     int accumulated = (int)(accumulator[i]); //get amount
 
                     if(amount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                        int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
-                        core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
-
-                        accumulator[i] -= accepting;
+                        if(core != null){
+                            int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
+                            core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
+                            accumulator[i] -= accepting;
+                        }else{
+                            accumulator[i] -= accumulated;
+                        }
                     }
                 }
             }

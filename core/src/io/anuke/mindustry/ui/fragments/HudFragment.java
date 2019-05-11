@@ -17,6 +17,7 @@ import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -25,8 +26,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-
-import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -131,8 +130,13 @@ public class HudFragment extends Fragment{
                 }
             });
 
-            cont.table(stuff -> {
-                stuff.left();
+            Table wavesMain, editorMain;
+
+            cont.stack(wavesMain = new Table(), editorMain = new Table());
+
+            {
+                wavesMain.visible(() -> shown && !state.isEditor());
+                wavesMain.left();
                 Stack stack = new Stack();
                 TextButton waves = new TextButton("", "wave");
                 Table btable = new Table().margin(0);
@@ -142,12 +146,36 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                stuff.add(stack).width(dsize * 4 + 3f);
-                stuff.row();
-                stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                wavesMain.add(stack).width(dsize * 4 + 3f);
+                wavesMain.row();
+                wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
-                stuff.row();
-            }).visible(() -> shown);
+                wavesMain.row();
+            }
+
+            {
+                editorMain.table("button-edge-4", t -> {
+                    //t.margin(0f);
+                    t.add("$editor.teams").growX().left();
+                    t.row();
+                    t.table(teams -> {
+                        teams.left();
+                        int i = 0;
+                        for(Team team : Team.all){
+                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> player.setTeam(team))
+                                .size(50f).margin(6f).get();
+                            button.getImageCell().grow();
+                            button.getStyle().imageUpColor = team.color;
+                            button.update(() -> button.setChecked(player.getTeam() == team));
+
+                            if(++i % 3 == 0){
+                                teams.row();
+                            }
+                        }
+                    }).left();
+                }).width(dsize * 4 + 3f);
+                editorMain.visible(() -> shown && state.isEditor());
+            }
 
             //fps display
             cont.table(info -> {
