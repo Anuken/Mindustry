@@ -806,10 +806,15 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     public void beginRespawning(SpawnerTrait spawner){
-        this.spawner = spawner;
-        this.lastSpawner = spawner;
-        this.dead = true;
-        setNet(spawner.getX(), spawner.getY());
+        if(state.isEditor()){
+            dead = false;
+            set(spawner.getX(), spawner.getY());
+        }else{
+            this.spawner = spawner;
+            this.lastSpawner = spawner;
+            this.dead = true;
+            setNet(spawner.getX(), spawner.getY());
+        }
     }
 
     //endregion

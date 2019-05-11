@@ -18,6 +18,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Gamemode;
 import io.anuke.mindustry.game.Team;
@@ -26,6 +27,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.OverlayFloor;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
@@ -210,6 +212,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void resumeEditing(){
+        state.set(State.menu);
         shownWithMap = true;
         show();
         editor.renderer().updateAll();
@@ -219,7 +222,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.hide();
         ui.loadAnd(() -> {
             hide();
-            //logic.reset();
+            logic.reset();
             state.rules = Gamemode.editor.get();
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
@@ -227,6 +230,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "height", editor.height()
             )));
             world.endMapLoad();
+            //add entities so they update. is this really needed?
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.rawTile(x, y);
+                    if(tile.entity != null){
+                        tile.entity.add();
+                    }
+                }
+            }
             logic.play();
         });
     }
