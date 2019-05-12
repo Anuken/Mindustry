@@ -58,13 +58,6 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
-
-        //sometimes a map has no waves defined, they're defined in the zone rules
-        //TODO ???? how does this even work now
-        //if(world.getMap().getWaves() != DefaultWaves.get() || !world.isZone()){
-        //    state.rules.spawns = world.getMap().getWaves();
-        //}
-
         Events.fire(new PlayEvent());
     }
 

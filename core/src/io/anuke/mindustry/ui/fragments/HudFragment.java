@@ -4,6 +4,8 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
@@ -17,7 +19,10 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
@@ -178,6 +183,7 @@ public class HudFragment extends Fragment{
                             }
                         }
                     }).left();
+
                     t.row();
                     t.addImageTextButton("$editor.spawn", "icon-add", 8*3, () -> {
                         FloatingDialog dialog = new FloatingDialog("$editor.spawn");
@@ -190,6 +196,7 @@ public class HudFragment extends Fragment{
                                 unit.add();
                                 //trigger the entity to become visible
                                 unitGroups[player.getTeam().ordinal()].updateEvents();
+                                collisions.updatePhysics( unitGroups[player.getTeam().ordinal()]);
                                 dialog.hide();
                             }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
                             if(++i % 4 == 0) dialog.cont.row();
@@ -199,17 +206,43 @@ public class HudFragment extends Fragment{
                         dialog.show();
                     }).fillX();
 
+                    float[] size = {0};
+                    float[] position = {0, 0};
+
                     t.row();
                     t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8*3, () -> {
 
                     }).fillX().update(b -> {
-                        if(b.isChecked() && Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                        boolean[] found = {false};
+                        if(b.isChecked()){
                             Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
                             if(e == null){
                                 Vector2 world = Core.input.mouseWorld();
-
+                                Units.nearby(world.x, world.y, 1f, 1f, unit -> {
+                                    if(!found[0] && unit instanceof BaseUnit){
+                                        if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                                            Effects.effect(Fx.spawn, unit);
+                                            unit.remove();
+                                            unitGroups[unit.getTeam().ordinal()].updateEvents();
+                                            collisions.updatePhysics(unitGroups[unit.getTeam().ordinal()]);
+                                        }
+                                        found[0] = true;
+                                        unit.hitbox(Tmp.r1);
+                                        size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width*2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
+                                        position[0] = unit.x;
+                                        position[1] = unit.y;
+                                    }
+                                });
                                 //TODO check for unit removal, remove unit if needed
                             }
+                        }
+
+                        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                        Lines.poly(position[0], position[1], 4, size[0]/2f);
+                        Draw.reset();
+
+                        if(!found[0]){
+                            size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
                         }
                     });
                 }).width(dsize * 4 + 3f);
