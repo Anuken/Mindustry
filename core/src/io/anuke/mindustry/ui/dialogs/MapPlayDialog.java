@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.ScrollPane;
@@ -21,6 +20,7 @@ public class MapPlayDialog extends FloatingDialog{
 
     public MapPlayDialog(){
         super("");
+        setFillParent(false);
     }
 
     public void show(Map map){
@@ -81,11 +81,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(sdif);
         cont.row();
-        if(map.hasTag("description")){
-            cont.add(map.description()).color(Color.LIGHT_GRAY);
-            cont.row();
-        }
-        cont.add(new BorderImage(map.texture, 3f)).grow().get().setScaling(Scaling.fit);
+        cont.add(new BorderImage(map.texture, 3f)).size(250f).get().setScaling(Scaling.fit);
 
         buttons.clearChildren();
         addCloseButton();
@@ -98,6 +94,8 @@ public class MapPlayDialog extends FloatingDialog{
 
         show();
     }
+
+
 
     private void displayGameModeHelp(){
         FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.help.title"));

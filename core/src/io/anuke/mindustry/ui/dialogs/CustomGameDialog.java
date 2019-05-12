@@ -24,6 +24,8 @@ public class CustomGameDialog extends FloatingDialog{
 
     void setup(){
         clearChildren();
+        add(titleTable);
+        row();
         stack(cont, buttons).grow();
         buttons.bottom();
         cont.clear();
