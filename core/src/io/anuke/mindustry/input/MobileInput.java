@@ -266,7 +266,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void buildUI(Table table){
         table.addImage("blank").color(Pal.accent).height(3f).colspan(4).growX();
         table.row();
-        table.left().margin(0f).defaults().size(49f);
+        table.left().margin(0f).defaults().size(48f);
 
         table.addImageButton("icon-break", "clear-toggle-partial", 16 * 2f, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;

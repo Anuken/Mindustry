@@ -29,7 +29,7 @@ allprojects{
         arcHash = null
 
         debugged = {
-            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release")
+            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
         }
 
         localArc = {
