@@ -266,7 +266,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void buildUI(Table table){
         table.addImage("blank").color(Pal.accent).height(3f).colspan(4).growX();
         table.row();
-        table.left().margin(0f).defaults().size(48f);
+        table.left().margin(0f).defaults().size(49f);
 
         table.addImageButton("icon-break", "clear-toggle-partial", 16 * 2f, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
@@ -276,12 +276,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }).update(l -> l.setChecked(mode == breaking));
 
-        //cancel button
-        table.addImageButton("icon-cancel", "clear-partial", 16 * 2f, () -> {
-            player.clearBuilding();
-            mode = none;
-            block = null;
-        }).visible(() -> player.isBuilding() || block != null || mode == breaking);
+        //diagonal swap button
+        table.addImageButton("icon-diagonal", "clear-toggle-partial", 16 * 2f, () -> {
+            Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
+            Core.settings.save();
+        }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
         table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
@@ -311,6 +310,15 @@ public class MobileInput extends InputHandler implements GestureListener{
             selection.clear();
             selecting = false;
         }).visible(() -> !selection.isEmpty());
+
+        Core.scene.table(t -> {
+           t.bottom().left().visible(() -> player.isBuilding() || block != null || mode == breaking);
+           t.addImageTextButton("$cancel", "icon-cancel", 16*2, () -> {
+               player.clearBuilding();
+               mode = none;
+               block = null;
+           }).width(155f);
+        });
     }
 
     @Override
