@@ -11,12 +11,12 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.*;
 import java.util.zip.InflaterInputStream;
 
-import static io.anuke.mindustry.Vars.bufferSize;
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.*;
 
 /** Reads and writes map files. */
 //TODO does this class even need to exist??? move to Maps?
@@ -64,6 +64,10 @@ public class MapIO{
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{
+        //by default, it does not have an enemy core or any other cores
+        map.tags.put("enemycore", "false");
+        map.tags.put("othercore", "false");
+
         try(InputStream is = new InflaterInputStream(map.file.read(bufferSize)); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             SaveIO.readHeader(stream);
             int version = stream.readInt();
@@ -82,6 +86,22 @@ public class MapIO{
                     if(c != black){
                         walls.drawPixel(x, floors.getHeight() - 1 - y, c);
                         floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+                    }
+                }
+
+                @Override
+                public void setTeam(Team team){
+                    super.setTeam(team);
+                    if(block instanceof CoreBlock){
+                        if(team != defaultTeam){
+                            //map must have other team's cores
+                            map.tags.put("othercore", "true");
+                        }
+
+                        if(team == waveTeam){
+                            //map must have default enemy team's core
+                            map.tags.put("enemycore", "true");
+                        }
                     }
                 }
             };

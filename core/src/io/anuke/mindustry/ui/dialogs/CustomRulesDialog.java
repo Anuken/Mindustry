@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Gamemode;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
 
@@ -14,7 +13,6 @@ import static io.anuke.mindustry.Vars.tilesize;
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;
     public Rules rules;
-    public Gamemode selectedGamemode;
 
     public CustomRulesDialog(){
         super("$mode.custom");
@@ -24,9 +22,9 @@ public class CustomRulesDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Rules rules, Gamemode gamemode){
+    public void show(Rules rules){
         this.rules = rules;
-        this.selectedGamemode = gamemode;
+       // this.selectedGamemode = gamemode;
         show();
     }
 
@@ -35,7 +33,7 @@ public class CustomRulesDialog extends FloatingDialog{
         cont.pane(m -> main = m);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
-            rules = selectedGamemode.get(); 
+            //rules = selectedGamemode.get();
             setup();
         }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
@@ -63,7 +61,7 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.playerhealthmultiplier", f -> rules.playerHealthMultiplier = f, () -> rules.playerHealthMultiplier);
 
         title("$rules.title.unit");
-        check("$rules.unitdrops", b -> rules.unitDrops = b, () -> rules.unitDrops, ()->true);
+        check("$rules.unitdrops", b -> rules.unitDrops = b, () -> rules.unitDrops, () -> true);
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);

@@ -20,7 +20,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Gamemode;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
@@ -226,7 +225,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             hide();
             //only reset the player; logic.reset() will clear entities, which we do not want
             player.reset();
-            state.rules = Gamemode.editor.get();
+//            state.rules = Gamemode.editor.get();
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),

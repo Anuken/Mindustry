@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.type.Zone;
 
 /**
@@ -62,4 +63,9 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+
+    /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
+    public Rules copy(){
+        return JsonIO.read(Rules.class, JsonIO.write(this));
+    }
 }
