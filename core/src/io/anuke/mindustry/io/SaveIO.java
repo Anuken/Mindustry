@@ -59,8 +59,9 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(int slot){
-        try{ //file may not even exist at all, so catch that too
-            return isSaveValid(getSlotStream(slot)) || isSaveValid(getBackupSlotStream(slot));
+        try{
+            getMeta(slot);
+            return true;
         }catch(Exception e){
             return false;
         }
@@ -85,7 +86,11 @@ public class SaveIO{
     }
 
     public static SaveMeta getMeta(int slot){
-        return getMeta(getSlotStream(slot));
+        try{
+            return getMeta(getSlotStream(slot));
+        }catch(Exception e){
+            return getMeta(getBackupSlotStream(slot));
+        }
     }
 
     public static SaveMeta getMeta(DataInputStream stream){

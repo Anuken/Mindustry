@@ -179,7 +179,7 @@ public class Maps implements Disposable{
 
         //free up any potential memory that was used up during conversion
         if(convertedAny){
-            world.createTiles(0, 0);
+            world.createTiles(1, 1);
             //reload maps to load the converted ones
             reload();
         }
