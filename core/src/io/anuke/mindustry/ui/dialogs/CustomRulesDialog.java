@@ -12,7 +12,8 @@ import static io.anuke.mindustry.Vars.tilesize;
 
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;
-    public Rules rules;
+    private Rules rules;
+    private Supplier<Rules> resetter;
 
     public CustomRulesDialog(){
         super("$mode.custom");
@@ -22,9 +23,9 @@ public class CustomRulesDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    public void show(Rules rules){
+    public void show(Rules rules, Supplier<Rules> resetter){
         this.rules = rules;
-       // this.selectedGamemode = gamemode;
+        this.resetter = resetter;
         show();
     }
 
@@ -33,12 +34,12 @@ public class CustomRulesDialog extends FloatingDialog{
         cont.pane(m -> main = m);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
-            //rules = selectedGamemode.get();
+            rules = resetter.get();
             setup();
         }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
         main.row();
-        
+
         title("$rules.title.waves");
         check("$rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("$rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer, () -> rules.waves);
@@ -47,8 +48,8 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
 
         title("$rules.title.respawns");
-        check("$rules.limitedRespawns", b -> rules.limitedRespawns= b, () -> rules.limitedRespawns);
-        number("$rules.respawns", true, f -> rules.respawns = (int) f, () -> rules.respawns, () -> rules.limitedRespawns);
+        check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns);
+        number("$rules.respawns", true, f -> rules.respawns = (int)f, () -> rules.respawns, () -> rules.limitedRespawns);
         number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
 
         title("$rules.title.resourcesbuilding");
@@ -78,11 +79,11 @@ public class CustomRulesDialog extends FloatingDialog{
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
-                    .update(a->a.setColor(condition.get() ? Color.WHITE : Color.GRAY));
+            .update(a -> a.setColor(condition.get() ? Color.WHITE : Color.GRAY));
             Platform.instance.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
-                    .padRight(100f)
-                    .update(a -> a.setDisabled(!condition.get()))
-                    .valid(Strings::canParsePositiveFloat).width(120f) .left().get());
+            .padRight(100f)
+            .update(a -> a.setDisabled(!condition.get()))
+            .valid(Strings::canParsePositiveFloat).width(120f).left().get());
         }).padTop(0);
         main.row();
     }

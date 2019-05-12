@@ -4,14 +4,14 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
 
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapPlayDialog extends FloatingDialog{
     Difficulty difficulty = Difficulty.normal;
@@ -21,18 +21,14 @@ public class MapPlayDialog extends FloatingDialog{
 
     public MapPlayDialog(){
         super("");
-        addCloseButton();
     }
 
     public void show(Map map){
         title.setText(map.name());
         cont.clearChildren();
-
-        selectedGamemode = Gamemode.survival;
-        rules = selectedGamemode.apply(new Rules());
+        rules = map.rules();
 
         Table selmode = new Table();
-        ButtonGroup<TextButton> group = new ButtonGroup<>();
         selmode.add("$level.mode").colspan(4);
         selmode.row();
         int i = 0;
@@ -47,11 +43,9 @@ public class MapPlayDialog extends FloatingDialog{
             }
 
             modes.addButton(mode.toString(), "toggle", () -> {
-                selectedGamemode = mode;
-                //rules = mode.get();
-                //dialog.selectedGamemode = null;
-                dialog.rules = null;
-            }).update(b -> b.setChecked(selectedGamemode == mode)).group(group).size(140f, 54f);
+                selectedGamemode = selectedGamemode == mode ? null : mode;
+                rules = mode.apply(map.rules());
+            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -83,7 +77,7 @@ public class MapPlayDialog extends FloatingDialog{
             difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
             state.wavetime = difficulty.waveTime;
         }).width(s);
-        sdif.addButton("$customize", () -> dialog.show(rules)).width(140).padLeft(10);
+        sdif.addButton("$customize", () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(140).padLeft(10);
 
         cont.add(sdif);
         cont.row();
@@ -92,6 +86,15 @@ public class MapPlayDialog extends FloatingDialog{
             cont.row();
         }
         cont.add(new BorderImage(map.texture, 3f)).grow().get().setScaling(Scaling.fit);
+
+        buttons.clearChildren();
+        addCloseButton();
+
+        buttons.addImageTextButton("$play", "icon-play", 8*3, () -> {
+            control.playMap(map, rules);
+            hide();
+            ui.custom.hide();
+        }).size(210f, 64f);
 
         show();
     }

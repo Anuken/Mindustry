@@ -55,6 +55,7 @@ public class Map implements Comparable<Map>{
         Vars.data.modified();
     }
 
+    /** This creates a new instance.*/
     public Rules rules(){
         return JsonIO.read(Rules.class, tags.get("rules", "{}"));
     }

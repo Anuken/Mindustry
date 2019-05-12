@@ -297,6 +297,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @Override
+    public boolean isValid(){
+        return !isDead() && tile.entity == this;
+    }
+
+    @Override
     public EntityGroup targetGroup(){
         return tileGroup;
     }
