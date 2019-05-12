@@ -244,11 +244,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public void update(){
-        hitTime -= Time.delta();
-
         if(isDead()){
+            //dead enemies should get immediately removed
+            remove();
             return;
         }
+
+        hitTime -= Time.delta();
 
         if(Net.client()){
             interpolate();
