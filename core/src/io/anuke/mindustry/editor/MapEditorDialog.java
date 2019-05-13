@@ -135,14 +135,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.cont.row();
 
-        menu.cont.addImageTextButton("$play", "icon-play", isize, this::playtest).padTop(-5).size(swidth * 2f + 10, 60f);
+        menu.cont.addImageTextButton("$editor.ingame", "icon-arrow", isize, this::playtest).padTop(-5).size(swidth * 2f + 10, 60f);
 
         menu.cont.row();
 
         menu.cont.addImageTextButton("$quit", "icon-back", isize, () -> {
             tryExit();
             menu.hide();
-        }).padTop(-5).size(swidth * 2f + 10, 60f);
+        }).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog(editor, (x, y) -> {
             if(!(editor.width() == x && editor.height() == y)){

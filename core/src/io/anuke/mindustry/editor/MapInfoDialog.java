@@ -40,7 +40,6 @@ public class MapInfoDialog extends FloatingDialog{
         name.setMessageText("$unknown");
 
         cont.row();
-
         cont.add("$editor.description").padRight(8).left();
 
         TextArea description = cont.addArea(tags.get("description", ""), "textarea", text -> {
@@ -48,7 +47,6 @@ public class MapInfoDialog extends FloatingDialog{
         }).size(400f, 140f).get();
 
         cont.row();
-
         cont.add("$editor.author").padRight(8).left();
 
         TextField author = cont.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
