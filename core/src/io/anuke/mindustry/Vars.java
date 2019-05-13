@@ -25,6 +25,8 @@ import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /** Whether to load locales.*/
+    public static boolean loadLocales = true;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset */
@@ -143,19 +145,22 @@ public class Vars{
     public static void init(){
         Serialization.init();
 
-        //load locales
-        String[] stra = Core.files.internal("locales").readString().split("\n");
-        locales = new Locale[stra.length];
-        for(int i = 0; i < locales.length; i++){
-            String code = stra[i];
-            if(code.contains("_")){
-                locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
-            }else{
-                locales[i] = new Locale(code);
+        if(loadLocales){
+            //load locales
+            String[] stra = Core.files.internal("locales").readString().split("\n");
+            locales = new Locale[stra.length];
+            for(int i = 0; i < locales.length; i++){
+                String code = stra[i];
+                if(code.contains("_")){
+                    locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
+                }else{
+                    locales[i] = new Locale(code);
+                }
             }
+
+            Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         }
 
-        Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         Version.init();
 
         content = new ContentLoader();

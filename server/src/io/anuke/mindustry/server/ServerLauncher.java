@@ -1,19 +1,10 @@
 package io.anuke.mindustry.server;
 
 
-import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
-import io.anuke.mindustry.net.CrashSender;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.ArcNetClient;
-import io.anuke.mindustry.net.ArcNetServer;
+import io.anuke.mindustry.net.*;
 
-public class ServerLauncher extends HeadlessApplication{
-
-    public ServerLauncher(ApplicationListener listener, HeadlessApplicationConfiguration config){
-        super(listener, config);
-    }
+public class ServerLauncher{
 
     public static void main(String[] args){
         try{
@@ -21,18 +12,9 @@ public class ServerLauncher extends HeadlessApplication{
             Net.setClientProvider(new ArcNetClient());
             Net.setServerProvider(new ArcNetServer());
 
-            HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-            new ServerLauncher(new MindustryServer(args), config);
+            new HeadlessApplication(new MindustryServer(args), null, throwable -> CrashSender.send(throwable, f -> {}));
         }catch(Throwable t){
             CrashSender.send(t, f -> {});
-        }
-
-        //find and handle uncaught exceptions in libGDX thread
-        for(Thread thread : Thread.getAllStackTraces().keySet()){
-            if(thread.getName().equals("HeadlessApplication")){
-                thread.setUncaughtExceptionHandler((t, throwable) -> CrashSender.send(throwable, f -> {}));
-                break;
-            }
         }
     }
 }
