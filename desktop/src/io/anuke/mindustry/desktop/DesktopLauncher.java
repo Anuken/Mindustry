@@ -1,17 +1,12 @@
 package io.anuke.mindustry.desktop;
 
-import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3Application;
 import io.anuke.arc.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.net.*;
 
-public class DesktopLauncher extends Lwjgl3Application{
-
-    public DesktopLauncher(ApplicationListener listener, Lwjgl3ApplicationConfiguration config){
-        super(listener, config);
-    }
+public class DesktopLauncher{
 
     public static void main(String[] arg){
         try{
@@ -26,7 +21,7 @@ public class DesktopLauncher extends Lwjgl3Application{
 
             Net.setClientProvider(new ArcNetClient());
             Net.setServerProvider(new ArcNetServer());
-            new DesktopLauncher(new Mindustry(), config);
+            new Lwjgl3Application(new Mindustry(), config);
         }catch(Throwable e){
             DesktopPlatform.handleCrash(e);
         }
