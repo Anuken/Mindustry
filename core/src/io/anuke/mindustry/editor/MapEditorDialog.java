@@ -42,6 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapGenerateDialog generateDialog;
     private ScrollPane pane;
     private FloatingDialog menu;
+    private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
     private Array<Block> blocksOut = new Array<>();
@@ -193,6 +194,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             editor.clearOp();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
+                state.rules = new Rules();
                 editor.beginEdit(200, 200);
             }
             shownWithMap = false;
@@ -216,12 +218,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.set(State.menu);
         shownWithMap = true;
         show();
+        state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
+        lastSavedRules = null;
         editor.renderer().updateAll();
     }
 
     private void playtest(){
         menu.hide();
         ui.loadAnd(() -> {
+            lastSavedRules = state.rules;
             hide();
             //only reset the player; logic.reset() will clear entities, which we do not want
             player.reset();

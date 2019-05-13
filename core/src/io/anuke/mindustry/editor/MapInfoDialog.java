@@ -4,12 +4,16 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.scene.ui.TextArea;
 import io.anuke.arc.scene.ui.TextField;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.ui.dialogs.CustomRulesDialog;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
     private final WaveInfoDialog waveinfo;
+    private final CustomRulesDialog ruleinfo = new CustomRulesDialog();
 
     public MapInfoDialog(MapEditor editor){
         super("$editor.mapinfo");
@@ -55,13 +59,12 @@ public class MapInfoDialog extends FloatingDialog{
         author.setMessageText("$unknown");
 
         cont.row();
+        cont.add("$editor.rules").padRight(8).left();
+        cont.addButton("$edit", () -> ruleinfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);;
+
+        cont.row();
         cont.add("$editor.waves").padRight(8).left();
-        cont.table(t -> {
-            t.add().growX();
-            t.label(() -> tags.containsKey("waves") ? "" : Core.bundle.get("editor.default")).left();
-            t.add().growX();
-            t.addButton("$edit", waveinfo::show).growY().width(200f);
-        }).size(400, 55f);
+        cont.addButton("$edit", waveinfo::show).left().width(200f);
 
         name.change();
         description.change();
