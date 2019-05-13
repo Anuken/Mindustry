@@ -1,6 +1,5 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.backends.headless.HeadlessApplicationConfiguration;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
@@ -64,16 +63,7 @@ public class ApplicationTests{
                 }
             };
 
-            HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-
-            new HeadlessApplication(core, config);
-
-            for(Thread thread : Thread.getAllStackTraces().keySet()){
-                if(thread.getName().equals("HeadlessApplication")){
-                    thread.setUncaughtExceptionHandler((t, throwable) -> exceptionThrown[0] = throwable);
-                    break;
-                }
-            }
+            new HeadlessApplication(core, null, throwable -> exceptionThrown[0] = throwable);
 
             while(!begins[0]){
                 if(exceptionThrown[0] != null){
