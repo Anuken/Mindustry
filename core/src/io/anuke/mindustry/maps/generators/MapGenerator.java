@@ -73,7 +73,6 @@ public class MapGenerator extends Generator{
             }
         }
 
-        //TODO this will probably not get the desired effect
         MapIO.loadMap(map);
         Array<Point2> players = new Array<>();
         Array<Point2> enemies = new Array<>();
