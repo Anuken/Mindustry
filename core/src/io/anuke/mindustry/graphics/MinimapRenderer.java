@@ -129,7 +129,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     private int colorFor(Tile tile){
-        tile = tile.target();
+        tile = tile.link();
         return MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam());
     }
 

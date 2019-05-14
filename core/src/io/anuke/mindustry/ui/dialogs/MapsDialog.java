@@ -24,7 +24,7 @@ public class MapsDialog extends FloatingDialog{
         buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 try{
-                    Map map = MapIO.readMap(file, true);
+                    Map map = MapIO.createMap(file, true);
                     String name = map.tags.get("name");
                     if(name == null){
                         ui.showError("$editor.errorname");

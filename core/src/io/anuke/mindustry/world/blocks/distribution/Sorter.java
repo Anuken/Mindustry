@@ -99,14 +99,14 @@ public class Sorter extends Block{
             }else if(!bc){
                 return null;
             }else{
-                if(dest.getDump() == 0){
+                if(dest.rotation() == 0){
                     to = a;
                     if(flip)
-                        dest.setDump((byte)1);
+                        dest.rotation((byte)1);
                 }else{
                     to = b;
                     if(flip)
-                        dest.setDump((byte)0);
+                        dest.rotation((byte)0);
                 }
             }
         }
@@ -132,14 +132,15 @@ public class Sorter extends Block{
         public Item sortItem;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
-            stream.writeByte(sortItem == null ? -1 : sortItem.id);
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            stream.writeShort(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
-            byte b = stream.readByte();
-            sortItem = b == -1 ? null : content.items().get(b);
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            sortItem = content.item(stream.readShort());
         }
     }
 }

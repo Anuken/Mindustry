@@ -109,12 +109,12 @@ public class TypeIO{
 
     @WriteClass(Block.class)
     public static void writeBlock(ByteBuffer buffer, Block block){
-        buffer.put(block.id);
+        buffer.putShort(block.id);
     }
 
     @ReadClass(Block.class)
     public static Block readBlock(ByteBuffer buffer){
-        return content.block(buffer.get());
+        return content.block(buffer.getShort());
     }
 
     @WriteClass(BuildRequest[].class)
@@ -124,7 +124,7 @@ public class TypeIO{
             buffer.put(request.breaking ? (byte)1 : 0);
             buffer.putInt(Pos.get(request.x, request.y));
             if(!request.breaking){
-                buffer.put(request.block.id);
+                buffer.putShort(request.block.id);
                 buffer.put((byte)request.rotation);
             }
         }
@@ -142,7 +142,7 @@ public class TypeIO{
             if(type == 1){ //remove
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
-                byte block = buffer.get();
+                short block = buffer.getShort();
                 byte rotation = buffer.get();
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
             }
@@ -205,7 +205,7 @@ public class TypeIO{
 
     @WriteClass(Mech.class)
     public static void writeMech(ByteBuffer buffer, Mech mech){
-        buffer.put(mech.id);
+        buffer.put((byte)mech.id);
     }
 
     @ReadClass(Mech.class)
@@ -215,33 +215,33 @@ public class TypeIO{
 
     @WriteClass(Liquid.class)
     public static void writeLiquid(ByteBuffer buffer, Liquid liquid){
-        buffer.put(liquid == null ? -1 : liquid.id);
+        buffer.putShort(liquid == null ? -1 : liquid.id);
     }
 
     @ReadClass(Liquid.class)
     public static Liquid readLiquid(ByteBuffer buffer){
-        byte id = buffer.get();
-        return id == -1 ? null : content.liquid(buffer.get());
+        short id = buffer.getShort();
+        return id == -1 ? null : content.liquid(buffer.getShort());
     }
 
     @WriteClass(BulletType.class)
     public static void writeBulletType(ByteBuffer buffer, BulletType type){
-        buffer.put(type.id);
+        buffer.putShort(type.id);
     }
 
     @ReadClass(BulletType.class)
     public static BulletType readBulletType(ByteBuffer buffer){
-        return content.getByID(ContentType.bullet, buffer.get());
+        return content.getByID(ContentType.bullet, buffer.getShort());
     }
 
     @WriteClass(Item.class)
     public static void writeItem(ByteBuffer buffer, Item item){
-        buffer.put(item == null ? -1 : item.id);
+        buffer.putShort(item == null ? -1 : item.id);
     }
 
     @ReadClass(Item.class)
     public static Item readItem(ByteBuffer buffer){
-        byte id = buffer.get();
+        short id = buffer.getShort();
         return id == -1 ? null : content.item(id);
     }
 

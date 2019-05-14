@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
+import io.anuke.annotations.Annotations.Nullable;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.graphics.Color;
@@ -8,7 +9,8 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.*;
@@ -138,7 +140,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         byte team = stream.readByte();
         boolean dead = stream.readBoolean();
         float x = stream.readFloat();
@@ -150,7 +152,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte itemID = stream.readByte();
         short itemAmount = stream.readShort();
 
-        this.status.readSave(stream);
+        this.status.readSave(stream, version);
         this.item.amount = itemAmount;
         this.item.item = content.item(itemID);
         this.dead = dead;
@@ -221,7 +223,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
     }
 
-    public TileEntity getClosestCore(){
+    public @Nullable TileEntity getClosestCore(){
         TeamData data = state.teams.get(team);
 
         Tile tile = Geometry.findClosest(x, y, data.cores);

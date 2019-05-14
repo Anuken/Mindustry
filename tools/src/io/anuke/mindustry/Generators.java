@@ -70,7 +70,7 @@ public class Generators{
         });
 
         ImagePacker.generate("block-icons", () -> {
-            Image colors = new Image(256, 1);
+            Image colors = new Image(content.blocks().size, 1);
             Color outlineColor = new Color(0, 0, 0, 0.3f);
 
             for(Block block : content.blocks()){

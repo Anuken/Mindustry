@@ -154,7 +154,7 @@ public abstract class InputHandler implements InputProcessor{
 
     /** Handles tile tap events that are not platform specific. */
     boolean tileTapped(Tile tile){
-        tile = tile.target();
+        tile = tile.link();
 
         boolean consumed = false, showedInventory = false;
 
@@ -331,7 +331,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public void breakBlock(int x, int y){
-        Tile tile = world.tile(x, y).target();
+        Tile tile = world.ltile(x, y);
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }
 

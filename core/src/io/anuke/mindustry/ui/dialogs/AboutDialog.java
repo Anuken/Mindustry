@@ -7,9 +7,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Cell;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.Contributors;
 import io.anuke.mindustry.io.Contributors.Contributor;
@@ -27,7 +25,10 @@ public class AboutDialog extends FloatingDialog{
         super("$about.button");
 
         if(!ios){
-            Contributors.getContributors(out -> contributors = out, Throwable::printStackTrace);
+            shown(() -> Contributors.getContributors(out -> {
+                contributors = out;
+                Core.app.post(this::setup);
+            }, Throwable::printStackTrace));
         }
 
         shown(this::setup);

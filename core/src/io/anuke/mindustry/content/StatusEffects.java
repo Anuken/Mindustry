@@ -75,8 +75,6 @@ public class StatusEffects implements ContentList{
             armorMultiplier = 3f;
             damageMultiplier = 3f;
             speedMultiplier = 1.1f;
-            //TODO custom effect
-            //effect = Fx.overdriven;
         }};
 
         shocked = new StatusEffect();

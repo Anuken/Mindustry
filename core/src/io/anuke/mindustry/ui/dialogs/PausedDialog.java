@@ -47,7 +47,7 @@ public class PausedDialog extends FloatingDialog{
             }
             cont.addButton("$settings", ui.settings::show);
 
-            if(!world.isZone()){
+            if(!world.isZone() && !state.isEditor()){
                 cont.row();
                 cont.addButton("$savegame", save::show);
                 cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
@@ -55,9 +55,10 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
-
-            cont.row();
+            if(!state.isEditor()){
+                cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+                cont.row();
+            }
 
             cont.addButton("$quit", () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
@@ -74,7 +75,7 @@ public class PausedDialog extends FloatingDialog{
             cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
             cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
 
-            if(!world.isZone()){
+            if(!world.isZone() && !state.isEditor()){
                 cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
                 cont.row();
@@ -84,7 +85,9 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
             }
 
-            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            if(!state.isEditor()){
+                cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            }
             cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
                     if(Net.client()) netClient.disconnectQuietly();
@@ -96,8 +99,12 @@ public class PausedDialog extends FloatingDialog{
     }
 
     public void runExitSave(){
-        if(control.saves.getCurrent() == null ||
-        !control.saves.getCurrent().isAutosave()){
+        if(state.isEditor()){
+            ui.editor.resumeEditing();
+            return;
+        }
+
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave()){
             state.set(State.menu);
             return;
         }

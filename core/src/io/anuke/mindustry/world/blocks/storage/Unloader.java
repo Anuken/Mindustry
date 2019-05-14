@@ -35,8 +35,7 @@ public class Unloader extends Block{
 
     @Override
     public boolean canDump(Tile tile, Tile to, Item item){
-        Block block = to.target().block();
-        return !(block instanceof StorageBlock);
+        return !(to.block() instanceof StorageBlock);
     }
 
     @Override
@@ -104,12 +103,14 @@ public class Unloader extends Block{
         public Item sortItem = null;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeByte(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             byte id = stream.readByte();
             sortItem = id == -1 ? null : content.items().get(id);
         }

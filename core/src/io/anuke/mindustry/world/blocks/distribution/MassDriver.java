@@ -23,8 +23,6 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
@@ -323,13 +321,15 @@ public class MassDriver extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeInt(link);
             stream.writeFloat(rotation);
             stream.writeByte((byte)state.ordinal());
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             link = stream.readInt();
             rotation = stream.readFloat();
             state = DriverState.values()[stream.readByte()];

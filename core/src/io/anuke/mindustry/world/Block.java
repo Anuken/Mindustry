@@ -240,7 +240,7 @@ public class Block extends BlockStorage{
     }
 
     public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
+        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }
 
     public void drawTeam(Tile tile){
@@ -449,6 +449,10 @@ public class Block extends BlockStorage{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+    }
+
+    public Tile linked(Tile tile){
+        return tile;
     }
 
     public boolean isSolidFor(Tile tile){

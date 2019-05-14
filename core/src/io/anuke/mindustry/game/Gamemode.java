@@ -1,49 +1,64 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.function.Consumer;
 
 /** Defines preset rule sets.. */
 public enum Gamemode{
-    survival(() -> new Rules(){{
-        waveTimer = true;
-        waves = true;
-        unitDrops = true;
-        spawns = DefaultWaves.get();
-    }}),
-    sandbox(() -> new Rules(){{
-        infiniteResources = true;
-        waves = true;
-        waveTimer = false;
-        respawnTime = 0f;
-    }}),
-    attack(() -> new Rules(){{
-        enemyCheat = true;
-        unitDrops = true;
-        waves = false;
-        attackMode = true;
-    }}),
-    pvp(() -> new Rules(){{
-        pvp = true;
-        enemyCoreBuildRadius = 600f;
-        respawnTime = 60 * 10;
-        buildCostMultiplier = 0.5f;
-        buildSpeedMultiplier = 2f;
-        playerDamageMultiplier = 0.45f;
-        playerHealthMultiplier = 0.8f;
-        unitBuildSpeedMultiplier = 3f;
-        unitHealthMultiplier = 2f;
-        attackMode = true;
-    }});
+    survival(rules -> {
+        rules.waveTimer = true;
+        rules.waves = true;
+        rules.unitDrops = true;
+    }),
+    sandbox(rules -> {
+        rules.infiniteResources = true;
+        rules.waves = true;
+        rules.waveTimer = false;
+        rules.respawnTime = 0f;
+    }),
+    attack(rules -> {
+        rules.enemyCheat = true;
+        rules.unitDrops = true;
+        rules.waves = false;
+        rules.attackMode = true;
+    }),
+    pvp(rules -> {
+        rules.pvp = true;
+        rules.enemyCoreBuildRadius = 600f;
+        rules.respawnTime = 60 * 10;
+        rules.buildCostMultiplier = 0.5f;
+        rules.buildSpeedMultiplier = 2f;
+        rules.playerDamageMultiplier = 0.45f;
+        rules.playerHealthMultiplier = 0.8f;
+        rules.unitBuildSpeedMultiplier = 3f;
+        rules.unitHealthMultiplier = 2f;
+        rules.attackMode = true;
+    }),
+    editor(true, rules -> {
+        rules.infiniteResources = true;
+        rules.editor = true;
+        rules.waves = false;
+        rules.enemyCoreBuildRadius = 0f;
+        rules.waveTimer = false;
+        rules.respawnTime = 0f;
+    });
 
-    private final Supplier<Rules> rules;
+    private final Consumer<Rules> rules;
+    public final boolean hidden;
 
-    Gamemode(Supplier<Rules> rules){
-        this.rules = rules;
+    Gamemode(Consumer<Rules> rules){
+        this(false, rules);
     }
 
-    public Rules get(){
-        return rules.get();
+    Gamemode(boolean hidden, Consumer<Rules> rules){
+        this.rules = rules;
+        this.hidden = hidden;
+    }
+
+    /** Applies this preset to this ruleset. */
+    public Rules apply(Rules in){
+        rules.accept(in);
+        return in;
     }
 
     public String description(){

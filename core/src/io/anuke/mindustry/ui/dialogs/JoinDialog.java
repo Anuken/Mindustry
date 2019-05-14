@@ -164,9 +164,9 @@ public class JoinDialog extends FloatingDialog{
             server.content.clear();
 
             server.content.table(t -> {
-                t.add(versionString).left();
+                t.add("[lightgray]" + host.name).width(targetWidth() - 10f).left().get().setEllipsis(true);
                 t.row();
-                t.add("[lightgray]" + Core.bundle.format("server.hostname", host.name)).width(targetWidth() - 10f).left().get().setEllipsis(true);
+                t.add(versionString).left();
                 t.row();
                 t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
                 Core.bundle.format("players.single", host.players))).left();

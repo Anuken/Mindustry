@@ -87,8 +87,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             player.setMineTile(null);
             player.target = unit;
         }else{
-            Tile tile = world.tileWorld(x, y);
-            if(tile != null) tile = tile.target();
+            Tile tile = world.ltileWorld(x, y);
 
             if(tile != null && tile.synthetic() && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
                 TileEntity entity = tile.entity;
@@ -416,9 +415,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 for(int x = dresult.x; x <= dresult.x2; x++){
                     for(int y = dresult.y; y <= dresult.y2; y++){
-                        Tile other = world.tile(x, y);
+                        Tile other = world.ltile(x, y);
                         if(other == null || !validBreak(other.x, other.y)) continue;
-                        other = other.target();
 
                         Draw.color(Pal.removeBack);
                         Lines.square(other.drawx(), other.drawy() - 1, other.block().size * tilesize / 2f - 1);
@@ -514,11 +512,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                         int wx = lineStartX + x * Mathf.sign(tileX - lineStartX);
                         int wy = lineStartY + y * Mathf.sign(tileY - lineStartY);
 
-                        Tile tar = world.tile(wx, wy);
+                        Tile tar = world.ltile(wx, wy);
 
                         if(tar == null) continue;
-
-                        tar = tar.target();
 
                         if(!hasRequest(world.tile(tar.x, tar.y)) && validBreak(tar.x, tar.y)){
                             PlaceRequest request = new PlaceRequest(tar.x, tar.y);
@@ -535,7 +531,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(tile == null) return false;
 
-            tryDropItems(tile.target(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.link(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -585,11 +581,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selection.add(lastPlaced = new PlaceRequest(cursor.x, cursor.y, block, rotation));
-        }else if(mode == breaking && validBreak(cursor.target().x, cursor.target().y) && !hasRequest(cursor.target())){
+        }else if(mode == breaking && validBreak(cursor.link().x, cursor.link().y) && !hasRequest(cursor.link())){
             //add to selection queue if it's a valid BREAK position
-            cursor = cursor.target();
+            cursor = cursor.link();
             selection.add(new PlaceRequest(cursor.x, cursor.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(cursor.target())){
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(cursor.link())){
             tryBeginMine(cursor);
         }
 

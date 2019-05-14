@@ -58,12 +58,12 @@ public class OverflowGate extends Router{
             }else if(bc && !ac){
                 to = b;
             }else{
-                if(tile.getDump() == 0){
+                if(tile.rotation() == 0){
                     to = a;
-                    if(flip) tile.setDump((byte)1);
+                    if(flip) tile.rotation((byte)1);
                 }else{
                     to = b;
-                    if(flip) tile.setDump((byte)0);
+                    if(flip) tile.rotation((byte)0);
                 }
             }
         }

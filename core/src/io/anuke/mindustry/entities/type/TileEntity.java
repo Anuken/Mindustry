@@ -1,14 +1,12 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.impl.BaseEntity;
@@ -115,16 +113,35 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return dead || tile.entity != this;
     }
 
+    @CallSuper
     public void write(DataOutput stream) throws IOException{
+        stream.writeShort((short)health);
+        stream.writeByte(Pack.byteByte(tile.getTeamID(), tile.rotation())); //team + rotation
+        if(items != null) items.write(stream);
+        if(power != null) power.write(stream);
+        if(liquids != null) liquids.write(stream);
+        if(cons != null) cons.write(stream);
     }
 
-    public void writeConfig(DataOutput stream) throws IOException{
+    @CallSuper
+    public void read(DataInput stream, byte revision) throws IOException{
+        health = stream.readUnsignedShort();
+        byte tr = stream.readByte();
+        byte team = Pack.leftByte(tr);
+        byte rotation = Pack.rightByte(tr);
+
+        tile.setTeam(Team.all[team]);
+        tile.rotation(rotation);
+
+        if(items != null) items.read(stream);
+        if(power != null) power.read(stream);
+        if(liquids != null) liquids.read(stream);
+        if(cons != null) cons.read(stream);
     }
 
-    public void read(DataInput stream) throws IOException{
-    }
-
-    public void readConfig(DataInput stream) throws IOException{
+    /** Returns the version of this TileEntity IO code.*/
+    public byte version(){
+        return 0;
     }
 
     public boolean collide(Bullet other){
@@ -168,14 +185,14 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+            Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
-                other = other.target();
                 other.block().onProximityUpdate(other);
-            }
-            if(other != null && other.entity != null){
-                other.entity.proximity.removeValue(tile, true);
+
+                if(other.entity != null){
+                    other.entity.proximity.removeValue(tile, true);
+                }
             }
         }
     }
@@ -186,10 +203,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+            Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
 
             if(other == null) continue;
-            other = other.target();
             if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
 
             other.block().onProximityUpdate(other);
@@ -278,6 +294,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         if(block == previous && power != null){
             power.graph.update();
         }
+    }
+
+    @Override
+    public boolean isValid(){
+        return !isDead() && tile.entity == this;
     }
 
     @Override

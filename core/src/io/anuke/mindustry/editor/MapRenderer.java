@@ -14,6 +14,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -84,7 +85,6 @@ public class MapRenderer implements Disposable{
     }
 
     public void updatePoint(int x, int y){
-        //TODO spread out over multiple frames?
         updates.add(x + y * width);
     }
 
@@ -110,13 +110,13 @@ public class MapRenderer implements Disposable{
         int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
         int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
 
-        if(wall != Blocks.air && (wall.synthetic() || wall == Blocks.part)){
+        if(wall != Blocks.air && (wall.synthetic() || wall instanceof BlockPart)){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
             if(wall.rotate){
                 mesh.draw(idxWall, region,
                 wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.getRotation() * 90 - 90);
+                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.rotation() * 90 - 90);
             }else{
                 mesh.draw(idxWall, region,
                 wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl) / 2f,

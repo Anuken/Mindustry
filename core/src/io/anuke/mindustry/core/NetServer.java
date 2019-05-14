@@ -12,8 +12,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.io.ByteBufferOutput;
-import io.anuke.arc.util.io.ReusableByteOutStream;
+import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Entities;
@@ -213,7 +212,7 @@ public class NetServer implements ApplicationListener{
 
     public void sendWorldData(Player player, int clientID){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DeflaterOutputStream def = new DeflaterOutputStream(stream);
+        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
         NetworkIO.writeWorld(player, def);
         WorldStream data = new WorldStream();
         data.stream = new ByteArrayInputStream(stream.toByteArray());
@@ -290,7 +289,7 @@ public class NetServer implements ApplicationListener{
             //auto-skip done requests
             if(req.breaking && tile.block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.getRotation() == req.rotation)){
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);

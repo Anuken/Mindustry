@@ -40,10 +40,98 @@ public interface BuilderTrait extends Entity, TeamTrait{
     float placeDistance = 220f;
     float mineDistance = 70f;
 
-    //due to iOS wierdness
-    class BuildDataStatic{
-        static Array<BuildRequest> removal = new Array<>();
-        static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
+    /**
+     * Update building mechanism for this unit.
+     * This includes mining.
+     */
+    default void updateBuilding(){
+        float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : placeDistance;
+        Unit unit = (Unit)this;
+        //remove already completed build requests
+        removal.clear();
+        for(BuildRequest req : getPlaceQueue()){
+            removal.add(req);
+        }
+
+        getPlaceQueue().clear();
+
+        for(BuildRequest request : removal){
+            if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
+            (!request.breaking && (world.tile(request.x, request.y).rotation() == request.rotation || !request.block.rotate)
+            && world.tile(request.x, request.y).block() == request.block))){
+                getPlaceQueue().addLast(request);
+            }
+        }
+
+        BuildRequest current = getCurrentRequest();
+
+        //update mining here
+        if(current == null){
+            if(getMineTile() != null){
+                updateMining();
+            }
+            return;
+        }else{
+            setMineTile(null);
+        }
+
+        Tile tile = world.tile(current.x, current.y);
+
+        if(dst(tile) > finalPlaceDst){
+            if(getPlaceQueue().size > 1){
+                getPlaceQueue().removeFirst();
+                getPlaceQueue().addLast(current);
+            }
+            return;
+        }
+
+        if(!(tile.block() instanceof BuildBlock)){
+            if(canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
+                Call.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
+            }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
+                Call.beginBreak(getTeam(), current.x, current.y);
+            }else{
+                getPlaceQueue().removeFirst();
+                return;
+            }
+        }
+
+        TileEntity core = unit.getClosestCore();
+
+        //if there is no core to build with or no build entity, stop building!
+        if((core == null && !state.rules.infiniteResources) || !(tile.entity instanceof BuildEntity)){
+            return;
+        }
+
+        //otherwise, update it.
+        BuildEntity entity = tile.entity();
+
+        if(entity == null){
+            return;
+        }
+
+        if(unit.dst(tile) <= finalPlaceDst){
+            unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
+        }
+
+        //progress is synced, thus not updated clientside
+        if(!Net.client()){
+            //deconstructing is 2x as fast
+            if(current.breaking){
+                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
+            }else{
+                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
+            }
+
+            current.progress = entity.progress();
+        }else{
+            entity.progress = current.progress;
+        }
+
+        if(!current.initialized){
+            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
+            current.initialized = true;
+        }
     }
 
     /** Returns the queue for storing build requests. */
@@ -148,97 +236,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
     }
 
-    /**
-     * Update building mechanism for this unit.
-     * This includes mining.
-     */
-    default void updateBuilding(){
-        Unit unit = (Unit)this;
-        //remove already completed build requests
-        removal.clear();
-        for(BuildRequest req : getPlaceQueue()){
-            removal.add(req);
-        }
-
-        getPlaceQueue().clear();
-
-        for(BuildRequest request : removal){
-            if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
-            (!request.breaking && (world.tile(request.x, request.y).getRotation() == request.rotation || !request.block.rotate)
-            && world.tile(request.x, request.y).block() == request.block))){
-                getPlaceQueue().addLast(request);
-            }
-        }
-
-        BuildRequest current = getCurrentRequest();
-
-        //update mining here
-        if(current == null){
-            if(getMineTile() != null){
-                updateMining();
-            }
-            return;
-        }else{
-            setMineTile(null);
-        }
-
-        Tile tile = world.tile(current.x, current.y);
-
-        if(dst(tile) > placeDistance){
-            if(getPlaceQueue().size > 1){
-                getPlaceQueue().removeFirst();
-                getPlaceQueue().addLast(current);
-            }
-            return;
-        }
-
-        if(!(tile.block() instanceof BuildBlock)){
-            if(canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
-                Call.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
-            }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
-                Call.beginBreak(getTeam(), current.x, current.y);
-            }else{
-                getPlaceQueue().removeFirst();
-                return;
-            }
-        }
-
-        TileEntity core = unit.getClosestCore();
-
-        //if there is no core to build with or no build entity, stop building!
-        if(core == null || !(tile.entity instanceof BuildEntity)){
-            return;
-        }
-
-        //otherwise, update it.
-        BuildEntity entity = tile.entity();
-
-        if(entity == null){
-            return;
-        }
-
-        if(unit.dst(tile) <= placeDistance){
-            unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
-        }
-
-        //progress is synced, thus not updated clientside
-        if(!Net.client()){
-            //deconstructing is 2x as fast
-            if(current.breaking){
-                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
-            }else{
-                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
-            }
-
-            current.progress = entity.progress();
-        }else{
-            entity.progress = current.progress;
-        }
-
-        if(!current.initialized){
-            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
-            current.initialized = true;
-        }
+    //due to iOS wierdness, this is apparently required
+    class BuildDataStatic{
+        static Array<BuildRequest> removal = new Array<>();
+        static Vector2[] tmptr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     }
 
     /** Do not call directly. */
@@ -291,7 +292,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         Tile tile = world.tile(request.x, request.y);
 
-        if(dst(tile) > placeDistance){
+        if(dst(tile) > placeDistance && !state.isEditor()){
             return;
         }
 

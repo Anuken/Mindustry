@@ -398,9 +398,9 @@ public class Bullets implements ContentList{
             @Override
             public void hitTile(Bullet b, Tile tile){
                 super.hit(b);
-                tile = tile.target();
+                tile = tile.link();
 
-                if(tile != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }
@@ -424,7 +424,6 @@ public class Bullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                //TODO add color to the bullet depending on the color of the flame it came from
                 Draw.color(Pal.lightFlame, Pal.darkFlame, Color.GRAY, b.fin());
                 Fill.circle(b.x, b.y, 3f * b.fout());
                 Draw.reset();

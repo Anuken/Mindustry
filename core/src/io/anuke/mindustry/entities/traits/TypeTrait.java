@@ -23,9 +23,7 @@ public interface TypeTrait{
         lastRegisteredID[0]++;
     }
 
-    /**
-     * Registers a syncable type by ID.
-     */
+    /**Gets a syncable type by ID.*/
     static Supplier<? extends TypeTrait> getTypeByID(int id){
         if(id == -1){
             throw new IllegalArgumentException("Attempt to retrieve invalid entity type ID! Did you forget to set it in ContentLoader.registerTypes()?");

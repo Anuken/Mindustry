@@ -85,9 +85,8 @@ public class Damage{
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
         tr.trns(angle, length);
         world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
-            Tile tile = world.tile(cx, cy);
-            if(tile != null) tile = tile.target();
-            if(tile != null && tile.entity != null && tile.target().getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
+            Tile tile = world.ltile(cx, cy);
+            if(tile != null && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
             }
@@ -216,11 +215,9 @@ public class Damage{
             int scaledDamage = (int)(damage * (1f - (float)dst / radius));
 
             bits.set(bitOffset + x, bitOffset + y);
-            Tile tile = world.tile(startx + x, starty + y);
+            Tile tile = world.ltile(startx + x, starty + y);
 
             if(scaledDamage <= 0 || tile == null) continue;
-
-            tile = tile.target();
 
             //apply damage to entity if needed
             if(tile.entity != null && tile.getTeam() != team){

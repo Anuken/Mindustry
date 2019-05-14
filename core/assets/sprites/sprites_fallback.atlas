@@ -10642,35 +10642,35 @@ filter: Nearest,Nearest
 repeat: none
 char1
   rotate: false
-  xy: 423, 637
+  xy: 713, 735
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 char2
   rotate: false
-  xy: 473, 687
+  xy: 763, 785
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 char3
   rotate: false
-  xy: 763, 785
+  xy: 1, 309
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 cliffs1
   rotate: false
-  xy: 1, 309
+  xy: 183, 491
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 coal1
   rotate: false
-  xy: 183, 491
+  xy: 473, 589
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10684,42 +10684,42 @@ coal2
   index: -1
 coal3
   rotate: false
-  xy: 383, 555
+  xy: 673, 653
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 copper1
   rotate: false
-  xy: 423, 603
+  xy: 713, 701
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 copper2
   rotate: false
-  xy: 507, 687
+  xy: 797, 785
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 copper3
   rotate: false
-  xy: 797, 785
+  xy: 1, 275
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 craters1
   rotate: false
-  xy: 1, 275
+  xy: 217, 491
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 craters2
   rotate: false
-  xy: 217, 491
+  xy: 507, 589
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10740,14 +10740,14 @@ craters4
   index: -1
 craters5
   rotate: false
-  xy: 541, 687
+  xy: 831, 785
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 craters6
   rotate: false
-  xy: 831, 785
+  xy: 1, 241
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10761,21 +10761,21 @@ creeptree
   index: -1
 dark-metal-large
   rotate: false
-  xy: 291, 655
+  xy: 581, 753
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 dark-metal1
   rotate: false
-  xy: 1, 241
+  xy: 251, 491
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 dark-metal2
   rotate: false
-  xy: 251, 491
+  xy: 541, 589
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10824,14 +10824,14 @@ dark-panel-6
   index: -1
 darksand-tainted-water
   rotate: false
-  xy: 649, 719
+  xy: 359, 523
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 darksand-water
   rotate: false
-  xy: 683, 719
+  xy: 393, 523
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10845,49 +10845,49 @@ darksand1
   index: -1
 darksand2
   rotate: false
-  xy: 581, 719
+  xy: 291, 523
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 darksand3
   rotate: false
-  xy: 615, 719
+  xy: 325, 523
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 deepwater
   rotate: false
-  xy: 575, 685
+  xy: 285, 489
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 dunerocks-large
   rotate: false
-  xy: 581, 753
+  xy: 1, 459
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 dunerocks1
   rotate: false
-  xy: 609, 685
+  xy: 319, 489
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 dunerocks2
   rotate: false
-  xy: 643, 685
+  xy: 353, 489
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 grass1
   rotate: false
-  xy: 677, 685
+  xy: 387, 489
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10908,7 +10908,7 @@ grass3
   index: -1
 holostone1
   rotate: false
-  xy: 717, 735
+  xy: 427, 539
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -10929,385 +10929,385 @@ holostone3
   index: -1
 hotrock1
   rotate: false
-  xy: 457, 637
+  xy: 747, 735
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 hotrock2
   rotate: false
-  xy: 457, 603
+  xy: 747, 701
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 hotrock3
   rotate: false
-  xy: 491, 653
+  xy: 781, 751
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice-snow1
   rotate: false
-  xy: 559, 651
+  xy: 35, 309
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice-snow2
   rotate: false
-  xy: 593, 651
+  xy: 35, 275
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice-snow3
   rotate: false
-  xy: 627, 651
+  xy: 35, 241
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice1
   rotate: false
-  xy: 491, 619
+  xy: 781, 717
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice2
   rotate: false
-  xy: 525, 653
+  xy: 815, 751
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ice3
   rotate: false
-  xy: 525, 619
+  xy: 815, 717
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 icerocks-large
   rotate: false
-  xy: 1, 459
+  xy: 291, 557
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icerocks1
   rotate: false
-  xy: 661, 651
+  xy: 35, 207
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 icerocks2
   rotate: false
-  xy: 559, 617
+  xy: 35, 173
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ignarock1
   rotate: false
-  xy: 593, 617
+  xy: 35, 139
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ignarock2
   rotate: false
-  xy: 627, 617
+  xy: 35, 105
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ignarock3
   rotate: false
-  xy: 661, 617
+  xy: 35, 71
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 lead1
   rotate: false
-  xy: 763, 751
+  xy: 35, 37
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 lead2
   rotate: false
-  xy: 797, 751
+  xy: 35, 3
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 lead3
   rotate: false
-  xy: 831, 751
+  xy: 473, 555
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 magmarock1
   rotate: false
-  xy: 865, 771
+  xy: 507, 555
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 magmarock2
   rotate: false
-  xy: 865, 737
+  xy: 541, 555
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 magmarock3
   rotate: false
-  xy: 35, 309
+  xy: 183, 457
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor
   rotate: false
-  xy: 35, 275
+  xy: 217, 457
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-2
   rotate: false
-  xy: 35, 241
+  xy: 251, 457
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-3
   rotate: false
-  xy: 35, 207
+  xy: 285, 455
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-5
   rotate: false
-  xy: 35, 173
+  xy: 319, 455
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-damaged1
   rotate: false
-  xy: 35, 139
+  xy: 353, 455
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-damaged2
   rotate: false
-  xy: 35, 105
+  xy: 387, 455
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 metal-floor-damaged3
   rotate: false
-  xy: 35, 71
+  xy: 427, 505
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 moss1
   rotate: false
-  xy: 35, 37
+  xy: 421, 471
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 moss2
   rotate: false
-  xy: 35, 3
+  xy: 461, 521
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 moss3
   rotate: false
-  xy: 183, 457
+  xy: 495, 521
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-coal1
   rotate: false
-  xy: 217, 457
+  xy: 529, 521
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-coal2
   rotate: false
-  xy: 251, 457
+  xy: 85, 375
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-coal3
   rotate: false
-  xy: 717, 701
+  xy: 781, 683
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-copper1
   rotate: false
-  xy: 751, 717
+  xy: 815, 683
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-copper2
   rotate: false
-  xy: 785, 717
+  xy: 849, 751
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-copper3
   rotate: false
-  xy: 819, 717
+  xy: 849, 717
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-lead1
   rotate: false
-  xy: 85, 375
+  xy: 849, 683
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-lead2
   rotate: false
-  xy: 695, 651
+  xy: 421, 437
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-lead3
   rotate: false
-  xy: 695, 617
+  xy: 461, 487
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-scrap1
   rotate: false
-  xy: 491, 585
+  xy: 495, 487
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-scrap2
   rotate: false
-  xy: 525, 585
+  xy: 529, 487
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-scrap3
   rotate: false
-  xy: 559, 583
+  xy: 455, 453
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-thorium1
   rotate: false
-  xy: 593, 583
+  xy: 489, 453
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-thorium2
   rotate: false
-  xy: 627, 583
+  xy: 523, 453
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-thorium3
   rotate: false
-  xy: 661, 583
+  xy: 85, 341
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-titanium1
   rotate: false
-  xy: 695, 583
+  xy: 69, 307
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-titanium2
   rotate: false
-  xy: 751, 683
+  xy: 69, 273
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ore-titanium3
   rotate: false
-  xy: 785, 683
+  xy: 69, 239
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pebbles1
   rotate: false
-  xy: 819, 683
+  xy: 69, 205
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pebbles2
   rotate: false
-  xy: 853, 703
+  xy: 69, 171
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pebbles3
   rotate: false
-  xy: 853, 669
+  xy: 69, 137
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pine
   rotate: false
-  xy: 291, 539
+  xy: 581, 637
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 rock1
   rotate: false
-  xy: 423, 671
+  xy: 713, 769
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 rock2
   rotate: false
-  xy: 713, 769
+  xy: 1, 343
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
@@ -11321,42 +11321,42 @@ rocks-large
   index: -1
 rocks1
   rotate: false
-  xy: 85, 341
+  xy: 69, 103
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 rocks2
   rotate: false
-  xy: 69, 307
+  xy: 69, 69
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 salt
   rotate: false
-  xy: 69, 273
+  xy: 69, 35
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 saltrocks-large
   rotate: false
-  xy: 291, 589
+  xy: 581, 687
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 saltrocks1
   rotate: false
-  xy: 69, 239
+  xy: 69, 1
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 saltrocks2
   rotate: false
-  xy: 69, 205
+  xy: 119, 391
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -11370,7 +11370,7 @@ sand-edge
   index: -1
 sand-water
   rotate: false
-  xy: 69, 69
+  xy: 523, 419
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -11384,77 +11384,77 @@ sand-water-edge
   index: -1
 sand1
   rotate: false
-  xy: 69, 171
+  xy: 119, 357
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 sand2
   rotate: false
-  xy: 69, 137
+  xy: 455, 419
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 sand3
   rotate: false
-  xy: 69, 103
+  xy: 489, 419
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 sandrocks-large
   rotate: false
-  xy: 357, 655
+  xy: 647, 753
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 sandrocks1
   rotate: false
-  xy: 69, 35
+  xy: 103, 307
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 sandrocks2
   rotate: false
-  xy: 69, 1
+  xy: 103, 273
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 scrap1
   rotate: false
-  xy: 119, 391
+  xy: 103, 239
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 scrap2
   rotate: false
-  xy: 119, 357
+  xy: 103, 205
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 scrap3
   rotate: false
-  xy: 103, 307
+  xy: 103, 171
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shale-boulder1
   rotate: false
-  xy: 103, 171
+  xy: 103, 35
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shale-boulder2
   rotate: false
-  xy: 103, 137
+  xy: 103, 1
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -11468,63 +11468,63 @@ shale-edge
   index: -1
 shale1
   rotate: false
-  xy: 103, 273
+  xy: 103, 137
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shale2
   rotate: false
-  xy: 103, 239
+  xy: 103, 103
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shale3
   rotate: false
-  xy: 103, 205
+  xy: 103, 69
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shalerocks-large
   rotate: false
-  xy: 647, 753
+  xy: 1, 393
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 shalerocks1
   rotate: false
-  xy: 103, 103
+  xy: 581, 603
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shalerocks2
   rotate: false
-  xy: 103, 69
+  xy: 575, 569
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shrubs-large
   rotate: false
-  xy: 1, 393
+  xy: 67, 459
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 shrubs1
   rotate: false
-  xy: 103, 35
+  xy: 615, 603
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shrubs2
   rotate: false
-  xy: 103, 1
+  xy: 609, 569
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -11538,58 +11538,65 @@ snow-edge
   index: -1
 snow1
   rotate: false
-  xy: 291, 505
+  xy: 649, 611
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 snow2
   rotate: false
-  xy: 285, 471
+  xy: 683, 619
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 snow3
   rotate: false
-  xy: 325, 505
+  xy: 707, 653
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 snowrock1
   rotate: false
-  xy: 1, 343
+  xy: 67, 409
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 snowrock2
   rotate: false
-  xy: 67, 409
+  xy: 133, 475
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 snowrocks-large
   rotate: false
-  xy: 67, 459
+  xy: 357, 557
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 snowrocks1
   rotate: false
-  xy: 319, 471
+  xy: 717, 619
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 snowrocks2
   rotate: false
-  xy: 359, 513
+  xy: 741, 667
   size: 32, 32
   orig: 32, 32
+  offset: 0, 0
+  index: -1
+spawn-edge
+  rotate: false
+  xy: 291, 819
+  size: 288, 96
+  orig: 288, 96
   offset: 0, 0
   index: -1
 spore-cluster1
@@ -11608,203 +11615,203 @@ spore-cluster2
   index: -1
 spore-cluster3
   rotate: false
-  xy: 341, 547
+  xy: 631, 645
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
 spore-moss-edge
   rotate: false
-  xy: 291, 819
+  xy: 581, 917
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
   index: -1
 spore-moss1
   rotate: false
-  xy: 393, 521
+  xy: 575, 535
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 spore-moss2
   rotate: false
-  xy: 417, 555
+  xy: 609, 535
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 spore-moss3
   rotate: false
-  xy: 427, 521
+  xy: 563, 501
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 spore-pine
   rotate: false
-  xy: 133, 475
+  xy: 423, 573
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 sporerocks-large
   rotate: false
-  xy: 357, 589
+  xy: 647, 687
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 sporerocks1
   rotate: false
-  xy: 451, 569
+  xy: 597, 501
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 sporerocks2
   rotate: false
-  xy: 285, 437
+  xy: 563, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 stone-edge
   rotate: false
-  xy: 581, 917
+  xy: 1, 623
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
   index: -1
 stone1
   rotate: false
-  xy: 319, 437
+  xy: 597, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 stone2
   rotate: false
-  xy: 887, 703
+  xy: 557, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 stone3
   rotate: false
-  xy: 887, 669
+  xy: 591, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tainted-water
   rotate: false
-  xy: 729, 649
+  xy: 557, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tainted-water-edge
   rotate: false
-  xy: 1, 623
+  xy: 291, 721
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
   index: -1
 tar
   rotate: false
-  xy: 729, 615
+  xy: 591, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tar-edge
   rotate: false
-  xy: 291, 721
+  xy: 581, 819
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
   index: -1
 tendrils-edge
   rotate: false
-  xy: 581, 819
+  xy: 1, 525
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
   index: -1
 tendrils1
   rotate: false
-  xy: 763, 649
+  xy: 631, 501
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tendrils2
   rotate: false
-  xy: 763, 615
+  xy: 631, 467
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tendrils3
   rotate: false
-  xy: 797, 649
+  xy: 625, 433
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 thorium1
   rotate: false
-  xy: 797, 615
+  xy: 625, 399
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 thorium2
   rotate: false
-  xy: 729, 581
+  xy: 751, 633
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 thorium3
   rotate: false
-  xy: 763, 581
+  xy: 785, 649
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium1
   rotate: false
-  xy: 797, 581
+  xy: 819, 649
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium2
   rotate: false
-  xy: 831, 635
+  xy: 853, 649
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 titanium3
   rotate: false
-  xy: 831, 601
+  xy: 785, 615
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 water
   rotate: false
-  xy: 865, 635
+  xy: 819, 615
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 water-edge
   rotate: false
-  xy: 1, 525
+  xy: 291, 623
   size: 288, 96
   orig: 288, 96
   offset: 0, 0
