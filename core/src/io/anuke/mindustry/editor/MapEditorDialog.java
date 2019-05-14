@@ -21,6 +21,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -254,6 +255,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void save(){
         String name = editor.getTags().get("name", "").trim();
+        editor.getTags().put("rules", JsonIO.write(state.rules));
 
         if(name.isEmpty()){
             infoDialog.show();

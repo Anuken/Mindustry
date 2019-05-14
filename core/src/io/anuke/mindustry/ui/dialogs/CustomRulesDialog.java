@@ -3,10 +3,12 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.io.JsonIO;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -24,6 +26,7 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     public void show(Rules rules, Supplier<Rules> resetter){
+        Log.info("Shown: " + JsonIO.write(rules));
         this.rules = rules;
         this.resetter = resetter;
         show();
