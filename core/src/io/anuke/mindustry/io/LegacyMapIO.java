@@ -144,6 +144,7 @@ public class LegacyMapIO{
                         int x = i % width, y = i / width;
                         int id = stream.readUnsignedByte();
                         Block block = idmap.get(id);
+                        if(block == null) block = Blocks.air;
 
                         Tile tile = tiles.get(x, y);
                         //the spawn block is saved in the block tile layer in older maps, shift it to the overlay
