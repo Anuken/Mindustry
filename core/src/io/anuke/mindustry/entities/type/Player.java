@@ -782,6 +782,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         moveTarget = null;
         spawner = lastSpawner = null;
         health = maxHealth();
+        mining = null;
         boostHeat = drownTime = hitTime = 0f;
         mech = Mechs.starter;
         placeQueue.clear();

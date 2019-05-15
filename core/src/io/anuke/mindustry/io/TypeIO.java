@@ -221,7 +221,7 @@ public class TypeIO{
     @ReadClass(Liquid.class)
     public static Liquid readLiquid(ByteBuffer buffer){
         short id = buffer.getShort();
-        return id == -1 ? null : content.liquid(buffer.getShort());
+        return id == -1 ? null : content.liquid(id);
     }
 
     @WriteClass(BulletType.class)

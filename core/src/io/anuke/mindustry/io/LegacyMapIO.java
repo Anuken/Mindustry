@@ -154,7 +154,7 @@ public class LegacyMapIO{
                             tile.setOverlay(block);
                         }
 
-                        if(namemap.get(id).equals("part")){
+                        if(namemap.get(id, "").equals("part")){
                             stream.readByte(); //link
                         }else if(tile.entity != null){
                             byte tr = stream.readByte();

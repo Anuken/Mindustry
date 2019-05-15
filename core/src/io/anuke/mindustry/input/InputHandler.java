@@ -199,12 +199,6 @@ public abstract class InputHandler implements InputProcessor{
             frag.inv.hide();
         }
 
-        if(!consumed && player.isBuilding()){
-            player.clearBuilding();
-            block = null;
-            return true;
-        }
-
         return consumed;
     }
 

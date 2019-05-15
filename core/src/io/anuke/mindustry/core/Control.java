@@ -201,8 +201,8 @@ public class Control implements ApplicationListener{
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
-            state.rules = rules;
             world.loadMap(map);
+            state.rules = rules;
             logic.play();
         });
     }

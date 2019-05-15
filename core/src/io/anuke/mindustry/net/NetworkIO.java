@@ -4,8 +4,9 @@ import io.anuke.arc.Core;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.gen.Serialization;
+import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 
@@ -20,7 +21,7 @@ public class NetworkIO{
     public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
-            Serialization.writeRules(stream, state.rules);
+            stream.writeUTF(JsonIO.write(state.rules));
             SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
 
             stream.writeInt(state.wave);
@@ -39,7 +40,7 @@ public class NetworkIO{
 
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
-            state.rules = Serialization.readRules(stream);
+            state.rules = JsonIO.read(Rules.class, stream.readUTF());
             world.setMap(new Map(SaveIO.getSaveWriter().readStringMap(stream)));
 
             state.wave = stream.readInt();

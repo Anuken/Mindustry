@@ -59,6 +59,12 @@ public class GenericCrafter extends Block{
     }
 
     @Override
+    public void init(){
+        outputsLiquid = outputLiquid != null;
+        super.init();
+    }
+
+    @Override
     public void draw(Tile tile){
         if(drawer == null){
             super.draw(tile);

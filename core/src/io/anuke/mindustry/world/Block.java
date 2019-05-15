@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.annotations.Annotations.CallSuper;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
@@ -313,6 +314,7 @@ public class Block extends BlockStorage{
 
     /** Called after all blocks are created. */
     @Override
+    @CallSuper
     public void init(){
         //initialize default health based on size
         if(health == -1){
