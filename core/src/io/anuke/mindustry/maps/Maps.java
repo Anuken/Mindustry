@@ -162,12 +162,12 @@ public class Maps implements Disposable{
         for(FileHandle file : customMapDirectory.list()){
             if(file.extension().equalsIgnoreCase(oldMapExtension)){
                 try{
+                    convertedAny = true;
                     LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
                     //delete old, converted file; it is no longer useful
                     file.delete();
-                    convertedAny = true;
                     Log.info("Converted file {0}", file);
-                }catch(IOException e){
+                }catch(Exception e){
                     //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
                     //but don't delete it
                     file.copyTo(file.sibling(file.name() + "_conversion_failed"));
