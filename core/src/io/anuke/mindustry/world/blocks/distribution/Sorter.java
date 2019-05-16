@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
@@ -70,7 +69,7 @@ public class Sorter extends Block{
             Item item = entity.buffer.poll(i);
             if(item != null){
                 Tile other = getTileTarget(item, tile, tile.getNearby(i), true);
-                if(other.block().acceptItem(item, other, tile)){
+                if(other != null && other.block().acceptItem(item, other, tile)){
                     other.block().handleItem(item, other, tile);
                     entity.buffer.remove(i);
                 }
@@ -93,7 +92,7 @@ public class Sorter extends Block{
         }
     }
 
-    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
+    @Nullable Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
         SorterEntity entity = dest.entity();
 
         int dir = source.relativeTo(dest.x, dest.y);

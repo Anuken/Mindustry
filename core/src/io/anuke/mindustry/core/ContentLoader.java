@@ -167,6 +167,10 @@ public class ContentLoader{
     public <T extends Content> T getByID(ContentType type, int id){
 
         if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
+            //-1 = invalid content
+            if(id < 0){
+                return null;
+            }
             if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
                 return getByID(type, 0); //default value is always ID 0
             }

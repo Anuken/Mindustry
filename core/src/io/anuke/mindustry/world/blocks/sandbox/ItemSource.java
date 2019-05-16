@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -45,6 +46,18 @@ public class ItemSource extends Block{
     @Override
     public boolean outputsItems(){
         return true;
+    }
+
+    @Override
+    public void draw(Tile tile){
+        super.draw(tile);
+
+        ItemSourceEntity entity = tile.entity();
+        if(entity.outputItem == null) return;
+
+        Draw.color(entity.outputItem.color);
+        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+        Draw.color();
     }
 
     @Override
