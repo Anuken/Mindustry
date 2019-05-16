@@ -2,11 +2,14 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
+
+import java.io.*;
 
 public class OverflowGate extends Router{
+    private int bufferCapacity = 10;
 
     public OverflowGate(String name){
         super(name);
@@ -69,5 +72,21 @@ public class OverflowGate extends Router{
         }
 
         return to;
+    }
+
+    public class OverflowGateEntity extends TileEntity{
+        DirectionalItemBuffer buffer = new DirectionalItemBuffer(bufferCapacity, speed);
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            buffer.write(stream);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            buffer.read(stream);
+        }
     }
 }
