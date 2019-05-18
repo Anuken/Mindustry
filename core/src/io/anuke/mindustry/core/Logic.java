@@ -86,7 +86,7 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
         }else if(state.rules.attackMode){

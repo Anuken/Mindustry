@@ -195,6 +195,13 @@ public abstract class InputHandler implements InputProcessor{
             }
         }
 
+        //clear when the player taps on something else
+        if(!consumed && !mobile && player.isBuilding() && block == null){
+            player.clearBuilding();
+            block = null;
+            return true;
+        }
+
         if(!showedInventory){
             frag.inv.hide();
         }

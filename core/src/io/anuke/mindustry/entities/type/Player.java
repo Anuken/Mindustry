@@ -819,6 +819,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         this.lastSpawner = spawner;
         this.dead = true;
         setNet(spawner.getX(), spawner.getY());
+        spawner.updateSpawning(this);
     }
 
     //endregion
