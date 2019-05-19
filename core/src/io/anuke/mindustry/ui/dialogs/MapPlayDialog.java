@@ -95,8 +95,6 @@ public class MapPlayDialog extends FloatingDialog{
         show();
     }
 
-
-
     private void displayGameModeHelp(){
         FloatingDialog d = new FloatingDialog(Core.bundle.get("mode.help.title"));
         d.setFillParent(false);
