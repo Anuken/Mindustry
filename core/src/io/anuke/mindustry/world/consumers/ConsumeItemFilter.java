@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -33,9 +32,8 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void build(Tile tile, Table table){
-        Array<Item> list = content.items().select(filter);
         MultiReqImage image = new MultiReqImage();
-        list.each(item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
+        content.items().each(filter, item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
 
         table.add(image).size(8 * 4);
     }

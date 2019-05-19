@@ -168,7 +168,7 @@ task swapColors(){
 task scaleSprites4x(){
     doLast{
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().contains("/ui/")) return
+            if(file.isDirectory() || file.toString().replace("\\", "/").contains("/ui/")) return
 
             scaleImage(file.file)
             antialias(file.file)
@@ -205,7 +205,7 @@ task pack(){
     doLast{
 
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().contains("/ui/")) return
+            if(file.isDirectory() || file.toString().replace("\\", "/").contains("/ui/")) return
 
             antialias(file.file)
         }

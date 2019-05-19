@@ -88,13 +88,14 @@ public class Weapon{
     public static void shootDirect(ShooterTrait shooter, float offsetX, float offsetY, float rotation, boolean left){
         float x = shooter.getX() + offsetX;
         float y = shooter.getY() + offsetY;
+        float baseX = shooter.getX(), baseY = shooter.getY();
 
         Weapon weapon = shooter.getWeapon();
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> weapon.bullet(shooter, x, y, f + Mathf.range(weapon.inaccuracy)));
+                Time.run(sequenceNum * weapon.shotDelay, () -> weapon.bullet(shooter, x + shooter.getX() - baseX, y + shooter.getY() - baseY, f + Mathf.range(weapon.inaccuracy)));
                 sequenceNum++;
             });
         }else{

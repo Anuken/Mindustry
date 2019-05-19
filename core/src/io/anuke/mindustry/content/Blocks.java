@@ -1110,7 +1110,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 130f;
-            itemDuration = 80f;
+            itemDuration = 90f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.25f);
@@ -1151,7 +1151,7 @@ public class Blocks implements ContentList{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 90));
+            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 100));
             drillTime = 200;
             size = 4;
             drawRim = true;
