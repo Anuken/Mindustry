@@ -38,7 +38,7 @@ public class PlacementFragment extends Fragment{
     Table blockTable, toggler, topTable;
     boolean lastGround;
 
-    //TODO make this configurable
+    //not configurable, no plans to make it configurable
     final KeyCode[] inputGrid = {
         KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
         KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,
@@ -78,7 +78,7 @@ public class PlacementFragment extends Fragment{
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(tile != null){
-                tile = tile.target();
+                tile = tile.link();
                 Block tryRecipe = tile.block();
                 if(tryRecipe.isVisible() && unlocked(tryRecipe)){
                     input.block = tryRecipe;
@@ -142,7 +142,7 @@ public class PlacementFragment extends Fragment{
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
                             if(unlocked(block)){
-                                input.block = input.block == block ? null : block;
+                                input.block = block;
                             }
                         }).size(46f).group(group).get();
 
@@ -150,7 +150,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources) ? Color.WHITE : Color.GRAY;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -313,7 +313,7 @@ public class PlacementFragment extends Fragment{
         if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
             Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             if(tile != null){
-                hoverTile = tile.target();
+                hoverTile = tile.link();
             }else{
                 hoverTile = null;
             }

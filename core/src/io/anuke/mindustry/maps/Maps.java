@@ -1,16 +1,14 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.util.Disposable;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.io.*;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -52,7 +50,7 @@ public class Maps implements Disposable{
         FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
 
         try{
-            return MapIO.readMap(file, false);
+            return MapIO.createMap(file, false);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -81,13 +79,12 @@ public class Maps implements Disposable{
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public void saveMap(ObjectMap<String, String> baseTags, Tile[][] data){
+    public void saveMap(ObjectMap<String, String> baseTags){
 
         try{
-            ObjectMap<String, String> tags = new ObjectMap<>(baseTags);
+            StringMap tags = new StringMap(baseTags);
             String name = tags.get("name");
             if(name == null) throw new IllegalArgumentException("Can't save a map with no name. How did this happen?");
-            //FileHandle file = customMapDirectory.child(name + "." + mapExtension);
             FileHandle file;
 
             //find map with the same exact display name
@@ -106,11 +103,11 @@ public class Maps implements Disposable{
             }
 
             //create map, write it, etc etc etc
-            Map map = new Map(file, data.length, data[0].length, tags, true);
-            MapIO.writeMap(file, map, data);
+            Map map = new Map(file, world.width(), world.height(), tags, true);
+            MapIO.writeMap(file, map);
 
             if(!headless){
-                map.texture = new Texture(MapIO.generatePreview(data));
+                map.texture = new Texture(MapIO.generatePreview(world.getTiles()));
             }
             maps.add(map);
             maps.sort();
@@ -160,6 +157,34 @@ public class Maps implements Disposable{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
+    public void loadLegacyMaps(){
+        boolean convertedAny = false;
+        for(FileHandle file : customMapDirectory.list()){
+            if(file.extension().equalsIgnoreCase(oldMapExtension)){
+                try{
+                    convertedAny = true;
+                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
+                    //delete old, converted file; it is no longer useful
+                    file.delete();
+                    Log.info("Converted file {0}", file);
+                }catch(Exception e){
+                    //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
+                    //but don't delete it
+                    file.copyTo(file.sibling(file.name() + "_conversion_failed"));
+                    file.delete();
+                    Log.err(e);
+                }
+            }
+        }
+
+        //free up any potential memory that was used up during conversion
+        if(convertedAny){
+            world.createTiles(1, 1);
+            //reload maps to load the converted ones
+            reload();
+        }
+    }
+
     /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
@@ -171,7 +196,7 @@ public class Maps implements Disposable{
     }
 
     private void loadMap(FileHandle file, boolean custom) throws IOException{
-        Map map = MapIO.readMap(file, custom);
+        Map map = MapIO.createMap(file, custom);
 
         if(map.name() == null){
             throw new IOException("Map name cannot be empty! File: " + file);

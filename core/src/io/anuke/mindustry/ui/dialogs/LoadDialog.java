@@ -185,12 +185,7 @@ public class LoadDialog extends FloatingDialog{
         button.clicked(() -> {
             if(!button.childrenPressed()){
                 int build = slot.getBuild();
-                if(SaveIO.breakingVersions.contains(build)){
-                    ui.showInfo("$save.old");
-                    slot.delete();
-                }else{
-                    runLoadSave(slot);
-                }
+                runLoadSave(slot);
             }
         });
     }

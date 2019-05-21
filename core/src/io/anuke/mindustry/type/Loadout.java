@@ -71,7 +71,7 @@ public class Loadout extends Content{
             int ry = Pos.y(entry.key);
             Tile tile = world.tile(x + rx, y + ry);
             world.setBlock(tile, entry.value.block, defaultTeam);
-            tile.setRotation((byte)entry.value.rotation);
+            tile.rotation((byte)entry.value.rotation);
             if(entry.value.ore != null){
                 for(Tile t : tile.getLinkedTiles(outArray)){
                     t.setOverlay(entry.value.ore);

@@ -59,11 +59,11 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     public void showFor(Tile t){
-        if(this.tile == t.target()){
+        if(this.tile == t){
             hide();
             return;
         }
-        this.tile = t.target();
+        this.tile = t;
         if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0)
             return;
         rebuild(true);

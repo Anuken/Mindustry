@@ -26,7 +26,6 @@ public class CrashSender{
             exception.printStackTrace();
 
             //don't create crash logs for me (anuke) or custom builds, as it's expected
-            //TODO maybe custom builds such as bleeding edge in certain cases
             if(System.getProperty("user.name").equals("anuke") || Version.build == -1) return;
 
             //attempt to load version regardless

@@ -9,6 +9,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.BombBulletType;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.ContentList;
@@ -307,11 +308,11 @@ public class Mechs implements ContentList{
         trident = new Mech("trident-ship", true){
             {
                 drillPower = 2;
-                speed = 0.14f;
+                speed = 0.15f;
                 drag = 0.034f;
                 mass = 2.5f;
                 turnCursor = false;
-                health = 220f;
+                health = 250f;
                 itemCapacity = 30;
                 engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
@@ -319,14 +320,22 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("bomber"){{
                     length = 0f;
                     width = 2f;
-                    reload = 8f;
+                    reload = 25f;
                     shots = 2;
+                    shotDelay = 1f;
+                    shots = 8;
                     roundrobin = true;
                     ejectEffect = Fx.none;
                     velocityRnd = 1f;
-                    inaccuracy = 40f;
+                    inaccuracy = 20f;
                     ignoreRotation = true;
-                    bullet = Bullets.bombExplosive;
+                    bullet = new BombBulletType(14f, 25f, "shell"){{
+                        bulletWidth = 10f;
+                        bulletHeight = 14f;
+                        hitEffect = Fx.flakExplosion;
+                        shootEffect = Fx.none;
+                        smokeEffect = Fx.none;
+                    }};
                 }};
             }
 

@@ -25,7 +25,6 @@ import static io.anuke.mindustry.Vars.tilesize;
  * Liquids will take priority over items.
  */
 public class ItemLiquidGenerator extends PowerGenerator{
-
     protected float minItemEfficiency = 0.2f;
     /** The time in number of ticks during which a single item will produce power. */
     protected float itemDuration = 70f;
@@ -69,6 +68,12 @@ public class ItemLiquidGenerator extends PowerGenerator{
         if(hasItems){
             stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
+    }
+
+    @Override
+    public boolean shouldConsume(Tile tile){
+        ItemLiquidGeneratorEntity entity = tile.entity();
+        return entity.generateTime > 0;
     }
 
     @Override

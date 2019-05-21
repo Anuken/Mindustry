@@ -2,10 +2,10 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
@@ -14,39 +14,16 @@ import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.Pos;
-
-import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class WaveSpawner{
     private Array<FlyerSpawn> flySpawns = new Array<>();
     private Array<GroundSpawn> groundSpawns = new Array<>();
-    private IntArray loadedSpawns = new IntArray();
     private boolean spawning = false;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
-    }
-
-    public void write(DataOutput stream) throws IOException{
-        stream.writeInt(groundSpawns.size);
-        for(GroundSpawn spawn : groundSpawns){
-            stream.writeInt(Pos.get(spawn.x, spawn.y));
-        }
-    }
-
-    public void read(DataInput stream) throws IOException{
-        flySpawns.clear();
-        groundSpawns.clear();
-        loadedSpawns.clear();
-
-        int amount = stream.readInt();
-
-        for(int i = 0; i < amount; i++){
-            loadedSpawns.add(stream.readInt());
-        }
     }
 
     public int countSpawns(){
@@ -55,7 +32,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return groundSpawns.count(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius) > 0;
+        return groundSpawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius);
     }
 
     public void spawnEnemies(){
@@ -117,21 +94,11 @@ public class WaveSpawner{
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
 
-                if(world.tile(x, y).block() == Blocks.spawn){
+                if(world.tile(x, y).overlay() == Blocks.spawn){
                     addSpawns(x, y);
-
-                    //hide spawnpoints, they have served their purpose
-                    world.tile(x, y).setBlock(Blocks.air);
                 }
             }
         }
-
-        for(int i = 0; i < loadedSpawns.size; i++){
-            int pos = loadedSpawns.get(i);
-            addSpawns(Pos.x(pos), Pos.y(pos));
-        }
-
-        loadedSpawns.clear();
     }
 
     private void addSpawns(int x, int y){

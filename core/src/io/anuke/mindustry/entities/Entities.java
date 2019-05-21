@@ -7,9 +7,10 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.Entity;
+
+import static io.anuke.mindustry.Vars.collisions;
 
 public class Entities{
     public static final int maxLeafObjects = 4;
@@ -48,7 +49,7 @@ public class Entities{
         group.updateEvents();
 
         if(group.useTree()){
-            Vars.collisions.updatePhysics(group);
+            collisions.updatePhysics(group);
         }
 
         for(Entity e : group.all()){

@@ -2,39 +2,46 @@ package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.io.CounterInputStream;
+import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
+import io.anuke.mindustry.world.WorldContext;
 
 import java.io.*;
-import java.util.zip.DeflaterOutputStream;
+import java.util.Arrays;
 import java.util.zip.InflaterInputStream;
 
 import static io.anuke.mindustry.Vars.*;
 
-//TODO load backup meta if possible
 public class SaveIO{
-    public static final IntArray breakingVersions = IntArray.with(47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 63);
-    public static final IntMap<SaveFileVersion> versions = new IntMap<>();
-    public static final Array<SaveFileVersion> versionArray = Array.with(new Save1());
+    /** Format header. This is the string 'MSAV' in ASCII. */
+    public static final byte[] header = {77, 83, 65, 86};
+    public static final IntMap<SaveVersion> versions = new IntMap<>();
+    public static final Array<SaveVersion> versionArray = Array.with(new Save1());
 
     static{
-        for(SaveFileVersion version : versionArray){
+        for(SaveVersion version : versionArray){
             versions.put(version.version, version);
         }
     }
 
-    public static SaveFileVersion getSaveWriter(){
+    public static SaveVersion getSaveWriter(){
         return versionArray.peek();
+    }
+
+    public static SaveVersion getSaveWriter(int version){
+        return versions.get(version);
     }
 
     public static void saveToSlot(int slot){
         FileHandle file = fileFor(slot);
         boolean exists = file.exists();
-        if(exists) file.moveTo(file.sibling(file.name() + "-backup." + file.extension()));
+        if(exists) file.moveTo(backupFileFor(file));
         try{
             write(fileFor(slot));
         }catch(Exception e){
-            if(exists) file.sibling(file.name() + "-backup." + file.extension()).moveTo(file);
+            if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
         }
     }
@@ -47,22 +54,30 @@ public class SaveIO{
         return new DataInputStream(new InflaterInputStream(fileFor(slot).read(bufferSize)));
     }
 
+    public static DataInputStream getBackupSlotStream(int slot){
+        return new DataInputStream(new InflaterInputStream(backupFileFor(fileFor(slot)).read(bufferSize)));
+    }
+
     public static boolean isSaveValid(int slot){
         try{
-            return isSaveValid(getSlotStream(slot));
+            getMeta(slot);
+            return true;
         }catch(Exception e){
             return false;
         }
     }
 
     public static boolean isSaveValid(FileHandle file){
-        return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
+        try{
+            return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
+        }catch(Exception e){
+            return false;
+        }
     }
 
     public static boolean isSaveValid(DataInputStream stream){
-
         try{
-            getData(stream);
+            getMeta(stream);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -70,15 +85,20 @@ public class SaveIO{
         }
     }
 
-    public static SaveMeta getData(int slot){
-        return getData(getSlotStream(slot));
+    public static SaveMeta getMeta(int slot){
+        try{
+            return getMeta(getSlotStream(slot));
+        }catch(Exception e){
+            return getMeta(getBackupSlotStream(slot));
+        }
     }
 
-    public static SaveMeta getData(DataInputStream stream){
+    public static SaveMeta getMeta(DataInputStream stream){
 
         try{
+            readHeader(stream);
             int version = stream.readInt();
-            SaveMeta meta = versions.get(version).getData(stream);
+            SaveMeta meta = versions.get(version).getMeta(stream);
             stream.close();
             return meta;
         }catch(IOException e){
@@ -90,59 +110,77 @@ public class SaveIO{
         return saveDirectory.child(slot + "." + Vars.saveExtension);
     }
 
-    public static void write(FileHandle file){
-        write(new DeflaterOutputStream(file.write(false, bufferSize)){
-            byte[] tmp = {0};
-
-            public void write(int var1) throws IOException{
-                tmp[0] = (byte)(var1 & 255);
-                this.write(tmp, 0, 1);
-            }
-        });
+    public static FileHandle backupFileFor(FileHandle file){
+        return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(OutputStream os){
-        DataOutputStream stream;
+    public static void write(FileHandle file, StringMap tags){
+        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), tags);
+    }
 
-        try{
-            stream = new DataOutputStream(os);
-            getVersion().write(stream);
-            stream.close();
+    public static void write(FileHandle file){
+        write(file, null);
+    }
+
+    public static void write(OutputStream os, StringMap tags){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.write(header);
+            stream.writeInt(getVersion().version);
+            if(tags == null){
+                getVersion().write(stream);
+            }else{
+                getVersion().write(stream, tags);
+            }
         }catch(Exception e){
             throw new RuntimeException(e);
         }
     }
 
     public static void load(FileHandle file) throws SaveException{
+        load(file, world.context);
+    }
+
+    public static void load(FileHandle file, WorldContext context) throws SaveException{
         try{
             //try and load; if any exception at all occurs
-            load(new InflaterInputStream(file.read(bufferSize)));
+            load(new InflaterInputStream(file.read(bufferSize)), context);
         }catch(SaveException e){
             e.printStackTrace();
             FileHandle backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
-                load(new InflaterInputStream(backup.read(bufferSize)));
+                load(new InflaterInputStream(backup.read(bufferSize)), context);
             }else{
                 throw new SaveException(e.getCause());
             }
         }
     }
 
-    public static void load(InputStream is) throws SaveException{
-        try(DataInputStream stream = new DataInputStream(is)){
+    /** Loads from a deflated (!) input stream.*/
+    public static void load(InputStream is, WorldContext context) throws SaveException{
+        try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
+            readHeader(stream);
             int version = stream.readInt();
-            SaveFileVersion ver = versions.get(version);
+            SaveVersion ver = versions.get(version);
 
-            ver.read(stream);
+            ver.read(stream, counter, context);
         }catch(Exception e){
-            content.setTemporaryMapper(null);
             throw new SaveException(e);
+        }finally{
+            content.setTemporaryMapper(null);
         }
     }
 
-    public static SaveFileVersion getVersion(){
+    public static SaveVersion getVersion(){
         return versionArray.peek();
+    }
+
+    public static void readHeader(DataInput input) throws IOException{
+        byte[] bytes = new byte[header.length];
+        input.readFully(bytes);
+        if(!Arrays.equals(bytes, header)){
+            throw new IOException("Incorrect header! Expecting: " + Arrays.toString(header) + "; Actual: " + Arrays.toString(bytes));
+        }
     }
 
     public static class SaveException extends RuntimeException{

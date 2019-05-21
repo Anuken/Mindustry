@@ -146,8 +146,7 @@ public abstract class Turret extends Block{
     public void update(Tile tile){
         TurretEntity entity = tile.entity();
 
-        if(entity.target != null && entity.target.isDead())
-            entity.target = null;
+        if(!validateTarget(tile)) entity.target = null;
 
         entity.recoil = Mathf.lerpDelta(entity.recoil, 0f, restitution);
         entity.heat = Mathf.lerpDelta(entity.heat, 0f, cooldown);

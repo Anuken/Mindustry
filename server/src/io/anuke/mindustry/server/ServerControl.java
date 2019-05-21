@@ -235,7 +235,7 @@ public class ServerControl implements ApplicationListener{
             info("Loading map...");
 
             logic.reset();
-            state.rules = preset.get();
+            state.rules = preset.apply(result.rules());
             try{
                 world.loadMap(result);
                 logic.play();
@@ -355,6 +355,16 @@ public class ServerControl implements ApplicationListener{
             }catch(IllegalArgumentException ignored){
                 err("No such team exists.");
             }
+        });
+
+        handler.register("name", "[name...]", "Change the server display name.", arg -> {
+            if(arg.length == 0){
+                info("Server name is currently &lc'{0}'.", Core.settings.getString("servername"));
+                return;
+            }
+            Core.settings.put("servername", arg[0]);
+            Core.settings.save();
+            info("Server name is now &lc'{0}'.", arg[0]);
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
@@ -775,6 +785,8 @@ public class ServerControl implements ApplicationListener{
                             socketOutput = null;
                         }
                     }
+                }catch(BindException b){
+                    err("Command input socket already in use. Is another instance of the server running?");
                 }catch(IOException e){
                     err("Terminating socket server.");
                     e.printStackTrace();

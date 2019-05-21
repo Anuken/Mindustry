@@ -58,12 +58,6 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
-
-        //sometimes a map has no waves defined, they're defined in the zone rules
-        if(world.getMap().getWaves() != DefaultWaves.get() || !world.isZone()){
-            state.rules.spawns = world.getMap().getWaves();
-        }
-
         Events.fire(new PlayEvent());
     }
 
@@ -92,7 +86,7 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(state.rules.waves && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
         }else if(state.rules.attackMode){
@@ -165,15 +159,17 @@ public class Logic implements ApplicationListener{
                     Entities.update(groundEffectGroup);
                 }
 
-                for(EntityGroup group : unitGroups){
-                    Entities.update(group);
-                }
+                if(!state.isEditor()){
+                    for(EntityGroup group : unitGroups){
+                        Entities.update(group);
+                    }
 
-                Entities.update(puddleGroup);
-                Entities.update(shieldGroup);
-                Entities.update(bulletGroup);
-                Entities.update(tileGroup);
-                Entities.update(fireGroup);
+                    Entities.update(puddleGroup);
+                    Entities.update(shieldGroup);
+                    Entities.update(bulletGroup);
+                    Entities.update(tileGroup);
+                    Entities.update(fireGroup);
+                }
                 Entities.update(playerGroup);
 
                 //effect group only contains item transfers in the headless version, update it!
@@ -181,19 +177,21 @@ public class Logic implements ApplicationListener{
                     Entities.update(effectGroup);
                 }
 
-                for(EntityGroup group : unitGroups){
-                    if(group.isEmpty()) continue;
+                if(!state.isEditor()){
 
-                    collisions.collideGroups(bulletGroup, group);
+                    for(EntityGroup group : unitGroups){
+                        if(group.isEmpty()) continue;
+                        collisions.collideGroups(bulletGroup, group);
+                    }
+
+                    collisions.collideGroups(bulletGroup, playerGroup);
+                    collisions.collideGroups(playerGroup, playerGroup);
                 }
-
-                collisions.collideGroups(bulletGroup, playerGroup);
-                collisions.collideGroups(playerGroup, playerGroup);
 
                 world.pathfinder.update();
             }
 
-            if(!Net.client() && !world.isInvalidMap()){
+            if(!Net.client() && !world.isInvalidMap() && !state.isEditor()){
                 checkGameOver();
             }
         }

@@ -34,9 +34,9 @@ public class DiscordDialog extends Dialog{
             }).size(h).left();
 
             t.add("$discord").color(Pal.accent).growX().padLeft(10f);
-        }).size(470f, h).pad(10f);
+        }).size(440f, h).pad(10f);
 
-        buttons.defaults().size(170f, 50);
+        buttons.defaults().size(150f, 50);
 
         buttons.addButton("$back", this::hide);
         buttons.addButton("$copylink", () -> {

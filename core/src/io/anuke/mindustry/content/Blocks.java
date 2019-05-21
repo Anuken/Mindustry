@@ -30,7 +30,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, part, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
+    air, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
@@ -88,15 +88,9 @@ public class Blocks implements ContentList{
                 hasShadow = false;
             }
 
-            public void draw(Tile tile){
-            }
-
-            public void load(){
-            }
-
-            public void init(){
-            }
-
+            public void draw(Tile tile){}
+            public void load(){}
+            public void init(){}
             public boolean isHidden(){
                 return true;
             }
@@ -109,14 +103,24 @@ public class Blocks implements ContentList{
             }
         };
 
-        part = new BlockPart();
+        //create special blockpart variants
+        for(int dx = 0; dx < BlockPart.maxSize; dx++){
+            for(int dy = 0; dy < BlockPart.maxSize; dy++){
+                int fx = dx - BlockPart.maxSize/2, fy = dy - BlockPart.maxSize/2;
+                if(fx != 0 || fy != 0){
+                    new BlockPart(fx, fy);
+                }
+            }
+        }
 
-        spawn = new Block("spawn");
+        spawn = new OverlayFloor("spawn"){
+            public void draw(Tile tile){}
+        };
 
-        //Registers build blocks from size 1-6
+        //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= 6; i++){
-            new BuildBlock("build" + i);
+        for(int i = 1; i <= BuildBlock.maxSize; i++){
+            new BuildBlock(i);
         }
 
         deepwater = new Floor("deepwater"){{
@@ -556,7 +560,7 @@ public class Blocks implements ContentList{
             drawer = tile -> {
                 LiquidModule mod = tile.entity.liquids;
 
-                int rotation = rotate ? tile.getRotation() * 90 : 0;
+                int rotation = rotate ? tile.rotation() * 90 : 0;
 
                 Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy(), rotation);
 
@@ -1105,11 +1109,11 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 1000, Items.silicon, 600, Items.graphite, 800, Items.thorium, 200, Items.surgealloy, 500, Items.metaglass, 500));
             size = 4;
             health = 900;
-            powerProduction = 110f;
-            itemDuration = 60f;
+            powerProduction = 130f;
+            itemDuration = 90f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
-            consumes.liquid(Liquids.cryofluid, 0.26f);
+            consumes.liquid(Liquids.cryofluid, 0.25f);
         }};
 
         //endregion power
@@ -1147,7 +1151,7 @@ public class Blocks implements ContentList{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 60));
+            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 100));
             drillTime = 200;
             size = 4;
             drawRim = true;

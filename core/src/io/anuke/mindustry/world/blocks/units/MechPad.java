@@ -59,6 +59,7 @@ public class MechPad extends Block{
 
         if(!entity.cons.valid()) return;
         player.beginRespawning(entity);
+        entity.sameMech = false;
     }
 
     @Remote(called = Loc.server)
@@ -71,7 +72,7 @@ public class MechPad extends Block{
 
         if(entity.player == null) return;
         Mech mech = ((MechPad)tile.block()).mech;
-        entity.player.mech = entity.player.mech == mech ? Mechs.starter : mech;
+        entity.player.mech = !entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech;
 
         entity.progress = 0;
         entity.player.onRespawn(tile);
@@ -113,7 +114,7 @@ public class MechPad extends Block{
         Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy());
 
         if(entity.player != null){
-            TextureRegion region = (entity.player.mech == mech ? Mechs.starter.iconRegion : mech.iconRegion);
+            TextureRegion region = (!entity.sameMech && entity.player.mech == mech ? Mechs.starter.iconRegion : mech.iconRegion);
 
             Shaders.build.region = region;
             Shaders.build.progress = entity.progress;
@@ -162,6 +163,7 @@ public class MechPad extends Block{
 
     public class MechFactoryEntity extends TileEntity implements SpawnerTrait{
         Player player;
+        boolean sameMech;
         float progress;
         float time;
         float heat;
@@ -171,6 +173,7 @@ public class MechPad extends Block{
             if(player == null){
                 progress = 0f;
                 player = unit;
+                sameMech = true;
 
                 player.beginRespawning(this);
             }
@@ -178,13 +181,15 @@ public class MechPad extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(progress);
             stream.writeFloat(time);
             stream.writeFloat(heat);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             progress = stream.readFloat();
             time = stream.readFloat();
             heat = stream.readFloat();

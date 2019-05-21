@@ -1,12 +1,11 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.customMapDirectory;
 import static io.anuke.mindustry.Vars.world;
 
 public abstract class RandomGenerator extends Generator{
@@ -26,14 +25,13 @@ public abstract class RandomGenerator extends Generator{
                 block = Blocks.air;
                 ore = Blocks.air;
                 generate(x, y);
-                tiles[x][y] = new Tile(x, y, floor.id, block.id);
-                tiles[x][y].setOverlay(ore);
+                tiles[x][y] = new Tile(x, y, floor.id, ore.id, block.id);
             }
         }
 
         decorate(tiles);
 
-        world.setMap(new Map(customMapDirectory.child("generated"), 0, 0, new ObjectMap<>(), true));
+        world.setMap(new Map(new StringMap()));
     }
 
     public abstract void decorate(Tile[][] tiles);

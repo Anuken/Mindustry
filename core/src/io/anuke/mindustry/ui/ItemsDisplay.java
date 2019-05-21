@@ -13,6 +13,7 @@ import java.util.Locale;
 import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.data;
 
+/** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
     private static final NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
 

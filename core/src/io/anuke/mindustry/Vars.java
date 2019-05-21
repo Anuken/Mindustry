@@ -25,6 +25,8 @@ import java.util.Locale;
 
 @SuppressWarnings("unchecked")
 public class Vars{
+    /** Whether to load locales.*/
+    public static boolean loadLocales = true;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset */
@@ -38,9 +40,10 @@ public class Vars{
     /** URL for Github API for releases */
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     /** URL for Github API for contributors */
+    //TODO remove and replace with a manually updated list
     public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     /** URL for sending crash reports to */
-    public static final String crashReportURL = "http://mindustry.us.to/report";
+    public static final String crashReportURL = "http://mins.us.to/report";
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */
@@ -104,8 +107,10 @@ public class Vars{
     public static FileHandle customMapDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
+    /** old map file extension, for conversion */
+    public static final String oldMapExtension = "mmap";
     /** map file extension */
-    public static final String mapExtension = "mmap";
+    public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
 
@@ -141,19 +146,22 @@ public class Vars{
     public static void init(){
         Serialization.init();
 
-        //load locales
-        String[] stra = Core.files.internal("locales").readString().split("\n");
-        locales = new Locale[stra.length];
-        for(int i = 0; i < locales.length; i++){
-            String code = stra[i];
-            if(code.contains("_")){
-                locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
-            }else{
-                locales[i] = new Locale(code);
+        if(loadLocales){
+            //load locales
+            String[] stra = Core.files.internal("locales").readString().split("\n");
+            locales = new Locale[stra.length];
+            for(int i = 0; i < locales.length; i++){
+                String code = stra[i];
+                if(code.contains("_")){
+                    locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
+                }else{
+                    locales[i] = new Locale(code);
+                }
             }
+
+            Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         }
 
-        Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         Version.init();
 
         content = new ContentLoader();

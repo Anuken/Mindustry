@@ -18,7 +18,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Tile;
 
@@ -120,7 +120,7 @@ public class Control implements ApplicationListener{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != -1){
+            if(state.rules.zone != null){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null){
                     saves.getZoneSlot().delete();
@@ -201,8 +201,25 @@ public class Control implements ApplicationListener{
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
-            state.rules = rules;
             world.loadMap(map);
+            state.rules = rules;
+            logic.play();
+        });
+    }
+
+    public void playZone(Zone zone){
+        ui.loadAnd(() -> {
+            logic.reset();
+            world.loadGenerator(zone.generator);
+            state.rules = zone.rules.get();
+            state.rules.zone = zone;
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.getStartingItems()){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+            state.set(State.playing);
+            control.saves.zoneSave();
             logic.play();
         });
     }

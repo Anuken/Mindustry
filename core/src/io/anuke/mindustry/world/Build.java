@@ -10,7 +10,7 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
 import static io.anuke.mindustry.Vars.*;
@@ -25,7 +25,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.tile(x, y);
+        Tile tile = world.ltile(x, y);
         float prevPercent = 1f;
 
         //just in case
@@ -35,38 +35,15 @@ public class Build{
             prevPercent = tile.entity.healthf();
         }
 
-        tile = tile.target();
-
+        int rotation = tile.rotation();
         Block previous = tile.block();
+        Block sub = BuildBlock.get(previous.size);
 
-        Block sub = content.getByName(ContentType.block, "build" + previous.size);
-
-        tile.setBlock(sub);
+        world.setBlock(tile, sub, team, rotation);
         tile.<BuildEntity>entity().setDeconstruct(previous);
-        tile.setTeam(team);
         tile.entity.health = tile.entity.maxHealth() * prevPercent;
 
-        if(previous.isMultiblock()){
-            int offsetx = -(previous.size - 1) / 2;
-            int offsety = -(previous.size - 1) / 2;
-
-            for(int dx = 0; dx < previous.size; dx++){
-                for(int dy = 0; dy < previous.size; dy++){
-                    int worldx = dx + offsetx + tile.x;
-                    int worldy = dy + offsety + tile.y;
-                    if(!(worldx == tile.x && worldy == tile.y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
-                        }
-                    }
-                }
-            }
-        }
-
-        Tile ftile = tile;
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(ftile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
 
     /** Places a BuildBlock at this location. */
@@ -82,31 +59,10 @@ public class Build{
         if(tile == null) return;
 
         Block previous = tile.block();
+        Block sub = BuildBlock.get(result.size);
 
-        Block sub = content.getByName(ContentType.block, "build" + result.size);
-
-        tile.setBlock(sub, rotation);
+        world.setBlock(tile, sub, team, rotation);
         tile.<BuildEntity>entity().setConstruct(previous, result);
-        tile.setTeam(team);
-
-        if(result.isMultiblock()){
-            int offsetx = -(result.size - 1) / 2;
-            int offsety = -(result.size - 1) / 2;
-
-            for(int dx = 0; dx < result.size; dx++){
-                for(int dy = 0; dy < result.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-                    if(!(worldx == x && worldy == y)){
-                        Tile toplace = world.tile(worldx, worldy);
-                        if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
-                        }
-                    }
-                }
-            }
-        }
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
@@ -129,6 +85,7 @@ public class Build{
                 }
             }
         }
+
 
         Tile tile = world.tile(x, y);
 
@@ -166,7 +123,7 @@ public class Build{
             && (!tile.floor().isDeep() || type.floating)
             && tile.floor().placeableOn
             && ((type.canReplace(tile.block())
-            && !(type == tile.block() && rotation == tile.getRotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+            && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
             && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile);
         }
     }
@@ -195,9 +152,7 @@ public class Build{
 
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
-        Tile tile = world.tile(x, y);
-        if(tile != null) tile = tile.target();
-
+        Tile tile = world.ltile(x, y);
         return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
     }
 }

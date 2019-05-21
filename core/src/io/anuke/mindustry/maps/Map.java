@@ -1,23 +1,18 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectMap;
+import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.DefaultWaves;
-import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.MapIO;
-
-import static io.anuke.mindustry.Vars.world;
+import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.io.JsonIO;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
     public final boolean custom;
     /** Metadata. Author description, display name, etc. */
-    public final ObjectMap<String, String> tags;
+    public final StringMap tags;
     /** Base file of this map. File can be named anything at all. */
     public final FileHandle file;
     /** Format version. */
@@ -29,7 +24,7 @@ public class Map implements Comparable<Map>{
     /** Build that this map was created in. -1 = unknown or custom build. */
     public int build;
 
-    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom, int version, int build){
+    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version, int build){
         this.custom = custom;
         this.tags = tags;
         this.file = file;
@@ -39,26 +34,16 @@ public class Map implements Comparable<Map>{
         this.build = build;
     }
 
-    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom, int version){
+    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version){
         this(file, width, height, tags, custom, version, -1);
     }
 
-    public Map(FileHandle file, int width, int height, ObjectMap<String, String> tags, boolean custom){
-        this(file, width, height, tags, custom, MapIO.version);
+    public Map(FileHandle file, int width, int height, StringMap tags, boolean custom){
+        this(file, width, height, tags, custom, -1);
     }
 
-    public Array<SpawnGroup> getWaves(){
-        if(tags.containsKey("waves")){
-            try{
-                return world.maps.readWaves(tags.get("waves"));
-            }catch(Exception e){
-                Log.err("Malformed waves: {0}", tags.get("waves"));
-                e.printStackTrace();
-                return DefaultWaves.get();
-            }
-        }else{
-            return DefaultWaves.get();
-        }
+    public Map(StringMap tags){
+        this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
     public int getHightScore(){
@@ -68,6 +53,23 @@ public class Map implements Comparable<Map>{
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
         Vars.data.modified();
+    }
+
+    /** This creates a new instance.*/
+    public Rules rules(){
+        return JsonIO.read(Rules.class, tags.get("rules", "{}"));
+    }
+
+    /** Whether this map has a core of the enemy 'wave' team. Default: true.
+     * Used for checking Attack mode validity.*/
+    public boolean hasEnemyCore(){
+        return tags.get("enemycore", "true").equals("true");
+    }
+
+    /** Whether this map has a core of any team except the default player team. Default: true.
+     * Used for checking PvP mode validity.*/
+    public boolean hasOtherCores(){
+        return tags.get("othercore", "true").equals("true");
     }
 
     public String author(){

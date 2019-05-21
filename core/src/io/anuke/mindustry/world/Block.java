@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.annotations.Annotations.CallSuper;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
@@ -240,7 +241,7 @@ public class Block extends BlockStorage{
     }
 
     public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
+        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }
 
     public void drawTeam(Tile tile){
@@ -313,6 +314,7 @@ public class Block extends BlockStorage{
 
     /** Called after all blocks are created. */
     @Override
+    @CallSuper
     public void init(){
         //initialize default health based on size
         if(health == -1){
@@ -449,6 +451,10 @@ public class Block extends BlockStorage{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+    }
+
+    public Tile linked(Tile tile){
+        return tile;
     }
 
     public boolean isSolidFor(Tile tile){

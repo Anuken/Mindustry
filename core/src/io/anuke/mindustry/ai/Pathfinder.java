@@ -83,7 +83,7 @@ public class Pathfinder{
     }
 
     private boolean passable(Tile tile, Team team){
-        return (!tile.solid()) || (tile.breakable() && (tile.target().getTeam() != team));
+        return (!tile.solid()) || (tile.breakable() && (tile.getTeam() != team));
     }
 
     /**

@@ -85,10 +85,9 @@ public class MendProjector extends Block{
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
                     if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
 
-                    Tile other = world.tile(x, y);
+                    Tile other = world.ltile(x, y);
 
                     if(other == null) continue;
-                    other = other.target();
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
                         other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
@@ -149,12 +148,14 @@ public class MendProjector extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(heat);
             stream.writeFloat(phaseHeat);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }

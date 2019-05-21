@@ -9,7 +9,6 @@ import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.ButtonGroup;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Liquids;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -109,19 +108,21 @@ public class LiquidSource extends Block{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
         LiquidSourceEntity entity = tile.entity();
-        entity.source = liquid;
+        if(entity != null) entity.source = liquid;
     }
 
     class LiquidSourceEntity extends TileEntity{
         public Liquid source = null;
 
         @Override
-        public void writeConfig(DataOutput stream) throws IOException{
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeByte(source == null ? -1 : source.id);
         }
 
         @Override
-        public void readConfig(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             byte id = stream.readByte();
             source = id == -1 ? null : content.liquid(id);
         }

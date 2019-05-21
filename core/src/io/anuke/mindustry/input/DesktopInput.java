@@ -96,9 +96,8 @@ public class DesktopInput extends InputHandler{
 
             for(int x = dresult.x; x <= dresult.x2; x++){
                 for(int y = dresult.y; y <= dresult.y2; y++){
-                    Tile tile = world.tile(x, y);
+                    Tile tile = world.ltile(x, y);
                     if(tile == null || !validBreak(tile.x, tile.y)) continue;
-                    tile = tile.target();
 
                     Draw.color(Pal.removeBack);
                     Lines.square(tile.drawx(), tile.drawy() - 1, tile.block().size * tilesize / 2f - 1);
@@ -175,7 +174,7 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
-            cursor = cursor.target();
+            cursor = cursor.link();
 
             cursorType = cursor.block().getCursor(cursor);
 
@@ -257,7 +256,7 @@ public class DesktopInput extends InputHandler{
             }
 
             if(selected != null){
-                tryDropItems(selected.target(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                tryDropItems(selected.link(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
             mode = none;

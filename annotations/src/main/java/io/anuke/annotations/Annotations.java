@@ -4,12 +4,27 @@ import java.lang.annotation.*;
 
 public class Annotations{
 
-    @Target({ElementType.METHOD, ElementType.FIELD})
+    /** Indicates that a method should always call its super version. */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CallSuper{
+
+    }
+
+    /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class.*/
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OverrideCallSuper {
+    }
+
+    /** Indicates that a method return or field can be null.*/
+    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Nullable{
 
     }
 
+    /** Indicates that a method return or field cannot be null.*/
     @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NonNull{

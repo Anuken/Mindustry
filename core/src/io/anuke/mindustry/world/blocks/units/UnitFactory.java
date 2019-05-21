@@ -196,15 +196,15 @@ public class UnitFactory extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeFloat(buildTime);
-            stream.writeFloat(0f);
             stream.writeInt(spawned);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             buildTime = stream.readFloat();
-            stream.readFloat(); //unneeded information, will remove later
             spawned = stream.readInt();
         }
     }

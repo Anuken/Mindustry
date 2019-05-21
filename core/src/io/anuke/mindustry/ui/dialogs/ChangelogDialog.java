@@ -24,15 +24,17 @@ public class ChangelogDialog extends FloatingDialog{
 
         cont.add("$changelog.loading");
 
-        if(!ios && !OS.isMac){
-            Changelogs.getChangelog(result -> {
-                versions = result;
-                Core.app.post(this::setup);
-            }, t -> {
-                Log.err(t);
-                Core.app.post(this::setup);
-            });
-        }
+        shown(() -> {
+            if(!ios && !OS.isMac){
+                Changelogs.getChangelog(result -> {
+                    versions = result;
+                    Core.app.post(this::setup);
+                }, t -> {
+                    Log.err(t);
+                    Core.app.post(this::setup);
+                });
+            }
+        });
     }
 
     void setup(){

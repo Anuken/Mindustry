@@ -10,8 +10,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.modules.LiquidModule;
 
-import java.io.*;
-
 public class Conduit extends LiquidBlock{
     protected final int timerFlow = timers++;
 
@@ -62,17 +60,17 @@ public class Conduit extends LiquidBlock{
     }
 
     private boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
-        if(other != null) other = other.target();
+        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
+        if(other != null) other = other.link();
 
-        return other != null && other.block().hasLiquids && other.block().outputsLiquid && ((tile.getNearby(tile.getRotation()) == other) || (!other.block().rotate || other.getNearby(other.getRotation()) == tile));
+        return other != null && other.block().hasLiquids && other.block().outputsLiquid && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
     }
 
     @Override
     public void draw(Tile tile){
         ConduitEntity entity = tile.entity();
         LiquidModule mod = tile.entity.liquids;
-        int rotation = tile.getRotation() * 90;
+        int rotation = tile.rotation() * 90;
 
         Draw.colorl(0.34f);
         Draw.rect(botRegions[entity.blendbits], tile.drawx(), tile.drawy(), rotation);
@@ -91,7 +89,7 @@ public class Conduit extends LiquidBlock{
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.getRotation()), true, tile.entity.liquids.current());
+            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), true, tile.entity.liquids.current());
             entity.noSleep();
         }else{
             entity.sleep();
@@ -106,7 +104,7 @@ public class Conduit extends LiquidBlock{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.noSleep();
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.getRotation());
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.rotation());
     }
 
     @Override
@@ -119,15 +117,5 @@ public class Conduit extends LiquidBlock{
 
         byte blendbits;
         int blendshadowrot;
-
-        @Override
-        public void write(DataOutput stream) throws IOException{
-            stream.writeFloat(smoothLiquid);
-        }
-
-        @Override
-        public void read(DataInput stream) throws IOException{
-            smoothLiquid = stream.readFloat();
-        }
     }
 }

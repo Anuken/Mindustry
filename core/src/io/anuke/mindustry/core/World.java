@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.Nullable;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
@@ -18,8 +17,9 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,15 +28,20 @@ public class World implements ApplicationListener{
     public final BlockIndexer indexer = new BlockIndexer();
     public final WaveSpawner spawner = new WaveSpawner();
     public final Pathfinder pathfinder = new Pathfinder();
+    public final Context context = new Context();
 
     private Map currentMap;
     private Tile[][] tiles;
 
-    private Array<Tile> tempTiles = new Array<>();
     private boolean generating, invalidMap;
 
     public World(){
         maps.load();
+    }
+
+    @Override
+    public void init(){
+        maps.loadLegacyMaps();
     }
 
     @Override
@@ -97,12 +102,22 @@ public class World implements ApplicationListener{
         return tiles[x][y];
     }
 
+    public @Nullable Tile ltile(int x, int y){
+        Tile tile = tile(x, y);
+        if(tile == null) return null;
+        return tile.block().linked(tile);
+    }
+
     public Tile rawTile(int x, int y){
         return tiles[x][y];
     }
 
     public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public @Nullable Tile ltileWorld(float x, float y){
+        return ltile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
     public int toTile(float coord){
@@ -160,6 +175,8 @@ public class World implements ApplicationListener{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        prepareTiles(tiles);
+
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
@@ -188,24 +205,7 @@ public class World implements ApplicationListener{
     }
 
     public Zone getZone(){
-        return content.getByID(ContentType.zone, state.rules.zone);
-    }
-
-    public void playZone(Zone zone){
-        ui.loadAnd(() -> {
-            logic.reset();
-            state.rules = zone.rules.get();
-            state.rules.zone = zone.id;
-            loadGenerator(zone.generator);
-            for(Tile core : state.teams.get(defaultTeam).cores){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.entity.items.add(stack.item, stack.amount);
-                }
-            }
-            state.set(State.playing);
-            control.saves.zoneSave();
-            logic.play();
-        });
+        return state.rules.zone;
     }
 
     public void loadGenerator(Generator generator){
@@ -213,24 +213,14 @@ public class World implements ApplicationListener{
 
         createTiles(generator.width, generator.height);
         generator.generate(tiles);
-        prepareTiles(tiles);
 
         endMapLoad();
     }
 
     public void loadMap(Map map){
-        beginMapLoad();
-        this.currentMap = map;
 
         try{
-            createTiles(map.width, map.height);
-            for(int x = 0; x < map.width; x++){
-                for(int y = 0; y < map.height; y++){
-                    tiles[x][y] = new Tile(x, y);
-                }
-            }
-            MapIO.readTiles(map, tiles);
-            prepareTiles(tiles);
+            MapIO.loadMap(map);
         }catch(Exception e){
             Log.err(e);
             if(!headless){
@@ -242,7 +232,7 @@ public class World implements ApplicationListener{
             return;
         }
 
-        endMapLoad();
+        this.currentMap = map;
 
         invalidMap = false;
 
@@ -289,16 +279,7 @@ public class World implements ApplicationListener{
     }
 
     public void removeBlock(Tile tile){
-        if(!tile.block().isMultiblock() && !tile.isLinked()){
-            tile.setBlock(Blocks.air);
-        }else{
-            Tile target = tile.target();
-            Array<Tile> removals = target.getLinkedTiles(tempTiles);
-            for(Tile toremove : removals){
-                //note that setting a new block automatically unlinks it
-                if(toremove != null) toremove.setBlock(Blocks.air);
-            }
-        }
+        tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
     }
 
     public void setBlock(Tile tile, Block block, Team team){
@@ -318,22 +299,12 @@ public class World implements ApplicationListener{
                     if(!(worldx == tile.x && worldy == tile.y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
                         }
                     }
                 }
             }
         }
-    }
-
-    public int transform(int packed, int oldWidth, int oldHeight, int newWidth, int shiftX, int shiftY){
-        int x = packed % oldWidth;
-        int y = packed / oldWidth;
-        if(!Structs.inBounds(x, y, oldWidth, oldHeight)) return -1;
-        x += shiftX;
-        y += shiftY;
-        return y * newWidth + x;
     }
 
     /**
@@ -413,11 +384,6 @@ public class World implements ApplicationListener{
         }
     }
 
-    /** Loads raw map tile data into a Tile[][] array, setting up multiblocks, cliffs and ores. */
-    void loadTileData(Tile[][] tiles){
-        prepareTiles(tiles);
-    }
-
     public void addDarkness(Tile[][] tiles){
         byte[][] dark = new byte[tiles.length][tiles[0].length];
         byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
@@ -456,7 +422,7 @@ public class World implements ApplicationListener{
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
                 if(tile.block().solid && !tile.block().synthetic()){
-                    tiles[x][y].setRotation(dark[x][y]);
+                    tiles[x][y].rotation(dark[x][y]);
                 }
             }
         }
@@ -503,25 +469,47 @@ public class World implements ApplicationListener{
                     if(!(worldx == x && worldy == y)){
                         Tile toplace = world.tile(worldx, worldy);
                         if(toplace != null){
-                            toplace.setLinked((byte)(dx + offsetx), (byte)(dy + offsety));
-                            toplace.setTeam(team);
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
                         }
                     }
                 }
-            }
-        }
-
-        //update cliffs, occlusion data
-        for(int x = 0; x < tiles.length; x++){
-            for(int y = 0; y < tiles[0].length; y++){
-                Tile tile = tiles[x][y];
-
-                tile.updateOcclusion();
             }
         }
     }
 
     public interface Raycaster{
         boolean accept(int x, int y);
+    }
+
+    class Context implements WorldContext{
+        @Override
+        public Tile tile(int x, int y){
+            return tiles[x][y];
+        }
+
+        @Override
+        public void resize(int width, int height){
+            createTiles(width, height);
+        }
+
+        @Override
+        public Tile create(int x, int y, int floorID, int overlayID, int wallID){
+            return (tiles[x][y] = new Tile(x, y, floorID, overlayID, wallID));
+        }
+
+        @Override
+        public boolean isGenerating(){
+            return World.this.isGenerating();
+        }
+
+        @Override
+        public void begin(){
+            beginMapLoad();
+        }
+
+        @Override
+        public void end(){
+            endMapLoad();
+        }
     }
 }

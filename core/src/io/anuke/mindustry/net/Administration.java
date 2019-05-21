@@ -14,7 +14,8 @@ public class Administration{
 
     public Administration(){
         Core.settings.defaults(
-        "strict", true
+            "strict", true,
+            "servername", "Server"
         );
 
         load();
@@ -282,6 +283,18 @@ public class Administration{
         }
 
         public PlayerInfo(){
+        }
+    }
+
+    public static class TraceInfo{
+        public String ip, uuid;
+        public boolean modded, mobile;
+
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile){
+            this.ip = ip;
+            this.uuid = uuid;
+            this.modded = modded;
+            this.mobile = mobile;
         }
     }
 
