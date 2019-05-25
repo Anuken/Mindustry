@@ -170,10 +170,14 @@ public abstract class SaveVersion extends SaveFileReader{
             tile.setBlock(block);
 
             if(tile.entity != null){
-                readChunk(stream, true, in -> {
-                    byte version = in.readByte();
-                    tile.entity.read(in, version);
-                });
+                try{
+                    readChunk(stream, true, in -> {
+                        byte version = in.readByte();
+                        tile.entity.read(in, version);
+                    });
+                }catch(Exception e){
+                    throw new IOException("Failed to read tile entity of block: " + block, e);
+                }
             }else{
                 int consecutives = stream.readUnsignedByte();
 
