@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.IntSet;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
@@ -56,6 +57,7 @@ public class Floor extends Block{
     protected byte eq = 0;
     protected Array<Block> blenders = new Array<>();
     protected IntSet blended = new IntSet();
+    protected TextureRegion edgeRegion, edgierRegion;
 
     public Floor(String name){
         super(name);
@@ -82,6 +84,8 @@ public class Floor extends Block{
             edges = Core.atlas.find(name + "-edge").split(size, size);
         }
         region = variantRegions[0];
+        edgeRegion = Core.atlas.find("edge");
+        edgierRegion = Core.atlas.find("edgier");
     }
 
     @Override
@@ -140,13 +144,31 @@ public class Floor extends Block{
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.getNearby(point);
                 if(other != null && other.floor() == block){
-                    TextureRegion region = edge((Floor)block, type(i), 2 - (point.x + 1), 2 - (point.y + 1));
+                    TextureRegion region = edge((Floor)block, 2 - (point.x + 1), 2 - (point.y + 1));
                     Draw.rect(region, tile.worldx(), tile.worldy());
+
+                    if(!sameLayer && block.cacheLayer.ordinal() > cacheLayer.ordinal()){
+                        Draw.rect(block.variantRegions()[0], tile.worldx() + point.x*tilesize, tile.worldy() + point.y*tilesize);
+                    }
                 }
             }
         }
 
     }
+
+    //'new' style of edges with shadows instead of colors, not used currently
+    protected void drawEdgesFlat(Tile tile, boolean sameLayer){
+        for(int i = 0; i < 4; i++){
+            Tile other = tile.getNearby(i);
+            if(other != null && doEdge(other.floor(), sameLayer)){
+                Color color = other.floor().color;
+                Draw.color(color.r, color.g, color.b, 1f);
+                Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
+            }
+        }
+        Draw.color();
+    }
+
 
     protected TextureRegion[][] edges(){
         return ((Floor)blendGroup).edges;
@@ -160,28 +182,12 @@ public class Floor extends Block{
         return true;
     }
 
-    int type(int i){
-        if(!eq(i - 1) && !eq(i + 1)){
-            //case 0: touching
-            return 0;
-        }else if(eq(i - 1) && eq(i - 2) && eq(i + 1) && eq(i + 2)){
-            //case 2: surrounded
-            return 2;
-        }else if(eq(i - 1) && eq(i + 1)){
-            //case 1: flat
-            return 1;
-        }else{
-            //case 0 is rounded, so it's the safest choice, should work for most possibilities
-            return 0;
-        }
-    }
-
     boolean eq(int i){
         return (eq & (1 << Mathf.mod(i, 8))) != 0;
     }
 
-    TextureRegion edge(Floor block, int type, int x, int y){
-        return block.edges()[x + type * 3][2 - y];
+    TextureRegion edge(Floor block, int x, int y){
+        return block.edges()[x][2 - y];
     }
 
 }
