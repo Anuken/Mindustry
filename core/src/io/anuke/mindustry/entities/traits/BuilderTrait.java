@@ -165,7 +165,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             output.writeInt(Pos.get(request.x, request.y));
             output.writeFloat(request.progress);
             if(!request.breaking){
-                output.writeByte(request.block.id);
+                output.writeShort(request.block.id);
                 output.writeByte(request.rotation);
             }
         }else{
@@ -189,7 +189,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             if(type == 1){ //remove
                 request = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place
-                byte block = input.readByte();
+                short block = input.readShort();
                 byte rotation = input.readByte();
                 request = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
             }

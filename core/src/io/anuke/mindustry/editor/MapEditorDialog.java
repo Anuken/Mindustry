@@ -188,13 +188,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         shown(() -> {
-            //clear units, rules and other unnecessary stuff
-            logic.reset();
+
             saved = true;
             if(!Core.settings.getBool("landscape")) Platform.instance.beginForceLandscape();
             editor.clearOp();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
+                //clear units, rules and other unnecessary stuff
+                logic.reset();
                 state.rules = new Rules();
                 editor.beginEdit(200, 200);
             }
