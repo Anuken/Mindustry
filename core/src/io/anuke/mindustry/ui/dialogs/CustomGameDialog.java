@@ -12,7 +12,8 @@ import io.anuke.mindustry.ui.BorderImage;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class CustomGameDialog extends FloatingDialog{
+public class
+CustomGameDialog extends FloatingDialog{
     private MapPlayDialog dialog = new MapPlayDialog();
 
     public CustomGameDialog(){

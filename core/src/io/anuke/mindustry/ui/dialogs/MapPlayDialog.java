@@ -16,7 +16,7 @@ public class MapPlayDialog extends FloatingDialog{
     Difficulty difficulty = Difficulty.normal;
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    Gamemode selectedGamemode;
+    Gamemode selectedGamemode = Gamemode.survival;
 
     public MapPlayDialog(){
         super("");
@@ -27,6 +27,8 @@ public class MapPlayDialog extends FloatingDialog{
         title.setText(map.name());
         cont.clearChildren();
         rules = map.rules();
+
+        rules = selectedGamemode.apply(map.rules());
 
         Table selmode = new Table();
         selmode.add("$level.mode").colspan(4);
@@ -43,8 +45,8 @@ public class MapPlayDialog extends FloatingDialog{
             }
 
             modes.addButton(mode.toString(), "toggle", () -> {
-                selectedGamemode = selectedGamemode == mode ? null : mode;
-                rules = selectedGamemode == null ? map.rules() : mode.apply(map.rules());
+                selectedGamemode = mode;
+                rules = mode.apply(map.rules());
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f);
             if(i++ % 2 == 1) modes.row();
         }

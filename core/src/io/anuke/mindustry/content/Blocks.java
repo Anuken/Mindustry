@@ -114,6 +114,9 @@ public class Blocks implements ContentList{
         }
 
         spawn = new OverlayFloor("spawn"){
+            {
+                variants = 0;
+            }
             public void draw(Tile tile){}
         };
 

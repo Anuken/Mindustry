@@ -178,7 +178,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
 
-
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
@@ -221,6 +220,22 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("animatedshields", !mobile);
         graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false);
+
+        //TODO is this necessary?
+        /*
+        graphics.checkPref("linear", false, b -> {
+            for(Texture tex : Core.atlas.getTextures()){
+                TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
+                tex.setFilter(filter, filter);
+            }
+        });
+
+        if(Core.settings.getBool("linear")){
+            for(Texture tex : Core.atlas.getTextures()){
+                TextureFilter filter = TextureFilter.Linear;
+                tex.setFilter(filter, filter);
+            }
+        }*/
     }
 
     private void back(){
