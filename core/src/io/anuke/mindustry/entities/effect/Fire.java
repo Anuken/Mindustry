@@ -1,13 +1,11 @@
 package io.anuke.mindustry.entities.effect;
 
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.pooling.Pool.Poolable;
-import io.anuke.arc.util.pooling.Pools;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.impl.TimedEntity;
@@ -22,7 +20,7 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
+public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
     private static final IntMap<Fire> map = new IntMap<>();
     private static final float baseLifetime = 1000f, spreadChance = 0.05f, fireballChance = 0.07f;
 
@@ -36,6 +34,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     public Fire(){
     }
 
+    @Remote
+    public static void onRemoveFire(int fid){
+        fireGroup.removeByID(fid);
+    }
+
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(Net.client() || tile == null) return; //not clientside.
@@ -43,7 +46,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         Fire fire = map.get(tile.pos());
 
         if(fire == null){
-            fire = Pools.obtain(Fire.class, Fire::new);
+            fire = new Fire();
             fire.tile = tile;
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());
@@ -94,12 +97,12 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());
 
-        if(time >= lifetime() || tile == null){
-            remove();
+        if(Net.client()){
             return;
         }
 
-        if(Net.client()){
+        if(time >= lifetime() || tile == null){
+            remove();
             return;
         }
 
@@ -176,6 +179,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
 
         x = Pos.x(pos) * tilesize;
         y = Pos.y(pos) * tilesize;
+        tile = world.tile(pos);
     }
 
     @Override
@@ -184,6 +188,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
         tile = null;
         baseFlammability = -1;
         puddleFlammability = 0f;
+        incrementID();
     }
 
     @Override
@@ -198,9 +203,9 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait, Poolable{
     @Override
     public void removed(){
         if(tile != null){
+            Call.onRemoveFire(id);
             map.remove(tile.pos());
         }
-        reset();
     }
 
     @Override
