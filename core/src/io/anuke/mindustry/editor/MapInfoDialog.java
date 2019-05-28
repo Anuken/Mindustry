@@ -58,7 +58,7 @@ public class MapInfoDialog extends FloatingDialog{
 
         cont.row();
         cont.add("$editor.rules").padRight(8).left();
-        cont.addButton("$edit", () -> ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);;
+        cont.addButton("$edit", () -> ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);
 
         cont.row();
         cont.add("$editor.waves").padRight(8).left();
