@@ -795,7 +795,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     public boolean isShooting(){
-        return isShooting && (!isBoosting || mech.flying);
+        return isShooting && (!isBoosting || mech.flying) && mining == null;
     }
 
     public void updateRespawning(){
