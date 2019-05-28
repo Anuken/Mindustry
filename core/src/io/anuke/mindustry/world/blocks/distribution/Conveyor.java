@@ -406,7 +406,7 @@ public class Conveyor extends Block{
 
         static long packItem(Item item, float x, float y){
             short[] shorts = packShorts;
-            shorts[0] = (short)item.id;
+            shorts[0] = item.id;
             shorts[1] = (short)(x * Short.MAX_VALUE);
             shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);

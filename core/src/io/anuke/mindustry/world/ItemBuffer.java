@@ -25,7 +25,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time()), Pack.shortInt((short)item.id, data));
+        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time()), Pack.shortInt(item.id, data));
     }
 
     public void accept(Item item){
