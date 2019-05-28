@@ -240,13 +240,13 @@ public class MapEditor{
 
     public void undo(){
         if(stack.canUndo()){
-            stack.undo(this);
+            stack.undo();
         }
     }
 
     public void redo(){
         if(stack.canRedo()){
-            stack.redo(this);
+            stack.redo();
         }
     }
 
@@ -267,7 +267,7 @@ public class MapEditor{
     public void addTileOp(long data){
         if(loading) return;
 
-        if(currentOp == null) currentOp = new DrawOperation();
+        if(currentOp == null) currentOp = new DrawOperation(this);
         currentOp.addOperation(data);
 
         renderer.updatePoint(TileOp.x(data), TileOp.y(data));
