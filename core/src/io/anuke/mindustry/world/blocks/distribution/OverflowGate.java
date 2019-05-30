@@ -1,41 +1,56 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.BlockGroup;
 
-public class OverflowGate extends Router{
+import java.io.*;
+
+public class OverflowGate extends Block{
+    protected int bufferCapacity = 10;
+    protected float speed = 45f;
 
     public OverflowGate(String name){
         super(name);
         hasItems = true;
-        speed = 1f;
+        solid = true;
+        update = true;
+        group = BlockGroup.transportation;
     }
 
     @Override
     public void update(Tile tile){
-        SplitterEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.entity();
 
-        if(entity.lastItem == null && entity.items.total() > 0){
-            entity.items.clear();
-        }
-
-        if(entity.lastItem != null){
-            entity.time += 1f / speed * Time.delta();
-            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
-
-            if(target != null && (entity.time >= 1f)){
-                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
-                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
-                entity.items.remove(entity.lastItem, 1);
-                entity.lastItem = null;
+        for(int i = 0; i < 4; i++){
+            Item item = entity.buffer.poll(i);
+            if(item != null){
+                Tile other = getTileTarget(tile, item, tile.getNearby(i), true);
+                if(other != null && other.block().acceptItem(item, other, tile)){
+                    other.block().handleItem(item, other, tile);
+                    entity.buffer.remove(i);
+                }
             }
         }
     }
 
     @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        OverflowGateEntity entity = tile.entity();
+        return entity.buffer.accepts(tile.relativeTo(source.x, source.y));
+    }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        OverflowGateEntity entity = tile.entity();
+        int buffer = tile.relativeTo(source.x, source.y);
+        if(entity.buffer.accepts(buffer)){
+            entity.buffer.accept(buffer, item);
+        }
+    }
+
     Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
         int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
@@ -69,5 +84,33 @@ public class OverflowGate extends Router{
         }
 
         return to;
+    }
+
+    @Override
+    public TileEntity newEntity(){
+        return new OverflowGateEntity();
+    }
+
+    public class OverflowGateEntity extends TileEntity{
+        DirectionalItemBuffer buffer = new DirectionalItemBuffer(bufferCapacity, speed);
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+            buffer.write(stream);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            if(revision == 1){
+                buffer.read(stream);
+            }
+        }
     }
 }

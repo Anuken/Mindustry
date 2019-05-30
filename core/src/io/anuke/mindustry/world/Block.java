@@ -73,8 +73,6 @@ public class Block extends BlockStorage{
     public Layer layer2 = null;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
-    /** whether this block has instant transfer checking. used for calculations to prevent infinite loops. */
-    public boolean instantTransfer = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
