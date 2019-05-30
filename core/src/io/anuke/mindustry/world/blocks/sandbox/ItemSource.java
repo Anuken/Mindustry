@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
@@ -35,6 +36,11 @@ public class ItemSource extends Block{
         if(entity != null){
             entity.outputItem = item;
         }
+    }
+
+    @Override
+    public void playerPlaced(Tile tile){
+        Core.app.post(() -> Call.setItemSourceItem(null, tile, lastItem));
     }
 
     @Override

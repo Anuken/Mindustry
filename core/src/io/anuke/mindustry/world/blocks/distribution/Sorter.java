@@ -21,7 +21,7 @@ public class Sorter extends Block{
     private static Item lastItem;
 
     protected int bufferCapacity = 20;
-    protected float speed = 20f;
+    protected float speed = 45f;
 
     public Sorter(String name){
         super(name);
