@@ -62,7 +62,7 @@ public class ItemSource extends Block{
         if(entity.outputItem == null) return;
 
         Draw.color(entity.outputItem.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+        Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 

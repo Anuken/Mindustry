@@ -57,7 +57,7 @@ public class Sorter extends Block{
         if(entity.sortItem == null) return;
 
         Draw.color(entity.sortItem.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+        Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
