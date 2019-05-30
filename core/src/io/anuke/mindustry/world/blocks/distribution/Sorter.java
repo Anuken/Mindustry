@@ -92,7 +92,8 @@ public class Sorter extends Block{
         }
     }
 
-    @Nullable Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
+    @Nullable
+    Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
         SorterEntity entity = dest.entity();
 
         int dir = source.relativeTo(dest.x, dest.y);
@@ -146,6 +147,11 @@ public class Sorter extends Block{
         Item sortItem;
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeShort(sortItem == null ? -1 : sortItem.id);
@@ -156,7 +162,9 @@ public class Sorter extends Block{
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
             sortItem = content.item(stream.readShort());
-            buffer.read(stream);
+            if(revision == 1){
+                buffer.read(stream);
+            }
         }
     }
 }
