@@ -1302,8 +1302,8 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 15f;
-            range = 180f;
+            reload = 16f;
+            range = 175f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
@@ -1502,7 +1502,7 @@ public class Blocks implements ContentList{
             ammo(Items.graphite, Bullets.fuseShot);
             reload = 40f;
             shootShake = 4f;
-            range = 80f;
+            range = 110f;
             recoil = 5f;
             restitution = 0.1f;
             size = 3;

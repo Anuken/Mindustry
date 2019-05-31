@@ -559,7 +559,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 updateShooting(); //server simulates player shooting
             }
             return;
-        }else{
+        }else if(world.isZone()){
             //unlock mech when used
             data.unlockContent(mech);
         }

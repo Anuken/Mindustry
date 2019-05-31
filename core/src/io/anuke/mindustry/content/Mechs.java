@@ -51,10 +51,6 @@ public class Mechs implements ContentList{
                 player.healBy(Time.delta() * 0.09f);
             }
 
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
-            }
         };
 
         delta = new Mech("delta-mech", false){
@@ -239,6 +235,11 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
+            }
+
+            @Override
+            public boolean alwaysUnlocked(){
+                return true;
             }
         };
 
