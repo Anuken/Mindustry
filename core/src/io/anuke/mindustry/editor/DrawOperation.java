@@ -12,7 +12,12 @@ import static io.anuke.mindustry.Vars.content;
 import static io.anuke.mindustry.Vars.world;
 
 public class DrawOperation{
+    private MapEditor editor;
     private LongArray array = new LongArray();
+
+    public DrawOperation(MapEditor editor) {
+        this.editor = editor;
+    }
 
     public boolean isEmpty(){
         return array.isEmpty();
@@ -22,22 +27,22 @@ public class DrawOperation{
         array.add(op);
     }
 
-    public void undo(MapEditor editor){
+    public void undo(){
         for(int i = array.size - 1; i >= 0; i--){
-            updateTile(editor, i);
+            updateTile(i);
         }
     }
 
-    public void redo(MapEditor editor){
+    public void redo(){
         for(int i = 0; i < array.size; i++){
-            updateTile(editor, i);
+            updateTile(i);
         }
     }
 
-    private void updateTile(MapEditor editor, int i) {
+    private void updateTile(int i) {
         long l = array.get(i);
         array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), getTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
-        setTile(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
+        setTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
     }
 
     short getTile(Tile tile, byte type){
@@ -55,7 +60,7 @@ public class DrawOperation{
         throw new IllegalArgumentException("Invalid type.");
     }
 
-    void setTile(MapEditor editor, Tile tile, byte type, short to){
+    void setTile(Tile tile, byte type, short to){
         editor.load(() -> {
             if(type == OpType.floor.ordinal()){
                 tile.setFloor((Floor)content.block(to));
