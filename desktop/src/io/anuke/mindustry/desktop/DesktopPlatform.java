@@ -1,14 +1,11 @@
 package io.anuke.mindustry.desktop;
 
-import club.minnced.discord.rpc.DiscordEventHandlers;
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
+import club.minnced.discord.rpc.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
+import io.anuke.arc.function.Predicate;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
@@ -69,8 +66,8 @@ public class DesktopPlatform extends Platform{
     }
 
     @Override
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filter){
-        new FileChooser(text, file -> file.extension().equalsIgnoreCase(filter), open, cons).show();
+    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+        new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons).show();
     }
 
     @Override

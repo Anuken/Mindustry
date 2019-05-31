@@ -55,6 +55,9 @@ public class LegacyMapIO{
 
             //meta is uncompressed
             int version = stream.readInt();
+            if(version != 1){
+                throw new IOException("Outdated legacy map format");
+            }
             int build = stream.readInt();
             short width = stream.readShort(), height = stream.readShort();
             byte tagAmount = stream.readByte();

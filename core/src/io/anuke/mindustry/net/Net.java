@@ -6,8 +6,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.net.HttpRequestBuilder;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.gen.Call;
@@ -67,7 +66,7 @@ public class Net{
             }else if(error.equals("alreadyconnected")){
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
-                error = Core.bundle.get("error.any") + "\n" + t.getClass().getSimpleName() + "\n" + (t.getMessage() == null ? "" : t.getMessage());
+                error = Core.bundle.get("error.any") + "\n" + Strings.parseException(e, true);
             }
 
             ui.showText("", Core.bundle.format("connectfail", error));

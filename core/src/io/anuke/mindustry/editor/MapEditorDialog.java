@@ -21,9 +21,9 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.JsonIO;
-import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
@@ -93,14 +93,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
                 Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
-                    try{
-                        //TODO what if it's an image? users should be warned for their stupidity
-                        editor.beginEdit(MapIO.createMap(file, true));
-                    }catch(Exception e){
-                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                        Log.err(e);
-                    }
-                }), true, mapExtension),
+                    world.maps.tryCatchMapError(() -> {
+                        if(MapIO.isImage(file)){
+                            ui.showInfo("$editor.errorimage");
+                        }else if(file.extension().equalsIgnoreCase(oldMapExtension)){
+                            editor.beginEdit(world.maps.makeLegacyMap(file));
+                        }else{
+                            editor.beginEdit(MapIO.createMap(file, true));
+                        }
+                    });
+                }), true, FileChooser.anyMapFiles),
 
                 "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
                 Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
@@ -110,10 +112,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){
-                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
                         Log.err(e);
                     }
-                }), true, "png"))
+                }), true, FileChooser.pngFiles))
             );
 
             t.addImageTextButton("$editor.export", "icon-save-map", isize, () ->
@@ -127,11 +129,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             }
                             MapIO.writeMap(result, editor.createMap(result));
                         }catch(Exception e){
-                            ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, false)));
+                            ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
                             Log.err(e);
                         }
                     });
-                }, false, mapExtension));
+                }, false, FileChooser.mapFiles));
         });
 
         menu.cont.row();
@@ -158,7 +160,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             try{
                 editor.beginEdit(map);
             }catch(Exception e){
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
                 Log.err(e);
             }
         }));
@@ -336,7 +338,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 show();
             }catch(Exception e){
                 Log.err(e);
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
+                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
             }
         });
     }
