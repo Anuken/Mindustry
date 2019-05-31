@@ -943,7 +943,7 @@ public class Blocks implements ContentList{
             itemCapacity = 120;
             reloadTime = 200f;
             range = 440f;
-            consumes.power(2f);
+            consumes.power(1.75f);
         }};
 
         //endregion

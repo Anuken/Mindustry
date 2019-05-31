@@ -29,12 +29,21 @@ public class FileChooser extends FloatingDialog{
     private Predicate<FileHandle> filter;
     private Consumer<FileHandle> selectListener;
     private boolean open;
+    private int lastWidth = Core.graphics.getWidth(), lastHeight = Core.graphics.getHeight();
 
     public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
         super(title);
         this.open = open;
         this.filter = filter;
         this.selectListener = result;
+
+        update(() -> {
+            if(Core.graphics.getWidth() != lastWidth || Core.graphics.getHeight() != lastHeight){
+                updateFiles(false);
+                lastHeight = Core.graphics.getHeight();
+                lastWidth = Core.graphics.getWidth();
+            }
+        });
     }
 
     private void setupWidgets(){
@@ -266,14 +275,6 @@ public class FileChooser extends FloatingDialog{
             Core.scene.setScrollFocus(pane);
         });
         return this;
-    }
-
-    public void fileSelected(Consumer<FileHandle> listener){
-        this.selectListener = listener;
-    }
-
-    public interface FileHandleFilter{
-        boolean accept(FileHandle file);
     }
 
     public class FileHistory{
