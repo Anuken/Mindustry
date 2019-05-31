@@ -35,7 +35,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
-                health = 300f;
+                health = 250f;
 
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
@@ -75,7 +75,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("shockgun"){{
                     shake = 2f;
                     length = 1f;
-                    reload = 40f;
+                    reload = 45f;
                     shotDelay = 3f;
                     roundrobin = true;
                     shots = 2;
@@ -163,12 +163,12 @@ public class Mechs implements ContentList{
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
                 engineColor = Color.valueOf("feb380");
-                health = 300f;
+                health = 310f;
                 buildPower = 1.5f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
                     recoil = 4f;
-                    reload = 60f;
+                    reload = 50f;
                     shots = 4;
                     spacing = 8f;
                     inaccuracy = 8f;

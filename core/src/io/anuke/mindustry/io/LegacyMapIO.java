@@ -40,6 +40,8 @@ public class LegacyMapIO{
         for(int x = 0; x < map.width; x++){
             for(int y = 0; y < map.height; y++){
                 tiles[x][y] = new CachedTile();
+                tiles[x][y].x = (short)x;
+                tiles[x][y].y = (short)y;
             }
         }
         state.rules.spawns = groups;
