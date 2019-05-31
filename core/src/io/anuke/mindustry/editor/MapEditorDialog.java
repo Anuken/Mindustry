@@ -155,8 +155,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
-        loadDialog = new MapLoadDialog(map ->
-        ui.loadAnd(() -> {
+        loadDialog = new MapLoadDialog(map -> ui.loadAnd(() -> {
             try{
                 editor.beginEdit(map);
             }catch(Exception e){

@@ -1547,7 +1547,7 @@ public class Blocks implements ContentList{
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUse = 10f;
+            powerUse = 14f;
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
