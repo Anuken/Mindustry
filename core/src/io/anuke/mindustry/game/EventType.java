@@ -1,6 +1,5 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.Events.Event;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.Unit;
@@ -10,7 +9,7 @@ import io.anuke.mindustry.world.Tile;
 public class EventType{
 
     /** Called when a zone's requirements are met. */
-    public static class ZoneRequireCompleteEvent implements Event{
+    public static class ZoneRequireCompleteEvent{
         public final Zone zone, required;
 
         public ZoneRequireCompleteEvent(Zone zone, Zone required){
@@ -20,7 +19,7 @@ public class EventType{
     }
 
     /** Called when a zone's requirements are met. */
-    public static class ZoneConfigureCompleteEvent implements Event{
+    public static class ZoneConfigureCompleteEvent{
         public final Zone zone;
 
         public ZoneConfigureCompleteEvent(Zone zone){
@@ -29,23 +28,23 @@ public class EventType{
     }
 
     /** Called when the game is first loaded. */
-    public static class GameLoadEvent implements Event{
+    public static class GameLoadEvent{
 
     }
 
-    public static class PlayEvent implements Event{
+    public static class PlayEvent{
 
     }
 
-    public static class ResetEvent implements Event{
+    public static class ResetEvent{
 
     }
 
-    public static class WaveEvent implements Event{
+    public static class WaveEvent{
 
     }
 
-    public static class GameOverEvent implements Event{
+    public static class GameOverEvent{
         public final Team winner;
 
         public GameOverEvent(Team winner){
@@ -54,12 +53,12 @@ public class EventType{
     }
 
     /** Called when a game begins and the world is loaded. */
-    public static class WorldLoadEvent implements Event{
+    public static class WorldLoadEvent{
 
     }
 
     /** Called from the logic thread. Do not access graphics here! */
-    public static class TileChangeEvent implements Event{
+    public static class TileChangeEvent{
         public final Tile tile;
 
         public TileChangeEvent(Tile tile){
@@ -67,7 +66,7 @@ public class EventType{
         }
     }
 
-    public static class StateChangeEvent implements Event{
+    public static class StateChangeEvent{
         public final State from, to;
 
         public StateChangeEvent(State from, State to){
@@ -76,7 +75,7 @@ public class EventType{
         }
     }
 
-    public static class UnlockEvent implements Event{
+    public static class UnlockEvent{
         public final UnlockableContent content;
 
         public UnlockEvent(UnlockableContent content){
@@ -88,7 +87,7 @@ public class EventType{
      * Called when block building begins by placing down the BuildBlock.
      * The tile's block will nearly always be a BuildBlock.
      */
-    public static class BlockBuildBeginEvent implements Event{
+    public static class BlockBuildBeginEvent{
         public final Tile tile;
         public final Team team;
         public final boolean breaking;
@@ -100,7 +99,7 @@ public class EventType{
         }
     }
 
-    public static class BlockBuildEndEvent implements Event{
+    public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
         public final boolean breaking;
@@ -116,7 +115,7 @@ public class EventType{
      * Called when a player or drone begins building something.
      * This does not necessarily happen when a new BuildBlock is created.
      */
-    public static class BuildSelectEvent implements Event{
+    public static class BuildSelectEvent{
         public final Tile tile;
         public final Team team;
         public final BuilderTrait builder;
@@ -130,7 +129,7 @@ public class EventType{
         }
     }
 
-    public static class BlockDestroyEvent implements Event{
+    public static class BlockDestroyEvent{
         public final Tile tile;
 
         public BlockDestroyEvent(Tile tile){
@@ -138,7 +137,7 @@ public class EventType{
         }
     }
 
-    public static class UnitDestroyEvent implements Event{
+    public static class UnitDestroyEvent{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
@@ -146,7 +145,7 @@ public class EventType{
         }
     }
 
-    public static class ResizeEvent implements Event{
+    public static class ResizeEvent{
 
     }
 }
