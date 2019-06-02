@@ -499,19 +499,7 @@ public class Blocks implements ContentList{
                 GenericCrafterEntity entity = tile.entity();
 
                 Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
-
-                float progress = 0.5f;
-
-                Shaders.build.region = reg(weaveRegion);
-                Shaders.build.progress = progress;
-                Shaders.build.color.set(Pal.accent);
-                Shaders.build.color.a = entity.warmup;
-                Shaders.build.time = -entity.totalProgress / 10f;
-
-                Draw.shader(Shaders.build, false);
-                Shaders.build.apply();
                 Draw.rect(reg(weaveRegion), tile.drawx(), tile.drawy(), entity.totalProgress);
-                Draw.shader();
 
                 Draw.color(Pal.accent);
                 Draw.alpha(entity.warmup);
