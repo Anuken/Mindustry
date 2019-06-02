@@ -28,10 +28,10 @@ public enum Gamemode{
         rules.respawnTime = 60 * 10;
         rules.buildCostMultiplier = 0.5f;
         rules.buildSpeedMultiplier = 2f;
-        rules.playerDamageMultiplier = 0.45f;
-        rules.playerHealthMultiplier = 0.8f;
+        rules.playerDamageMultiplier = 0.33f;
+        rules.playerHealthMultiplier = 0.5f;
         rules.unitBuildSpeedMultiplier = 3f;
-        rules.unitHealthMultiplier = 2f;
+        rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
     }),
     editor(true, rules -> {

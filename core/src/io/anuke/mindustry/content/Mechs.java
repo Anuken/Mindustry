@@ -62,7 +62,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
-                health = 250f;
+                health = 150f;
                 buildPower = 0.9f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
@@ -159,12 +159,12 @@ public class Mechs implements ContentList{
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
                 engineColor = Color.valueOf("feb380");
-                health = 310f;
+                health = 320f;
                 buildPower = 1.5f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
                     recoil = 4f;
-                    reload = 50f;
+                    reload = 45f;
                     shots = 4;
                     spacing = 8f;
                     inaccuracy = 8f;
@@ -317,7 +317,7 @@ public class Mechs implements ContentList{
                 itemCapacity = 30;
                 engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
-                buildPower = 2f;
+                buildPower = 2.5f;
                 weapon = new Weapon("bomber"){{
                     length = 0f;
                     width = 2f;
@@ -330,7 +330,7 @@ public class Mechs implements ContentList{
                     velocityRnd = 1f;
                     inaccuracy = 20f;
                     ignoreRotation = true;
-                    bullet = new BombBulletType(14f, 25f, "shell"){{
+                    bullet = new BombBulletType(16f, 25f, "shell"){{
                         bulletWidth = 10f;
                         bulletHeight = 14f;
                         hitEffect = Fx.flakExplosion;
