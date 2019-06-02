@@ -233,7 +233,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             hide();
             //only reset the player; logic.reset() will clear entities, which we do not want
             player.reset();
-            state.rules = Gamemode.editor.apply(new Rules());
+            state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),
