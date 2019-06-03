@@ -296,7 +296,7 @@ public class NetServer implements ApplicationListener{
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        vector.limit(maxMove);
+        //vector.limit(maxMove);
 
         float prevx = player.x, prevy = player.y;
         player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
