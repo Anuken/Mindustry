@@ -55,7 +55,7 @@ class CodeAnalyzerTreeScanner extends TreePathScanner<Object, Trees> {
 	}
 
 	public boolean checkScope (Scope members) {
-		for (Symbol s : members.getElements()) {
+		for (Symbol s : members.getSymbols()) {
 			if (s instanceof MethodSymbol) {
 				MethodSymbol ms = (MethodSymbol) s;
 
