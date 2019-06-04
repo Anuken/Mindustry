@@ -39,6 +39,10 @@ public class Pathfinder{
         });
     }
 
+    public void updateSolid(Tile tile){
+        update(tile, tile.getTeam());
+    }
+
     public void update(){
         if(Net.client() || paths == null) return;
 
@@ -93,6 +97,10 @@ public class Pathfinder{
         //make sure team exists
         if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
             PathData path = paths[team.ordinal()];
+
+            if(!path.frontier.isEmpty()){
+                return;
+            }
 
             //impassable tiles have a weight of float.max
             if(!passable(tile, team)){
