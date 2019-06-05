@@ -181,12 +181,10 @@ task scaleSprites(){
 
     doLast{
         copy{
-            from "../core/assets-raw/sprites_replacement/"
+            from "../core/assets-raw/sprites/"
             into "../core/assets-raw/sprites_out/"
         }
     }
-
-    dependsOn 'scaleSprites4x'
 }
 
 task scaleImages(){
