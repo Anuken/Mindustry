@@ -258,6 +258,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void save(){
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
+        player.dead = true;
 
         if(name.isEmpty()){
             infoDialog.show();
