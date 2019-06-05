@@ -10,8 +10,7 @@ import io.anuke.mindustry.ImagePacker.GenRegion;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -283,7 +282,7 @@ public class Generators{
         });
 
         ImagePacker.generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor, floor -> {
+            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
 
                 if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
                     return;
