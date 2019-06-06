@@ -12,13 +12,13 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
-    private final WaveInfoDialog waveinfo;
-    private final CustomRulesDialog ruleinfo = new CustomRulesDialog();
+    private final WaveInfoDialog waveInfo;
+    private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
 
     public MapInfoDialog(MapEditor editor){
         super("$editor.mapinfo");
         this.editor = editor;
-        this.waveinfo = new WaveInfoDialog(editor);
+        this.waveInfo = new WaveInfoDialog(editor);
 
         addCloseButton();
 
@@ -58,11 +58,11 @@ public class MapInfoDialog extends FloatingDialog{
 
         cont.row();
         cont.add("$editor.rules").padRight(8).left();
-        cont.addButton("$edit", () -> ruleinfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);;
+        cont.addButton("$edit", () -> ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);;
 
         cont.row();
         cont.add("$editor.waves").padRight(8).left();
-        cont.addButton("$edit", waveinfo::show).left().width(200f);
+        cont.addButton("$edit", waveInfo::show).left().width(200f);
 
         name.change();
         description.change();

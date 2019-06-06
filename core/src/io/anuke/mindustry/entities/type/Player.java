@@ -559,7 +559,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 updateShooting(); //server simulates player shooting
             }
             return;
-        }else{
+        }else if(world.isZone()){
             //unlock mech when used
             data.unlockContent(mech);
         }
@@ -665,10 +665,10 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             attractDst = 0f;
 
             if(tapping){
-                velocity.setAngle(Mathf.slerpDelta(velocity.angle(), angleTo(moveTarget), 0.1f));
+                velocity.setAngle(angleTo(moveTarget));
             }
 
-            if(dst(moveTarget) < 2f){
+            if(dst(moveTarget) <= 2f * Time.delta()){
                 if(tapping){
                     Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
@@ -680,7 +680,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             moveTarget = null;
         }
 
-        movement.set(targetX - x, targetY - y).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
         movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
         if(dst(targetX, targetY) < attractDst){
@@ -795,7 +795,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     public boolean isShooting(){
-        return isShooting && (!isBoosting || mech.flying);
+        return isShooting && (!isBoosting || mech.flying) && mining == null;
     }
 
     public void updateRespawning(){

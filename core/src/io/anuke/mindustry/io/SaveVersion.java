@@ -71,6 +71,7 @@ public abstract class SaveVersion extends SaveFileReader{
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = DefaultWaves.get();
         Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
@@ -170,10 +171,14 @@ public abstract class SaveVersion extends SaveFileReader{
             tile.setBlock(block);
 
             if(tile.entity != null){
-                readChunk(stream, true, in -> {
-                    byte version = in.readByte();
-                    tile.entity.read(in, version);
-                });
+                try{
+                    readChunk(stream, true, in -> {
+                        byte version = in.readByte();
+                        tile.entity.read(in, version);
+                    });
+                }catch(Exception e){
+                    throw new IOException("Failed to read tile entity of block: " + block, e);
+                }
             }else{
                 int consecutives = stream.readUnsignedByte();
 

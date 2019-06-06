@@ -25,8 +25,7 @@ import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
 import static io.anuke.arc.scene.actions.Actions.*;
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.disableUI;
+import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
     private FreeTypeFontGenerator generator;
@@ -244,8 +243,17 @@ public class UI implements ApplicationListener{
     }
 
     public void showError(String text){
-        new Dialog("$error.title", "dialog"){{
-            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+        new Dialog("", "dialog"){{
+            setFillParent(true);
+            cont.add("$error.title");
+            cont.row();
+            cont.margin(15).pane(t -> {
+                Label l = t.add(text).pad(14f).get();
+                l.setAlignment(Align.center, Align.left);
+                if(mobile){
+                    t.getCell(l).wrap().width(400f);
+                }
+            });
             buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }

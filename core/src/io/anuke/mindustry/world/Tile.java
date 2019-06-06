@@ -439,6 +439,6 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass()));
+        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
     }
 }

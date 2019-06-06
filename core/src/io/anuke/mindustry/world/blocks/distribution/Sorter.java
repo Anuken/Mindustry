@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
@@ -10,8 +9,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.ItemSelection;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
@@ -22,11 +20,13 @@ import static io.anuke.mindustry.Vars.content;
 public class Sorter extends Block{
     private static Item lastItem;
 
+    protected int bufferCapacity = 20;
+    protected float speed = 45f;
+
     public Sorter(String name){
         super(name);
         update = true;
         solid = true;
-        instantTransfer = true;
         group = BlockGroup.transportation;
         configurable = true;
     }
@@ -57,24 +57,42 @@ public class Sorter extends Block{
         if(entity.sortItem == null) return;
 
         Draw.color(entity.sortItem.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+        Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, false);
+    public void update(Tile tile){
+        SorterEntity entity = tile.entity();
 
-        return to != null && to.block().acceptItem(item, to, tile);
+        for(int i = 0; i < 4; i++){
+            Item item = entity.buffer.poll(i);
+            if(item != null){
+                Tile other = getTileTarget(item, tile, tile.getNearby(i), true);
+                if(other != null && other.block().acceptItem(item, other, tile)){
+                    other.block().handleItem(item, other, tile);
+                    entity.buffer.remove(i);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        SorterEntity entity = tile.entity();
+        return entity.buffer.accepts(tile.relativeTo(source.x, source.y));
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        Tile to = getTileTarget(item, tile, source, true);
-
-        to.block().handleItem(item, to, tile);
+        SorterEntity entity = tile.entity();
+        int buffer = tile.relativeTo(source.x, source.y);
+        if(entity.buffer.accepts(buffer)){
+            entity.buffer.accept(buffer, item);
+        }
     }
 
+    @Nullable
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
         SorterEntity entity = dest.entity();
 
@@ -87,10 +105,8 @@ public class Sorter extends Block{
         }else{
             Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
             Tile b = dest.getNearby(Mathf.mod(dir + 1, 4));
-            boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
-            a.block().acceptItem(item, a, dest);
-            boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
-            b.block().acceptItem(item, b, dest);
+            boolean ac = a != null && a.block().acceptItem(item, a, dest);
+            boolean bc = b != null && b.block().acceptItem(item, b, dest);
 
             if(ac && !bc){
                 to = a;
@@ -101,12 +117,10 @@ public class Sorter extends Block{
             }else{
                 if(dest.rotation() == 0){
                     to = a;
-                    if(flip)
-                        dest.rotation((byte)1);
+                    if(flip) dest.rotation((byte)1);
                 }else{
                     to = b;
-                    if(flip)
-                        dest.rotation((byte)0);
+                    if(flip) dest.rotation((byte)0);
                 }
             }
         }
@@ -128,19 +142,29 @@ public class Sorter extends Block{
         return new SorterEntity();
     }
 
-    public static class SorterEntity extends TileEntity{
-        public Item sortItem;
+    public class SorterEntity extends TileEntity{
+        DirectionalItemBuffer buffer = new DirectionalItemBuffer(bufferCapacity, speed);
+        Item sortItem;
+
+        @Override
+        public byte version(){
+            return 1;
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeShort(sortItem == null ? -1 : sortItem.id);
+            buffer.write(stream);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
             sortItem = content.item(stream.readShort());
+            if(revision == 1){
+                buffer.read(stream);
+            }
         }
     }
 }

@@ -15,8 +15,6 @@ buildscript{
 }
 
 allprojects{
-    apply plugin: "idea"
-
     version = 'release'
 
     ext{

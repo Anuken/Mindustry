@@ -81,8 +81,8 @@ public class MechPad extends Block{
 
     protected static boolean checkValidTap(Tile tile, Player player){
         MechFactoryEntity entity = tile.entity();
-        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize / 2f &&
-        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize / 2f && entity.cons.valid() && entity.player == null;
+        return Math.abs(player.x - tile.drawx()) <= tile.block().size * tilesize &&
+        Math.abs(player.y - tile.drawy()) <= tile.block().size * tilesize && entity.cons.valid() && entity.player == null;
     }
 
     @Override

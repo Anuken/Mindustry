@@ -5,8 +5,7 @@ import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.IntQueue;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -38,6 +37,10 @@ public class Pathfinder{
 
             update(event.tile, event.tile.getTeam());
         });
+    }
+
+    public void updateSolid(Tile tile){
+        update(tile, tile.getTeam());
     }
 
     public void update(){
@@ -94,6 +97,10 @@ public class Pathfinder{
         //make sure team exists
         if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
             PathData path = paths[team.ordinal()];
+
+            if(!path.frontier.isEmpty()){
+                return;
+            }
 
             //impassable tiles have a weight of float.max
             if(!passable(tile, team)){

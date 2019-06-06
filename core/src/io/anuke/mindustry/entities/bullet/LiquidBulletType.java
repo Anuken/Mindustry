@@ -28,6 +28,7 @@ public class LiquidBulletType extends BulletType{
         statusDuration = 90f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
+        smokeEffect = Fx.none;
         shootEffect = Fx.none;
         drag = 0.009f;
         knockback = 0.55f;

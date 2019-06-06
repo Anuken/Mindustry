@@ -234,7 +234,7 @@ public class NetServer implements ApplicationListener{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
-        Log.info("&lc{0} has disconnected.", player.name);
+        Log.info("&lm[{1}] &lc{0} has disconnected.", player.name, player.uuid);
     }
 
     private static float compound(float speed, float drag){
@@ -248,16 +248,16 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
-    Player player,
-    int snapshotID,
-    float x, float y,
-    float pointerX, float pointerY,
-    float rotation, float baseRotation,
-    float xVelocity, float yVelocity,
-    Tile mining,
-    boolean boosting, boolean shooting, boolean chatting,
-    BuildRequest[] requests,
-    float viewX, float viewY, float viewWidth, float viewHeight
+        Player player,
+        int snapshotID,
+        float x, float y,
+        float pointerX, float pointerY,
+        float rotation, float baseRotation,
+        float xVelocity, float yVelocity,
+        Tile mining,
+        boolean boosting, boolean shooting, boolean chatting,
+        BuildRequest[] requests,
+        float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
@@ -296,7 +296,7 @@ public class NetServer implements ApplicationListener{
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        vector.limit(maxMove);
+        //vector.limit(maxMove);
 
         float prevx = player.x, prevy = player.y;
         player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
@@ -372,7 +372,7 @@ public class NetServer implements ApplicationListener{
         player.add();
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-        Log.info("&y{0} has connected.", player.name);
+        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
     }
 
     public boolean isWaitingForPlayers(){
