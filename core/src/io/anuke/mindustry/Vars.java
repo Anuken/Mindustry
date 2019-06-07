@@ -39,9 +39,6 @@ public class Vars{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for Github API for releases */
     public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
-    /** URL for Github API for contributors */
-    //TODO remove and replace with a manually updated list
-    public static final String contributorsURL = "https://api.github.com/repos/Anuken/Mindustry/contributors";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
     /** maximum distance between mine and core that supports automatic transferring */

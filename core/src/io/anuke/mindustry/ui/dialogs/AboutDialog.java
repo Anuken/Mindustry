@@ -1,35 +1,28 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.layout.Cell;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.Contributors;
-import io.anuke.mindustry.io.Contributors.Contributor;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
 
-import static io.anuke.mindustry.Vars.ios;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class AboutDialog extends FloatingDialog{
-    private Array<Contributor> contributors = new Array<>();
+    private Array<String> contributors = new Array<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "trello");
 
     public AboutDialog(){
         super("$about.button");
 
-        if(!ios){
-            shown(() -> Contributors.getContributors(out -> {
-                contributors = out;
-                Core.app.post(this::setup);
-            }, Throwable::printStackTrace));
-        }
+        shown(() -> {
+            contributors = Array.with(Core.files.internal("contributors").readString().split("\n"));
+            Core.app.post(this::setup);
+        });
 
         shown(this::setup);
         onResize(this::setup);
@@ -112,8 +105,8 @@ public class AboutDialog extends FloatingDialog{
             dialog.cont.pane(new Table(){{
                 int i = 0;
                 left();
-                for(Contributor c : contributors){
-                    add("[lightgray]" + c.login).left().pad(3).padLeft(6).padRight(6);
+                for(String c : contributors){
+                    add("[lightgray]" + c).left().pad(3).padLeft(6).padRight(6);
                     if(++i % 3 == 0){
                         row();
                     }

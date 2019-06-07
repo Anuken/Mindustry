@@ -435,7 +435,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         TargetTrait target = player.target;
 
         //draw targeting crosshair
-        if(target != null){
+        if(target != null && !state.isEditor()){
             if(target != lastTarget){
                 crosshairScale = 0f;
                 lastTarget = target;

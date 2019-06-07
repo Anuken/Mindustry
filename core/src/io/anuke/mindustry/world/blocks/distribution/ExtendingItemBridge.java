@@ -5,8 +5,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class ExtendingItemBridge extends ItemBridge{
 
@@ -27,8 +26,10 @@ public class ExtendingItemBridge extends ItemBridge{
         float ex = other.worldx() - tile.worldx() - Geometry.d4[i].x * tilesize / 2f,
         ey = other.worldy() - tile.worldy() - Geometry.d4[i].y * tilesize / 2f;
 
-        ex *= entity.uptime;
-        ey *= entity.uptime;
+        float uptime = state.isEditor() ? 1f : entity.uptime;
+
+        ex *= uptime;
+        ey *= uptime;
 
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
@@ -49,10 +50,10 @@ public class ExtendingItemBridge extends ItemBridge{
         Draw.color();
 
         for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * entity.uptime);
+            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime);
             Draw.rect(arrowRegion,
-            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * entity.uptime,
-            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * entity.uptime, i * 90f);
+            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * uptime,
+            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime, i * 90f);
         }
         Draw.reset();
     }

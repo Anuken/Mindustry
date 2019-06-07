@@ -7,6 +7,7 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.type.*;
 
+@SuppressWarnings("unused")
 public class JsonIO{
     private static Json json = new Json(){{
         setIgnoreUnknownFields(true);
@@ -40,6 +41,10 @@ public class JsonIO{
 
     public static String write(Object object){
         return json.toJson(object);
+    }
+
+    public static <T> T copy(T object){
+        return read((Class<T>)object.getClass(), write(object));
     }
 
     public static <T> T read(Class<T> type, String string){

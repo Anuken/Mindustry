@@ -9,20 +9,17 @@ import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.game.DefaultWaves;
-import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends FloatingDialog{
-    private final MapEditor editor;
     private final static int displayed = 20;
     private Array<SpawnGroup> groups;
 
@@ -33,15 +30,10 @@ public class WaveInfoDialog extends FloatingDialog{
 
     public WaveInfoDialog(MapEditor editor){
         super("$waves.title");
-        this.editor = editor;
 
         shown(this::setup);
         hidden(() -> {
-            if(groups == null){
-                editor.getTags().remove("waves");
-            }else{
-                editor.getTags().put("waves", world.maps.writeWaves(groups));
-            }
+            state.rules.spawns = groups;
         });
 
         keyDown(key -> {
@@ -73,7 +65,7 @@ public class WaveInfoDialog extends FloatingDialog{
             }).disabled(b -> Core.app.getClipboard().getContents() == null || Core.app.getClipboard().getContents().isEmpty());
             dialog.cont.row();
             dialog.cont.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
-                groups = null;
+                groups = JsonIO.copy(DefaultWaves.get());
                 buildGroups();
                 dialog.hide();
             }));
@@ -82,10 +74,9 @@ public class WaveInfoDialog extends FloatingDialog{
     }
 
     void setup(){
-        groups = world.maps.readWaves(editor.getTags().get("waves"));
+        groups = JsonIO.copy(state.rules.spawns);
 
         cont.clear();
-
         cont.table("clear", main -> {
             main.pane(t -> table = t).growX().growY().get().setScrollingDisabled(true, false);
             main.row();
@@ -237,8 +228,6 @@ public class WaveInfoDialog extends FloatingDialog{
         preview.clear();
         preview.top();
 
-        Array<SpawnGroup> groups = (this.groups == null ? DefaultWaves.get() : this.groups);
-
         for(int i = start; i < displayed + start; i++){
             int wave = i;
             preview.table("underline", table -> {
@@ -250,8 +239,6 @@ public class WaveInfoDialog extends FloatingDialog{
                 for(SpawnGroup spawn : groups){
                     spawned[spawn.type.id] += spawn.getUnitsSpawned(wave);
                 }
-
-                int f = 0;
 
                 for(int j = 0; j < spawned.length; j++){
                     if(spawned[j] > 0){
