@@ -12,7 +12,6 @@ public class JsonIO{
     private static Json json = new Json(){{
         setIgnoreUnknownFields(true);
         setElementType(Rules.class, "spawns", SpawnGroup.class);
-        setElementType(Rules.class, "startingItems", ItemStack.class);
 
         setSerializer(Zone.class, new Serializer<Zone>(){
             @Override

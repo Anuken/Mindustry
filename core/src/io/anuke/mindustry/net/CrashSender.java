@@ -100,19 +100,25 @@ public class CrashSender{
             ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
 
+            boolean[] sent = {false};
+
             Log.info("Sending crash report.");
             //post to crash report URL
             Net.http(Vars.crashReportURL, "POST", value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
+                sent[0] = true;
                 System.exit(1);
             }, t -> {
                 t.printStackTrace();
+                sent[0] = true;
                 System.exit(1);
             });
 
-            //sleep for 10 seconds or until crash report is sent
+            //sleep until report is sent
             try{
-                Thread.sleep(10000);
+                while(!sent[0]){
+                    Thread.sleep(30);
+                }
             }catch(InterruptedException ignored){
             }
         }catch(Throwable death){

@@ -7,6 +7,7 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.Player;
@@ -15,7 +16,6 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -66,9 +66,7 @@ public class Logic implements ApplicationListener{
             for(Team team : Team.all){
                 if(state.teams.isActive(team)){
                     for(Tile core : state.teams.get(team).cores){
-                        for(ItemStack stack : state.rules.startingItems){
-                            core.entity.items.add(stack.item, stack.amount);
-                        }
+                        core.entity.items.add(Items.copper, 200);
                     }
                 }
             }
