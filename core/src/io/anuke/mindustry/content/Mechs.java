@@ -9,6 +9,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.bullet.BombBulletType;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.ContentList;
@@ -34,7 +35,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
-                health = 300f;
+                health = 250f;
 
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
@@ -50,10 +51,6 @@ public class Mechs implements ContentList{
                 player.healBy(Time.delta() * 0.09f);
             }
 
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
-            }
         };
 
         delta = new Mech("delta-mech", false){
@@ -65,7 +62,7 @@ public class Mechs implements ContentList{
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
-                health = 250f;
+                health = 150f;
                 buildPower = 0.9f;
                 weaponOffsetX = -1;
                 weaponOffsetY = -1;
@@ -74,7 +71,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("shockgun"){{
                     shake = 2f;
                     length = 1f;
-                    reload = 40f;
+                    reload = 45f;
                     shotDelay = 3f;
                     roundrobin = true;
                     shots = 2;
@@ -162,12 +159,12 @@ public class Mechs implements ContentList{
                 weaponOffsetX = 1;
                 weaponOffsetY = 0;
                 engineColor = Color.valueOf("feb380");
-                health = 300f;
+                health = 320f;
                 buildPower = 1.5f;
                 weapon = new Weapon("swarmer"){{
                     length = 1.5f;
                     recoil = 4f;
-                    reload = 60f;
+                    reload = 45f;
                     shots = 4;
                     spacing = 8f;
                     inaccuracy = 8f;
@@ -239,6 +236,11 @@ public class Mechs implements ContentList{
                     bullet = Bullets.standardCopper;
                 }};
             }
+
+            @Override
+            public boolean alwaysUnlocked(){
+                return true;
+            }
         };
 
         javelin = new Mech("javelin-ship", true){
@@ -307,26 +309,34 @@ public class Mechs implements ContentList{
         trident = new Mech("trident-ship", true){
             {
                 drillPower = 2;
-                speed = 0.14f;
+                speed = 0.15f;
                 drag = 0.034f;
                 mass = 2.5f;
                 turnCursor = false;
-                health = 220f;
+                health = 250f;
                 itemCapacity = 30;
                 engineColor = Color.valueOf("84f491");
                 cellTrnsY = 1f;
-                buildPower = 2f;
+                buildPower = 2.5f;
                 weapon = new Weapon("bomber"){{
                     length = 0f;
                     width = 2f;
-                    reload = 8f;
+                    reload = 25f;
                     shots = 2;
+                    shotDelay = 1f;
+                    shots = 8;
                     roundrobin = true;
                     ejectEffect = Fx.none;
                     velocityRnd = 1f;
-                    inaccuracy = 40f;
+                    inaccuracy = 20f;
                     ignoreRotation = true;
-                    bullet = Bullets.bombExplosive;
+                    bullet = new BombBulletType(16f, 25f, "shell"){{
+                        bulletWidth = 10f;
+                        bulletHeight = 14f;
+                        hitEffect = Fx.flakExplosion;
+                        shootEffect = Fx.none;
+                        smokeEffect = Fx.none;
+                    }};
                 }};
             }
 

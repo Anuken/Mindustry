@@ -69,7 +69,7 @@ public class Conveyor extends Block{
     @Override
     public void draw(Tile tile){
         ConveyorEntity entity = tile.entity();
-        byte rotation = tile.getRotation();
+        byte rotation = tile.rotation();
 
         int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
@@ -125,11 +125,11 @@ public class Conveyor extends Block{
     }
 
     private boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.getRotation() - direction, 4));
-        if(other != null) other = other.target();
+        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
+        if(other != null) other = other.link();
 
         return other != null && other.block().outputsItems()
-        && ((tile.getNearby(tile.getRotation()) == other) || (!other.block().rotate || other.getNearby(other.getRotation()) == tile));
+        && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
     }
 
     @Override
@@ -141,7 +141,7 @@ public class Conveyor extends Block{
     public void drawLayer(Tile tile){
         ConveyorEntity entity = tile.entity();
 
-        byte rotation = tile.getRotation();
+        byte rotation = tile.rotation();
 
         try{
 
@@ -176,7 +176,7 @@ public class Conveyor extends Block{
         float speed = this.speed * tilesize / 2.4f;
         float centerSpeed = 0.1f;
         float centerDstScl = 3f;
-        float tx = Geometry.d4[tile.getRotation()].x, ty = Geometry.d4[tile.getRotation()].y;
+        float tx = Geometry.d4[tile.rotation()].x, ty = Geometry.d4[tile.rotation()].y;
 
         float centerx = 0f, centery = 0f;
 
@@ -197,7 +197,8 @@ public class Conveyor extends Block{
     public void update(Tile tile){
         ConveyorEntity entity = tile.entity();
         entity.minitem = 1f;
-        Tile next = tile.getNearby(tile.getRotation());
+        Tile next = tile.getNearby(tile.rotation());
+        if(next != null) next = next.link();
 
         float nextMax = next != null && next.block() instanceof Conveyor ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
@@ -231,7 +232,7 @@ public class Conveyor extends Block{
 
                     ItemPos ni = pos2.set(othere.convey.get(othere.lastInserted), ItemPos.updateShorts);
 
-                    if(next.getRotation() == tile.getRotation()){
+                    if(next.rotation() == tile.rotation()){
                         ni.x = pos.x;
                     }
                     othere.convey.set(othere.lastInserted, ni.pack());
@@ -290,7 +291,7 @@ public class Conveyor extends Block{
 
     @Override
     public void getStackOffset(Item item, Tile tile, Vector2 trns){
-        trns.trns(tile.getRotation() * 90 + 180f, tilesize / 2f);
+        trns.trns(tile.rotation() * 90 + 180f, tilesize / 2f);
     }
 
     @Override
@@ -314,15 +315,15 @@ public class Conveyor extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.getRotation());
+        int direction = source == null ? 0 : Math.abs(source.relativeTo(tile.x, tile.y) - tile.rotation());
         float minitem = tile.<ConveyorEntity>entity().minitem;
         return (((direction == 0) && minitem > itemSpace) ||
-        ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.getRotation() + 2) % 4 == tile.getRotation()));
+        ((direction % 2 == 1) && minitem > 0.52f)) && (source == null || !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation()));
     }
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        byte rotation = tile.getRotation();
+        byte rotation = tile.rotation();
 
         int ch = Math.abs(source.relativeTo(tile.x, tile.y) - rotation);
         int ang = ((source.relativeTo(tile.x, tile.y) - rotation));
@@ -367,6 +368,7 @@ public class Conveyor extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeInt(convey.size);
 
             for(int i = 0; i < convey.size; i++){
@@ -375,7 +377,8 @@ public class Conveyor extends Block{
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             convey.clear();
             int amount = stream.readInt();
             convey.ensureCapacity(Math.min(amount, 10));

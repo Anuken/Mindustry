@@ -7,14 +7,14 @@ import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.MapEditor;
-import io.anuke.mindustry.editor.MapGenerateDialog.DummyTile;
+import io.anuke.mindustry.editor.MapGenerateDialog.GenTile;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.blocks.Floor;
 
 public abstract class GenerateFilter{
-    protected float o = (float)(Math.random() * 10000000.0);
-    protected long seed;
-    protected GenerateInput in;
+    protected transient float o = (float)(Math.random() * 10000000.0);
+    protected transient long seed;
+    protected transient GenerateInput in;
 
     public FilterOption[] options;
 
@@ -88,12 +88,12 @@ public abstract class GenerateFilter{
             pnoise.setSeed((int)(filter.seed + 1));
         }
 
-        DummyTile tile(float x, float y){
+        GenTile tile(float x, float y){
             return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 
         public interface TileProvider{
-            DummyTile get(int x, int y);
+            GenTile get(int x, int y);
         }
     }
 }

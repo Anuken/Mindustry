@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
+import io.anuke.annotations.Annotations.Nullable;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.graphics.Color;
@@ -138,7 +139,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         byte team = stream.readByte();
         boolean dead = stream.readBoolean();
         float x = stream.readFloat();
@@ -150,7 +151,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         byte itemID = stream.readByte();
         short itemAmount = stream.readShort();
 
-        this.status.readSave(stream);
+        this.status.readSave(stream, version);
         this.item.amount = itemAmount;
         this.item.item = content.item(itemID);
         this.dead = dead;
@@ -221,7 +222,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
     }
 
-    public TileEntity getClosestCore(){
+    public @Nullable TileEntity getClosestCore(){
         TeamData data = state.teams.get(team);
 
         Tile tile = Geometry.findClosest(x, y, data.cores);
@@ -252,6 +253,16 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
             kill();
+        }
+
+        //apply knockback based on spawns
+        if(getTeam() != waveTeam){
+            float relativeSize = state.rules.dropZoneRadius + getSize()/2f + 1f;
+            for(Tile spawn : world.spawner.getGroundSpawns()){
+                if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
+                    velocity.add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                }
+            }
         }
 
         if(isFlying()){

@@ -130,7 +130,7 @@ public class Statuses implements Saveable{
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         for(StatusEntry effect : statuses){
             Pools.free(effect);
         }

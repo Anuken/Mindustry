@@ -58,7 +58,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                     if(isBreaking){
                         getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.getRotation(), entity.cblock));
+                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.rotation(), entity.cblock));
                     }
                 }
 
@@ -211,7 +211,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
         Events.on(BuildSelectEvent.class, event -> {
             EntityGroup<BaseUnit> group = unitGroups[event.team.ordinal()];
 
-            if(!(event.builder instanceof Player) || !(event.tile.entity instanceof BuildEntity)) return;
+            if(!(event.tile.entity instanceof BuildEntity)) return;
 
             for(BaseUnit unit : group.all()){
                 if(unit instanceof Drone){

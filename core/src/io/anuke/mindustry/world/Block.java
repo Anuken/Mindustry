@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world;
 
+import io.anuke.annotations.Annotations.CallSuper;
 import io.anuke.arc.Core;
 import io.anuke.arc.Graphics.Cursor;
 import io.anuke.arc.Graphics.Cursor.SystemCursor;
@@ -72,8 +73,6 @@ public class Block extends BlockStorage{
     public Layer layer2 = null;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
-    /** whether this block has instant transfer checking. used for calculations to prevent infinite loops. */
-    public boolean instantTransfer = false;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
@@ -104,6 +103,8 @@ public class Block extends BlockStorage{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BooleanProvider buildVisibility = () -> false;
+    /** Whether this block has instant transfer.*/
+    public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
 
     protected TextureRegion[] cacheRegions = {};
@@ -240,7 +241,7 @@ public class Block extends BlockStorage{
     }
 
     public void draw(Tile tile){
-        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.getRotation() * 90 : 0);
+        Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }
 
     public void drawTeam(Tile tile){
@@ -313,6 +314,7 @@ public class Block extends BlockStorage{
 
     /** Called after all blocks are created. */
     @Override
+    @CallSuper
     public void init(){
         //initialize default health based on size
         if(health == -1){
@@ -449,6 +451,10 @@ public class Block extends BlockStorage{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+    }
+
+    public Tile linked(Tile tile){
+        return tile;
     }
 
     public boolean isSolidFor(Tile tile){

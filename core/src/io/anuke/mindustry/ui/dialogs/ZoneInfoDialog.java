@@ -133,7 +133,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 ui.deploy.hide();
                 data.removeItems(zone.getLaunchCost());
                 hide();
-                world.playZone(zone);
+                control.playZone(zone);
             }
         }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 

@@ -80,7 +80,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, baseSize / 2f, baseSize / 2f);
+            Fill.rect(x + rx, y + ry, io.anuke.arc.scene.ui.layout.Unit.dp.scl(baseSize / 2f), io.anuke.arc.scene.ui.layout.Unit.dp.scl(baseSize / 2f));
         }
 
         Draw.color();
@@ -129,7 +129,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     private int colorFor(Tile tile){
-        tile = tile.target();
+        tile = tile.link();
         return MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam());
     }
 

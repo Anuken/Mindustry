@@ -2,7 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.mindustry.game.Content;
 
-//TODO implement-- should it even be content?
+//currently unimplemented, see trello for implementation plans
 public class WeatherEvent extends Content{
     public final String name;
 

@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
+import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
@@ -117,7 +118,7 @@ public class NetClient implements ApplicationListener{
     }
 
     //called on all clients
-    @Remote(called = Loc.server, targets = Loc.server)
+    @Remote(called = Loc.server, targets = Loc.server, variants = Variant.both)
     public static void sendMessage(String message, String sender, Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
@@ -156,6 +157,13 @@ public class NetClient implements ApplicationListener{
         Player player = playerGroup.getByID(id);
         if(name == null || player == null) return null;
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
+    }
+
+    @Remote(variants = Variant.one)
+    public static void onTraceInfo(Player player, TraceInfo info){
+        if(player != null){
+            ui.traces.show(player, info);
+        }
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)

@@ -31,7 +31,7 @@ public class ArcNetClient implements ClientProvider{
         handler = new ClientDiscoveryHandler(){
             @Override
             public DatagramPacket newDatagramPacket(){
-                return new DatagramPacket(new byte[128], 128);
+                return new DatagramPacket(new byte[256], 256);
             }
 
             @Override

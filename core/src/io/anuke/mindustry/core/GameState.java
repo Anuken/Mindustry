@@ -40,6 +40,10 @@ public class GameState{
         state = astate;
     }
 
+    public boolean isEditor(){
+        return rules.editor;
+    }
+
     public boolean isPaused(){
         return (is(State.paused) && !Net.active()) || (gameOver && !Net.active());
     }

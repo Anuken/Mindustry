@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Tmp;
 
-//TODO remove
 public class Shapes{
 
     public static void laser(String line, String edge, float x, float y, float x2, float y2, float scale){

@@ -90,15 +90,10 @@ public class ContentLoader{
         for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
-                if(id < 0) id += 256;
                 if(id != i){
                     throw new IllegalArgumentException("Out-of-order IDs for content '" + arr.get(i) + "' (expected " + i + " but got " + id + ")");
                 }
             }
-        }
-
-        if(blocks().size >= 256){
-            throw new ImpendingDoomException("THE TIME HAS COME. More than 256 blocks have been created.");
         }
 
         if(verbose){
@@ -129,7 +124,7 @@ public class ContentLoader{
     /** Loads block colors. */
     public void loadColors(){
         Pixmap pixmap = new Pixmap(files.internal("sprites/block_colors.png"));
-        for(int i = 0; i < 256; i++){
+        for(int i = 0; i < pixmap.getWidth(); i++){
             if(blocks().size > i){
                 int color = pixmap.getPixel(i, 0);
 
@@ -170,10 +165,12 @@ public class ContentLoader{
     }
 
     public <T extends Content> T getByID(ContentType type, int id){
-        //offset negative values by 256, as they are probably a product of byte overflow
-        if(id < 0) id += 256;
 
         if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
+            //-1 = invalid content
+            if(id < 0){
+                return null;
+            }
             if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
                 return getByID(type, 0); //default value is always ID 0
             }
@@ -242,11 +239,5 @@ public class ContentLoader{
         TypeTrait.registerType(Puddle.class, Puddle::new);
         TypeTrait.registerType(Bullet.class, Bullet::new);
         TypeTrait.registerType(Lightning.class, Lightning::new);
-    }
-
-    private class ImpendingDoomException extends RuntimeException{
-        ImpendingDoomException(String s){
-            super(s);
-        }
     }
 }

@@ -97,11 +97,10 @@ public class OverlayRenderer{
         //draw selected block bars and info
         if(input.block == null && !Core.scene.hasMouse()){
             Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Tile tile = world.tileWorld(vec.x, vec.y);
+            Tile tile = world.ltileWorld(vec.x, vec.y);
 
-            if(tile != null && tile.block() != Blocks.air && tile.target().getTeam() == player.getTeam()){
-                Tile target = tile.target();
-                target.block().drawSelect(target);
+            if(tile != null && tile.block() != Blocks.air && tile.getTeam() == player.getTeam()){
+                tile.block().drawSelect(tile);
             }
         }
 
@@ -113,8 +112,7 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
             Draw.reset();
 
-            Tile tile = world.tileWorld(v.x, v.y);
-            if(tile != null) tile = tile.target();
+            Tile tile = world.ltileWorld(v.x, v.y);
             if(tile != null && tile.interactable(player.getTeam()) && tile.block().acceptStack(player.item().item, player.item().amount, tile, player) > 0){
                 Draw.color(Pal.place);
                 Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Time.time(), 5f, 1f));

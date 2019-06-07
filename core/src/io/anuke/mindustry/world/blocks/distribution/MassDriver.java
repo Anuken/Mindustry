@@ -23,8 +23,6 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
@@ -80,7 +78,7 @@ public class MassDriver extends Block{
 
         //reload regardless of state
         if(entity.reload > 0f){
-            entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime);
+            entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime * entity.power.satisfaction);
         }
 
         //cleanup waiting shooters that are not valid
@@ -116,7 +114,7 @@ public class MassDriver extends Block{
             }
 
             //align to shooter rotation
-            entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed);
+            entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.power.satisfaction);
         }else if(entity.state == DriverState.shooting){
             //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
             if(!hasLink || !entity.waitingShooters.isEmpty()){
@@ -135,7 +133,7 @@ public class MassDriver extends Block{
                 other.waitingShooters.add(tile);
 
                 //align to target location
-                entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed);
+                entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
 
                 //fire when it's the first in the queue and angles are ready.
                 if(other.currentShooter() == tile &&
@@ -216,7 +214,8 @@ public class MassDriver extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.items.total() < itemCapacity;
+        //mass drivers that ouput only cannot accept items
+        return tile.entity.items.total() < itemCapacity && linkValid(tile);
     }
 
     @Override
@@ -323,13 +322,15 @@ public class MassDriver extends Block{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeInt(link);
             stream.writeFloat(rotation);
             stream.writeByte((byte)state.ordinal());
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             link = stream.readInt();
             rotation = stream.readFloat();
             state = DriverState.values()[stream.readByte()];

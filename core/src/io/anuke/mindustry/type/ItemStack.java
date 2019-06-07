@@ -1,14 +1,22 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.content.Items;
 
 public class ItemStack implements Comparable<ItemStack>{
     public Item item;
     public int amount;
 
     public ItemStack(Item item, int amount){
+        if(item == null) item = Items.copper;
         this.item = item;
         this.amount = amount;
+    }
+
+    //serialization only
+    public ItemStack(){
+        //prevent nulls.
+        item = Items.copper;
     }
 
     public boolean equals(ItemStack other){

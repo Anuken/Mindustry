@@ -41,15 +41,14 @@ void main() {
     vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
 	vec4 c = texture2D(u_texture, v_texCoord.xy);
-	bool outl = cont(t, v);
 
-    if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress && !outl){
+    if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress){
         c = vec4(0.0);
     }
 
     if(c.a > 0.01){
         float f = abs(sin(coords.x*2.0 + u_time));
-        if(f > 0.9 || outl)
+        if(f > 0.9)
             f = 1.0;
         else
             f = 0.0;

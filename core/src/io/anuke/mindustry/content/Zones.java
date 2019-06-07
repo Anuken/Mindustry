@@ -154,20 +154,6 @@ public class Zones implements ContentList{
             }};
         }};
 
-        /*
-        crags = new Zone("crags", new MapGenerator("groundZero", 1)){{ //TODO implement
-            baseLaunchCost = ItemStack.with(Items.copper, 300);
-            startingItems = ItemStack.with(Items.copper, 200);
-            conditionWave = 15;
-            zoneRequirements = new Zone[]{frozenForest};
-            blockRequirements = new Block[]{Blocks.copperWall};
-            rules = () -> new Rules(){{
-                waves = true;]
-                waveTimer = true;
-                waveSpacing = 60 * 80;
-            }};
-        }};*/
-
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
         .dist(0f, false)
         .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{

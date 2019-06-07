@@ -11,17 +11,57 @@ import io.anuke.mindustry.world.Tile;
  * They are made to share all properties from the linked tile/block.
  */
 public class BlockPart extends Block{
+    public final static int maxSize = 9;
+    private final static BlockPart[][] parts = new BlockPart[maxSize][maxSize];
 
-    public BlockPart(){
-        super("part");
+    private final int dx, dy;
+
+    public BlockPart(int dx, int dy){
+        super("part_" + dx + "_" + dy);
+        this.dx = dx;
+        this.dy = dy;
         solid = false;
         hasPower = hasItems = hasLiquids = true;
+        parts[dx + maxSize/2][dy + maxSize/2] = this;
+    }
+
+    public static BlockPart get(int dx, int dy){
+        if(dx == -maxSize/2 && dy == -maxSize/2) throw new IllegalArgumentException("Why are you getting a [0,0] blockpart? Stop it.");
+        return parts[dx + maxSize/2][dy + maxSize/2];
     }
 
     @Override
-    public void drawTeam(Tile tile){
-
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        return tile.link().block().acceptItem(item, tile.link(), source);
     }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        tile.link().block().handleItem(item, tile.link(), source);
+    }
+
+    @Override
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        Block block = tile.link().block();
+        block.handleLiquid(tile.link(), source, liquid, amount);
+    }
+
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        Block block = tile.link().block();
+        return block.hasLiquids && block.acceptLiquid(tile.link(), source, liquid, amount);
+    }
+
+    @Override
+    public Tile linked(Tile tile){
+        return tile.getNearby(-dx, -dy);
+    }
+
+    @Override
+    public void drawTeam(Tile tile){}
+
+    @Override
+    public void draw(Tile tile){}
 
     @Override
     public boolean synthetic(){
@@ -34,42 +74,9 @@ public class BlockPart extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
-        //do nothing
+    public String toString(){
+        return "BlockPart[" + dx + ", " + dy + "]";
     }
 
-    @Override
-    public boolean isSolidFor(Tile tile){
-        return tile.getLinked() == null
-        || (tile.getLinked().block() instanceof BlockPart || tile.getLinked().solid()
-        || tile.getLinked().block().isSolidFor(tile.getLinked()));
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        tile.getLinked().block().handleItem(item, tile.getLinked(), source);
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.getLinked().block().acceptItem(item, tile.getLinked(), source);
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        Block block = linked(tile);
-        return block.hasLiquids
-        && block.acceptLiquid(tile.getLinked(), source, liquid, amount);
-    }
-
-    @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        Block block = linked(tile);
-        block.handleLiquid(tile.getLinked(), source, liquid, amount);
-    }
-
-    private Block linked(Tile tile){
-        return tile.getLinked().block();
-    }
 
 }

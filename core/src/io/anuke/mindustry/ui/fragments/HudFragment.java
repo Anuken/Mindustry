@@ -4,29 +4,38 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-
-import java.lang.StringBuilder;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -131,8 +140,13 @@ public class HudFragment extends Fragment{
                 }
             });
 
-            cont.table(stuff -> {
-                stuff.left();
+            Table wavesMain, editorMain;
+
+            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(e -> wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight());
+
+            {
+                wavesMain.visible(() -> shown && !state.isEditor());
+                wavesMain.left();
                 Stack stack = new Stack();
                 TextButton waves = new TextButton("", "wave");
                 Table btable = new Table().margin(0);
@@ -142,17 +156,103 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                stuff.add(stack).width(dsize * 4 + 3f);
-                stuff.row();
-                stuff.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                wavesMain.add(stack).width(dsize * 4 + 3f);
+                wavesMain.row();
+                wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
-                stuff.row();
-            }).visible(() -> shown);
+                wavesMain.row();
+            }
+
+            {
+                editorMain.table("button-edge-4", t -> {
+                    //t.margin(0f);
+                    t.add("$editor.teams").growX().left();
+                    t.row();
+                    t.table(teams -> {
+                        teams.left();
+                        int i = 0;
+                        for(Team team : Team.all){
+                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> player.setTeam(team))
+                                .size(50f).margin(6f).get();
+                            button.getImageCell().grow();
+                            button.getStyle().imageUpColor = team.color;
+                            button.update(() -> button.setChecked(player.getTeam() == team));
+
+                            if(++i % 3 == 0){
+                                teams.row();
+                            }
+                        }
+                    }).left();
+
+                    t.row();
+                    t.addImageTextButton("$editor.spawn", "icon-add", 8*3, () -> {
+                        FloatingDialog dialog = new FloatingDialog("$editor.spawn");
+                        int i = 0;
+                        for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                            dialog.cont.addImageButton("white", 48, () -> {
+                                BaseUnit unit = type.create(player.getTeam());
+                                unit.set(player.x, player.y);
+                                unit.rotation = player.rotation;
+                                unit.add();
+                                //trigger the entity to become visible
+                                unitGroups[player.getTeam().ordinal()].updateEvents();
+                                collisions.updatePhysics( unitGroups[player.getTeam().ordinal()]);
+                                dialog.hide();
+                            }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                            if(++i % 4 == 0) dialog.cont.row();
+                        }
+                        dialog.addCloseButton();
+                        dialog.setFillParent(false);
+                        dialog.show();
+                    }).fillX();
+
+                    float[] size = {0};
+                    float[] position = {0, 0};
+
+                    t.row();
+                    t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8*3, () -> {
+
+                    }).fillX().update(b -> {
+                        boolean[] found = {false};
+                        if(b.isChecked()){
+                            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(e == null){
+                                Vector2 world = Core.input.mouseWorld();
+                                Units.nearby(world.x, world.y, 1f, 1f, unit -> {
+                                    if(!found[0] && unit instanceof BaseUnit){
+                                        if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                                            Effects.effect(Fx.spawn, unit);
+                                            unit.remove();
+                                            unitGroups[unit.getTeam().ordinal()].updateEvents();
+                                            collisions.updatePhysics(unitGroups[unit.getTeam().ordinal()]);
+                                        }
+                                        found[0] = true;
+                                        unit.hitbox(Tmp.r1);
+                                        size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width*2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
+                                        position[0] = unit.x;
+                                        position[1] = unit.y;
+                                    }
+                                });
+                                //TODO check for unit removal, remove unit if needed
+                            }
+                        }
+
+                        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                        Lines.poly(position[0], position[1], 4, size[0]/2f);
+                        Draw.reset();
+
+                        if(!found[0]){
+                            size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
+                        }
+                    });
+                }).width(dsize * 4 + 3f);
+                editorMain.visible(() -> shown && state.isEditor());
+            }
 
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 

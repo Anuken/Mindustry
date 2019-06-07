@@ -15,21 +15,7 @@ public enum EditorTool{
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
-            Tile tile = editor.tile(x, y);
-
-            byte link = tile.getLinkByte();
-
-            if(tile.isLinked()){
-                x -= (Pack.leftByte(link) - 8);
-                y -= (Pack.rightByte(link) - 8);
-
-                tile = editor.tile(x, y);
-            }
-
-            //do not.
-            if(tile.isLinked()){
-                return;
-            }
+            Tile tile = editor.tile(x, y).link();
 
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
@@ -64,7 +50,7 @@ public enum EditorTool{
 
         IntArray stack = new IntArray();
         Block dest;
-        boolean isfloor;
+        boolean isFloor;
         MapEditor data;
 
         public void touched(MapEditor editor, int x, int y){
@@ -78,16 +64,16 @@ public enum EditorTool{
             }
 
             data = editor;
-            isfloor = editor.drawBlock instanceof Floor;
+            isFloor = editor.drawBlock instanceof Floor;
 
             Block floor = tile.floor();
             Block block = tile.block();
             boolean synth = editor.drawBlock.synthetic();
 
             Block draw = editor.drawBlock;
-            dest = draw instanceof OverlayFloor ? tile.overlay() : isfloor ? floor : block;
+            dest = draw instanceof OverlayFloor ? tile.overlay() : isFloor ? floor : block;
 
-            if(dest == draw || block == Blocks.part || block.isMultiblock()){
+            if(dest == draw || block instanceof BlockPart || block.isMultiblock()){
                 return;
             }
 
@@ -99,7 +85,7 @@ public enum EditorTool{
             IntPositionConsumer writer = (px, py) -> {
                 Tile write = editor.tile(px, py);
 
-                if(isfloor){
+                if(isFloor){
                     if(alt && !(draw instanceof OverlayFloor)){
                         Block ore = write.overlay();
                         write.setFloor((Floor)draw);
@@ -116,7 +102,7 @@ public enum EditorTool{
                 }
 
                 if(draw.rotate){
-                    write.setRotation((byte)editor.rotation);
+                    write.rotation((byte)editor.rotation);
                 }
             };
 
@@ -181,7 +167,7 @@ public enum EditorTool{
         boolean eq(int px, int py){
             Tile tile = data.tile(px, py);
 
-            return (data.drawBlock instanceof OverlayFloor ? tile.overlay() : isfloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OverlayFloor && tile.floor().isLiquid);
+            return (data.drawBlock instanceof OverlayFloor ? tile.overlay() : isFloor ? tile.floor() : tile.block()) == dest && !(data.drawBlock instanceof OverlayFloor && tile.floor().isLiquid);
         }
     },
     spray{

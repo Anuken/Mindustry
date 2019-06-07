@@ -59,7 +59,7 @@ public class LiquidBridge extends ItemBridge{
 
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        if(tile.getTeam() != source.target().getTeam()) return false;
+        if(tile.getTeam() != source.getTeam()) return false;
 
         ItemBridgeEntity entity = tile.entity();
         Tile other = world.tile(entity.link);

@@ -9,9 +9,15 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.world;
 
 public class DrawOperation{
+    private MapEditor editor;
     private LongArray array = new LongArray();
+
+    public DrawOperation(MapEditor editor) {
+        this.editor = editor;
+    }
 
     public boolean isEmpty(){
         return array.isEmpty();
@@ -21,35 +27,51 @@ public class DrawOperation{
         array.add(op);
     }
 
-    public void undo(MapEditor editor){
+    public void undo(){
         for(int i = array.size - 1; i >= 0; i--){
-            long l = array.get(i);
-            set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.from(l));
+            updateTile(i);
         }
     }
 
-    public void redo(MapEditor editor){
+    public void redo(){
         for(int i = 0; i < array.size; i++){
-            long l = array.get(i);
-            set(editor, editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.to(l));
+            updateTile(i);
         }
     }
 
-    void set(MapEditor editor, Tile tile, byte type, byte to){
+    private void updateTile(int i) {
+        long l = array.get(i);
+        array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), getTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
+        setTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
+    }
+
+    short getTile(Tile tile, byte type){
+        if(type == OpType.floor.ordinal()){
+            return tile.floorID();
+        }else if(type == OpType.block.ordinal()){
+            return tile.blockID();
+        }else if(type == OpType.rotation.ordinal()){
+            return tile.rotation();
+        }else if(type == OpType.team.ordinal()){
+            return tile.getTeamID();
+        }else if(type == OpType.overlay.ordinal()){
+            return tile.overlayID();
+        }
+        throw new IllegalArgumentException("Invalid type.");
+    }
+
+    void setTile(Tile tile, byte type, short to){
         editor.load(() -> {
             if(type == OpType.floor.ordinal()){
                 tile.setFloor((Floor)content.block(to));
             }else if(type == OpType.block.ordinal()){
                 Block block = content.block(to);
-                tile.setBlock(block);
-                if(block.isMultiblock()){
-                    editor.updateLinks(block, tile.x, tile.y);
-                }
+                world.setBlock(tile, block, tile.getTeam(), tile.rotation());
             }else if(type == OpType.rotation.ordinal()){
-                tile.setRotation(to);
+                tile.rotation(to);
             }else if(type == OpType.team.ordinal()){
                 tile.setTeam(Team.all[to]);
-            }else if(type == OpType.ore.ordinal()){
+            }else if(type == OpType.overlay.ordinal()){
                 tile.setOverlayID(to);
             }
         });
@@ -61,8 +83,7 @@ public class DrawOperation{
         short x;
         short y;
         byte type;
-        byte from;
-        byte to;
+        short value;
     }
 
     public enum OpType{
@@ -70,6 +91,6 @@ public class DrawOperation{
         block,
         rotation,
         team,
-        ore
+        overlay
     }
 }

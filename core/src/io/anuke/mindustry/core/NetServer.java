@@ -12,8 +12,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.io.ByteBufferOutput;
-import io.anuke.arc.util.io.ReusableByteOutStream;
+import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Entities;
@@ -29,6 +28,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.world.Tile;
 
@@ -212,7 +212,7 @@ public class NetServer implements ApplicationListener{
 
     public void sendWorldData(Player player, int clientID){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DeflaterOutputStream def = new DeflaterOutputStream(stream);
+        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
         NetworkIO.writeWorld(player, def);
         WorldStream data = new WorldStream();
         data.stream = new ByteArrayInputStream(stream.toByteArray());
@@ -234,7 +234,7 @@ public class NetServer implements ApplicationListener{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
-        Log.info("&lc{0} has disconnected.", player.name);
+        Log.info("&lm[{1}] &lc{0} has disconnected.", player.name, player.uuid);
     }
 
     private static float compound(float speed, float drag){
@@ -248,16 +248,16 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
-    Player player,
-    int snapshotID,
-    float x, float y,
-    float pointerX, float pointerY,
-    float rotation, float baseRotation,
-    float xVelocity, float yVelocity,
-    Tile mining,
-    boolean boosting, boolean shooting, boolean chatting,
-    BuildRequest[] requests,
-    float viewX, float viewY, float viewWidth, float viewHeight
+        Player player,
+        int snapshotID,
+        float x, float y,
+        float pointerX, float pointerY,
+        float rotation, float baseRotation,
+        float xVelocity, float yVelocity,
+        Tile mining,
+        boolean boosting, boolean shooting, boolean chatting,
+        BuildRequest[] requests,
+        float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection connection = player.con;
         if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
@@ -289,14 +289,14 @@ public class NetServer implements ApplicationListener{
             //auto-skip done requests
             if(req.breaking && tile.block() == Blocks.air){
                 continue;
-            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.getRotation() == req.rotation)){
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
             }
             player.getPlaceQueue().addLast(req);
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        vector.limit(maxMove);
+        //vector.limit(maxMove);
 
         float prevx = player.x, prevy = player.y;
         player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
@@ -355,11 +355,11 @@ public class NetServer implements ApplicationListener{
             netServer.kick(other.con.id, KickReason.kick);
             Log.info("&lc{0} has kicked {1}.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            //TODO implement
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
             if(player.con != null){
-                //Call.onTraceInfo(player.con.id, other.con.trace);
+                Call.onTraceInfo(player.con.id, other, info);
             }else{
-                //NetClient.onTraceInfo(other.con.trace);
+                NetClient.onTraceInfo(other, info);
             }
             Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
         }
@@ -372,7 +372,7 @@ public class NetServer implements ApplicationListener{
         player.add();
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-        Log.info("&y{0} has connected.", player.name);
+        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
     }
 
     public boolean isWaitingForPlayers(){
@@ -478,7 +478,7 @@ public class NetServer implements ApplicationListener{
 
                 sent++;
 
-                if(syncStream.position() > maxSnapshotSize){
+                if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
                     byte[] syncBytes = syncStream.toByteArray();
                     Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));

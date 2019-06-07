@@ -41,7 +41,7 @@ public class LiquidJunction extends LiquidBlock{
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         int dir = source.relativeTo(tile.x, tile.y);
         dir = (dir + 4) % 4;
-        Tile to = tile.getNearby(dir).target();
+        Tile to = tile.getNearby(dir).link();
 
         if(to.block().hasLiquids && to.block().acceptLiquid(to, tile, liquid, amount)){
             to.block().handleLiquid(to, tile, liquid, amount);
@@ -54,7 +54,7 @@ public class LiquidJunction extends LiquidBlock{
         dir = (dir + 4) % 4;
         Tile to = dest.getNearby(dir);
         if(to == null) return false;
-        to = to.target();
+        to = to.link();
         return to != null && to.entity != null && to.block().hasLiquids && to.block().acceptLiquid(to, dest, liquid, amount);
     }
 }

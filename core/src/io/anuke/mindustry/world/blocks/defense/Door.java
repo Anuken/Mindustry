@@ -16,6 +16,8 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
+import static io.anuke.mindustry.Vars.world;
+
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();
 
@@ -68,6 +70,7 @@ public class Door extends Wall{
         }
 
         entity.open = !entity.open;
+        world.pathfinder.updateSolid(tile);
         if(!entity.open){
             Effects.effect(closefx, tile.drawx(), tile.drawy());
         }else{
@@ -85,11 +88,13 @@ public class Door extends Wall{
 
         @Override
         public void write(DataOutput stream) throws IOException{
+            super.write(stream);
             stream.writeBoolean(open);
         }
 
         @Override
-        public void read(DataInput stream) throws IOException{
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
             open = stream.readBoolean();
         }
     }

@@ -2,21 +2,43 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Edges;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.BlockGroup;
 
-public class OverflowGate extends Router{
+import java.io.*;
+
+public class OverflowGate extends Block{
+    protected float speed = 8f;
 
     public OverflowGate(String name){
         super(name);
         hasItems = true;
-        speed = 1f;
+        solid = true;
+        update = true;
+        group = BlockGroup.transportation;
     }
 
     @Override
+    public boolean outputsItems(){
+        return true;
+    }
+
+    @Override
+    public int removeStack(Tile tile, Item item, int amount){
+        OverflowGateEntity entity = tile.entity();
+        int result = super.removeStack(tile, item, amount);
+        if(result != 0 && item == entity.lastItem){
+            entity.lastItem = null;
+        }
+        return result;
+    }
+
+
+    @Override
     public void update(Tile tile){
-        SplitterEntity entity = tile.entity();
+        OverflowGateEntity entity = tile.entity();
 
         if(entity.lastItem == null && entity.items.total() > 0){
             entity.items.clear();
@@ -36,6 +58,21 @@ public class OverflowGate extends Router{
     }
 
     @Override
+    public boolean acceptItem(Item item, Tile tile, Tile source){
+        OverflowGateEntity entity = tile.entity();
+
+        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
+    }
+
+    @Override
+    public void handleItem(Item item, Tile tile, Tile source){
+        OverflowGateEntity entity = tile.entity();
+        entity.items.add(item, 1);
+        entity.lastItem = item;
+        entity.time = 0f;
+        entity.lastInput = source;
+    }
+
     Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
         int from = tile.relativeTo(src.x, src.y);
         if(from == -1) return null;
@@ -58,16 +95,45 @@ public class OverflowGate extends Router{
             }else if(bc && !ac){
                 to = b;
             }else{
-                if(tile.getDump() == 0){
+                if(tile.rotation() == 0){
                     to = a;
-                    if(flip) tile.setDump((byte)1);
+                    if(flip) tile.rotation((byte) 1);
                 }else{
                     to = b;
-                    if(flip) tile.setDump((byte)0);
+                    if(flip) tile.rotation((byte) 0);
                 }
             }
         }
 
         return to;
+    }
+
+    @Override
+    public TileEntity newEntity(){
+        return new OverflowGateEntity();
+    }
+
+    public class OverflowGateEntity extends TileEntity{
+        Item lastItem;
+        Tile lastInput;
+        float time;
+
+        @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
+        public void write(DataOutput stream) throws IOException{
+            super.write(stream);
+        }
+
+        @Override
+        public void read(DataInput stream, byte revision) throws IOException{
+            super.read(stream, revision);
+            if(revision == 1){
+                new DirectionalItemBuffer(25, 0f).read(stream);
+            }
+        }
     }
 }

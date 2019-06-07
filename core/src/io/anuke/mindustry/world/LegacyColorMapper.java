@@ -18,7 +18,7 @@ public class LegacyColorMapper implements ContentList{
     public void load(){
         defaultValue = new LegacyBlock(Blocks.stone, Blocks.air);
 
-        map("ff0000", Blocks.stone, Blocks.spawn);
+        map("ff0000", Blocks.stone, Blocks.air, Blocks.spawn);
         map("00ff00", Blocks.stone);
         map("323232", Blocks.stone);
         map("646464", Blocks.stone, Blocks.rocks);
@@ -60,9 +60,7 @@ public class LegacyColorMapper implements ContentList{
         public final Block ore;
 
         public LegacyBlock(Block floor, Block wall){
-            this.floor = (Floor)floor;
-            this.wall = wall;
-            this.ore = null;
+            this(floor, wall, Blocks.air);
         }
 
         public LegacyBlock(Block floor, Block wall, Block ore){

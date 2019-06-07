@@ -432,7 +432,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             if(getCurrentRequest() == request && request.progress > 0.001f) continue;
 
             if(request.breaking){
-                Block block = world.tile(request.x, request.y).target().block();
+                Block block = world.ltile(request.x, request.y).block();
 
                 //draw removal request
                 Lines.stroke(2f, Pal.removeBack);
@@ -559,7 +559,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 updateShooting(); //server simulates player shooting
             }
             return;
-        }else{
+        }else if(world.isZone()){
             //unlock mech when used
             data.unlockContent(mech);
         }
@@ -636,13 +636,22 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     protected void updateShooting(){
-        if(isShooting() && mech.canShoot(this)){
-            mech.weapon.update(this, pointerX, pointerY);
+        if(!state.isEditor() && isShooting() && mech.canShoot(this)){
+            if(!mech.turnCursor){
+                //shoot forward ignoring cursor
+                mech.weapon.update(this, x + Angles.trnsx(rotation, 1f), y + Angles.trnsy(rotation, 1f));
+            }else{
+                mech.weapon.update(this, pointerX, pointerY);
+            }
         }
     }
 
     protected void updateFlying(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && ((TileEntity)target).isAdded() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+            target = null;
+        }
+
+        if(state.isEditor()){
             target = null;
         }
 
@@ -656,10 +665,10 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             attractDst = 0f;
 
             if(tapping){
-                velocity.setAngle(Mathf.slerpDelta(velocity.angle(), angleTo(moveTarget), 0.1f));
+                velocity.setAngle(angleTo(moveTarget));
             }
 
-            if(dst(moveTarget) < 2f){
+            if(dst(moveTarget) <= 2f * Time.delta()){
                 if(tapping){
                     Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
@@ -671,7 +680,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             moveTarget = null;
         }
 
-        movement.set(targetX - x, targetY - y).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
         movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
         if(dst(targetX, targetY) < attractDst){
@@ -778,6 +787,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         moveTarget = null;
         spawner = lastSpawner = null;
         health = maxHealth();
+        mining = null;
         boostHeat = drownTime = hitTime = 0f;
         mech = Mechs.starter;
         placeQueue.clear();
@@ -785,12 +795,16 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     public boolean isShooting(){
-        return isShooting && (!isBoosting || mech.flying);
+        return isShooting && (!isBoosting || mech.flying) && mining == null;
     }
 
     public void updateRespawning(){
 
-        if(spawner != null && spawner.isValid()){
+        if(state.isEditor()){
+            //instant respawn at center of map.
+            set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            setDead(false);
+        }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
             if(!Net.client()){
@@ -810,6 +824,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         this.lastSpawner = spawner;
         this.dead = true;
         setNet(spawner.getX(), spawner.getY());
+        spawner.updateSpawning(this);
     }
 
     //endregion
@@ -817,8 +832,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     //region read and write methods
 
     @Override
-    public boolean isClipped(){
-        return false;
+    public byte version(){
+        return 0;
     }
 
     @Override
@@ -833,7 +848,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
-    public void readSave(DataInput stream) throws IOException{
+    public void readSave(DataInput stream, byte version) throws IOException{
         boolean local = stream.readBoolean();
 
         if(local){
@@ -844,14 +859,14 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
                 lastSpawner = (SpawnerTrait)stile.entity;
             }
             Player player = headless ? this : Vars.player;
-            player.readSaveSuper(stream);
+            player.readSaveSuper(stream, version);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
         }
     }
 
-    private void readSaveSuper(DataInput stream) throws IOException{
-        super.readSave(stream);
+    private void readSaveSuper(DataInput stream, byte version) throws IOException{
+        super.readSave(stream, version);
 
         add();
     }
@@ -859,7 +874,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
-        TypeIO.writeStringData(buffer, name); //TODO writing strings is very inefficient
+        TypeIO.writeStringData(buffer, name);
         buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
@@ -873,7 +888,9 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     @Override
     public void read(DataInput buffer) throws IOException{
         float lastx = x, lasty = y, lastrot = rotation, lastvx = velocity.x, lastvy = velocity.y;
-        super.readSave(buffer);
+
+        super.readSave(buffer, version());
+
         name = TypeIO.readStringData(buffer);
         byte bools = buffer.readByte();
         isAdmin = (bools & 1) != 0;

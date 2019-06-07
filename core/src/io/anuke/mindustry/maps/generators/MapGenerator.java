@@ -12,12 +12,9 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Loadout;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.StaticWall;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
-
-import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -70,115 +67,115 @@ public class MapGenerator extends Generator{
 
     @Override
     public void generate(Tile[][] tiles){
-        try{
-            for(int x = 0; x < width; x++){
-                for(int y = 0; y < height; y++){
-                    tiles[x][y] = new Tile(x, y);
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                tiles[x][y] = new Tile(x, y);
+            }
+        }
+
+        MapIO.loadMap(map);
+        Array<Point2> players = new Array<>();
+        Array<Point2> enemies = new Array<>();
+
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                if(tiles[x][y].block() instanceof CoreBlock){
+                    players.add(new Point2(x, y));
+                    tiles[x][y].setBlock(Blocks.air);
+                }
+
+                if(tiles[x][y].overlay() == Blocks.spawn && enemySpawns != -1){
+                    enemies.add(new Point2(x, y));
+                    tiles[x][y].setOverlay(Blocks.air);
+                }
+
+                if(tiles[x][y].block() instanceof BlockPart){
+                    tiles[x][y].setBlock(Blocks.air);
                 }
             }
+        }
 
-            MapIO.readTiles(map, tiles);
-            Array<Point2> players = new Array<>();
-            Array<Point2> enemies = new Array<>();
+        Simplex simplex = new Simplex(Mathf.random(99999));
 
-            for(int x = 0; x < width; x++){
-                for(int y = 0; y < height; y++){
-                    if(tiles[x][y].block() instanceof CoreBlock){
-                        players.add(new Point2(x, y));
-                        tiles[x][y].setBlock(Blocks.air);
-                    }
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                final double scl = 10;
+                Tile tile = tiles[x][y];
+                int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, width - 1);
+                int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, height - 1);
 
-                    if(tiles[x][y].block() == Blocks.spawn && enemySpawns != -1){
-                        enemies.add(new Point2(x, y));
-                        tiles[x][y].setBlock(Blocks.air);
-                    }
-
-                    if(tiles[x][y].block() == Blocks.part){
-                        tiles[x][y].setBlock(Blocks.air);
-                    }
+                if(((tile.block() instanceof StaticWall
+                && tiles[newX][newY].block() instanceof StaticWall)
+                || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
+                || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall))){
+                    tile.setBlock(tiles[newX][newY].block());
                 }
-            }
 
-            Simplex simplex = new Simplex(Mathf.random(99999));
-
-            for(int x = 0; x < width; x++){
-                for(int y = 0; y < height; y++){
-                    final double scl = 10;
-                    Tile tile = tiles[x][y];
-                    int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, width - 1);
-                    int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, height - 1);
-
-                    if(((tile.block() instanceof StaticWall
-                    && tiles[newX][newY].block() instanceof StaticWall)
-                    || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
-                    || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall)) && tiles[newX][newY].block() != Blocks.spawn && tile.block() != Blocks.spawn){
-                        tile.setBlock(tiles[newX][newY].block());
-                    }
-
-                    if(distortFloor){
-                        tile.setFloor(tiles[newX][newY].floor());
+                if(distortFloor){
+                    tile.setFloor(tiles[newX][newY].floor());
+                    if(tiles[newX][newY].overlay() != Blocks.spawn && tile.overlay() != Blocks.spawn){
                         tile.setOverlay(tiles[newX][newY].overlay());
                     }
+                }
 
-                    for(Decoration decor : decorations){
-                        if(x > 0 && y > 0 && (tiles[x - 1][y].block() == decor.wall || tiles[x][y - 1].block() == decor.wall)){
-                            continue;
-                        }
-
-                        if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
-                            tile.setBlock(decor.wall);
-                        }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
-                            tile.setFloor((Floor)decor.wall);
-                        }
+                for(Decoration decor : decorations){
+                    if(x > 0 && y > 0 && (tiles[x - 1][y].block() == decor.wall || tiles[x][y - 1].block() == decor.wall)){
+                        continue;
                     }
 
-                    if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
-                        for(Item item : world.getZone().resources){
-                            if(Mathf.chance(0.3)){
-                                tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
-                            }
+                    if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
+                        tile.setBlock(decor.wall);
+                    }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
+                        tile.setFloor((Floor)decor.wall);
+                    }
+                }
+
+                if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && world.getZone() != null){
+                    for(Item item : world.getZone().resources){
+                        if(Mathf.chance(0.3)){
+                            tile.entity.items.add(item, Math.min(Mathf.random(500), tile.block().itemCapacity));
                         }
                     }
                 }
             }
+        }
 
-            if(enemySpawns != -1){
-                if(enemySpawns > enemies.size){
-                    throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number for map: " + mapName);
-                }
+        if(enemySpawns != -1){
+            if(enemySpawns > enemies.size){
+                throw new IllegalArgumentException("Enemy spawn pool greater than map spawn number for map: " + mapName);
+            }
 
-                enemies.shuffle();
-                for(int i = 0; i < enemySpawns; i++){
-                    Point2 point = enemies.get(i);
-                    tiles[point.x][point.y].setBlock(Blocks.spawn);
+            enemies.shuffle();
+            for(int i = 0; i < enemySpawns; i++){
+                Point2 point = enemies.get(i);
+                tiles[point.x][point.y].setOverlay(Blocks.spawn);
 
-                    int rad = 10, frad = 12;
+                int rad = 10, frad = 12;
 
-                    for(int x = -rad; x <= rad; x++){
-                        for(int y = -rad; y <= rad; y++){
-                            int wx = x + point.x, wy = y + point.y;
-                            double dst = Mathf.dst(x, y);
-                            if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
-                                Tile tile = tiles[wx][wy];
+                for(int x = -rad; x <= rad; x++){
+                    for(int y = -rad; y <= rad; y++){
+                        int wx = x + point.x, wy = y + point.y;
+                        double dst = Mathf.dst(x, y);
+                        if(dst < frad && Structs.inBounds(wx, wy, tiles) && (dst <= rad || Mathf.chance(0.5))){
+                            Tile tile = tiles[wx][wy];
+                            if(tile.overlay() != Blocks.spawn){
                                 tile.clearOverlay();
                             }
                         }
                     }
                 }
             }
-
-            Point2 core = players.random();
-            if(core == null){
-                throw new IllegalArgumentException("All zone maps must have a core.");
-            }
-
-            loadout.setup(core.x, core.y);
-
-            world.prepareTiles(tiles);
-            world.setMap(map);
-        }catch(IOException e){
-            throw new RuntimeException(e);
         }
+
+        Point2 core = players.random();
+        if(core == null){
+            throw new IllegalArgumentException("All zone maps must have a core.");
+        }
+
+        loadout.setup(core.x, core.y);
+
+        world.prepareTiles(tiles);
+        world.setMap(map);
     }
 
     public static class Decoration{

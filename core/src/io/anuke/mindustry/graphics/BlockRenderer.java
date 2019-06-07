@@ -78,7 +78,7 @@ public class BlockRenderer implements Disposable{
                 for(int y = 0; y < world.height(); y++){
                     Tile tile = world.rawTile(x, y);
                     int edgeBlend = 2;
-                    float rot = tile.getRotation();
+                    float rot = tile.rotation();
                     boolean fillable = (tile.block().solid && tile.block().fillsTile && !tile.block().synthetic());
                     int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
                     if(edgeDst <= edgeBlend){

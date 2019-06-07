@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Input.TextInput;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.serialization.Base64Coder;
@@ -66,14 +67,14 @@ public abstract class Platform{
     }
 
     /**
-     * Show a file chooser. Desktop only.
+     * Show a file chooser.
      * @param text File chooser title text
      * @param content Description of the type of files to be loaded
      * @param cons Selection listener
      * @param open Whether to open or save files
      * @param filetype File extension to filter
      */
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){
+    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
     }
 
     /** Hide the app. Android only. */

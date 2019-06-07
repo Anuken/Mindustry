@@ -171,11 +171,9 @@ public class BlockIndexer{
 
                 for(int tx = rx * structQuadrantSize; tx < (rx + 1) * structQuadrantSize && tx < world.width(); tx++){
                     for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
-                        Tile other = world.tile(tx, ty);
+                        Tile other = world.ltile(tx, ty);
 
                         if(other == null) continue;
-
-                        other = other.target();
 
                         if(other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable)
                             continue;
@@ -293,7 +291,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
                 for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
-                    Tile result = world.tile(x, y).target();
+                    Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
                         structQuadrants[data.team.ordinal()].set(index);

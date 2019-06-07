@@ -41,7 +41,7 @@ public class DesertWastesGenerator extends BasicGenerator{
         overlay(tiles, Blocks.sand, Blocks.pebbles, 0.15f, 5, 0.8f, 30f, 0.62f);
         //scatter(tiles, Blocks.sandRocks, Blocks.creeptree, 1f);
 
-        tiles[endX][endY].setBlock(Blocks.spawn);
+        tiles[endX][endY].setOverlay(Blocks.spawn);
         loadout.setup(spawnX, spawnY);
     }
 }

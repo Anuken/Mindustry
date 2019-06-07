@@ -59,6 +59,5 @@ public class BundleLoader{
             Locale.setDefault(locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
-
     }
 }

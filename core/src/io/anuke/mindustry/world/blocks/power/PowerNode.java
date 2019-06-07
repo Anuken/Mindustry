@@ -101,7 +101,7 @@ public class PowerNode extends PowerBlock{
         Tile before = world.tile(lastPlaced);
         if(linkValid(tile, before) && before.block() instanceof PowerNode){
             for(Tile near : before.entity.proximity()){
-                if(near.target() == tile){
+                if(near == tile){
                     lastPlaced = tile.pos();
                     return;
                 }
@@ -127,7 +127,7 @@ public class PowerNode extends PowerBlock{
     @Override
     public boolean onConfigureTileTapped(Tile tile, Tile other){
         TileEntity entity = tile.entity();
-        other = other.target();
+        other = other.link();
 
         Tile result = other;
 
@@ -167,8 +167,7 @@ public class PowerNode extends PowerBlock{
 
         for(int x = (int)(tile.x - laserRange - 1); x <= tile.x + laserRange + 1; x++){
             for(int y = (int)(tile.y - laserRange - 1); y <= tile.y + laserRange + 1; y++){
-                Tile link = world.tile(x, y);
-                if(link != null) link = link.target();
+                Tile link = world.ltile(x, y);
 
                 if(link != tile && linkValid(tile, link, false)){
                     boolean linked = linked(tile, link);

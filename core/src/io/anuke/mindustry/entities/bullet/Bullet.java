@@ -225,9 +225,8 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         if(type.hitTiles && collidesTiles() && !supressCollision && initialized){
             world.raycastEach(world.toTile(lastPosition().x), world.toTile(lastPosition().y), world.toTile(x), world.toTile(y), (x, y) -> {
 
-                Tile tile = world.tile(x, y);
+                Tile tile = world.ltile(x, y);
                 if(tile == null) return false;
-                tile = tile.target();
 
                 if(tile.entity != null && tile.entity.collide(this) && type.collides(this, tile) && !tile.entity.isDead() && (type.collidesTeam || tile.getTeam() != team)){
                     if(tile.getTeam() != team){
