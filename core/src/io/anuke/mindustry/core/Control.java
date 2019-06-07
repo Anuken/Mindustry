@@ -83,6 +83,8 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, event -> {
+            player.setTeam(defaultTeam);
+            player.setDead(true);
             player.add();
 
             state.set(State.playing);

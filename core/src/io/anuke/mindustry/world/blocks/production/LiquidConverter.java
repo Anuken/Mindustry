@@ -37,6 +37,7 @@ public class LiquidConverter extends GenericCrafter{
             if(hasPower){
                 use *= entity.power.satisfaction; // Produce less liquid if power is not maxed
             }
+            useContent(tile, outputLiquid.liquid);
             entity.progress += use / cl.amount / craftTime;
             entity.liquids.add(outputLiquid.liquid, use);
             if(entity.progress >= 1f){
