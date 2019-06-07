@@ -1,13 +1,18 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.gen.BufferItem;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.DirectionalItemBuffer;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -24,6 +29,11 @@ public class Junction extends Block{
     }
 
     @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
+    }
+
+    @Override
     public boolean outputsItems(){
         return true;
     }
@@ -31,19 +41,19 @@ public class Junction extends Block{
     @Override
     public void update(Tile tile){
         JunctionEntity entity = tile.entity();
+        DirectionalItemBuffer buffer = entity.buffer;
 
         for(int i = 0; i < 4; i++){
-            Buffer buffer = entity.buffers[i];
-
-            if(buffer.index > 0){
-                if(buffer.index > buffer.items.length) buffer.index = buffer.items.length;
-                long l = buffer.items[0];
-                float time = Float.intBitsToFloat(Pack.leftInt(l));
+            if(buffer.indexes[i] > 0){
+                if(buffer.indexes[i] > capacity) buffer.indexes[i] = capacity;
+                long l = buffer.buffers[i][0];
+                float time = BufferItem.time(l);
 
                 if(Time.time() >= time + speed || Time.time() < time){
 
-                    Item item = content.item(Pack.rightInt(l));
+                    Item item = content.item(BufferItem.item(l));
                     Tile dest = tile.getNearby(i);
+                    if(dest != null) dest = dest.link();
 
                     //skip blocks that don't want the item, keep waiting until they do
                     if(dest == null || !dest.block().acceptItem(item, dest, tile)){
@@ -51,8 +61,8 @@ public class Junction extends Block{
                     }
 
                     dest.block().handleItem(item, dest, tile);
-                    System.arraycopy(buffer.items, 1, buffer.items, 0, buffer.index - 1);
-                    buffer.index--;
+                    System.arraycopy(buffer.buffers[i], 1, buffer.buffers[i], 0, buffer.indexes[i] - 1);
+                    buffer.indexes[i] --;
                 }
             }
         }
@@ -61,9 +71,8 @@ public class Junction extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         JunctionEntity entity = tile.entity();
-        long value = Pack.longInt(Float.floatToIntBits(Time.time()), item.id);
         int relative = source.relativeTo(tile.x, tile.y);
-        entity.buffers[relative].add(value);
+        entity.buffer.accept(relative, item);
     }
 
     @Override
@@ -71,7 +80,7 @@ public class Junction extends Block{
         JunctionEntity entity = tile.entity();
         int relative = source.relativeTo(tile.x, tile.y);
 
-        if(entity == null || relative == -1 || entity.buffers[relative].full())
+        if(entity == null || relative == -1 || !entity.buffer.accepts(relative))
             return false;
         Tile to = tile.getNearby(relative);
         return to != null && to.link().entity != null;
@@ -83,55 +92,18 @@ public class Junction extends Block{
     }
 
     class JunctionEntity extends TileEntity{
-        Buffer[] buffers = {new Buffer(), new Buffer(), new Buffer(), new Buffer()};
+        DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity, speed);
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            for(Buffer b : buffers){
-                b.write(stream);
-            }
+            buffer.write(stream);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            for(Buffer b : buffers){
-                b.read(stream);
-            }
-        }
-    }
-
-    class Buffer{
-        long[] items = new long[capacity];
-        int index;
-
-        void add(long id){
-            if(full()) return;
-            items[index++] = id;
-        }
-
-        boolean full(){
-            return index >= items.length - 1;
-        }
-
-        void write(DataOutput stream) throws IOException{
-            stream.writeByte((byte)index);
-            stream.writeByte((byte)items.length);
-            for(long l : items){
-                stream.writeLong(l);
-            }
-        }
-
-        void read(DataInput stream) throws IOException{
-            index = stream.readByte();
-            byte length = stream.readByte();
-            for(int i = 0; i < length; i++){
-                long l = stream.readLong();
-                if(i < items.length){
-                    items[i] = l;
-                }
-            }
+            buffer.read(stream);
         }
     }
 }

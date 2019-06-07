@@ -58,4 +58,9 @@ public abstract class BaseEntity implements Entity{
     public String toString(){
         return getClass() + " " + id;
     }
+
+    /** Increments this entity's ID. Used for pooled entities.*/
+    public void incrementID(){
+        id = lastid++;
+    }
 }

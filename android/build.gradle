@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 
@@ -166,27 +166,4 @@ task run(type: Exec){
 
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/io.anuke.mindustry.AndroidLauncher'
-}
-
-// sets up the Android Idea project, using the old Ant based build.
-idea{
-    module{
-        sourceDirs += file("src")
-        scopes = [COMPILE: [plus: [project.configurations.compile]]]
-
-        iml{
-            withXml{
-                def node = it.asNode()
-                def builder = NodeBuilder.newInstance()
-                builder.current = node
-                builder.component(name: "FacetManager"){
-                    facet(type: "android", name: "Android"){
-                        configuration{
-                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

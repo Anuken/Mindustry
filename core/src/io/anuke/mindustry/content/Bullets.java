@@ -579,11 +579,12 @@ public class Bullets implements ContentList{
 
         fuseShot = new BulletType(0.01f, 70){
             int rays = 3;
-            float rayLength = 80f;
+            float rayLength = 120f;
 
             {
                 hitEffect = Fx.hitFuse;
-                lifetime = 13f;
+                shootEffect = smokeEffect = Fx.none;
+                lifetime = 10f;
                 despawnEffect = Fx.none;
                 pierce = true;
             }
@@ -599,14 +600,15 @@ public class Bullets implements ContentList{
             public void draw(Bullet b){
                 super.draw(b);
                 Draw.color(Color.WHITE, Pal.surge, b.fin());
+                //Draw.alpha(b.fout());
                 for(int i = 0; i < 7; i++){
                     Tmp.v1.trns(b.rot(), i * 8f);
                     float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
                     Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
                     Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
                 }
-                Shapes.tri(b.x, b.y, 13f, (rayLength + 50) * b.fout(), b.rot());
-                Shapes.tri(b.x, b.y, 13f, 10f * b.fout(), b.rot() + 180f);
+                Shapes.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
+                Shapes.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
                 Draw.reset();
             }
         };

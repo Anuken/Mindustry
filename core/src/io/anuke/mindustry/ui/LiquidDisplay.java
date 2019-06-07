@@ -10,8 +10,15 @@ import io.anuke.mindustry.world.meta.StatUnit;
 
 /** An ItemDisplay, but for liquids. */
 public class LiquidDisplay extends Table{
+    public final Liquid liquid;
+    public final float amount;
+    public final boolean perSecond;
 
     public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
+        this.liquid = liquid;
+        this.amount = amount;
+        this.perSecond = perSecond;
+
         add(new Stack(){{
             add(new Image(liquid.getContentIcon()));
 

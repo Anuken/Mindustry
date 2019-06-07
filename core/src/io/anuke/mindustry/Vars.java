@@ -105,6 +105,8 @@ public class Vars{
     public static FileHandle screenshotDirectory;
     /** data subdirectory used for custom mmaps */
     public static FileHandle customMapDirectory;
+    /** tmp subdirectory for map conversion */
+    public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
     /** old map file extension, for conversion */
@@ -206,5 +208,6 @@ public class Vars{
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
+        tmpDirectory = dataDirectory.child("tmp/");
     }
 }

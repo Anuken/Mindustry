@@ -19,7 +19,7 @@ import io.anuke.mindustry.world.blocks.BlockPart;
 import static io.anuke.mindustry.Vars.tilesize;
 
 public class MapRenderer implements Disposable{
-    private static final int chunksize = 64;
+    private static final int chunkSize = 64;
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
     private IntSet delayedUpdates = new IntSet();
@@ -41,11 +41,11 @@ public class MapRenderer implements Disposable{
             }
         }
 
-        chunks = new IndexedRenderer[(int)Math.ceil((float)width / chunksize)][(int)Math.ceil((float)height / chunksize)];
+        chunks = new IndexedRenderer[(int)Math.ceil((float)width / chunkSize)][(int)Math.ceil((float)height / chunkSize)];
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
-                chunks[x][y] = new IndexedRenderer(chunksize * chunksize * 2);
+                chunks[x][y] = new IndexedRenderer(chunkSize * chunkSize * 2);
             }
         }
         this.width = width;
@@ -97,7 +97,7 @@ public class MapRenderer implements Disposable{
     }
 
     private void render(int wx, int wy){
-        int x = wx / chunksize, y = wy / chunksize;
+        int x = wx / chunkSize, y = wy / chunkSize;
         IndexedRenderer mesh = chunks[x][y];
         Tile tile = editor.tiles()[wx][wy];
 
@@ -107,8 +107,8 @@ public class MapRenderer implements Disposable{
 
         TextureRegion region;
 
-        int idxWall = (wx % chunksize) + (wy % chunksize) * chunksize;
-        int idxDecal = (wx % chunksize) + (wy % chunksize) * chunksize + chunksize * chunksize;
+        int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
+        int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
 
         if(wall != Blocks.air && (wall.synthetic() || wall instanceof BlockPart)){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
@@ -145,8 +145,8 @@ public class MapRenderer implements Disposable{
         }
 
         mesh.draw(idxDecal, region,
-        wx * tilesize + offsetX, wy * tilesize + offsetY,
-        region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
+            wx * tilesize + offsetX, wy * tilesize + offsetY,
+            region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
         mesh.setColor(Color.WHITE);
     }
 

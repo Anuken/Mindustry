@@ -114,6 +114,9 @@ public class Blocks implements ContentList{
         }
 
         spawn = new OverlayFloor("spawn"){
+            {
+                variants = 0;
+            }
             public void draw(Tile tile){}
         };
 
@@ -496,19 +499,7 @@ public class Blocks implements ContentList{
                 GenericCrafterEntity entity = tile.entity();
 
                 Draw.rect(reg(bottomRegion), tile.drawx(), tile.drawy());
-
-                float progress = 0.5f;
-
-                Shaders.build.region = reg(weaveRegion);
-                Shaders.build.progress = progress;
-                Shaders.build.color.set(Pal.accent);
-                Shaders.build.color.a = entity.warmup;
-                Shaders.build.time = -entity.totalProgress / 10f;
-
-                Draw.shader(Shaders.build, false);
-                Shaders.build.apply();
                 Draw.rect(reg(weaveRegion), tile.drawx(), tile.drawy(), entity.totalProgress);
-                Draw.shader();
 
                 Draw.color(Pal.accent);
                 Draw.alpha(entity.warmup);
@@ -940,7 +931,7 @@ public class Blocks implements ContentList{
             itemCapacity = 120;
             reloadTime = 200f;
             range = 440f;
-            consumes.power(2f);
+            consumes.power(1.75f);
         }};
 
         //endregion
@@ -1299,8 +1290,8 @@ public class Blocks implements ContentList{
                 Items.scrap, Bullets.flakScrap,
                 Items.lead, Bullets.flakLead
             );
-            reload = 15f;
-            range = 180f;
+            reload = 16f;
+            range = 175f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
@@ -1499,7 +1490,7 @@ public class Blocks implements ContentList{
             ammo(Items.graphite, Bullets.fuseShot);
             reload = 40f;
             shootShake = 4f;
-            range = 80f;
+            range = 110f;
             recoil = 5f;
             restitution = 0.1f;
             size = 3;
@@ -1544,7 +1535,7 @@ public class Blocks implements ContentList{
             reload = 50f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUse = 10f;
+            powerUse = 14f;
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);

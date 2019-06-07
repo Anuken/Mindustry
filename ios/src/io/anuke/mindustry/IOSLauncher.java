@@ -103,7 +103,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         SaveSlot slot = control.saves.importSave(file);
                         ui.load.runLoadSave(slot);
                     }catch(IOException e){
-                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
+                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
                     }
                 }else{
                     ui.showError("save.import.invalid");

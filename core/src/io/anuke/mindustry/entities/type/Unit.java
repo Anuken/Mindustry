@@ -9,8 +9,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.*;
@@ -254,6 +253,16 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
         if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
             kill();
+        }
+
+        //apply knockback based on spawns
+        if(getTeam() != waveTeam){
+            float relativeSize = state.rules.dropZoneRadius + getSize()/2f + 1f;
+            for(Tile spawn : world.spawner.getGroundSpawns()){
+                if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
+                    velocity.add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                }
+            }
         }
 
         if(isFlying()){

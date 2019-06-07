@@ -15,16 +15,15 @@ import io.anuke.arc.backends.android.surfaceview.AndroidApplication;
 import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.mindustry.net.ArcNetClient;
-import io.anuke.mindustry.net.ArcNetServer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -72,10 +71,10 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, String filetype){
-                chooser = new FileChooser(text, file -> file.extension().equalsIgnoreCase(filetype), open, cons);
+            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+                chooser = new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons);
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
                     chooser.show();
                     chooser = null;
                 }else{
@@ -157,7 +156,7 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, false)));
+                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
                             }
                         }else{
                             ui.showError("$save.import.invalid");

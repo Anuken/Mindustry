@@ -157,7 +157,7 @@ public class ServerControl implements ApplicationListener{
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
                     + "\nNext selected map:[accent] " + map.name() + "[]"
                     + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                    "\nNew game begins in " + roundExtraTime + " seconds.");
+                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
                     info("Selected next map to be {0}.", map.name());
 
@@ -235,9 +235,9 @@ public class ServerControl implements ApplicationListener{
             info("Loading map...");
 
             logic.reset();
-            state.rules = preset.apply(result.rules());
             try{
                 world.loadMap(result);
+                state.rules = preset.apply(result.rules());
                 logic.play();
 
                 info("Map loaded.");

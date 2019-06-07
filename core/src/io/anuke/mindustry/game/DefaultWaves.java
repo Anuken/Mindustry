@@ -11,13 +11,20 @@ public class DefaultWaves{
         if(spawns == null && UnitTypes.dagger != null){
             spawns = Array.with(
             new SpawnGroup(UnitTypes.dagger){{
-                end = 8;
+                end = 10;
+                unitScaling = 2f;
+            }},
+
+            new SpawnGroup(UnitTypes.crawler){{
+                begin = 4;
+                end = 13;
+                unitAmount = 2;
                 unitScaling = 1.5f;
             }},
 
             new SpawnGroup(UnitTypes.wraith){{
                 begin = 12;
-                end = 14;
+                end = 16;
                 unitScaling = 1f;
             }},
 
@@ -29,7 +36,7 @@ public class DefaultWaves{
             }},
 
             new SpawnGroup(UnitTypes.titan){{
-                begin = 9;
+                begin = 7;
                 spacing = 3;
                 unitScaling = 2;
 
@@ -39,7 +46,7 @@ public class DefaultWaves{
             new SpawnGroup(UnitTypes.dagger){{
                 begin = 8;
                 unitScaling = 1;
-                unitAmount = 1;
+                unitAmount = 4;
                 spacing = 2;
             }},
 

@@ -23,6 +23,7 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import java.io.*;
@@ -264,7 +265,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         avoidOthers();
 
-        if(spawner != noSpawner && (world.tile(spawner) == null || world.tile(spawner).entity == null)){
+        if(spawner != noSpawner && (world.tile(spawner) == null || !(world.tile(spawner).entity instanceof UnitFactoryEntity))){
             kill();
         }
 

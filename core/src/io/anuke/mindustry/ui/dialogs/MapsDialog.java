@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.io.MapIO;
@@ -23,8 +23,19 @@ public class MapsDialog extends FloatingDialog{
         addCloseButton();
         buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
-                try{
-                    Map map = MapIO.createMap(file, true);
+                world.maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showError("$editor.errorimage");
+                        return;
+                    }
+
+                    Map map;
+                    if(file.extension().equalsIgnoreCase(mapExtension)){
+                        map = MapIO.createMap(file, true);
+                    }else{
+                        map = world.maps.makeLegacyMap(file);
+                    }
+
                     String name = map.tags.get("name");
                     if(name == null){
                         ui.showError("$editor.errorname");
@@ -34,27 +45,21 @@ public class MapsDialog extends FloatingDialog{
                     Map conflict = world.maps.all().find(m -> m.name().equals(name));
 
                     if(conflict != null && !conflict.custom){
-                        ui.showError(Core.bundle.format("editor.import.exists", name));
+                        ui.showInfo(Core.bundle.format("editor.import.exists", name));
                     }else if(conflict != null){
                         ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                            try{
+                            world.maps.tryCatchMapError(() -> {
                                 world.maps.importMap(file);
                                 setup();
-                            }catch(Exception e){
-                                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                                Log.err(e);
-                            }
+                            });
                         });
                     }else{
-                        world.maps.importMap(file);
+                        world.maps.importMap(map.file);
                         setup();
                     }
 
-                }catch(Exception e){
-                    ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, false)));
-                    Log.err(e);
-                }
-            }, true, mapExtension);
+                });
+            }, true, FileChooser.anyMapFiles);
         }).size(230f, 64f);
 
         shown(this::setup);

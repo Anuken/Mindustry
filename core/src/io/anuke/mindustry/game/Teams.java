@@ -28,7 +28,7 @@ public class Teams{
     /** Returns whether a team is active, e.g. whether it has any cores remaining. */
     public boolean isActive(Team team){
         //the enemy wave team is always active
-        return (Vars.state.rules.waves && team == Vars.waveTeam) || get(team).cores.size > 0;
+        return team == Vars.waveTeam || get(team).cores.size > 0;
     }
 
     /** Returns a set of all teams that are enemies of this team. */

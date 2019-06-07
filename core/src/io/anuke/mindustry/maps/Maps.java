@@ -3,12 +3,13 @@ package io.anuke.mindustry.maps;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.ExceptionRunnable;
 import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.util.Disposable;
-import io.anuke.arc.util.Log;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.LegacyMapIO;
+import io.anuke.mindustry.io.MapIO;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -17,7 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. Filenames only. */
-    private static final String[] defaultMapNames = {"fortress"};
+    private static final String[] defaultMapNames = {"fortress", "labyrinth", "islands"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
@@ -116,12 +117,38 @@ public class Maps implements Disposable{
         }
     }
 
+    /** Creates a legacy map by converting it to a non-legacy map and pasting it in a temp directory.
+     * Should be followed up by {@link #importMap(FileHandle)} .*/
+    public Map makeLegacyMap(FileHandle file) throws IOException{
+        FileHandle dst = tmpDirectory.child("conversion_map." + mapExtension);
+        LegacyMapIO.convertMap(file, dst);
+        return MapIO.createMap(dst, true);
+    }
+
     /** Import a map, then save it. This updates all values and stored data necessary. */
     public void importMap(FileHandle file) throws IOException{
         FileHandle dest = findFile();
         file.copyTo(dest);
 
         loadMap(dest, true);
+    }
+
+    /** Attempts to run the following code;
+     * catches any errors and attempts to display them in a readable way.*/
+    public void tryCatchMapError(ExceptionRunnable run){
+        try{
+            run.run();
+        }catch(Exception e){
+            Log.err(e);
+
+            if("Outdated legacy map format".equals(e.getMessage())){
+                ui.showError("$editor.errorlegacy");
+            }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
+                ui.showError("$editor.errorheader");
+            }else{
+                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+            }
+        }
     }
 
     /** Removes a map completely. */
