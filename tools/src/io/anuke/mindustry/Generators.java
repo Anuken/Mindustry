@@ -10,8 +10,7 @@ import io.anuke.mindustry.ImagePacker.GenRegion;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,7 +70,7 @@ public class Generators{
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(content.blocks().size, 1);
-            Color outlineColor = new Color(0, 0, 0, 0.3f);
+            Color outlineColor = Color.valueOf("4d4e58");
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
@@ -96,7 +95,7 @@ public class Generators{
                 try{
                     Image last = null;
                     if(block.outlineIcon){
-                        int radius = 3;
+                        int radius = 4;
                         GenRegion region = (GenRegion)regions[regions.length - 1];
                         Image base = ImagePacker.get(region);
                         Image out = last = new Image(region.getWidth(), region.getHeight());
@@ -283,7 +282,7 @@ public class Generators{
         });
 
         ImagePacker.generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor, floor -> {
+            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
 
                 if(ImagePacker.has(floor.name + "-edge") || floor.blendGroup != floor){
                     return;

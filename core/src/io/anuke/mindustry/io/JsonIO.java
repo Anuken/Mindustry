@@ -5,13 +5,13 @@ import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 
 public class JsonIO{
     private static Json json = new Json(){{
         setIgnoreUnknownFields(true);
         setElementType(Rules.class, "spawns", SpawnGroup.class);
+        setElementType(Rules.class, "startingItems", ItemStack.class);
 
         setSerializer(Zone.class, new Serializer<Zone>(){
             @Override
@@ -22,6 +22,18 @@ public class JsonIO{
             @Override
             public Zone read(Json json, JsonValue jsonData, Class type){
                 return Vars.content.getByName(ContentType.zone, jsonData.asString());
+            }
+        });
+
+        setSerializer(Item.class, new Serializer<Item>(){
+            @Override
+            public void write(Json json, Item object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Item read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.item, jsonData.asString());
             }
         });
     }};

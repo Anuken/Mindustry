@@ -61,6 +61,11 @@ public class ForceProjector extends Block{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void load(){
         super.load();
         topRegion = Core.atlas.find(name + "-top");
