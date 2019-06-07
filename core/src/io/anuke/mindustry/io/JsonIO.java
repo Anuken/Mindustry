@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.type.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("unchecked")
 public class JsonIO{
     private static Json json = new Json(){{
         setIgnoreUnknownFields(true);
