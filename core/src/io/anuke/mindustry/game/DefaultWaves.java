@@ -16,7 +16,7 @@ public class DefaultWaves{
             }},
 
             new SpawnGroup(UnitTypes.crawler){{
-                begin = 5;
+                begin = 4;
                 end = 13;
                 unitAmount = 2;
                 unitScaling = 1.5f;
@@ -36,7 +36,7 @@ public class DefaultWaves{
             }},
 
             new SpawnGroup(UnitTypes.titan){{
-                begin = 9;
+                begin = 7;
                 spacing = 3;
                 unitScaling = 2;
 
