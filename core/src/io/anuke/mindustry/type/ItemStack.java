@@ -11,6 +11,11 @@ public class ItemStack implements Comparable<ItemStack>{
         this.amount = amount;
     }
 
+    //serialization only
+    public ItemStack(){
+
+    }
+
     public boolean equals(ItemStack other){
         return other != null && other.item == item && other.amount == amount;
     }

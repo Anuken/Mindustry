@@ -3,7 +3,9 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
+
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.IntArray
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
@@ -86,18 +88,48 @@ def antialias = { File file ->
     ImageIO.write(out, "png", file)
 }
 
+def medianBlur = { File file ->
+    def image = ImageIO.read(file)
+    def result = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
+    def radius = 4
+    IntArray array = new IntArray()
+
+    def getRGB = { int ix, int iy ->
+        return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+    }
+
+    for(int x = 0; x < image.width; x++){
+        for(int y = 0; y < image.height; y++){
+            array.clear()
+
+            for(int dx = -radius; dx <= radius; dx ++){
+                for(int dy = -radius; dy <= radius; dy ++){
+                    if(dx*dx + dy*dy <= radius*radius){
+                        array.add(getRGB(x + dx, y + dy))
+                    }
+                }
+            }
+
+            array.sort()
+
+            result.setRGB(x, y, array.get((int)(array.size / 2)))
+        }
+    }
+
+    ImageIO.write(result, "png", file)
+}
+
 def scaleImage = { File file ->
     def image = ImageIO.read(file)
     for(int iteration in 0..1){
-        def scaled = new BufferedImage(image.getWidth() * 2, image.getHeight() * 2, BufferedImage.TYPE_INT_ARGB)
+        def scaled = new BufferedImage(image.width * 2, image.height * 2, BufferedImage.TYPE_INT_ARGB)
 
         def getRGB = { int ix, int iy ->
-            //if(ix <= 0 || iy <= 0 || ix >= image.width || iy >= image.height) return 0
             return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
         }
 
-        for(int x = 0; x < image.getWidth(); x++){
-            for(int y = 0; y < image.getHeight(); y++){
+        for(int x = 0; x < image.width; x++){
+            for(int y = 0; y < image.height; y++){
                 int p = image.getRGB(x, y)
                 int p1 = p, p2 = p, p3 = p, p4 = p
 
@@ -181,12 +213,10 @@ task scaleSprites(){
 
     doLast{
         copy{
-            from "../core/assets-raw/sprites_replacement/"
+            from "../core/assets-raw/sprites/"
             into "../core/assets-raw/sprites_out/"
         }
     }
-
-    dependsOn 'scaleSprites4x'
 }
 
 task scaleImages(){
