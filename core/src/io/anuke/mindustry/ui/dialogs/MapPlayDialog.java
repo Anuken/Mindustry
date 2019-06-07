@@ -83,7 +83,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(sdif);
         cont.row();
-        cont.add(new BorderImage(map.texture, 3f)).size(250f).get().setScaling(Scaling.fit);
+        cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
 
         buttons.clearChildren();
         addCloseButton();

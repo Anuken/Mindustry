@@ -103,6 +103,8 @@ public class Block extends BlockStorage{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BooleanProvider buildVisibility = () -> false;
+    /** Whether this block has instant transfer.*/
+    public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
 
     protected TextureRegion[] cacheRegions = {};
