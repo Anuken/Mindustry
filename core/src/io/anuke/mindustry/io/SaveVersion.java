@@ -6,11 +6,15 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.WorldContext;
 
 import java.io.*;
 

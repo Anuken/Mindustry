@@ -63,9 +63,13 @@ public class Logic implements ApplicationListener{
 
         //add starting items
         if(!world.isZone()){
-            for(Tile core : state.teams.get(defaultTeam).cores){
-                for(ItemStack stack : state.rules.startingItems){
-                    core.entity.items.add(stack.item, stack.amount);
+            for(Team team : Team.all){
+                if(state.teams.isActive(team)){
+                    for(Tile core : state.teams.get(team).cores){
+                        for(ItemStack stack : state.rules.startingItems){
+                            core.entity.items.add(stack.item, stack.amount);
+                        }
+                    }
                 }
             }
         }

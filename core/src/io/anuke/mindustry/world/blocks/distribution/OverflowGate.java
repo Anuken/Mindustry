@@ -2,11 +2,17 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.DirectionalItemBuffer;
+import io.anuke.mindustry.world.Edges;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class OverflowGate extends Block{
     protected int bufferCapacity = 10;
@@ -18,6 +24,11 @@ public class OverflowGate extends Block{
         solid = true;
         update = true;
         group = BlockGroup.transportation;
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
     }
 
     @Override

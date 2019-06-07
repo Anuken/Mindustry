@@ -2,12 +2,17 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.gen.BufferItem;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.DirectionalItemBuffer;
+import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -20,6 +25,11 @@ public class Junction extends Block{
         update = true;
         solid = true;
         group = BlockGroup.transportation;
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
     }
 
     @Override

@@ -7,6 +7,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
@@ -29,6 +30,11 @@ public class Sorter extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
+    }
+
+    @Override
+    public int acceptStack(Item item, int amount, Tile tile, Unit source){
+        return 0;
     }
 
     @Override

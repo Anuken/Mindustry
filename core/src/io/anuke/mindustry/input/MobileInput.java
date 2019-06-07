@@ -42,8 +42,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     //gesture data
     private Vector2 vector = new Vector2();
     private float lastDistance = -1f;
-    /** Set of completed guides. */
-    //private ObjectSet<String> guides = new ObjectSet<>();
 
     /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY;
@@ -311,7 +309,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selection.isEmpty());
 
         Core.scene.table(t -> {
-           t.bottom().left().visible(() -> player.isBuilding() || block != null || mode == breaking);
+           t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
            t.addImageTextButton("$cancel", "icon-cancel", 16*2, () -> {
                player.clearBuilding();
                mode = none;
