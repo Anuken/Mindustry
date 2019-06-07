@@ -66,7 +66,7 @@ public class Rules{
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
     /** Items that the player starts with here. Not applicable to zones.*/
-    public Array<ItemStack> startingItems = Array.with(new ItemStack(Items.copper, 100));
+    public Array<ItemStack> startingItems = Array.with(new ItemStack(Items.copper, 200));
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

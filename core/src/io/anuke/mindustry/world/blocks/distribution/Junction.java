@@ -42,6 +42,7 @@ public class Junction extends Block{
 
                     Item item = content.item(BufferItem.item(l));
                     Tile dest = tile.getNearby(i);
+                    if(dest != null) dest = dest.link();
 
                     //skip blocks that don't want the item, keep waiting until they do
                     if(dest == null || !dest.block().acceptItem(item, dest, tile)){
