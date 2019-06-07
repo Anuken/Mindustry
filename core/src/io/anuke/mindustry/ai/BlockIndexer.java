@@ -31,7 +31,7 @@ public class BlockIndexer{
     /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores;
     /** Tags all quadrants. */
-    private Bits[] structQuadrants;
+    private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
     private ObjectSet<Tile>[] damagedTiles = new ObjectSet[Team.all.length];
     /**All ores available on this map.*/
@@ -73,9 +73,9 @@ public class BlockIndexer{
             ores = null;
 
             //create bitset for each team type that contains each quadrant
-            structQuadrants = new Bits[Team.all.length];
+            structQuadrants = new GridBits[Team.all.length];
             for(int i = 0; i < Team.all.length; i++){
-                structQuadrants[i] = new Bits(Mathf.ceil(world.width() / (float)structQuadrantSize) * Mathf.ceil(world.height() / (float)structQuadrantSize));
+                structQuadrants[i] = new GridBits(Mathf.ceil(world.width() / (float)structQuadrantSize), Mathf.ceil(world.height() / (float)structQuadrantSize));
             }
 
             for(int x = 0; x < world.width(); x++){
@@ -282,11 +282,11 @@ public class BlockIndexer{
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
             if(tile.getTeam() == data.team && tile.entity != null && tile.block().targetable){
-                structQuadrants[data.team.ordinal()].set(index);
+                structQuadrants[data.team.ordinal()].set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }
 
-            structQuadrants[data.team.ordinal()].clear(index);
+            structQuadrants[data.team.ordinal()].set(quadrantX, quadrantY, false);
 
             outer:
             for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
@@ -294,7 +294,7 @@ public class BlockIndexer{
                     Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
-                        structQuadrants[data.team.ordinal()].set(index);
+                        structQuadrants[data.team.ordinal()].set(quadrantX, quadrantY);
                         break outer;
                     }
                 }
@@ -303,8 +303,7 @@ public class BlockIndexer{
     }
 
     private boolean getQuad(Team team, int quadrantX, int quadrantY){
-        int index = quadrantX + quadrantY * Mathf.ceil(world.width() / (float)structQuadrantSize);
-        return structQuadrants[team.ordinal()].get(index);
+        return structQuadrants[team.ordinal()].get(quadrantX, quadrantY);
     }
 
     private int quadWidth(){

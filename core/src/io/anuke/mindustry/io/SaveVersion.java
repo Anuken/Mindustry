@@ -6,15 +6,11 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.mindustry.entities.traits.SaveTrait;
-import io.anuke.mindustry.entities.traits.TypeTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.WorldContext;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -42,8 +38,13 @@ public abstract class SaveVersion extends SaveFileReader{
     public final void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         region("meta", stream, counter, this::readMeta);
         region("content", stream, counter, this::readContentHeader);
-        region("map", stream, counter, in -> readMap(in, context));
-        region("entities", stream, counter, this::readEntities);
+
+        try{
+            region("map", stream, counter, in -> readMap(in, context));
+            region("entities", stream, counter, this::readEntities);
+        }finally{
+            content.setTemporaryMapper(null);
+        }
     }
 
     public final void write(DataOutputStream stream, StringMap extraTags) throws IOException{
@@ -147,56 +148,57 @@ public abstract class SaveVersion extends SaveFileReader{
         boolean generating = context.isGenerating();
 
         if(!generating) context.begin();
+        try{
 
-        context.resize(width, height);
+            context.resize(width, height);
 
-        //read floor and create tiles first
-        for(int i = 0; i < width * height; i++){
-            int x = i % width, y = i / width;
-            short floorid = stream.readShort();
-            short oreid = stream.readShort();
-            int consecutives = stream.readUnsignedByte();
-
-            context.create(x, y, floorid, oreid, (short)0);
-
-            for(int j = i + 1; j < i + 1 + consecutives; j++){
-                int newx = j % width, newy = j / width;
-                context.create(newx, newy, floorid, oreid, (short)0);
-            }
-
-            i += consecutives;
-        }
-
-        //read blocks
-        for(int i = 0; i < width * height; i++){
-            int x = i % width, y = i / width;
-            Block block = content.block(stream.readShort());
-            Tile tile = context.tile(x, y);
-            tile.setBlock(block);
-
-            if(tile.entity != null){
-                try{
-                    readChunk(stream, true, in -> {
-                        byte version = in.readByte();
-                        tile.entity.read(in, version);
-                    });
-                }catch(Exception e){
-                    throw new IOException("Failed to read tile entity of block: " + block, e);
-                }
-            }else{
+            //read floor and create tiles first
+            for(int i = 0; i < width * height; i++){
+                int x = i % width, y = i / width;
+                short floorid = stream.readShort();
+                short oreid = stream.readShort();
                 int consecutives = stream.readUnsignedByte();
+
+                context.create(x, y, floorid, oreid, (short)0);
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
-                    context.tile(newx, newy).setBlock(block);
+                    context.create(newx, newy, floorid, oreid, (short)0);
                 }
 
                 i += consecutives;
             }
-        }
 
-        content.setTemporaryMapper(null);
-        if(!generating) context.end();
+            //read blocks
+            for(int i = 0; i < width * height; i++){
+                int x = i % width, y = i / width;
+                Block block = content.block(stream.readShort());
+                Tile tile = context.tile(x, y);
+                tile.setBlock(block);
+
+                if(tile.entity != null){
+                    try{
+                        readChunk(stream, true, in -> {
+                            byte version = in.readByte();
+                            tile.entity.read(in, version);
+                        });
+                    }catch(Exception e){
+                        throw new IOException("Failed to read tile entity of block: " + block, e);
+                    }
+                }else{
+                    int consecutives = stream.readUnsignedByte();
+
+                    for(int j = i + 1; j < i + 1 + consecutives; j++){
+                        int newx = j % width, newy = j / width;
+                        context.tile(newx, newy).setBlock(block);
+                    }
+
+                    i += consecutives;
+                }
+            }
+        }finally{
+            if(!generating) context.end();
+        }
     }
 
     public void writeEntities(DataOutput stream) throws IOException{

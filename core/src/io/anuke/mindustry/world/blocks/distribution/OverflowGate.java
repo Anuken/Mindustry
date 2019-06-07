@@ -132,7 +132,7 @@ public class OverflowGate extends Block{
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
             if(revision == 1){
-                new DirectionalItemBuffer(25, 0f).read(stream);
+                new DirectionalItemBuffer(25, 50f).read(stream);
             }
         }
     }
