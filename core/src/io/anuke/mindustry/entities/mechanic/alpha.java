@@ -20,13 +20,17 @@ public class alpha extends Mech {
         engineColor = Color.valueOf("ffd37f");
         health = 250f;
 
-        weapon = new Weapon("blaster"){{
+        weapon = new Weapon("blaster") {{
             length = 1.5f;
             reload = 14f;
             roundrobin = true;
             ejectEffect = Fx.shellEjectSmall;
             bullet = Bullets.standardMechSmall;
         }};
+    }
 
+    @Override
+    public void updateAlt(Player player) {
+        player.healBy(Time.delta() * 0.09f);
     }
 }
