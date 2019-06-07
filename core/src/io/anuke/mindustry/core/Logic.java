@@ -15,6 +15,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
@@ -59,6 +60,15 @@ public class Logic implements ApplicationListener{
         state.set(State.playing);
         state.wavetime = state.rules.waveSpacing * 2; //grace period of 2x wave time before game starts
         Events.fire(new PlayEvent());
+
+        //add starting items
+        if(!world.isZone()){
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : state.rules.startingItems){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+        }
     }
 
     public void reset(){

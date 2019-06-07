@@ -42,10 +42,10 @@ public class CustomRulesDialog extends FloatingDialog{
 
         title("$rules.title.waves");
         check("$rules.waves", b -> rules.waves = b, () -> rules.waves);
-        check("$rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer, () -> rules.waves);
-        check("$rules.waitForWaveToEnd", b -> rules.waitForWaveToEnd = b, () -> rules.waitForWaveToEnd, () -> rules.waves);
-        number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waves);
-        number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
+        check("$rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
+        check("$rules.waitForWaveToEnd", b -> rules.waitForWaveToEnd = b, () -> rules.waitForWaveToEnd);
+        number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
+        number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("$rules.title.respawns");
         check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns);
