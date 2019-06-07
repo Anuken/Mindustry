@@ -1,13 +1,11 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
@@ -155,7 +153,7 @@ public class Sorter extends Block{
             super.read(stream, revision);
             sortItem = content.item(stream.readShort());
             if(revision == 1){
-                new ItemBuffer(20, 45f).read(stream);
+                new DirectionalItemBuffer(20, 45f).read(stream);
             }
         }
     }
