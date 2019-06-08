@@ -56,8 +56,8 @@ public class Predict{
      */
     public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(),
-        dst.getTargetVelocityX() - src.getTargetVelocityX(),
-        dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
+        dst.getTargetVelocityX() - src.getTargetVelocityX()/2f,
+        dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
     }
 
     private static Vector2 quad(float a, float b, float c){

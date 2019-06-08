@@ -3,8 +3,7 @@ package io.anuke.mindustry.entities;
 import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.collection.IntQueue;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
@@ -78,17 +77,30 @@ public class Damage{
         }
     }
 
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
+        collideLine(hitter, team, effect, x, y, angle, length, false);
+    }
+
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         tr.trns(angle, length);
-        world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+        IntPositionConsumer collider = (cx, cy) -> {
             Tile tile = world.ltile(cx, cy);
             if(tile != null && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
                 hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+            }
+        };
+
+        world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            collider.accept(cx, cy);
+            if(large){
+                for(Point2 p : Geometry.d4){
+                    collider.accept(cx + p.x, cy + p.y);
+                }
             }
             return false;
         });

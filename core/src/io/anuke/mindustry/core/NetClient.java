@@ -190,6 +190,7 @@ public class NetClient implements ApplicationListener{
     public static void onWorldDataBegin(){
         Entities.clear();
         netClient.removed.clear();
+        logic.reset();
 
         ui.chatfrag.clearMessages();
         Net.setClientLoaded(false);

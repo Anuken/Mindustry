@@ -547,7 +547,7 @@ public class Bullets implements ContentList{
             @Override
             public void update(Bullet b){
                 if(b.timer.get(1, 5f)){
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length);
+                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), length, true);
                 }
                 Effects.shake(1f, 1f, b.x, b.y);
             }
