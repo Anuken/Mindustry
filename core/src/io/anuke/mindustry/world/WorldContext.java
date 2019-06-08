@@ -19,4 +19,5 @@ public interface WorldContext{
 
     /** End generating, prepares tiles.*/
     void end();
+
 }
