@@ -142,7 +142,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 35f;
+            splashDamage = 30f;
             splashDamageRadius = 15f;
         }};
 
@@ -154,7 +154,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 26f;
+            splashDamage = 24f;
             splashDamageRadius = 24f;
         }};
 

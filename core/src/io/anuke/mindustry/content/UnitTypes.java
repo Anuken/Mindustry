@@ -288,6 +288,7 @@ public class UnitTypes implements ContentList{
                 reload = 180f;
                 width = 22f;
                 shots = 22;
+                shootCone = 100f;
                 shotDelay = 2;
                 inaccuracy = 10f;
                 roundrobin = true;
@@ -318,6 +319,7 @@ public class UnitTypes implements ContentList{
                 reload = 10f;
                 width = 32f;
                 shots = 1;
+                shootCone = 100f;
 
                 shake = 1f;
                 inaccuracy = 3f;
