@@ -162,6 +162,12 @@ public class PlacementFragment extends Fragment{
                             }
                         });
                     }
+                    //add missing elements to even out table size
+                    if(index < 4){
+                        for(int i = 0; i < 4-index; i++){
+                            blockTable.add().size(46f);
+                        }
+                    }
                     blockTable.act(0f);
                 };
 

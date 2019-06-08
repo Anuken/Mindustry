@@ -1249,7 +1249,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 500, Items.silicon, 150, Items.lead, 200));
             size = 3;
             itemCapacity = 100;
-            launchTime = 60f * 8;
+            launchTime = 60f * 16;
             hasPower = true;
             consumes.power(1f);
         }};
@@ -1258,7 +1258,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.titanium, 400, Items.silicon, 300, Items.lead, 500, Items.plastanium, 150));
             size = 4;
             itemCapacity = 250;
-            launchTime = 60f * 7;
+            launchTime = 60f * 14;
             hasPower = true;
             consumes.power(2f);
         }};
