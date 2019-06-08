@@ -98,7 +98,10 @@ public class Pathfinder{
         if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
             PathData path = paths[team.ordinal()];
 
-            if(!path.frontier.isEmpty()){
+            if(path.weights[tile.x][tile.y] <= 0.1f){
+                //this was a previous target
+                path.frontier.clear();
+            }else if(!path.frontier.isEmpty()){
                 return;
             }
 
