@@ -44,7 +44,7 @@ public class ServerControl implements ApplicationListener{
     private FileHandle currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-    private GameMode lastMode = GameMode.survival;
+    private Gamemode lastMode = Gamemode.survival;
 
     private Thread socketThread;
     private PrintWriter socketOutput;
