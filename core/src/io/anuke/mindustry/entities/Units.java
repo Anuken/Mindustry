@@ -102,6 +102,8 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static TargetTrait closestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred, Predicate<Tile> tilePred){
+        if(team == Team.none) return null;
+
         Unit unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;

@@ -66,6 +66,6 @@ public class Rules{
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){
-        return JsonIO.read(Rules.class, JsonIO.write(this));
+        return JsonIO.copy(this);
     }
 }

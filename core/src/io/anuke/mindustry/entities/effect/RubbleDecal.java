@@ -15,7 +15,7 @@ public class RubbleDecal extends Decal{
     public static void create(float x, float y, int size){
         if(headless) return;
 
-        if(regions[size].length == 0){
+        if(regions[size].length == 0 || regions[size][0].getTexture().isDisposed()){
             regions[size] = new TextureRegion[2];
             for(int j = 0; j < 2; j++){
                 regions[size][j] = Core.atlas.find("rubble-" + size + "-" + j);

@@ -108,9 +108,13 @@ public class ContentLoader{
         loaded = true;
     }
 
-    /** Initializes all content with the specified function. */
     public void initialize(Consumer<Content> callable){
-        if(initialization.contains(callable)) return;
+        initialize(callable, false);
+    }
+
+    /** Initializes all content with the specified function. */
+    public void initialize(Consumer<Content> callable, boolean override){
+        if(initialization.contains(callable) && !override) return;
 
         for(ContentType type : ContentType.values()){
             for(Content content : contentMap[type.ordinal()]){
