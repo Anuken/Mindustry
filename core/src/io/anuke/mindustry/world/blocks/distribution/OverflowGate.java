@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 import java.io.*;
 
 public class OverflowGate extends Block{
-    protected float speed = 8f;
+    protected float speed = 1f;
 
     public OverflowGate(String name){
         super(name);
@@ -34,7 +34,6 @@ public class OverflowGate extends Block{
         }
         return result;
     }
-
 
     @Override
     public void update(Tile tile){
