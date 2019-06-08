@@ -236,7 +236,7 @@ public class ServerControl implements ApplicationListener{
             info("Loading map...");
 
             logic.reset();
-            lastMode = preset:
+            lastMode = preset;
             try{
                 world.loadMap(result);
                 state.rules = preset.apply(result.rules());
