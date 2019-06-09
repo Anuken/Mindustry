@@ -1451,7 +1451,7 @@ public class Blocks implements ContentList{
 
             reload = 35f;
             shootShake = 4f;
-            range = 95f;
+            range = 90f;
             recoil = 5f;
             shots = 3;
             spread = 20f;
