@@ -345,7 +345,7 @@ public class Block extends BlockStorage{
             cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
         }
 
-        if(cracks == null || cracks[0][0].getTexture().isDisposed()){
+        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
                 for(int i = 0; i < crackRegions; i++){

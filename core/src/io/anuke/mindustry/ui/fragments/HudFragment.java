@@ -111,6 +111,7 @@ public class HudFragment extends Fragment{
                     float size = Unit.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
+                    //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
                     int index = 0;
                     for(Element elem : children){
                         int fi = index++;
@@ -119,7 +120,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(3f, size);
+                                elem.setSize(Unit.dp.scl(3f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return !state.is(State.menu);
@@ -135,7 +136,7 @@ public class HudFragment extends Fragment{
             }
 
             cont.update(() -> {
-                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen()){
+                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
                     toggleMenus();
                 }
             });

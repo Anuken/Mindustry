@@ -12,7 +12,6 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 
@@ -41,7 +40,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, pyraFlame, fuseShot, driverBolt, healBullet, frag, eruptorShot,
+    fireball, basicFlame, pyraFlame, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil, explode;
@@ -142,7 +141,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 30f;
+            splashDamage = 27f;
             splashDamageRadius = 15f;
         }};
 
@@ -154,7 +153,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 24f;
+            splashDamage = 22f;
             splashDamageRadius = 24f;
         }};
 
@@ -180,7 +179,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
         }};
 
-        missileExplosive = new MissileBulletType(1.8f, 10, "missile"){{
+        missileExplosive = new MissileBulletType(2.7f, 10, "missile"){{
             bulletWidth = 8f;
             bulletHeight = 8f;
             bulletShrink = 0f;
@@ -192,7 +191,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
         }};
 
-        missileIncendiary = new MissileBulletType(2f, 12, "missile"){{
+        missileIncendiary = new MissileBulletType(2.9f, 12, "missile"){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             bulletWidth = 7f;
@@ -208,7 +207,7 @@ public class Bullets implements ContentList{
             incendAmount = 3;
         }};
 
-        missileSurge = new MissileBulletType(3.5f, 15, "bullet"){{
+        missileSurge = new MissileBulletType(4.4f, 15, "bullet"){{
             bulletWidth = 8f;
             bulletHeight = 8f;
             bulletShrink = 0f;
@@ -573,42 +572,6 @@ public class Bullets implements ContentList{
                         Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rot(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
-                Draw.reset();
-            }
-        };
-
-        fuseShot = new BulletType(0.01f, 70){
-            int rays = 3;
-            float rayLength = 120f;
-
-            {
-                hitEffect = Fx.hitFuse;
-                shootEffect = smokeEffect = Fx.none;
-                lifetime = 10f;
-                despawnEffect = Fx.none;
-                pierce = true;
-            }
-
-            @Override
-            public void init(Bullet b){
-                for(int i = 0; i < rays; i++){
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
-                }
-            }
-
-            @Override
-            public void draw(Bullet b){
-                super.draw(b);
-                Draw.color(Color.WHITE, Pal.surge, b.fin());
-                //Draw.alpha(b.fout());
-                for(int i = 0; i < 7; i++){
-                    Tmp.v1.trns(b.rot(), i * 8f);
-                    float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                    Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
-                    Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
-                }
-                Shapes.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
-                Shapes.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
                 Draw.reset();
             }
         };

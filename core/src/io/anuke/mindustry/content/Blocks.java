@@ -5,7 +5,11 @@ import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.entities.Damage;
+import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -1292,7 +1296,7 @@ public class Blocks implements ContentList{
                 Items.lead, Bullets.flakLead
             );
             reload = 18f;
-            range = 175f;
+            range = 170f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
@@ -1408,11 +1412,11 @@ public class Blocks implements ContentList{
                 Items.pyratite, Bullets.missileIncendiary,
                 Items.surgealloy, Bullets.missileSurge
             );
-            reload = 50f;
+            reload = 40f;
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 140f;
+            range = 185f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1440,6 +1444,58 @@ public class Blocks implements ContentList{
             shots = 3;
             ammoUseEffect = Fx.shellEjectBig;
             health = 360;
+        }};
+
+        fuse = new ItemTurret("fuse"){{
+            requirements(Category.turret, ItemStack.with(Items.copper, 450, Items.graphite, 450, Items.thorium, 200));
+
+            reload = 35f;
+            shootShake = 4f;
+            range = 95f;
+            recoil = 5f;
+            shots = 3;
+            spread = 20f;
+            restitution = 0.1f;
+            shootCone = 30;
+            size = 3;
+
+            health = 220 * size * size;
+
+            ammo(Items.graphite, new BulletType(0.01f, 105){
+                int rays = 1;
+                float rayLength = range + 10f;
+
+                {
+                    hitEffect = Fx.hitLancer;
+                    shootEffect = smokeEffect = Fx.lightningShoot;
+                    lifetime = 10f;
+                    despawnEffect = Fx.none;
+                    pierce = true;
+                }
+
+                @Override
+                public void init(Bullet b){
+                    for(int i = 0; i < rays; i++){
+                        Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
+                    }
+                }
+
+                @Override
+                public void draw(Bullet b){
+                    super.draw(b);
+                    Draw.color(Color.WHITE, Pal.lancerLaser, b.fin());
+                    //Draw.alpha(b.fout());
+                    for(int i = 0; i < 7; i++){
+                        Tmp.v1.trns(b.rot(), i * 8f);
+                        float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
+                        Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
+                        Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
+                    }
+                    Shapes.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
+                    Shapes.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
+                    Draw.reset();
+                }
+            });
         }};
 
         ripple = new ArtilleryTurret("ripple"){{
@@ -1484,19 +1540,6 @@ public class Blocks implements ContentList{
             shootCone = 30f;
 
             health = 145 * size * size;
-        }};
-
-        fuse = new ItemTurret("fuse"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 450, Items.graphite, 450, Items.surgealloy, 250));
-            ammo(Items.graphite, Bullets.fuseShot);
-            reload = 40f;
-            shootShake = 4f;
-            range = 110f;
-            recoil = 5f;
-            restitution = 0.1f;
-            size = 3;
-
-            health = 165 * size * size;
         }};
 
         spectre = new DoubleTurret("spectre"){{
