@@ -16,6 +16,7 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 
+import static io.anuke.mindustry.Vars.defaultTeam;
 import static io.anuke.mindustry.Vars.world;
 
 public class MapGenerator extends Generator{
@@ -79,7 +80,7 @@ public class MapGenerator extends Generator{
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                if(tiles[x][y].block() instanceof CoreBlock){
+                if(tiles[x][y].block() instanceof CoreBlock && tiles[x][y].getTeam() == defaultTeam){
                     players.add(new Point2(x, y));
                     tiles[x][y].setBlock(Blocks.air);
                 }

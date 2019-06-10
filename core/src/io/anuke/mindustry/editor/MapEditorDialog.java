@@ -21,7 +21,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
@@ -267,7 +268,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }else{
             Map map = world.maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
-                ui.showError("$editor.save.overwrite");
+                handleSaveBuiltin(map);
             }else{
                 world.maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
@@ -276,6 +277,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.hide();
         saved = true;
+    }
+
+    /** Called when a built-in map save is attempted.*/
+    protected void handleSaveBuiltin(Map map){
+        ui.showError("$editor.save.overwrite");
     }
 
     /**

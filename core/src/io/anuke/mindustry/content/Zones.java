@@ -80,20 +80,24 @@ public class Zones implements ContentList{
             }};
         }};
 
-        //to be implemented as an attack map
-        /*
-        saltFlats = new Zone("saltFlats", new DesertWastesGenerator(260, 260)){{
-            startingItems = ItemStack.list(Items.copper, 200);
-            conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(desertWastes, 25);
-            blockRequirements = new Block[]{Blocks.router};
-            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
+        saltFlats = new Zone("saltFlats", new MapGenerator("saltFlats")){{
+            baseLaunchCost = ItemStack.with(Items.copper, -100);
+            startingItems = ItemStack.list(Items.copper, 100);
+            alwaysUnlocked = true;
+            conditionWave = 5;
+            launchPeriod = 5;
+            zoneRequirements = ZoneRequirement.with(desertWastes, 60);
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
-                waveSpacing = 60 * 60 * 1.5f;
+                attackMode = true;
+                waveSpacing = 60 * 60;
+                buildCostMultiplier = 0.5f;
+                unitBuildSpeedMultiplier = 0.5f;
+                enemyCheat = true;
             }};
-        }};*/
+        }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
             startingItems = ItemStack.list(Items.copper, 200);

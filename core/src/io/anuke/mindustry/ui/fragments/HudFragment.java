@@ -534,11 +534,27 @@ public class HudFragment extends Fragment{
     }
 
     private void addWaveTable(TextButton table){
+        StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
-        IntFormat waitingf = new IntFormat("wave.waiting");
+        IntFormat waitingf = new IntFormat("wave.waiting", i -> {
+            ibuild.setLength(0);
+            int m = i/60;
+            int s = i % 60;
+            if(m <= 0){
+                ibuild.append(s);
+            }else{
+                ibuild.append(m);
+                ibuild.append(":");
+                if(s < 10){
+                    ibuild.append("0");
+                }
+                ibuild.append(s);
+            }
+            return ibuild.toString();
+        });
 
         table.clearChildren();
         table.touchable(Touchable.enabled);

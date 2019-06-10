@@ -45,14 +45,14 @@ public class ZoneTests{
                         if(tile.drop() != null){
                             resources.add(tile.drop());
                         }
-                        if(tile.block() instanceof CoreBlock){
+                        if(tile.block() instanceof CoreBlock && tile.getTeam() == defaultTeam){
                             hasSpawnPoint = true;
                         }
                     }
                 }
 
                 assertTrue(hasSpawnPoint, "Zone \"" + zone.name + "\" has no spawn points.");
-                assertTrue(world.spawner.countSpawns() > 0, "Zone \"" + zone.name + "\" has no enemy spawn points: " + world.spawner.countSpawns());
+                assertTrue(world.spawner.countSpawns() > 0 || (zone.rules.get().attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + world.spawner.countSpawns());
 
                 for(Item item : resources){
                     assertTrue(Structs.contains(zone.resources, item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");

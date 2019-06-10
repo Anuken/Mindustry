@@ -70,7 +70,7 @@ public class Generators{
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(content.blocks().size, 1);
-            Color outlineColor = Color.valueOf("404049");
+            Color outlineColor = Color.valueOf("4d4e58");
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
