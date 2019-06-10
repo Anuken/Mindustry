@@ -104,7 +104,7 @@ public class CrashSender{
 
             Log.info("Sending crash report.");
             //post to crash report URL
-            Net.http(Vars.crashReportURL, "POST", value.toJson(OutputType.json), r -> {
+            Core.net.httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
                 System.exit(1);
