@@ -5,19 +5,18 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.*;
-import io.anuke.arc.scene.ui.layout.Container;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Minimap extends Container<Element>{
+public class Minimap extends Table{
 
     public Minimap(){
         background("pane");
         float margin = 5f;
         touchable(Touchable.enabled);
 
-        addChild(new Element(){
+        add(new Element(){
             {
                 setSize(Unit.dp.scl(140f));
             }
@@ -39,9 +38,8 @@ public class Minimap extends Container<Element>{
                     renderer.minimap.drawEntities(x, y, width, height);
                 }
             }
-        });
+        }).size(140f);
 
-        size(140f);
         margin(margin);
 
         addListener(new InputListener(){

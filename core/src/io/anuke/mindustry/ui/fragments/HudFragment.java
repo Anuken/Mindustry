@@ -143,7 +143,9 @@ public class HudFragment extends Fragment{
 
             Table wavesMain, editorMain;
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(e -> wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight());
+            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight()).update(s -> {
+                ((Table)s.getParent()).getCell(s).height(wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight());
+            });
 
             {
                 wavesMain.visible(() -> shown && !state.isEditor());

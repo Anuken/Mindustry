@@ -15,6 +15,7 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
+import io.anuke.arc.scene.ui.Tooltip.Tooltips;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
@@ -92,7 +93,7 @@ public class UI implements ApplicationListener{
             )
         ));
 
-        TooltipManager.getInstance().animations = false;
+        Tooltips.getInstance().animations = false;
 
         Core.settings.setErrorHandler(e -> {
             e.printStackTrace();

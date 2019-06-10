@@ -115,8 +115,8 @@ public class BlockInventoryFragment extends Fragment{
         int cols = 3;
         int row = 0;
 
-        table.margin(6f);
-        table.defaults().size(8 * 5).space(8f);
+        table.margin(4f);
+        table.defaults().size(8 * 5).pad(4f);
 
         if(tile.block().hasItems){
 
