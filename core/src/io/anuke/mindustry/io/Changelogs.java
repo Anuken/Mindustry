@@ -1,19 +1,19 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.util.serialization.JsonReader;
 import io.anuke.arc.util.serialization.JsonValue;
-import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.releasesURL;
 
 public class Changelogs{
 
     public static void getChangelog(Consumer<Array<VersionInfo>> success, Consumer<Throwable> fail){
-        Net.http(releasesURL, "GET", result -> {
+        Core.net.httpGet(releasesURL, result -> {
             JsonReader reader = new JsonReader();
-            JsonValue value = reader.parse(result).child;
+            JsonValue value = reader.parse(result.getResultAsString()).child;
             Array<VersionInfo> out = new Array<>();
 
             while(value != null){

@@ -1,11 +1,9 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.net.HttpRequestBuilder;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
@@ -331,31 +329,6 @@ public class Net{
         serverProvider = null;
         server = false;
         active = false;
-    }
-
-    public static void http(String url, String method, Consumer<String> listener, Consumer<Throwable> failure){
-        http(url, method, null, listener, failure);
-    }
-
-    public static void http(String url, String method, String body, Consumer<String> listener, Consumer<Throwable> failure){
-        HttpRequest req = new HttpRequestBuilder().newRequest()
-        .method(method).url(url).content(body).build();
-
-        Core.net.sendHttpRequest(req, new HttpResponseListener(){
-            @Override
-            public void handleHttpResponse(HttpResponse httpResponse){
-                listener.accept(httpResponse.getResultAsString());
-            }
-
-            @Override
-            public void failed(Throwable t){
-                failure.accept(t);
-            }
-
-            @Override
-            public void cancelled(){
-            }
-        });
     }
 
     public enum SendMode{

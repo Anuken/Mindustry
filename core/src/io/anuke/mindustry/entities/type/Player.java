@@ -429,7 +429,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void drawBuildRequests(){
         BuildRequest last = null;
         for(BuildRequest request : getPlaceQueue()){
-            if(getCurrentRequest() == request && request.progress > 0.001f && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor())) continue;
+            if(request.progress > 0.01f || (getCurrentRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
                 Block block = world.ltile(request.x, request.y).block();
