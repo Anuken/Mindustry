@@ -42,4 +42,4 @@ After building, the output .JAR file should be in `/desktop/build/libs/desktop-r
 
 <a href="https://anuke.itch.io/mindustry"><img src="https://i.imgur.com/sk26hTV.png" width="auto" height="75"></a>
 
-<a href="https://play.google.com/store/apps/details?id=io.anuke.mindustry&hl=en"><img src="https://i.imgur.com/8dF6l81.png" width="auto" height="75"></a>
+<a href="https://play.google.com/store/apps/details?id=io.anuke.mindustry&hl=en"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/1280px-Get_it_on_Google_play.svg.png" width="auto" height="75"></a>
