@@ -1588,7 +1588,7 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
-        BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp;
+        BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
 
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 80));
