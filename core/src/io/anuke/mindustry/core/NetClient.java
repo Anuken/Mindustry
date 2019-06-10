@@ -229,7 +229,7 @@ public class NetClient implements ApplicationListener{
                 int id = input.readInt();
                 byte typeID = input.readByte();
 
-                SyncTrait entity = (SyncTrait)group.getByID(id);
+                SyncTrait entity = group == null ? null : (SyncTrait)group.getByID(id);
                 boolean add = false;
 
                 if(entity == null && id == player.id){

@@ -17,8 +17,8 @@ public class UnitTypes implements ContentList{
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
             isFlying = true;
             drag = 0.01f;
-            speed = 0.2f;
-            maxVelocity = 0.8f;
+            speed = 0.4f;
+            maxVelocity = 1.6f;
             range = 50f;
             health = 60;
             engineSize = 1.8f;
@@ -217,8 +217,8 @@ public class UnitTypes implements ContentList{
             isFlying = true;
             drag = 0.01f;
             mass = 2f;
-            speed = 0.2f;
-            maxVelocity = 0.9f;
+            speed = 0.45f;
+            maxVelocity = 1.9f;
             range = 70f;
             itemCapacity = 70;
             health = 220;
