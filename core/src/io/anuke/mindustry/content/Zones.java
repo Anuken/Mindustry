@@ -24,7 +24,7 @@ public class Zones implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
@@ -87,7 +87,7 @@ public class Zones implements ContentList{
             conditionWave = 5;
             launchPeriod = 5;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
             rules = () -> new Rules(){{
                 waves = true;
                 waveTimer = true;
