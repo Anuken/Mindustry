@@ -83,6 +83,11 @@ public class Drone extends FlyingUnit implements BuilderTrait{
                 }else{
                     getWeapon().update(Drone.this, target.getX(), target.getY());
                 }
+            }else{
+                if(getSpawner() != null){
+                    target = getSpawner();
+                    circle(type.range * 0.9f);
+                }
             }
         }
     },
