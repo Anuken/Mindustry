@@ -80,6 +80,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.drag;
     }
 
+    public Tile getSpawner(){
+        return world.tile(spawner);
+    }
+
     /** Initialize the type and team of this unit. Only call once! */
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");

@@ -142,9 +142,14 @@ public class HudFragment extends Fragment{
             });
 
             Table wavesMain, editorMain;
+            boolean[] prev = {false};
 
             cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight()).update(s -> {
-                ((Table)s.getParent()).getCell(s).height(wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight());
+                ((Table)s.getParent()).getCell(s).height((wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight()) / Unit.dp.scl(1f));
+                if(prev[0] != wavesMain.isVisible()){
+                    s.getParent().pack();
+                    prev[0] = wavesMain.isVisible();
+                }
             });
 
             {

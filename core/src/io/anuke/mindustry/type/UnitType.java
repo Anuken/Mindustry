@@ -28,7 +28,7 @@ public class UnitType extends UnlockableContent{
     public boolean rotateWeapon = false;
     public float drag = 0.1f;
     public float maxVelocity = 5f;
-    public float retreatPercent = 0.2f;
+    public float retreatPercent = 0.6f;
     public int itemCapacity = 30;
     public ObjectSet<Item> toMine = ObjectSet.with(Items.lead, Items.copper);
     public float buildPower = 0.3f, minePower = 0.7f;

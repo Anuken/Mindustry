@@ -40,7 +40,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 430;
-    private final static float serverSyncTime = 20, kickDuration = 30 * 1000;
+    private final static float serverSyncTime = 15, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     private final static Rectangle viewport = new Rectangle();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */

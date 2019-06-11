@@ -25,8 +25,6 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Drone extends FlyingUnit implements BuilderTrait{
-
-
     protected Item targetItem;
     protected Tile mineTile;
     protected Queue<BuildRequest> placeQueue = new Queue<>();
@@ -77,20 +75,14 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
         public void update(){
 
-            retarget(() -> {
-                target = Units.findDamagedTile(team, x, y);
+            retarget(() -> target = Units.findDamagedTile(team, x, y));
 
-                if(target == null){
-                    setState(mine);
+            if(target != null){
+                if(target.dst(Drone.this) > type.range){
+                    circle(type.range * 0.9f);
+                }else{
+                    getWeapon().update(Drone.this, target.getX(), target.getY());
                 }
-            });
-
-            if(target == null) return;
-
-            if(target.dst(Drone.this) > type.range){
-                circle(type.range * 0.9f);
-            }else{
-                getWeapon().update(Drone.this, target.getX(), target.getY());
             }
         }
     },
@@ -196,10 +188,14 @@ public class Drone extends FlyingUnit implements BuilderTrait{
             if(health >= maxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
-                if(timer.get(timerTarget, 20)){
-                    Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
-                    if(target != null) Drone.this.target = target.entity;
-                }
+                retarget(() -> {
+                    Tile repairPoint = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
+                    if(repairPoint != null){
+                        target = repairPoint;
+                    }else if(getSpawner() != null){
+                        target = getSpawner();
+                    }
+                });
             }else{
                 circle(40f);
             }
@@ -300,8 +296,7 @@ public class Drone extends FlyingUnit implements BuilderTrait{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent &&
-        Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
+        if(health <= health * type.retreatPercent){
             setState(retreat);
         }
     }
