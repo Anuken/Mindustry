@@ -2,59 +2,28 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.*;
 import io.anuke.arc.net.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.net.Net.ClientProvider;
-import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.Packets.Connect;
-import io.anuke.mindustry.net.Packets.Disconnect;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
+import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.net.Packets.*;
+import net.jpountz.lz4.*;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.ClosedSelectorException;
 
-import static io.anuke.mindustry.Vars.netClient;
-import static io.anuke.mindustry.Vars.port;
+import static io.anuke.mindustry.Vars.*;
 
 public class ArcNetClient implements ClientProvider{
     final Client client;
-    final Array<InetAddress> foundAddresses = new Array<>();
-    final ClientDiscoveryHandler handler;
+    final Supplier<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
     final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-    Consumer<Host> lastCallback;
 
     public ArcNetClient(){
-        handler = new ClientDiscoveryHandler(){
-            @Override
-            public DatagramPacket newDatagramPacket(){
-                return new DatagramPacket(new byte[256], 256);
-            }
-
-            @Override
-            public void discoveredHost(DatagramPacket datagramPacket){
-                ByteBuffer buffer = ByteBuffer.wrap(datagramPacket.getData());
-                Host host = NetworkIO.readServerData(datagramPacket.getAddress().getHostAddress(), buffer);
-                for(InetAddress address : foundAddresses){
-                    if(address.equals(datagramPacket.getAddress()) || (isLocal(address) && isLocal(datagramPacket.getAddress()))){
-                        return;
-                    }
-                }
-                Core.app.post(() -> lastCallback.accept(host));
-                foundAddresses.add(datagramPacket.getAddress());
-            }
-
-            @Override
-            public void finish(){
-
-            }
-        };
-
         client = new Client(8192, 4096, new PacketSerializer());
-        client.setDiscoveryHandler(handler);
+        client.setDiscoveryPacket(packetSupplier);
 
         NetListener listener = new NetListener(){
             @Override
@@ -172,40 +141,43 @@ public class ArcNetClient implements ClientProvider{
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
         runAsync(() -> {
-            synchronized(handler){
-                try{
-                    DatagramSocket socket = new DatagramSocket();
-                    socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
+            try{
+                DatagramSocket socket = new DatagramSocket();
+                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
+                socket.setSoTimeout(2000);
 
-                    socket.setSoTimeout(2000);
+                DatagramPacket packet = packetSupplier.get();
+                socket.receive(packet);
 
-                    lastCallback = valid;
+                ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
-                    DatagramPacket packet = handler.newDatagramPacket();
-
-                    socket.receive(packet);
-
-                    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
-
-                    Core.app.post(() -> valid.accept(host));
-                }catch(Exception e){
-                    Core.app.post(() -> invalid.accept(e));
-                }
+                Core.app.post(() -> valid.accept(host));
+            }catch(Exception e){
+                Core.app.post(() -> invalid.accept(e));
             }
         });
     }
 
     @Override
     public void discover(Consumer<Host> callback, Runnable done){
-        runAsync(() -> {
-            synchronized(handler){
-                foundAddresses.clear();
-                lastCallback = callback;
-                client.discoverHosts(port, 3000);
-                Core.app.post(done);
-            }
-        });
+        Array<InetAddress> foundAddresses = new Array<>();
+        client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
+            Core.app.post(() -> {
+                try{
+                    if(foundAddresses.contains(address -> address.equals(packet.getAddress()) || (isLocal(address) && isLocal(packet.getAddress())))){
+                        return;
+                    }
+                    ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                    callback.accept(host);
+                    foundAddresses.add(packet.getAddress());
+                }catch(Exception e){
+                    //don't crash when there's an error pinging a a server or parsing data
+                    e.printStackTrace();
+                }
+            });
+        }, () -> Core.app.post(done));
     }
 
     @Override

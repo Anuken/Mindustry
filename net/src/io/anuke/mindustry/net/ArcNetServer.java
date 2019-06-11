@@ -19,6 +19,8 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class ArcNetServer implements ServerProvider{
     final Server server;
     final CopyOnWriteArrayList<KryoConnection> connections = new CopyOnWriteArrayList<>();
@@ -31,10 +33,11 @@ public class ArcNetServer implements ServerProvider{
 
     public ArcNetServer(){
         server = new Server(4096 * 2, 4096, new PacketSerializer());
-        server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
+        server.setMulticast(multicastGroup, multicastPort);
+        server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
-            datagramChannel.send(buffer, fromAddress);
+            handler.respond(buffer);
         });
 
         NetListener listener = new NetListener(){
