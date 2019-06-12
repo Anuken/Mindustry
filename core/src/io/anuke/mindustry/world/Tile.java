@@ -9,8 +9,7 @@ import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -161,6 +160,13 @@ public class Tile implements Position, TargetTrait{
         this.overlay = 0;
     }
 
+    /** Sets the floor, preserving overlay.*/
+    public void setFloorUnder(Floor floor){
+        Block overlay = overlay();
+        setFloor(floor);
+        setOverlay(overlay);
+    }
+
     public byte rotation(){
         return rotation;
     }
@@ -190,7 +196,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void clearOverlay(){
-        this.overlay = 0;
+        setOverlayID((short)0);
     }
 
     public boolean passable(){

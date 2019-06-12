@@ -27,16 +27,7 @@ public class Net{
     private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
     private static ClientProvider clientProvider;
     private static ServerProvider serverProvider;
-
     private static IntMap<StreamBuilder> streams = new IntMap<>();
-
-    public static boolean hasClient(){
-        return clientProvider != null;
-    }
-
-    public static boolean hasServer(){
-        return serverProvider != null;
-    }
 
     /** Display a network error. Call on the graphics thread. */
     public static void showError(Throwable e){
@@ -50,12 +41,13 @@ public class Net{
 
             String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
             String type = t.getClass().toString().toLowerCase();
+            boolean isError = false;
 
             if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
                 error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch")){
                 error = Core.bundle.get("error.mismatch");
-            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
+            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.parseException(e, true).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Core.bundle.get("error.unreachable");
@@ -65,9 +57,14 @@ public class Net{
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
                 error = Core.bundle.get("error.any") + "\n" + Strings.parseException(e, true);
+                isError = true;
             }
 
-            ui.showText("", Core.bundle.format("connectfail", error));
+            if(isError){
+                ui.showError(Core.bundle.format("connectfail", error));
+            }else{
+                ui.showText("", Core.bundle.format("connectfail", error));
+            }
             ui.loadfrag.hide();
 
             if(Net.client()){

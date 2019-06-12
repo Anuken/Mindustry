@@ -1,7 +1,6 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.GestureDetector;
@@ -24,7 +23,6 @@ import static io.anuke.mindustry.Vars.ui;
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
     private EditorTool tool = EditorTool.pencil;
-    private Bresenham2 br = new Bresenham2();
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -107,19 +105,8 @@ public class MapView extends Element implements GestureListener{
                 Point2 p = project(x, y);
 
                 if(tool == EditorTool.line){
-                    if(Core.input.keyDown(KeyCode.TAB)){
-                        if(Math.abs(p.x - firstTouch.x) > Math.abs(p.y - firstTouch.y)){
-                            p.y = firstTouch.y;
-                        }else{
-                            p.x = firstTouch.x;
-                        }
-                    }
-
                     ui.editor.resetSaved();
-                    Array<Point2> points = br.line(startx, starty, p.x, p.y);
-                    for(Point2 point : points){
-                        editor.draw(point.x, point.y, EditorTool.isPaint());
-                    }
+                    tool.touchedLine(editor, startx, starty, p.x, p.y);
                 }
 
                 editor.flushOp();
@@ -133,7 +120,6 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
-
                 mousex = x;
                 mousey = y;
 
@@ -141,13 +127,10 @@ public class MapView extends Element implements GestureListener{
 
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
-                    Array<Point2> points = br.line(lastx, lasty, p.x, p.y);
-                    for(Point2 point : points){
-                        tool.touched(editor, point.x, point.y);
-                    }
+                    Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
                 }
 
-                if(tool == EditorTool.line && Core.input.keyDown(KeyCode.TAB)){
+                if(tool == EditorTool.line && tool.mode == 1){
                     if(Math.abs(p.x - firstTouch.x) > Math.abs(p.y - firstTouch.y)){
                         lastx = p.x;
                         lasty = firstTouch.y;
@@ -296,7 +279,13 @@ public class MapView extends Element implements GestureListener{
             if((tool.edit || (tool == EditorTool.line && !drawing)) && (!mobile || drawing)){
                 Point2 p = project(mousex, mousey);
                 Vector2 v = unproject(p.x, p.y).add(x, y);
-                Lines.poly(brushPolygons[index], v.x, v.y, scaling);
+
+                //pencil square outline
+                if(tool == EditorTool.pencil && tool.mode == 1){
+                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * (editor.brushSize + 0.5f));
+                }else{
+                    Lines.poly(brushPolygons[index], v.x, v.y, scaling);
+                }
             }
         }else{
             if((tool.edit || tool == EditorTool.line) && (!mobile || drawing)){

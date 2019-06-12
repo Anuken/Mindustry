@@ -2,6 +2,8 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
@@ -132,15 +134,111 @@ public class MapEditor{
         return world.height();
     }
 
-    public void draw(int x, int y, boolean paint){
-        draw(x, y, paint, drawBlock);
+    public void drawBlocksReplace(int x, int y){
+        drawBlocks(x, y, tile -> tile.block() != Blocks.air || drawBlock.isFloor());
     }
 
-    public void draw(int x, int y, boolean paint, Block drawBlock){
-        draw(x, y, paint, drawBlock, 1.0);
+    public void drawBlocks(int x, int y){
+        drawBlocks(x, y, false, tile -> true);
     }
 
-    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
+    public void drawBlocks(int x, int y, Predicate<Tile> tester){
+        drawBlocks(x, y, false, tester);
+    }
+
+    public void drawBlocks(int x, int y, boolean square, Predicate<Tile> tester){
+        if(drawBlock.isMultiblock()){
+            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
+
+            int offsetx = -(drawBlock.size - 1) / 2;
+            int offsety = -(drawBlock.size - 1) / 2;
+
+            for(int dx = 0; dx < drawBlock.size; dx++){
+                for(int dy = 0; dy < drawBlock.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+
+                    if(Structs.inBounds(worldx, worldy, width(), height())){
+                        Tile tile = tile(worldx, worldy);
+
+                        Block block = tile.block();
+
+                        //bail out if there's anything blocking the way
+                        if(block.isMultiblock() || block instanceof BlockPart){
+                            return;
+                        }
+
+                        renderer.updatePoint(worldx, worldy);
+                    }
+                }
+            }
+
+            world.setBlock(tile(x, y), drawBlock, drawTeam);
+        }else{
+
+            boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
+
+            Consumer<Tile> drawer = tile -> {
+                if(!tester.test(tile)) return;
+
+                //remove linked tiles blocking the way
+                if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
+                    world.removeBlock(tile.link());
+                }
+
+                if(isFloor){
+                    tile.setFloor(drawBlock.asFloor());
+                }else{
+                    tile.setBlock(drawBlock);
+                    if(drawBlock.synthetic()){
+                        tile.setTeam(drawTeam);
+                    }
+                    if(drawBlock.rotate){
+                        tile.rotation((byte)rotation);
+                    }
+                }
+            };
+
+            if(square){
+                drawSquare(x, y, drawer);
+            }else{
+                drawCircle(x, y, drawer);
+            }
+        }
+    }
+
+    public void drawCircle(int x, int y, Consumer<Tile> drawer){
+        for(int rx = -brushSize; rx <= brushSize; rx++){
+            for(int ry = -brushSize; ry <= brushSize; ry++){
+                if(Mathf.dst2(rx, ry) <= (brushSize - 0.5f) * (brushSize - 0.5f)){
+                    int wx = x + rx, wy = y + ry;
+
+                    if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                        continue;
+                    }
+
+                    drawer.accept(tile(wx, wy));
+                }
+            }
+        }
+    }
+
+    public void drawSquare(int x, int y, Consumer<Tile> drawer){
+        for(int rx = -brushSize; rx <= brushSize; rx++){
+            for(int ry = -brushSize; ry <= brushSize; ry++){
+                int wx = x + rx, wy = y + ry;
+
+                if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                    continue;
+                }
+
+                drawer.accept(tile(wx, wy));
+            }
+        }
+    }
+
+    public void draw_DEPRECATED(int x, int y, boolean paint, Block drawBlock, double chance){
         boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
         Tile[][] tiles = world.getTiles();
 

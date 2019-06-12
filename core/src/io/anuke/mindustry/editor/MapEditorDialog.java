@@ -12,8 +12,10 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.TextButton.TextButtonStyle;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
@@ -21,6 +23,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
@@ -380,15 +383,77 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
                 Consumer<EditorTool> addTool = tool -> {
+                    Table[] lastTable = {null};
+
                     ImageButton button = new ImageButton("icon-" + tool.name(), "clear-toggle");
-                    button.clicked(() -> view.setTool(tool));
+                    button.clicked(() -> {
+                        view.setTool(tool);
+                        if(lastTable[0] != null){
+                            lastTable[0].remove();
+                        }
+                    });
                     button.resizeImage(16 * 2f);
                     button.update(() -> button.setChecked(view.getTool() == tool));
                     group.add(button);
-                    if(tool == EditorTool.pencil)
-                        button.setChecked(true);
 
-                    tools.add(button);
+                    if(tool.altModes.length > 0){
+                        button.clicked(l -> {
+                            if(!mobile){
+                                //desktop: rightclick
+                                l.setButton(KeyCode.MOUSE_RIGHT);
+                            }
+                        }, e -> {
+                            //need to double tap
+                            if(mobile && e.getTapCount() < 2){
+                                return;
+                            }
+
+                            if(lastTable[0] != null){
+                                lastTable[0].remove();
+                            }
+
+                            Table table = new Table("dialogDim");
+                            table.defaults().size(280f, 70f);
+
+                            for(int i = 0; i < tool.altModes.length; i++){
+                                int mode = i;
+                                String name = tool.altModes[i];
+
+                                table.addButton(b -> {
+                                    b.left();
+                                    b.marginLeft(6);
+                                    b.setStyle(Core.scene.skin.get("clear-toggle", TextButtonStyle.class));
+                                    b.add(Core.bundle.get("toolmode." + name)).left();
+                                    b.row();
+                                    b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.LIGHT_GRAY).left();
+                                }, () -> {
+                                    tool.mode = (tool.mode == mode ? -1 : mode);
+                                    table.remove();
+                                }).update(b -> b.setChecked(tool.mode == mode));
+                                table.row();
+                            }
+
+                            table.update(() -> {
+                                Vector2 v = button.localToStageCoordinates(Tmp.v1.setZero());
+                                table.setPosition(v.x, v.y, Align.topLeft);
+                            });
+
+                            table.pack();
+                            table.act(Core.graphics.getDeltaTime());
+
+                            Core.scene.add(table);
+                            lastTable[0] = table;
+                        });
+                    }
+
+
+                    Label mode = new Label("");
+                    mode.setColor(Pal.remove);
+                    mode.update(() -> mode.setText(tool.mode == -1 ? "" : "M" + (tool.mode + 1) + " "));
+                    mode.setAlignment(Align.bottomRight, Align.bottomRight);
+                    mode.touchable(Touchable.disabled);
+
+                    tools.stack(button, mode);
                 };
 
                 tools.defaults().size(size, size);
@@ -479,13 +544,25 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void doInput(){
-        //tool select
-        for(int i = 0; i < EditorTool.values().length; i++){
-            if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
-                view.setTool(EditorTool.values()[i]);
-                break;
+
+        if(Core.input.ctrl()){
+            //alt mode select
+            //TODO these keycode are unusable, tweak later
+            for(int i = 0; i < view.getTool().altModes.length + 1; i++){
+                if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
+                    view.getTool().mode = i - 1;
+                }
+            }
+        }else{
+            //tool select
+            for(int i = 0; i < EditorTool.values().length; i++){
+                if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
+                    view.setTool(EditorTool.values()[i]);
+                    break;
+                }
             }
         }
+
 
         if(Core.input.keyTap(KeyCode.ESCAPE)){
             if(!menu.isShown()){
