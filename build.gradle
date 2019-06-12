@@ -113,6 +113,8 @@ allprojects{
         maven{ url 'https://jitpack.io' }
         jcenter()
     }
+
+    tasks.withType(Javadoc).all{ enabled = false }
 }
 
 project(":desktop"){
@@ -175,7 +177,7 @@ project(":core"){
     }
 
     dependencies{
-        if(System.properties["user.name"] == "anuke"){
+        if(System.properties["user.name"] == "anuke" && !System.properties["os.name"].contains("Mac")){
             task cleanGen{
                 doFirst{
                     delete{
