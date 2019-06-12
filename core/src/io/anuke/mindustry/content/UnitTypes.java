@@ -34,6 +34,30 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
+        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
+            isFlying = true;
+            drag = 0.01f;
+            mass = 2f;
+            speed = 0.45f;
+            maxVelocity = 1.9f;
+            range = 70f;
+            itemCapacity = 70;
+            health = 220;
+            buildPower = 0.9f;
+            minePower = 1.1f;
+            engineOffset = 6.5f;
+            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
+            weapon = new Weapon("heal-blaster"){{
+                length = 1.5f;
+                reload = 20f;
+                width = 0.5f;
+                roundrobin = true;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBullet;
+            }};
+        }};
+
         dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
@@ -210,30 +234,6 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 40f;
                 ignoreRotation = true;
                 bullet = Bullets.bombExplosive;
-            }};
-        }};
-
-        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
-            isFlying = true;
-            drag = 0.01f;
-            mass = 2f;
-            speed = 0.45f;
-            maxVelocity = 1.9f;
-            range = 70f;
-            itemCapacity = 70;
-            health = 220;
-            buildPower = 0.9f;
-            minePower = 1.1f;
-            engineOffset = 6.5f;
-            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
-            weapon = new Weapon("heal-blaster"){{
-                length = 1.5f;
-                reload = 20f;
-                width = 0.5f;
-                roundrobin = true;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBullet;
             }};
         }};
 

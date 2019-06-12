@@ -1,4 +1,4 @@
-import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.*;
 import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
@@ -213,6 +213,15 @@ public class ApplicationTests{
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
         assertTrue(state.teams.get(defaultTeam).cores.size > 0);
+    }
+
+    @Test
+    void loadOldSave(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("build77.msav"));
+
+        assertEquals(50, world.width());
+        assertEquals(50, world.height());
     }
 
     @Test
