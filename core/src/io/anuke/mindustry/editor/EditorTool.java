@@ -20,7 +20,7 @@ public enum EditorTool{
             editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
-    line("replace", "straight"){
+    line("replace", "orthogonal"){
 
         @Override
         public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
