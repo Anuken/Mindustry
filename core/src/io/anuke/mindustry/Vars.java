@@ -124,6 +124,7 @@ public class Vars{
     public static GameState state;
     public static GlobalData data;
     public static EntityCollisions collisions;
+    public static DefaultWaves defaultWaves;
 
     public static Control control;
     public static Logic logic;
@@ -172,6 +173,7 @@ public class Vars{
             content.setVerbose();
         }
 
+        defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();

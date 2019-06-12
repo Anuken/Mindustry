@@ -331,7 +331,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tile[][] tiles = world.createTiles(256 + 20, 10);
+        Tile[][] tiles = world.createTiles(256*2 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){
@@ -344,6 +344,7 @@ public class ApplicationTests{
         for(int x = 5; x < tiles.length && i < content.blocks().size; ){
             Block block = content.block(i++);
             if(block.buildVisibility.get()){
+                x += block.size;
                 tiles[x][5].setBlock(block);
                 x += block.size;
             }

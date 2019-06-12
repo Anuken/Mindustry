@@ -5,6 +5,8 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
@@ -21,7 +23,7 @@ import static io.anuke.mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends FloatingDialog{
     private final static int displayed = 20;
-    private Array<SpawnGroup> groups;
+    private Array<SpawnGroup> groups = new Array<>();
 
     private Table table, preview;
     private int start = 0;
@@ -65,7 +67,7 @@ public class WaveInfoDialog extends FloatingDialog{
             }).disabled(b -> Core.app.getClipboard().getContents() == null || Core.app.getClipboard().getContents().isEmpty());
             dialog.cont.row();
             dialog.cont.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
-                groups = JsonIO.copy(DefaultWaves.get());
+                groups = JsonIO.copy(defaultWaves.get());
                 buildGroups();
                 dialog.hide();
             }));
@@ -74,10 +76,10 @@ public class WaveInfoDialog extends FloatingDialog{
     }
 
     void setup(){
-        groups = JsonIO.copy(state.rules.spawns);
+        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? defaultWaves.get() : state.rules.spawns);
 
         cont.clear();
-        cont.table("clear", main -> {
+        cont.stack(new Table("clear", main -> {
             main.pane(t -> table = t).growX().growY().get().setScrollingDisabled(true, false);
             main.row();
             main.addButton("$add", () -> {
@@ -85,7 +87,13 @@ public class WaveInfoDialog extends FloatingDialog{
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
             }).growX().height(70f);
-        }).width(390f).growY();
+        }), new Label("$waves.none"){{
+            visible(groups::isEmpty);
+            touchable(Touchable.disabled);
+            setWrap(true);
+            setAlignment(Align.center, Align.center);
+        }}).width(390f).growY();
+
         cont.table("clear", m -> {
             m.add("$waves.preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();

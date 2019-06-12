@@ -583,7 +583,7 @@ public class Fx implements ContentList{
         spawnShockwave = new Effect(20f, 400f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.5f);
-            Lines.poly(e.x, e.y, 60, e.fin() * (e.rotation + 50f));
+            Lines.poly(e.x, e.y, 40, e.fin() * (e.rotation + 50f));
             Draw.reset();
         });
 

@@ -5,7 +5,6 @@ import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.DefaultWaves;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.io.JsonIO;
 
@@ -59,7 +58,7 @@ public class Map implements Comparable<Map>{
     /** This creates a new instance.*/
     public Rules rules(){
         Rules result = JsonIO.read(Rules.class, tags.get("rules", "{}"));
-        if(result.spawns.isEmpty()) result.spawns = DefaultWaves.get();
+        if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
         return result;
     }
 

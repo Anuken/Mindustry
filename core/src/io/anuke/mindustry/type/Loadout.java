@@ -11,8 +11,8 @@ import static io.anuke.mindustry.Vars.defaultTeam;
 import static io.anuke.mindustry.Vars.world;
 
 public class Loadout extends Content{
-    private final static Array<Tile> outArray = new Array<>();
-    private final static IntMap<BlockEntry> entries = new IntMap<BlockEntry>(){{
+    private final Array<Tile> outArray = new Array<>();
+    private final IntMap<BlockEntry> entries = new IntMap<BlockEntry>(){{
         put('>', new BlockEntry(Blocks.conveyor, 0));
         put('^', new BlockEntry(Blocks.conveyor, 1));
         put('<', new BlockEntry(Blocks.conveyor, 2));

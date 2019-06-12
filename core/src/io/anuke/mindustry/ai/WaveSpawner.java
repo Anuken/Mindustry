@@ -72,14 +72,16 @@ public class WaveSpawner{
 
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }
-
-                    if(doShockwave){
-                        Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawnX, spawnY, state.rules.dropZoneRadius));
-                        Time.run(40f, () -> Damage.damage(waveTeam, spawnX, spawnY, state.rules.dropZoneRadius, 99999999f, true));
-                    }
                 });
             }
         }
+
+        eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
+            if(doShockwave){
+                Time.run(20f, () -> Effects.effect(Fx.spawnShockwave, spawnX, spawnY, state.rules.dropZoneRadius));
+                Time.run(40f, () -> Damage.damage(waveTeam, spawnX, spawnY, state.rules.dropZoneRadius, 99999999f, true));
+            }
+        });
 
         Time.runTask(121f, () -> spawning = false);
     }

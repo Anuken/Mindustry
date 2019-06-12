@@ -5,9 +5,9 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.type.ItemStack;
 
 public class DefaultWaves{
-    private static Array<SpawnGroup> spawns;
+    private Array<SpawnGroup> spawns;
 
-    public static Array<SpawnGroup> get(){
+    public Array<SpawnGroup> get(){
         if(spawns == null && UnitTypes.dagger != null){
             spawns = Array.with(
             new SpawnGroup(UnitTypes.dagger){{

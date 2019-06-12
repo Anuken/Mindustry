@@ -51,8 +51,8 @@ public class Rules{
     public float launchWaveMultiplier = 2f;
     /** Zone for saves that have them.*/
     public Zone zone;
-    /** Spawn layout. Should be assigned on save load based on map or zone. */
-    public Array<SpawnGroup> spawns = DefaultWaves.get();
+    /** Spawn layout. */
+    public Array<SpawnGroup> spawns = new Array<>();
     /** Determines if there should be limited respawns. */
     public boolean limitedRespawns = false;
     /** How many times player can respawn during one wave. */

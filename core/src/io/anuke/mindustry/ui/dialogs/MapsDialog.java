@@ -79,7 +79,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = 4;
+        int maxwidth = Core.graphics.isPortrait() ? 2 : 4;
         float mapsize = 200f;
 
         int i = 0;

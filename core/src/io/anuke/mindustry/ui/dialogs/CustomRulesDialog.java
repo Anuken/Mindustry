@@ -93,7 +93,7 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     void check(String text, BooleanConsumer cons, BooleanProvider prov, BooleanProvider condition){
-        main.addCheck(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f);
+        main.addCheck(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
         main.row();
     }
 
