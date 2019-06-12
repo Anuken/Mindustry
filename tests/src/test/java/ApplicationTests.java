@@ -1,6 +1,6 @@
-import io.anuke.arc.*;
+import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.Core;
 import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -11,11 +11,13 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.Spirit;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
@@ -264,39 +266,6 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertTrue(world.tile(1, 1).block() instanceof BlockPart);
-    }
-
-    @Test
-    void zoneEmptyWaves(){
-        for(Zone zone : content.zones()){
-            Array<SpawnGroup> spawns = zone.rules.get().spawns;
-            for(int i = 1; i <= 100; i++){
-                int total = 0;
-                for(SpawnGroup spawn : spawns){
-                    total += spawn.getUnitsSpawned(i);
-                }
-
-                assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
-            }
-        }
-    }
-
-    @Test
-    void zoneOverflowWaves(){
-        for(Zone zone : content.zones()){
-            Array<SpawnGroup> spawns = zone.rules.get().spawns;
-
-            for(int i = 1; i <= 40; i++){
-                int total = 0;
-                for(SpawnGroup spawn : spawns){
-                    total += spawn.getUnitsSpawned(i);
-                }
-
-                if(total >= 140){
-                    fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
-                }
-            }
-        }
     }
 
     @Test

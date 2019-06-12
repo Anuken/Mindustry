@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Supplier;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Structs;
@@ -25,7 +24,7 @@ public class Zone extends UnlockableContent{
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
     public Item[] resources = {};
-    public Supplier<Rules> rules = Rules::new;
+    public Consumer<Rules> rules = rules -> {};
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
     public int configureWave = 15;

@@ -213,7 +213,7 @@ public class Control implements ApplicationListener{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadGenerator(zone.generator);
-            state.rules = zone.rules.get();
+            zone.rules.accept(state.rules);
             state.rules.zone = zone;
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){
