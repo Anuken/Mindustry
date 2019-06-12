@@ -26,11 +26,6 @@ public class Zones implements ContentList{
             conditionWave = 5;
             launchPeriod = 5;
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 2;
-            };
         }};
 
         desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
@@ -89,15 +84,6 @@ public class Zones implements ContentList{
             launchPeriod = 5;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.attackMode = true;
-                r.waveSpacing = 60 * 60;
-                r.buildCostMultiplier = 0.5f;
-                r.unitBuildSpeedMultiplier = 0.5f;
-                r.enemyCheat = true;
-            };
         }};
 
         craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
@@ -106,11 +92,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 1.5f;
-            };
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
@@ -121,11 +102,6 @@ public class Zones implements ContentList{
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(craters, 10);
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 1.5f;
-            };
         }};
 
         overgrowth = new Zone("overgrowth", new MapGenerator("overgrowth")){{
@@ -136,11 +112,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(frozenForest, 40);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium, Items.scrap};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 100f;
-            };
         }};
 
         ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1).dist(3f, true)){{
@@ -152,11 +123,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(desertWastes, 20, craters, 15);
             blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 80;
-            };
         }};
 
         stainedMountains = new Zone("stainedMountains", new MapGenerator("stainedMountains", 2)
@@ -169,11 +135,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 2;
-            };
         }};
 
         tarFields = new Zone("tarFields", new MapGenerator("tarFields")
@@ -186,11 +147,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(ruinousShores, 20);
             blockRequirements = new Block[]{Blocks.coalCentrifuge};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 2;
-            };
         }};
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift").dist(2f)){{
@@ -202,11 +158,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(tarFields, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 2.5f;
-            };
         }};
 
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
@@ -219,11 +170,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
-            rules = r -> {
-                r.waves = true;
-                r.waveTimer = true;
-                r.waveSpacing = 60 * 60 * 2;
-            };
         }};
     }
 }
