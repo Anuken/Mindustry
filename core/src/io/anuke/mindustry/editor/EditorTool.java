@@ -44,7 +44,7 @@ public enum EditorTool{
             });
         }
     },
-    pencil("replace", "square"){
+    pencil("replace", "square", "drawteams"){
         {
             edit = true;
             draggable = true;
@@ -61,6 +61,9 @@ public enum EditorTool{
             }else if(mode == 1){
                 //square mode
                 editor.drawBlocks(x, y, true, tile -> true);
+            }else if(mode == 2){
+                //draw teams
+                editor.drawCircle(x, y, tile -> tile.link().setTeam(editor.drawTeam));
             }
 
         }
