@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
+    draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -1589,6 +1589,16 @@ public class Blocks implements ContentList{
         //region units
 
         BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
+
+        draugFactory = new UnitFactory("draug-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 120));
+            type = UnitTypes.draug;
+            produceTime = 5000;
+            size = 2;
+            maxSpawn = 2;
+            consumes.power(0.5f);
+            consumes.items();
+        }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 80));

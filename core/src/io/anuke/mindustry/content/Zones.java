@@ -82,6 +82,7 @@ public class Zones implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
+            loadout = Loadouts.basicFoundation;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};

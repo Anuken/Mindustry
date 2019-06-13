@@ -53,9 +53,7 @@ public class MinerDrone extends FlyingUnit implements MinerTrait{
                 }
 
                 retarget(() -> {
-                    if(getMineTile() == null){
-                        findItem();
-                    }
+                    findItem();
 
                     if(targetItem == null) return;
 
@@ -146,6 +144,11 @@ public class MinerDrone extends FlyingUnit implements MinerTrait{
             }
         }
     };
+
+    @Override
+    public UnitState getStartState(){
+        return mine;
+    }
 
     @Override
     public void update(){

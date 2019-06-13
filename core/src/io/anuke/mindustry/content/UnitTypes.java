@@ -8,12 +8,27 @@ import io.anuke.mindustry.type.Weapon;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-    spirit, phantom,
+    draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){
+        draug = new UnitType("draug", Draug.class, Draug::new){{
+            isFlying = true;
+            drag = 0.01f;
+            speed = 0.3f;
+            maxVelocity = 1.2f;
+            range = 50f;
+            health = 60;
+            minePower = 0.5f;
+            engineSize = 1.8f;
+            engineOffset = 5.7f;
+            weapon = new Weapon("you have incurred my wrath. prepare to die."){{
+                bullet = Bullets.lancerLaser;
+            }};
+        }};
+
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
             isFlying = true;
             drag = 0.01f;

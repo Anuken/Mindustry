@@ -413,7 +413,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             }
 
                             Table table = new Table("dialogDim");
-                            table.defaults().size(280f, 70f);
+                            table.defaults().size(300f, 70f);
 
                             for(int i = 0; i < tool.altModes.length; i++){
                                 int mode = i;

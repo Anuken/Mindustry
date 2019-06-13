@@ -112,14 +112,17 @@ public enum EditorTool{
 
                 if(editor.drawBlock.isOverlay()){
                     Block dest = tile.overlay();
+                    if(dest == editor.drawBlock) return;
                     tester = t -> t.overlay() == dest;
                     setter = t -> t.setOverlay(editor.drawBlock);
                 }else if(editor.drawBlock.isFloor()){
                     Block dest = tile.floor();
+                    if(dest == editor.drawBlock) return;
                     tester = t -> t.floor() == dest;
                     setter = t -> t.setFloorUnder(editor.drawBlock.asFloor());
                 }else{
                     Block dest = tile.block();
+                    if(dest == editor.drawBlock) return;
                     tester = t -> t.block() == dest;
                     setter = t -> t.setBlock(editor.drawBlock);
                 }
@@ -130,9 +133,9 @@ public enum EditorTool{
 
                 //only fill synthetic blocks, it's meaningless otherwise
                 if(tile.link().synthetic()){
-
                     Team dest = tile.getTeam();
-                    fill(editor, x, y, false, t -> t.getTeam() == dest, t -> t.setTeam(editor.drawTeam));
+                    if(dest == editor.drawTeam) return;
+                    fill(editor, x, y, false, t -> t.getTeamID() == dest.ordinal() && t.link().synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }
