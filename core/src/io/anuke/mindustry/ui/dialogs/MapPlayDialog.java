@@ -1,8 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
@@ -13,7 +11,6 @@ import io.anuke.mindustry.ui.BorderImage;
 import static io.anuke.mindustry.Vars.*;
 
 public class MapPlayDialog extends FloatingDialog{
-    Difficulty difficulty = Difficulty.normal;
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
@@ -55,33 +52,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-
-        Difficulty[] ds = Difficulty.values();
-
-        float s = 50f;
-
-        Table sdif = new Table();
-
-        sdif.add("$setting.difficulty.name").colspan(3);
-        sdif.row();
-        sdif.defaults().height(s + 4);
-        sdif.addImageButton("icon-arrow-left", 10 * 3, () -> {
-            difficulty = (ds[Mathf.mod(difficulty.ordinal() - 1, ds.length)]);
-            state.wavetime = difficulty.waveTime;
-        }).width(s);
-
-        sdif.addButton("", () -> {}).update(t -> {
-            t.setText(difficulty.toString());
-            t.touchable(Touchable.disabled);
-        }).width(180f);
-
-        sdif.addImageButton("icon-arrow-right", 10 * 3, () -> {
-            difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
-            state.wavetime = difficulty.waveTime;
-        }).width(s);
-        sdif.addButton("$customize", () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(140).padLeft(10);
-
-        cont.add(sdif);
+        cont.addImageTextButton("$customize", "icon-tools", 14*2, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
 
