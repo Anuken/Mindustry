@@ -220,14 +220,17 @@ public class BuildBlock extends Block{
                     setDeconstruct(previous);
                 }
 
+                //make sure you take into account that you can't deconstruct more than there is deconstructed
+                float clampedAmount = Math.min(amount, progress);
+
                 for(int i = 0; i < requirements.length; i++){
                     int reqamount = Math.round(state.rules.buildCostMultiplier * requirements[i].amount);
-                    accumulator[i] += Math.min(amount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
-                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * amount * deconstructMultiplier, reqamount);
+                    accumulator[i] += Math.min(clampedAmount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
+                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * clampedAmount * deconstructMultiplier, reqamount);
 
                     int accumulated = (int)(accumulator[i]); //get amount
 
-                    if(amount > 0 && accumulated > 0){ //if it's positive, add it to the core
+                    if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null){
                             int accepting = core.tile.block().acceptStack(requirements[i].item, accumulated, core.tile, builder);
                             core.tile.block().handleStack(requirements[i].item, accepting, core.tile, builder);
