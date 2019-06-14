@@ -10,7 +10,7 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.base.Spirit;
+import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
@@ -250,8 +250,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -272,8 +272,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
