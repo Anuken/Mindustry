@@ -1,23 +1,22 @@
 package io.anuke.mindustry.entities.type.base;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.MinerTrait;
-import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.world.Pos;
+import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.world;
 
 /** A drone that only mines.*/
-public class MinerDrone extends FlyingUnit implements MinerTrait{
+public class MinerDrone extends BaseDrone implements MinerTrait{
     protected Item targetItem;
     protected Tile mineTile;
 
@@ -120,29 +119,6 @@ public class MinerDrone extends FlyingUnit implements MinerTrait{
 
             circle(type.range / 1.8f);
         }
-    },
-
-    retreat = new UnitState(){
-        public void entered(){
-            target = null;
-        }
-
-        public void update(){
-            if(health >= maxHealth()){
-                state.set(attack);
-            }else if(!targetHasFlag(BlockFlag.repair)){
-                retarget(() -> {
-                    Tile repairPoint = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
-                    if(repairPoint != null){
-                        target = repairPoint;
-                    }else{
-                        setState(mine);
-                    }
-                });
-            }else{
-                circle(40f);
-            }
-        }
     };
 
     @Override
@@ -158,19 +134,8 @@ public class MinerDrone extends FlyingUnit implements MinerTrait{
     }
 
     @Override
-    protected void updateRotation(){
-        if(target != null && state.is(mine)){
-            rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.3f);
-        }else{
-            rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.3f);
-        }
-    }
-
-    @Override
-    public void behavior(){
-        if(health <= health * type.retreatPercent){
-            setState(retreat);
-        }
+    public boolean shouldRotate(){
+        return false;
     }
 
     @Override
