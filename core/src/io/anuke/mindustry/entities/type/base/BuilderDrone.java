@@ -5,10 +5,10 @@ import io.anuke.arc.Events;
 import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.StaticReset;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
@@ -53,6 +53,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 }
 
                 circle(placeDistance * 0.7f);
+                velocity.scl(0.74f);
             }else{ //else, building isn't valid, follow a player
                 if(playerTarget == null || playerTarget.getTeam() != team || !playerTarget.isValid()){
                     playerTarget = null;
@@ -77,10 +78,14 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                     });
                 }else{
                     incDrones(playerTarget);
+                    TargetTrait prev = target;
                     target = playerTarget;
-                    float dst = 100f + (id % 4)*15;
+                    float dst = 90f + (id % 4)*30;
                     float tdst = dst(target);
-                    circle(dst, type.speed * (Mathf.lerp(1f, 0.3f, 1f - Mathf.clamp((tdst - dst) / dst))));
+                    float scale = (Mathf.lerp(1f, 0.77f, 1f - Mathf.clamp((tdst - dst) / dst)));
+                    circle(dst);
+                    velocity.scl(scale);
+                    target = prev;
                 }
             }
         }
@@ -101,6 +106,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                             BuildRequest req = drone.getCurrentRequest();
                             if(req.breaking != event.breaking && req.x == event.tile.x && req.y == event.tile.y){
                                 drone.clearBuilding();
+                                drone.target = null;
                             }
                         }
                     }
@@ -110,7 +116,6 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     }
 
     int getDrones(Player player){
-        int num = totals.get(player.id, 0);
         return Pack.leftShort(totals.get(player.id, 0));
     }
 
@@ -140,7 +145,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     public void update(){
         super.update();
 
-        if(!state.is(build) && timer.get(timerTarget2, 15)){
+        if(!isBuilding() && timer.get(timerTarget2, 15)){
             for(Player player : playerGroup.all()){
                 if(player.getTeam() == team && player.getCurrentRequest() != null){
                     BuildRequest req = player.getCurrentRequest();
@@ -164,7 +169,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
 
     @Override
     public boolean shouldRotate(){
-        return false;
+        return isBuilding();
     }
 
     @Override
