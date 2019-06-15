@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.type.FlyingUnit;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.world.Pos;
@@ -11,7 +10,7 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class RepairDrone extends FlyingUnit{
+public class RepairDrone extends BaseDrone{
     public final UnitState repair = new UnitState(){
 
         public void entered(){
@@ -32,11 +31,17 @@ public class RepairDrone extends FlyingUnit{
                 //circle spawner if there's nothing to repair
                 if(getSpawner() != null){
                     target = getSpawner();
-                    circle(type.range * 0.9f);
+                    circle(type.range * 1.5f, type.speed/2f);
+                    target = null;
                 }
             }
         }
     };
+
+    @Override
+    public boolean shouldRotate(){
+        return target != null;
+    }
 
     @Override
     public UnitState getStartState(){

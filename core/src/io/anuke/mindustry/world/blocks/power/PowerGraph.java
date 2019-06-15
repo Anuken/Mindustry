@@ -149,6 +149,13 @@ public class PowerGraph{
     public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
+        }else if(!consumers.isEmpty() && consumers.first().isEnemyCheat()){
+            //when cheating, just set satisfaction to 1
+            for(Tile tile : consumers){
+                tile.entity.power.satisfaction = 1f;
+            }
+
+            return;
         }
 
         lastFrameUpdated = Core.graphics.getFrameId();

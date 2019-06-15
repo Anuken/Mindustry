@@ -14,6 +14,12 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void update(){
+        //everything is valid here
+        if(entity.tile.isEnemyCheat()){
+            valid = optionalValid = true;
+            return;
+        }
+
         boolean prevValid = valid();
         valid = true;
         optionalValid = true;

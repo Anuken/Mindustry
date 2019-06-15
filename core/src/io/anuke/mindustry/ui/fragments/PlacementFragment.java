@@ -53,8 +53,10 @@ public class PlacementFragment extends Fragment{
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
-            control.input().block = null;
-            rebuild();
+            Core.app.post(() -> {
+                control.input().block = null;
+                rebuild();
+            });
         });
 
         Events.on(UnlockEvent.class, event -> {

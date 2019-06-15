@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.storage;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
@@ -24,7 +23,6 @@ import io.anuke.mindustry.world.meta.BlockFlag;
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
-    protected TextureRegion topRegion;
 
     public CoreBlock(String name){
         super(name);
@@ -84,22 +82,16 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void load(){
-        super.load();
-
-        topRegion = Core.atlas.find(name + "-top");
-    }
-
-    @Override
     public void draw(Tile tile){
         CoreEntity entity = tile.entity();
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        if(Core.atlas.isFound(topRegion)){
-            Draw.alpha(entity.heat);
-            Draw.rect(topRegion, tile.drawx(), tile.drawy());
-            Draw.color();
+        if(entity.heat > 0){
+            Draw.colorl(0.25f);
+            Lines.stroke(2f * entity.heat);
+            Lines.poly(tile.drawx(), tile.drawy(), 4, 8f * entity.heat);
+            Draw.reset();
         }
 
         if(entity.currentUnit != null){

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.type.base;
 
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.traits.MinerTrait;
@@ -134,8 +135,17 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
     }
 
     @Override
+    protected void updateRotation(){
+        if(mineTile != null && shouldRotate() && mineTile.dst(this) < type.range){
+            rotation = Mathf.slerpDelta(rotation, angleTo(mineTile), 0.3f);
+        }else{
+            rotation = Mathf.slerpDelta(rotation, velocity.angle(), 0.3f);
+        }
+    }
+
+    @Override
     public boolean shouldRotate(){
-        return false;
+        return isMining();
     }
 
     @Override
