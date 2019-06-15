@@ -237,13 +237,13 @@ public class World implements ApplicationListener{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.get(player.getTeam()).cores.size == 0){
+            if(state.teams.get(defaultTeam).cores.size == 0){
                 ui.showError("$map.nospawn");
                 invalidMap = true;
             }else if(state.rules.pvp){ //pvp maps need two cores to be valid
                 invalidMap = true;
                 for(Team team : Team.all){
-                    if(state.teams.get(team).cores.size != 0 && team != player.getTeam()){
+                    if(state.teams.get(team).cores.size != 0 && team != defaultTeam){
                         invalidMap = false;
                     }
                 }
