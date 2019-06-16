@@ -6,17 +6,21 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.BuildBlock;
+import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -39,13 +43,25 @@ public class Logic implements ApplicationListener{
                 p.respawns = state.rules.respawns;
             }
         });
-    }
 
-    @Override
-    public void init(){
-        collisions.setCollider(tilesize, (x, y) -> {
-            Tile tile = world.tile(x, y);
-            return tile != null && tile.solid();
+        Events.on(BlockDestroyEvent.class, event -> {
+            //blocks that get broken are appended to the team's broken block queue
+            Tile tile = event.tile;
+            Block block = tile.block();
+            if(block instanceof BuildBlock){
+                BuildEntity entity = tile.entity();
+
+                //update block to reflect the fact that something was being constructed
+                if(entity.cblock != null && entity.cblock.synthetic()){
+                    block = entity.cblock;
+                }else{
+                    //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
+                    return;
+                }
+            }
+
+            TeamData data = state.teams.get(tile.getTeam());
+            data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, block.id, tile.rotation()));
         });
     }
 
@@ -197,7 +213,6 @@ public class Logic implements ApplicationListener{
                     }
 
                     collisions.collideGroups(bulletGroup, playerGroup);
-                    collisions.collideGroups(playerGroup, playerGroup);
                 }
 
                 world.pathfinder.update();

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.*;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
@@ -43,6 +44,7 @@ public class Teams{
 
     public class TeamData{
         public final ObjectSet<Tile> cores = new ObjectSet<>();
+        public final LongQueue brokenBlocks = new LongQueue();
         public final EnumSet<Team> enemies;
         public final Team team;
 
@@ -50,5 +52,12 @@ public class Teams{
             this.team = team;
             this.enemies = enemies;
         }
+    }
+
+    /** Represents a block made by this team that was destroyed somewhere on the map.
+     * This does not include deconstructed blocks.*/
+    @Struct
+    public class BrokenBlockStruct{
+        public short x, y, rotation, block;
     }
 }

@@ -1,11 +1,14 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SolidTrait;
+import io.anuke.mindustry.world.Tile;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class EntityCollisions{
     //range for tile collision scanning
@@ -14,28 +17,14 @@ public class EntityCollisions{
     private static final float seg = 1f;
 
     //tile collisions
-    private float tilesize;
     private Rectangle tmp = new Rectangle();
-    private TileCollider collider;
-    private TileHitboxProvider hitboxProvider;
     private Vector2 vector = new Vector2();
     private Vector2 l1 = new Vector2();
     private Rectangle r1 = new Rectangle();
     private Rectangle r2 = new Rectangle();
 
     //entity collisions
-    private IntSet collided = new IntSet();
     private Array<SolidTrait> arrOut = new Array<>();
-
-    public void setCollider(float tilesize, TileCollider collider, TileHitboxProvider hitbox){
-        this.tilesize = tilesize;
-        this.collider = collider;
-        this.hitboxProvider = hitbox;
-    }
-
-    public void setCollider(float tilesize, TileCollider collider){
-        setCollider(tilesize, collider, (x, y, out) -> out.setSize(tilesize).setCenter(x * tilesize, y * tilesize));
-    }
 
     public void move(SolidTrait entity, float deltax, float deltay){
 
@@ -67,8 +56,6 @@ public class EntityCollisions{
     }
 
     public void moveDelta(SolidTrait entity, float deltax, float deltay, boolean x){
-        if(collider == null)
-            throw new IllegalArgumentException("No tile collider specified! Call setCollider() first.");
 
         Rectangle rect = r1;
         entity.hitboxTile(rect);
@@ -81,9 +68,8 @@ public class EntityCollisions{
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
                 int wx = dx + tilex, wy = dy + tiley;
-                if(collider.solid(wx, wy) && entity.collidesGrid(wx, wy)){
-
-                    hitboxProvider.getHitbox(wx, wy, tmp);
+                if(solid(wx, wy) && entity.collidesGrid(wx, wy)){
+                    tmp.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
                     if(tmp.overlaps(rect)){
                         Vector2 v = Geometry.overlap(rect, tmp, x);
@@ -99,9 +85,6 @@ public class EntityCollisions{
     }
 
     public boolean overlapsTile(Rectangle rect){
-        if(collider == null)
-            throw new IllegalArgumentException("No tile collider specified! Call setCollider() first.");
-
         rect.getCenter(vector);
         int r = 1;
 
@@ -112,8 +95,8 @@ public class EntityCollisions{
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
                 int wx = dx + tilex, wy = dy + tiley;
-                if(collider.solid(wx, wy)){
-                    hitboxProvider.getHitbox(wx, wy, r2);
+                if(solid(wx, wy)){
+                    r2.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
                     if(r2.overlaps(rect)){
                         return true;
@@ -126,7 +109,6 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> void updatePhysics(EntityGroup<T> group){
-        collided.clear();
 
         QuadTree tree = group.tree();
         tree.clear();
@@ -138,6 +120,11 @@ public class EntityCollisions{
                 tree.insert(s);
             }
         }
+    }
+
+    private static boolean solid(int x, int y){
+        Tile tile = world.tile(x, y);
+        return tile != null && tile.solid();
     }
 
     private void checkCollide(Entity entity, Entity other){
@@ -221,10 +208,9 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public void collideGroups(EntityGroup<?> groupa, EntityGroup<?> groupb){
-        collided.clear();
 
         for(Entity entity : groupa.all()){
-            if(!(entity instanceof SolidTrait) || collided.contains(entity.getID()))
+            if(!(entity instanceof SolidTrait))
                 continue;
 
             SolidTrait solid = (SolidTrait)entity;
@@ -241,20 +227,10 @@ public class EntityCollisions{
 
             for(SolidTrait sc : arrOut){
                 sc.hitbox(r1);
-                if(r2.overlaps(r1) && !collided.contains(sc.getID())){
+                if(r2.overlaps(r1)){
                     checkCollide(entity, sc);
                 }
             }
-
-            collided.add(entity.getID());
         }
-    }
-
-    public interface TileCollider{
-        boolean solid(int x, int y);
-    }
-
-    public interface TileHitboxProvider{
-        void getHitbox(int x, int y, Rectangle out);
     }
 }
