@@ -185,7 +185,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 }
             }
 
-            if(isRebuild()){
+            if(isRebuild() && !isBuilding()){
                 TeamData data = Vars.state.teams.get(team);
                 if(!data.brokenBlocks.isEmpty()){
                     long block = data.brokenBlocks.removeLast();
