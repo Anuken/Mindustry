@@ -241,7 +241,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     @Override
-    public Queue<BuildRequest> getPlaceQueue(){
+    public Queue<BuildRequest> buildQueue(){
         return placeQueue;
     }
 
@@ -428,8 +428,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
         BuildRequest last = null;
-        for(BuildRequest request : getPlaceQueue()){
-            if(request.progress > 0.01f || (getCurrentRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
+        for(BuildRequest request : buildQueue()){
+            if(request.progress > 0.01f || (buildRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
                 Block block = world.ltile(request.x, request.y).block();

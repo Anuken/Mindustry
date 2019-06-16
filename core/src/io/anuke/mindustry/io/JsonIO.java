@@ -1,10 +1,12 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.LongQueue;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.SpawnGroup;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.*;
 
 @SuppressWarnings("unchecked")
@@ -34,6 +36,25 @@ public class JsonIO{
             @Override
             public Item read(Json json, JsonValue jsonData, Class type){
                 return Vars.content.getByName(ContentType.item, jsonData.asString());
+            }
+        });
+
+        setSerializer(TeamData.class, new Serializer<TeamData>(){
+            @Override
+            public void write(Json json, TeamData object, Class knownType){
+                json.writeObjectStart();
+                json.writeValue("brokenBlocks", object.brokenBlocks.toArray());
+                json.writeValue("team", object.team.ordinal());
+                json.writeObjectEnd();
+            }
+
+            @Override
+            public TeamData read(Json json, JsonValue jsonData, Class type){
+                long[] blocks = jsonData.get("brokenBlocks").asLongArray();
+                Team team = Team.all[jsonData.getInt("team", 0)];
+                TeamData out = new TeamData(team, EnumSet.of(new Team[]{}));
+                out.brokenBlocks = new LongQueue(blocks);
+                return out;
             }
         });
     }};

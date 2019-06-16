@@ -123,7 +123,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         sound.add("[LIGHT_GRAY]there is no sound implemented in v4 yet");
 
         game.screenshakePref();
-        game.checkPref("effects", true);
         if(mobile){
             game.checkPref("autotarget", true);
         }
@@ -212,6 +211,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        graphics.checkPref("effects", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("fps", false);

@@ -360,11 +360,11 @@ public class NetClient implements ApplicationListener{
         if(timer.get(0, playerSyncTime)){
             BuildRequest[] requests;
             //limit to 10 to prevent buffer overflows
-            int usedRequests = Math.min(player.getPlaceQueue().size, 10);
+            int usedRequests = Math.min(player.buildQueue().size, 10);
 
             requests = new BuildRequest[usedRequests];
             for(int i = 0; i < usedRequests; i++){
-                requests[i] = player.getPlaceQueue().get(i);
+                requests[i] = player.buildQueue().get(i);
             }
 
             Call.onClientShapshot(lastSent++, player.x, player.y,

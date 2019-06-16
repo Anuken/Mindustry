@@ -61,7 +61,7 @@ public class Logic implements ApplicationListener{
             }
 
             TeamData data = state.teams.get(tile.getTeam());
-            data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, block.id, tile.rotation()));
+            data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, tile.rotation(), block.id));
         });
     }
 

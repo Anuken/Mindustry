@@ -52,13 +52,13 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
                     return;
                 }
 
-                retarget(() -> {
+                if(retarget()){
                     findItem();
 
                     if(targetItem == null) return;
 
                     target = world.indexer.findClosestOre(x, y, targetItem);
-                });
+                };
 
                 if(target instanceof Tile){
                     moveTo(type.range / 1.5f);

@@ -32,7 +32,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 target = null;
             }
 
-            retarget(() -> {
+            if(retarget()){
                 targetClosest();
 
                 if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
@@ -41,7 +41,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 if(target == null){
                     setState(patrol);
                 }
-            });
+            };
 
             if(target != null){
                 attack(type.attackLength);
@@ -71,7 +71,7 @@ public abstract class FlyingUnit extends BaseUnit{
     },
     patrol = new UnitState(){
         public void update(){
-            retarget(() -> {
+            if(retarget()){
                 targetClosest();
                 targetClosestEnemyFlag(BlockFlag.target);
 
@@ -81,7 +81,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 }
 
                 target = getClosestCore();
-            });
+            };
 
             if(target != null){
                 circle(60f + Mathf.absin(Time.time() + Mathf.randomSeed(id) * 1200f, 70f, 1200f));

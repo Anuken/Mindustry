@@ -19,7 +19,9 @@ public class RepairDrone extends BaseDrone{
 
         public void update(){
 
-            retarget(() -> target = Units.findDamagedTile(team, x, y));
+            if(retarget()){
+                target = Units.findDamagedTile(team, x, y);
+            }
 
             if(target != null){
                 if(target.dst(RepairDrone.this) > type.range){

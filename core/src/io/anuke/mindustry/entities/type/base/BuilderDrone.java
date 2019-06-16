@@ -6,12 +6,15 @@ import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
+import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
@@ -20,7 +23,6 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-//TODO follow players
 public class BuilderDrone extends BaseDrone implements BuilderTrait{
     private static final StaticReset reset = new StaticReset();
     private static final IntIntMap totals = new IntIntMap();
@@ -43,12 +45,22 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
             BuildEntity entity = (BuildEntity)target;
             TileEntity core = getClosestCore();
 
-            if(entity != null && core != null && (entity.progress < 1f || entity.progress > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
+            if(isBuilding() && entity == null && isRebuild()){
+                target = world.tile(buildRequest().x, buildRequest().y);
+                circle(placeDistance * 0.7f);
+                target = null;
+
+                BuildRequest request = buildRequest();
+
+                if(world.tile(request.x, request.y).entity instanceof BuildEntity){
+                    target = world.tile(request.x, request.y).entity;
+                }
+            }else if(entity != null && core != null && (entity.progress < 1f || entity.progress > 0f) && entity.tile.block() instanceof BuildBlock){ //building is valid
                 if(!isBuilding() && dst(target) < placeDistance * 0.9f){ //within distance, begin placing
                     if(isBreaking){
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
+                        buildQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y));
                     }else{
-                        getPlaceQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.rotation(), entity.cblock));
+                        buildQueue().addLast(new BuildRequest(entity.tile.x, entity.tile.y, entity.tile.rotation(), entity.cblock));
                     }
                 }
 
@@ -58,7 +70,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 if(playerTarget == null || playerTarget.getTeam() != team || !playerTarget.isValid()){
                     playerTarget = null;
 
-                    retarget(() -> {
+                    if(retarget()){
                         float minDst = Float.POSITIVE_INFINITY;
                         int minDrones = Integer.MAX_VALUE;
 
@@ -75,7 +87,13 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                                 }
                             }
                         }
-                    });
+                    }
+
+                    if(getSpawner() != null){
+                        target = getSpawner();
+                        circle(40f);
+                        target = null;
+                    }
                 }else{
                     incDrones(playerTarget);
                     TargetTrait prev = target;
@@ -103,7 +121,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                         BuilderDrone drone = (BuilderDrone)unit;
                         if(drone.isBuilding()){
                             //stop building if opposite building begins.
-                            BuildRequest req = drone.getCurrentRequest();
+                            BuildRequest req = drone.buildRequest();
                             if(req.breaking != event.breaking && req.x == event.tile.x && req.y == event.tile.y){
                                 drone.clearBuilding();
                                 drone.target = null;
@@ -131,13 +149,17 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
         }
     }
 
+    boolean isRebuild(){
+        return Vars.state.rules.enemyCheat && team == waveTeam;
+    }
+
     @Override
     public float getBuildPower(Tile tile){
         return type.buildPower;
     }
 
     @Override
-    public Queue<BuildRequest> getPlaceQueue(){
+    public Queue<BuildRequest> buildQueue(){
         return placeQueue;
     }
 
@@ -147,8 +169,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
 
         if(!isBuilding() && timer.get(timerTarget2, 15)){
             for(Player player : playerGroup.all()){
-                if(player.getTeam() == team && player.getCurrentRequest() != null){
-                    BuildRequest req = player.getCurrentRequest();
+                if(player.getTeam() == team && player.buildRequest() != null){
+                    BuildRequest req = player.buildRequest();
                     Tile tile = world.tile(req.x, req.y);
                     if(tile != null && tile.entity instanceof BuildEntity){
                         BuildEntity b = tile.entity();
@@ -160,6 +182,16 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                             break;
                         }
                     }
+                }
+            }
+
+            if(isRebuild()){
+                TeamData data = Vars.state.teams.get(team);
+                if(!data.brokenBlocks.isEmpty()){
+                    long block = data.brokenBlocks.removeLast();
+
+                    placeQueue.addFirst(new BuildRequest(BrokenBlock.x(block), BrokenBlock.y(block), BrokenBlock.rotation(block), content.block(BrokenBlock.block(block))));
+                    setState(build);
                 }
             }
         }

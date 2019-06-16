@@ -42,11 +42,17 @@ public class Teams{
         return enemiesOf(team).contains(other);
     }
 
-    public class TeamData{
+    /** Allocates a new array with the active teams.
+     * Never call in the main game loop.*/
+    public Array<TeamData> getActive(){
+        return Array.select(map, t -> t != null);
+    }
+
+    public static class TeamData{
         public final ObjectSet<Tile> cores = new ObjectSet<>();
-        public final LongQueue brokenBlocks = new LongQueue();
         public final EnumSet<Team> enemies;
         public final Team team;
+        public LongQueue brokenBlocks = new LongQueue();
 
         public TeamData(Team team, EnumSet<Team> enemies){
             this.team = team;

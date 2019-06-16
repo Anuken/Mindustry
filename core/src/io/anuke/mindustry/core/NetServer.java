@@ -282,7 +282,7 @@ public class NetServer implements ApplicationListener{
         player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;
-        player.getPlaceQueue().clear();
+        player.buildQueue().clear();
         for(BuildRequest req : requests){
             Tile tile = world.tile(req.x, req.y);
             if(tile == null) continue;
@@ -292,7 +292,7 @@ public class NetServer implements ApplicationListener{
             }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
             }
-            player.getPlaceQueue().addLast(req);
+            player.buildQueue().addLast(req);
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
