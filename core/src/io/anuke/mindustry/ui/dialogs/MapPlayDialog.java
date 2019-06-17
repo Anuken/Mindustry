@@ -23,8 +23,13 @@ public class MapPlayDialog extends FloatingDialog{
     public void show(Map map){
         title.setText(map.name());
         cont.clearChildren();
-        rules = map.rules();
 
+        //reset to a valid mode after switching to attack
+        if((selectedGamemode == Gamemode.attack && !map.hasEnemyCore()) || (selectedGamemode == Gamemode.pvp && !map.hasOtherCores())){
+            selectedGamemode = Gamemode.survival;
+        }
+
+        rules = map.rules();
         rules = selectedGamemode.apply(map.rules());
 
         Table selmode = new Table();

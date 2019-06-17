@@ -176,7 +176,9 @@ public abstract class GroundUnit extends BaseUnit{
             target = null;
         }
 
-        retarget(this::targetClosest);
+        if(retarget()){
+            targetClosest();
+        }
     }
 
     protected void patrol(){

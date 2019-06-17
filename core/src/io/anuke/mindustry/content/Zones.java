@@ -84,6 +84,7 @@ public class Zones implements ContentList{
             launchPeriod = 5;
             loadout = Loadouts.basicFoundation;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
+            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.draugFactory};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 

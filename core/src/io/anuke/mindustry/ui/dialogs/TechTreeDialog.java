@@ -246,43 +246,50 @@ public class TechTreeDialog extends FloatingDialog{
                 }
             });
 
-            infoTable.background("content-background");
             infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
 
-            infoTable.margin(0).left().defaults().left();
+            infoTable.left();
 
-            infoTable.addImageButton("icon-info", "node", 14 * 2, () -> ui.content.show(node.block)).growY().width(50f);
+            infoTable.table("content-background", b -> {
+                b.margin(0).left().defaults().left();
 
-            infoTable.add().grow();
+                b.addImageButton("icon-info", "node", 14 * 2, () -> ui.content.show(node.block)).growY().width(50f);
+                b.add().grow();
+                b.table(desc -> {
+                    desc.left().defaults().left();
+                    desc.add(node.block.localizedName);
+                    desc.row();
+                    if(locked(node)){
+                        desc.table(t -> {
+                            t.left();
+                            for(ItemStack req : node.requirements){
+                                t.table(list -> {
+                                    list.left();
+                                    list.addImage(req.item.getContentIcon()).size(8 * 3).padRight(3);
+                                    list.add(req.item.localizedName()).color(Color.LIGHT_GRAY);
+                                    list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
+                                    .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.LIGHT_GRAY : Color.SCARLET));
+                                }).fillX().left();
+                                t.row();
+                            }
+                        });
+                    }else{
+                        desc.add("$completed");
+                    }
+                }).pad(9);
 
-            infoTable.table(desc -> {
-                desc.left().defaults().left();
-                desc.add(node.block.localizedName);
-                desc.row();
-                if(locked(node)){
-                    desc.table(t -> {
-                        t.left();
-                        for(ItemStack req : node.requirements){
-                            t.table(list -> {
-                                list.left();
-                                list.addImage(req.item.getContentIcon()).size(8 * 3).padRight(3);
-                                list.add(req.item.localizedName()).color(Color.LIGHT_GRAY);
-                                list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
-                                .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.LIGHT_GRAY : Color.SCARLET));
-                            }).fillX().left();
-                            t.row();
-                        }
-                    });
-                }else{
-                    desc.add("$completed");
+                if(mobile && locked(node)){
+                    b.row();
+                    b.addImageTextButton("$research", "icon-check", "node", 16 * 2, () -> unlock(node))
+                    .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
-            }).pad(9);
+            });
 
-            if(mobile && locked(node)){
-                infoTable.row();
-                infoTable.addImageTextButton("$research", "icon-check", "node", 16 * 2, () -> unlock(node))
-                .disabled(b -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
+            infoTable.row();
+            if(node.block.description != null){
+                infoTable.table("dialogDim", t -> t.margin(3f).left().labelWrap(node.block.description).color(Color.LIGHT_GRAY).growX()).fillX();
             }
+
 
             addChild(infoTable);
             infoTable.pack();

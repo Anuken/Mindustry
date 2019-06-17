@@ -7,7 +7,7 @@ public interface BuilderMinerTrait extends MinerTrait, BuilderTrait{
         updateBuilding();
 
         //mine only when not building
-        if(getCurrentRequest() == null){
+        if(buildRequest() == null){
             updateMining();
         }
     }

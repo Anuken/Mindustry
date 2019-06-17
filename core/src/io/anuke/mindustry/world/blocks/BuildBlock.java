@@ -170,7 +170,7 @@ public class BuildBlock extends Block{
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
-        public Block cblock;
+        public @Nullable Block cblock;
 
         public float progress = 0;
         public float buildCost;

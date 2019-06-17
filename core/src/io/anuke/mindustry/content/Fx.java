@@ -792,8 +792,9 @@ public class Fx implements ContentList{
             Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
             for(int i : Mathf.signs){
+                float ex = e.x, ey = e.y, fout = e.fout();
                 Angles.randLenVectors(e.id, 4, 1f + e.finpow() * 11f, e.rotation + 90f * i, 20f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
+                    Fill.circle(ex + x, ey + y, fout * 1.5f);
                 });
             }
 
@@ -816,8 +817,9 @@ public class Fx implements ContentList{
             Draw.color(Color.LIGHT_GRAY);
 
             for(int i : Mathf.signs){
+                float ex = e.x, ey = e.y, fout = e.fout();
                 Angles.randLenVectors(e.id, 4, -e.finpow() * 15f, e.rotation + 90f * i, 25f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
+                    Fill.circle(ex + x, ey + y, fout * 2f);
                 });
             }
 

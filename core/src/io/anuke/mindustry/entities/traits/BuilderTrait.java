@@ -35,21 +35,21 @@ public interface BuilderTrait extends Entity, TeamTrait{
         Unit unit = (Unit)this;
         //remove already completed build requests
         removal.clear();
-        for(BuildRequest req : getPlaceQueue()){
+        for(BuildRequest req : buildQueue()){
             removal.add(req);
         }
 
-        getPlaceQueue().clear();
+        buildQueue().clear();
 
         for(BuildRequest request : removal){
             if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
             (!request.breaking && (world.tile(request.x, request.y).rotation() == request.rotation || !request.block.rotate)
             && world.tile(request.x, request.y).block() == request.block))){
-                getPlaceQueue().addLast(request);
+                buildQueue().addLast(request);
             }
         }
 
-        BuildRequest current = getCurrentRequest();
+        BuildRequest current = buildRequest();
 
         if(current == null){
             return;
@@ -58,9 +58,9 @@ public interface BuilderTrait extends Entity, TeamTrait{
         Tile tile = world.tile(current.x, current.y);
 
         if(dst(tile) > finalPlaceDst){
-            if(getPlaceQueue().size > 1){
-                getPlaceQueue().removeFirst();
-                getPlaceQueue().addLast(current);
+            if(buildQueue().size > 1){
+                buildQueue().removeFirst();
+                buildQueue().addLast(current);
             }
             return;
         }
@@ -71,7 +71,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
                 Call.beginBreak(getTeam(), current.x, current.y);
             }else{
-                getPlaceQueue().removeFirst();
+                buildQueue().removeFirst();
                 return;
             }
         }
@@ -115,7 +115,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     }
 
     /** Returns the queue for storing build requests. */
-    Queue<BuildRequest> getPlaceQueue();
+    Queue<BuildRequest> buildQueue();
 
     /** Build power, can be any float. 1 = builds recipes in normal time, 0 = doesn't build at all. */
     float getBuildPower(Tile tile);
@@ -126,7 +126,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     }
 
     default void writeBuilding(DataOutput output) throws IOException{
-        BuildRequest request = getCurrentRequest();
+        BuildRequest request = buildRequest();
 
         if(request != null){
             output.writeByte(request.breaking ? 1 : 0);
@@ -146,7 +146,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     }
 
     default void readBuilding(DataInput input, boolean applyChanges) throws IOException{
-        if(applyChanges) getPlaceQueue().clear();
+        if(applyChanges) buildQueue().clear();
 
         byte type = input.readByte();
         if(type != -1){
@@ -165,26 +165,26 @@ public interface BuilderTrait extends Entity, TeamTrait{
             request.progress = progress;
 
             if(applyChanges){
-                getPlaceQueue().addLast(request);
+                buildQueue().addLast(request);
             }else if(isBuilding()){
-                getCurrentRequest().progress = progress;
+                buildRequest().progress = progress;
             }
         }
     }
 
     /** Return whether this builder's place queue contains items. */
     default boolean isBuilding(){
-        return getPlaceQueue().size != 0;
+        return buildQueue().size != 0;
     }
 
     /** Clears the placement queue. */
     default void clearBuilding(){
-        getPlaceQueue().clear();
+        buildQueue().clear();
     }
 
     /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
     default void addBuildRequest(BuildRequest place){
-        for(BuildRequest request : getPlaceQueue()){
+        for(BuildRequest request : buildQueue()){
             if(request.x == place.x && request.y == place.y){
                 return;
             }
@@ -193,15 +193,15 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(tile != null && tile.entity instanceof BuildEntity){
             place.progress = tile.<BuildEntity>entity().progress;
         }
-        getPlaceQueue().addLast(place);
+        buildQueue().addLast(place);
     }
 
     /**
      * Return the build requests currently active, or the one at the top of the queue.
      * May return null.
      */
-    default BuildRequest getCurrentRequest(){
-        return getPlaceQueue().size == 0 ? null : getPlaceQueue().first();
+    default BuildRequest buildRequest(){
+        return buildQueue().size == 0 ? null : buildQueue().first();
     }
 
     //due to iOS weirdness, this is apparently required
@@ -215,7 +215,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(!isBuilding()) return;
 
         Unit unit = (Unit)this;
-        BuildRequest request = getCurrentRequest();
+        BuildRequest request = buildRequest();
         Tile tile = world.tile(request.x, request.y);
 
         if(dst(tile) > placeDistance && !state.isEditor()){

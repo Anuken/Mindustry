@@ -112,10 +112,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         this.state.set(state);
     }
 
-    public void retarget(Runnable run){
-        if(timer.get(timerTarget, 20)){
-            run.run();
-        }
+    public boolean retarget(){
+        return timer.get(timerTarget, 20);
     }
 
     /** Only runs when the unit has a target. */

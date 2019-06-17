@@ -51,6 +51,7 @@ public class HudFragment extends Fragment{
 
     private float coreAttackTime;
     private float lastCoreHP;
+    private Team lastTeam;
     private float coreAttackOpacity = 0f;
 
     public void build(Group parent){
@@ -314,13 +315,19 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 ||
-                state.teams.get(player.getTeam()).cores.first().entity == null){
+                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 || state.teams.get(player.getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }
 
                 float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
+
+                if(lastTeam != player.getTeam()){
+                    lastCoreHP = curr;
+                    lastTeam = player.getTeam();
+                    return false;
+                }
+
                 if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
                     coreAttackTime = notifDuration;
                 }
@@ -334,6 +341,7 @@ public class HudFragment extends Fragment{
                 }
 
                 coreAttackTime -= Time.delta();
+                lastTeam = player.getTeam();
 
                 return coreAttackOpacity > 0;
             });
@@ -538,6 +546,7 @@ public class HudFragment extends Fragment{
         }
 
         shown = !shown;
+        flip.getParent().act(Core.graphics.getDeltaTime());
     }
 
     private void addWaveTable(TextButton table){

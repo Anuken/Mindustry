@@ -1,13 +1,14 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.StringMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.*;
@@ -64,6 +65,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
+            "teamdata", JsonIO.write(state.teams.getActive().toArray(TeamData.class)),
             "width", world.width(),
             "height", world.height()
         ).merge(tags));
@@ -77,6 +79,13 @@ public abstract class SaveVersion extends SaveFileReader{
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+
+        //only broken blocks are transferred over right now; nothing else
+        TeamData[] teams = JsonIO.read(TeamData[].class, map.get("teamdata", "[]"));
+        for(TeamData data : teams){
+            state.teams.get(data.team).brokenBlocks = data.brokenBlocks;
+        }
+
         Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
@@ -92,13 +101,13 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //floor + overlay
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
+            Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
 
             for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                Tile nextTile = world.tile(j % world.width(), j / world.width());
+                Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
                 if(nextTile.floorID() != tile.floorID() || nextTile.overlayID() != tile.overlayID()){
                     break;
@@ -113,7 +122,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //blocks
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
+            Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
             if(tile.entity != null){
@@ -126,7 +135,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                    Tile nextTile = world.tile(j % world.width(), j / world.width());
+                    Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
                     if(nextTile.blockID() != tile.blockID()){
                         break;
@@ -264,6 +273,8 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(map);
+
+        remapContent();
     }
 
     public void writeContentHeader(DataOutput stream) throws IOException{
@@ -283,6 +294,19 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(arr.size);
                 for(Content c : arr){
                     stream.writeUTF(((MappableContent)c).name);
+                }
+            }
+        }
+    }
+
+    /** sometimes it's necessary to remap IDs after the content header is read.*/
+    public void remapContent(){
+        for(Team team : Team.all){
+            if(state.teams.isActive(team)){
+                LongQueue queue = state.teams.get(team).brokenBlocks;
+                for(int i = 0; i < queue.size; i++){
+                    //remap broken block IDs
+                    queue.set(i, BrokenBlock.block(queue.get(i), content.block(BrokenBlock.block(queue.get(i))).id));
                 }
             }
         }

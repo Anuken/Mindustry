@@ -246,8 +246,28 @@ public class TechTree implements ContentList{
                         });
                     });
 
-                    node(spiritFactory, () -> {
-                        node(phantomFactory);
+                    node(draugFactory, () -> {
+                        node(spiritFactory, () -> {
+                            node(phantomFactory);
+                        });
+
+                        node(daggerFactory, () -> {
+                            node(crawlerFactory, () -> {
+                                node(titanFactory, () -> {
+                                    node(fortressFactory, () -> {
+
+                                    });
+                                });
+                            });
+
+                            node(wraithFactory, () -> {
+                                node(spiritFactory, () -> {
+                                    node(revenantFactory, () -> {
+
+                                    });
+                                });
+                            });
+                        });
                     });
 
                     node(dartPad, () -> {

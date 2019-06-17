@@ -19,14 +19,14 @@ public abstract class BaseDrone extends FlyingUnit{
             if(health >= maxHealth()){
                 state.set(attack);
             }else if(!targetHasFlag(BlockFlag.repair)){
-                retarget(() -> {
+                if(retarget()){
                     Tile repairPoint = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
                     if(repairPoint != null){
                         target = repairPoint;
                     }else{
                         setState(getStartState());
                     }
-                });
+                }
             }else{
                 circle(40f);
             }

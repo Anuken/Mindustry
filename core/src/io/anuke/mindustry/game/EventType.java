@@ -129,6 +129,8 @@ public class EventType{
         }
     }
 
+    /** Called right before a block is destroyed.
+     * The tile entity of the tile in this event cannot be null when this happens.*/
     public static class BlockDestroyEvent{
         public final Tile tile;
 
