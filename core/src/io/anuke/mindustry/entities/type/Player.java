@@ -669,7 +669,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             }
 
             if(dst(moveTarget) <= 2f * Time.delta()){
-                if(tapping){
+                if(tapping && !isDead()){
                     Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }

@@ -187,11 +187,6 @@ public class PowerGraph{
     }
 
     public void add(Tile tile){
-        if(tile.block().consumes.hasPower() && !tile.block().consumes.getPower().buffered){
-            //reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
-            tile.entity.power.satisfaction = 0.0f;
-        }
-
         tile.entity.power.graph = this;
         all.add(tile);
 
