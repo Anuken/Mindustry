@@ -1601,7 +1601,7 @@ public class Blocks implements ContentList{
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 80));
+            requirements(Category.units, ItemStack.with(Items.metaglass, 70, Items.lead, 110, Items.silicon, 90));
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
