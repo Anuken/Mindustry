@@ -17,6 +17,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
@@ -230,7 +231,7 @@ public class NetClient implements ApplicationListener{
                 byte typeID = input.readByte();
 
                 SyncTrait entity = group == null ? null : (SyncTrait)group.getByID(id);
-                boolean add = false;
+                boolean add = false, created = false;
 
                 if(entity == null && id == player.id){
                     entity = player;
@@ -244,10 +245,19 @@ public class NetClient implements ApplicationListener{
                     if(!netClient.isEntityUsed(entity.getID())){
                         add = true;
                     }
+                    created = true;
                 }
 
                 //read the entity
                 entity.read(input);
+
+                if(created){
+                    //set initial starting position
+                    entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
+                    if(entity instanceof Unit && entity.getInterpolator().targets.length > 0){
+                        ((Unit)entity).rotation = entity.getInterpolator().targets[0];
+                    }
+                }
 
                 if(add){
                     entity.add();

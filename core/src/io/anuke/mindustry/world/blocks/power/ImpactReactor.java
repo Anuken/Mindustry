@@ -31,8 +31,7 @@ public class ImpactReactor extends PowerGenerator{
     protected int explosionDamage = 2000;
 
     protected Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
-    protected Color ind1 = Color.valueOf("858585"), ind2 = Color.valueOf("fea080");
-    protected int bottomRegion, topRegion, lightRegion;
+    protected int bottomRegion;
     protected int[] plasmaRegions;
 
     public ImpactReactor(String name){
@@ -44,8 +43,6 @@ public class ImpactReactor extends PowerGenerator{
         outputsPower = consumesPower = true;
 
         bottomRegion = reg("-bottom");
-        topRegion = reg("-top");
-        lightRegion = reg("-light");
         plasmaRegions = new int[plasmas];
         for(int i = 0; i < plasmas; i++){
             plasmaRegions[i] = reg("-plasma-" + i);
@@ -112,17 +109,12 @@ public class ImpactReactor extends PowerGenerator{
 
         Draw.rect(region, tile.drawx(), tile.drawy());
 
-        Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
-
-        Draw.color(ind1, ind2, entity.warmup + Mathf.absin(entity.productionEfficiency, 3f, entity.warmup * 0.5f));
-        Draw.rect(reg(lightRegion), tile.drawx(), tile.drawy());
-
         Draw.color();
     }
 
     @Override
     public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-top")};
+        return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
     }
 
     @Override

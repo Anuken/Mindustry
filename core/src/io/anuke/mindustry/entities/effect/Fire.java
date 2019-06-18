@@ -96,6 +96,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
         }
 
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());
+        map.put(tile.pos(), this);
 
         if(Net.client()){
             return;

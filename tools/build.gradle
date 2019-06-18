@@ -5,15 +5,34 @@ sourceSets.main.java.srcDirs = ["src/"]
 
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.IntArray
+import com.badlogic.gdx.utils.*
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 
 import javax.imageio.ImageIO
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
+def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
+
+def transformColors = { List<List<String>> list ->
+    list.each{ colors ->
+        def newColors = []
+        colors.each{ hexc ->
+            newColors += Color.valueOf(hexc)
+        }
+
+        newColors.each{ color ->
+            colorMap.put(Color.argb8888(color), newColors)
+            colorIndexMap.put(Color.argb8888(color), newColors.indexOf(color))
+        }
+    }
+}
+
+
+transformColors([["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["dea158", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"]])
 
 def antialias = { File file ->
     if(!doAntialias || file.lastModified() <= 1000) return
@@ -164,6 +183,38 @@ def scaleImage = { File file ->
     ImageIO.write(image, "png", file)
 }
 
+def tileImage = { File file ->
+    def image = ImageIO.read(file)
+    def color = new Color()
+
+    def result = new BufferedImage(image.width * 2, image.height * 2, image.getType())
+    Graphics2D graphics = result.createGraphics()
+    graphics.drawImage(image, image.width, 0, -image.width, image.height, null)
+
+    graphics.drawImage(image, image.width, 0, image.width, image.height, null)
+
+    graphics.drawImage(image, image.width, image.height*2, -image.width, -image.height, null)
+
+    graphics.drawImage(image, image.width, image.height*2, image.width, -image.height, null)
+
+    for(int x = 0; x < result.width; x++){
+        for(int y = 0; y < result.height; y++){
+            int p = result.getRGB(x, y)
+            if(x <= y){
+                List<Color> list = colorMap.get(p)
+                int index = colorIndexMap.get(p, -1)
+
+                if(index != -1){
+                    int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
+                    result.setRGB(x, y, Color.argb8888(list[resultIndex]))
+                }
+            }
+        }
+    }
+
+    ImageIO.write(result, "png", file)
+}
+
 task swapColors(){
     doLast{
         if(project.hasProperty("colors")){
@@ -224,6 +275,15 @@ task scaleImages(){
         for(def img : project.getProperty("images").split(",")){
             println(project.getProperty("startdir") + "/" + img)
             scaleImage(new File(project.getProperty("startdir") + "/" + img))
+        }
+    }
+}
+
+task tileImages(){
+    doLast{
+        for(def img : project.getProperty("images").split(",")){
+            println(project.getProperty("startdir") + "/" + img)
+            tileImage(new File(project.getProperty("startdir") + "/" + img))
         }
     }
 }

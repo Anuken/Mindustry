@@ -197,7 +197,14 @@ public class Logic implements ApplicationListener{
                     Entities.update(bulletGroup);
                     Entities.update(tileGroup);
                     Entities.update(fireGroup);
+                }else{
+                    for(EntityGroup group : unitGroups){
+                        group.updateEvents();
+                        collisions.updatePhysics(group);
+                    }
                 }
+
+
                 Entities.update(playerGroup);
 
                 //effect group only contains item transfers in the headless version, update it!

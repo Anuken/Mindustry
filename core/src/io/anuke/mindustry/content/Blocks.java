@@ -424,8 +424,8 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasPower = true;
 
-            consumes.power(2f);
-            consumes.item(Items.coal, 4);
+            consumes.power(1.8f);
+            consumes.item(Items.coal, 3);
             consumes.liquid(Liquids.water, 0.1f);
         }};
 

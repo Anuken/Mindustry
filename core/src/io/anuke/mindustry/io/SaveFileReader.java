@@ -14,7 +14,9 @@ public abstract class SaveFileReader{
     protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
     protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
     protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
-    protected final ObjectMap<String, String> fallback = ObjectMap.of();
+    protected final ObjectMap<String, String> fallback = ObjectMap.of(
+
+    );
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();

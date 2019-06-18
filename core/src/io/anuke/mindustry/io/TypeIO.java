@@ -86,15 +86,15 @@ public class TypeIO{
 
     @WriteClass(BaseUnit.class)
     public static void writeBaseUnit(ByteBuffer buffer, BaseUnit unit){
-        buffer.put((byte)unitGroups[unit.getTeam().ordinal()].getID());
+        buffer.put((byte)unit.getTeam().ordinal());
         buffer.putInt(unit.getID());
     }
 
     @ReadClass(BaseUnit.class)
-    public static BaseUnit writeBaseUnit(ByteBuffer buffer){
-        byte gid = buffer.get();
+    public static BaseUnit readBaseUnit(ByteBuffer buffer){
+        byte tid = buffer.get();
         int id = buffer.getInt();
-        return (BaseUnit)Entities.getGroup(gid).getByID(id);
+        return unitGroups[tid].getByID(id);
     }
 
     @WriteClass(Tile.class)
@@ -191,6 +191,16 @@ public class TypeIO{
     @ReadClass(Effect.class)
     public static Effect readEffect(ByteBuffer buffer){
         return Effects.getEffect(buffer.getShort());
+    }
+
+    @WriteClass(UnitType.class)
+    public static void writeUnitType(ByteBuffer buffer, UnitType effect){
+        buffer.putShort(effect.id);
+    }
+
+    @ReadClass(UnitType.class)
+    public static UnitType readUnitType(ByteBuffer buffer){
+        return content.getByID(ContentType.unit, buffer.getShort());
     }
 
     @WriteClass(Color.class)

@@ -1,5 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
@@ -19,11 +21,10 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -181,7 +182,7 @@ public class HudFragment extends Fragment{
                         teams.left();
                         int i = 0;
                         for(Team team : Team.all){
-                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> player.setTeam(team))
+                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
@@ -199,13 +200,7 @@ public class HudFragment extends Fragment{
                         int i = 0;
                         for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
                             dialog.cont.addImageButton("white", 48, () -> {
-                                BaseUnit unit = type.create(player.getTeam());
-                                unit.set(player.x, player.y);
-                                unit.rotation = player.rotation;
-                                unit.add();
-                                //trigger the entity to become visible
-                                unitGroups[player.getTeam().ordinal()].updateEvents();
-                                collisions.updatePhysics( unitGroups[player.getTeam().ordinal()]);
+                                Call.spawnUnitEditor(player, type);
                                 dialog.hide();
                             }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
                             if(++i % 4 == 0) dialog.cont.row();
@@ -230,10 +225,7 @@ public class HudFragment extends Fragment{
                                 Units.nearby(world.x, world.y, 1f, 1f, unit -> {
                                     if(!found[0] && unit instanceof BaseUnit){
                                         if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
-                                            Effects.effect(Fx.spawn, unit);
-                                            unit.remove();
-                                            unitGroups[unit.getTeam().ordinal()].updateEvents();
-                                            collisions.updatePhysics(unitGroups[unit.getTeam().ordinal()]);
+                                            Call.removeUnitEditor(player, (BaseUnit)unit);
                                         }
                                         found[0] = true;
                                         unit.hitbox(Tmp.r1);
@@ -242,7 +234,6 @@ public class HudFragment extends Fragment{
                                         position[1] = unit.y;
                                     }
                                 });
-                                //TODO check for unit removal, remove unit if needed
                             }
                         }
 
@@ -282,19 +273,6 @@ public class HudFragment extends Fragment{
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f)).get().color.a = 0f;
-        });
-
-        //out of bounds warning
-        parent.fill(t -> {
-            t.touchable(Touchable.disabled);
-            t.visible(() -> !state.is(State.menu));
-            t.table("flat", c -> c.add("")
-            .update(l -> {
-                l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
-                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - player.destructTime) / 60f)));
-            }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(player.isOutOfBounds()), 0.1f);
-            }).get().color.a = 0f;
         });
 
         parent.fill(t -> {
@@ -415,6 +393,30 @@ public class HudFragment extends Fragment{
         });
 
         blockfrag.build(Core.scene.root);
+    }
+
+    @Remote(targets = Loc.both, forward = true, called = Loc.both)
+    public static void setPlayerTeamEditor(Player player, Team team){
+        if(state.isEditor()){
+            player.setTeam(team);
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void spawnUnitEditor(Player player, UnitType type){
+        if(state.isEditor()){
+            BaseUnit unit = type.create(player.getTeam());
+            unit.set(player.x, player.y);
+            unit.rotation = player.rotation;
+            unit.add();
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void removeUnitEditor(Player player, BaseUnit unit){
+        if(state.isEditor() && unit != null){
+            unit.remove();
+        }
     }
 
     public void showToast(String text){

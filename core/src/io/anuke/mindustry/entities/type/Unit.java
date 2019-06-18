@@ -265,6 +265,15 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             }
         }
 
+        //repel player out of bounds
+        final float warpDst = 230f;
+
+        if(x < 0) velocity.x += (-x/warpDst);
+        if(y < 0) velocity.y += (-y/warpDst);
+        if(x > world.unitWidth()) velocity.x -= (x - world.unitWidth())/warpDst;
+        if(y > world.unitHeight()) velocity.y -= (y - world.unitHeight())/warpDst;
+
+
         if(isFlying()){
             drownTime = 0f;
             move(velocity.x * Time.delta(), velocity.y * Time.delta());

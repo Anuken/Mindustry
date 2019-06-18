@@ -150,7 +150,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     }
 
     boolean isRebuild(){
-        return Vars.state.rules.enemyCheat && team == waveTeam;
+        //disabled until further notice, reason being that it's too annoying when playing enemies and too broken for ally use
+        return false; //Vars.state.rules.enemyCheat && team == waveTeam;
     }
 
     @Override
