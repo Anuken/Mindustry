@@ -88,7 +88,7 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.011))){{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
