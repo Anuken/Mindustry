@@ -5,7 +5,7 @@ script:
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
-  git config --global user.name "Wiki Updater"
+- git config --global user.name "Wiki Updater"
 - git clone --depth=1 --branch=master https://github.com/MindustryGame/wiki ../wiki
 - git clone --depth=1 --branch=master https://github.com/Anuken/Mindustry-Wiki-Generator ../Mindustry-Wiki-Generator
 - cd ../Mindustry-Wiki-Generator
