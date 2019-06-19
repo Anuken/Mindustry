@@ -47,6 +47,8 @@ public class Vars{
     public static final Team defaultTeam = Team.blue;
     /** team of the enemy in waves/sectors */
     public static final Team waveTeam = Team.red;
+    /** whether to enable editing of units in the editor */
+    public static final boolean enableUnitEditing = false;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */

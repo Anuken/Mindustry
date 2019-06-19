@@ -194,57 +194,60 @@ public class HudFragment extends Fragment{
                         }
                     }).left();
 
-                    t.row();
-                    t.addImageTextButton("$editor.spawn", "icon-add", 8*3, () -> {
-                        FloatingDialog dialog = new FloatingDialog("$editor.spawn");
-                        int i = 0;
-                        for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                            dialog.cont.addImageButton("white", 48, () -> {
-                                Call.spawnUnitEditor(player, type);
-                                dialog.hide();
-                            }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
-                            if(++i % 4 == 0) dialog.cont.row();
-                        }
-                        dialog.addCloseButton();
-                        dialog.setFillParent(false);
-                        dialog.show();
-                    }).fillX();
+                    if(enableUnitEditing){
 
-                    float[] size = {0};
-                    float[] position = {0, 0};
-
-                    t.row();
-                    t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8*3, () -> {
-
-                    }).fillX().update(b -> {
-                        boolean[] found = {false};
-                        if(b.isChecked()){
-                            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                            if(e == null){
-                                Vector2 world = Core.input.mouseWorld();
-                                Units.nearby(world.x, world.y, 1f, 1f, unit -> {
-                                    if(!found[0] && unit instanceof BaseUnit){
-                                        if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
-                                            Call.removeUnitEditor(player, (BaseUnit)unit);
-                                        }
-                                        found[0] = true;
-                                        unit.hitbox(Tmp.r1);
-                                        size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width*2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
-                                        position[0] = unit.x;
-                                        position[1] = unit.y;
-                                    }
-                                });
+                        t.row();
+                        t.addImageTextButton("$editor.spawn", "icon-add", 8 * 3, () -> {
+                            FloatingDialog dialog = new FloatingDialog("$editor.spawn");
+                            int i = 0;
+                            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                                dialog.cont.addImageButton("white", 48, () -> {
+                                    Call.spawnUnitEditor(player, type);
+                                    dialog.hide();
+                                }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                                if(++i % 4 == 0) dialog.cont.row();
                             }
-                        }
+                            dialog.addCloseButton();
+                            dialog.setFillParent(false);
+                            dialog.show();
+                        }).fillX();
 
-                        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
-                        Lines.poly(position[0], position[1], 4, size[0]/2f);
-                        Draw.reset();
+                        float[] size = {0};
+                        float[] position = {0, 0};
 
-                        if(!found[0]){
-                            size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
-                        }
-                    });
+                        t.row();
+                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8 * 3, () -> {
+
+                        }).fillX().update(b -> {
+                            boolean[] found = {false};
+                            if(b.isChecked()){
+                                Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                if(e == null){
+                                    Vector2 world = Core.input.mouseWorld();
+                                    Units.nearby(world.x, world.y, 1f, 1f, unit -> {
+                                        if(!found[0] && unit instanceof BaseUnit){
+                                            if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                                                Call.removeUnitEditor(player, (BaseUnit)unit);
+                                            }
+                                            found[0] = true;
+                                            unit.hitbox(Tmp.r1);
+                                            size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width * 2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
+                                            position[0] = unit.x;
+                                            position[1] = unit.y;
+                                        }
+                                    });
+                                }
+                            }
+
+                            Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                            Lines.poly(position[0], position[1], 4, size[0] / 2f);
+                            Draw.reset();
+
+                            if(!found[0]){
+                                size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
+                            }
+                        });
+                    }
                 }).width(dsize * 4 + 3f);
                 editorMain.visible(() -> shown && state.isEditor());
             }

@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.Events;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.base.BaseDrone;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
@@ -28,7 +29,7 @@ public class GameState{
     private State state = State.menu;
 
     public int enemies(){
-        return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].size();
+        return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));
     }
 
     public BaseUnit boss(){

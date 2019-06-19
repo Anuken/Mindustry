@@ -198,7 +198,7 @@ public class Logic implements ApplicationListener{
                     Entities.update(tileGroup);
                     Entities.update(fireGroup);
                 }else{
-                    for(EntityGroup group : unitGroups){
+                    for(EntityGroup<?> group : unitGroups){
                         group.updateEvents();
                         collisions.updatePhysics(group);
                     }
