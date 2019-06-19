@@ -855,13 +855,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
             Tile stile = world.tile(spawner);
-            if(stile != null && stile.entity instanceof SpawnerTrait){
-                lastSpawner = (SpawnerTrait)stile.entity;
-            }
             Player player = headless ? this : Vars.player;
             player.readSaveSuper(stream, version);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
+            if(stile != null && stile.entity instanceof SpawnerTrait){
+                player.lastSpawner = (SpawnerTrait)stile.entity;
+            }
         }
     }
 
