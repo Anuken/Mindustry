@@ -266,7 +266,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
 
         //repel player out of bounds
-        final float warpDst = 230f;
+        final float warpDst = 180f;
 
         if(x < 0) velocity.x += (-x/warpDst);
         if(y < 0) velocity.y += (-y/warpDst);

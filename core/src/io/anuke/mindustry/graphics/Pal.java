@@ -11,6 +11,8 @@ public class Pal{
     bulletYellow = Color.valueOf("ffeec9"),
     bulletYellowBack = Color.valueOf("f9c87a"),
 
+    darkMetal = Color.valueOf("6e7080"),
+
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
 

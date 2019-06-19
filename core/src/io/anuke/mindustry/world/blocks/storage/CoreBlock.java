@@ -88,7 +88,7 @@ public class CoreBlock extends StorageBlock{
         Draw.rect(region, tile.drawx(), tile.drawy());
 
         if(entity.heat > 0){
-            Draw.colorl(0.25f);
+            Draw.color(Pal.darkMetal);
             Lines.stroke(2f * entity.heat);
             Lines.poly(tile.drawx(), tile.drawy(), 4, 8f * entity.heat);
             Draw.reset();
