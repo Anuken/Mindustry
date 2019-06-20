@@ -385,7 +385,7 @@ public class HudFragment extends Fragment{
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.is(State.paused) && !Net.active());
+            t.top().visible(() -> state.isPaused());
             t.table("button", top -> top.add("$paused").pad(6f));
         });
 
@@ -551,7 +551,9 @@ public class HudFragment extends Fragment{
         }
 
         shown = !shown;
-        flip.getParent().act(Core.graphics.getDeltaTime());
+        if(flip != null){
+            flip.getParent().act(Core.graphics.getDeltaTime());
+        }
     }
 
     private void addWaveTable(TextButton table){
