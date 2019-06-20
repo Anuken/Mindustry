@@ -251,7 +251,7 @@ public class NetClient implements ApplicationListener{
                 //read the entity
                 entity.read(input);
 
-                if(created){
+                if(created && entity.getInterpolator() != null){
                     //set initial starting position
                     entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
                     if(entity instanceof Unit && entity.getInterpolator().targets.length > 0){
