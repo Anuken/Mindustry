@@ -384,7 +384,7 @@ public class Blocks implements ContentList{
 
         darkMetal = new StaticWall("dark-metal");
 
-        pebbles = new OverlayFloor("pebbles");
+        pebbles = new DoubleOverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 

@@ -19,7 +19,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1).decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01))){{
+        groundZero = new Zone("groundZero", new MapGenerator("groundZero", 1)){{
             baseLaunchCost = ItemStack.with(Items.copper, -100);
             startingItems = ItemStack.list(Items.copper, 100);
             alwaysUnlocked = true;
