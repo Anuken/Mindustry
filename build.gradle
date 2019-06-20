@@ -177,7 +177,7 @@ project(":core"){
     }
 
     dependencies{
-        if(System.properties["user.name"] == "anuke" && !System.properties["os.name"].contains("Mac")){
+        if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{
                     delete{
