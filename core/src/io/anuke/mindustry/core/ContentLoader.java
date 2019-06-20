@@ -6,9 +6,9 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.effect.Fire;
+import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
@@ -241,7 +241,5 @@ public class ContentLoader{
         TypeTrait.registerType(Player.class, Player::new);
         TypeTrait.registerType(Fire.class, Fire::new);
         TypeTrait.registerType(Puddle.class, Puddle::new);
-        TypeTrait.registerType(Bullet.class, Bullet::new);
-        TypeTrait.registerType(Lightning.class, Lightning::new);
     }
 }
