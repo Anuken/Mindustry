@@ -1,7 +1,8 @@
 package io.anuke.mindustry;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.Pixmap;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.util.*;
@@ -16,7 +17,7 @@ public class SquareMarcher{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tmp.c1.set(pixmap.getPixel(x, y));
-                grid[x][pixmap.getHeight() - 1 - y] = Tmp.c1.a > 0.01f;
+                grid[x][y] = Tmp.c1.a > 0.01f;
             }
         }
 
@@ -24,6 +25,8 @@ public class SquareMarcher{
         Draw.proj().setOrtho(0, 0, resolution, resolution);
 
         buffer.begin();
+        Core.graphics.clear(Color.BLACK);
+        Draw.color(Color.WHITE);
         float xscl = resolution / (float)pixmap.getWidth(), yscl = resolution / (float)pixmap.getHeight();
         float scl = xscl;
 
@@ -167,6 +170,7 @@ public class SquareMarcher{
             }
         }
 
+        Draw.flush();
         ScreenUtils.saveScreenshot(file, 0, 0, resolution, resolution);
         buffer.end();
     }

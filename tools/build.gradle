@@ -351,6 +351,17 @@ task antialiasGen(){
     }
 }
 
+task testUpscale(dependsOn: classes, type: JavaExec){
+
+    if(System.getProperty("os.name").toLowerCase().contains("mac")){
+        jvmArgs "-XstartOnFirstThread"
+    }
+    main = "io.anuke.mindustry.Upscaler"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets/"
+}
+
 task genSprites(dependsOn: classes, type: JavaExec){
     finalizedBy 'antialiasGen'
 
