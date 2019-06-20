@@ -46,8 +46,6 @@ public abstract class BulletType extends Content{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 1f;
-    /** Whether to sync this bullet to clients. */
-    public boolean syncable;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */

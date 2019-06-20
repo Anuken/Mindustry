@@ -1687,7 +1687,7 @@ public class Blocks implements ContentList{
 
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 30, Items.copper, 30, Items.silicon, 30));
-            repairSpeed = 0.1f;
+            repairSpeed = 0.3f;
             powerUse = 1f;
         }};
 

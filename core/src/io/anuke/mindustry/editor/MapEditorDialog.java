@@ -436,12 +436,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             table.update(() -> {
                                 Vector2 v = button.localToStageCoordinates(Tmp.v1.setZero());
                                 table.setPosition(v.x, v.y, Align.topLeft);
+                                if(!isShown()){
+                                    table.remove();
+                                    lastTable[0] = null;
+                                }
                             });
 
                             table.pack();
                             table.act(Core.graphics.getDeltaTime());
 
-                            Core.scene.add(table);
+                            addChild(table);
                             lastTable[0] = table;
                         });
                     }

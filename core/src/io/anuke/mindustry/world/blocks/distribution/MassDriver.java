@@ -204,7 +204,7 @@ public class MassDriver extends Block{
         if(entity.link == other.pos()){
             Call.linkMassDriver(null, tile, -1);
             return false;
-        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range){
+        }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.getTeam() == tile.getTeam()){
             Call.linkMassDriver(null, tile, other.pos());
             return false;
         }
