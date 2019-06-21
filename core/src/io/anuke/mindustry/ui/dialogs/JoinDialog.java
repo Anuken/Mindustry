@@ -107,16 +107,35 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton("icon-loading", "empty", 16 * 2, () -> {
+            inner.addImageButton("icon-arrow-up-small", "empty", iconsizesmall, () -> {
+                int index = servers.indexOf(server);
+                if(index > 0){
+                    servers.remove(index);
+                    servers.insert(0, server);
+
+                    saveServers();
+                    setupRemote();
+                    for(Server other : servers){
+                        if(other.lastHost != null){
+                            setupServer(other, other.lastHost);
+                        }else{
+                            refreshServer(other);
+                        }
+                    }
+                }
+
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton("icon-loading-small", "empty", iconsizesmall, () -> {
                 refreshServer(server);
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-pencil", "empty", 16 * 2, () -> {
+            inner.addImageButton("icon-pencil-small", "empty", iconsizesmall, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-trash-16", "empty", 16 * 2, () -> {
+            inner.addImageButton("icon-trash-16-small", "empty", iconsizesmall, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
@@ -144,40 +163,42 @@ public class JoinDialog extends FloatingDialog{
         server.content.clear();
         server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
 
-        Net.pingHost(server.ip, server.port, host -> {
-            String versionString;
-
-            if(host.version == -1){
-                versionString = Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
-            }else if(host.version == 0){
-                versionString = Core.bundle.get("server.outdated");
-            }else if(host.version < Version.build && Version.build != -1){
-                versionString = Core.bundle.get("server.outdated") + "\n" +
-                Core.bundle.format("server.version", host.version, "");
-            }else if(host.version > Version.build && Version.build != -1){
-                versionString = Core.bundle.get("server.outdated.client") + "\n" +
-                Core.bundle.format("server.version", host.version, "");
-            }else{
-                versionString = Core.bundle.format("server.version", host.version, host.versionType);
-            }
-
-            server.content.clear();
-
-            server.content.table(t -> {
-                t.add("[lightgray]" + host.name).width(targetWidth() - 10f).left().get().setEllipsis(true);
-                t.row();
-                t.add(versionString).left();
-                t.row();
-                t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
-                Core.bundle.format("players.single", host.players))).left();
-                t.row();
-                t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
-            }).expand().left().bottom().padLeft(12f).padBottom(8);
-
-        }, e -> {
+        Net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
             server.content.add("$host.invalid");
         });
+    }
+
+    void setupServer(Server server, Host host){
+        server.lastHost = host;
+        String versionString;
+
+        if(host.version == -1){
+            versionString = Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
+        }else if(host.version == 0){
+            versionString = Core.bundle.get("server.outdated");
+        }else if(host.version < Version.build && Version.build != -1){
+            versionString = Core.bundle.get("server.outdated") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else if(host.version > Version.build && Version.build != -1){
+            versionString = Core.bundle.get("server.outdated.client") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else{
+            versionString = Core.bundle.format("server.version", host.version, host.versionType);
+        }
+
+        server.content.clear();
+
+        server.content.table(t -> {
+            t.add("[lightgray]" + host.name).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            t.row();
+            t.add(versionString).left();
+            t.row();
+            t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
+            Core.bundle.format("players.single", host.players))).left();
+            t.row();
+            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
+        }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
     void setup(){
@@ -217,7 +238,7 @@ public class JoinDialog extends FloatingDialog{
         cont.row();
         cont.add(pane).width(w + 38).pad(0);
         cont.row();
-        cont.addCenteredImageTextButton("$server.add", "icon-add", 14 * 3, () -> {
+        cont.addCenteredImageTextButton("$server.add", "icon-add", iconsize, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {
@@ -253,7 +274,7 @@ public class JoinDialog extends FloatingDialog{
             local.background("button");
             local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton("icon-loading", 16 * 2f, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+            local.addImageButton("icon-loading", iconsize, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
         }else{
             local.background((Drawable)null);
         }
@@ -320,6 +341,7 @@ public class JoinDialog extends FloatingDialog{
         public int port;
 
         transient Table content;
+        transient Host lastHost;
 
         void setIP(String ip){
 

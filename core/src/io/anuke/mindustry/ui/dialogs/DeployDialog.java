@@ -40,7 +40,7 @@ public class DeployDialog extends FloatingDialog{
         layout.layout(root);
 
         addCloseButton();
-        buttons.addImageTextButton("$techtree", "icon-tree", 16 * 2, () -> ui.tech.show()).size(230f, 64f);
+        buttons.addImageTextButton("$techtree", "icon-tree", iconsize, () -> ui.tech.show()).size(230f, 64f);
 
         shown(this::setup);
     }
@@ -131,10 +131,10 @@ public class DeployDialog extends FloatingDialog{
         button.clicked(() -> info.show(zone));
 
         if(zone.unlocked()){
-            button.addImage("icon-zone").padRight(3);
+            button.addImage("icon-terrain").size(iconsize).padRight(3);
             button.labelWrap(zone.localizedName()).width(140).growX();
         }else{
-            button.addImage("icon-zone-locked");
+            button.addImage("icon-locked");
             button.row();
             button.add("$locked");
         }

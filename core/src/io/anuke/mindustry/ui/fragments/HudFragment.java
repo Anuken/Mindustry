@@ -48,7 +48,6 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 59;
-    private float isize = 40;
 
     private float coreAttackTime;
     private float lastCoreHP;
@@ -70,10 +69,10 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    select.addImageButton("icon-menu", "clear", isize, ui.paused::show);
-                    flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
+                    select.addImageButton("icon-menu-large", "clear", iconsize, ui.paused::show);
+                    flip = select.addImageButton("icon-arrow-up", "clear", iconsize, this::toggleMenus).get();
 
-                    select.addImageButton("icon-pause", "clear", isize, () -> {
+                    select.addImageButton("icon-pause", "clear", iconsize, () -> {
                         if(Net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -88,7 +87,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", "clear", isize, () -> {
+                    select.addImageButton("icon-settings", "clear", iconsize, () -> {
                         if(Net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
@@ -104,7 +103,7 @@ public class HudFragment extends Fragment{
                         if(Net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database-small");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
                         }
                     }).get();
 
@@ -197,7 +196,7 @@ public class HudFragment extends Fragment{
                     if(enableUnitEditing){
 
                         t.row();
-                        t.addImageTextButton("$editor.spawn", "icon-add", 8 * 3, () -> {
+                        t.addImageTextButton("$editor.spawn", "icon-add", iconsize, () -> {
                             FloatingDialog dialog = new FloatingDialog("$editor.spawn");
                             int i = 0;
                             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
@@ -216,7 +215,7 @@ public class HudFragment extends Fragment{
                         float[] position = {0, 0};
 
                         t.row();
-                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8 * 3, () -> {
+                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", iconsize, () -> {
 
                         }).fillX().update(b -> {
                             boolean[] found = {false};
@@ -430,7 +429,7 @@ public class HudFragment extends Fragment{
             }
         });
         table.margin(12);
-        table.addImage("icon-check").size(16 * 2).pad(3);
+        table.addImage("icon-check").size(iconsize).pad(3);
         table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
         table.pack();
 

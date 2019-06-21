@@ -53,7 +53,7 @@ public class MenuFragment extends Fragment{
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float size = 120f;
-        float isize = 14f * 4;
+        float isize = iconsize;
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton

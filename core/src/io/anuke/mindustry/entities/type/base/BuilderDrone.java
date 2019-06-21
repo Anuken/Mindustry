@@ -67,6 +67,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 circle(placeDistance * 0.7f);
                 velocity.scl(0.74f);
             }else{ //else, building isn't valid, follow a player
+                target = null;
+
                 if(playerTarget == null || playerTarget.getTeam() != team || !playerTarget.isValid()){
                     playerTarget = null;
 

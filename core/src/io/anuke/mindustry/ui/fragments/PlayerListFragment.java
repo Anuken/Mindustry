@@ -95,7 +95,7 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14 * 2).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
+            button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
             if((Net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || Net.server())){
                 button.add().growY();
@@ -105,14 +105,14 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", "clear-partial", 14 * 2,
+                    t.addImageButton("icon-ban", "clear-partial", iconsize,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton("icon-cancel", "clear-partial", 16 * 2,
+                    t.addImageButton("icon-cancel", "clear-partial", iconsize,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "clear-toggle-partial", 14 * 2, () -> {
+                    t.addImageButton("icon-admin", "clear-toggle-partial", iconsize, () -> {
                         if(Net.client()) return;
 
                         String id = user.uuid;
@@ -128,7 +128,7 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton("icon-zoom", "clear-partial", iconsize, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }

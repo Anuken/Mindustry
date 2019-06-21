@@ -50,7 +50,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addImageTextButton("$database", "icon-database", 14 * 2, () -> {
+        buttons.addImageTextButton("$database", "icon-database", iconsize, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -194,7 +194,7 @@ public class TechTreeDialog extends FloatingDialog{
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "content-background" : !data.hasItems(node.node.requirements) ? "content-background-noitems" : "content-background-locked");
                     ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-tree-locked"));
+                    .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-locked"));
                     button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
                 });
                 addChild(button);
@@ -253,7 +253,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.table("content-background", b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton("icon-info", "node", 14 * 2, () -> ui.content.show(node.block)).growY().width(50f);
+                b.addImageButton("icon-info", "node", iconsize, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -280,7 +280,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", "icon-check", "node", 16 * 2, () -> unlock(node))
+                    b.addImageTextButton("$research", "icon-check", "node", iconsize, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

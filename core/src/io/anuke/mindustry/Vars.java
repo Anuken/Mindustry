@@ -57,6 +57,10 @@ public class Vars{
     public static final float itemSize = 5f;
     /** extra padding around the world; units outside this bound will begin to self-destruct. */
     public static final float worldBounds = 100f;
+    /** default size of UI icons.*/
+    public static final int iconsize = 48;
+    /** size of UI icons (small)*/
+    public static final int iconsizesmall = 32;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */

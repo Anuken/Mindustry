@@ -53,7 +53,7 @@ public class AboutDialog extends FloatingDialog{
 
             table.table(i -> {
                 i.background("button-edge-3");
-                i.addImage("icon-" + link.name).size(14 * 3f);
+                i.addImage("icon-" + link.name).size(iconsize);
             }).size(h - 5, h);
 
             table.table(inset -> {
@@ -62,7 +62,7 @@ public class AboutDialog extends FloatingDialog{
                 inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
             }).padLeft(8);
 
-            table.addImageButton("icon-link", 14 * 3, () -> {
+            table.addImageButton("icon-link", iconsize, () -> {
                 if(!Core.net.openURI(link.link)){
                     ui.showError("$linkfail");
                     Core.app.getClipboard().setContents(link.link);

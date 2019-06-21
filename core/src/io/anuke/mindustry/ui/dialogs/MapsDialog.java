@@ -21,7 +21,7 @@ public class MapsDialog extends FloatingDialog{
         super("$maps");
 
         addCloseButton();
-        buttons.addImageTextButton("$editor.importmap", "icon-add", 14 * 2, () -> {
+        buttons.addImageTextButton("$editor.importmap", "icon-add", iconsize, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 world.maps.tryCatchMapError(() -> {
                     if(MapIO.isImage(file)){
@@ -145,7 +145,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.row();
 
-        table.addImageTextButton("$editor.openin", "icon-load-map", 16 * 2, () -> {
+        table.addImageTextButton("$editor.openin", "icon-load-map", iconsize, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
@@ -156,7 +156,7 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$delete", "icon-trash-16", 16 * 2, () -> {
+        table.addImageTextButton("$delete", "icon-trash-16", iconsize, () -> {
             ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();

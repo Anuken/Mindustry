@@ -5,8 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.mindustry.graphics.Pal;
 
-import static io.anuke.mindustry.Vars.discordURL;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class DiscordDialog extends Dialog{
 
@@ -30,7 +29,7 @@ public class DiscordDialog extends Dialog{
 
             t.table(i -> {
                 i.background("button");
-                i.addImage("icon-discord").size(14 * 3);
+                i.addImage("icon-discord").size(iconsize);
             }).size(h).left();
 
             t.add("$discord").color(Pal.accent).growX().padLeft(10f);

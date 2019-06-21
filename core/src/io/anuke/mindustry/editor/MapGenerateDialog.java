@@ -63,7 +63,7 @@ public class MapGenerateDialog extends FloatingDialog{
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", "icon-add", 14 * 2, this::showAdd).height(64f).width(140f);
+        buttons.addImageTextButton("$add", "icon-add", iconsize, this::showAdd).height(64f).width(140f);
     }
 
     void setup(){
@@ -123,7 +123,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 t.table(b -> {
                     b.left();
                     b.defaults().size(50f);
-                    b.addImageButton("icon-refresh", 14 * 2, () -> {
+                    b.addImageButton("icon-refresh", iconsize, () -> {
                         filter.randomize();
                         update();
                     });
@@ -140,7 +140,7 @@ public class MapGenerateDialog extends FloatingDialog{
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-trash", 14 * 2, () -> {
+                    b.addImageButton("icon-trash", iconsize, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();

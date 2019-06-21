@@ -265,7 +265,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton("icon-break", "clear-toggle-partial", 16 * 2f, () -> {
+        table.addImageButton("icon-break", "clear-toggle-partial", iconsize, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
             if(mode == breaking){
@@ -274,17 +274,17 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).update(l -> l.setChecked(mode == breaking));
 
         //diagonal swap button
-        table.addImageButton("icon-diagonal", "clear-toggle-partial", 16 * 2f, () -> {
+        table.addImageButton("icon-diagonal", "clear-toggle-partial", iconsize, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton("icon-arrow", "clear-partial", 16 * 2f, () -> rotation = Mathf.mod(rotation + 1, 4))
+        table.addImageButton("icon-arrow", "clear-partial", iconsize, () -> rotation = Mathf.mod(rotation + 1, 4))
         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
 
         //confirm button
-        table.addImageButton("icon-check", "clear-partial", 16 * 2f, () -> {
+        table.addImageButton("icon-check", "clear-partial", iconsize, () -> {
             for(PlaceRequest request : selection){
                 Tile tile = request.tile();
 

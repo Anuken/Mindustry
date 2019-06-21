@@ -12,7 +12,6 @@ import javax.imageio.ImageIO
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
-def outFolder = "../core/assets-raw/sprites_out/"
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
 def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
@@ -185,7 +184,6 @@ def scaleImage = { File file ->
 
 def tileImage = { File file ->
     def image = ImageIO.read(file)
-    def color = new Color()
 
     def result = new BufferedImage(image.width * 2, image.height * 2, image.getType())
     Graphics2D graphics = result.createGraphics()
@@ -248,28 +246,6 @@ task swapColors(){
     }
 }
 
-task scaleSprites4x(){
-    doLast{
-        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().replace("\\", "/").contains("/ui/")) return
-
-            scaleImage(file.file)
-            antialias(file.file)
-        }
-    }
-}
-
-task scaleSprites(){
-    finalizedBy 'genSprites'
-
-    doLast{
-        copy{
-            from "../core/assets-raw/sprites/"
-            into "../core/assets-raw/sprites_out/"
-        }
-    }
-}
-
 task scaleImages(){
     doLast{
         for(def img : project.getProperty("images").split(",")){
@@ -289,23 +265,57 @@ task tileImages(){
 }
 
 task pack(){
-    dependsOn 'cleanSprites', 'scaleSprites'
-    //finalizedBy 'cleanup'
 
     doLast{
+        //cleanup old sprites
+        delete{
+            delete "../core/assets-raw/sprites_out/"
+        }
 
+        //copy in new sprites
+        copy{
+            from "../core/assets-raw/sprites/"
+            into "../core/assets-raw/sprites_out/"
+        }
+
+        //run generation task; generate all needed sprites
+        file(genFolder).mkdirs()
+        javaexec{
+
+            main = "io.anuke.mindustry.ImagePacker"
+            classpath = sourceSets.main.runtimeClasspath
+            standardInput = System.in
+            workingDir = genFolder
+        }
+
+        //upscale icon sprites using different method, which requires an OpenGL context
+        javaexec{
+            if(System.getProperty("os.name").toLowerCase().contains("mac")){
+                jvmArgs "-XstartOnFirstThread"
+            }
+
+            main = "io.anuke.mindustry.Upscaler"
+            classpath = sourceSets.main.runtimeClasspath
+            standardInput = System.in
+            workingDir = "../core/assets-raw/sprites_out/ui/icons"
+        }
+
+        //antialias everything except UI elements (...for some reason)
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().replace("\\", "/").contains("/ui/")) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && !file.toString().replace("\\", "/").contains("/icons/"))) return
 
             antialias(file.file)
         }
 
+        //pack normal sprites
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
 
+        //delete old pack defintions
         delete{
             delete fileTree(dir: '../core/assets-raw/sprites_out/', include: '**/pack.json')
         }
 
+        //rename pack definitions, generate fallback 1024x sprites
         copy{
             from '../core/assets-raw/sprites_out/'
             into '../core/assets-raw/sprites_out/'
@@ -315,51 +325,6 @@ task pack(){
 
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites_fallback.atlas")
     }
-
-}
-
-task cleanup(){
-    doLast{
-        delete{
-            delete genFolder
-            delete outFolder
-        }
-    }
-}
-
-task cleanSprites(){
-
-    doLast{
-        delete{
-            delete "../core/assets-raw/sprites_out/"
-        }
-
-        copy{
-            from "../core/assets-raw/sprites/"
-            into "../core/assets-raw/sprites_out/"
-        }
-
-        file(genFolder).mkdirs()
-    }
-}
-
-task antialiasGen(){
-    doLast{
-        fileTree(dir: '../core/assets-raw/sprites_out/generated/', include: "**/*.png").visit{ file ->
-            antialias(file.file)
-        }
-    }
-}
-
-task testUpscale(dependsOn: classes, type: JavaExec){
-
-    if(System.getProperty("os.name").toLowerCase().contains("mac")){
-        jvmArgs "-XstartOnFirstThread"
-    }
-    main = "io.anuke.mindustry.Upscaler"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = "../core/assets/"
 }
 
 task genSprites(dependsOn: classes, type: JavaExec){
