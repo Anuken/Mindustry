@@ -385,14 +385,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Consumer<EditorTool> addTool = tool -> {
                     Table[] lastTable = {null};
 
-                    ImageButton button = new ImageButton("icon-" + tool.name(), "clear-toggle");
+                    ImageButton button = new ImageButton("icon-" + tool.name() + "-small", "clear-toggle");
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
                             lastTable[0].remove();
                         }
                     });
-                    button.resizeImage(iconsize);
+                    button.resizeImage(iconsizesmall);
                     button.update(() -> button.setChecked(view.getTool() == tool));
                     group.add(button);
 
@@ -462,16 +462,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton("icon-menu-large", "clear", iconsize, menu::show);
+                tools.addImageButton("icon-menu-large-small", "clear", iconsizesmall, menu::show);
 
-                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", iconsize, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton("icon-grid-small", "clear-toggle", iconsizesmall, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton("icon-undo", "clear", iconsize, editor::undo).get();
-                ImageButton redo = tools.addImageButton("icon-redo", "clear", iconsize, editor::redo).get();
+                ImageButton undo = tools.addImageButton("icon-undo-small", "clear", iconsizesmall, editor::undo).get();
+                ImageButton redo = tools.addImageButton("icon-redo-small", "clear", iconsizesmall, editor::redo).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -493,7 +493,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", iconsize, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton("icon-arrow-16-small", "clear", iconsizesmall, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);

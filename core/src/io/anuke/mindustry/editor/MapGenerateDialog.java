@@ -123,24 +123,24 @@ public class MapGenerateDialog extends FloatingDialog{
                 t.table(b -> {
                     b.left();
                     b.defaults().size(50f);
-                    b.addImageButton("icon-refresh", iconsize, () -> {
+                    b.addImageButton("icon-refresh-small", iconsizesmall, () -> {
                         filter.randomize();
                         update();
                     });
 
-                    b.addImageButton("icon-arrow-up", 10 * 2, () -> {
+                    b.addImageButton("icon-arrow-up-small", iconsizesmall, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.max(0, idx - 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-arrow-down", 10 * 2, () -> {
+                    b.addImageButton("icon-arrow-down-small", iconsizesmall, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-trash", iconsize, () -> {
+                    b.addImageButton("icon-trash-small", iconsizesmall, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
