@@ -17,6 +17,8 @@ import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
+import static io.anuke.mindustry.Vars.iconsize;
+
 public class FileChooser extends FloatingDialog{
     private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
     private static FileHandle lastDirectory = homeDirectory;
@@ -99,7 +101,7 @@ public class FileChooser extends FloatingDialog{
 
         Table icontable = new Table();
 
-        float isize = 14 * 2;
+        float isize = iconsize;
 
         ImageButton up = new ImageButton("icon-folder-parent");
         up.resizeImage(isize);
@@ -131,7 +133,7 @@ public class FileChooser extends FloatingDialog{
             updateFiles(true);
         });
 
-        icontable.defaults().height(50).growX().padTop(5).uniform();
+        icontable.defaults().height(60).growX().padTop(5).uniform();
         icontable.add(home);
         icontable.add(back);
         icontable.add(forward);
@@ -142,7 +144,7 @@ public class FileChooser extends FloatingDialog{
         fieldcontent.add(filefield).height(40f).fillX().expandX().padLeft(10f);
 
         Table buttons = new Table();
-        buttons.defaults().growX().height(50);
+        buttons.defaults().growX().height(60);
         buttons.add(cancel);
         buttons.add(ok);
 
@@ -213,7 +215,7 @@ public class FileChooser extends FloatingDialog{
                 updateFiles(true);
             });
 
-            upbutton.left().add(upimage).padRight(4f).size(14 * 2);
+            upbutton.left().add(upimage).padRight(4f).size(iconsize);
             upbutton.getLabel().setAlignment(Align.left);
             upbutton.getCells().reverse();
 
@@ -249,7 +251,7 @@ public class FileChooser extends FloatingDialog{
 
             Image image = new Image(file.isDirectory() ? "icon-folder" : "icon-file-text");
 
-            button.add(image).padRight(4f).size(14 * 2f);
+            button.add(image).padRight(4f).size(iconsize);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
             .height(50).pad(2).padTop(0).padBottom(0).colspan(2);

@@ -57,7 +57,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.addImageTextButton("$customize", "icon-tools", 14*2, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
+        cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
 

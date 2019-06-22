@@ -11,6 +11,7 @@ import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 
+import static io.anuke.mindustry.Vars.iconsize;
 import static io.anuke.mindustry.Vars.state;
 
 public class FloatingDialog extends Dialog{
@@ -63,7 +64,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(210f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){

@@ -59,7 +59,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         Consumer<SettingsTable> s = table -> {
             table.row();
-            table.addImageTextButton("$back", "icon-arrow-left", 10 * 3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+            table.addImageTextButton("$back", "icon-arrow-left", iconsize, this::back).size(240f, 60f).colspan(2).padTop(15f);
         };
 
         game = new SettingsTable(s);

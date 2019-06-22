@@ -28,7 +28,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public String getIcon(){
-        return "icon-liquid-small";
+        return "icon-liquid-consume";
     }
 
     @Override

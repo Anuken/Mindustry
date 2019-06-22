@@ -384,7 +384,7 @@ public class Blocks implements ContentList{
 
         darkMetal = new StaticWall("dark-metal");
 
-        pebbles = new OverlayFloor("pebbles");
+        pebbles = new DoubleOverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 
@@ -424,8 +424,8 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasPower = true;
 
-            consumes.power(2f);
-            consumes.item(Items.coal, 4);
+            consumes.power(1.8f);
+            consumes.item(Items.coal, 3);
             consumes.liquid(Liquids.water, 0.1f);
         }};
 
@@ -1125,7 +1125,7 @@ public class Blocks implements ContentList{
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 60, Items.graphite, 50));
+            requirements(Category.production, ItemStack.with(Items.copper, 35, Items.graphite, 15));
             tier = 3;
             drillTime = 480;
             size = 2;
@@ -1134,7 +1134,7 @@ public class Blocks implements ContentList{
         }};
 
         laserDrill = new Drill("laser-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 70, Items.graphite, 90, Items.silicon, 60, Items.titanium, 50));
+            requirements(Category.production, ItemStack.with(Items.copper, 70, Items.graphite, 60, Items.silicon, 60, Items.titanium, 40));
             drillTime = 280;
             size = 3;
             hasPower = true;
@@ -1147,8 +1147,8 @@ public class Blocks implements ContentList{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 100));
-            drillTime = 200;
+            requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 150));
+            drillTime = 220;
             size = 4;
             drawRim = true;
             hasPower = true;
@@ -1601,7 +1601,7 @@ public class Blocks implements ContentList{
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 70, Items.lead, 110, Items.silicon, 80));
+            requirements(Category.units, ItemStack.with(Items.metaglass, 70, Items.lead, 110, Items.silicon, 90));
             type = UnitTypes.spirit;
             produceTime = 5700;
             size = 2;
@@ -1687,7 +1687,7 @@ public class Blocks implements ContentList{
 
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 30, Items.copper, 30, Items.silicon, 30));
-            repairSpeed = 0.1f;
+            repairSpeed = 0.3f;
             powerUse = 1f;
         }};
 

@@ -10,6 +10,7 @@ import static io.anuke.mindustry.Vars.*;
 public class PausedDialog extends FloatingDialog{
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
+    private boolean wasClient = false;
 
     public PausedDialog(){
         super("$menu");
@@ -55,13 +56,12 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            if(!state.isEditor()){
-                cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
-                cont.row();
-            }
+            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+            cont.row();
 
             cont.addButton("$quit", () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
+                    wasClient = Net.client();
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -85,11 +85,11 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
             }
 
-            if(!state.isEditor()){
-                cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
-            }
+            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+
             cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
                 ui.showConfirm("$confirm", "$quit.confirm", () -> {
+                    wasClient = Net.client();
                     if(Net.client()) netClient.disconnectQuietly();
                     runExitSave();
                     hide();
@@ -99,7 +99,7 @@ public class PausedDialog extends FloatingDialog{
     }
 
     public void runExitSave(){
-        if(state.isEditor()){
+        if(state.isEditor() && !wasClient){
             ui.editor.resumeEditing();
             return;
         }

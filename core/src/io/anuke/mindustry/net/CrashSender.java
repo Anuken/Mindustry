@@ -51,6 +51,17 @@ public class CrashSender{
             }
 
             try{
+                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
+                new BufferedOutputStream(new FileOutputStream(file), Streams.DEFAULT_BUFFER_SIZE).write(parseException(exception).getBytes());
+                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+
+                writeListener.accept(file);
+            }catch(Throwable ignored){
+                Log.err("Failed to save local crash report.");
+            }
+
+            try{
                 //check crash report setting
                 if(!Core.settings.getBool("crashreport", true)){
                     return;
@@ -62,17 +73,6 @@ public class CrashSender{
             //do not send exceptions that occur for versions that can't be parsed
             if(Version.number == 0){
                 return;
-            }
-
-            try{
-                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
-                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
-                new BufferedOutputStream(new FileOutputStream(file), Streams.DEFAULT_BUFFER_SIZE).write(parseException(exception).getBytes());
-                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
-
-                writeListener.accept(file);
-            }catch(Throwable ignored){
-                Log.err("Failed to save local crash report.");
             }
 
             boolean netActive = false, netServer = false;

@@ -67,6 +67,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 circle(placeDistance * 0.7f);
                 velocity.scl(0.74f);
             }else{ //else, building isn't valid, follow a player
+                target = null;
+
                 if(playerTarget == null || playerTarget.getTeam() != team || !playerTarget.isValid()){
                     playerTarget = null;
 
@@ -150,7 +152,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     }
 
     boolean isRebuild(){
-        return Vars.state.rules.enemyCheat && team == waveTeam;
+        //disabled until further notice, reason being that it's too annoying when playing enemies and too broken for ally use
+        return false; //Vars.state.rules.enemyCheat && team == waveTeam;
     }
 
     @Override

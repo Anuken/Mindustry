@@ -113,7 +113,8 @@ public class ItemBridge extends Block{
             float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);
             float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
             Lines.rect((x + link.x) / 2f * tilesize - w / 2f, (y + link.y) / 2f * tilesize - h / 2f, w, h);
-            Fill.poly(link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, 3, 2.8f, link.absoluteRelativeTo(x, y) * 90);
+
+            Draw.rect("bridge-arrow", link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, link.absoluteRelativeTo(x, y) * 90);
         }
         Draw.reset();
     }

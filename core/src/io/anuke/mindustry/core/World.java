@@ -90,6 +90,14 @@ public class World implements ApplicationListener{
         return tiles == null ? 0 : tiles[0].length;
     }
 
+    public int unitWidth(){
+        return width()*tilesize;
+    }
+
+    public int unitHeight(){
+        return height()*tilesize;
+    }
+
     public @Nullable Tile tile(int pos){
         return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }

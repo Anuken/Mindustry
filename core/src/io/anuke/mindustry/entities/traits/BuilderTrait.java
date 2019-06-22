@@ -66,9 +66,9 @@ public interface BuilderTrait extends Entity, TeamTrait{
         }
 
         if(!(tile.block() instanceof BuildBlock)){
-            if(canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
+            if(!current.initialized && canCreateBlocks() && !current.breaking && Build.validPlace(getTeam(), current.x, current.y, current.block, current.rotation)){
                 Call.beginPlace(getTeam(), current.x, current.y, current.block, current.rotation);
-            }else if(canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
+            }else if(!current.initialized && canCreateBlocks() && current.breaking && Build.validBreak(getTeam(), current.x, current.y)){
                 Call.beginBreak(getTeam(), current.x, current.y);
             }else{
                 buildQueue().removeFirst();

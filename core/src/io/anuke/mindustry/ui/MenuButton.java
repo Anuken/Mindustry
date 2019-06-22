@@ -4,6 +4,8 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.util.Align;
 
+import static io.anuke.mindustry.Vars.iconsize;
+
 public class MenuButton extends TextButton{
 
     public MenuButton(String icon, String text, Runnable clicked){
@@ -19,7 +21,7 @@ public class MenuButton extends TextButton{
         margin(0);
 
         table(t -> {
-            t.addImage(icon).size(14 * 3).padLeft(6);
+            t.addImage(icon).size(iconsize).padLeft(6);
 
             t.add(text).wrap().growX().get().setAlignment(Align.center, Align.left);
             if(description != null){

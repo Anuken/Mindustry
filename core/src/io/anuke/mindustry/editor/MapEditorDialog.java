@@ -65,7 +65,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu = new FloatingDialog("$menu");
         menu.addCloseButton();
 
-        float isize = 16 * 2f;
+        float isize = iconsize;
         float swidth = 180f;
 
         menu.cont.table(t -> {
@@ -314,7 +314,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }).left().margin(0).get();
 
             button.clearChildren();
-            button.addImage(iconname).size(16 * 3).padLeft(10);
+            button.addImage(iconname).size(iconsize).padLeft(10);
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
@@ -392,7 +392,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             lastTable[0].remove();
                         }
                     });
-                    button.resizeImage(16 * 2f);
+                    button.resizeImage(iconsize);
                     button.update(() -> button.setChecked(view.getTool() == tool));
                     group.add(button);
 
@@ -436,12 +436,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             table.update(() -> {
                                 Vector2 v = button.localToStageCoordinates(Tmp.v1.setZero());
                                 table.setPosition(v.x, v.y, Align.topLeft);
+                                if(!isShown()){
+                                    table.remove();
+                                    lastTable[0] = null;
+                                }
                             });
 
                             table.pack();
                             table.act(Core.graphics.getDeltaTime());
 
-                            Core.scene.add(table);
+                            addChild(table);
                             lastTable[0] = table;
                         });
                     }
@@ -458,16 +462,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton("icon-menu-large", "clear", 16 * 2f, menu::show);
+                tools.addImageButton("icon-menu-large", "clear", iconsize, menu::show);
 
-                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", 16 * 2f, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", iconsize, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton("icon-undo", "clear", 16 * 2f, editor::undo).get();
-                ImageButton redo = tools.addImageButton("icon-redo", "clear", 16 * 2f, editor::redo).get();
+                ImageButton undo = tools.addImageButton("icon-undo", "clear", iconsize, editor::undo).get();
+                ImageButton redo = tools.addImageButton("icon-redo", "clear", iconsize, editor::redo).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -489,7 +493,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", 16 * 2f, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", iconsize, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);

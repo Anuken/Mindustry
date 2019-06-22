@@ -16,11 +16,10 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
-import java.io.*;
+import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.world;
 
-import static io.anuke.mindustry.Vars.*;
-
-public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, SyncTrait, AbsorbTrait{
+public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, AbsorbTrait{
     public Interval timer = new Interval(3);
 
     private float lifeScl;
@@ -151,31 +150,6 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
             return (Float)data;
         }
         return type.damage * damageMultiplier();
-    }
-
-    @Override
-    public boolean isSyncing(){
-        return type.syncable;
-    }
-
-    @Override
-    public void write(DataOutput data) throws IOException{
-        data.writeFloat(x);
-        data.writeFloat(y);
-        data.writeFloat(velocity.x);
-        data.writeFloat(velocity.y);
-        data.writeByte(team.ordinal());
-        data.writeByte(type.id);
-    }
-
-    @Override
-    public void read(DataInput data) throws IOException{
-        x = data.readFloat();
-        y = data.readFloat();
-        velocity.x = data.readFloat();
-        velocity.y = data.readFloat();
-        team = Team.all[data.readByte()];
-        type = content.bullet(data.readByte());
     }
 
     @Override
