@@ -42,16 +42,6 @@ public class ItemsEater extends StorageBlock{
     }
 
     @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-    	return tile.getTeam() == source.getTeam();
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-    	tile.entity.items.add(item, 1);
-    }
-
-    @Override
     public void placed(Tile tile){
         super.placed(tile);
         state.teams.get(tile.getTeam()).cannons.add(tile);
