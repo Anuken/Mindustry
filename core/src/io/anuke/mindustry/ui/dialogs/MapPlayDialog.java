@@ -42,7 +42,7 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            if((mode == Gamemode.attack && !map.hasEnemyCore()) || (mode == Gamemode.pvp && !map.hasOtherCores())){
+            if((mode == Gamemode.attack && !map.hasEnemyCore()) || (mode == Gamemode.pvp && !map.hasOtherCores())  || (mode == Gamemode.resourcesWar && !map.hasOtherCores())){
                 continue;
             }
 

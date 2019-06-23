@@ -160,12 +160,15 @@ public class HudFragment extends Fragment{
                 TextButton waves = new TextButton("", "wave");
                 Table btable = new Table().margin(0);
 
+
                 stack.add(waves);
                 stack.add(btable);
 
                 addWaveTable(waves);
                 addPlayButton(btable);
                 wavesMain.add(stack).width(dsize * 4 + 3f);
+                wavesMain.row();
+                addPointsTable(wavesMain);
                 wavesMain.row();
                 wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
@@ -254,7 +257,7 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.rules.resourcesWar || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
@@ -620,5 +623,44 @@ public class HudFragment extends Fragment{
         }).growY().fillX().right().width(40f)
         .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0
         && !world.spawner.isSpawning());
+    }
+
+    private void addPointsTable(Table table){
+        TextButton textButton = new TextButton("", "wave");
+        table.add(textButton).width(dsize * 4 + 3f);
+
+        StringBuilder builder = new StringBuilder();
+        StringBuilder ibuild = new StringBuilder();
+
+        IntFormat pointsf = new IntFormat("points.accent");
+        IntFormat waitingf = new IntFormat("points.nextelimination", i -> {
+            ibuild.setLength(0);
+            int m = i/60;
+            int s = i % 60;
+            if(m <= 0){
+                ibuild.append(s);
+            }else{
+                ibuild.append(m);
+                ibuild.append(":");
+                if(s < 10){
+                    ibuild.append("0");
+                }
+                ibuild.append(s);
+            }
+            return ibuild.toString();
+        });
+
+        textButton.clearChildren();
+        textButton.left().labelWrap(()->{
+            builder.setLength(0);
+            builder.append(pointsf.get(state.points[player.getTeam().ordinal()]));
+            builder.append("\n");
+            builder.append(waitingf.get((int) state.eliminationtime /60));
+            return builder;
+        }).pad(8f).left().growX();
+
+        textButton.setDisabled(true);
+        textButton.visible(() -> state.rules.resourcesWar);
+        textButton.update(()-> textButton.setTranslation(0, (state.rules.waves) ? 0 : 90));
     }
 }

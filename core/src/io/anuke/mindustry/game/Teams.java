@@ -50,6 +50,7 @@ public class Teams{
 
     public static class TeamData{
         public final ObjectSet<Tile> cores = new ObjectSet<>();
+        public final ObjectSet<Tile> cannons = new ObjectSet<>();
         public final EnumSet<Team> enemies;
         public final Team team;
         public LongQueue brokenBlocks = new LongQueue();

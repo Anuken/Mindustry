@@ -292,6 +292,24 @@ public class TypeIO{
         return bytes;
     }
 
+    @WriteClass(int[].class)
+    public static void writeInts(ByteBuffer buffer, int[] ints){
+        buffer.putShort((short)ints.length);
+        for(int i=0; i<ints.length; i++){
+            buffer.putInt(ints[i]);
+        }
+    }
+
+    @ReadClass(int[].class)
+    public static int[] readInts(ByteBuffer buffer){
+        short length = buffer.getShort();
+        int[] ints = new int[length];
+        for(int i=0; i<length; i++){
+            ints[i] = buffer.getInt();
+        }
+        return ints;
+    }
+
     @WriteClass(TraceInfo.class)
     public static void writeTraceInfo(ByteBuffer buffer, TraceInfo trace){
         writeString(buffer, trace.ip);

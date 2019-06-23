@@ -28,8 +28,7 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.Attribute;
 import io.anuke.mindustry.world.modules.LiquidModule;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
     public static Block
@@ -81,7 +80,10 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
+
+    //mode specific
+    itemsEater;
 
     @Override
     public void load(){
@@ -1741,6 +1743,14 @@ public class Blocks implements ContentList{
             mech = Mechs.glaive;
             size = 3;
             consumes.power(1.2f);
+        }};
+
+        //endregion
+        //region mode specific
+
+        itemsEater = new ItemsEater("items-eater"){{
+            requirements(Category.distribution,()->state.rules.resourcesWar, requirementsInRound[0]);
+            size = 2;
         }};
 
         //endregion

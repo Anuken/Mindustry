@@ -168,5 +168,11 @@ public class CoreBlock extends StorageBlock{
                 player.beginRespawning(this);
             }
         }
+
+        @Override
+        public void damage(float damage){
+            if(state.rules.resourcesWar) return;
+            super.damage(damage);
+        }
     }
 }

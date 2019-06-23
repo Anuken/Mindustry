@@ -4,7 +4,9 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
@@ -15,12 +17,14 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.gen.BrokenBlock;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.blocks.distribution.ItemsEater;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -96,6 +100,9 @@ public class Logic implements ApplicationListener{
         state.teams = new Teams();
         state.rules = new Rules();
         state.stats = new Stats();
+        state.eliminationtime = state.rules.eliminationTime;
+        state.round = 1;
+        Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[0];
 
         Time.clear();
         Entities.clear();
@@ -111,6 +118,65 @@ public class Logic implements ApplicationListener{
         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
+    }
+
+    public void eliminateWeakest(){
+        state.eliminationtime = state.rules.eliminationTime;
+        state.round++;
+
+        calcPoints();
+
+        for(Team team : state.getWeakest()){
+            Call.eliminateTeam(team.ordinal());
+        }
+
+        Call.onRound();
+    }
+
+    public void calcPoints(){
+        for(Team team : Team.values()){
+            Teams.TeamData teamData = state.teams.get(team);
+            int points = -1;
+            if(teamData.cores.size!=0 || Structs.filter(Player.class, playerGroup.all().toArray(), (p)->p.getTeam()==team).length!=0){
+                points = 0;
+                for(Tile t : teamData.cannons){
+                    points += calcPoints(t);
+                }
+            }
+            state.points[team.ordinal()] = points;
+        }
+    }
+
+    public int calcPoints(Tile t){
+        int points = 0;
+        for(int i=0; i<content.items().size; i++){
+            points += (int)(t.entity.items.get(content.items().get(i)) * itemsValues[i]);
+        }
+        return points;
+    }
+
+    @Remote(called = Loc.client)
+    public static void onRound(){
+        //bump requirements
+        Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[(state.round > ItemsEater.requirementsInRound.length) ?
+                ItemsEater.requirementsInRound.length-1 : state.round -1];
+        player.respawns = state.rules.respawns;
+    }
+
+    @Remote(called = Loc.both)
+    public static void eliminateTeam(int team){
+        Team t = Team.values()[team];
+        //We need to copy set because when Core is destroyed it wants to remove itself from the original set and will occur error
+        ObjectSet<Tile> cores = new ObjectSet<>(state.teams.get(t).cores);
+        for(Tile tile : cores){
+            world.tile(tile.pos()).block().onDestroyed(tile);
+            world.removeBlock(tile);
+        }
+        if(player.getTeam() == t){
+            player.kill();
+        }
+
+        Events.fire(new TeamEliminatedEvent(t));
     }
 
     private void checkGameOver(){
@@ -178,8 +244,20 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
+                if(state.rules.resourcesWar && !state.gameOver){
+                    state.eliminationtime = Math.max(state.eliminationtime - Time.delta(), 0);
+                }
+
+                if(!Net.client() && state.rules.resourcesWar){
+                    calcPoints();
+                }
+
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
+                }
+
+                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar){
+                    eliminateWeakest();
                 }
 
                 if(!headless){

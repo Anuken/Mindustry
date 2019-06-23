@@ -71,6 +71,9 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+
+        title("$rules.title.resourceswar");
+        number("$rules.eliminationspacing", false, f -> rules.eliminationTime = f * 60f, () -> rules.eliminationTime / 60f, () -> rules.resourcesWar);
     }
 
     void number(String text, FloatConsumer cons, FloatProvider prov){

@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
@@ -15,6 +16,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.ui.IntFormat;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -67,7 +69,11 @@ public class PlayerListFragment extends Fragment{
 
         float h = 74f;
 
-        playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+        if(state.rules.resourcesWar){
+            playerGroup.all().sort((p1, p2) -> state.points[p2.getTeam().ordinal()]-state.points[p1.getTeam().ordinal()]);
+        }else{
+            playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+        }
         playerGroup.all().each(user -> {
             NetConnection connection = user.con;
 
@@ -92,7 +98,14 @@ public class PlayerListFragment extends Fragment{
             table.add(new Image(user.mech.iconRegion)).grow();
 
             button.add(table).size(h);
-            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
+            button.labelWrap(()->{
+                StringBuilder builder = new StringBuilder();
+                builder.append("[#" + user.color.toString().toUpperCase() + "]"+ user.name);
+                if(state.rules.resourcesWar && state.points[user.getTeam().ordinal()]!=-1){
+                    builder.append("\n" + "[LIGHT_GRAY]" + new IntFormat("points.lightgray").get(state.points[user.getTeam().ordinal()]));
+                }
+                return builder.toString();
+            }).width(170f).pad(10);
             button.add().grow();
 
             button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();

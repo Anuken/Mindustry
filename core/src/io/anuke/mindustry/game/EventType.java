@@ -52,6 +52,12 @@ public class EventType{
         }
     }
 
+    public static class TeamEliminatedEvent{
+        public final Team eliminated;
+
+        public TeamEliminatedEvent(Team eliminated) { this.eliminated = eliminated; }
+    }
+
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{
 

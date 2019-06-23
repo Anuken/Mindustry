@@ -63,6 +63,11 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+    /** Determinates if gamemode is resourceswar mode */
+    public boolean resourcesWar = false;
+    /** Determinates how often weakest team should be eliminated in ticks */
+    public float eliminationTime = 240 * 60;
+
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

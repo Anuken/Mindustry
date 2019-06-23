@@ -124,7 +124,7 @@ public class EntityGroup<T extends Entity>{
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
         if(useTree){
-            tree = new QuadTree<>(new Rectangle(x, y, w, h));
+            tree = new QuadTree(new Rectangle(x, y, w, h));
         }
     }
 

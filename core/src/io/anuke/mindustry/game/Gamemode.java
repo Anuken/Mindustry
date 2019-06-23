@@ -34,6 +34,18 @@ public enum Gamemode{
         rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
     }),
+    resourcesWar(rules -> {
+        rules.pvp = true;
+        rules.enemyCoreBuildRadius = 600f;
+        rules.respawnTime = 60 * 10;
+        rules.buildSpeedMultiplier = 2f;
+        rules.playerDamageMultiplier = 0.33f;
+        rules.playerHealthMultiplier = 0.5f;
+        rules.unitBuildSpeedMultiplier = 3f;
+        rules.unitHealthMultiplier = 3f;
+        rules.attackMode = true;
+        rules.resourcesWar = true;
+    }),
     editor(true, rules -> {
         rules.infiniteResources = true;
         rules.editor = true;

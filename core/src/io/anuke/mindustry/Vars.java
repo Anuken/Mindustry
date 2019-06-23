@@ -122,6 +122,10 @@ public class Vars{
     public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
+    /** item value, index is id of item */
+    public static float[] itemsValues = {
+        1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f
+    };
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;

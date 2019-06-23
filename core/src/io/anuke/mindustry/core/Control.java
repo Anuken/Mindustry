@@ -130,6 +130,12 @@ public class Control implements ApplicationListener{
             }
         });
 
+        Events.on(TeamEliminatedEvent.class, event -> {
+            if(player.getTeam() == event.eliminated){
+                ui.eliminated.show();
+            }
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
             if(state.rules.pvp && !Net.active()){

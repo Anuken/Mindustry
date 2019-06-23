@@ -26,6 +26,13 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
+            stream.writeInt(state.round);
+            stream.writeFloat(state.eliminationtime);
+
+            for(int i=0; i<state.points.length; i++){
+                stream.writeInt(state.points[i]);
+            }
+
             stream.writeInt(player.id);
             player.write(stream);
 
@@ -44,6 +51,13 @@ public class NetworkIO{
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
+
+            state.round = stream.readInt();
+            state.eliminationtime = stream.readFloat();
+
+            for(int i=0; i<state.points.length; i++){
+                state.points[i] = stream.readInt();
+            }
 
             Entities.clear();
             int id = stream.readInt();
