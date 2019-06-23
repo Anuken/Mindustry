@@ -22,7 +22,6 @@ public class Mindustry extends ApplicationCore{
         Time.mark();
 
         Vars.init();
-
         Log.setUseColors(false);
         BundleLoader.load();
         content.load();
