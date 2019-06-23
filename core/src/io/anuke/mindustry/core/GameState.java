@@ -32,6 +32,8 @@ public class GameState{
     private State state = State.menu;
     /** Points. Used in resources-war mode */
     public int[] points = new int[Team.values().length];
+    /** Points. Used in resources-war mode */
+    public int pointsThreshold = rules.firstThreshold;
 
     public int enemies(){
         return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));

@@ -102,6 +102,7 @@ public class Logic implements ApplicationListener{
         state.stats = new Stats();
         state.eliminationtime = state.rules.eliminationTime;
         state.round = 1;
+        state.pointsThreshold = state.rules.firstThreshold;
         Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[0];
 
         Time.clear();
@@ -155,12 +156,13 @@ public class Logic implements ApplicationListener{
         return points;
     }
 
-    @Remote(called = Loc.client)
+    @Remote(called = Loc.both)
     public static void onRound(){
         //bump requirements
         Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[(state.round > ItemsEater.requirementsInRound.length) ?
                 ItemsEater.requirementsInRound.length-1 : state.round -1];
         player.respawns = state.rules.respawns;
+        state.pointsThreshold += state.rules.bumpThreshold;
     }
 
     @Remote(called = Loc.both)
@@ -244,7 +246,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if(state.rules.resourcesWar && !state.gameOver){
+                if(state.rules.resourcesWar && !state.rules.rushGame && !state.gameOver){
                     state.eliminationtime = Math.max(state.eliminationtime - Time.delta(), 0);
                 }
 
@@ -252,11 +254,19 @@ public class Logic implements ApplicationListener{
                     calcPoints();
                 }
 
+                if(!Net.client() && state.rules.resourcesWar && state.rules.rushGame){
+                    for(int i=0; i<state.points.length; i++){
+                        if(state.points[i] >= state.pointsThreshold){
+                            eliminateWeakest();
+                        }
+                    }
+                }
+
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
 
-                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar){
+                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar && !state.rules.rushGame){
                     eliminateWeakest();
                 }
 

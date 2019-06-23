@@ -632,6 +632,7 @@ public class HudFragment extends Fragment{
         StringBuilder builder = new StringBuilder();
         StringBuilder ibuild = new StringBuilder();
 
+        IntFormat pointsthreshold = new IntFormat("points.threshold");
         IntFormat pointsf = new IntFormat("points.accent");
         IntFormat waitingf = new IntFormat("points.nextelimination", i -> {
             ibuild.setLength(0);
@@ -655,7 +656,11 @@ public class HudFragment extends Fragment{
             builder.setLength(0);
             builder.append(pointsf.get(state.points[player.getTeam().ordinal()]));
             builder.append("\n");
-            builder.append(waitingf.get((int) state.eliminationtime /60));
+            if(!state.rules.rushGame){
+                builder.append(waitingf.get((int) state.eliminationtime / 60));
+            }else{
+                builder.append(pointsthreshold.get(state.pointsThreshold));
+            }
             return builder;
         }).pad(8f).left().growX();
 

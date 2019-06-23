@@ -73,7 +73,22 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("$rules.title.resourceswar");
-        number("$rules.eliminationspacing", false, f -> rules.eliminationTime = f * 60f, () -> rules.eliminationTime / 60f, () -> rules.resourcesWar);
+
+        main.table(t->{
+            t.left();
+            t.add("$rules.regularmode").update(tt->tt.setColor(rules.resourcesWar ? Color.WHITE : Pal.darkishGray)).left();
+            t.row();
+            t.add("$rules.rushmode").update(tt->tt.setColor(rules.resourcesWar ? Color.WHITE : Pal.darkishGray)).left();
+            t.row();
+        }).padTop(20).padBottom(30).padRight(100f).left();
+        main.row();
+        check("$rules.rushmode.check", b -> rules.rushGame = b, () -> rules.rushGame, () -> rules.resourcesWar);
+        main.table(t->{}).padTop(20);
+        main.row();
+
+        number("$rules.eliminationspacing", false, f -> rules.eliminationTime = f * 60f, () -> rules.eliminationTime / 60f, () -> rules.resourcesWar && !rules.rushGame);
+        number("$rules.pointsthreshold", true, i -> rules.firstThreshold = (int) i, () -> rules.firstThreshold, () -> rules.resourcesWar && rules.rushGame);
+        number("$rules.pointsthresholdbump", true, i -> rules.bumpThreshold = (int) i, () -> rules.bumpThreshold, () -> rules.resourcesWar && rules.rushGame);
     }
 
     void number(String text, FloatConsumer cons, FloatProvider prov){

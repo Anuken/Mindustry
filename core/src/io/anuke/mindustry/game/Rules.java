@@ -67,6 +67,12 @@ public class Rules{
     public boolean resourcesWar = false;
     /** Determinates how often weakest team should be eliminated in ticks */
     public float eliminationTime = 240 * 60;
+    /**  */
+    public boolean rushGame = false;
+    /**  */
+    public int firstThreshold = 200;
+    /**  */
+    public int bumpThreshold = 100;
 
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
