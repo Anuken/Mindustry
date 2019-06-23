@@ -42,7 +42,6 @@ public class Renderer implements ApplicationListener{
     private float shakeIntensity, shaketime;
 
     public Renderer(){
-        batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(20);
         Shaders.init();
