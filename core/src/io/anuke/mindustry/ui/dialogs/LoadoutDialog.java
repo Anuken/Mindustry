@@ -1,16 +1,23 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.mindustry.type.*;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.data;
 
-public class ZoneLoadoutDialog extends FloatingDialog{
-    private Zone zone;
+public class LoadoutDialog extends FloatingDialog{
     private Runnable hider;
+    private Supplier<Array<ItemStack>> supplier;
+    private Runnable resetter;
+    private Runnable updater;
+    private Function<Item, Boolean> filter;
+    private int capacity;
 
-    public ZoneLoadoutDialog(){
+    public LoadoutDialog(){
         super("$configure");
         setFillParent(false);
         addCloseButton();
@@ -22,15 +29,19 @@ public class ZoneLoadoutDialog extends FloatingDialog{
         });
         buttons.row();
         buttons.addButton("$settings.reset", () -> {
-            zone.resetStartingItems();
-            zone.updateLaunchCost();
+            resetter.run();
+            updater.run();
             setup();
         }).size(210f, 64f);
     }
 
-    public void show(Zone zone, Runnable hider){
+    public void show(int capacity, Supplier<Array<ItemStack>> supplier, Runnable reseter, Runnable updater, Runnable hider, Function<Item, Boolean> filter){
+        this.resetter = reseter;
+        this.supplier = supplier;
+        this.updater = updater;
+        this.capacity = capacity;
         this.hider = hider;
-        this.zone = zone;
+        this.filter = filter;
         show();
     }
 
@@ -39,20 +50,20 @@ public class ZoneLoadoutDialog extends FloatingDialog{
         float bsize = 40f;
         int step = 50;
 
-        for(ItemStack stack : zone.getStartingItems()){
+        for(ItemStack stack : supplier.get()){
             cont.addButton("x", "clear-partial", () -> {
-                zone.getStartingItems().remove(stack);
-                zone.updateLaunchCost();
+                supplier.get().remove(stack);
+                updater.run();
                 setup();
             }).size(bsize);
 
             cont.addButton("-", "clear-partial", () -> {
                 stack.amount = Math.max(stack.amount - step, 0);
-                zone.updateLaunchCost();
+                updater.run();
             }).size(bsize);
             cont.addButton("+", "clear-partial", () -> {
-                stack.amount = Math.min(stack.amount + step, zone.loadout.core().itemCapacity);
-                zone.updateLaunchCost();
+                stack.amount = Math.min(stack.amount + step, capacity);
+                updater.run();
             }).size(bsize);
 
             cont.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4);
@@ -64,10 +75,10 @@ public class ZoneLoadoutDialog extends FloatingDialog{
         cont.addButton("$add", () -> {
             FloatingDialog dialog = new FloatingDialog("");
             dialog.setFillParent(false);
-            for(Item item : content.items().select(item -> data.getItem(item) > 0 && item.type == ItemType.material && zone.getStartingItems().find(stack -> stack.item == item) == null)){
+            for(Item item : content.items().select(item -> filter.apply(item) && item.type == ItemType.material && supplier.get().find(stack -> stack.item == item) == null)){
                 TextButton button = dialog.cont.addButton("", "clear", () -> {
-                    zone.getStartingItems().add(new ItemStack(item, 0));
-                    zone.updateLaunchCost();
+                    supplier.get().add(new ItemStack(item, 0));
+                    updater.run();
                     setup();
                     dialog.hide();
                 }).size(300f, 36f).get();
@@ -78,7 +89,7 @@ public class ZoneLoadoutDialog extends FloatingDialog{
                 dialog.cont.row();
             }
             dialog.show();
-        }).colspan(4).size(100f, bsize).left().disabled(b -> !content.items().contains(item -> data.getItem(item) > 0 && item.type == ItemType.material && !zone.getStartingItems().contains(stack -> stack.item == item)));
+        }).colspan(4).size(100f, bsize).left().disabled(b -> !content.items().contains(item -> filter.apply(item) && !supplier.get().contains(stack -> stack.item == item)));
         pack();
     }
 }

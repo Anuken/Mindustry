@@ -2,7 +2,9 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.collection.Array;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.Zone;
 
 /**
@@ -63,6 +65,8 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+    /** Loadout */
+    public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 200));
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

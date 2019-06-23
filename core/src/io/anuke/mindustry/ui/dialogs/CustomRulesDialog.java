@@ -4,9 +4,13 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.ItemStack;
+import io.anuke.mindustry.type.ItemType;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -14,10 +18,12 @@ public class CustomRulesDialog extends FloatingDialog{
     private Table main;
     private Rules rules;
     private Supplier<Rules> resetter;
+    private LoadoutDialog loadoutDialog;
 
     public CustomRulesDialog(){
         super("$mode.custom");
 
+        loadoutDialog = new LoadoutDialog();
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
@@ -56,6 +62,12 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         number("$rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
+
+        main.addButton("$configure", ()->loadoutDialog.show(
+                Blocks.coreShard.itemCapacity, ()->rules.loadout, ()->{rules.loadout.clear(); rules.loadout.add(ItemStack.with(Items.copper, 200)[0]);},
+                ()->{}, ()->{}, (item)->item.type == ItemType.material
+        )).left().width(300f);
+        main.row();
 
         title("$rules.title.player");
         number("$rules.playerdamagemultiplier", f -> rules.playerDamageMultiplier = f, () -> rules.playerDamageMultiplier);

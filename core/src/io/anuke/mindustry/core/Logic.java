@@ -17,6 +17,7 @@ import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
@@ -82,7 +83,9 @@ public class Logic implements ApplicationListener{
             for(Team team : Team.all){
                 if(state.teams.isActive(team)){
                     for(Tile core : state.teams.get(team).cores){
-                        core.entity.items.add(Items.copper, 200);
+                        for(ItemStack itemStack : state.rules.loadout){
+                            core.entity.items.add(itemStack.item, itemStack.amount);
+                        }
                     }
                 }
             }
