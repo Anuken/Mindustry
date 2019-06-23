@@ -1,99 +1,103 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.annotations.Annotations.Serialize;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.style.Drawable;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Cell;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Host;
 import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.style.Drawable;
-import io.anuke.ucore.scene.ui.Dialog;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Cell;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
-public class JoinDialog extends FloatingDialog {
+public class JoinDialog extends FloatingDialog{
     Array<Server> servers = new Array<>();
     Dialog add;
     Server renaming;
     Table local = new Table();
     Table remote = new Table();
     Table hosts = new Table();
-    float w = 500;
+    int totalHosts;
 
     public JoinDialog(){
-        super("$text.joingame");
+        super("$joingame");
 
         loadServers();
 
-        buttons().add().width(60f);
-        buttons().add().growX();
+        buttons.add().width(60f);
+        buttons.add().growX();
 
         addCloseButton();
 
-        buttons().add().growX();
-        buttons().addButton("?", () -> ui.showInfo("$text.join.info")).size(60f, 64f);
+        buttons.add().growX();
+        buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
 
-        add = new FloatingDialog("$text.joingame.title");
-        add.content().add("$text.joingame.ip").padRight(5f).left();
+        add = new FloatingDialog("$joingame.title");
+        add.cont.add("$joingame.ip").padRight(5f).left();
 
-        Platform.instance.addDialog(add.content().addField(Settings.getString("ip"), text ->{
-            Settings.putString("ip", text);
-            Settings.save();
-        }).size(320f, 54f).get(), 100);
+        TextField field = add.cont.addField(Core.settings.getString("ip"), text -> {
+            Core.settings.put("ip", text);
+            Core.settings.save();
+        }).size(320f, 54f).get();
 
-        add.content().row();
-        add.buttons().defaults().size(140f, 60f).pad(4f);
-        add.buttons().addButton("$text.cancel", add::hide);
-        add.buttons().addButton("$text.ok", () -> {
-            if(renaming == null) {
-                Server server = new Server(Settings.getString("ip"), Strings.parseInt(Settings.getString("port")));
+        Platform.instance.addDialog(field, 100);
+
+        add.cont.row();
+        add.buttons.defaults().size(140f, 60f).pad(4f);
+        add.buttons.addButton("$cancel", add::hide);
+        add.buttons.addButton("$ok", () -> {
+            if(renaming == null){
+                Server server = new Server();
+                server.setIP(Core.settings.getString("ip"));
                 servers.add(server);
                 saveServers();
                 setupRemote();
                 refreshRemote();
             }else{
-                renaming.ip = Settings.getString("ip");
+                renaming.setIP(Core.settings.getString("ip"));
                 saveServers();
                 setupRemote();
                 refreshRemote();
             }
             add.hide();
-        }).disabled(b -> Settings.getString("ip").isEmpty() || Net.active());
+        }).disabled(b -> Core.settings.getString("ip").isEmpty() || Net.active());
 
         add.shown(() -> {
-            add.getTitleLabel().setText(renaming != null ? "$text.server.edit" : "$text.server.add");
+            add.title.setText(renaming != null ? "$server.edit" : "$server.add");
+            if(renaming != null){
+                field.setText(renaming.displayIP());
+            }
         });
 
-        setup();
-
         shown(() -> {
+            setup();
             refreshLocal();
             refreshRemote();
         });
+
+        onResize(this::setup);
     }
 
     void setupRemote(){
         remote.clear();
-        for (Server server : servers) {
+        for(Server server : servers){
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]"+server.ip, "clear", () -> {
-                if(!buttons[0].childrenPressed()) connect(server.ip, Vars.port);
-            }).width(w).height(150f).pad(4f).get();
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), "clear", () -> {
+                if(!buttons[0].childrenPressed()){
+                    connect(server.ip, server.port);
+                }
+            }).width(targetWidth()).height(155f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -103,17 +107,36 @@ public class JoinDialog extends FloatingDialog {
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton("icon-loading", "empty", 16*2, () -> {
+            inner.addImageButton("icon-arrow-up-small", "empty", iconsizesmall, () -> {
+                int index = servers.indexOf(server);
+                if(index > 0){
+                    servers.remove(index);
+                    servers.insert(0, server);
+
+                    saveServers();
+                    setupRemote();
+                    for(Server other : servers){
+                        if(other.lastHost != null){
+                            setupServer(other, other.lastHost);
+                        }else{
+                            refreshServer(other);
+                        }
+                    }
+                }
+
+            }).margin(3f).padTop(6f).top().right();
+
+            inner.addImageButton("icon-loading-small", "empty", iconsizesmall, () -> {
                 refreshServer(server);
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-pencil", "empty", 16*2, () -> {
+            inner.addImageButton("icon-pencil-small", "empty", iconsizesmall, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton("icon-trash-16", "empty", 16*2, () -> {
-                ui.showConfirm("$text.confirm", "$text.server.delete", () -> {
+            inner.addImageButton("icon-trash-16-small", "empty", iconsizesmall, () -> {
+                ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
                     setupRemote();
@@ -123,7 +146,8 @@ public class JoinDialog extends FloatingDialog {
 
             button.row();
 
-            server.content = button.table(t -> {}).grow().get();
+            server.content = button.table(t -> {
+            }).grow().get();
 
             remote.row();
         }
@@ -137,92 +161,84 @@ public class JoinDialog extends FloatingDialog {
 
     void refreshServer(Server server){
         server.content.clear();
-        server.content.label(() -> Bundles.get("text.server.refreshing") + Strings.animated(4, 11, "."));
+        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
 
-        Net.pingHost(server.ip, server.port, host -> {
-            String versionString;
-
-            if(host.version == -1) {
-                versionString = Bundles.format("text.server.version", Bundles.get("text.server.custombuild"));
-            }else if(host.version == 0){
-                versionString = Bundles.get("text.server.outdated");
-            }else if(host.version < Version.build && Version.build != -1){
-                versionString = Bundles.get("text.server.outdated") + "\n" +
-                        Bundles.format("text.server.version", host.version);
-            }else if(host.version > Version.build && Version.build != -1){
-                versionString = Bundles.get("text.server.outdated.client") + "\n" +
-                        Bundles.format("text.server.version", host.version);
-            }else{
-                versionString = Bundles.format("text.server.version", host.version);
-            }
-
+        Net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
-
-            server.content.table(t -> {
-                t.add(versionString).left();
-                t.row();
-                t.add("[lightgray]" + Bundles.format("text.server.hostname", host.name)).left();
-                t.row();
-                t.add("[lightgray]" + (host.players != 1 ? Bundles.format("text.players", host.players) :
-                        Bundles.format("text.players.single", host.players))).left();
-                t.row();
-                t.add("[lightgray]" + Bundles.format("text.save.map", host.mapname) + " / " + Bundles.format("text.save.wave", host.wave)).left();
-            }).expand().left().bottom().padLeft(12f).padBottom(8);
-
-            //server.content.add(versionString).top().expandY().top().expandX();
-
-        }, e -> {
-            server.content.clear();
-            server.content.add("$text.host.invalid");
+            server.content.add("$host.invalid");
         });
     }
 
-    void refreshLocal(){
-        if(!Vars.gwt) {
-            local.clear();
-            local.background("button");
-            local.label(() -> "[accent]" + Bundles.get("text.hosts.discovering") + Strings.animated(4, 10f, ".")).pad(10f);
-            Net.discoverServers(this::addLocalHosts);
+    void setupServer(Server server, Host host){
+        server.lastHost = host;
+        String versionString;
+
+        if(host.version == -1){
+            versionString = Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
+        }else if(host.version == 0){
+            versionString = Core.bundle.get("server.outdated");
+        }else if(host.version < Version.build && Version.build != -1){
+            versionString = Core.bundle.get("server.outdated") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else if(host.version > Version.build && Version.build != -1){
+            versionString = Core.bundle.get("server.outdated.client") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else{
+            versionString = Core.bundle.format("server.version", host.version, host.versionType);
         }
+
+        server.content.clear();
+
+        server.content.table(t -> {
+            t.add("[lightgray]" + host.name).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            t.row();
+            t.add(versionString).left();
+            t.row();
+            t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
+            Core.bundle.format("players.single", host.players))).left();
+            t.row();
+            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
+        }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
     void setup(){
+        float w = targetWidth();
+
         hosts.clear();
 
         hosts.add(remote).growX();
         hosts.row();
         hosts.add(local).width(w);
 
-        ScrollPane pane = new ScrollPane(hosts, "clear");
+        ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
         setupRemote();
         refreshRemote();
 
-        content().clear();
-        content().table(t -> {
-            t.add("$text.name").padRight(10);
-            t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
-                Vars.player.name = text;
-                Settings.put("name", text);
-                Settings.save();
-            }).grow().pad(8).get().setMaxLength(40);
+        cont.clear();
+        cont.table(t -> {
+            t.add("$name").padRight(10);
+            t.addField(Core.settings.getString("name"), text -> {
+                player.name = text;
+                Core.settings.put("name", text);
+                Core.settings.save();
+            }).grow().pad(8).get().setMaxLength(maxNameLength);
 
-            ImageButton button = t.addImageButton("white", 40, () -> {
+            ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Settings.putInt("color", Color.rgba8888(color));
-                    Settings.save();
+                    Core.settings.put("color-0", Color.rgba8888(color));
+                    Core.settings.save();
                 });
-            }).size(50f, 54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.getColor());
+            }).size(54f).get();
+            button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4);
-        content().row();
-        content().add(pane).width(w + 34).pad(0);
-        content().row();
-        content().addCenteredImageTextButton("$text.server.add", "icon-add", "clear", 14*3, () -> {
+        cont.row();
+        cont.add(pane).width(w + 38).pad(0);
+        cont.row();
+        cont.addCenteredImageTextButton("$server.add", "icon-add", iconsize, () -> {
             renaming = null;
             add.show();
         }).marginLeft(6).width(w).height(80f).update(button -> {
@@ -233,9 +249,9 @@ public class JoinDialog extends FloatingDialog {
                 pad = 6;
             }
 
-            Cell<TextButton> cell = ((Table)pane.getParent()).getCell(button);
+            Cell cell = ((Table)pane.getParent()).getCell(button);
 
-            if(!MathUtils.isEqual(cell.getMinWidth(), pw)){
+            if(!Mathf.isEqual(cell.minWidth(), pw)){
                 cell.width(pw);
                 cell.padLeft(pad);
                 pane.getParent().invalidateHierarchy();
@@ -243,100 +259,113 @@ public class JoinDialog extends FloatingDialog {
         });
     }
 
-    void addLocalHosts(Array<Host> array){
+    void refreshLocal(){
+        totalHosts = 0;
+
         local.clear();
+        local.background((Drawable)null);
+        local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
+        Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+    }
 
-        if(array.size == 0){
-            local.add("$text.hosts.none").pad(10f);
+    void finishLocalHosts(){
+        if(totalHosts == 0){
+            local.clear();
+            local.background("button");
+            local.add("$hosts.none").pad(10f);
             local.add().growX();
-            local.addImageButton("icon-loading", 16*2f, this::refreshLocal).pad(-10f).padLeft(0).padTop(-6).size(70f, 74f);
-        }else {
-            for (Host a : array) {
-                TextButton button = local.addButton("[accent]"+a.name, "clear", () -> {
-                    connect(a.address, Vars.port);
-                }).width(w).height(80f).pad(4f).get();
-                button.left();
-                button.row();
-                button.add("[lightgray]" + (a.players != 1 ? Bundles.format("text.players", a.players) :
-                        Bundles.format("text.players.single", a.players)));
-                button.row();
-                button.add("[lightgray]" + a.address).pad(4).left();
-
-                local.row();
-                local.background((Drawable) null);
-            }
+            local.addImageButton("icon-loading", iconsize, this::refreshLocal).pad(-12f).padLeft(0).size(70f);
+        }else{
+            local.background((Drawable)null);
         }
+    }
+
+    void addLocalHost(Host host){
+        if(totalHosts == 0){
+            local.clear();
+        }
+        local.background((Drawable)null);
+        totalHosts++;
+        float w = targetWidth();
+
+        local.row();
+
+        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
+        .width(w).height(80f).pad(4f).get();
+        button.left();
+        button.row();
+        button.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
+        Core.bundle.format("players.single", host.players))).padBottom(5);
     }
 
     void connect(String ip, int port){
-        ui.loadfrag.show("$text.connecting");
+        if(Core.settings.getString("name").trim().isEmpty()){
+            ui.showInfo("$noname");
+            return;
+        }
 
-        Timers.runTask(2f, () -> {
-            try{
-                Vars.netClient.beginConnecting();
-                Net.connect(ip, port);
+        ui.loadfrag.show("$connecting");
+
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            netClient.disconnectQuietly();
+        });
+
+        Time.runTask(2f, () -> {
+            logic.reset();
+            Vars.netClient.beginConnecting();
+            Net.connect(ip, port, () -> {
                 hide();
                 add.hide();
-            }catch (Exception e) {
-                Throwable t = e;
-                while(t.getCause() != null){
-                    t = t.getCause();
-                }
-                //TODO localize
-                String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
-                if(error.contains("connection refused")) {
-                    error = "connection refused";
-                }else if(error.contains("port out of range")){
-                    error = "invalid port!";
-                }else if(error.contains("invalid argument")) {
-                    error = "invalid IP or port!";
-                }else if(t.getClass().toString().toLowerCase().contains("sockettimeout")){
-                    error = "timed out!\nmake sure the host has port forwarding set up,\nand that the address is correct!";
-                }else{
-                    error = Strings.parseException(e, false);
-                }
-                ui.showError(Bundles.format("text.connectfail", error));
-                ui.loadfrag.hide();
-
-                Log.err(e);
-            }
+            });
         });
     }
 
-    private void loadServers(){
-        String h = Settings.getString("servers");
-        String[] list = h.split("\\|\\|\\|");
-        for(String fname : list){
-            if(fname.isEmpty()) continue;
-            String[] split = fname.split(":");
-            String host = split[0];
-            int port = Strings.parseInt(split[1]);
+    float targetWidth(){
+        return Core.graphics.isPortrait() ? 350f : 500f;
+    }
 
-            if(port != Integer.MIN_VALUE) servers.add(new Server(host, port));
-        }
+    @SuppressWarnings("unchecked")
+    private void loadServers(){
+        servers = Core.settings.getObject("server-list", Array.class, Array::new);
     }
 
     private void saveServers(){
-        StringBuilder out = new StringBuilder();
-        for(Server server : servers){
-            out.append(server.ip);
-            out.append(":");
-            out.append(server.port);
-            out.append("|||");
-        }
-        Settings.putString("servers", out.toString());
-        Settings.save();
+        Core.settings.putObject("server-list", servers);
+        Core.settings.save();
     }
 
-    private class Server{
+    @Serialize
+    public static class Server{
         public String ip;
         public int port;
-        public Host host;
-        public Table content;
 
-        public Server(String ip, int port){
-            this.ip = ip;
-            this.port = port;
+        transient Table content;
+        transient Host lastHost;
+
+        void setIP(String ip){
+
+            //parse ip:port, if unsuccessful, use default values
+            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
+                try{
+                    int idx = ip.lastIndexOf(':');
+                    this.ip = ip.substring(0, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 1));
+                }catch(Exception e){
+                    this.ip = ip;
+                    this.port = Vars.port;
+                }
+            }else{
+                this.ip = ip;
+                this.port = Vars.port;
+            }
+        }
+
+        String displayIP(){
+            return ip + (port != Vars.port ? ":" + port : "");
+        }
+
+        public Server(){
         }
     }
 }

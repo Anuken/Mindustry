@@ -1,89 +1,63 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.util.Interval;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
-import io.anuke.mindustry.net.NetEvents;
 import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.ucore.core.Inputs;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Stack;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class PlayerListFragment implements Fragment{
-    public boolean visible = false;
-    Table content = new Table();
-    int last = 0;
+public class PlayerListFragment extends Fragment{
+    private boolean visible = false;
+    private Table content = new Table().marginRight(13f).marginLeft(13f);
+    private Interval timer = new Interval();
 
     @Override
-    public void build(){
-        new table(){{
-            new table("pane"){{
-                touchable(Touchable.enabled);
-                margin(14f);
-                new label(() -> Bundles.format(playerGroup.size() == 1 ? "text.players.single" :
-                        "text.players", playerGroup.size()));
-                row();
-                content.marginRight(13f).marginLeft(13f);
-                ScrollPane pane = new ScrollPane(content, "clear");
-                pane.setScrollingDisabled(true, false);
-                pane.setFadeScrollBars(false);
-                add(pane).grow();
-                row();
-                new table("pane"){{
-                    margin(12f);
-
-                    get().addCheck("$text.server.friendlyfire", b -> {
-                        state.friendlyFire = b;
-                        NetEvents.handleFriendlyFireChange(b);
-                    }).growX().update(i -> i.setChecked(state.friendlyFire)).disabled(b -> Net.client()).padRight(5);
-
-                    new button("$text.server.bans", () -> {
-                        ui.bans.show();
-                    }).padTop(-12).padBottom(-12).fillY().cell.disabled(b -> Net.client());
-
-                    new button("$text.server.admins", () -> {
-                        ui.admins.show();
-                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> Net.client());
-    
-                    new button("$text.server.rollback", () -> {
-                        ui.rollback.show();
-                    }).padTop(-12).padBottom(-12).padRight(-12).fillY().cell.disabled(b -> !player.isAdmin);
-
-                }}.pad(10f).growX().end();
-            }}.end();
-
-            update(t -> {
-                if(!mobile){
-                    if(Inputs.keyTap("player_list")){
-                        visible = !visible;
-                    }
-                }
+    public void build(Group parent){
+        parent.fill(cont -> {
+            cont.visible(() -> visible);
+            cont.update(() -> {
                 if(!(Net.active() && !state.is(State.menu))){
                     visible = false;
+                    return;
                 }
-                if(playerGroup.size() != last){
+
+                if(visible && timer.get(20)){
                     rebuild();
-                    last = playerGroup.size();
+                    content.pack();
+                    content.act(Core.graphics.getDeltaTime());
+                    //TODO hack
+                    Core.scene.act(0f);
                 }
             });
 
-            visible(() -> visible);
-        }}.end();
+            cont.table("button", pane -> {
+                pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
+                pane.row();
+                pane.pane(content).grow().get().setScrollingDisabled(true, false);
+                pane.row();
+
+                pane.table(menu -> {
+                    menu.defaults().growX().height(50f).fillY();
+
+                    menu.addButton("$server.bans", ui.bans::show).disabled(b -> Net.client());
+                    menu.addButton("$server.admins", ui.admins::show).disabled(b -> Net.client());
+                    menu.addButton("$close", this::toggle);
+                }).margin(0f).pad(10f).growX();
+
+            }).touchable(Touchable.enabled).margin(14f);
+        });
 
         rebuild();
     }
@@ -93,100 +67,86 @@ public class PlayerListFragment implements Fragment{
 
         float h = 74f;
 
-        for(Player player : playerGroup.all()){
-            NetConnection connection = gwt ? null : Net.getConnection(player.clientid);
+        playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
+        playerGroup.all().each(user -> {
+            NetConnection connection = user.con;
 
-            if(connection == null && Net.server() && !player.isLocal) continue;
+            if(connection == null && Net.server() && !user.isLocal) return;
 
-            Table button = new Table("button");
+            Table button = new Table();
             button.left();
             button.margin(5).marginBottom(10);
 
-            Stack stack = new Stack();
-            BorderImage image = new BorderImage(Draw.region(player.isAndroid ? "ship-standard" : "mech-standard-icon"), 3f);
+            Table table = new Table(){
+                @Override
+                public void draw(){
+                    super.draw();
+                    Draw.color(Pal.accent);
+                    Draw.alpha(parentAlpha);
+                    Lines.stroke(Unit.dp.scl(3f));
+                    Lines.rect(x, y, width, height);
+                    Draw.reset();
+                }
+            };
+            table.margin(8);
+            table.add(new Image(user.mech.iconRegion)).grow();
 
-            stack.add(image);
-
-            if(!player.isAndroid) {
-
-                stack.add(new Element(){
-                    public void draw(){
-                        float s = getWidth() / 12f;
-                        for(int i : Mathf.signs){
-                            Draw.rect((i < 0 ? player.weaponLeft.name : player.weaponRight.name)
-                                    + "-equip", x + s * 6 + i * 3*s, y + s*6 + 2*s, -8*s*i, 8*s);
-                        }
-                    }
-                });
-            }
-            button.add(stack).size(h);
-            button.labelWrap("[#" + player.getColor().toString().toUpperCase() + "]" + player.name).width(170f).pad(10);
+            button.add(table).size(h);
+            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14*2).visible(() -> player.isAdmin && !(!player.isLocal && Net.server())).padRight(5);
+            button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
-            if((Net.server() || Vars.player.isAdmin) && !player.isLocal && (!player.isAdmin || Net.server())){
+            if((Net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || Net.server())){
                 button.add().growY();
 
-                float bs = (h + 14)/2f;
+                float bs = (h) / 2f;
 
                 button.table(t -> {
-                    t.defaults().size(bs - 1, bs + 3);
+                    t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", 14*2, () -> {
-                        ui.showConfirm("$text.confirm", "$text.confirmban", () -> {
-                            if(Net.server()) {
-                                netServer.admins.banPlayerIP(connection.address);
-                                netServer.kick(player.clientid, KickReason.banned);
-                            }else{
-                                NetEvents.handleAdministerRequest(player, AdminAction.ban);
-                            }
-                        });
-                    }).padBottom(-5.1f);
-
-                    t.addImageButton("icon-cancel", 14*2, () -> {
-                        if(Net.server()) {
-                            netServer.kick(player.clientid, KickReason.kick);
-                        }else{
-                            NetEvents.handleAdministerRequest(player, AdminAction.kick);
-                        }
-                    }).padBottom(-5.1f);
+                    t.addImageButton("icon-ban", "clear-partial", iconsize,
+                    () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
+                    t.addImageButton("icon-cancel", "clear-partial", iconsize,
+                    () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "toggle", 14*2, () -> {
+                    t.addImageButton("icon-admin", "clear-toggle-partial", iconsize, () -> {
                         if(Net.client()) return;
 
-                        String id = netServer.admins.getTrace(connection.address).uuid;
+                        String id = user.uuid;
 
                         if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$text.confirm", "$text.confirmunadmin", () -> {
-                                netServer.admins.unAdminPlayer(id);
-                                NetEvents.handleAdminSet(player, false);
-                            });
+                            ui.showConfirm("$confirm", "$confirmunadmin", () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$text.confirm", "$text.confirmadmin", () -> {
-                                netServer.admins.adminPlayer(id, connection.address);
-                                NetEvents.handleAdminSet(player, true);
-                            });
+                            ui.showConfirm("$confirm", "$confirmadmin", () -> netServer.admins.adminPlayer(id, user.usid));
                         }
-                    }).update(b ->{
-                        b.setChecked(player.isAdmin);
-                        b.setDisabled(Net.client());
-                    }).get().setTouchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled);
+                    })
+                    .update(b -> b.setChecked(user.isAdmin))
+                    .disabled(b -> Net.client())
+                    .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
+                    .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", 14*2, () -> NetEvents.handleTraceRequest(player));
+                    t.addImageButton("icon-zoom", "clear-partial", iconsize, () -> Call.onAdminRequest(user, AdminAction.trace));
 
-                }).padRight(12).padTop(-5).padLeft(0).padBottom(-10).size(bs + 10f, bs);
-
-
+                }).padRight(12).size(bs + 10f, bs);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-        }
+            content.addImage("blank").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
+            content.row();
+        });
 
         content.marginBottom(5);
+    }
+
+    public void toggle(){
+        visible = !visible;
+        if(visible){
+            rebuild();
+        }
     }
 
 }

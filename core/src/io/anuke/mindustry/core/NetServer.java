@@ -1,52 +1,71 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.utils.*;
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
+import io.anuke.arc.ApplicationListener;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.IntMap;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Colors;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.entities.SyncEntity;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Net.SendMode;
+import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.resource.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Placement;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.Events;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.EntityGroup;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Timer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.zip.DeflaterOutputStream;
+
 import static io.anuke.mindustry.Vars.*;
 
-public class NetServer extends Module{
-    private final static float serverSyncTime = 4, itemSyncTime = 10, kickDuration = 30 * 1000;
-
-    private final static int timerEntitySync = 0;
-    private final static int timerStateSync = 1;
+public class NetServer implements ApplicationListener{
+    public final static int maxSnapshotSize = 430;
+    private final static float serverSyncTime = 15, kickDuration = 30 * 1000;
+    private final static Vector2 vector = new Vector2();
+    private final static Rectangle viewport = new Rectangle();
+    /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
+    private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
 
-    /**Maps connection IDs to players.*/
+    /** Maps connection IDs to players. */
     private IntMap<Player> connections = new IntMap<>();
-    private ObjectMap<String, ByteArray> weapons = new ObjectMap<>();
     private boolean closing = false;
-    private Timer timer = new Timer(5);
+
+    private ByteBuffer writeBuffer = ByteBuffer.allocate(127);
+    private ByteBufferOutput outputBuffer = new ByteBufferOutput(writeBuffer);
+
+    /** Stream for writing player sync data to. */
+    private ReusableByteOutStream syncStream = new ReusableByteOutStream();
+    /** Data stream for writing player sync data to. */
+    private DataOutputStream dataStream = new DataOutputStream(syncStream);
 
     public NetServer(){
-
-        Events.on(GameOverEvent.class, () -> {
-			weapons.clear();
-			admins.getEditLogs().clear();
-		});
+        Events.on(WorldLoadEvent.class, event -> {
+            if(!headless){
+                connections.clear();
+            }
+        });
 
         Net.handleServer(Connect.class, (id, connect) -> {
             if(admins.isIPBanned(connect.addressTCP)){
@@ -54,28 +73,72 @@ public class NetServer extends Module{
             }
         });
 
+        Net.handleServer(Disconnect.class, (id, packet) -> {
+            Player player = connections.get(id);
+            if(player != null){
+                onDisconnect(player);
+            }
+            connections.remove(id);
+        });
+
         Net.handleServer(ConnectPacket.class, (id, packet) -> {
-            String uuid = new String(Base64Coder.encode(packet.uuid));
+            String uuid = packet.uuid;
 
-            if(Net.getConnection(id) == null ||
-                    admins.isIPBanned(Net.getConnection(id).address)) return;
+            NetConnection connection = Net.getConnection(id);
 
-            TraceInfo trace = admins.getTrace(Net.getConnection(id).address);
+            if(connection == null ||
+            admins.isIPBanned(connection.address)) return;
+
+            if(connection.hasBegunConnecting){
+                kick(id, KickReason.idInUse);
+                return;
+            }
+
+            connection.hasBegunConnecting = true;
+
             PlayerInfo info = admins.getInfo(uuid);
-            trace.uuid = uuid;
-            trace.android = packet.android;
+
+            connection.mobile = packet.mobile;
 
             if(admins.isIDBanned(uuid)){
                 kick(id, KickReason.banned);
                 return;
             }
 
-            if(TimeUtils.millis() - info.lastKicked < kickDuration){
+            if(Time.millis() - info.lastKicked < kickDuration){
                 kick(id, KickReason.recentKick);
                 return;
             }
 
-            Log.info("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, trace.ip);
+            if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
+                kick(id, KickReason.customClient);
+                return;
+            }
+
+            boolean preventDuplicates = headless && netServer.admins.getStrict();
+
+            if(preventDuplicates){
+                for(Player player : playerGroup.all()){
+                    if(player.name.trim().equalsIgnoreCase(packet.name.trim())){
+                        kick(id, KickReason.nameInUse);
+                        return;
+                    }
+
+                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
+                        kick(id, KickReason.idInUse);
+                        return;
+                    }
+                }
+            }
+
+            packet.name = fixName(packet.name);
+
+            if(packet.name.trim().length() <= 0){
+                kick(id, KickReason.nameEmpty);
+                return;
+            }
+
+            Log.debug("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
@@ -87,294 +150,250 @@ public class NetServer extends Module{
             }
 
             if(packet.version == -1){
-                trace.modclient = true;
+                connection.modclient = true;
             }
 
             Player player = new Player();
-            player.isAdmin = admins.isAdmin(uuid, ip);
-            player.clientid = id;
+            player.isAdmin = admins.isAdmin(uuid, packet.usid);
+            player.con = Net.getConnection(id);
+            player.usid = packet.usid;
             player.name = packet.name;
-            player.isAndroid = packet.android;
-            player.set(world.getSpawnX(), world.getSpawnY());
-            player.setNet(player.x, player.y);
+            player.uuid = uuid;
+            player.isMobile = packet.mobile;
+            player.dead = true;
             player.setNet(player.x, player.y);
             player.color.set(packet.color);
+            player.color.a = 1f;
+
+            try{
+                writeBuffer.position(0);
+                player.write(outputBuffer);
+            }catch(Throwable t){
+                t.printStackTrace();
+                kick(id, KickReason.nameEmpty);
+                return;
+            }
+
+            //playing in pvp mode automatically assigns players to teams
+            if(state.rules.pvp){
+                player.setTeam(assignTeam(playerGroup.all()));
+                Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
+            }
+
             connections.put(id, player);
 
-            trace.playerid = player.id;
-
-            if(world.getMap().custom){
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                NetworkIO.writeMap(world.getMap(), stream);
-                CustomMapPacket data = new CustomMapPacket();
-                data.stream = new ByteArrayInputStream(stream.toByteArray());
-                Net.sendStream(id, data);
-
-                Log.info("Sending custom map: Packed {0} uncompressed bytes of MAP data.", stream.size());
-            }else{
-                //hack-- simulate the map ack packet recieved to send the world data to the client.
-                Net.handleServerReceived(id, new MapAckPacket());
-            }
+            sendWorldData(player, id);
 
             Platform.instance.updateRPC();
         });
 
-        Net.handleServer(MapAckPacket.class, (id, packet) -> {
+        Net.handleServer(InvokePacket.class, (id, packet) -> {
             Player player = connections.get(id);
-
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            NetworkIO.writeWorld(player, weapons.get(admins.getTrace(Net.getConnection(id).address).uuid, new ByteArray()), stream);
-            WorldData data = new WorldData();
-            data.stream = new ByteArrayInputStream(stream.toByteArray());
-            Net.sendStream(id, data);
-
-            Log.info("Packed {0} uncompressed bytes of WORLD data.", stream.size());
-        });
-
-        Net.handleServer(ConnectConfirmPacket.class, (id, packet) -> {
-            Player player = connections.get(id);
-
-            if (player == null) return;
-
-            player.add();
-            Log.info("&y{0} has connected.", player.name);
-            netCommon.sendMessage("[accent]" + player.name + " has connected.");
-        });
-
-        Net.handleServer(Disconnect.class, (id, packet) -> {
-            Player player = connections.get(packet.id);
-
-            if (player == null) {
-                Log.err("Unknown client has disconnected (ID={0})", id);
-                return;
-            }
-
-            Log.info("&y{0} has disconnected.", player.name);
-            netCommon.sendMessage("[accent]" + player.name + " has disconnected.");
-            player.remove();
-
-            DisconnectPacket dc = new DisconnectPacket();
-            dc.playerid = player.id;
-
-            Net.send(dc, SendMode.tcp);
-
-            Platform.instance.updateRPC();
-            admins.save();
-        });
-
-        Net.handleServer(PositionPacket.class, (id, packet) -> {
-            ByteBuffer buffer = ByteBuffer.wrap(packet.data);
-            long time = buffer.getLong();
-
-            Player player = connections.get(id);
-            player.read(buffer, time);
-        });
-
-        Net.handleServer(ShootPacket.class, (id, packet) -> {
-            TraceInfo info = admins.getTrace(Net.getConnection(id).address);
-            Weapon weapon = (Weapon)Upgrade.getByID(packet.weaponid);
-
-            float wtrc = 80;
-
-            if(!Timers.get("fastshoot-" + id + "-" + weapon.id, wtrc)){
-                info.fastShots.getAndIncrement(weapon.id, 0, 1);
-
-                if(info.fastShots.get(weapon.id, 0) > (int)(wtrc / (weapon.getReload() / 2f)) + 30){
-                    kick(id, KickReason.fastShoot);
-                }
-            }else{
-                info.fastShots.put(weapon.id, 0);
-            }
-
-            packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.udp);
-        });
-
-        Net.handleServer(PlacePacket.class, (id, packet) -> {
-            packet.playerid = connections.get(id).id;
-
-            Block block = Block.getByID(packet.block);
-
-            if(!Placement.validPlace(packet.x, packet.y, block)) return;
-
-            Recipe recipe = Recipes.getByResult(block);
-
-            if(recipe == null) return;
-
-            Tile tile = world.tile(packet.x, packet.y);
-            if(tile.synthetic() && admins.isValidateReplace() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
-                if(Timers.get("break-message-" + id, 120)){
-                    sendMessageTo(id, "[scarlet]Anti-grief: you are replacing blocks too quickly. wait until replacing again.");
-                }
-                return;
-            }
-
-            state.inventory.removeItems(recipe.requirements);
-
-            Placement.placeBlock(packet.x, packet.y, block, packet.rotation, true, false);
-
-            admins.logEdit(packet.x, packet.y, connections.get(id), block, packet.rotation, EditLog.EditAction.PLACE);
-            admins.getTrace(Net.getConnection(id).address).lastBlockPlaced = block;
-            admins.getTrace(Net.getConnection(id).address).totalBlocksPlaced ++;
-            admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlockPlaced ++;
-
-            Net.send(packet, SendMode.tcp);
-        });
-
-        Net.handleServer(BreakPacket.class, (id, packet) -> {
-            packet.playerid = connections.get(id).id;
-
-            if(!Placement.validBreak(packet.x, packet.y)) return;
-
-            Tile tile = world.tile(packet.x, packet.y);
-
-            if(tile.synthetic() && !admins.validateBreak(admins.getTrace(Net.getConnection(id).address).uuid, Net.getConnection(id).address)){
-                if(Timers.get("break-message-" + id, 120)){
-                    sendMessageTo(id, "[scarlet]Anti-grief: you are breaking blocks too quickly. wait until breaking again.");
-                }
-                return;
-            }
-
-            Block block = Placement.breakBlock(packet.x, packet.y, true, false);
-
-            if(block != null) {
-                admins.logEdit(packet.x, packet.y, connections.get(id), block, tile.getRotation(), EditLog.EditAction.BREAK);
-                admins.getTrace(Net.getConnection(id).address).lastBlockBroken = block;
-                admins.getTrace(Net.getConnection(id).address).totalBlocksBroken++;
-                admins.getInfo(admins.getTrace(Net.getConnection(id).address).uuid).totalBlocksBroken ++;
-                if (block.update || block.destructible)
-                    admins.getTrace(Net.getConnection(id).address).structureBlocksBroken++;
-            }
-
-            Net.send(packet, SendMode.tcp);
-        });
-
-        Net.handleServer(ChatPacket.class, (id, packet) -> {
-            if(!Timers.get("chatFlood" + id, 20)){
-                ChatPacket warn = new ChatPacket();
-                warn.text = "[scarlet]You are sending messages too quickly.";
-                Net.sendTo(id, warn, SendMode.tcp);
-                return;
-            }
-            Player player = connections.get(id);
-            packet.name = player.name;
-            packet.id = player.id;
-            Net.send(packet, SendMode.tcp);
-        });
-
-        Net.handleServer(UpgradePacket.class, (id, packet) -> {
-            Player player = connections.get(id);
-
-            Weapon weapon = (Weapon) Upgrade.getByID(packet.id);
-            String uuid = admins.getTrace(Net.getConnection(id).address).uuid;
-
-            if(!state.inventory.hasItems(UpgradeRecipes.get(weapon))){
-                return;
-            }
-
-            if (!weapons.containsKey(uuid)) weapons.put(uuid, new ByteArray());
-
-            if (!weapons.get(uuid).contains(weapon.id)){
-                weapons.get(uuid).add(weapon.id);
-            }else{
-                return;
-            }
-
-            state.inventory.removeItems(UpgradeRecipes.get(weapon));
-            Net.sendTo(id, packet, SendMode.tcp);
-        });
-
-        Net.handleServer(WeaponSwitchPacket.class, (id, packet) -> {
-            TraceInfo info = admins.getTrace(Net.getConnection(id).address);
-
-            packet.playerid = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
-        });
-
-        Net.handleServer(BlockTapPacket.class, (id, packet) -> {
-            Net.sendExcept(id, packet, SendMode.tcp);
-        });
-
-        Net.handleServer(BlockConfigPacket.class, (id, packet) -> {
-            Net.sendExcept(id, packet, SendMode.tcp);
-        });
-
-        Net.handleServer(EntityRequestPacket.class, (cid, packet) -> {
-
-            int id = packet.id;
-            int dest = cid;
-            EntityGroup group = Entities.getGroup(packet.group);
-            if(group.getByID(id) != null){
-                EntitySpawnPacket p = new EntitySpawnPacket();
-                p.entity = (SyncEntity)group.getByID(id);
-                p.group = group;
-                Net.sendTo(dest, p, SendMode.tcp);
-            }
-        });
-
-        Net.handleServer(PlayerDeathPacket.class, (id, packet) -> {
-            packet.id = connections.get(id).id;
-            Net.sendExcept(id, packet, SendMode.tcp);
-        });
-        
-        Net.handleServer(AdministerRequestPacket.class, (id, packet) -> {
-            Player player = connections.get(id);
-
-            if(!player.isAdmin){
-                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
-                        player.name, Net.getConnection(player.clientid).address);
-                return;
-            }
-
-            Player other = playerGroup.getByID(packet.id);
-
-            if(other == null || other.isAdmin){
-                Log.err("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
-                return;
-            }
-
-            String ip = Net.getConnection(other.clientid).address;
-
-            if(packet.action == AdminAction.ban){
-                admins.banPlayerIP(ip);
-                kick(other.clientid, KickReason.banned);
-                Log.info("&lc{0} has banned {1}.", player.name, other.name);
-            }else if(packet.action == AdminAction.kick){
-                kick(other.clientid, KickReason.kick);
-                Log.info("&lc{0} has kicked {1}.", player.name, other.name);
-            }else if(packet.action == AdminAction.trace){
-                TracePacket trace = new TracePacket();
-                trace.info = admins.getTrace(ip);
-                Net.sendTo(id, trace, SendMode.tcp);
-                Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
-            }
-        });
-    
-        Net.handleServer(BlockLogRequestPacket.class, (id, packet) -> {
-            packet.editlogs = admins.getEditLogs().get(packet.x + packet.y * world.width(), new Array<>());
-            Net.sendTo(id, packet, SendMode.udp);
-        });
-    
-        Net.handleServer(RollbackRequestPacket.class, (id, packet) -> {
-            Player player = connections.get(id);
-    
-            if(!player.isAdmin){
-                Log.err("ACCESS DENIED: Player {0} / {1} attempted to perform a rollback without proper security access.",
-                        player.name, Net.getConnection(player.clientid).address);
-                return;
-            }
-            
-            admins.rollbackWorld(packet.rollbackTimes);
-            Log.info("&lc{0} has rolled back the world {1} times.", player.name, packet.rollbackTimes);
+            if(player == null) return;
+            RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
         });
     }
 
+    public Team assignTeam(Iterable<Player> players){
+        //find team with minimum amount of players and auto-assign player to that.
+        return Structs.findMin(Team.all, team -> {
+            if(state.teams.isActive(team) && !state.teams.get(team).cores.isEmpty()){
+                int count = 0;
+                for(Player other : players){
+                    if(other.getTeam() == team){
+                        count++;
+                    }
+                }
+                return count;
+            }
+            return Integer.MAX_VALUE;
+        });
+    }
+
+    public void sendWorldData(Player player, int clientID){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
+        NetworkIO.writeWorld(player, def);
+        WorldStream data = new WorldStream();
+        data.stream = new ByteArrayInputStream(stream.toByteArray());
+        Net.sendStream(clientID, data);
+
+        Log.debug("Packed {0} compressed bytes of world data.", stream.size());
+    }
+
+    public static void onDisconnect(Player player){
+        //singleplayer multiplayer wierdness
+        if(player.con == null){
+            player.remove();
+            return;
+        }
+
+        if(player.con.hasConnected){
+            Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+            Call.onPlayerDisconnect(player.id);
+        }
+        player.remove();
+        netServer.connections.remove(player.con.id);
+        Log.info("&lm[{1}] &lc{0} has disconnected.", player.name, player.uuid);
+    }
+
+    private static float compound(float speed, float drag){
+        float total = 0f;
+        for(int i = 0; i < 50; i++){
+            total *= (1f - drag);
+            total += speed;
+        }
+        return total;
+    }
+
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void onClientShapshot(
+        Player player,
+        int snapshotID,
+        float x, float y,
+        float pointerX, float pointerY,
+        float rotation, float baseRotation,
+        float xVelocity, float yVelocity,
+        Tile mining,
+        boolean boosting, boolean shooting, boolean chatting,
+        BuildRequest[] requests,
+        float viewX, float viewY, float viewWidth, float viewHeight
+    ){
+        NetConnection connection = player.con;
+        if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
+
+        boolean verifyPosition = !player.isDead() && netServer.admins.getStrict() && headless;
+
+        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
+
+        connection.viewX = viewX;
+        connection.viewY = viewY;
+        connection.viewWidth = viewWidth;
+        connection.viewHeight = viewHeight;
+
+        long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
+
+        float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
+        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
+
+        player.pointerX = pointerX;
+        player.pointerY = pointerY;
+        player.setMineTile(mining);
+        player.isTyping = chatting;
+        player.isBoosting = boosting;
+        player.isShooting = shooting;
+        player.buildQueue().clear();
+        for(BuildRequest req : requests){
+            Tile tile = world.tile(req.x, req.y);
+            if(tile == null) continue;
+            //auto-skip done requests
+            if(req.breaking && tile.block() == Blocks.air){
+                continue;
+            }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
+                continue;
+            }
+            player.buildQueue().addLast(req);
+        }
+
+        vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
+        //vector.limit(maxMove);
+
+        float prevx = player.x, prevy = player.y;
+        player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
+        if(!player.mech.flying && player.boostHeat < 0.01f){
+            player.move(vector.x, vector.y);
+        }else{
+            player.x += vector.x;
+            player.y += vector.y;
+        }
+        float newx = player.x, newy = player.y;
+
+        if(!verifyPosition){
+            player.x = prevx;
+            player.y = prevy;
+            newx = x;
+            newy = y;
+        }else if(Mathf.dst(x, y, newx, newy) > correctDist){
+            Call.onPositionSet(player.con.id, newx, newy); //teleport and correct position when necessary
+        }
+
+        //reset player to previous synced position so it gets interpolated
+        player.x = prevx;
+        player.y = prevy;
+
+        //set interpolator target to *new* position so it moves toward it
+        player.getInterpolator().read(player.x, player.y, newx, newy, rotation, baseRotation);
+        player.velocity().set(xVelocity, yVelocity); //only for visual calculation purposes, doesn't actually update the player
+
+        connection.lastRecievedClientSnapshot = snapshotID;
+        connection.lastRecievedClientTime = Time.millis();
+    }
+
+    @Remote(targets = Loc.client, called = Loc.server)
+    public static void onAdminRequest(Player player, Player other, AdminAction action){
+
+        if(!player.isAdmin){
+            Log.warn("ACCESS DENIED: Player {0} / {1} attempted to perform admin action without proper security access.",
+            player.name, player.con.address);
+            return;
+        }
+
+        if(other == null || ((other.isAdmin && !player.isLocal) && other != player)){
+            Log.warn("{0} attempted to perform admin action on nonexistant or admin player.", player.name);
+            return;
+        }
+
+        if(action == AdminAction.wave){
+            //no verification is done, so admins can hypothetically spam waves
+            //not a real issue, because server owners may want to do just that
+            state.wavetime = 0f;
+        }else if(action == AdminAction.ban){
+            netServer.admins.banPlayerIP(other.con.address);
+            netServer.kick(other.con.id, KickReason.banned);
+            Log.info("&lc{0} has banned {1}.", player.name, other.name);
+        }else if(action == AdminAction.kick){
+            netServer.kick(other.con.id, KickReason.kick);
+            Log.info("&lc{0} has kicked {1}.", player.name, other.name);
+        }else if(action == AdminAction.trace){
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
+            if(player.con != null){
+                Call.onTraceInfo(player.con.id, other, info);
+            }else{
+                NetClient.onTraceInfo(other, info);
+            }
+            Log.info("&lc{0} has requested trace info of {1}.", player.name, other.name);
+        }
+    }
+
+    @Remote(targets = Loc.client)
+    public static void connectConfirm(Player player){
+        if(player.con == null || player.con.hasConnected) return;
+
+        player.add();
+        player.con.hasConnected = true;
+        Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
+        Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+    }
+
+    public boolean isWaitingForPlayers(){
+        if(state.rules.pvp){
+            int used = 0;
+            for(Team t : Team.all){
+                if(playerGroup.count(p -> p.getTeam() == t) > 0){
+                    used++;
+                }
+            }
+            return used < 2;
+        }
+        return false;
+    }
+
     public void update(){
+
         if(!headless && !closing && Net.server() && state.is(State.menu)){
             closing = true;
-            reset();
-            ui.loadfrag.show("$text.server.closing");
-            Timers.runTask(5f, () -> {
+            ui.loadfrag.show("$server.closing");
+            Time.runTask(5f, () -> {
                 Net.closeServer();
                 ui.loadfrag.hide();
                 closing = false;
@@ -386,9 +405,10 @@ public class NetServer extends Module{
         }
     }
 
-    public void reset(){
-        weapons.clear();
-        admins.clearTraces();
+    public void kickAll(KickReason reason){
+        for(NetConnection con : Net.getConnections()){
+            kick(con.id, reason);
+        }
     }
 
     public void kick(int connection, KickReason reason){
@@ -397,107 +417,159 @@ public class NetServer extends Module{
             Log.err("Cannot kick unknown player!");
             return;
         }else{
-            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason);
+            Log.info("Kicking connection #{0} / IP: {1}. Reason: {2}", connection, con.address, reason.name());
         }
 
-        if((reason == KickReason.kick || reason == KickReason.banned) && admins.getTrace(con.address).uuid != null){
-            PlayerInfo info = admins.getInfo(admins.getTrace(con.address).uuid);
-            info.timesKicked ++;
-            info.lastKicked = TimeUtils.millis();
+        Player player = connections.get(con.id);
+
+        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
+            PlayerInfo info = admins.getInfo(player.uuid);
+            info.timesKicked++;
+            info.lastKicked = Time.millis();
         }
 
-        KickPacket p = new KickPacket();
-        p.reason = reason;
+        Call.onKick(connection, reason);
 
-        con.send(p, SendMode.tcp);
-        Timers.runTask(2f, con::close);
+        Time.runTask(2f, con::close);
 
         admins.save();
     }
 
-    void sendMessageTo(int id, String message){
-        ChatPacket packet = new ChatPacket();
-        packet.text = message;
-        Net.sendTo(id, packet, SendMode.tcp);
+    public void writeSnapshot(Player player) throws IOException{
+        syncStream.reset();
+        ObjectSet<Tile> cores = state.teams.get(player.getTeam()).cores;
+
+        dataStream.writeByte(cores.size);
+
+        for(Tile tile : cores){
+            dataStream.writeInt(tile.pos());
+            tile.entity.items.write(dataStream);
+        }
+
+        dataStream.close();
+        byte[] stateBytes = syncStream.toByteArray();
+
+        //write basic state data.
+        Call.onStateSnapshot(player.con.id, state.wavetime, state.wave, state.enemies(), (short)stateBytes.length, Net.compressSnapshot(stateBytes));
+
+        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
+
+        //check for syncable groups
+        for(EntityGroup<?> group : Entities.getAllGroups()){
+            if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
+
+            //make sure mapping is enabled for this group
+            if(!group.mappingEnabled()){
+                throw new RuntimeException("Entity group '" + group.getType() + "' contains SyncTrait entities, yet mapping is not enabled. In order for syncing to work, you must enable mapping for this group.");
+            }
+
+            syncStream.reset();
+
+            int sent = 0;
+
+            for(Entity entity :  group.all()){
+                SyncTrait sync = (SyncTrait)entity;
+                if(!sync.isSyncing()) continue;
+
+                //write all entities now
+                dataStream.writeInt(entity.getID()); //write id
+                dataStream.writeByte(sync.getTypeID()); //write type ID
+                sync.write(dataStream); //write entity
+
+                sent++;
+
+                if(syncStream.size() > maxSnapshotSize){
+                    dataStream.close();
+                    byte[] syncBytes = syncStream.toByteArray();
+                    Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
+                    sent = 0;
+                    syncStream.reset();
+                }
+            }
+
+            if(sent > 0){
+                dataStream.close();
+
+                byte[] syncBytes = syncStream.toByteArray();
+                Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, Net.compressSnapshot(syncBytes));
+            }
+        }
+    }
+
+    String fixName(String name){
+        name = name.trim();
+        if(name.equals("[") || name.equals("]")){
+            return "";
+        }
+
+        for(int i = 0; i < name.length(); i++){
+            if(name.charAt(i) == '[' && i != name.length() - 1 && name.charAt(i + 1) != '[' && (i == 0 || name.charAt(i - 1) != '[')){
+                String prev = name.substring(0, i);
+                String next = name.substring(i);
+                String result = checkColor(next);
+
+                name = prev + result;
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+        int curChar = 0;
+        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+            result.append(name.charAt(curChar++));
+        }
+        return result.toString();
+    }
+
+    String checkColor(String str){
+
+        for(int i = 1; i < str.length(); i++){
+            if(str.charAt(i) == ']'){
+                String color = str.substring(1, i);
+
+                if(Colors.get(color.toUpperCase()) != null || Colors.get(color.toLowerCase()) != null){
+                    Color result = (Colors.get(color.toLowerCase()) == null ? Colors.get(color.toUpperCase()) : Colors.get(color.toLowerCase()));
+                    if(result.a <= 0.8f){
+                        return str.substring(i + 1);
+                    }
+                }else{
+                    try{
+                        Color result = Color.valueOf(color);
+                        if(result.a <= 0.8f){
+                            return str.substring(i + 1);
+                        }
+                    }catch(Exception e){
+                        return str;
+                    }
+                }
+            }
+        }
+        return str;
     }
 
     void sync(){
 
-        if(timer.get(timerEntitySync, serverSyncTime)){
-            //scan through all groups with syncable entities
-            for(EntityGroup<?> group : Entities.getAllGroups()) {
-                if(group.size() == 0 || !(group.all().iterator().next() instanceof SyncEntity)) continue;
+        try{
 
-                //get write size for one entity (adding 4, as you need to write the ID as well)
-                int writesize = SyncEntity.getWriteSize((Class<? extends SyncEntity>)group.getType()) + 4;
-                //amount of entities
-                int amount = group.size();
-                //maximum amount of entities per packet
-                int maxsize = 64;
+            //iterate through each player
+            for(int i = 0; i < playerGroup.size(); i++){
+                Player player = playerGroup.all().get(i);
+                if(player.isLocal) continue;
 
-                //current buffer you're writing to
-                ByteBuffer current = null;
-                //number of entities written to this packet/buffer
-                int written = 0;
+                NetConnection connection = player.con;
 
-                //for all the entities...
-                for (int i = 0; i < amount; i++) {
-                    //if the buffer is null, create a new one
-                    if(current == null){
-                        //calculate amount of entities to go into this packet
-                        int csize = Math.min(amount-i, maxsize);
-                        //create a byte array to write to
-                        byte[] bytes = new byte[csize*writesize + 1 + 8];
-                        //wrap it for easy writing
-                        current = ByteBuffer.wrap(bytes);
-                        current.putLong(TimeUtils.millis());
-                        //write the group ID so the client knows which group this is
-                        current.put((byte)group.getID());
-                    }
-
-                    SyncEntity entity = (SyncEntity) group.all().get(i);
-
-                    //write ID to the buffer
-                    current.putInt(entity.id);
-
-                    int previous = current.position();
-                    //write extra data to the buffer
-                    entity.write(current);
-
-                    written ++;
-
-                    //if the packet is too big now...
-                    if(written >= maxsize){
-                        //send the packet.
-                        SyncPacket packet = new SyncPacket();
-                        packet.data = current.array();
-                        Net.send(packet, SendMode.udp);
-
-                        //reset data, send the next packet
-                        current = null;
-                        written = 0;
-                    }
+                if(connection == null || !connection.isConnected() || !connections.containsKey(connection.id)){
+                    //player disconnected, call d/c event
+                    onDisconnect(player);
+                    return;
                 }
 
-                //make sure to send incomplete packets too
-                if(current != null){
-                    SyncPacket packet = new SyncPacket();
-                    packet.data = current.array();
-                    Net.send(packet, SendMode.udp);
-                }
+                if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
+
+                writeSnapshot(player);
             }
-        }
 
-        if(timer.get(timerStateSync, itemSyncTime)){
-            StateSyncPacket packet = new StateSyncPacket();
-            packet.items = state.inventory.getItems();
-            packet.countdown = state.wavetime;
-            packet.enemies = state.enemies;
-            packet.wave = state.wave;
-            packet.time = Timers.time();
-            packet.timestamp = TimeUtils.millis();
-           
-            Net.send(packet, SendMode.udp);
+        }catch(IOException e){
+            e.printStackTrace();
         }
     }
 }

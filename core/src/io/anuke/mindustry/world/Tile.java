@@ -1,303 +1,450 @@
 package io.anuke.mindustry.world;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.util.Bits;
-import io.anuke.ucore.util.Mathf;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.*;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
+public class Tile implements Position, TargetTrait{
+    /** Tile traversal cost. */
+    public byte cost = 1;
+    /** Tile entity, usually null. */
+    public TileEntity entity;
+    public short x, y;
+    protected Block block;
+    protected Floor floor;
+    /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
+    protected byte rotation;
+    /** Team ordinal. */
+    protected byte team;
+    /** Ore that is on top of this (floor) block. */
+    protected short overlay = 0;
 
-public class Tile{
-	public static final Object tileSetLock = new Object();
-	private static final Array<Tile> tmpArray = new Array<>();
-	
-	/**Packed block data. Left is floor, right is block.*/
-	private short blocks;
-	/**Packed data. Left is rotation, right is extra data, packed into two half-bytes: left is dump, right is extra.*/
-	private short data;
-	/**The coordinates of the core tile this is linked to, in the form of two bytes packed into one.
-	 * This is relative to the block it is linked to; negate coords to find the link.*/
-	public byte link = 0;
-	public short x, y;
-	/**Whether this tile has any solid blocks near it.*/
-	public boolean occluded = false;
-	public TileEntity entity;
-	
-	public Tile(int x, int y){
-		this.x = (short)x;
-		this.y = (short)y;
-	}
-	
-	public Tile(int x, int y, Block floor){
-		this(x, y);
-		iSetFloor(floor);
-	}
-
-	public int packedPosition(){
-		return x + y * world.width();
-	}
-	
-	private void iSetFloor(Block floor){
-		byte id = (byte)floor.id;
-		blocks = Bits.packShort(id, getWallID());
-	}
-	
-	private void iSetBlock(Block wall){
-		byte id = (byte)wall.id;
-		blocks = Bits.packShort(getFloorID(), id);
-	}
-	
-	public byte getWallID(){
-		return Bits.getRightByte(blocks);
-	}
-	
-	public byte getFloorID(){
-		return Bits.getLeftByte(blocks);
-	}
-	
-	/**Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.*/
-	public byte relativeTo(int cx, int cy){
-		if(x == cx && y == cy - 1) return 1;
-		if(x == cx && y == cy + 1) return 3;
-		if(x == cx - 1 && y == cy) return 0;
-		if(x == cx + 1 && y == cy) return 2;
-		return -1;
-	}
-	
-	public <T extends TileEntity> T entity(){
-		return (T)entity;
-	}
-	
-	public void damageNearby(int rad, int amount, float falloff){
-		for(int dx = -rad; dx <= rad; dx ++){
-			for(int dy = -rad; dy <= rad; dy ++){
-				float dst = Vector2.dst(dx, dy, 0, 0);
-				if(dst > rad || (dx == 0 && dy == 0)) continue;
-				
-				Tile other = world.tile(x + dx, y + dy);
-				if(other != null && other.entity != null){
-					other.entity.damage((int)(amount * Mathf.lerp(1f-dst/rad, 1f, falloff)));
-				}
-			}
-		}
-	}
-	
-	public int id(){
-		return x + y * world.width();
-	}
-	
-	public float worldx(){
-		return x * tilesize;
-	}
-	
-	public float worldy(){
-		return y * tilesize;
-	}
-
-	public float drawx(){
-		return block().getPlaceOffset().x + worldx();
-	}
-
-	public float drawy(){
-		return block().getPlaceOffset().y + worldy();
-	}
-	
-	public Block floor(){
-		return Block.getByID(getFloorID());
-	}
-	
-	public Block block(){
-		return Block.getByID(getWallID());
-	}
-	
-	/**Returns the breaktime of the block, <i>or</i> the breaktime of the linked block, if this tile is linked.*/
-	public float getBreakTime(){
-		Block block = block();
-		return link == 0 ? block.breaktime : getLinked().block().breaktime;
-	}
-	
-	public void setBlock(Block type, int rotation){
-		synchronized (tileSetLock) {
-			if(rotation < 0) rotation = (-rotation + 2);
-			iSetBlock(type);
-			setRotation((byte) (rotation % 4));
-			this.link = 0;
-			changed();
-		}
-	}
-	
-	public void setBlock(Block type){
-		synchronized (tileSetLock) {
-			iSetBlock(type);
-			this.link = 0;
-			changed();
-		}
-	}
-	
-	public void setFloor(Block type){
-		iSetFloor(type);
-	}
-	
-	public void setRotation(byte rotation){
-		data = Bits.packShort(rotation, Bits.getRightByte(data));
-	}
-	
-	public void setDump(byte dump){
-		data = Bits.packShort(getRotation(), Bits.packByte(dump, getExtra()));
-	}
-	
-	public void setExtra(byte extra){
-		data = Bits.packShort(getRotation(), Bits.packByte(getDump(), extra));
-	}
-	
-	public byte getRotation(){
-		return Bits.getLeftByte(data);
-	}
-	
-	public byte getDump(){
-		return Bits.getLeftByte(Bits.getRightByte(data));
-	}
-	
-	public byte getExtra(){
-		return Bits.getRightByte(Bits.getRightByte(data));
-	}
-
-	public short getPackedData(){
-		return data;
-	}
-
-	public void setPackedData(short data){
-		this.data = data;
-	}
-
-	public boolean passable(){
-		Block block = block();
-		Block floor = floor();
-		return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
-	}
-
-	public boolean synthetic(){
-		Block block = block();
-		return block.update || block.destructible;
-	}
-	
-	public boolean solid(){
-		Block block = block();
-		Block floor = floor();
-		return block.solid || (floor.solid && (block == Blocks.air || block.solidifes)) || block.isSolidFor(this);
-	}
-	
-	public boolean breakable(){
-		Block block = block();
-		if(link == 0){
-			return (block.destructible || block.breakable || block.update);
-		}else{
-			return getLinked().breakable();
-		}
-	}
-	
-	public boolean isLinked(){
-		return link != 0;
-	}
-	
-	/**Sets this to a linked tile, which sets the block to a blockpart. dx and dy can only be -8-7.*/
-	public void setLinked(byte dx, byte dy){
-		setBlock(Blocks.blockpart);
-		link = Bits.packByte((byte)(dx + 8), (byte)(dy + 8));
-	}
-	
-	/**Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
-	 * This array contains all linked tiles, including this tile itself.*/
-	public synchronized Array<Tile> getLinkedTiles(){
-		Block block = block();
-		tmpArray.clear();
-		if(!(block.width == 1 && block.height == 1)){
-			int offsetx = -(block.width-1)/2;
-			int offsety = -(block.height-1)/2;
-			for(int dx = 0; dx < block.width; dx ++){
-				for(int dy = 0; dy < block.height; dy ++){
-					Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-					tmpArray.add(other);
-				}
-			}
-		}
-		return tmpArray;
-	}
-	
-	/**Returns the block the multiblock is linked to, or null if it is not linked to any block.*/
-	public Tile getLinked(){
-		if(link == 0){
-			return null;
-		}else{
-			byte dx = Bits.getLeftByte(link);
-			byte dy = Bits.getRightByte(link);
-			return world.tile(x - (dx - 8), y - (dy - 8));
-		}
-	}
-
-	public Tile target(){
-	    Tile link = getLinked();
-	    return link == null ? this : link;
+    public Tile(int x, int y){
+        this.x = (short)x;
+        this.y = (short)y;
+        block = floor = (Floor)Blocks.air;
     }
 
+    public Tile(int x, int y, int floor, int overlay, int wall){
+        this.x = (short)x;
+        this.y = (short)y;
+        this.floor = (Floor)content.block(floor);
+        this.block = content.block(wall);
+        this.overlay = (short)overlay;
 
-	public Tile getNearby(int rotation){
-		if(rotation == 0) return world.tile(x + 1, y);
-		if(rotation == 1) return world.tile(x, y + 1);
-		if(rotation == 2) return world.tile(x - 1, y);
-		if(rotation == 3) return world.tile(x, y - 1);
-		return null;
-	}
+        //update entity and create it if needed
+        changed();
+    }
 
-	public Tile[] getNearby(Tile[] temptiles){
-		temptiles[0] = world.tile(x+1, y);
-		temptiles[1] = world.tile(x, y+1);
-		temptiles[2] = world.tile(x-1, y);
-		temptiles[3] = world.tile(x, y-1);
-		return temptiles;
-	}
+    /** Returns this tile's position as a {@link Pos}. */
+    public int pos(){
+        return Pos.get(x, y);
+    }
 
-	public void updateOcclusion(){
-		occluded = false;
-		for(int dx = -1; dx <= 1; dx ++){
-			for(int dy = -1; dy <= 1; dy ++){
-				Tile tile = world.tile(x + dx, y + dy);
-				if(tile != null && tile.solid()){
-					occluded = true;
-					break;
-				}
-			}
-		}
-	}
-	
-	public void changed(){
-		synchronized (tileSetLock) {
-			if (entity != null) {
-				entity.remove();
-				entity = null;
-			}
+    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
+    public byte relativeTo(int cx, int cy){
+        if(x == cx && y == cy - 1) return 1;
+        if(x == cx && y == cy + 1) return 3;
+        if(x == cx - 1 && y == cy) return 0;
+        if(x == cx + 1 && y == cy) return 2;
+        return -1;
+    }
 
-			Block block = block();
+    public static byte relativeTo(int x, int y, int cx, int cy){
+        if(x == cx && y == cy - 1) return 1;
+        if(x == cx && y == cy + 1) return 3;
+        if(x == cx - 1 && y == cy) return 0;
+        if(x == cx + 1 && y == cy) return 2;
+        return -1;
+    }
 
-			if (block.destructible || block.update) {
-				entity = block.getEntity().init(this, block.update);
-			}
+    public byte absoluteRelativeTo(int cx, int cy){
+        if(x == cx && y <= cy - 1) return 1;
+        if(x == cx && y >= cy + 1) return 3;
+        if(x <= cx - 1 && y == cy) return 0;
+        if(x >= cx + 1 && y == cy) return 2;
+        return -1;
+    }
 
-			updateOcclusion();
-		}
-	}
-	
-	@Override
-	public String toString(){
-		Block block = block();
-		Block floor = floor();
-		
-		return floor.name() + ":" + block.name() + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : ClassReflection.getSimpleName(entity.getClass())) +
-				(link != 0 ? " link=[" + (Bits.getLeftByte(link) - 8) + ", " + (Bits.getRightByte(link) - 8) +  "]" : "");
-	}
+    public static byte absoluteRelativeTo(int x, int y, int cx, int cy){
+        if(x == cx && y <= cy - 1) return 1;
+        if(x == cx && y >= cy + 1) return 3;
+        if(x <= cx - 1 && y == cy) return 0;
+        if(x >= cx + 1 && y == cy) return 2;
+        return -1;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends TileEntity> T entity(){
+        return (T)entity;
+    }
+
+    public float worldx(){
+        return x * tilesize;
+    }
+
+    public float worldy(){
+        return y * tilesize;
+    }
+
+    public float drawx(){
+        return block().offset() + worldx();
+    }
+
+    public float drawy(){
+        return block().offset() + worldy();
+    }
+
+    public Floor floor(){
+        return floor;
+    }
+
+    public Block block(){
+        return block;
+    }
+
+    public Floor overlay(){
+        return (Floor)content.block(overlay);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Block> T cblock(){
+        return (T)block;
+    }
+
+    @Override
+    public Team getTeam(){
+        return Team.all[link().team];
+    }
+
+    public void setTeam(Team team){
+        this.team = (byte)team.ordinal();
+    }
+
+    public byte getTeamID(){
+        return team;
+    }
+
+    public void setBlock(Block type, Team team, int rotation){
+        preChanged();
+        this.block = type;
+        this.team = (byte)team.ordinal();
+        this.rotation = (byte)Mathf.mod(rotation, 4);
+        changed();
+    }
+
+    public void setBlock(Block type, Team team){
+        setBlock(type, team, 0);
+    }
+
+    public void setBlock(Block type){
+        preChanged();
+        this.block = type;
+        this.rotation = 0;
+        changed();
+    }
+
+    /**This resets the overlay!*/
+    public void setFloor(Floor type){
+        this.floor = type;
+        this.overlay = 0;
+    }
+
+    /** Sets the floor, preserving overlay.*/
+    public void setFloorUnder(Floor floor){
+        Block overlay = overlay();
+        setFloor(floor);
+        setOverlay(overlay);
+    }
+
+    public byte rotation(){
+        return rotation;
+    }
+
+    public void rotation(int rotation){
+        this.rotation = (byte)rotation;
+    }
+
+    public short overlayID(){
+        return overlay;
+    }
+
+    public short blockID(){
+        return block.id;
+    }
+
+    public short floorID(){
+        return floor.id;
+    }
+
+    public void setOverlayID(short ore){
+        this.overlay = ore;
+    }
+
+    public void setOverlay(Block block){
+        setOverlayID(block.id);
+    }
+
+    public void clearOverlay(){
+        setOverlayID((short)0);
+    }
+
+    public boolean passable(){
+        return isLinked() || !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
+    }
+
+    /** Whether this block was placed by a player/unit. */
+    public boolean synthetic(){
+        return block.update || block.destructible;
+    }
+
+    public boolean solid(){
+        return block.solid || block.isSolidFor(this) || (isLinked() && link().solid());
+    }
+
+    public boolean breakable(){
+        return !isLinked() ? (block.destructible || block.breakable || block.update) : link().breakable();
+    }
+
+    public Tile link(){
+        return block.linked(this);
+    }
+
+    public boolean isEnemyCheat(){
+        return getTeam() == waveTeam && !state.rules.pvp;
+    }
+
+    public boolean isLinked(){
+        return block instanceof BlockPart;
+    }
+
+    /**
+     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public void getLinkedTiles(Consumer<Tile> cons){
+        if(block.isMultiblock()){
+            int size = block.size;
+            int offsetx = -(size - 1) / 2;
+            int offsety = -(size - 1) / 2;
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
+                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                    if(other != null) cons.accept(other);
+                }
+            }
+        }else{
+            cons.accept(this);
+        }
+    }
+
+    /**
+     * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+        tmpArray.clear();
+        getLinkedTiles(tmpArray::add);
+        return tmpArray;
+    }
+
+    /**
+     * Returns the list of all tiles linked to this multiblock if it were this block, or an empty array if it's not a multiblock.
+     * This array contains all linked tiles, including this tile itself.
+     */
+    public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+        tmpArray.clear();
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                    if(other != null) tmpArray.add(other);
+                }
+            }
+        }else{
+            tmpArray.add(this);
+        }
+        return tmpArray;
+    }
+
+    /** Returns the block the multiblock is linked to, or null if it is not linked to any block.
+    public Tile getLinked(){
+        if(!isLinked()){
+            return null;
+        }else{
+            return world.tile(x + linkX(rotation), y + linkY(rotation));
+        }
+    }
+
+    public Tile target(){
+        Tile link = getLinked();
+        return link == null ? this : link;
+    }*/
+
+    public Rectangle getHitbox(Rectangle rect){
+        return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
+    }
+
+    public Tile getNearby(Point2 relative){
+        return world.tile(x + relative.x, y + relative.y);
+    }
+
+    public Tile getNearby(int dx, int dy){
+        return world.tile(x + dx, y + dy);
+    }
+
+    public Tile getNearby(int rotation){
+        if(rotation == 0) return world.tile(x + 1, y);
+        if(rotation == 1) return world.tile(x, y + 1);
+        if(rotation == 2) return world.tile(x - 1, y);
+        if(rotation == 3) return world.tile(x, y - 1);
+        return null;
+    }
+
+    public boolean interactable(Team team){
+        return getTeam() == Team.none || team == getTeam();
+    }
+
+    public Item drop(){
+        return overlay == 0 || ((Floor)content.block(overlay)).itemDrop == null ? floor.itemDrop : ((Floor)content.block(overlay)).itemDrop;
+    }
+
+    public void updateOcclusion(){
+        cost = 1;
+        boolean occluded = false;
+
+        //check for occlusion
+        for(int i = 0; i < 8; i++){
+            Point2 point = Geometry.d8[i];
+            Tile tile = world.tile(x + point.x, y + point.y);
+            if(tile != null && tile.floor.isLiquid){
+                cost += 4;
+            }
+            if(tile != null && tile.solid()){
+                occluded = true;
+                break;
+            }
+        }
+
+        //+24
+
+        if(occluded){
+            cost += 2;
+        }
+
+        //+26
+
+        if(link().synthetic()){
+            cost += Mathf.clamp(link().block.health / 10f, 0, 20);
+        }
+
+        //+46
+
+        if(floor.isLiquid){
+            cost += 10;
+        }
+
+        //+56
+
+        if(floor.drownTime > 0){
+            cost += 70;
+        }
+
+        //+126
+
+        if(cost < 0){
+            cost = Byte.MAX_VALUE;
+        }
+    }
+
+    protected void preChanged(){
+        block().removed(this);
+        if(entity != null){
+            entity.removeFromProximity();
+        }
+        team = 0;
+    }
+
+    protected void changed(){
+        if(entity != null){
+            entity.remove();
+            entity = null;
+        }
+
+        Block block = block();
+
+        if(block.hasEntity()){
+            entity = block.newEntity().init(this, block.update);
+            entity.cons = new ConsumeModule(entity);
+            if(block.hasItems) entity.items = new ItemModule();
+            if(block.hasLiquids) entity.liquids = new LiquidModule();
+            if(block.hasPower){
+                entity.power = new PowerModule();
+                entity.power.graph.add(this);
+            }
+
+            if(!world.isGenerating()){
+                entity.updateProximity();
+            }
+        }else if(!(block instanceof BlockPart) && !world.isGenerating()){
+            //since the entity won't update proximity for us, update proximity for all nearby tiles manually
+            for(Point2 p : Geometry.d4){
+                Tile tile = world.ltile(x + p.x, y + p.y);
+                if(tile != null){
+                    tile.block().onProximityUpdate(tile);
+                }
+            }
+        }
+
+        updateOcclusion();
+
+        world.notifyChanged(this);
+    }
+
+    @Override
+    public boolean isDead(){
+        return entity == null;
+    }
+
+    @Override
+    public Vector2 velocity(){
+        return Vector2.ZERO;
+    }
+
+    @Override
+    public float getX(){
+        return drawx();
+    }
+
+    @Override
+    public void setX(float x){
+        throw new IllegalArgumentException("Tile position cannot change.");
+    }
+
+    @Override
+    public float getY(){
+        return drawy();
+    }
+
+    @Override
+    public void setY(float y){
+        throw new IllegalArgumentException("Tile position cannot change.");
+    }
+
+    @Override
+    public String toString(){
+        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+    }
 }

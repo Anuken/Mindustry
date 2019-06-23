@@ -1,42 +1,69 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Filter;
-import com.badlogic.gdx.graphics.PixmapIO;
+import io.anuke.arc.*;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.io.BlockLoader;
+import io.anuke.mindustry.game.EventType.GameLoadEvent;
 import io.anuke.mindustry.io.BundleLoader;
-import io.anuke.ucore.modules.ModuleCore;
-import io.anuke.ucore.util.Log;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Mindustry extends ModuleCore {
+public class Mindustry extends ApplicationCore{
 
-	@Override
-	public void init(){
-		debug = Platform.instance.isDebug();
+    @Override
+    public void setup(){
+        Time.setDeltaProvider(() -> {
+            float result = Core.graphics.getDeltaTime() * 60f;
+            return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
+        });
 
-		Log.setUseColors(false);
-		BundleLoader.load();
-		BlockLoader.load();
+        Time.mark();
 
-		module(logic = new Logic());
-		module(world = new World());
-		module(control = new Control());
-		module(renderer = new Renderer());
-		module(ui = new UI());
-		module(netServer = new NetServer());
-		module(netClient = new NetClient());
-		module(netCommon = new NetCommon());
-	}
+        Vars.init();
 
-	@Override
-	public void render(){
-		super.render();
-		threads.handleRender();
-	}
+        Log.setUseColors(false);
+        BundleLoader.load();
+        content.load();
+        content.loadColors();
+
+        add(logic = new Logic());
+        add(world = new World());
+        add(control = new Control());
+        add(renderer = new Renderer());
+        add(ui = new UI());
+        add(netServer = new NetServer());
+        add(netClient = new NetClient());
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        Log.info("Time to load [total]: {0}", Time.elapsed());
+        Events.fire(new GameLoadEvent());
+    }
+
+    @Override
+    public void update(){
+        long lastFrameTime = Time.nanos();
+
+        super.update();
+
+        int fpsCap = Core.settings.getInt("fpscap", 125);
+
+        if(fpsCap <= 120){
+            long target = (1000 * 1000000) / fpsCap; //target in nanos
+            long elapsed = Time.timeSinceNanos(lastFrameTime);
+            if(elapsed < target){
+                try{
+                    Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

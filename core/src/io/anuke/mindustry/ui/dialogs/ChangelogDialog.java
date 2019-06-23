@@ -1,16 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.OS;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.Changelogs;
 import io.anuke.mindustry.io.Changelogs.VersionInfo;
-import io.anuke.mindustry.io.Version;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.ios;
 
@@ -19,40 +18,42 @@ public class ChangelogDialog extends FloatingDialog{
     private Array<VersionInfo> versions;
 
     public ChangelogDialog(){
-        super("$text.changelog.title");
+        super("$changelog.title");
 
         addCloseButton();
 
-        content().add("$text.changelog.loading");
+        cont.add("$changelog.loading");
 
-        if(!ios && !OS.isMac) {
-            Changelogs.getChangelog(result -> {
-                versions = result;
-                Gdx.app.postRunnable(this::setup);
-            }, t -> {
-                Log.err(t);
-                Gdx.app.postRunnable(this::setup);
-            });
-        }
+        shown(() -> {
+            if(!ios && !OS.isMac){
+                Changelogs.getChangelog(result -> {
+                    versions = result;
+                    Core.app.post(this::setup);
+                }, t -> {
+                    Log.err(t);
+                    Core.app.post(this::setup);
+                });
+            }
+        });
     }
 
     void setup(){
         Table table = new Table();
-        ScrollPane pane = new ScrollPane(table, "clear");
+        ScrollPane pane = new ScrollPane(table);
 
-        content().clear();
-        content().add(pane).grow();
+        cont.clear();
+        cont.add(pane).grow();
 
         if(versions == null){
-            table.add("$text.changelog.error");
+            table.add("$changelog.error");
             if(Vars.android){
                 table.row();
-                table.add("$text.changelog.error.android").padTop(8);
+                table.add("$changelog.error.android").padTop(8);
             }
 
             if(ios){
                 table.row();
-                table.add("$text.changelog.error.ios").padTop(8);
+                table.add("$changelog.error.ios").padTop(8);
             }
         }else{
             for(VersionInfo info : versions){
@@ -60,16 +61,16 @@ public class ChangelogDialog extends FloatingDialog{
 
                 desc = desc.replace("Android", "Mobile");
 
-                Table in = new Table("clear");
+                Table in = new Table("underline");
                 in.top().left().margin(10);
 
-                in.add("[accent]" + info.name);
+                in.add("[accent]" + info.name + "[LIGHT_GRAY]  | " + info.date);
                 if(info.build == Version.build){
                     in.row();
-                    in.add("$text.changelog.current");
+                    in.add("$changelog.current");
                 }else if(info == versions.first()){
                     in.row();
-                    in.add("$text.changelog.latest");
+                    in.add("$changelog.latest");
                 }
                 in.row();
                 in.labelWrap("[lightgray]" + desc).width(vw - 20).padTop(12);
@@ -77,10 +78,10 @@ public class ChangelogDialog extends FloatingDialog{
                 table.add(in).width(vw).pad(8).row();
             }
 
-            int lastid = Settings.getInt("lastBuild");
+            int lastid = Core.settings.getInt("lastBuild");
             if(lastid != 0 && versions.peek().build > lastid){
-                Settings.putInt("lastBuild", versions.peek().build);
-                Settings.save();
+                Core.settings.put("lastBuild", versions.peek().build);
+                Core.settings.save();
                 show();
             }
         }

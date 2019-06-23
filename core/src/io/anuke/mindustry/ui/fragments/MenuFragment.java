@@ -1,152 +1,156 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.io.Version;
+import io.anuke.mindustry.game.EventType.ResizeEvent;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.ui.MenuButton;
+import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.util.OS;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MenuFragment implements Fragment{
-	
-	public void build(){
-		new table(){{
-			visible(() -> state.is(State.menu));
+public class MenuFragment extends Fragment{
+    private Table container;
 
-			if(!mobile){
-				new table(){{
+    @Override
+    public void build(Group parent){
+        parent.fill(c -> {
+            container = c;
+            container.visible(() -> state.is(State.menu));
 
-					float w = 200f;
-					float bw = w * 2f + 10f;
+            if(!mobile){
+                buildDesktop();
+            }else{
+                buildMobile();
+                Events.on(ResizeEvent.class, event -> buildMobile());
+            }
+        });
 
-					defaults().size(w, 70f).padTop(5).padRight(5);
+        //discord icon in top right
+        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
+        .visible(() -> state.is(State.menu)));
 
-					add(new MenuButton("icon-play-2", "$text.play", MenuFragment.this::showPlaySelect)).width(bw).colspan(2);
+        //info icon
+        if(mobile){
+            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
+            .visible(() -> state.is(State.menu)));
+        }
 
-					row();
+        //version info
+        parent.fill(c -> c.bottom().left().add(Strings.format("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
+        (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
+        .visible(() -> state.is(State.menu)));
+    }
 
-					add(new MenuButton("icon-editor", "$text.editor", () -> {
-						if(gwt){
-							ui.showInfo("$text.editor.web");
-						}else{
-							ui.editor.show();
-						}
-					}));
-					
-					add(new MenuButton("icon-tools", "$text.settings", ui.settings::show));
+    private void buildMobile(){
+        container.clear();
+        container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-					row();
+        float size = 120f;
+        float isize = iconsize;
+        container.defaults().size(size).pad(5).padTop(4f);
 
-					add(new MenuButton("icon-info", "$text.about.button", ui.about::show));
+        MobileButton
+        play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
+        maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
+        custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
+        join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
+        editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
+        tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
+        donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
+        exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
 
-					add(new MenuButton("icon-menu", OS.isMac ? "$text.credits" : "$text.changelog.title", () -> {
-						if(OS.isMac){
-							ui.about.showCredits();
-						}else {
-							ui.changelog.show();
-						}
-					}));
+        if(!Core.graphics.isPortrait()){
+            container.add(play);
+            container.add(join);
+            container.add(custom);
+            container.add(maps);
+            container.row();
 
-					row();
-					
-					if(!gwt){
-						add(new MenuButton("icon-exit", "$text.quit", Gdx.app::exit)).width(bw).colspan(2);
-					}
+            container.table(table -> {
+                table.defaults().set(container.defaults());
 
-					get().margin(16);
-				}}.end();
+                table.add(editor);
+                table.add(tools);
 
-			}else {
-				new table() {{
-				    float size = 120f;
-					defaults().size(size).pad(5);
-					float isize = 14f * 4;
+                if(Platform.instance.canDonate()) table.add(donate);
+                table.add(exit);
+            }).colspan(4);
+        }else{
+            container.add(play);
+            container.add(maps);
+            container.row();
+            container.add(custom);
+            container.add(join);
+            container.row();
+            container.add(editor);
+            container.add(tools);
+            container.row();
 
-					new imagebutton("icon-play-2", isize, ui.levels::show).text("$text.play").padTop(4f);
+            container.table(table -> {
+                table.defaults().set(container.defaults());
 
-					new imagebutton("icon-tutorial", isize, () -> control.playMap(world.maps().getMap("tutorial"))).text("$text.tutorial").padTop(4f);
+                if(Platform.instance.canDonate()) table.add(donate);
+                table.add(exit);
+            }).colspan(2);
+        }
+    }
 
-					new imagebutton("icon-load", isize, ui.load::show).text("$text.load").padTop(4f);
+    private void buildDesktop(){
+        container.table(out -> {
 
-					new imagebutton("icon-add", isize, ui.join::show).text("$text.joingame").padTop(4f);
+            float w = 200f;
+            float bw = w * 2f + 10f;
 
-					row();
+            out.margin(16);
+            out.defaults().size(w, 66f).padTop(5).padRight(5);
 
-					new table(){{
+            out.add(new MenuButton("icon-play-2", "$play", ui.deploy::show)).width(bw).colspan(2);
 
-                        defaults().size(size).pad(5);
+            out.row();
 
-                        new imagebutton("icon-editor", isize, ui.editor::show).text("$text.editor").padTop(4f);
+            out.add(new MenuButton("icon-add", "$joingame", ui.join::show));
 
-                        new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
+            out.add(new MenuButton("icon-play-custom", "$customgame", this::showCustomSelect));
 
-                        new imagebutton("icon-info", isize, ui.about::show).text("$text.about.button").padTop(4f);
+            out.row();
 
-                        if (!ios) {
-                            new imagebutton("icon-donate", isize, Platform.instance::openDonations).text("$text.donate").padTop(4f);
-                        }
+            out.add(new MenuButton("icon-editor", "$editor", () -> ui.loadAnd(ui.editor::show)));
 
-                    }}.colspan(4).end();
-				}}.end();
-			}
-		}}.end();
+            out.add(new MenuButton("icon-map", "$maps", ui.maps::show));
 
-		//discord icon in top right
-		if(Platform.instance.hasDiscord()) {
-			new table() {{
-				abottom().atop().aright();
-				get().addButton("", "discord", ui.discord::show);
-			}}.end().visible(() -> state.is(State.menu));
-		}
+            out.row();
 
-		//version info
-		new table(){{
-			visible(() -> state.is(State.menu));
-			abottom().aleft();
-			new label("Mindustry " + Version.code + " " + Version.type + " / " + Version.buildName);
-		}}.end();
-	}
+            out.add(new MenuButton("icon-info", "$about.button", ui.about::show));
 
-	private void showPlaySelect(){
-		float w = 200f;
-		float bw = w * 2f + 10f;
+            out.add(new MenuButton("icon-tools", "$settings", ui.settings::show));
 
-		FloatingDialog dialog = new FloatingDialog("$text.play");
-		dialog.addCloseButton();
-		dialog.content().defaults().height(70f).width(w).padRight(5f);
+            out.row();
 
-		dialog.content().add(new MenuButton("icon-play-2", "$text.newgame", () -> {
-			dialog.hide();
-			ui.levels.show();
-		})).width(bw).colspan(2);
-		dialog.content().row();
+            out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
+        });
+    }
 
-		dialog.content().add(new MenuButton("icon-add", "$text.joingame", () -> {
-			if(Platform.instance.canJoinGame()){
-				ui.join.show();
-				dialog.hide();
-			}else{
-				ui.showInfo("$text.multiplayer.web");
-			}
-		}));
-		dialog.content().add(new MenuButton("icon-tutorial", "$text.tutorial", ()-> {
-			control.playMap(world.maps().getMap("tutorial"));
-			dialog.hide();
-		}));
-
-		dialog.content().row();
-
-		dialog.content().add(new MenuButton("icon-load", "$text.loadgame", () -> {
-			ui.load.show();
-			dialog.hide();
-		})).width(bw).colspan(2);
-
-		dialog.show();
-	}
+    private void showCustomSelect(){
+        FloatingDialog dialog = new FloatingDialog("$play");
+        dialog.setFillParent(false);
+        dialog.addCloseButton();
+        dialog.cont.defaults().size(210f, 64f);
+        dialog.cont.add(new MenuButton("icon-editor", "$newgame", () -> {
+            dialog.hide();
+            ui.custom.show();
+        }));
+        dialog.cont.row();
+        dialog.cont.add(new MenuButton("icon-load", "$loadgame", () -> {
+            ui.load.show();
+            dialog.hide();
+        }));
+        dialog.show();
+    }
 }

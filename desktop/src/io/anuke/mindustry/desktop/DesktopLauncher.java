@@ -1,39 +1,29 @@
 package io.anuke.mindustry.desktop;
 
-import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import io.anuke.kryonet.KryoClient;
-import io.anuke.kryonet.KryoServer;
+import io.anuke.arc.backends.lwjgl3.Lwjgl3Application;
+import io.anuke.arc.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.anuke.mindustry.Mindustry;
 import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.UCore;
-import io.anuke.ucore.util.OS;
+import io.anuke.mindustry.net.*;
 
-public class DesktopLauncher {
-	
-	public static void main (String[] arg) {
-		
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setTitle("Mindustry");
-		config.setMaximized(true);
-		config.setWindowedMode(960, 540);
-		config.setWindowIcon("sprites/icon.png");
+public class DesktopLauncher{
 
-		if(OS.isMac) {
-            config.setPreferencesConfig(UCore.getProperty("user.home") + "/Library/Application Support/Mindustry", FileType.Absolute);
+    public static void main(String[] arg){
+        try{
+            Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+            config.setTitle("Mindustry");
+            config.setMaximized(true);
+            config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 0);
+            config.setWindowedMode(960, 540);
+            config.setWindowIcon("sprites/icon.png");
+
+            Platform.instance = new DesktopPlatform(arg);
+
+            Net.setClientProvider(new ArcNetClient());
+            Net.setServerProvider(new ArcNetServer());
+            new Lwjgl3Application(new Mindustry(), config);
+        }catch(Throwable e){
+            DesktopPlatform.handleCrash(e);
         }
-
-        Platform.instance = new DesktopPlatform(arg);
-
-		Net.setClientProvider(new KryoClient());
-		Net.setServerProvider(new KryoServer());
-
-		try {
-			new Lwjgl3Application(new Mindustry(), config);
-		}catch (Throwable e){
-		    CrashHandler.handle(e);
-		}
-	}
+    }
 }

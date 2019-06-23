@@ -1,62 +1,20 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
-import io.anuke.mindustry.net.Packet.ImportantPacket;
+import io.anuke.mindustry.net.Packets.StreamBegin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.*;
 
-public class Streamable implements ImportantPacket{
+public class Streamable implements Packet{
     public transient ByteArrayInputStream stream;
 
-    /**Marks the beginning of a stream.*/
-    public static class StreamBegin implements Packet{
-        private static int lastid;
-
-        public int id = lastid ++;
-        public int total;
-        public Class<? extends Streamable> type;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.putInt(id);
-            buffer.putInt(total);
-            buffer.put(Registrator.getID(type));
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            id = buffer.getInt();
-            total = buffer.getInt();
-            type = (Class<? extends Streamable>)Registrator.getByID(buffer.get());
-        }
-    }
-
-    public static class StreamChunk implements Packet{
-        public int id;
-        public byte[] data;
-
-        @Override
-        public void write(ByteBuffer buffer) {
-            buffer.putInt(id);
-            buffer.putShort((short)data.length);
-            buffer.put(data);
-        }
-
-        @Override
-        public void read(ByteBuffer buffer) {
-            id = buffer.getInt();
-            data = new byte[buffer.getShort()];
-            buffer.get(data);
-        }
+    @Override
+    public boolean isImportant(){
+        return true;
     }
 
     public static class StreamBuilder{
         public final int id;
-        public final Class<? extends Streamable> type;
+        public final byte type;
         public final int total;
         public final ByteArrayOutputStream stream;
 
@@ -68,21 +26,17 @@ public class Streamable implements ImportantPacket{
         }
 
         public void add(byte[] bytes){
-            try {
+            try{
                 stream.write(bytes);
-            }catch (IOException e){
+            }catch(IOException e){
                 throw new RuntimeException(e);
             }
         }
 
         public Streamable build(){
-            try {
-                Streamable s = ClassReflection.newInstance(type);
-                s.stream = new ByteArrayInputStream(stream.toByteArray());
-                return s;
-            }catch(ReflectionException e){
-                throw new RuntimeException(e);
-            }
+            Streamable s = (Streamable)Registrator.getByID(type).constructor.get();
+            s.stream = new ByteArrayInputStream(stream.toByteArray());
+            return s;
         }
 
         public boolean isDone(){

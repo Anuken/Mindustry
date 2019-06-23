@@ -1,5 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
-public interface Fragment{
-	public void build();
+import io.anuke.arc.scene.Group;
+
+public abstract class Fragment{
+    public abstract void build(Group parent);
 }

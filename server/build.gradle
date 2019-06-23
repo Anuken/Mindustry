@@ -1,23 +1,27 @@
 apply plugin: "java"
 
 sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
-project.ext.assetsDir = new File("../core/assets");
+project.ext.assetsDir = new File("../core/assets")
 
-task run(dependsOn: classes, type: JavaExec) {
+ext.getServerFolder = {
+    return "../deploy/${appName}-server-${getVersionString()}"
+}
+
+task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
     ignoreExitValue = true
-    if (project.hasProperty("appArgs")) {
+    if(project.hasProperty("appArgs")){
         args Eval.me(appArgs)
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
+task debug(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -26,25 +30,56 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
-task dist(type: Jar) {
+task dist(type: Jar){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir);
+    from{ configurations.compile.collect{ zipTree(it) } }
+    from files(project.assetsDir)
+    exclude("sprites/**")
+    exclude("fonts/**")
+    exclude("com/badlogic/gdx/**")
+    exclude("bundles/**")
 
     writeVersion()
- 
-    manifest {
+
+    manifest{
         attributes 'Main-Class': project.mainClassName
     }
 }
 
-task deploy(type: Copy){
+task dzip(type: Zip){
+    from getServerFolder()
+    archiveName "$appName-server-${getVersionString()}.zip"
+    destinationDir(file("../deploy/"))
+
+    finalizedBy 'cleanup'
+}
+
+task cleanup{
+    doLast{
+        delete{
+            delete getServerFolder()
+        }
+    }
+}
+
+task deploy{
     dependsOn "dist"
-    
-    from "build/libs/server-release.jar"
-    into "../deploy/";
-    rename ("server-release.jar", appName + "-server-" + getVersionString() + ".jar");
+
+    finalizedBy 'dzip'
+
+    doLast{
+        copy{
+            from "build/libs/server-release.jar"
+            into getServerFolder()
+            rename("server-release.jar", "server.jar")
+        }
+
+        copy{
+            from "server_template"
+            into getServerFolder()
+        }
+    }
 }
 
 dist.dependsOn classes

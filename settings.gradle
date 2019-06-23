@@ -1,14 +1,41 @@
-include 'desktop', 'html', 'core', 'android', 'kryonet', 'server', 'ios'
+include 'desktop', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
 
-if(System.properties["release"] == null || System.properties["release"].equals("false")){
-    if (new File(settingsDir, '../uCore').exists()) {
-        include ':uCore'
-        project(':uCore').projectDir = new File(settingsDir, '../uCore')
+def use = { String name, String path ->
+    include(name)
+    project(name).projectDir = new File(settingsDir, path)
+}
+
+Properties properties = new Properties()
+
+if(new File(settingsDir, 'local.properties').exists()){
+    properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+
+    if(properties.containsKey("sdk.dir")){
+        include 'android'
+    }else{
+        println("No android SDK dir found Not loading Android module.")
     }
+}else{
+    println("No local.properties found. Not loading Android module.")
+}
 
-    if (new File(settingsDir, '../GDXGifRecorder').exists()) {
-        include ':GDXGifRecorder'
-        project(':GDXGifRecorder').projectDir = new File(settingsDir, '../GDXGifRecorder')
+if(!hasProperty("release")){
+    if(new File(settingsDir, '../Arc').exists()){
+        use(':Arc', '../Arc')
+        use(':Arc:arc-core', '../Arc/arc-core')
+        use(':Arc:extensions', '../Arc/extensions')
+        use(':Arc:extensions:freetype', '../Arc/extensions/freetype')
+        use(':Arc:extensions:recorder', '../Arc/extensions/recorder')
+        use(':Arc:extensions:arcnet', '../Arc/extensions/arcnet')
+        use(':Arc:extensions:packer', '../Arc/extensions/packer')
+        use(':Arc:backends', '../Arc/backends')
+        use(':Arc:backends:backend-lwjgl3', '../Arc/backends/backend-lwjgl3')
+        use(':Arc:backends:backend-android', '../Arc/backends/backend-android')
+        use(':Arc:backends:backend-robovm', '../Arc/backends/backend-robovm')
+        use(':Arc:backends:backend-headless', '../Arc/backends/backend-headless')
+    }
+    if(new File(settingsDir, '../debug').exists()){
+        use(':debug', '../debug')
     }
 }else{
     println("Not including local repositories.")

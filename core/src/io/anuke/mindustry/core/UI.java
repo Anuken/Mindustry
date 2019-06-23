@@ -231,7 +231,6 @@ public class UI implements ApplicationListener{
         showTextInput(title, text, textLength < 0 ? 12 : textLength, def, (field, c) -> true, confirmed);
     }
 
-
     public void showInfoFade(String info){
         Table table = new Table();
         table.setFillParent(true);

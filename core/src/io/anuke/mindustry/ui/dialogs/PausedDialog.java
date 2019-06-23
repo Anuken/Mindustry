@@ -1,149 +1,122 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.utils.reflect.ClassReflection;
+import io.anuke.arc.Core;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.ui.PressGroup;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.builders.build;
-import io.anuke.ucore.scene.builders.imagebutton;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.util.Bundles;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class PausedDialog extends FloatingDialog{
-	private SaveDialog save = new SaveDialog();
-	private LoadDialog load = new LoadDialog();
-	public boolean wasPaused = false;
+    private SaveDialog save = new SaveDialog();
+    private LoadDialog load = new LoadDialog();
+    private boolean wasClient = false;
 
-	public PausedDialog() {
-		super("$text.menu");
-		setup();
-	}
+    public PausedDialog(){
+        super("$menu");
+        shouldPause = true;
 
-	void setup(){
-		update(() -> {
-			if(state.is(State.menu) && isShown()){
-				hide();
-			}
-		});
+        shown(this::rebuild);
 
-		shown(() -> {
-			wasPaused = state.is(State.paused);
-			if(!Net.active()) state.set(State.paused);
-		});
-		
-		if(!mobile){
-			content().defaults().width(220).height(50);
+        keyDown(key -> {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+                hide();
+            }
+        });
+    }
 
-			content().addButton("$text.back", () -> {
-				hide();
-				if((!wasPaused || Net.active()) && !state.is(State.menu))
-					state.set(State.playing);
-			});
+    void rebuild(){
+        cont.clear();
 
-			content().row();
-			content().addButton("$text.settings", ui.settings::show);
+        update(() -> {
+            if(state.is(State.menu) && isShown()){
+                hide();
+            }
+        });
 
-			content().row();
-			content().addButton("$text.savegame", () -> {
-				save.show();
-			}).disabled(b -> world.getMap().id == -1);
+        if(!mobile){
+            float dw = 210f;
+            cont.defaults().width(dw).height(50).pad(5f);
 
-			content().row();
-			content().addButton("$text.loadgame", () -> {
-				load.show();
-			}).disabled(b -> Net.active());
+            cont.addButton("$back", this::hide).colspan(2).width(dw * 2 + 20f);
 
-			content().row();
+            cont.row();
+            if(world.isZone()){
+                cont.addButton("$techtree", ui.tech::show);
+            }else{
+                cont.addButton("$database", ui.database::show);
+            }
+            cont.addButton("$settings", ui.settings::show);
 
-			if(!gwt) {
-				content().addButton("$text.hostserver", () -> {
-					ui.host.show();
-				}).disabled(b -> Net.active());
-			}
+            if(!world.isZone() && !state.isEditor()){
+                cont.row();
+                cont.addButton("$savegame", save::show);
+                cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+            }
 
-            content().row();
+            cont.row();
 
-			content().addButton("$text.quit", () -> {
-                ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
-                	if(Net.client()) netClient.disconnectQuietly();
-					runExitSave();
-					hide();
-				});
-			});
+            cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+            cont.row();
 
-		}else{
-			build.begin(content());
-			
-			PressGroup group = new PressGroup();
-			
-			content().defaults().size(120f).pad(5);
-			float isize = 14f*4;
-			
-			new imagebutton("icon-play-2", isize, () -> {
-				hide();
-				if(!wasPaused && !state.is(State.menu))
-					state.set(State.playing);
-			}).text("$text.back").padTop(4f);
-			
-			new imagebutton("icon-tools", isize, ui.settings::show).text("$text.settings").padTop(4f);
-			
-			imagebutton sa = new imagebutton("icon-save", isize, save::show);
-			sa.text("$text.save").padTop(4f);
-			sa.cell.disabled(b -> world.getMap().id == -1);
+            cont.addButton("$quit", () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
+                    wasClient = Net.client();
+                    if(Net.client()) netClient.disconnectQuietly();
+                    runExitSave();
+                    hide();
+                });
+            }).colspan(2).width(dw + 10f);
 
-			content().row();
-			
-			imagebutton lo = new imagebutton("icon-load", isize, load::show);
-			lo.text("$text.load").padTop(4f);
-			lo.cell.disabled(b -> Net.active());
+        }else{
+            cont.defaults().size(120f).pad(5);
+            float isize = 14f * 4;
 
-			imagebutton ho = new imagebutton("icon-host", isize, () -> {
-				ui.host.show();
-			});
-			ho.text("$text.host").padTop(4f);
-			ho.cell.disabled(b -> Net.active());
-			
-			new imagebutton("icon-quit", isize, () -> {
-				ui.showConfirm("$text.confirm", "$text.quit.confirm", () -> {
-					if(Net.client()) netClient.disconnectQuietly();
-					runExitSave();
-					hide();
-				});
-			}).text("Quit").padTop(4f);
-			
-			for(Element e : content().getChildren()){
-				if(e instanceof ImageButton){
-					group.add((ImageButton)e);
-				}
-			}
-			
-			build.end();
-		}
-	}
+            cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
+            cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
 
-	private void runExitSave(){
-		if(control.getSaves().getCurrent() == null ||
-				!control.getSaves().getCurrent().isAutosave()){
-			state.set(State.menu);
-			control.tutorial().reset();
-			return;
-		}
+            if(!world.isZone() && !state.isEditor()){
+                cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
 
-		ui.loadfrag.show("$text.saveload");
+                cont.row();
 
-		Timers.runTask(5f, () -> {
-			ui.loadfrag.hide();
-			try{
-				control.getSaves().getCurrent().save();
-			}catch(Throwable e){
-				e = (e.getCause() == null ? e : e.getCause());
-				ui.showError("[orange]"+ Bundles.get("text.savefail")+"\n[white]" + ClassReflection.getSimpleName(e.getClass()) + ": " + e.getMessage() + "\n" + "at " + e.getStackTrace()[0].getFileName() + ":" + e.getStackTrace()[0].getLineNumber());
-			}
-			state.set(State.menu);
-		});
-	}
+                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+            }else{
+                cont.row();
+            }
+
+            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+
+            cont.addRowImageTextButton("$quit", "icon-quit", isize, () -> {
+                ui.showConfirm("$confirm", "$quit.confirm", () -> {
+                    wasClient = Net.client();
+                    if(Net.client()) netClient.disconnectQuietly();
+                    runExitSave();
+                    hide();
+                });
+            });
+        }
+    }
+
+    public void runExitSave(){
+        if(state.isEditor() && !wasClient){
+            ui.editor.resumeEditing();
+            return;
+        }
+
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave()){
+            state.set(State.menu);
+            return;
+        }
+
+        ui.loadAnd("$saveload", () -> {
+            try{
+                control.saves.getCurrent().save();
+            }catch(Throwable e){
+                e.printStackTrace();
+                ui.showError("[accent]" + Core.bundle.get("savefail"));
+            }
+            state.set(State.menu);
+        });
+    }
 }

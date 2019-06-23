@@ -1,195 +1,192 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
+import io.anuke.arc.Core;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.Saves.SaveSlot;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.Saves.SaveSlot;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.ScrollPane;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.scene.ui.layout.Table;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.mindustry.io.SaveIO.SaveException;
 
 import java.io.IOException;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class LoadDialog extends FloatingDialog{
-	ScrollPane pane;
-	Table slots;
+    ScrollPane pane;
+    Table slots;
 
-	public LoadDialog() {
-		this("$text.loadgame");
-	}
+    public LoadDialog(){
+        this("$loadgame");
+    }
 
-	public LoadDialog(String title) {
-		super(title);
-		setup();
+    public LoadDialog(String title){
+        super(title);
+        setup();
 
-		shown(() -> {
-			setup();
-			Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
-		});
+        shown(() -> {
+            setup();
+            Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
+        });
 
-		addCloseButton();
-	}
+        addCloseButton();
+    }
 
-	protected void setup(){
-		content().clear();
+    protected void setup(){
+        cont.clear();
 
-		slots = new Table();
-		pane = new ScrollPane(slots, "clear-black");
-		pane.setFadeScrollBars(false);
-		pane.setScrollingDisabled(true, false);
+        slots = new Table();
+        pane = new ScrollPane(slots);
+        pane.setFadeScrollBars(false);
+        pane.setScrollingDisabled(true, false);
 
-		slots.marginRight(24);
+        slots.marginRight(24);
 
-		Timers.runTask(2f, () -> Core.scene.setScrollFocus(pane));
+        Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
-		Array<SaveSlot> array = control.getSaves().getSaveSlots();
+        Array<SaveSlot> array = control.saves.getSaveSlots();
 
-		for(SaveSlot slot : array){
+        for(SaveSlot slot : array){
+            if(slot.isHidden()) continue;
 
-			TextButton button = new TextButton("[accent]" + slot.getName(), "clear");
-			button.getLabelCell().growX().left();
-			button.getLabelCell().padBottom(8f);
-			button.getLabelCell().top().left().growX();
+            TextButton button = new TextButton("[accent]" + slot.getName(), "clear");
+            button.getLabelCell().growX().left();
+            button.getLabelCell().padBottom(8f);
+            button.getLabelCell().top().left().growX();
 
-			button.defaults().left();
+            button.defaults().left();
 
-			button.table(t -> {
-				t.right();
+            button.table(t -> {
+                t.right();
 
-				t.addImageButton("icon-floppy", "emptytoggle", 14*3, () -> {
-					slot.setAutosave(!slot.isAutosave());
-				}).checked(slot.isAutosave()).right();
+                t.addImageButton("icon-floppy", "emptytoggle", iconsize, () -> {
+                    slot.setAutosave(!slot.isAutosave());
+                }).checked(slot.isAutosave()).right();
 
-				t.addImageButton("icon-trash", "empty", 14*3, () -> {
-					ui.showConfirm("$text.confirm", "$text.save.delete.confirm", () -> {
-						slot.delete();
-						setup();
-					});
-				}).size(14*3).right();
+                t.addImageButton("icon-trash", "empty", iconsize, () -> {
+                    ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
+                        slot.delete();
+                        setup();
+                    });
+                }).size(iconsize).right();
 
-				t.addImageButton("icon-pencil-small", "empty", 14*3, () -> {
-					ui.showTextInput("$text.save.rename", "$text.save.rename.text", slot.getName(), text -> {
-						slot.setName(text);
-						setup();
-					});
-				}).size(14*3).right();
+                t.addImageButton("icon-pencil", "empty", iconsize, () -> {
+                    ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
+                        slot.setName(text);
+                        setup();
+                    });
+                }).size(iconsize).right();
 
-				if(!gwt) {
-					t.addImageButton("icon-save", "empty", 14 * 3, () -> {
-					    if(!ios) {
-					    	Platform.instance.showFileChooser(Bundles.get("text.save.export"), "Mindustry Save", file -> {
-								try {
-									slot.exportFile(file);
-									setup();
-								} catch (IOException e) {
-									ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
-								}
-							}, false, "mins");
-                        }else{
-					        try {
-                                FileHandle file = Gdx.files.local("save-" + slot.getName() + ".mins");
+                t.addImageButton("icon-save", "empty", iconsize, () -> {
+                    if(!ios){
+                        Platform.instance.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
+                            try{
                                 slot.exportFile(file);
-                                Platform.instance.shareFile(file);
-                            }catch (Exception e){
-                                ui.showError(Bundles.format("text.save.export.fail", Strings.parseException(e, false)));
+                                setup();
+                            }catch(IOException e){
+                                ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                             }
+                        }, false, FileChooser.saveFiles);
+                    }else{
+                        try{
+                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
+                            slot.exportFile(file);
+                            Platform.instance.shareFile(file);
+                        }catch(Exception e){
+                            ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                         }
-					}).size(14 * 3).right();
-				}
+                    }
+                }).size(iconsize).right();
 
-			}).padRight(-10).growX();
 
-			String color = "[lightgray]";
+            }).padRight(-10).growX();
 
-			button.defaults().padBottom(3);
-			button.row();
-			button.add(Bundles.format("text.save.map", color+slot.getMap().localized()));
-			button.row();
-			button.add(Bundles.get("text.level.mode") + " " +color+ slot.getMode());
-			button.row();
-			button.add(Bundles.format("text.save.wave", color+slot.getWave()));
-			button.row();
-			button.add(Bundles.format("text.save.difficulty", color+slot.getDifficulty()));
-			button.row();
-			button.label(() -> Bundles.format("text.save.autosave", color + Bundles.get(slot.isAutosave() ? "text.on" : "text.off")));
-			button.row();
-			button.add();
-			button.add(Bundles.format("text.save.date", color+slot.getDate()));
-			button.row();
-			modifyButton(button, slot);
+            String color = "[lightgray]";
 
-			slots.add(button).uniformX().fillX().pad(4).padRight(-4).margin(10f).marginLeft(20f).marginRight(20f);
-			slots.row();
-		}
+            button.defaults().padBottom(3);
+            button.row();
+            button.add(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
+            button.row();
+            button.add(Core.bundle.format("save.wave", color + slot.getWave()));
+            button.row();
+            button.label(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
+            button.row();
+            button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
+            button.row();
+            button.add(Core.bundle.format("save.date", color + slot.getDate())).colspan(2).padTop(5).right();
+            button.row();
+            modifyButton(button, slot);
 
-		content().add(pane);
+            slots.add(button).uniformX().fillX().pad(4).padRight(-4).margin(10f).marginLeft(20f).marginRight(20f);
+            slots.row();
+        }
 
-		addSetup();
-	}
+        cont.add(pane);
 
-	public void addSetup(){
-		if(control.getSaves().getSaveSlots().size == 0) {
+        addSetup();
+    }
 
-			slots.row();
-			slots.addButton("$text.save.none", "clear", () -> {
-			}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
-		}
+    public void addSetup(){
+        boolean valids = false;
+        for(SaveSlot slot : control.saves.getSaveSlots()) if(!slot.isHidden()) valids = true;
 
-		slots.row();
+        if(!valids){
 
-		if(gwt || ios) return;
+            slots.row();
+            slots.addButton("$save.none", () -> {
+            }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
+        }
 
-		slots.addImageTextButton("$text.save.import", "icon-add", "clear", 14*3, () -> {
-			Platform.instance.showFileChooser(Bundles.get("text.save.import"), "Mindustry Save", file -> {
-				if(SaveIO.isSaveValid(file)){
-					try{
-						control.getSaves().importSave(file);
-						setup();
-					}catch (IOException e){
-						ui.showError(Bundles.format("text.save.import.fail", Strings.parseException(e, false)));
-					}
-				}else{
-					ui.showError("$text.save.import.invalid");
-				}
-			}, true, "mins");
-		}).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
-	}
+        slots.row();
 
-	public void runLoadSave(SaveSlot slot){
-        ui.loadfrag.show();
+        if(ios) return;
 
-        Timers.runTask(3f, () -> {
-            ui.loadfrag.hide();
-            hide();
+        slots.addImageTextButton("$save.import", "icon-add", iconsize, () -> {
+            Platform.instance.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
+                if(SaveIO.isSaveValid(file)){
+                    try{
+                        control.saves.importSave(file);
+                        setup();
+                    }catch(IOException e){
+                        e.printStackTrace();
+                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                    }
+                }else{
+                    ui.showError("$save.import.invalid");
+                }
+            }, true, FileChooser.saveFiles);
+        }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
+    }
+
+    public void runLoadSave(SaveSlot slot){
+        hide();
+        ui.paused.hide();
+
+        ui.loadAnd(() -> {
             try{
                 slot.load();
                 state.set(State.playing);
-                ui.paused.hide();
-            }catch(Exception e){
+            }catch(SaveException e){
                 Log.err(e);
-                ui.paused.hide();
                 state.set(State.menu);
                 logic.reset();
-                ui.showError("$text.save.corrupted");
+                ui.showError("$save.corrupted");
             }
         });
     }
 
-	public void modifyButton(TextButton button, SaveSlot slot){
-		button.clicked(() -> {
-			if(!button.childrenPressed()){
-				runLoadSave(slot);
-			}
-		});
-	}
+    public void modifyButton(TextButton button, SaveSlot slot){
+        button.clicked(() -> {
+            if(!button.childrenPressed()){
+                int build = slot.getBuild();
+                runLoadSave(slot);
+            }
+        });
+    }
 }

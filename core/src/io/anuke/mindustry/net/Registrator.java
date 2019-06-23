@@ -1,65 +1,27 @@
 package io.anuke.mindustry.net;
 
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
+import io.anuke.arc.collection.ObjectIntMap;
+import io.anuke.arc.function.Supplier;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Streamable.StreamBegin;
-import io.anuke.mindustry.net.Streamable.StreamChunk;
 
-public class Registrator {
-    private static Class<?>[] classes = {
-            StreamBegin.class,
-            StreamChunk.class,
-            WorldData.class,
-            SyncPacket.class,
-            PositionPacket.class,
-            ShootPacket.class,
-            PlacePacket.class,
-            BreakPacket.class,
-            StateSyncPacket.class,
-            BlockLogRequestPacket.class,
-            RollbackRequestPacket.class,
-            BlockSyncPacket.class,
-            BulletPacket.class,
-            EnemyDeathPacket.class,
-            BlockUpdatePacket.class,
-            BlockDestroyPacket.class,
-            ConnectPacket.class,
-            DisconnectPacket.class,
-            ChatPacket.class,
-            KickPacket.class,
-            UpgradePacket.class,
-            WeaponSwitchPacket.class,
-            BlockTapPacket.class,
-            BlockConfigPacket.class,
-            EntityRequestPacket.class,
-            ConnectConfirmPacket.class,
-            GameOverPacket.class,
-            FriendlyFireChangePacket.class,
-            PlayerDeathPacket.class,
-            CustomMapPacket.class,
-            MapAckPacket.class,
-            EntitySpawnPacket.class,
-            ItemTransferPacket.class,
-            ItemSetPacket.class,
-            ItemOffloadPacket.class,
-            NetErrorPacket.class,
-            PlayerAdminPacket.class,
-            AdministerRequestPacket.class,
-            TracePacket.class
+public class Registrator{
+    private static ClassEntry[] classes = {
+    new ClassEntry(StreamBegin.class, StreamBegin::new),
+    new ClassEntry(StreamChunk.class, StreamChunk::new),
+    new ClassEntry(WorldStream.class, WorldStream::new),
+    new ClassEntry(ConnectPacket.class, ConnectPacket::new),
+    new ClassEntry(InvokePacket.class, InvokePacket::new)
     };
-    private static ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
+    private static ObjectIntMap<Class> ids = new ObjectIntMap<>();
 
     static{
         if(classes.length > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
-        for(int i = 0; i < classes.length; i ++){
-            if(!ClassReflection.isAssignableFrom(Packet.class, classes[i]) &&
-                    !ClassReflection.isAssignableFrom(Streamable.class, classes[i])) throw new RuntimeException("Not a packet: " + classes[i]);
-            ids.put(classes[i], i);
+        for(int i = 0; i < classes.length; i++){
+            ids.put(classes[i].type, i);
         }
     }
 
-    public static Class<?> getByID(byte id){
+    public static ClassEntry getByID(byte id){
         return classes[id];
     }
 
@@ -67,7 +29,17 @@ public class Registrator {
         return (byte)ids.get(type, -1);
     }
 
-    public static Class<?>[] getClasses(){
+    public static ClassEntry[] getClasses(){
         return classes;
+    }
+
+    public static class ClassEntry{
+        public final Class<?> type;
+        public final Supplier<?> constructor;
+
+        public <T extends Packet> ClassEntry(Class<T> type, Supplier<T> constructor){
+            this.type = type;
+            this.constructor = constructor;
+        }
     }
 }

@@ -1,7 +1,8 @@
-##Packr, build stuff
-
+logs/
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
+/core/assets/bundles/output/
+/core/assets/.gifimages/
 /deploy/
 /desktop/packr-out/
 /desktop/packr-export/
@@ -9,13 +10,26 @@
 /desktop/mindustry-maps/
 /desktop/gifexport/
 /core/lib/
+/core/assets-raw/sprites/generated/
+/core/assets-raw/sprites_out/
 /annotations/build/
-/kryonet/build/
+/annotations/out/
+/net/build/
+/tools/build/
+/tests/build/
 /server/build/
+/test_files/
+/annotations/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
 /core/assets/version.properties
+/core/assets/locales
+/ios/src/io/anuke/mindustry/gen/
+/core/src/io/anuke/mindustry/gen/
+ios/robovm.properties
+packr-out/
+config/
 *.gif
 
 version.properties

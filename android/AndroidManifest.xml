@@ -1,32 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.anuke.mindustry">
+          package="io.anuke.mindustry">
 
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
-    <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
-        android:theme="@style/GdxTheme" >
-        <activity
-            android:name="io.anuke.mindustry.AndroidLauncher"
+            android:resizeableActivity="false"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:isGame="true"
+            android:appCategory="game"
             android:label="@string/app_name"
-            android:screenOrientation="sensorLandscape"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+            android:theme="@style/GdxTheme" android:fullBackupContent="@xml/backup_rules">
+        <meta-data android:name="android.max_aspect" android:value="2.1"/>
+        <activity
+                android:name="io.anuke.mindustry.AndroidLauncher"
+                android:label="@string/app_name"
+                android:screenOrientation="user"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout">
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.mmap"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.msav"/>
+            </intent-filter>
+
+
+            <intent-filter android:icon="@mipmap/ic_launcher"
+                           android:label="Mindustry Map"
+                           android:priority="1">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.mmap" android:mimeType="*/*"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.msav" android:mimeType="*/*"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".DonationsActivity"
-            android:theme="@style/GdxTheme" />
 
     </application>
 

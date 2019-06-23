@@ -1,359 +1,476 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.ApplicationLogger;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Array.ArrayIterable;
+import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.*;
+import io.anuke.arc.util.Timer.Task;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Player;
-import io.anuke.mindustry.game.Difficulty;
+import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.game.GameMode;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.Version;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Packets.ChatPacket;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.ui.fragments.DebugFragment;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Map;
-import io.anuke.mindustry.world.Placement;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.ucore.core.*;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.CommandHandler;
-import io.anuke.ucore.util.CommandHandler.Command;
-import io.anuke.ucore.util.CommandHandler.Response;
-import io.anuke.ucore.util.CommandHandler.ResponseType;
-import io.anuke.ucore.util.Log;
-import io.anuke.ucore.util.Strings;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemType;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.util.Log.*;
 
-public class ServerControl extends Module {
+public class ServerControl implements ApplicationListener{
+    private static final int roundExtraTime = 12;
+    //in bytes: 512 kb is max
+    private static final int maxLogLength = 1024 * 512;
+    private static final int commandSocketPort = 6859;
+
     private final CommandHandler handler = new CommandHandler("");
-    private ShuffleMode mode;
+    private final FileHandle logFolder = Core.files.local("logs/");
+
+    private FileHandle currentLogFile;
+    private boolean inExtraRound;
+    private Task lastTask;
+    private Gamemode lastMode = Gamemode.survival;
+
+    private Thread socketThread;
+    private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
-        Settings.defaultList(
+        Core.settings.defaults(
             "shufflemode", "normal",
             "bans", "",
-            "admins", ""
+            "admins", "",
+            "shuffle", true,
+            "crashreport", false,
+            "port", port,
+            "logging", true,
+            "socket", false
         );
 
-        mode = ShuffleMode.valueOf(Settings.getString("shufflemode"));
+        Log.setLogger(new LogHandler(){
+            DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
 
+            @Override
+            public void debug(String text, Object... args){
+                print("&lc&fb" + "[DEBG] " + text, args);
+            }
+
+            @Override
+            public void info(String text, Object... args){
+                print("&lg&fb" + "[INFO] " + text, args);
+            }
+
+            @Override
+            public void err(String text, Object... args){
+                print("&lr&fb" + "[ERR!] " + text, args);
+            }
+
+            @Override
+            public void warn(String text, Object... args){
+                print("&ly&fb" + "[WARN] " + text, args);
+            }
+
+            @Override
+            public void print(String text, Object... args){
+                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", args);
+                System.out.println(result);
+
+                if(Core.settings.getBool("logging")){
+                    logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + format(text + "&fr", false, args));
+                }
+
+                if(socketOutput != null){
+                    try{
+                        socketOutput.println(format(text + "&fr", false, args).replace("[DEBG] ", "").replace("[WARN] ", "").replace("[INFO] ", "").replace("[ERR!] ", ""));
+                    }catch(Throwable e){
+                        err("Error occurred logging to socket: {0}", e.getClass().getSimpleName());
+                    }
+                }
+            }
+        });
+
+        Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
-        Effects.setEffectProvider((a, b, c, d, e) -> {});
-        Sounds.setHeadless(true);
-
-        //override default handling of chat packets
-        Net.handle(ChatPacket.class, (packet) -> {
-            info("&y" + (packet.name == null ? "" : packet.name) +  ": &lb{0}", packet.text);
-        });
-
-        //don't do anything at all for GDX logging: don't want controller info and such
-        Gdx.app.setApplicationLogger(new ApplicationLogger() {
-            @Override public void log(String tag, String message) { }
-            @Override public void log(String tag, String message, Throwable exception) { }
-            @Override public void error(String tag, String message) { }
-            @Override public void error(String tag, String message, Throwable exception) { }
-            @Override public void debug(String tag, String message) { }
-            @Override public void debug(String tag, String message, Throwable exception) { }
-        });
-
-        String[] commands = {};
-
-        if(args.length > 0){
-            commands = String.join(" ", args).split(",");
-            Log.info("&lmFound {0} command-line arguments to parse. {1}", commands.length);
-        }
+        Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
         registerCommands();
 
-        for(String s : commands){
-            Response response = handler.handleMessage(s);
-            if(response.type != ResponseType.valid){
-                Log.err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
-                Log.err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
-                System.exit(1);
+        Core.app.post(() -> {
+            String[] commands = {};
+
+            if(args.length > 0){
+                commands = Strings.join(" ", args).split(",");
+                info("&lmFound {0} command-line arguments to parse.", commands.length);
             }
-        }
+
+            for(String s : commands){
+                Response response = handler.handleMessage(s);
+                if(response.type != ResponseType.valid){
+                    err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
+                    err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
+                    System.exit(1);
+                }
+            }
+        });
+
+        customMapDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
         thread.start();
 
-        Events.on(GameOverEvent.class, () -> {
+        if(Version.build == -1){
+            warn("&lyYour server is running a custom build, which means that client checking is disabled.");
+            warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
+        }
+
+        Events.on(GameOverEvent.class, event -> {
+            if(inExtraRound) return;
             info("Game over!");
 
-            for(NetConnection connection : Net.getConnections()){
-                netServer.kick(connection.id, KickReason.gameover);
-            }
+            if(Core.settings.getBool("shuffle")){
+                if(world.maps.all().size > 0){
+                    Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
-            if (mode != ShuffleMode.off) {
-                Array<Map> maps = mode == ShuffleMode.both ? world.maps().getAllMaps() :
-                        mode == ShuffleMode.normal ? world.maps().getDefaultMaps() : world.maps().getCustomMaps();
+                    Map previous = world.getMap();
+                    Map map = previous;
+                    if(maps.size > 1){
+                        while(map == previous) map = maps.random();
+                    }else if(!previous.custom && !world.maps.customMaps().isEmpty()){
+                        map = maps.first();
+                    }
 
-                Map previous = world.getMap();
-                Map map = previous;
-                while (map == previous || !map.visible) map = maps.random();
+                    Call.onInfoMessage((state.rules.pvp
+                    ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                    + "\nNext selected map:[accent] " + map.name() + "[]"
+                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
+                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                info("Selected next map to be {0}.", map.name);
-                state.set(State.playing);
-                logic.reset();
-                world.loadMap(map);
+                    info("Selected next map to be {0}.", map.name());
+
+                    Map fmap = map;
+
+                    play(true, () -> world.loadMap(fmap));
+                }
             }else{
+                netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
                 Net.closeServer();
             }
         });
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
+        System.out.print("> ");
+
+        if(Core.settings.getBool("socket")){
+            toggleSocket(true);
+        }
     }
 
     private void registerCommands(){
         handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
-                print("   &y" + command.text + (command.paramText.isEmpty() ? "" : " ") + command.paramText + " - &lm" + command.description);
+                info("   &y" + command.text + (command.paramText.isEmpty() ? "" : " ") + command.paramText + " - &lm" + command.description);
             }
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0} {1} / {2}", Version.code, Version.type, Version.buildName);
+            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build);
+            info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
             Net.dispose();
-            Gdx.app.exit();
+            Core.app.exit();
         });
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             Net.closeServer();
+            if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
-            netServer.reset();
-            Log.info("Stopped server.");
+            info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
-            Map result = null;
+            if(lastTask != null) lastTask.cancel();
 
-            if(arg.length > 0) {
-                String search = arg[0];
-                for (Map map : world.maps().list()) {
-                    if (map.name.equalsIgnoreCase(search))
-                        result = map;
-                }
+            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
-                if(result == null){
-                    err("No map with name &y'{0}'&lr found.", search);
-                    return;
-                }
-            }else{
-                while(result == null || !result.visible)
-                    result = world.maps().getAllMaps().random();
-                Log.info("&ly&fiNo map specified, so &lb{0}&ly was chosen randomly.", result.name);
-            }
-
-            GameMode mode;
-            try{
-                mode = arg.length < 2 ? GameMode.waves : GameMode.valueOf(arg[1]);
-            }catch (IllegalArgumentException e){
-                err("No gamemode '{0}' found.", arg[1]);
+            if(result == null){
+                err("No map with name &y'{0}'&lr found.", arg[0]);
                 return;
             }
 
+            Gamemode preset = Gamemode.survival;
+
+            if(arg.length > 1){
+                try{
+                    preset = Gamemode.valueOf(arg[1]);
+                }catch(IllegalArgumentException e){
+                    err("No gamemode '{0}' found.", arg[1]);
+                    return;
+                }
+            }
+
             info("Loading map...");
-            state.mode = mode;
 
             logic.reset();
-            world.loadMap(result);
-            state.set(State.playing);
-            info("Map loaded.");
+            lastMode = preset;
+            try{
+                world.loadMap(result);
+                state.rules = preset.apply(result.rules());
+                logic.play();
 
-            host();
+                info("Map loaded.");
+
+                host();
+            }catch(MapException e){
+                Log.err(e.map.name() + ": " + e.getMessage());
+            }
+        });
+
+        handler.register("port", "[port]", "Sets or displays the port for hosting the server.", arg -> {
+            if(arg.length == 0){
+                info("&lyPort: &lc{0}", Core.settings.getInt("port"));
+            }else{
+                int port = Strings.parseInt(arg[0]);
+                if(port < 0 || port > 65535){
+                    err("Port must be a number between 0 and 65535.");
+                    return;
+                }
+                info("&lyPort set to {0}.", port);
+                Core.settings.put("port", port);
+                Core.settings.save();
+            }
         });
 
         handler.register("maps", "Display all available maps.", arg -> {
-            Log.info("Maps:");
-            for(Map map : world.maps().getAllMaps()){
-                Log.info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name, map.custom ? "Custom" : "Default", map.getWidth(), map.getHeight());
+            if(!world.maps.all().isEmpty()){
+                info("Maps:");
+                for(Map map : world.maps.all()){
+                    info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
+                }
+            }else{
+                info("No maps found.");
+            }
+            info("&lyMap directory: &lb&fi{0}", customMapDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
+            int beforeMaps = world.maps.all().size;
+            world.maps.reload();
+            if(world.maps.all().size > beforeMaps){
+                info("&lc{0}&ly new map(s) found and reloaded.", world.maps.all().size - beforeMaps);
+            }else{
+                info("&lyMaps reloaded.");
             }
         });
 
         handler.register("status", "Display server status.", arg -> {
             if(state.is(State.menu)){
-                info("&lyStatus: &rserver closed");
+                info("Status: &rserver closed");
             }else{
-                info("&lyStatus: &lcPlaying on map &fi{0}&fb &lb/&lc Wave {1} &lb/&lc {2}",
-                        Strings.capitalize(world.getMap().name), state.wave, Strings.capitalize(state.difficulty.name()));
-                if(state.enemies > 0){
-                    info("&ly{0} enemies remaining.", state.enemies);
+                info("Status:");
+                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
+
+                if(state.rules.waves){
+                    info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
                 }else{
-                    info("&ly{0} seconds until next wave.", (int)(state.wavetime / 60));
+                    info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
 
-                if(playerGroup.size() > 0) {
-                    info("&lyPlayers: {0}", playerGroup.size());
-                    for (Player p : playerGroup.all()) {
-                        print("   &y" + p.name);
-                    }
-                }else{
-                    info("&lyNo players connected.");
-                }
-                info("&lbFPS: {0}", (int)(60f/Timers.delta()));
-            }
-        });
+                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
 
-        handler.register("players", "Display player info.", arg -> {
-            if(state.is(State.menu)){
-                info("&lyServer is closed.");
-            }else{
-                if(playerGroup.size() > 0) {
-                    info("&lyPlayers: {0}", playerGroup.size());
-                    for (Player p : playerGroup.all()) {
-                        print("   &y{0} / Connection {1} / IP: {2}", p.name, p.clientid, Net.getConnection(p.clientid).address);
+                if(playerGroup.size() > 0){
+                    info("  &lyPlayers: {0}", playerGroup.size());
+                    for(Player p : playerGroup.all()){
+                        info("    &y{0} / {1}", p.name, p.uuid);
                     }
                 }else{
-                    info("&lyNo players connected.");
+                    info("  &lyNo players connected.");
                 }
             }
         });
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
                 return;
             }
 
-            netCommon.sendMessage("[GRAY][[Server]:[] " + arg[0]);
+            Call.sendMessage("[scarlet][[Server]:[] " + arg[0]);
+
             info("&lyServer: &lb{0}", arg[0]);
         });
 
         handler.register("difficulty", "<difficulty>", "Set game difficulty.", arg -> {
             try{
-                Difficulty diff = Difficulty.valueOf(arg[0]);
-                state.difficulty = diff;
+                state.rules.waveSpacing = Difficulty.valueOf(arg[0]).waveTime * 60 * 60 * 2;
                 info("Difficulty set to '{0}'.", arg[0]);
-            }catch (IllegalArgumentException e){
+            }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
             }
         });
 
-        handler.register("friendlyfire", "<on/off>", "Enable or disable friendly fire.", arg -> {
-            String s = arg[0];
-            if(s.equalsIgnoreCase("on")){
-                NetEvents.handleFriendlyFireChange(true);
-                state.friendlyFire = true;
-                info("Friendly fire enabled.");
-            }else if(s.equalsIgnoreCase("off")){
-                NetEvents.handleFriendlyFireChange(false);
-                state.friendlyFire = false;
-                info("Friendly fire disabled.");
-            }else{
-                err("Incorrect command usage.");
+        handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
+            if(!state.is(State.playing)){
+                err("Not playing. Host first.");
+                return;
+            }
+
+            try{
+                Team team = arg.length == 0 ? Team.blue : Team.valueOf(arg[0]);
+
+                if(state.teams.get(team).cores.isEmpty()){
+                    err("That team has no cores.");
+                    return;
+                }
+
+                for(Item item : content.items()){
+                    if(item.type == ItemType.material){
+                        state.teams.get(team).cores.first().entity.items.set(item, state.teams.get(team).cores.first().block().itemCapacity);
+                    }
+                }
+
+                info("Core filled.");
+            }catch(IllegalArgumentException ignored){
+                err("No such team exists.");
             }
         });
 
-        handler.register("antigrief", "[on/off] [max-break] [cooldown-in-ms]", "Enable or disable anti-grief.", arg -> {
+        handler.register("name", "[name...]", "Change the server display name.", arg -> {
             if(arg.length == 0){
-                info("Anti-grief is currently &lc{0}.", netServer.admins.isAntiGrief() ? "on" : "off");
+                info("Server name is currently &lc'{0}'.", Core.settings.getString("servername"));
+                return;
+            }
+            Core.settings.put("servername", arg[0]);
+            Core.settings.save();
+            info("Server name is now &lc'{0}'.", arg[0]);
+        });
+
+        handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Core.settings.put("crashreport", value);
+            Core.settings.save();
+            info("Crash reporting is now {0}.", value ? "on" : "off");
+        });
+
+        handler.register("logging", "<on/off>", "Disables or enables server logs", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            Core.settings.put("logging", value);
+            Core.settings.save();
+            info("Logging is now {0}.", value ? "on" : "off");
+        });
+
+        handler.register("strict", "<on/off>", "Disables or enables strict mode", arg -> {
+            boolean value = arg[0].equalsIgnoreCase("on");
+            netServer.admins.setStrict(value);
+            info("Strict mode is now {0}.", netServer.admins.getStrict() ? "on" : "off");
+        });
+
+        handler.register("socketinput", "[on/off]", "Disables or enables a local TCP socket at port "+commandSocketPort+" to recieve commands from other applications", arg -> {
+            if(arg.length == 0){
+                info("Socket input is currently &lc{0}.", Core.settings.getBool("socket") ? "on" : "off");
+                return;
+            }
+
+            boolean value = arg[0].equalsIgnoreCase("on");
+            toggleSocket(value);
+            Core.settings.put("socket", value);
+            Core.settings.save();
+            info("Socket input is now &lc{0}.", value ? "on" : "off");
+        });
+
+        handler.register("allow-custom-clients", "[on/off]", "Allow or disallow custom clients.", arg -> {
+            if(arg.length == 0){
+                info("Custom clients are currently &lc{0}.", netServer.admins.allowsCustomClients() ? "allowed" : "disallowed");
                 return;
             }
 
             String s = arg[0];
             if(s.equalsIgnoreCase("on")){
-                netServer.admins.setAntiGrief(true);
-                info("Anti-grief enabled.");
+                netServer.admins.setCustomClients(true);
+                info("Custom clients enabled.");
             }else if(s.equalsIgnoreCase("off")){
-                netServer.admins.setAntiGrief(false);
-                info("Anti-grief disabled.");
+                netServer.admins.setCustomClients(false);
+                info("Custom clients disabled.");
             }else{
                 err("Incorrect command usage.");
             }
-
-            if(arg.length >= 2) {
-                try {
-                    int maxbreak = Integer.parseInt(arg[1]);
-                    int cooldown = (arg.length >= 3 ? Integer.parseInt(arg[2]) : Administration.defaultBreakCooldown);
-                    netServer.admins.setAntiGriefParams(maxbreak, cooldown);
-                    info("Anti-grief parameters set.");
-                } catch (NumberFormatException e) {
-                    err("Invalid number format.");
-                }
-            }
         });
 
-        handler.register("shuffle", "<normal/custom/both/off>", "Set map shuffling.", arg -> {
-
-            try{
-                mode = ShuffleMode.valueOf(arg[0]);
-                Settings.putString("shufflemode", arg[0]);
-                Settings.save();
-                info("Shuffle mode set to '{0}'.", arg[0]);
-            }catch (Exception e){
-                err("Unknown shuffle mode '{0}'.", arg[0]);
+        handler.register("shuffle", "<on/off>", "Set map shuffling.", arg -> {
+            if(!arg[0].equals("on") && !arg[0].equals("off")){
+                err("Invalid shuffle mode.");
+                return;
             }
+            Core.settings.put("shuffle", arg[0].equals("on"));
+            Core.settings.save();
+            info("Shuffle mode set to '{0}'.", arg[0]);
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting a game yet. Calm down.");
                 return;
             }
 
-            Player target = null;
-
-            for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(arg[0])){
-                    target = player;
-                    break;
-                }
-            }
+            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                netServer.kick(target.clientid, KickReason.kick);
+                Call.sendMessage("[scarlet] " + target.name + " has been kicked by the server.");
+                netServer.kick(target.con.id, KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
             }
         });
 
-        handler.register("ban", "<username...>", "Ban a person by name.", arg -> {
-            if(!state.is(State.playing)) {
-                err("Can't ban people by name with no players.");
-                return;
+        handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
+            if(arg[0].equals("id")){
+                netServer.admins.banPlayerID(arg[1]);
+                info("Banned.");
+            }else if(arg[0].equals("name")){
+                Player target = playerGroup.find(p -> p.name.equalsIgnoreCase(arg[1]));
+                if(target != null){
+                    netServer.admins.banPlayer(target.uuid);
+                    info("Banned.");
+                }else{
+                    err("No matches found.");
+                }
+            }else if(arg[0].equals("ip")){
+                netServer.admins.banPlayerIP(arg[1]);
+                info("Banned.");
+            }else{
+                err("Invalid type.");
             }
-
-            Player target = null;
 
             for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(arg[0])){
-                    target = player;
-                    break;
+                if(netServer.admins.isIDBanned(player.uuid)){
+                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    netServer.kick(player.con.id, KickReason.banned);
                 }
-            }
-
-            if(target != null){
-                String ip = Net.getConnection(target.clientid).address;
-                netServer.admins.banPlayerIP(ip);
-                netServer.admins.banPlayerID(netServer.admins.getTrace(ip).uuid);
-                netServer.kick(target.clientid, KickReason.banned);
-                info("Banned player by IP and ID: {0} / {1}", ip, netServer.admins.getTrace(ip).uuid);
-            }else{
-                info("Nobody with that name could be found.");
             }
         });
 
@@ -361,124 +478,76 @@ public class ServerControl extends Module {
             Array<PlayerInfo> bans = netServer.admins.getBanned();
 
             if(bans.size == 0){
-                Log.info("No ID-banned players have been found.");
+                info("No ID-banned players have been found.");
             }else{
-                Log.info("&lyBanned players [ID]:");
+                info("&lyBanned players [ID]:");
                 for(PlayerInfo info : bans){
-                    Log.info(" &ly {0} / Last known name: '{1}'", info.id, info.lastName);
+                    info(" &ly {0} / Last known name: '{1}'", info.id, info.lastName);
                 }
             }
 
             Array<String> ipbans = netServer.admins.getBannedIPs();
 
             if(ipbans.size == 0){
-                Log.info("No IP-banned players have been found.");
+                info("No IP-banned players have been found.");
             }else{
-                Log.info("&lmBanned players [IP]:");
+                info("&lmBanned players [IP]:");
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
-                    if(info != null) {
-                        Log.info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
+                    if(info != null){
+                        info(" &lm '{0}' / Last known name: '{1}' / ID: '{2}'", string, info.lastName, info.id);
                     }else{
-                        Log.info(" &lm '{0}' (No known name or info)", string);
+                        info(" &lm '{0}' (No known name or info)", string);
                     }
                 }
             }
         });
 
-        handler.register("banip", "<ip>", "Ban a person by IP.", arg -> {
-            if(netServer.admins.banPlayerIP(arg[0])) {
-                info("Banned player by IP: {0}.", arg[0]);
-
-                for(Player player : playerGroup.all()){
-                    if(Net.getConnection(player.clientid) != null &&
-                            Net.getConnection(player.clientid).address != null &&
-                            Net.getConnection(player.clientid).address.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
-                        break;
-                    }
+        handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
+            if(arg[0].contains(".")){
+                if(netServer.admins.unbanPlayerIP(arg[0])){
+                    info("Unbanned player by IP: {0}.", arg[0]);
+                }else{
+                    err("That IP is not banned!");
                 }
             }else{
-                err("That IP is already banned!");
-            }
-        });
-
-        handler.register("banid", "<id>", "Ban a person by their unique ID.", arg -> {
-            if(netServer.admins.banPlayerID(arg[0])) {
-                info("Banned player by ID: {0}.", arg[0]);
-
-                for(Player player : playerGroup.all()){
-                    if(netServer.admins.getTrace(Net.getConnection(player.clientid).address).uuid.equals(arg[0])){
-                        netServer.kick(player.clientid, KickReason.banned);
-                        break;
-                    }
+                if(netServer.admins.unbanPlayerID(arg[0])){
+                    info("Unbanned player by ID: {0}.", arg[0]);
+                }else{
+                    err("That ID is not banned!");
                 }
-            }else{
-                err("That ID is already banned!");
             }
         });
 
-        handler.register("unbanip", "<ip>", "Completely unban a person by IP.", arg -> {
-            if(netServer.admins.unbanPlayerIP(arg[0])) {
-                info("Unbanned player by IP: {0}.", arg[0]);
-            }else{
-                err("That IP is not banned!");
-            }
-        });
-
-        handler.register("unbanid", "<id>", "Completely unban a person by ID.", arg -> {
-            if(netServer.admins.unbanPlayerID(arg[0])) {
-                info("&lmUnbanned player by ID: {0}.", arg[0]);
-            }else{
-                err("That IP is not banned!");
-            }
-        });
-
-        handler.register("admin", "<username...>", "Make a user admin", arg -> {
-            if(!state.is(State.playing)) {
+        handler.register("admin", "<username...>", "Make an online user admin", arg -> {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            Player target = null;
-
-            for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(arg[0])){
-                    target = player;
-                    break;
-                }
-            }
+            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.adminPlayer(id, Net.getConnection(target.clientid).address);
-                NetEvents.handleAdminSet(target, true);
-                info("Admin-ed player by ID: {0} / {1}", id, arg[0]);
+                netServer.admins.adminPlayer(target.uuid, target.usid);
+                target.isAdmin = true;
+                info("Admin-ed player: {0}", arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
         });
 
-        handler.register("unadmin", "<username...>", "Removes admin status from a player", arg -> {
-            if(!state.is(State.playing)) {
+        handler.register("unadmin", "<username...>", "Removes admin status from an online player", arg -> {
+            if(!state.is(State.playing)){
                 err("Open the server first.");
                 return;
             }
 
-            Player target = null;
-
-            for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(arg[0])){
-                    target = player;
-                    break;
-                }
-            }
+            Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                String id = netServer.admins.getTrace(Net.getConnection(target.clientid).address).uuid;
-                netServer.admins.unAdminPlayer(id);
-                NetEvents.handleAdminSet(target, false);
-                info("Un-admin-ed player by ID: {0} / {1}", id, arg[0]);
+                netServer.admins.unAdminPlayer(target.uuid);
+                target.isAdmin = false;
+                info("Un-admin-ed player: {0}", arg[0]);
             }else{
                 info("Nobody with that name could be found.");
             }
@@ -488,20 +557,18 @@ public class ServerControl extends Module {
             Array<PlayerInfo> admins = netServer.admins.getAdmins();
 
             if(admins.size == 0){
-                Log.info("No admins have been found.");
+                info("No admins have been found.");
             }else{
-                Log.info("&lyAdmins:");
+                info("&lyAdmins:");
                 for(PlayerInfo info : admins){
-                    Log.info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
+                    info(" &lm {0} /  ID: '{1}' / IP: '{2}'", info.lastName, info.id, info.lastIP);
                 }
             }
         });
 
         handler.register("runwave", "Trigger the next wave.", arg -> {
-            if(!state.is(State.playing)) {
+            if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
-            }else if(state.enemies > 0){
-                err("There are still {0} enemies remaining.", state.enemies);
             }else{
                 logic.runWave();
                 info("Wave spawned.");
@@ -520,14 +587,20 @@ public class ServerControl extends Module {
             int slot = Strings.parseInt(arg[0]);
 
             if(!SaveIO.isSaveValid(slot)){
-                err("No save data found for slot.");
+                err("No (valid) save data found for slot.");
                 return;
             }
 
-            SaveIO.loadFromSlot(slot);
-            info("Save loaded.");
-            host();
-            state.set(State.playing);
+            Core.app.post(() -> {
+                try{
+                    SaveIO.loadFromSlot(slot);
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
+                info("Save loaded.");
+                host();
+                state.set(State.playing);
+            });
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
@@ -539,248 +612,195 @@ public class ServerControl extends Module {
                 return;
             }
 
-            int slot = Strings.parseInt(arg[0]);
-
-            SaveIO.saveToSlot(slot);
-
-            info("Saved to slot {0}.", slot);
-        });
-
-        handler.register("griefers", "[min-break:place-ratio] [min-breakage]", "Find possible griefers currently online.", arg -> {
-            if(!state.is(State.playing)) {
-                err("Open the server first.");
-                return;
-            }
-
-            try {
-
-                float ratio = arg.length > 0 ? Float.parseFloat(arg[0]) : 0.5f;
-                int minbreak = arg.length > 1 ? Integer.parseInt(arg[1]) : 100;
-
-                boolean found = false;
-
-                for (Player player : playerGroup.all()) {
-                    if(Net.getConnection(player.clientid) == null){
-                        err("Player \"{0}\" does not have an associated connection!");
-                        continue;
-                    }
-                    TraceInfo info = netServer.admins.getTrace(Net.getConnection(player.clientid).address);
-                    if(info.totalBlocksBroken >= minbreak && info.totalBlocksBroken / Math.max(info.totalBlocksPlaced, 1f) >= ratio){
-                        info("&ly - Player '{0}' / UUID &lm{1}&ly found: &lc{2}&ly broken and &lc{3}&ly placed.",
-                                player.name, info.uuid, info.totalBlocksBroken, info.totalBlocksPlaced);
-                        found = true;
-                    }
-                }
-
-                if (!found) {
-                    info("No griefers matching the criteria have been found.");
-                }
-
-            }catch (NumberFormatException e){
-                err("Invalid number format.");
-            }
+            Core.app.post(() -> {
+                int slot = Strings.parseInt(arg[0]);
+                SaveIO.saveToSlot(slot);
+                info("Saved to slot {0}.", slot);
+            });
         });
 
         handler.register("gameover", "Force a game over.", arg -> {
             if(state.is(State.menu)){
-               info("Not playing a map.");
-               return;
-            }
-
-            world.removeBlock(world.getCore());
-            info("Core destroyed.");
-        });
-
-        handler.register("debug", "Print debug info", arg -> {
-            info(DebugFragment.debugInfo());
-        });
-
-        handler.register("traceblock", "<x> <y>", "Prints debug info about a block", arg -> {
-            try{
-                int x = Integer.parseInt(arg[0]);
-                int y = Integer.parseInt(arg[1]);
-                Tile tile = world.tile(x, y);
-                if(tile != null){
-                    if(tile.entity != null){
-                        Array<Object> arr = tile.block().getDebugInfo(tile);
-                        StringBuilder result = new StringBuilder();
-                        for(int i = 0; i < arr.size/2; i ++){
-                            result.append(arr.get(i*2));
-                            result.append(": ");
-                            result.append(arr.get(i*2 + 1));
-                            result.append("\n");
-                        }
-                        Log.info("&ly{0}", result);
-                    }else{
-                        Log.info("No tile entity for that block.");
-                    }
-                }else{
-                    Log.info("No tile at that location.");
-                }
-            }catch (NumberFormatException e){
-                Log.err("Invalid coordinates passed.");
-            }
-        });
-
-        handler.register("find", "<name...>", "Find player info(s) by name. Can optionally check for all names a player has had.", arg -> {
-            boolean checkAll = true;
-
-            Array<PlayerInfo> infos = netServer.admins.findByName(arg[0], checkAll);
-
-            if(infos.size == 1) {
-                PlayerInfo info = infos.peek();
-                Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
-                Log.info("  &lyall names used: {0}", info.names);
-                Log.info("  &lyIP: {0}", info.lastIP);
-                Log.info("  &lyall IPs used: {0}", info.ips);
-                Log.info("  &lytimes joined: {0}", info.timesJoined);
-                Log.info("  &lytimes kicked: {0}", info.timesKicked);
-                Log.info("");
-                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
-                Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
-            }else if(infos.size > 1){
-                Log.info("&lcMultiple people have been found with that name:");
-                for(PlayerInfo info : infos){
-                    Log.info("  &ly{0}", info.id);
-                }
-                Log.info("&lcUse the info command to examine each person individually.");
-            }else{
-                info("Nobody with that name could be found.");
-            }
-        });
-
-        handler.register("findip", "<ip>", "Find player info(s) by IP.", arg -> {
-
-            Array<PlayerInfo> infos = netServer.admins.findByIPs(arg[0]);
-
-            if(infos.size == 1) {
-                PlayerInfo info = infos.peek();
-                Log.info("&lcTrace info for player '{0}' / UUID {1}:", info.lastName, info.id);
-                Log.info("  &lyall names used: {0}", info.names);
-                Log.info("  &lyIP: {0}", info.lastIP);
-                Log.info("  &lyall IPs used: {0}", info.ips);
-                Log.info("  &lytimes joined: {0}", info.timesJoined);
-                Log.info("  &lytimes kicked: {0}", info.timesKicked);
-                Log.info("");
-                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
-                Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
-            }else if(infos.size > 1){
-                Log.info("&lcMultiple people have been found with that IP:");
-                for(PlayerInfo info : infos){
-                    Log.info("  &ly{0}", info.id);
-                }
-                Log.info("&lcUse the info command to examine each person individually.");
-            }else{
-                info("Nobody with that IP could be found.");
-            }
-        });
-
-
-        handler.register("info", "<UUID>", "Get global info for a player's UUID.", arg -> {
-            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
-
-            if(info != null){
-                Log.info("&lcTrace info for player '{0}':", info.lastName);
-                Log.info("  &lyall names used: {0}", info.names);
-                Log.info("  &lyIP: {0}", info.lastIP);
-                Log.info("  &lyall IPs used: {0}", info.ips);
-                Log.info("  &lytimes joined: {0}", info.timesJoined);
-                Log.info("  &lytimes kicked: {0}", info.timesKicked);
-                Log.info("");
-                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
-                Log.info("  &lytotal blocks placed: {0}", info.totalBlockPlaced);
-            }else{
-                info("Nobody with that UUID could be found.");
-            }
-        });
-
-        handler.register("trace", "<username...>", "Trace a player's actions", arg -> {
-            if(!state.is(State.playing)) {
-                err("Open the server first.");
+                info("Not playing a map.");
                 return;
             }
 
-            Player target = null;
+            info("&lyCore destroyed.");
+            inExtraRound = false;
+            Events.fire(new GameOverEvent(Team.red));
+        });
 
-            for(Player player : playerGroup.all()){
-                if(player.name.equalsIgnoreCase(arg[0])){
-                    target = player;
-                    break;
+        handler.register("info", "<IP/UUID/name...>", "Find player info(s). Can optionally check for all names or IPs a player has had.", arg -> {
+
+            ObjectSet<PlayerInfo> infos = netServer.admins.findByName(arg[0]);
+
+            if(infos.size > 0){
+                info("&lgPlayers found: {0}", infos.size);
+
+                int i = 0;
+                for(PlayerInfo info : infos){
+                    info("&lc[{0}] Trace info for player '{1}' / UUID {2}", i++, info.lastName, info.id);
+                    info("  &lyall names used: {0}", info.names);
+                    info("  &lyIP: {0}", info.lastIP);
+                    info("  &lyall IPs used: {0}", info.ips);
+                    info("  &lytimes joined: {0}", info.timesJoined);
+                    info("  &lytimes kicked: {0}", info.timesKicked);
                 }
-            }
-
-            if(target != null){
-                TraceInfo info = netServer.admins.getTrace(Net.getConnection(target.clientid).address);
-                Log.info("&lcTrace info for player '{0}':", target.name);
-                Log.info("  &lyEntity ID: {0}", info. playerid);
-                Log.info("  &lyIP: {0}", info.ip);
-                Log.info("  &lyUUID: {0}", info.uuid);
-                Log.info("  &lycustom client: {0}", info.modclient);
-                Log.info("  &lyandroid: {0}", info.android);
-                Log.info("");
-                Log.info("  &lytotal blocks broken: {0}", info.totalBlocksBroken);
-                Log.info("  &lystructure blocks broken: {0}", info.structureBlocksBroken);
-                Log.info("  &lylast block broken: {0}", info.lastBlockBroken.formalName);
-                Log.info("");
-                Log.info("  &lytotal blocks placed: {0}", info.totalBlocksPlaced);
-                Log.info("  &lylast block placed: {0}", info.lastBlockPlaced.formalName);
             }else{
                 info("Nobody with that name could be found.");
             }
         });
-	
-		handler.register("rollback", "<amount>", "Rollback the block edits in the world", arg -> {
-			if(!state.is(State.playing)) {
-				err("Open the server first.");
-				return;
-			}
-			
-			if(!Strings.canParsePostiveInt(arg[0])) {
-				err("Please input a valid, positive, number of times to rollback");
-				return;
-			}
-			
-			int rollbackTimes = Integer.valueOf(arg[0]);
-			IntMap<Array<EditLog>> editLogs = netServer.admins.getEditLogs();
-			if(editLogs.size == 0){
-				err("Nothing to rollback!");
-				return;
-			}
-			
-			netServer.admins.rollbackWorld(rollbackTimes);
-			info("Rollback done!");
-		});
     }
 
     private void readCommands(){
+
         Scanner scan = new Scanner(System.in);
-        while(true){
+        while(scan.hasNext()){
             String line = scan.nextLine();
+            Core.app.post(() -> handleCommandString(line));
+        }
+    }
 
-            Gdx.app.postRunnable(() -> {
-                Response response = handler.handleMessage(line);
+    private void handleCommandString(String line){
+        Response response = handler.handleMessage(line);
 
-                if (response.type == ResponseType.unknownCommand) {
-                    err("Invalid command. Type 'help' for help.");
-                }else if (response.type == ResponseType.fewArguments) {
-                    err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-                }else if (response.type == ResponseType.manyArguments) {
-                    err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        if(response.type == ResponseType.unknownCommand){
+
+            int minDst = 0;
+            Command closest = null;
+
+            for(Command command : handler.getCommandList()){
+                int dst = Strings.levenshtein(command.text, response.runCommand);
+                if(dst < 3 && (closest == null || dst < minDst)){
+                    minDst = dst;
+                    closest = command;
                 }
-            });
+            }
+
+            if(closest != null){
+                err("Command not found. Did you mean \"" + closest.text + "\"?");
+            }else{
+                err("Invalid command. Type 'help' for help.");
+            }
+        }else if(response.type == ResponseType.fewArguments){
+            err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }else if(response.type == ResponseType.manyArguments){
+            err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }
+
+        System.out.print("> ");
+    }
+
+    private void play(boolean wait, Runnable run){
+        inExtraRound = true;
+        Runnable r = () -> {
+
+            Array<Player> players = new Array<>();
+            for(Player p : playerGroup.all()){
+                players.add(p);
+                p.setDead(true);
+            }
+            
+            logic.reset();
+
+            Call.onWorldDataBegin();
+            run.run();
+            logic.play();
+            state.rules = lastMode.apply(world.getMap().rules());
+            for(Player p : players){
+                p.reset();
+                if(state.rules.pvp){
+                    p.setTeam(netServer.assignTeam(new ArrayIterable<>(players)));
+                }
+                netServer.sendWorldData(p, p.con.id);
+            }
+            inExtraRound = false;
+        };
+
+        if(wait){
+            lastTask = new Task(){
+                @Override
+                public void run(){
+                    try{
+                        r.run();
+                    }catch(MapException e){
+                        Log.err(e.map.name() + ": " + e.getMessage());
+                        Net.closeServer();
+                    }
+                }
+            };
+
+            Timer.schedule(lastTask, roundExtraTime);
+        }else{
+            r.run();
         }
     }
 
     private void host(){
-        try {
-            Net.host(port);
-        }catch (IOException e){
-            Log.err(e);
+        try{
+            Net.host(Core.settings.getInt("port"));
+            info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
+        }catch(BindException e){
+            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            state.set(State.menu);
+        }catch(IOException e){
+            err(e);
             state.set(State.menu);
         }
     }
 
-    enum ShuffleMode{
-        normal, custom, both, off
+    private void logToFile(String text){
+        if(currentLogFile != null && currentLogFile.length() > maxLogLength){
+            String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
+            currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
+            currentLogFile = null;
+        }
+
+        if(currentLogFile == null){
+            int i = 0;
+            while(logFolder.child("log-" + i + ".txt").length() >= maxLogLength){
+                i++;
+            }
+
+            currentLogFile = logFolder.child("log-" + i + ".txt");
+        }
+
+        currentLogFile.writeString(text + "\n", true);
+    }
+
+    private void toggleSocket(boolean on){
+        if(on && socketThread == null){
+            socketThread = new Thread(() -> {
+                try{
+                    try(ServerSocket socket = new ServerSocket()){
+                        socket.bind(new InetSocketAddress("localhost", commandSocketPort));
+                        while(true){
+                            Socket client = socket.accept();
+                            info("&lmRecieved command socket connection: &lb{0}", socket.getLocalSocketAddress());
+                            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            socketOutput = new PrintWriter(client.getOutputStream(), true);
+                            String line;
+                            while(client.isConnected() && (line = in.readLine()) != null){
+                                String result = line;
+                                Core.app.post(() -> handleCommandString(result));
+                            }
+                            info("&lmLost command socket connection: &lb{0}", socket.getLocalSocketAddress());
+                            socketOutput = null;
+                        }
+                    }
+                }catch(BindException b){
+                    err("Command input socket already in use. Is another instance of the server running?");
+                }catch(IOException e){
+                    err("Terminating socket server.");
+                    e.printStackTrace();
+                }
+            });
+            socketThread.setDaemon(true);
+            socketThread.start();
+        }else if(socketThread != null){
+            socketThread.interrupt();
+            socketThread = null;
+            socketOutput = null;
+        }
     }
 }

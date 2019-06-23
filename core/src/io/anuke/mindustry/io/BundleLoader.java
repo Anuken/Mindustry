@@ -1,36 +1,34 @@
 package io.anuke.mindustry.io;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.I18NBundle;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.util.Log;
+import io.anuke.arc.Core;
+import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.input.Binding;
 
 import java.util.Locale;
 
 import static io.anuke.mindustry.Vars.headless;
 
-public class BundleLoader {
-    private static final boolean externalBundle = false;
+public class BundleLoader{
 
     public static void load(){
-        Settings.defaults("locale", "default");
-        Settings.load("io.anuke.moment");
+        Core.settings.defaults("locale", "default");
+        Core.keybinds.setDefaults(Binding.values());
+        Core.settings.load();
         loadBundle();
     }
 
     private static Locale getLocale(){
-        String loc = Settings.getString("locale");
+        String loc = Core.settings.getString("locale");
         if(loc.equals("default")){
             return Locale.getDefault();
         }else{
             Locale lastLocale;
-            if (loc.contains("_")) {
+            if(loc.contains("_")){
                 String[] split = loc.split("_");
                 lastLocale = new Locale(split[0], split[1]);
-            } else {
+            }else{
                 lastLocale = new Locale(loc);
             }
 
@@ -39,26 +37,26 @@ public class BundleLoader {
     }
 
     private static void loadBundle(){
-        I18NBundle.setExceptionOnMissingKey(false);
+        if(headless) return;
 
-        if(externalBundle){
-            try {
-                FileHandle handle = Gdx.files.local("bundle");
+        try{
+            //try loading external bundle
+            FileHandle handle = Core.files.local("bundle");
 
-                Locale locale = Locale.ENGLISH;
-                Core.bundle = I18NBundle.createBundle(handle, locale);
-            }catch (Exception e){
-                Log.err(e);
-                Platform.instance.showError("Failed to find bundle!\nMake sure you have bundle.properties in the same directory\nas the jar file.\n\nIf the problem persists, try running it through the command prompt:\n" +
-                        "Hold left-shift, then right click and select 'open command prompt here'.\nThen, type in 'java -jar mindustry.jar' without quotes.");
-                Gdx.app.exit();
+            Locale locale = Locale.ENGLISH;
+            Core.bundle = I18NBundle.createBundle(handle, locale);
+
+            Log.info("NOTE: external translation bundle has been loaded.");
+            if(!headless){
+                Time.run(10f, () -> Vars.ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }
-        }else{
-            FileHandle handle = Gdx.files.internal("bundles/bundle");
+        }catch(Throwable e){
+            //no external bundle found
+
+            FileHandle handle = Core.files.internal("bundles/bundle");
 
             Locale locale = getLocale();
             Locale.setDefault(locale);
-            if(!headless) Log.info("Got locale: {0}", locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
         }
     }

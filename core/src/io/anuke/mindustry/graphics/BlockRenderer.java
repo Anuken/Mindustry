@@ -1,331 +1,327 @@
 package io.anuke.mindustry.graphics;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.SpawnPoint;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Sort;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Texture.TextureFilter;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.Fill;
+import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.util.Disposable;
+import io.anuke.arc.util.Tmp;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Layer;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.types.StaticBlock;
-import io.anuke.mindustry.world.blocks.types.defense.Turret;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.graphics.CacheBatch;
-import io.anuke.ucore.graphics.Draw;
-import io.anuke.ucore.graphics.Lines;
-import io.anuke.ucore.util.Mathf;
-import java.util.Arrays;
 
+import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.ucore.core.Core.camera;
 
-public class BlockRenderer{
-	private final static int chunksize = 32;
-	private final static int initialRequests = 32*32;
-	private static float storeX = 0;
-	private static float storeY = 0;
-	
-	private int[][][] cache;
-	private CacheBatch cbatch;
-	
-	private Array<BlockRequest> requests = new Array<BlockRequest>(initialRequests);
-	private int requestidx = 0;
-	private int iterateidx = 0;
-	
-	public BlockRenderer(){
-		for(int i = 0; i < requests.size; i ++){
-			requests.set(i, new BlockRequest());
-		}
-	}
-	
-	private class BlockRequest implements Comparable<BlockRequest>{
-		Tile tile;
-		Layer layer;
-		
-		@Override
-		public int compareTo(BlockRequest other){
-			return layer.compareTo(other.layer);
-		}
-		
-		@Override
-		public String toString(){
-			return tile.block().name + ":" + layer.toString();
-		}
-	}
-	
-	/**Process all blocks to draw, simultaneously drawing block shadows and static blocks.*/
-	public void processBlocks(){
-		requestidx = 0;
-		
-		int crangex = (int) (camera.viewportWidth / (chunksize * tilesize)) + 1;
-		int crangey = (int) (camera.viewportHeight / (chunksize * tilesize)) + 1;
-		
-		int rangex = (int) (camera.viewportWidth * camera.zoom / tilesize / 2)+2;
-		int rangey = (int) (camera.viewportHeight * camera.zoom / tilesize / 2)+2;
-		
-		int expandr = 3;
-		
-		Graphics.surface(renderer.shadowSurface);
-		
-		for(int x = -rangex - expandr; x <= rangex + expandr; x++){
-			for(int y = -rangey - expandr; y <= rangey + expandr; y++){
-				int worldx = Mathf.scl(camera.position.x, tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, tilesize) + y;
-				boolean expanded = (x < -rangex || x > rangex || y < -rangey || y > rangey);
-				
-				Tile tile = world.tile(worldx, worldy);
-				
-				if(tile != null){
-					Block block = tile.block();
-					
-					if(!expanded && block != Blocks.air && world.isAccessible(worldx, worldy)){
-						block.drawShadow(tile);
-					}
-					
-					if(!(block instanceof StaticBlock)){
-						if(block == Blocks.air){
-							if(!state.is(State.paused)) tile.floor().update(tile);
-						}else{
-							
-							if(!expanded){
-								addRequest(tile, Layer.block);
-							}
-							
-							if(block.expanded || !expanded){
-								if(block.layer != null && block.isLayer(tile)){
-									addRequest(tile, block.layer);
-								}
-								
-								if(block.layer2 != null && block.isLayer2(tile)){
-									addRequest(tile, block.layer2);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		Draw.color(0, 0, 0, 0.15f);
-		Graphics.flushSurface();
-		Draw.color();
-		
-		Graphics.end();
-		drawCache(1, crangex, crangey);
-		Graphics.begin();
-		
-		Arrays.sort(requests.items, 0, requestidx);
-		iterateidx = 0;
-	}
-	
-	public int getRequests(){
-		return requestidx;
-	}
-	
-	public void drawBlocks(boolean top){
-		Layer stopAt = top ? Layer.laser : Layer.overlay;
-		
-		for(; iterateidx < requestidx; iterateidx ++){
-			
-			if(iterateidx < requests.size - 1 && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
-				break;
-			}
-			
-			BlockRequest req = requests.get(iterateidx);
-			Block block = req.tile.block();
-			
-			if(req.layer == Layer.block){
-				block.draw(req.tile);
-			}else if(req.layer == block.layer){
-				block.drawLayer(req.tile);
-			}else if(req.layer == block.layer2){
-				block.drawLayer2(req.tile);
-			}
-		}
-	}
-	
-	private void addRequest(Tile tile, Layer layer){
-		if(requestidx >= requests.size){
-			requests.add(new BlockRequest());
-		}
-		BlockRequest r = requests.get(requestidx);
-		if(r == null){
-			requests.set(requestidx, r = new BlockRequest());
-		}
-		r.tile = tile;
-		r.layer = layer;
-		requestidx ++;
-	}
-	
-	public void drawFloor(){
-		int chunksx = world.width() / chunksize, chunksy = world.height() / chunksize;
-		
-		//render the entire map
-		if(cache == null || cache.length != chunksx || cache[0].length != chunksy){
-			cache = new int[chunksx][chunksy][2];
-			
-			for(int x = 0; x < chunksx; x++){
-				for(int y = 0; y < chunksy; y++){
-					cacheChunk(x, y, true);
-					cacheChunk(x, y, false);
-				}
-			}
-		}
-		
-		OrthographicCamera camera = Core.camera;
-		
-		if(Graphics.drawing()) Graphics.end();
-		
-		int crangex = (int)(camera.viewportWidth * camera.zoom / (chunksize * tilesize))+1;
-		int crangey = (int)(camera.viewportHeight * camera.zoom / (chunksize * tilesize))+1;
-		
-		drawCache(0, crangex, crangey);
-		
-		Graphics.begin();
-		
-		Draw.reset();
-		
-		if(showPaths && debug){
-			drawPaths();
-		}
-		
-		if(debug && debugChunks){
-			Draw.color(Color.YELLOW);
-			Lines.stroke(1f);
-			for(int x = -crangex; x <= crangex; x++){
-				for(int y = -crangey; y <= crangey; y++){
-					int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-					int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-					
-					if(!Mathf.inBounds(worldx, worldy, cache))
-						continue;
-					Lines.rect(worldx * chunksize * tilesize, worldy * chunksize * tilesize, chunksize * tilesize, chunksize * tilesize);
-				}
-			}
-			Draw.reset();
-		}
-	}
-	
-	void drawPaths(){
-		Draw.color(Color.RED);
-		for(SpawnPoint point : world.getSpawns()){
-			if(point.pathTiles != null){
-				for(int i = 1; i < point.pathTiles.length; i ++){
-					Lines.line(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(),
-							   point.pathTiles[i].worldx(), point.pathTiles[i].worldy());
-					Lines.circle(point.pathTiles[i-1].worldx(), point.pathTiles[i-1].worldy(), 6f);
-				}
-			}
-		}
-		Draw.reset();
-	}
-	
-	
-	void drawCache(int layer, int crangex, int crangey){
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		
-		cbatch.setProjectionMatrix(Core.camera.combined);
-		cbatch.beginDraw();
-		for(int x = -crangex; x <= crangex; x++){
-			for(int y = -crangey; y <= crangey; y++){
-				int worldx = Mathf.scl(camera.position.x, chunksize * tilesize) + x;
-				int worldy = Mathf.scl(camera.position.y, chunksize * tilesize) + y;
-				
-				if(!Mathf.inBounds(worldx, worldy, cache))
-					continue;
-				
-				cbatch.drawCache(cache[worldx][worldy][layer]);
-			}
-		}
-		
-		cbatch.endDraw();
-	}
-	
-	void cacheChunk(int cx, int cy, boolean floor){
-		if(cbatch == null){
-			createBatch();
-		}
-		
-		cbatch.begin();
-		Graphics.useBatch(cbatch);
-		
-		for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
-			for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-				Tile tile = world.tile(tilex, tiley);
-				if(tile == null) continue;
-				if(floor){
-					if(!(tile.block() instanceof StaticBlock)){
-						tile.floor().draw(tile);
-					}
-				}else if(tile.block() instanceof StaticBlock){
-					tile.block().draw(tile);
-				}
-			}
-		}
-		Graphics.popBatch();
-		cbatch.end();
-		cache[cx][cy][floor ? 0 : 1] = cbatch.getLastCache();
-	}
-	
-	public void clearTiles(){
-		cache = null;
-		createBatch();
-	}
-	
-	private void createBatch(){
-		if(cbatch != null)
-			cbatch.dispose();
-		cbatch = new CacheBatch(world.width() * world.height() * 4);
-	}
-	
-	 public void drawPreview(Block block, float drawx, float drawy, float rotation, float opacity) {
-		Draw.alpha(opacity);
-		Draw.rect(block.name(), drawx, drawy, rotation);
-	}
-	
-	public void handlePreview(Block block, float rotation, float drawx, float drawy, int tilex, int tiley) {
-		
-		if(control.input().recipe != null && state.inventory.hasItems(control.input().recipe.requirements)
-		   && control.input().validPlace(tilex, tiley, block) && (mobile || control.input().cursorNear())) {
-			
-			 if(block.isMultiblock()) {
-				 float halfBlockWidth = (block.width * tilesize) / 2;
-				 float halfBlockHeight = (block.height * tilesize) / 2;
-			 	if((storeX == 0 && storeY == 0)) {
-			 		storeX = drawx;
-			 		storeY = drawy;
-				}
-				if((storeX == drawx - halfBlockWidth || storeX == drawx + halfBlockWidth || storeY == drawy - halfBlockHeight || storeY == drawy + halfBlockHeight) &&
-				   ((tiley - control.input().getBlockY()) % block.height != 0 || (tilex - control.input().getBlockX()) % block.width != 0)) {
-			 		return;
-			 	}
-			 	else {
-					storeX = drawx;
-					storeY = drawy;
-				}
-			 }
-			
-			float opacity = (float) Settings.getInt("previewopacity") / 100f;
-			Draw.color(Color.WHITE);
-			Draw.alpha(opacity);
-			
-			if(block instanceof Turret) {
-				if (block.isMultiblock()) {
-					Draw.rect("block-" + block.width + "x" + block.height, drawx, drawy);
-				} else {
-					Draw.rect("block", drawx, drawy);
-				}
-			}
-			
-			drawPreview(block, drawx, drawy, rotation, opacity);
-			
-			Draw.reset();
-		}
-	}
+public class BlockRenderer implements Disposable{
+    private final static int initialRequests = 32 * 32;
+    private final static int expandr = 9;
+    private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
+
+    public final FloorRenderer floor = new FloorRenderer();
+
+    private Array<BlockRequest> requests = new Array<>(true, initialRequests, BlockRequest.class);
+    private int lastCamX, lastCamY, lastRangeX, lastRangeY;
+    private int requestidx = 0;
+    private int iterateidx = 0;
+    private FrameBuffer shadows = new FrameBuffer(2, 2);
+    private FrameBuffer fog = new FrameBuffer(2, 2);
+    private Array<Tile> outArray = new Array<>();
+    private Array<Tile> shadowEvents = new Array<>();
+
+    public BlockRenderer(){
+
+        for(int i = 0; i < requests.size; i++){
+            requests.set(i, new BlockRequest());
+        }
+
+        Events.on(WorldLoadEvent.class, event -> {
+            shadowEvents.clear();
+            lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+
+            shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            shadows.resize(world.width(), world.height());
+            shadows.begin();
+            Core.graphics.clear(Color.WHITE);
+            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+
+            Draw.color(shadowColor);
+
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.rawTile(x, y);
+                    if(tile.block().hasShadow){
+                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    }
+                }
+            }
+
+            Draw.flush();
+            Draw.color();
+            shadows.end();
+
+            fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            fog.resize(world.width(), world.height());
+            fog.begin();
+            Core.graphics.clear(Color.WHITE);
+            Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
+
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    Tile tile = world.rawTile(x, y);
+                    int edgeBlend = 2;
+                    float rot = tile.rotation();
+                    boolean fillable = (tile.block().solid && tile.block().fillsTile && !tile.block().synthetic());
+                    int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (world.width() - 1)), Math.abs(y - (world.height() - 1)))));
+                    if(edgeDst <= edgeBlend){
+                        rot = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), fillable ? rot : 0);
+                    }
+                    if(rot > 0 && (fillable || edgeDst <= edgeBlend)){
+                        Draw.color(0f, 0f, 0f, Math.min((rot + 0.5f) / 4f, 1f));
+                        Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                    }
+                }
+            }
+
+            Draw.flush();
+            Draw.color();
+            fog.end();
+        });
+
+        Events.on(TileChangeEvent.class, event -> {
+            shadowEvents.add(event.tile);
+
+            int avgx = (int)(camera.position.x / tilesize);
+            int avgy = (int)(camera.position.y / tilesize);
+            int rangex = (int)(camera.width / tilesize / 2) + 2;
+            int rangey = (int)(camera.height / tilesize / 2) + 2;
+
+            if(Math.abs(avgx - event.tile.x) <= rangex && Math.abs(avgy - event.tile.y) <= rangey){
+                lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+            }
+        });
+    }
+
+    public void drawFog(){
+        float ww = world.width() * tilesize, wh = world.height() * tilesize;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
+
+        Tmp.tr1.set(fog.getTexture());
+        Tmp.tr1.set(u, v2, u2, v);
+
+        Draw.shader(Shaders.fog);
+        Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        Draw.shader();
+    }
+
+    public void drawShadows(){
+        if(!shadowEvents.isEmpty()){
+            Draw.flush();
+
+            shadows.begin();
+            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+
+            for(Tile tile : shadowEvents){
+                //clear it first
+                Draw.color(Color.WHITE);
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+                //then draw the shadow
+                Draw.color(!tile.block().hasShadow ? Color.WHITE : shadowColor);
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+            }
+
+            Draw.flush();
+            Draw.color();
+            shadows.end();
+            shadowEvents.clear();
+
+            Draw.proj(camera.projection());
+            renderer.pixelator.rebind();
+        }
+
+        float ww = world.width() * tilesize, wh = world.height() * tilesize;
+        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
+
+        Tmp.tr1.set(shadows.getTexture());
+        Tmp.tr1.set(u, v2, u2, v);
+
+        Draw.shader(Shaders.fog);
+        Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        Draw.shader();
+    }
+
+    /** Process all blocks to draw. */
+    public void processBlocks(){
+        iterateidx = 0;
+
+        int avgx = (int)(camera.position.x / tilesize);
+        int avgy = (int)(camera.position.y / tilesize);
+
+        int rangex = (int)(camera.width / tilesize / 2) + 3;
+        int rangey = (int)(camera.height / tilesize / 2) + 3;
+
+        if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
+            return;
+        }
+
+        requestidx = 0;
+
+        int minx = Math.max(avgx - rangex - expandr, 0);
+        int miny = Math.max(avgy - rangey - expandr, 0);
+        int maxx = Math.min(world.width() - 1, avgx + rangex + expandr);
+        int maxy = Math.min(world.height() - 1, avgy + rangey + expandr);
+
+        for(int x = minx; x <= maxx; x++){
+            for(int y = miny; y <= maxy; y++){
+                boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
+                Tile tile = world.rawTile(x, y);
+                if(tile == null) continue; //how is this possible?
+                Block block = tile.block();
+
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal){
+                    if(!expanded){
+                        addRequest(tile, Layer.block);
+                    }
+
+                    if(block.expanded || !expanded){
+
+                        if(block.layer != null){
+                            addRequest(tile, block.layer);
+                        }
+
+                        if(block.layer2 != null){
+                            addRequest(tile, block.layer2);
+                        }
+
+                        if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                            for(Tile other : block.getPowerConnections(tile, outArray)){
+                                if(other.block().layer == Layer.power){
+                                    addRequest(other, Layer.power);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Sort.instance().sort(requests.items, 0, requestidx);
+
+        lastCamX = avgx;
+        lastCamY = avgy;
+        lastRangeX = rangex;
+        lastRangeY = rangey;
+    }
+
+    public void drawBlocks(Layer stopAt){
+
+        for(; iterateidx < requestidx; iterateidx++){
+
+            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+                break;
+            }
+
+            BlockRequest req = requests.get(iterateidx);
+            Block block = req.tile.block();
+
+            if(req.layer == Layer.block){
+                block.draw(req.tile);
+                if(req.tile.entity != null && req.tile.entity.damaged()){
+                    block.drawCracks(req.tile);
+                }
+                if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
+                    block.drawTeam(req.tile);
+                }
+            }else if(req.layer == block.layer){
+                block.drawLayer(req.tile);
+            }else if(req.layer == block.layer2){
+                block.drawLayer2(req.tile);
+            }
+        }
+    }
+
+    public void drawTeamBlocks(Layer layer, Team team){
+        int index = this.iterateidx;
+
+        for(; index < requestidx; index++){
+
+            if(index < requests.size && requests.get(index).layer.ordinal() > layer.ordinal()){
+                break;
+            }
+
+            BlockRequest req = requests.get(index);
+            if(req.tile.getTeam() != team) continue;
+
+            Block block = req.tile.block();
+
+            if(req.layer == Layer.block){
+                block.draw(req.tile);
+            }else if(req.layer == block.layer){
+                block.drawLayer(req.tile);
+            }else if(req.layer == block.layer2){
+                block.drawLayer2(req.tile);
+            }
+
+        }
+    }
+
+    public void skipLayer(Layer stopAt){
+        for(; iterateidx < requestidx; iterateidx++){
+            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+                break;
+            }
+        }
+    }
+
+    private void addRequest(Tile tile, Layer layer){
+        if(requestidx >= requests.size){
+            requests.add(new BlockRequest());
+        }
+        BlockRequest r = requests.get(requestidx);
+        if(r == null){
+            requests.set(requestidx, r = new BlockRequest());
+        }
+        r.tile = tile;
+        r.layer = layer;
+        requestidx++;
+    }
+
+    @Override
+    public void dispose(){
+        shadows.dispose();
+        fog.dispose();
+        shadows = fog = null;
+        floor.dispose();
+    }
+
+    private class BlockRequest implements Comparable<BlockRequest>{
+        Tile tile;
+        Layer layer;
+
+        @Override
+        public int compareTo(BlockRequest other){
+            return layer.compareTo(other.layer);
+        }
+
+        @Override
+        public String toString(){
+            return tile.block().name + ":" + layer.toString();
+        }
+    }
 }

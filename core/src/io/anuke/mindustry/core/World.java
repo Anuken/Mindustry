@@ -1,359 +1,523 @@
 package io.anuke.mindustry.core;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import io.anuke.mindustry.ai.Pathfind;
-import io.anuke.mindustry.entities.TileEntity;
-import io.anuke.mindustry.game.SpawnPoint;
-import io.anuke.mindustry.io.Maps;
+import io.anuke.annotations.Annotations.Nullable;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.IntArray;
+import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.ai.*;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.Entities;
+import io.anuke.mindustry.game.EventType.TileChangeEvent;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.generators.Generator;
+import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.mindustry.world.blocks.DistributionBlocks;
-import io.anuke.mindustry.world.blocks.ProductionBlocks;
-import io.anuke.mindustry.world.blocks.WeaponBlocks;
-import io.anuke.ucore.entities.Entities;
-import io.anuke.ucore.entities.Entity;
-import io.anuke.ucore.modules.Module;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
-import static io.anuke.mindustry.Vars.control;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
-public class World extends Module{
-	private int seed;
-	
-	private Map currentMap;
-	private Tile[][] tiles;
-	private Pathfind pathfind = new Pathfind();
-	private Maps maps = new Maps();
-	private Tile core;
-	private Array<SpawnPoint> spawns = new Array<>();
+public class World implements ApplicationListener{
+    public final Maps maps = new Maps();
+    public final BlockIndexer indexer = new BlockIndexer();
+    public final WaveSpawner spawner = new WaveSpawner();
+    public final Pathfinder pathfinder = new Pathfinder();
+    public final Context context = new Context();
 
-	private Tile[] temptiles = new Tile[4];
-	
-	public World(){
-		maps.loadMaps();
-		currentMap = maps.getMap(0);
-	}
-	
-	@Override
-	public void dispose(){
-		maps.dispose();
-	}
+    private Map currentMap;
+    private Tile[][] tiles;
 
-	public Array<SpawnPoint> getSpawns(){
-		return spawns;
-	}
+    private boolean generating, invalidMap;
 
-	public Tile getCore(){
-		return core;
-	}
-	
-	public Maps maps(){
-		return maps;
-	}
-	
-	public Pathfind pathfinder(){
-		return pathfind;
-	}
+    public World(){
+        maps.load();
+    }
 
-	public float getSpawnX(){
-		return core.worldx();
-	}
+    @Override
+    public void init(){
+        maps.loadLegacyMaps();
+    }
 
-	public float getSpawnY(){
-		return core.worldy() - tilesize*2;
-	}
-	
-	public boolean solid(int x, int y){
-		Tile tile = tile(x, y);
-		
-		return tile == null || tile.solid();
-	}
-	
-	public boolean passable(int x, int y){
-		Tile tile = tile(x, y);
-		
-		return tile != null && tile.passable();
-	}
-	
-	public boolean wallSolid(int x, int y){
-		Tile tile = tile(x, y);
-		return tile == null || tile.block().solid;
-	}
-	
-	public boolean isAccessible(int x, int y){
-		return !wallSolid(x, y-1) || !wallSolid(x, y+1) || !wallSolid(x-1, y) ||!wallSolid(x+1, y);
-	}
-	
-	public boolean blends(Block block, int x, int y){
-		return !floorBlends(x, y-1, block) || !floorBlends(x, y+1, block) 
-				|| !floorBlends(x-1, y, block) ||!floorBlends(x+1, y, block);
-	}
-	
-	public boolean floorBlends(int x, int y, Block block){
-		Tile tile = tile(x, y);
-		return tile == null || tile.floor().id <= block.id;
-	}
-	
-	public Map getMap(){
-		return currentMap;
-	}
-	
-	public int width(){
-		return currentMap.getWidth();
-	}
-	
-	public int height(){
-		return currentMap.getHeight();
-	}
+    @Override
+    public void dispose(){
+        maps.dispose();
+    }
 
-	public Tile tile(int packed){
-		return tile(packed % width(), packed / width());
-	}
-	
-	public Tile tile(int x, int y){
-		if(tiles == null){
-			return null;
-		}
-		if(!Mathf.inBounds(x, y, tiles)) return null;
-		return tiles[x][y];
-	}
-	
-	public Tile tileWorld(float x, float y){
-		return tile(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize));
-	}
+    public boolean isInvalidMap(){
+        return invalidMap;
+    }
 
-	public int toTile(float coord){
-		return Mathf.scl2(coord, tilesize);
-	}
-	
-	public Tile[][] getTiles(){
-		return tiles;
-	}
-	
-	private void createTiles(){
-		for(int x = 0; x < tiles.length; x ++){
-			for(int y = 0; y < tiles[0].length; y ++){
-				if(tiles[x][y] == null){
-					tiles[x][y] = new Tile(x, y, Blocks.stone);
-				}
-			}
-		}
-	}
-	
-	private void clearTileEntities(){
-		for(int x = 0; x < tiles.length; x ++){
-			for(int y = 0; y < tiles[0].length; y ++){
-				if(tiles[x][y] != null && tiles[x][y].entity != null){
-					tiles[x][y].entity.remove();
-				}
-			}
-		}
-	}
-	
-	public void loadMap(Map map){
-		loadMap(map, MathUtils.random(0, 99999));
-	}
-	
-	public void loadMap(Map map, int seed){
-		currentMap = map;
-		
-		if(tiles != null){
-			clearTileEntities();
-			
-			if(tiles.length != map.getWidth() || tiles[0].length != map.getHeight()){
-				tiles = new Tile[map.getWidth()][map.getHeight()];
-			}
-			
-			createTiles();
-		}else{
-			tiles = new Tile[map.getWidth()][map.getHeight()];
-			
-			createTiles();
-		}
-		
-		spawns.clear();
-		
-		Entities.resizeTree(0, 0, map.getWidth() * tilesize, map.getHeight() * tilesize);
-		
-		this.seed = seed;
-		
-		core = WorldGenerator.generate(map.pixmap, tiles, spawns);
+    public boolean solid(int x, int y){
+        Tile tile = tile(x, y);
 
-		Placement.placeBlock(core.x, core.y, ProductionBlocks.core, 0, false, false);
-		
-		if(!map.name.equals("tutorial")){
-			setDefaultBlocks();
-		}else{
-			control.tutorial().setDefaultBlocks(core.x, core.y);
-		}
-		
-		pathfind.resetPaths();
-	}
-	
-	void setDefaultBlocks(){
-		int x = core.x, y = core.y;
-		int flip = Mathf.sign(!currentMap.flipBase);
-		int fr = currentMap.flipBase ? 2 : 0;
-		
-		set(x, y-2*flip, DistributionBlocks.conveyor, 1 + fr);
-		set(x, y-3*flip, DistributionBlocks.conveyor, 1 + fr);
-		
-		for(int i = 0; i < 2; i ++){
-			int d = Mathf.sign(i-0.5f);
-			
-			set(x+2*d, y-2*flip, ProductionBlocks.stonedrill, d);
-			set(x+2*d, y-1*flip, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y+1*flip, WeaponBlocks.doubleturret, 0 + fr);
-			
-			set(x+1*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-3*flip, DistributionBlocks.conveyor, 2*d);
-			set(x+2*d, y-4*flip, DistributionBlocks.conveyor, 1 + fr);
-			set(x+2*d, y-5*flip, DistributionBlocks.conveyor, 1 + fr);
-			
-			set(x+3*d, y-5*flip, ProductionBlocks.stonedrill, 0 + fr);
-			set(x+3*d, y-4*flip, ProductionBlocks.stonedrill, 0 + fr);
-			set(x+3*d, y-3*flip, ProductionBlocks.stonedrill, 0 + fr);
-		}
-	}
-	
-	void set(int x, int y, Block type, int rot){
-		if(!Mathf.inBounds(x, y, tiles)){
-			return;
-		}
-		if(type == ProductionBlocks.stonedrill){
-			tiles[x][y].setFloor(Blocks.stone);
-		}
-		tiles[x][y].setBlock(type, rot);
-	}
-	
-	public int getSeed(){
-		return seed;
-	}
+        return tile == null || tile.solid();
+    }
 
-	public void removeBlock(Tile tile){
-		if(!tile.block().isMultiblock() && !tile.isLinked()){
-			tile.setBlock(Blocks.air);
-		}else{
-			Tile target = tile.target();
-			Array<Tile> removals = target.getLinkedTiles();
-			for(Tile toremove : removals){
-				//note that setting a new block automatically unlinks it
-				if(toremove != null) toremove.setBlock(Blocks.air);
-			}
-		}
-	}
-	
-	public TileEntity findTileTarget(float x, float y, Tile tile, float range, boolean damaged){
-		Entity closest = null;
-		float dst = 0;
-		
-		int rad = (int)(range/tilesize)+1;
-		int tilex = Mathf.scl2(x, tilesize);
-		int tiley = Mathf.scl2(y, tilesize);
-		
-		for(int rx = -rad; rx <= rad; rx ++){
-			for(int ry = -rad; ry <= rad; ry ++){
-				Tile other = tile(rx+tilex, ry+tiley);
-				
-				if(other != null && other.getLinked() != null){
-					other = other.getLinked();
-				}
-				
-				if(other == null || other.entity == null || (tile != null && other.entity == tile.entity)) continue;
-				
-				TileEntity e = other.entity;
-				
-				if(damaged && e.health >= e.tile.block().health)
-					continue;
-				
-				float ndst = Vector2.dst(x, y, e.x, e.y);
-				if(ndst < range && (closest == null || ndst < dst)){
-					dst = ndst;
-					closest = e;
-				}
-			}
-		}
+    public boolean passable(int x, int y){
+        Tile tile = tile(x, y);
 
-		return (TileEntity) closest;
-	}
+        return tile != null && tile.passable();
+    }
 
-	/**Raycast, but with world coordinates.*/
-	public GridPoint2 raycastWorld(float x, float y, float x2, float y2){
-		return raycast(Mathf.scl2(x, tilesize), Mathf.scl2(y, tilesize),
-				Mathf.scl2(x2, tilesize), Mathf.scl2(y2, tilesize));
-	}
-	
-	/**
-	 * Input is in block coordinates, not world coordinates.
-	 * @return null if no collisions found, block position otherwise.*/
-	public GridPoint2 raycast(int x0f, int y0f, int x1, int y1){
-		int x0 = x0f;
-		int y0 = y0f;
-		int dx = Math.abs(x1 - x0);
-		int dy = Math.abs(y1 - y0);
+    public boolean wallSolid(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null || tile.block().solid;
+    }
 
-		int sx = x0 < x1 ? 1 : -1;
-		int sy = y0 < y1 ? 1 : -1;
+    public boolean isAccessible(int x, int y){
+        return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
+    }
 
-		int err = dx - dy;
-		int e2;
-		while(true){
+    public Map getMap(){
+        return currentMap;
+    }
 
-			if(!passable(x0, y0)){
-				return Tmp.g1.set(x0, y0);
-			}
-			if(x0 == x1 && y0 == y1) break;
+    public void setMap(Map map){
+        this.currentMap = map;
+    }
 
-			e2 = 2 * err;
-			if(e2 > -dy){
-				err = err - dy;
-				x0 = x0 + sx;
-			}
+    public int width(){
+        return tiles == null ? 0 : tiles.length;
+    }
 
-			if(e2 < dx){
-				err = err + dx;
-				y0 = y0 + sy;
-			}
-		}
-		return null;
-	}
+    public int height(){
+        return tiles == null ? 0 : tiles[0].length;
+    }
 
-	public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-		int x0 = x0f;
-		int y0 = y0f;
-		int dx = Math.abs(x1 - x0);
-		int dy = Math.abs(y1 - y0);
+    public int unitWidth(){
+        return width()*tilesize;
+    }
 
-		int sx = x0 < x1 ? 1 : -1;
-		int sy = y0 < y1 ? 1 : -1;
+    public int unitHeight(){
+        return height()*tilesize;
+    }
 
-		int err = dx - dy;
-		int e2;
-		while(true){
+    public @Nullable Tile tile(int pos){
+        return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
+    }
 
-			if(cons.accept(x0, y0)) break;
-			if(x0 == x1 && y0 == y1) break;
+    public @Nullable Tile tile(int x, int y){
+        if(tiles == null){
+            return null;
+        }
+        if(!Structs.inBounds(x, y, tiles)) return null;
+        return tiles[x][y];
+    }
 
-			e2 = 2 * err;
-			if(e2 > -dy){
-				err = err - dy;
-				x0 = x0 + sx;
-			}
+    public @Nullable Tile ltile(int x, int y){
+        Tile tile = tile(x, y);
+        if(tile == null) return null;
+        return tile.block().linked(tile);
+    }
 
-			if(e2 < dx){
-				err = err + dx;
-				y0 = y0 + sy;
-			}
-		}
-	}
+    public Tile rawTile(int x, int y){
+        return tiles[x][y];
+    }
 
-	public interface Raycaster{
-		boolean accept(int x, int y);
-	}
+    public @Nullable Tile tileWorld(float x, float y){
+        return tile(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public @Nullable Tile ltileWorld(float x, float y){
+        return ltile(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public int toTile(float coord){
+        return Math.round(coord / tilesize);
+    }
+
+    public Tile[][] getTiles(){
+        return tiles;
+    }
+
+    private void clearTileEntities(){
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                if(tiles[x][y] != null && tiles[x][y].entity != null){
+                    tiles[x][y].entity.remove();
+                }
+            }
+        }
+    }
+
+    /**
+     * Resizes the tile array to the specified size and returns the resulting tile array.
+     * Only use for loading saves!
+     */
+    public Tile[][] createTiles(int width, int height){
+        if(tiles != null){
+            clearTileEntities();
+
+            if(tiles.length != width || tiles[0].length != height){
+                tiles = new Tile[width][height];
+            }
+        }else{
+            tiles = new Tile[width][height];
+        }
+
+        return tiles;
+    }
+
+    /**
+     * Call to signify the beginning of map loading.
+     * TileChangeEvents will not be fired until endMapLoad().
+     */
+    public void beginMapLoad(){
+        generating = true;
+    }
+
+    /** Call to signal the beginning of loading the map with a custom set of tiles. */
+    public void beginMapLoad(Tile[][] tiles){
+        this.tiles = tiles;
+        generating = true;
+    }
+
+    /**
+     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * A WorldLoadEvent will be fire.
+     */
+    public void endMapLoad(){
+        prepareTiles(tiles);
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                tile.updateOcclusion();
+
+                if(tile.entity != null){
+                    tile.entity.updateProximity();
+                }
+            }
+        }
+
+        addDarkness(tiles);
+
+        Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
+
+        generating = false;
+        Events.fire(new WorldLoadEvent());
+    }
+
+    public boolean isGenerating(){
+        return generating;
+    }
+
+    public boolean isZone(){
+        return getZone() != null;
+    }
+
+    public Zone getZone(){
+        return state.rules.zone;
+    }
+
+    public void loadGenerator(Generator generator){
+        beginMapLoad();
+
+        createTiles(generator.width, generator.height);
+        generator.generate(tiles);
+
+        endMapLoad();
+    }
+
+    public void loadMap(Map map){
+
+        try{
+            MapIO.loadMap(map);
+        }catch(Exception e){
+            Log.err(e);
+            if(!headless){
+                ui.showError("$map.invalid");
+                Core.app.post(() -> state.set(State.menu));
+                invalidMap = true;
+            }
+            generating = false;
+            return;
+        }
+
+        this.currentMap = map;
+
+        invalidMap = false;
+
+        if(!headless){
+            if(state.teams.get(defaultTeam).cores.size == 0){
+                ui.showError("$map.nospawn");
+                invalidMap = true;
+            }else if(state.rules.pvp){ //pvp maps need two cores to be valid
+                invalidMap = true;
+                for(Team team : Team.all){
+                    if(state.teams.get(team).cores.size != 0 && team != defaultTeam){
+                        invalidMap = false;
+                    }
+                }
+                if(invalidMap){
+                    ui.showError("$map.nospawn.pvp");
+                }
+            }else if(state.rules.attackMode){ //pvp maps need two cores to be valid
+                invalidMap = state.teams.get(waveTeam).cores.isEmpty();
+                if(invalidMap){
+                    ui.showError("$map.nospawn.attack");
+                }
+            }
+        }else{
+            invalidMap = true;
+            for(Team team : Team.all){
+                if(state.teams.get(team).cores.size != 0){
+                    invalidMap = false;
+                }
+            }
+
+            if(invalidMap){
+                throw new MapException(map, "Map has no cores!");
+            }
+        }
+
+        if(invalidMap) Core.app.post(() -> state.set(State.menu));
+    }
+
+    public void notifyChanged(Tile tile){
+        if(!generating){
+            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
+        }
+    }
+
+    public void removeBlock(Tile tile){
+        tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
+    }
+
+    public void setBlock(Tile tile, Block block, Team team){
+        setBlock(tile, block, team, 0);
+    }
+
+    public void setBlock(Tile tile, Block block, Team team, int rotation){
+        tile.setBlock(block, team, rotation);
+        if(block.isMultiblock()){
+            int offsetx = -(block.size - 1) / 2;
+            int offsety = -(block.size - 1) / 2;
+
+            for(int dx = 0; dx < block.size; dx++){
+                for(int dy = 0; dy < block.size; dy++){
+                    int worldx = dx + offsetx + tile.x;
+                    int worldy = dy + offsety + tile.y;
+                    if(!(worldx == tile.x && worldy == tile.y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Raycast, but with world coordinates.
+     */
+    public Point2 raycastWorld(float x, float y, float x2, float y2){
+        return raycast(Math.round(x / tilesize), Math.round(y / tilesize),
+        Math.round(x2 / tilesize), Math.round(y2 / tilesize));
+    }
+
+    /**
+     * Input is in block coordinates, not world coordinates.
+     * @return null if no collisions found, block position otherwise.
+     */
+    public Point2 raycast(int x0f, int y0f, int x1, int y1){
+        int x0 = x0f;
+        int y0 = y0f;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+
+        int err = dx - dy;
+        int e2;
+        while(true){
+
+            if(!passable(x0, y0)){
+                return Tmp.g1.set(x0, y0);
+            }
+            if(x0 == x1 && y0 == y1) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x0 = x0 + sx;
+            }
+
+            if(e2 < dx){
+                err = err + dx;
+                y0 = y0 + sy;
+            }
+        }
+        return null;
+    }
+
+    public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
+    public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
+        int x0 = x0f;
+        int y0 = y0f;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+
+        int err = dx - dy;
+        int e2;
+        while(true){
+
+            if(cons.accept(x0, y0)) break;
+            if(x0 == x1 && y0 == y1) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x0 = x0 + sx;
+            }
+
+            if(e2 < dx){
+                err = err + dx;
+                y0 = y0 + sy;
+            }
+        }
+    }
+
+    public void addDarkness(Tile[][] tiles){
+        byte[][] dark = new byte[tiles.length][tiles[0].length];
+        byte[][] writeBuffer = new byte[tiles.length][tiles[0].length];
+
+        byte darkIterations = 4;
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
+                    dark[x][y] = darkIterations;
+                }
+            }
+        }
+
+        for(int i = 0; i < darkIterations; i++){
+            for(int x = 0; x < tiles.length; x++){
+                for(int y = 0; y < tiles[0].length; y++){
+                    boolean min = false;
+                    for(Point2 point : Geometry.d4){
+                        int newX = x + point.x, newY = y + point.y;
+                        if(Structs.inBounds(newX, newY, tiles) && dark[newX][newY] < dark[x][y]){
+                            min = true;
+                            break;
+                        }
+                    }
+                    writeBuffer[x][y] = (byte)Math.max(0, dark[x][y] - Mathf.num(min));
+                }
+            }
+
+            for(int x = 0; x < tiles.length; x++){
+                System.arraycopy(writeBuffer[x], 0, dark[x], 0, tiles[0].length);
+            }
+        }
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+                if(tile.block().solid && !tile.block().synthetic()){
+                    tiles[x][y].rotation(dark[x][y]);
+                }
+            }
+        }
+    }
+
+    /**
+     * 'Prepares' a tile array by:<br>
+     * - setting up multiblocks<br>
+     * - updating occlusion<br>
+     * Usually used before placing structures on a tile array.
+     */
+    public void prepareTiles(Tile[][] tiles){
+
+        //find multiblocks
+        IntArray multiblocks = new IntArray();
+
+        for(int x = 0; x < tiles.length; x++){
+            for(int y = 0; y < tiles[0].length; y++){
+                Tile tile = tiles[x][y];
+
+                if(tile.block().isMultiblock()){
+                    multiblocks.add(tile.pos());
+                }
+            }
+        }
+
+        //place multiblocks now
+        for(int i = 0; i < multiblocks.size; i++){
+            int pos = multiblocks.get(i);
+
+            int x = Pos.x(pos);
+            int y = Pos.y(pos);
+
+            Block result = tiles[x][y].block();
+            Team team = tiles[x][y].getTeam();
+
+            int offsetx = -(result.size - 1) / 2;
+            int offsety = -(result.size - 1) / 2;
+
+            for(int dx = 0; dx < result.size; dx++){
+                for(int dy = 0; dy < result.size; dy++){
+                    int worldx = dx + offsetx + x;
+                    int worldy = dy + offsety + y;
+                    if(!(worldx == x && worldy == y)){
+                        Tile toplace = world.tile(worldx, worldy);
+                        if(toplace != null){
+                            toplace.setBlock(BlockPart.get(dx + offsetx, dy + offsety), team);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public interface Raycaster{
+        boolean accept(int x, int y);
+    }
+
+    class Context implements WorldContext{
+        @Override
+        public Tile tile(int x, int y){
+            return tiles[x][y];
+        }
+
+        @Override
+        public void resize(int width, int height){
+            createTiles(width, height);
+        }
+
+        @Override
+        public Tile create(int x, int y, int floorID, int overlayID, int wallID){
+            return (tiles[x][y] = new Tile(x, y, floorID, overlayID, wallID));
+        }
+
+        @Override
+        public boolean isGenerating(){
+            return World.this.isGenerating();
+        }
+
+        @Override
+        public void begin(){
+            beginMapLoad();
+        }
+
+        @Override
+        public void end(){
+            endMapLoad();
+        }
+    }
 }
