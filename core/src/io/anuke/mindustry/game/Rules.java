@@ -67,11 +67,11 @@ public class Rules{
     public boolean resourcesWar = false;
     /** Determinates how often weakest team should be eliminated in ticks */
     public float eliminationTime = 240 * 60;
-    /**  */
+    /** Determinates if resourceswar is in rushmode */
     public boolean rushGame = false;
-    /**  */
+    /** First points threshold */
     public int firstThreshold = 200;
-    /**  */
+    /** How threshold is incremented */
     public int bumpThreshold = 100;
 
 

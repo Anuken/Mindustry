@@ -175,7 +175,11 @@ public class Logic implements ApplicationListener{
             world.removeBlock(tile);
         }
         if(player.getTeam() == t){
-            player.kill();
+            for(Player p : playerGroup.all()){
+                if(p.getTeam() == t){
+                    p.kill();
+                }
+            }
         }
 
         Events.fire(new TeamEliminatedEvent(t));
