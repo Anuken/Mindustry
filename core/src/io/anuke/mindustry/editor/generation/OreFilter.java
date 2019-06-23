@@ -8,8 +8,8 @@ import static io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
 import static io.anuke.mindustry.editor.generation.FilterOption.oresOnly;
 
 public class OreFilter extends GenerateFilter{
-    float scl = 40, threshold = 0.8f, octaves = 3f, falloff = 0.5f;
-    Block ore = Blocks.oreCopper;
+    public float scl = 50, threshold = 0.72f, octaves = 3f, falloff = 0.4f;
+    public Block ore = Blocks.oreCopper;
 
     {
         options(

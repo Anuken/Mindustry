@@ -1,14 +1,18 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.arc.*;
-import io.anuke.arc.collection.*;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.Queue;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.*;
+import io.anuke.arc.math.Angles;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.EventType.BuildSelectEvent;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -21,7 +25,8 @@ import java.io.*;
 import java.util.Arrays;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.*;
+import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.removal;
+import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.tmptr;
 
 /** Interface for units that build things.*/
 public interface BuilderTrait extends Entity, TeamTrait{
@@ -78,6 +83,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         TileEntity core = unit.getClosestCore();
 
+        if(tile.entity instanceof BuildEntity && !current.initialized){
+            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
+            current.initialized = true;
+        }
+
         //if there is no core to build with or no build entity, stop building!
         if((core == null && !state.rules.infiniteResources) || !(tile.entity instanceof BuildEntity)){
             return;
@@ -106,11 +116,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
             current.progress = entity.progress();
         }else{
             entity.progress = current.progress;
-        }
-
-        if(!current.initialized){
-            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, unit.getTeam(), this, current.breaking)));
-            current.initialized = true;
         }
     }
 
