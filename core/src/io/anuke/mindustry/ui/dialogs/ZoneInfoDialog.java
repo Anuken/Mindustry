@@ -104,8 +104,14 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.addImage("white").color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
                 cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave),
-                        () -> loadout.show(zone.loadout.core().itemCapacity, ()->zone.getStartingItems(),
-                        ()->zone.resetStartingItems(), ()->zone.updateLaunchCost(), rebuildItems, (item)->data.getItem(item) > 0 && item.type == ItemType.material)
+                        () -> loadout.show(
+                            zone.loadout.core().itemCapacity,
+                            () -> zone.getStartingItems(),
+                            () -> zone.resetStartingItems(),
+                            () -> zone.updateLaunchCost(),
+                            rebuildItems,
+                            item -> data.getItem(item) > 0 && item.type == ItemType.material
+                        )
                 ).fillX().pad(3).disabled(b -> !zone.canConfigure());
                 cont.row();
                 cont.table(res -> {

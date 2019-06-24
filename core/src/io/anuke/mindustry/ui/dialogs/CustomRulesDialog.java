@@ -63,9 +63,16 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
 
-        main.addButton("$configure", ()->loadoutDialog.show(
-                Blocks.coreShard.itemCapacity, ()->rules.loadout, ()->{rules.loadout.clear(); rules.loadout.add(ItemStack.with(Items.copper, 200)[0]);},
-                ()->{}, ()->{}, (item)->item.type == ItemType.material
+        main.addButton("$configure",
+                () -> loadoutDialog.show(
+                    Blocks.coreShard.itemCapacity,
+                    () -> rules.loadout,
+                    () -> {
+                        rules.loadout.clear();
+                        rules.loadout.add(new ItemStack(Items.copper, 200));
+                    },
+                    () -> {}, () -> {},
+                    item -> item.type == ItemType.material
         )).left().width(300f);
         main.row();
 

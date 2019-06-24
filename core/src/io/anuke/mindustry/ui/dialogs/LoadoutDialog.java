@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.mindustry.type.*;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.anuke.mindustry.Vars.content;
@@ -14,7 +14,7 @@ public class LoadoutDialog extends FloatingDialog{
     private Supplier<Array<ItemStack>> supplier;
     private Runnable resetter;
     private Runnable updater;
-    private Function<Item, Boolean> filter;
+    private Predicate<Item> filter;
     private int capacity;
 
     public LoadoutDialog(){
@@ -35,7 +35,7 @@ public class LoadoutDialog extends FloatingDialog{
         }).size(210f, 64f);
     }
 
-    public void show(int capacity, Supplier<Array<ItemStack>> supplier, Runnable reseter, Runnable updater, Runnable hider, Function<Item, Boolean> filter){
+    public void show(int capacity, Supplier<Array<ItemStack>> supplier, Runnable reseter, Runnable updater, Runnable hider, Predicate<Item> filter){
         this.resetter = reseter;
         this.supplier = supplier;
         this.updater = updater;
@@ -75,7 +75,7 @@ public class LoadoutDialog extends FloatingDialog{
         cont.addButton("$add", () -> {
             FloatingDialog dialog = new FloatingDialog("");
             dialog.setFillParent(false);
-            for(Item item : content.items().select(item -> filter.apply(item) && item.type == ItemType.material && supplier.get().find(stack -> stack.item == item) == null)){
+            for(Item item : content.items().select(item -> filter.test(item) && item.type == ItemType.material && supplier.get().find(stack -> stack.item == item) == null)){
                 TextButton button = dialog.cont.addButton("", "clear", () -> {
                     supplier.get().add(new ItemStack(item, 0));
                     updater.run();
@@ -89,7 +89,7 @@ public class LoadoutDialog extends FloatingDialog{
                 dialog.cont.row();
             }
             dialog.show();
-        }).colspan(4).size(100f, bsize).left().disabled(b -> !content.items().contains(item -> filter.apply(item) && !supplier.get().contains(stack -> stack.item == item)));
+        }).colspan(4).size(100f, bsize).left().disabled(b -> !content.items().contains(item -> filter.test(item) && !supplier.get().contains(stack -> stack.item == item)));
         pack();
     }
 }
