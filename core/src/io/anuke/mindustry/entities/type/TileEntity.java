@@ -156,6 +156,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         Call.onTileDestroyed(tile);
     }
 
+    public void damage(float damage, Team damager) {
+        damage(damage);
+    }
+
     public void damage(float damage){
         if(dead) return;
 

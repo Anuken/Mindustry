@@ -472,7 +472,7 @@ public class Block extends BlockStorage{
     }
 
     public void handleBulletHit(TileEntity entity, Bullet bullet){
-        entity.damage(bullet.damage());
+        entity.damage(bullet.damage(), bullet.getTeam());
     }
 
     public void update(Tile tile){

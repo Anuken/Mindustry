@@ -5,12 +5,16 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
@@ -167,6 +171,20 @@ public class CoreBlock extends StorageBlock{
                 player.mech = Mechs.starter;
                 player.beginRespawning(this);
             }
+        }
+
+        @Override
+        public void damage(float damage, Team team){
+            if(state.rules.resourcesWar){
+                for(Tile eater : state.teams.get(getTeam()).eaters){
+                    if(eater.entity().items.total() > 0){
+                        Item i = eater.entity.items.take();
+                        Tile target = state.teams.get(team).cores.first();
+                        Call.transferItemTo(i, 1, eater.entity().x, eater.entity().y, target);
+                    }
+                }
+            }
+            damage(damage);
         }
 
         @Override

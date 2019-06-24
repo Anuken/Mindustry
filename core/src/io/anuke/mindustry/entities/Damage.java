@@ -235,7 +235,7 @@ public class Damage{
             if(tile.entity != null && tile.getTeam() != team){
                 int health = (int)tile.entity.health;
                 if(tile.entity.health > 0){
-                    tile.entity.damage(scaledDamage);
+                    tile.entity.damage(scaledDamage, team);
                     scaledDamage -= health;
 
                     if(scaledDamage <= 0) continue;
@@ -256,7 +256,7 @@ public class Damage{
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.entity != null && (team == null || state.teams.areEnemies(team, tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
-                    tile.entity.damage(damage);
+                    tile.entity.damage(damage, team);
                 }
             }
         }
