@@ -4,7 +4,6 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
@@ -44,17 +43,17 @@ public class ItemsEater extends StorageBlock{
     @Override
     public void placed(Tile tile){
         super.placed(tile);
-        state.teams.get(tile.getTeam()).cannons.add(tile);
+        state.teams.get(tile.getTeam()).eaters.add(tile);
     }
 
     @Override
     public void removed(Tile tile){
         super.removed(tile);
-        state.teams.get(tile.getTeam()).cannons.remove(tile);
+        state.teams.get(tile.getTeam()).eaters.remove(tile);
     }
 
     @Override
     public void onProximityUpdate(Tile tile){
-        state.teams.get(tile.getTeam()).cannons.add(tile);
+        state.teams.get(tile.getTeam()).eaters.add(tile);
     }
 }

@@ -135,12 +135,12 @@ public class Logic implements ApplicationListener{
     }
 
     public void calcPoints(){
-        for(Team team : Team.values()){
+        for(Team team : Team.all){
             Teams.TeamData teamData = state.teams.get(team);
             int points = -1;
             if(teamData.cores.size!=0 || Structs.filter(Player.class, playerGroup.all().toArray(), (p)->p.getTeam()==team).length!=0){
                 points = 0;
-                for(Tile t : teamData.cannons){
+                for(Tile t : teamData.eaters){
                     points += calcPoints(t);
                 }
             }
@@ -167,7 +167,7 @@ public class Logic implements ApplicationListener{
 
     @Remote(called = Loc.both)
     public static void eliminateTeam(int team){
-        Team t = Team.values()[team];
+        Team t = Team.all[team];
         //We need to copy set because when Core is destroyed it wants to remove itself from the original set and will occur error
         ObjectSet<Tile> cores = new ObjectSet<>(state.teams.get(t).cores);
         for(Tile tile : cores){

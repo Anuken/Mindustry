@@ -31,7 +31,7 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
     /** Points. Used in resources-war mode */
-    public int[] points = new int[Team.values().length];
+    public int[] points = new int[Team.all.length];
     /** Points. Used in resources-war mode */
     public int pointsThreshold = rules.firstThreshold;
 
@@ -77,9 +77,9 @@ public class GameState{
                 min = points[i];
         }
         Array<Team> out = new Array<>();
-        for(int i=0; i<Team.values().length; i++)
+        for(int i=0; i<Team.all.length; i++)
             if(points[i]==min)
-                out.add(Team.values()[i]);
+                out.add(Team.all[i]);
         return out;
     }
 }
