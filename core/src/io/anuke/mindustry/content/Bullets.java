@@ -399,7 +399,7 @@ public class Bullets implements ContentList{
                 super.hit(b);
                 tile = tile.link();
 
-                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+                if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }

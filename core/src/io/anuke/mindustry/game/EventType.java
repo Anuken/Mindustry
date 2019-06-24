@@ -32,6 +32,10 @@ public class EventType{
 
     }
 
+    public static class DisposeEvent{
+
+    }
+
     public static class PlayEvent{
 
     }

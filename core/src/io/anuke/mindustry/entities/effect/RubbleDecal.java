@@ -8,22 +8,14 @@ import io.anuke.arc.math.Mathf;
 import static io.anuke.mindustry.Vars.headless;
 
 public class RubbleDecal extends Decal{
-    private static final TextureRegion[][] regions = new TextureRegion[16][0];
     private TextureRegion region;
 
     /** Creates a rubble effect at a position. Provide a block size to use. */
     public static void create(float x, float y, int size){
         if(headless) return;
 
-        if(regions[size].length == 0 || regions[size][0].getTexture().isDisposed()){
-            regions[size] = new TextureRegion[2];
-            for(int j = 0; j < 2; j++){
-                regions[size][j] = Core.atlas.find("rubble-" + size + "-" + j);
-            }
-        }
-
         RubbleDecal decal = new RubbleDecal();
-        decal.region = regions[size][Mathf.clamp(Mathf.randomSeed(decal.id, 0, 1), 0, regions[size].length - 1)];
+        decal.region = Core.atlas.find("rubble-" + size + "-" + Mathf.randomSeed(decal.id, 0, 1));
 
         if(!Core.atlas.isFound(decal.region)){
             return;

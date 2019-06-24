@@ -274,7 +274,7 @@ public class NetServer implements ApplicationListener{
         long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
+        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.2f);
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;
@@ -284,6 +284,7 @@ public class NetServer implements ApplicationListener{
         player.isShooting = shooting;
         player.buildQueue().clear();
         for(BuildRequest req : requests){
+            if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
             if(tile == null) continue;
             //auto-skip done requests
@@ -296,7 +297,7 @@ public class NetServer implements ApplicationListener{
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        //vector.limit(maxMove);
+        vector.limit(maxMove);
 
         float prevx = player.x, prevy = player.y;
         player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
