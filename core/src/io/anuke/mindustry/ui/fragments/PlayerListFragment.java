@@ -5,16 +5,20 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.Image;
+import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
+import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -81,7 +85,7 @@ public class PlayerListFragment extends Fragment{
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Pal.accent);
+                    Draw.color((state.rules.pvp) ? user.getTeam().color : Pal.accent);
                     Draw.alpha(parentAlpha);
                     Lines.stroke(Unit.dp.scl(3f));
                     Lines.rect(x, y, width, height);
@@ -90,6 +94,29 @@ public class PlayerListFragment extends Fragment{
             };
             table.margin(8);
             table.add(new Image(user.mech.iconRegion)).grow();
+            table.clicked(()->{
+                if(player.isAdmin && state.rules.pvp){
+                    FloatingDialog teamPicker = new FloatingDialog("$editor.teams");
+                    teamPicker.addCloseButton();
+                    teamPicker.setFillParent(false);
+                    teamPicker.cont.defaults().size(40*3f, 80);
+                    for(int i=0; i < Team.all.length; i++){
+                        Team team = Team.all[i];
+                        ImageButton teamButton = new ImageButton("white", "clear-toggle-partial");
+                        teamButton.margin(4f);
+                        teamButton.getStyle().imageUpColor = team.color;
+                        teamButton.clicked(() -> {user.setTeam(team); teamPicker.hide();});
+                        teamButton.update(() -> teamButton.setChecked(user.getTeam() == team));
+                        teamButton.setSize(32f, 32f);
+                        teamButton.getImageCell().grow();
+                        teamPicker.cont.add(teamButton).center();
+                        if((i+1)%3==0){
+                            teamPicker.cont.row();
+                        }
+                    }
+                    teamPicker.show();
+                }
+            });
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
