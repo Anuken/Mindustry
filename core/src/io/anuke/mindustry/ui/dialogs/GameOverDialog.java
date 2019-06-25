@@ -1,6 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.function.BooleanProvider;
+import io.anuke.arc.function.IntConsumer;
+import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Stats.RankResult;
 import io.anuke.mindustry.game.Team;
@@ -11,6 +14,9 @@ import static io.anuke.mindustry.Vars.*;
 
 public class GameOverDialog extends FloatingDialog{
     private Team winner;
+    private String mapName;
+    private String author;
+    private int time;
 
     public GameOverDialog(){
         super("$gameover");
@@ -20,6 +26,21 @@ public class GameOverDialog extends FloatingDialog{
 
     public void show(Team winner){
         this.winner = winner;
+        this.mapName = null;
+        this.author = null;
+        this.time = -1;
+        show();
+    }
+
+    public void show(Team winner, String mapName, String author, int time){
+        this.winner = winner;
+        this.mapName = mapName;
+        if(author==""){
+            this.author=null;
+        }else{
+            this.author = author;
+        }
+        this.time = time;
         show();
     }
 
@@ -32,65 +53,94 @@ public class GameOverDialog extends FloatingDialog{
 
         if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
+        }
+
+        StringBuilder builder = new StringBuilder();
+        if(mapName!=null){
+            builder.append(Core.bundle.format("gameover.nextmap", mapName));
+            if(author!=null){
+                builder.append(" ");
+                builder.append(Core.bundle.format("gameover.mapby", author));
+            }
+            builder.append("\n");
+        }
+        if(time!=-1){
+            builder.append(Core.bundle.format("gameover.nextgame", time));
+            builder.append("\n");
+        }
+        cont.add(builder.toString());
+        cont.row();
+
+        if(state.rules.waves){
+            if(control.isHighScore()){
+                cont.add("$highscore").pad(6);
+                cont.row();
+            }
+        }
+
+        cont.pane(t -> {
+            t.margin(13f);
+            t.left().defaults().left();
+
+            stat(t, "stat.wave", state.stats.wavesLasted, ()->state.rules.waves);
+            stat(t, "stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed);
+            stat(t, "stat.built", state.stats.buildingsBuilt);
+            stat(t, "stat.destroyed", state.stats.buildingsDestroyed);
+            stat(t, "stat.deconstructed", state.stats.buildingsDeconstructed);
+            stat(t, "stat.players", state.stats.playersKilled, ()->state.rules.pvp);
+            stat(t, "stat.cores", state.stats.coresDestroyed, ()->state.rules.attackMode);
+
+
+            if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
+                t.add("$stat.delivered");
+                t.row();
+                for(Item item : content.items()){
+                    if(state.stats.itemsDelivered.get(item, 0) > 0){
+                        t.table(items -> {
+                            items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
+                            items.addImage(item.icon(Icon.medium)).size(8 * 3).pad(4);
+                        }).left();
+                        t.row();
+                    }
+                }
+            }
+
+            if(world.isZone()){
+                RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
+                t.row();
+            }
+        }).pad(12);
+
+        if(world.isZone()){
+            buttons.addButton("$continue", () -> {
+                hide();
+                state.set(State.menu);
+                logic.reset();
+                ui.deploy.show();
+            }).size(130f, 60f);
+        }else{
             buttons.addButton("$menu", () -> {
                 hide();
                 state.set(State.menu);
                 logic.reset();
             }).size(130f, 60f);
-        }else{
-            if(control.isHighScore()){
-                cont.add("$highscore").pad(6);
-                cont.row();
-            }
+        }
+        if(mapName != null){
+            buttons.addButton("$continue", ()->
+                hide()
+            ).size(130f, 60f);
+        }
+    }
 
-            cont.pane(t -> {
-                t.margin(13f);
-                t.left().defaults().left();
-                t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted));
-                t.row();
-                t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed));
-                t.row();
-                t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt));
-                t.row();
-                t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed));
-                t.row();
-                t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
-                t.row();
-                if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
-                    t.add("$stat.delivered");
-                    t.row();
-                    for(Item item : content.items()){
-                        if(state.stats.itemsDelivered.get(item, 0) > 0){
-                            t.table(items -> {
-                                items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Icon.medium)).size(8 * 3).pad(4);
-                            }).left();
-                            t.row();
-                        }
-                    }
-                }
+    void stat(Table t, String s, int val){
+        stat(t, s, val, ()->true);
+    }
 
-                if(world.isZone()){
-                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
-                    t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
-                    t.row();
-                }
-            }).pad(12);
-
-            if(world.isZone()){
-                buttons.addButton("$continue", () -> {
-                    hide();
-                    state.set(State.menu);
-                    logic.reset();
-                    ui.deploy.show();
-                }).size(130f, 60f);
-            }else{
-                buttons.addButton("$menu", () -> {
-                    hide();
-                    state.set(State.menu);
-                    logic.reset();
-                }).size(130f, 60f);
-            }
+    void stat(Table t, String s, int val, BooleanProvider cond){
+        if(cond.get()){
+            t.add(Core.bundle.format(s, val));
+            t.row();
         }
     }
 }

@@ -154,11 +154,7 @@ public class ServerControl implements ApplicationListener{
                         map = maps.first();
                     }
 
-                    Call.onInfoMessage((state.rules.pvp
-                    ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                    + "\nNext selected map:[accent] " + map.name() + "[]"
-                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
+                    Call.onGameOver(event.winner, map.name(), (map.tags.containsKey("author")) ? map.author() : "", roundExtraTime);
 
                     info("Selected next map to be {0}.", map.name());
 

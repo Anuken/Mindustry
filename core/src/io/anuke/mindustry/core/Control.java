@@ -21,6 +21,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -158,12 +159,18 @@ public class Control implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.getTeam() == player.getTeam()){
                 state.stats.buildingsDestroyed++;
+                if(e.tile.block() instanceof CoreBlock){
+                    state.stats.coresDestroyed++;
+                }
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.getTeam() != player.getTeam()){
                 state.stats.enemyUnitsDestroyed++;
+                if(e.unit instanceof Player){
+                    state.stats.playersKilled++;
+                }
             }
         });
 

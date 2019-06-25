@@ -164,6 +164,13 @@ public class Logic implements ApplicationListener{
         netClient.setQuiet();
     }
 
+    @Remote(called = Loc.client)
+    public static void onGameOver(Team winner, String mapName, String author, int time){
+        state.stats.wavesLasted = state.wave;
+        ui.restart.show(winner, mapName, author, time);
+        netClient.setQuiet();
+    }
+
     @Override
     public void update(){
 
