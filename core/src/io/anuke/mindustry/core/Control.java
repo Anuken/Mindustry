@@ -159,7 +159,6 @@ public class Control implements ApplicationListener{
                     state.stats.buildingsDeconstructed++;
                 }else{
                     state.stats.buildingsBuilt++;
-                    state.stats.resourcesSpent += Array.with(e.tile.block().buildRequirements).sum(itemStack -> itemStack.amount);
                 }
             }
         });
@@ -167,20 +166,27 @@ public class Control implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.getTeam() == player.getTeam()){
                 state.stats.buildingsDestroyed++;
-                if(e.tile.block() instanceof CoreBlock){
-                    state.stats.coresDestroyed++;
-                }
             }
             if(e.tile.block() instanceof CoreBlock){
-                state.stats.place = Array.with(Team.all).select(t -> state.teams.get(t).cores.size > 0).size;
+                int i = 0;
+                for(Team t : Team.all){
+                    if(state.teams.get(t).cores.size > 0){
+                        i++;
+                    }
+                }
+                state.stats.rankPlace = i;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.getTeam() != player.getTeam()){
                 state.stats.enemyUnitsDestroyed++;
-                if(e.unit instanceof Player){
-                    state.stats.playersKilled++;
+            }
+            if(e.unit instanceof Player){
+                if(e.unit.getTeam() == player.getTeam()){
+                    state.stats.teamDeaths++;
+                }else{
+                    state.stats.enemyDeaths++;
                 }
             }
         });

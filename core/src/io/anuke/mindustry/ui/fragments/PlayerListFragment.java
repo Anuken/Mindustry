@@ -93,7 +93,7 @@ public class PlayerListFragment extends Fragment{
             };
             table.margin(8);
             table.add(new Image(user.mech.iconRegion)).grow();
-            table.clicked(()->{
+            table.clicked(() -> {
                 if(player.isAdmin && state.rules.pvp){
                     FloatingDialog teamPicker = new FloatingDialog("$editor.teams");
                     teamPicker.addCloseButton();
@@ -104,7 +104,10 @@ public class PlayerListFragment extends Fragment{
                         ImageButton teamButton = new ImageButton("white", "clear-toggle-partial");
                         teamButton.margin(4f);
                         teamButton.getStyle().imageUpColor = team.color;
-                        teamButton.clicked(() -> {user.setTeam(team); teamPicker.hide();});
+                        teamButton.clicked(() -> {
+                            user.setTeam(team);
+                            teamPicker.hide();
+                        });
                         teamButton.update(() -> teamButton.setChecked(user.getTeam() == team));
                         teamButton.setSize(32f, 32f);
                         teamButton.getImageCell().grow();

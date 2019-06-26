@@ -51,7 +51,7 @@ public class GameOverDialog extends FloatingDialog{
         resetVars();
         this.winner = winner;
         this.mapName = mapName;
-        if(author != ""){
+        if(!author.equals("")){
             this.author = author;
         }
         this.time = time;
@@ -72,7 +72,7 @@ public class GameOverDialog extends FloatingDialog{
                 cont.add(Core.bundle.format("gameover.eliminated")).pad(6);
             }
             cont.row();
-            cont.add(Core.bundle.format("gameover.place", (winner != null && winner == player.getTeam()) ? 1 : state.stats.place)).pad(6);
+            cont.add(Core.bundle.format("gameover.place", (winner != null && winner == player.getTeam()) ? 1 : state.stats.rankPlace)).pad(6);
         }
 
         StringBuilder builder = new StringBuilder();
@@ -102,14 +102,13 @@ public class GameOverDialog extends FloatingDialog{
             t.margin(13f);
             t.left().defaults().left();
 
-            stat(t, "stat.wave", state.stats.wavesLasted, ()->state.rules.waves);
+            stat(t, "stat.wave", state.stats.wavesLasted, () -> state.rules.waves);
             stat(t, "stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed);
             stat(t, "stat.built", state.stats.buildingsBuilt);
             stat(t, "stat.destroyed", state.stats.buildingsDestroyed);
             stat(t, "stat.deconstructed", state.stats.buildingsDeconstructed);
-            stat(t, "stat.players", state.stats.playersKilled, ()->state.rules.pvp);
-            stat(t, "stat.cores", state.stats.coresDestroyed, ()->state.rules.attackMode);
-            stat(t, "stat.resources", state.stats.resourcesSpent);
+            stat(t, "stat.friendly", state.stats.teamDeaths);
+            stat(t, "stat.enemies", state.stats.enemyDeaths, () -> state.rules.pvp);
 
 
             if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
@@ -148,14 +147,14 @@ public class GameOverDialog extends FloatingDialog{
             }).size(130f, 60f);
         }
         if(mapName != null){
-            buttons.addButton("$continue", ()->
+            buttons.addButton("$continue", () ->
                 hide()
             ).size(130f, 60f);
         }
     }
 
     void stat(Table t, String s, int val){
-        stat(t, s, val, ()->true);
+        stat(t, s, val, () -> true);
     }
 
     void stat(Table t, String s, int val, BooleanProvider cond){
