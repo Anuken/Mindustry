@@ -4,9 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
@@ -67,7 +65,7 @@ public class Logic implements ApplicationListener{
             data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, tile.rotation(), block.id));
         });
 
-        Events.on(BlockDestroyEvent.class, event ->{
+        Events.on(BlockDestroyEvent.class, event -> {
             if(event.tile.block() instanceof CoreBlock && state.teams.get(event.tile.getTeam()).cores.size == 1 && !Net.client()){
                 Events.fire(new TeamEliminatedEvent(event.tile.getTeam()));
             }

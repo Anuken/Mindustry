@@ -154,7 +154,7 @@ public class ServerControl implements ApplicationListener{
                         map = maps.first();
                     }
 
-                    Call.onGameOver(event.winner, map.name(), (map.tags.containsKey("author")) ? map.author() : "", roundExtraTime);
+                    Call.onGameOver(event.winner, map.name(), map.tags.containsKey("author") ? map.author() : "", roundExtraTime);
 
                     info("Selected next map to be {0}.", map.name());
 

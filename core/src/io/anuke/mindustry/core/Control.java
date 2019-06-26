@@ -159,7 +159,7 @@ public class Control implements ApplicationListener{
                     state.stats.buildingsDeconstructed++;
                 }else{
                     state.stats.buildingsBuilt++;
-                    state.stats.resourcesSpent+= Array.with(e.tile.block().buildRequirements).sum(itemStack -> itemStack.amount);
+                    state.stats.resourcesSpent += Array.with(e.tile.block().buildRequirements).sum(itemStack -> itemStack.amount);
                 }
             }
         });

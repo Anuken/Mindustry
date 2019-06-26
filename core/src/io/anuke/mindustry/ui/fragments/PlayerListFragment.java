@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;

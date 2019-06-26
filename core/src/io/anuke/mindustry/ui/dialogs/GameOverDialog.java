@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.IntConsumer;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Stats.RankResult;
@@ -73,19 +72,19 @@ public class GameOverDialog extends FloatingDialog{
                 cont.add(Core.bundle.format("gameover.eliminated")).pad(6);
             }
             cont.row();
-            cont.add(Core.bundle.format("gameover.place", (winner!=null && winner==player.getTeam()) ? 1 : state.stats.place)).pad(6);
+            cont.add(Core.bundle.format("gameover.place", (winner != null && winner == player.getTeam()) ? 1 : state.stats.place)).pad(6);
         }
 
         StringBuilder builder = new StringBuilder();
-        if(mapName!=null){
+        if(mapName != null){
             builder.append(Core.bundle.format("gameover.nextmap", mapName));
-            if(author!=null){
+            if(author != null){
                 builder.append(" ");
                 builder.append(Core.bundle.format("gameover.mapby", author));
             }
             builder.append("\n");
         }
-        if(time!=-1){
+        if(time != -1){
             builder.append(Core.bundle.format("gameover.nextgame", time));
             builder.append("\n");
         }
