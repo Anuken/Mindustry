@@ -44,6 +44,14 @@ public class EventType{
 
     }
 
+    public static class TeamEliminatedEvent{
+        public final Team eliminated;
+
+        public TeamEliminatedEvent(Team eliminated){
+            this.eliminated = eliminated;
+        }
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

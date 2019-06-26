@@ -14,6 +14,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class GameOverDialog extends FloatingDialog{
     private Team winner;
+    private Team eliminated;
     private String mapName;
     private String author;
     private int time;
@@ -24,20 +25,34 @@ public class GameOverDialog extends FloatingDialog{
         shown(this::rebuild);
     }
 
-    public void show(Team winner){
-        this.winner = winner;
+    void resetVars(){
+        if(isShown()){
+            hide();
+        }
+        this.winner = null;
+        this.eliminated = null;
         this.mapName = null;
         this.author = null;
         this.time = -1;
+    }
+
+    public void showEliminated(Team eliminated){
+        resetVars();
+        this.eliminated = eliminated;
         show();
     }
 
-    public void show(Team winner, String mapName, String author, int time){
+    public void show(Team winner){
+        resetVars();
+        this.winner = winner;
+        show();
+    }
+
+    public void showRemote(Team winner, String mapName, String author, int time){
+        resetVars();
         this.winner = winner;
         this.mapName = mapName;
-        if(author==""){
-            this.author=null;
-        }else{
+        if(author != ""){
             this.author = author;
         }
         this.time = time;
@@ -52,7 +67,13 @@ public class GameOverDialog extends FloatingDialog{
         buttons.margin(10);
 
         if(state.rules.pvp){
-            cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
+            if(eliminated == null){
+                cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
+            }else{
+                cont.add(Core.bundle.format("gameover.eliminated")).pad(6);
+            }
+            cont.row();
+            cont.add(Core.bundle.format("gameover.place", (winner!=null && winner==player.getTeam()) ? 1 : state.stats.place)).pad(6);
         }
 
         StringBuilder builder = new StringBuilder();
@@ -89,6 +110,7 @@ public class GameOverDialog extends FloatingDialog{
             stat(t, "stat.deconstructed", state.stats.buildingsDeconstructed);
             stat(t, "stat.players", state.stats.playersKilled, ()->state.rules.pvp);
             stat(t, "stat.cores", state.stats.coresDestroyed, ()->state.rules.attackMode);
+            stat(t, "stat.resources", state.stats.resourcesSpent);
 
 
             if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){

@@ -26,6 +26,10 @@ public class Stats{
     public int playersKilled;
     /** Cores destoryed */
     public int coresDestroyed;
+    /** Resources spent */
+    public int resourcesSpent;
+    /** Place */
+    public int place;
 
     public RankResult calculateRank(Zone zone, boolean launched){
         float score = 0;

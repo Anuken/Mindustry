@@ -4,7 +4,9 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
@@ -21,6 +23,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -62,6 +65,12 @@ public class Logic implements ApplicationListener{
 
             TeamData data = state.teams.get(tile.getTeam());
             data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, tile.rotation(), block.id));
+        });
+
+        Events.on(BlockDestroyEvent.class, event ->{
+            if(event.tile.block() instanceof CoreBlock && state.teams.get(event.tile.getTeam()).cores.size == 1 && !Net.client()){
+                Events.fire(new TeamEliminatedEvent(event.tile.getTeam()));
+            }
         });
     }
 
@@ -167,8 +176,17 @@ public class Logic implements ApplicationListener{
     @Remote(called = Loc.client)
     public static void onGameOver(Team winner, String mapName, String author, int time){
         state.stats.wavesLasted = state.wave;
-        ui.restart.show(winner, mapName, author, time);
+        ui.restart.showRemote(winner, mapName, author, time);
         netClient.setQuiet();
+    }
+
+    @Remote(called = Loc.both)
+    public static void onTeamEliminated(Team team){
+        if(player.getTeam() == team){
+            state.stats.wavesLasted = state.wave;
+            ui.restart.showEliminated(team);
+            netClient.setQuiet();
+        }
     }
 
     @Override

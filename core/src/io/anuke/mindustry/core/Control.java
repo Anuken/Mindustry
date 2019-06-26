@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.GL20;
 import io.anuke.arc.graphics.g2d.Draw;
@@ -131,6 +132,12 @@ public class Control implements ApplicationListener{
             }
         });
 
+        Events.on(TeamEliminatedEvent.class, event -> {
+            state.stats.wavesLasted = state.wave;
+            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            Call.onTeamEliminated(event.eliminated);
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
             if(state.rules.pvp && !Net.active()){
@@ -152,6 +159,7 @@ public class Control implements ApplicationListener{
                     state.stats.buildingsDeconstructed++;
                 }else{
                     state.stats.buildingsBuilt++;
+                    state.stats.resourcesSpent+= Array.with(e.tile.block().buildRequirements).sum(itemStack -> itemStack.amount);
                 }
             }
         });
@@ -162,6 +170,9 @@ public class Control implements ApplicationListener{
                 if(e.tile.block() instanceof CoreBlock){
                     state.stats.coresDestroyed++;
                 }
+            }
+            if(e.tile.block() instanceof CoreBlock){
+                state.stats.place = Array.with(Team.all).select(t -> state.teams.get(t).cores.size > 0).size;
             }
         });
 
