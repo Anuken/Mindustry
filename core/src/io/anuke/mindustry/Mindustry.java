@@ -86,7 +86,8 @@ public class Mindustry extends ApplicationCore{
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
         Texture icon = new Texture("sprites/logotext.png");
-        Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
+        float width = Math.min(Core.graphics.getWidth() - 10f, icon.getWidth());
+        Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, width, (float)icon.getHeight() / icon.getWidth() * width);
         Draw.flush();
 
         icon.dispose();
