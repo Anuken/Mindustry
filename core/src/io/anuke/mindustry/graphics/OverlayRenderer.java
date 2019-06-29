@@ -22,6 +22,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer{
     private static final float indicatorLength = 14f;
+    private static final float spawnerMargin = tilesize*11f;
     private static final Rectangle rect = new Rectangle();
     private float buildFadeTime;
 
@@ -89,6 +90,16 @@ public class OverlayRenderer{
                         Lines.poly(core.drawx(), core.drawy(), 200, state.rules.enemyCoreBuildRadius);
                     }
                 }
+            }
+        }
+
+        Lines.stroke(2f);
+        Draw.color(Color.GRAY, Color.LIGHT_GRAY, Mathf.absin(Time.time(), 8f, 1f));
+
+        for(Tile tile : world.spawner.getGroundSpawns()){
+            if(tile.withinDst(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
+                Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
+                Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
             }
         }
 
