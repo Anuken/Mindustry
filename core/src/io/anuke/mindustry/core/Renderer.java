@@ -44,7 +44,9 @@ public class Renderer implements ApplicationListener{
 
     public Renderer(){
         camera = new Camera();
-        bloom = new Bloom(true);
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
         Lines.setCircleVertices(20);
         Shaders.init();
 
@@ -132,14 +134,45 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         shieldBuffer.dispose();
         blocks.dispose();
-        bloom.dispose();
+        if(bloom != null){
+            bloom.dispose();
+            bloom = null;
+        }
         Events.fire(new DisposeEvent());
     }
 
     @Override
     public void resize(int width, int height){
-        bloom.dispose();
-        bloom = new Bloom(true);
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
+    }
+
+    void setupBloom(){
+        try{
+            if(bloom != null){
+                bloom.dispose();
+            }
+            bloom = new Bloom(true);
+        }catch(Exception e){
+            e.printStackTrace();
+            settings.put("bloom", false);
+            settings.save();
+            ui.showError("$error.bloom");
+        }
+    }
+
+    public void toggleBloom(boolean enabled){
+        if(enabled){
+            if(bloom == null){
+                setupBloom();
+            }
+        }else{
+            if(bloom != null){
+                bloom.dispose();
+                bloom = null;
+            }
+        }
     }
 
     void updateShake(float scale){
@@ -206,14 +239,18 @@ public class Renderer implements ApplicationListener{
         drawAllTeams(true);
 
         Draw.flush();
-        bloom.setClearColor(0f, 0f, 0f, 0f);
-        bloom.capture();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.setClearColor(0f, 0f, 0f, 0f);
+            bloom.capture();
+        }
 
         draw(bulletGroup);
         draw(effectGroup);
 
         Draw.flush();
-        bloom.render();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.render();
+        }
 
         overlays.drawBottom();
         draw(playerGroup, p -> true, Player::drawBuildRequests);
