@@ -359,10 +359,10 @@ public class HudFragment extends Fragment{
             button.getStyle().disabledFontColor = Color.WHITE;
             button.margin(16f);
             button.visible(() ->
-            world.isZone() &&
-            world.getZone().metCondition() &&
-            !Net.client() &&
-            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
+                world.isZone() &&
+                world.getZone().metCondition() &&
+                !Net.client() &&
+                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
