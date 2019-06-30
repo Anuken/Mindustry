@@ -294,6 +294,7 @@ task pack(){
                 jvmArgs "-XstartOnFirstThread"
             }
 
+            jvmArgs("-Djava.awt.headless=true")
             main = "io.anuke.mindustry.Upscaler"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in
@@ -332,6 +333,7 @@ task genSprites(dependsOn: classes, type: JavaExec){
 
     main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
+    jvmArgs("-Djava.awt.headless=true")
     standardInput = System.in
     workingDir = genFolder
 }

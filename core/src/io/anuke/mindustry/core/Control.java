@@ -321,7 +321,7 @@ public class Control implements ApplicationListener{
                 Time.update();
             }
 
-            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
+            if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
                 Platform.instance.hide();
             }
         }

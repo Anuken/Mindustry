@@ -189,11 +189,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
             if(Core.settings.getBool("fullscreen")){
-                Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
+                Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
 
             if(Core.settings.getBool("borderlesswindow")){
-                Core.graphics.setUndecorated(true);
+                Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
         }else{
             graphics.checkPref("landscape", false, b -> {
