@@ -2,8 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
@@ -155,7 +154,7 @@ public class NuclearReactor extends PowerGenerator{
         NuclearReactorEntity entity = tile.entity();
 
         Draw.color(coolColor, hotColor, entity.heat);
-        Draw.rect("white", tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
+        Fill.rect(tile.drawx(), tile.drawy(), size * tilesize, size * tilesize);
 
         Draw.color(entity.liquids.current().color);
         Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);

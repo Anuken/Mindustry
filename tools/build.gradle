@@ -303,7 +303,7 @@ task pack(){
 
         //antialias everything except UI elements (...for some reason)
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && !file.toString().replace("\\", "/").contains("/icons/"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/"))) return
 
             antialias(file.file)
         }
