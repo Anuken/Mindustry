@@ -64,7 +64,7 @@ public class MapPlayDialog extends FloatingDialog{
         buttons.clearChildren();
         addCloseButton();
 
-        buttons.addImageTextButton("$play", "icon-play", 8*3, () -> {
+        buttons.addImageTextButton("$play", "icon-play", iconsize, () -> {
             control.playMap(map, rules);
             hide();
             ui.custom.hide();

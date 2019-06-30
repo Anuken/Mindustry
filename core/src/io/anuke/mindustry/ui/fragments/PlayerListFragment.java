@@ -105,14 +105,14 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", "clear-partial", iconsize,
+                    t.addImageButton("icon-ban-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton("icon-cancel", "clear-partial", iconsize,
+                    t.addImageButton("icon-cancel-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "clear-toggle-partial", iconsize, () -> {
+                    t.addImageButton("icon-admin-small", "clear-toggle-partial", iconsizesmall, () -> {
                         if(Net.client()) return;
 
                         String id = user.uuid;
@@ -128,7 +128,7 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom", "clear-partial", iconsize, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", "clear-partial", iconsizesmall, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }

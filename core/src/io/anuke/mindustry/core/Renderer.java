@@ -112,7 +112,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile){
+            }else if(!mobile || settings.getBool("keyboard")){
                 camera.position.lerpDelta(position, 0.08f);
             }
 

@@ -141,7 +141,7 @@ public class DesktopInput extends InputHandler{
 
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
-        //zoom and rotate things
+        //zoom things
         if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }

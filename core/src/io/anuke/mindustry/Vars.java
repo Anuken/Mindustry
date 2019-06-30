@@ -61,6 +61,8 @@ public class Vars{
     public static final int iconsize = 48;
     /** size of UI icons (small)*/
     public static final int iconsizesmall = 32;
+    /** size of UI icons (medium)*/
+    public static final int iconsizemed = 42;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */
