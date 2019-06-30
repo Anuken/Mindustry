@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
@@ -33,18 +34,18 @@ public class MenuFragment extends Fragment{
         });
 
         //discord icon in top right
-        parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
-        .visible(() -> state.is(State.menu)));
+        //parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
+        //.visible(() -> state.is(State.menu)));
 
         //info icon
-        if(mobile){
-            parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
-            .visible(() -> state.is(State.menu)));
-        }
+        //if(mobile){
+        //    parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
+        //    .visible(() -> state.is(State.menu)));
+        //}
 
         //version info
-        parent.fill(c -> c.bottom().left().add(Strings.format("Mindustry v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
-        (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision))
+        parent.fill(c -> c.bottom().left().add(Strings.format("v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
+        (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
         .visible(() -> state.is(State.menu)));
     }
 
@@ -103,6 +104,40 @@ public class MenuFragment extends Fragment{
     }
 
     private void buildDesktop(){
+        container.table("dialogDim", t -> {
+            float isize = iconsizesmall;
+            float margin = 10f;
+            final String suffix = "-small";
+
+            t.left().defaults().width(230f).height(70f).left();
+
+            t.addImageTextButton("$play", "icon-play-2" + suffix, "clear", isize, ui.deploy::show).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$joingame", "icon-add" + suffix, "clear", isize, ui.join::show).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$customgame", "icon-play-custom" + suffix, "clear", isize, this::showCustomSelect).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$editor", "icon-editor" + suffix, "clear", isize, () -> ui.loadAnd(ui.editor::show)).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$maps", "icon-map" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$about.button", "icon-info" + suffix, "clear", isize, ui.about::show).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$settings", "icon-tools" + suffix, "clear", isize, ui.settings::show).marginLeft(margin);
+            t.row();
+
+            t.addImageTextButton("$quit", "icon-exit" + suffix, "clear", isize, Core.app::exit).marginLeft(margin);
+            t.row();
+
+        }).growY().margin(0f).expand().left().padLeft(200f);
+
+        /*
         container.table(out -> {
 
             float w = 200f;
@@ -134,7 +169,7 @@ public class MenuFragment extends Fragment{
             out.row();
 
             out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
-        });
+        });*/
     }
 
     private void showCustomSelect(){
