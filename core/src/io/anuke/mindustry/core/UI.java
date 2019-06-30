@@ -207,12 +207,12 @@ public class UI implements ApplicationListener{
         });
     }
 
-    public void showTextInput(String titleText, String text, String def, TextFieldFilter filter, Consumer<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, TextFieldFilter filter, Consumer<String> confirmed){
         new Dialog(titleText, "dialog"){{
             cont.margin(30).add(text).padRight(6f);
             TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
-            field.setFilter((f, c) -> field.getText().length() < 12 && filter.acceptChar(f, c));
+            field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
             Platform.instance.addDialog(field);
             buttons.defaults().size(120, 54).pad(4);
             buttons.addButton("$ok", () -> {
@@ -224,7 +224,11 @@ public class UI implements ApplicationListener{
     }
 
     public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
-        showTextInput(title, text, def, (field, c) -> true, confirmed);
+        showTextInput(title, text, 12, def, (field, c) -> true, confirmed);
+    }
+
+    public void showTextInput(String title, String text, int textLength, String def, Consumer<String> confirmed){
+        showTextInput(title, text, textLength < 0 ? 12 : textLength, def, (field, c) -> true, confirmed);
     }
 
     public void showInfoFade(String info){

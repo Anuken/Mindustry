@@ -35,7 +35,7 @@ allprojects{
         }
 
         getArcHash = {
-            //get latest commit hash from gtihub since JITPack's '-snapshot' version doesn't work correctly
+            //get latest commit hash from github since JITPack's '-snapshot' version doesn't work correctly
             if(arcHash == null){
                 try{
                     arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
@@ -172,12 +172,12 @@ project(":ios"){
 project(":core"){
     apply plugin: "java"
 
-    task finish{
+    task preGen{
         generateLocales()
     }
 
     dependencies{
-        if(System.properties["user.name"] == "anuke" && !System.properties["os.name"].contains("Mac")){
+        if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{
                     delete{
@@ -201,6 +201,8 @@ project(":core"){
             compileJava.dependsOn(cleanGen)
             compileJava.finalizedBy(copyGen)
         }
+
+        compileJava.dependsOn(preGen)
 
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
@@ -244,6 +246,12 @@ project(":tools"){
 
     dependencies{
         compile project(":core")
+
+        //for render tests
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+        compile arcModule("backends:backend-lwjgl3")
     }
 }
 

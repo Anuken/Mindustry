@@ -12,6 +12,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
 import io.anuke.arc.util.async.AsyncExecutor;
 import io.anuke.arc.util.async.AsyncResult;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.editor.generation.*;
 import io.anuke.mindustry.editor.generation.GenerateFilter.GenerateInput;
 import io.anuke.mindustry.game.Team;
@@ -27,7 +28,10 @@ import static io.anuke.mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends FloatingDialog{
-    private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new, RiverNoiseFilter::new, OreFilter::new, MedianFilter::new};
+    private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
+        NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
+        RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new
+    };
     private final MapEditor editor;
 
     private Pixmap pixmap;
@@ -63,7 +67,7 @@ public class MapGenerateDialog extends FloatingDialog{
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", "icon-add", 14 * 2, this::showAdd).height(64f).width(140f);
+        buttons.addImageTextButton("$add", "icon-add", iconsize, this::showAdd).height(64f).width(140f);
     }
 
     void setup(){
@@ -123,24 +127,24 @@ public class MapGenerateDialog extends FloatingDialog{
                 t.table(b -> {
                     b.left();
                     b.defaults().size(50f);
-                    b.addImageButton("icon-refresh", 14 * 2, () -> {
+                    b.addImageButton("icon-refresh-small", iconsizesmall, () -> {
                         filter.randomize();
                         update();
                     });
 
-                    b.addImageButton("icon-arrow-up", 10 * 2, () -> {
+                    b.addImageButton("icon-arrow-up-small", iconsizesmall, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.max(0, idx - 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-arrow-down", 10 * 2, () -> {
+                    b.addImageButton("icon-arrow-down-small", iconsizesmall, () -> {
                         int idx = filters.indexOf(filter);
                         filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                         rebuildFilters();
                         update();
                     });
-                    b.addImageButton("icon-trash", 14 * 2, () -> {
+                    b.addImageButton("icon-trash-small", iconsizesmall, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
@@ -183,6 +187,20 @@ public class MapGenerateDialog extends FloatingDialog{
             });
             if(++i % 2 == 0) selection.cont.row();
         }
+
+        selection.cont.addButton("Default Ores", () -> {
+            int index = 0;
+            for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreCoal, Blocks.oreLead, Blocks.oreTitanium, Blocks.oreThorium}){
+                OreFilter filter = new OreFilter();
+                filter.threshold += index ++ * 0.02f;
+                filter.ore = block;
+                filters.add(filter);
+            }
+
+            rebuildFilters();
+            update();
+            selection.hide();
+        });
 
         selection.addCloseButton();
         selection.show();

@@ -280,6 +280,7 @@ public class Bullets implements ContentList{
         standardCopper = new BasicBulletType(2.5f, 9, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
+            lifetime = 60f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
             ammoMultiplier = 1;
@@ -290,6 +291,7 @@ public class Bullets implements ContentList{
             bulletHeight = 12f;
             reloadMultiplier = 0.6f;
             ammoMultiplier = 2;
+            lifetime = 60f;
         }};
 
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
@@ -298,6 +300,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
             ammoMultiplier = 2;
+            lifetime = 60f;
         }};
 
         standardHoming = new BasicBulletType(3f, 9, "bullet"){{
@@ -306,6 +309,7 @@ public class Bullets implements ContentList{
             homingPower = 5f;
             reloadMultiplier = 1.4f;
             ammoMultiplier = 3;
+            lifetime = 60f;
         }};
 
         standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
@@ -317,6 +321,7 @@ public class Bullets implements ContentList{
             incendAmount = 1;
             incendChance = 0.3f;
             inaccuracy = 3f;
+            lifetime = 60f;
         }};
 
         standardGlaive = new BasicBulletType(4f, 7.5f, "bullet"){{
@@ -327,6 +332,7 @@ public class Bullets implements ContentList{
             incendSpread = 3f;
             incendAmount = 1;
             incendChance = 0.3f;
+            lifetime = 60f;
         }};
 
         standardMechSmall = new BasicBulletType(4f, 9, "bullet"){{
@@ -399,7 +405,7 @@ public class Bullets implements ContentList{
                 super.hit(b);
                 tile = tile.link();
 
-                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+                if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }

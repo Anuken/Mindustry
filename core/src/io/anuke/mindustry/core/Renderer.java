@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
@@ -21,6 +20,7 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.impl.EffectEntity;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.DisposeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
@@ -42,7 +42,6 @@ public class Renderer implements ApplicationListener{
     private float shakeIntensity, shaketime;
 
     public Renderer(){
-        batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(20);
         Shaders.init();
@@ -113,7 +112,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile){
+            }else if(!mobile || settings.getBool("keyboard")){
                 camera.position.lerpDelta(position, 0.08f);
             }
 
@@ -131,6 +130,7 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         shieldBuffer.dispose();
         blocks.dispose();
+        Events.fire(new DisposeEvent());
     }
 
     void updateShake(float scale){

@@ -58,6 +58,10 @@ public class MapGenerator extends Generator{
         return this;
     }
 
+    {
+        decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01), new Decoration(Blocks.ignarock, Blocks.pebbles, 0.03f));
+    }
+
     @Override
     public void init(Loadout loadout){
         this.loadout = loadout;
@@ -126,7 +130,9 @@ public class MapGenerator extends Generator{
 
                     if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
                         tile.setBlock(decor.wall);
-                    }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
+                    }else if(tile.floor() == decor.floor && decor.wall.isOverlay() && Mathf.chance(decor.chance)){
+                        tile.setOverlay(decor.wall);
+                    }else if(tile.floor() == decor.floor && decor.wall.isFloor() && !decor.wall.isOverlay() && Mathf.chance(decor.chance)){
                         tile.setFloor((Floor)decor.wall);
                     }
                 }

@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
@@ -65,7 +64,6 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
-            "teamdata", JsonIO.write(state.teams.getActive().toArray(TeamData.class)),
             "width", world.width(),
             "height", world.height()
         ).merge(tags));
@@ -79,12 +77,6 @@ public abstract class SaveVersion extends SaveFileReader{
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
-
-        //only broken blocks are transferred over right now; nothing else
-        TeamData[] teams = JsonIO.read(TeamData[].class, map.get("teamdata", "[]"));
-        for(TeamData data : teams){
-            state.teams.get(data.team).brokenBlocks = data.brokenBlocks;
-        }
 
         Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(

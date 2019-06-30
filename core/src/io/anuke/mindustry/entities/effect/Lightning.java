@@ -14,18 +14,16 @@ import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.impl.TimedEntity;
-import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.traits.DrawTrait;
+import io.anuke.mindustry.entities.traits.TimeTrait;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-
 import static io.anuke.mindustry.Vars.bulletGroup;
 
-public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, TimeTrait{
+public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
 
     private static final RandomXS128 random = new RandomXS128();
@@ -89,19 +87,6 @@ public class Lightning extends TimedEntity implements DrawTrait, SyncTrait, Time
                 y += Angles.trnsy(rotation, hitRange / 2f);
             }
         }
-    }
-
-    @Override
-    public boolean isSyncing(){
-        return false;
-    }
-
-    @Override
-    public void write(DataOutput data){
-    }
-
-    @Override
-    public void read(DataInput data){
     }
 
     @Override

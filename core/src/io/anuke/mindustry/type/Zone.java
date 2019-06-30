@@ -121,7 +121,8 @@ public class Zone extends UnlockableContent{
 
     /** Whether this zone has met its condition; if true, the player can leave. */
     public boolean metCondition(){
-        return state.wave >= conditionWave;
+        //players can't leave in attack mode.
+        return state.wave >= conditionWave && !state.rules.attackMode;
     }
 
     public boolean canConfigure(){

@@ -384,7 +384,7 @@ public class Blocks implements ContentList{
 
         darkMetal = new StaticWall("dark-metal");
 
-        pebbles = new OverlayFloor("pebbles");
+        pebbles = new DoubleOverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 
@@ -1433,15 +1433,15 @@ public class Blocks implements ContentList{
             );
 
             size = 2;
-            range = 120f;
-            reload = 35f;
+            range = 150f;
+            reload = 30f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
             recoil = 3f;
             shootShake = 2f;
-            burstSpacing = 4;
-            shots = 3;
+            burstSpacing = 3f;
+            shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
             health = 360;
         }};
@@ -1687,7 +1687,7 @@ public class Blocks implements ContentList{
 
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 30, Items.copper, 30, Items.silicon, 30));
-            repairSpeed = 0.1f;
+            repairSpeed = 0.3f;
             powerUse = 1f;
         }};
 

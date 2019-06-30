@@ -12,7 +12,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.graphics.Pal;
@@ -59,7 +58,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         Consumer<SettingsTable> s = table -> {
             table.row();
-            table.addImageTextButton("$back", "icon-arrow-left", 10 * 3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+            table.addImageTextButton("$back", "icon-arrow-left", iconsize, this::back).size(240f, 60f).colspan(2).padTop(15f);
         };
 
         game = new SettingsTable(s);
@@ -76,12 +75,10 @@ public class SettingsMenuDialog extends SettingsDialog{
         menu.addButton("$settings.graphics", () -> visible(1));
         menu.row();
         menu.addButton("$settings.sound", () -> visible(2));
-        if(!Vars.mobile){
-            menu.row();
-            menu.addButton("$settings.controls", ui.controls::show);
-        }
         menu.row();
         menu.addButton("$settings.language", ui.language::show);
+        menu.row();
+        menu.addButton("$settings.controls", ui.controls::show).visible(() -> !mobile || Core.settings.getBool("keyboard"));
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -125,6 +122,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         if(mobile){
             game.checkPref("autotarget", true);
+            game.checkPref("keyboard", false);
         }
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
@@ -191,11 +189,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
             if(Core.settings.getBool("fullscreen")){
-                Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
+                Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
 
             if(Core.settings.getBool("borderlesswindow")){
-                Core.graphics.setUndecorated(true);
+                Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
         }else{
             graphics.checkPref("landscape", false, b -> {

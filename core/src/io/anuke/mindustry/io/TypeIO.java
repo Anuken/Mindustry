@@ -139,6 +139,10 @@ public class TypeIO{
             int position = buffer.getInt();
             BuildRequest currentRequest;
 
+            if(world.tile(position) == null){
+                continue;
+            }
+
             if(type == 1){ //remove
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position));
             }else{ //place

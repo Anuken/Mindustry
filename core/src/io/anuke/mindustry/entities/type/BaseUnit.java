@@ -105,7 +105,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean targetHasFlag(BlockFlag flag){
-        return target instanceof TileEntity && ((TileEntity)target).tile.block().flags.contains(flag);
+        return (target instanceof TileEntity && ((TileEntity)target).tile.block().flags.contains(flag)) ||
+        (target instanceof Tile && ((Tile)target).block().flags.contains(flag));
     }
 
     public void setState(UnitState state){

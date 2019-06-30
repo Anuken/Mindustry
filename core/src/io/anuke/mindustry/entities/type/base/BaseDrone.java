@@ -17,7 +17,7 @@ public abstract class BaseDrone extends FlyingUnit{
 
         public void update(){
             if(health >= maxHealth()){
-                state.set(attack);
+                state.set(getStartState());
             }else if(!targetHasFlag(BlockFlag.repair)){
                 if(retarget()){
                     Tile repairPoint = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
@@ -44,7 +44,7 @@ public abstract class BaseDrone extends FlyingUnit{
 
     @Override
     public void behavior(){
-        if(health <= health * type.retreatPercent){
+        if(health <= maxHealth() * type.retreatPercent && !state.is(retreat) && Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }

@@ -261,7 +261,7 @@ public class TechTree implements ContentList{
                             });
 
                             node(wraithFactory, () -> {
-                                node(spiritFactory, () -> {
+                                node(ghoulFactory, () -> {
                                     node(revenantFactory, () -> {
 
                                     });

@@ -58,7 +58,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         cont.table(cont -> {
             if(zone.locked()){
-                cont.addImage("icon-zone-locked");
+                cont.addImage("icon-locked");
                 cont.row();
                 cont.add("$locked").padBottom(6);
                 cont.row();
@@ -71,9 +71,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$complete").colspan(2).left();
                             r.row();
                             for(ZoneRequirement other : zone.zoneRequirements){
-                                r.addImage("icon-zone").padRight(4);
+                                r.addImage("icon-terrain").padRight(4);
                                 r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.LIGHT_GRAY);
-                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check-2" : "icon-cancel-2")
+                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check" : "icon-cancel")
                                 .color(other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
@@ -89,7 +89,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             for(Block block : zone.blockRequirements){
                                 r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
                                 r.add(block.localizedName).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isUnlocked(block) ? "icon-check-2" : "icon-cancel-2")
+                                r.addImage(data.isUnlocked(block) ? "icon-check" : "icon-cancel")
                                 .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }

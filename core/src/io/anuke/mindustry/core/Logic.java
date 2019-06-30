@@ -15,6 +15,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.gen.BrokenBlock;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -130,8 +131,13 @@ public class Logic implements ApplicationListener{
             }
 
             if(alive != null && !state.gameOver){
+                if(world.isZone() && alive == defaultTeam){
+                    //in attack maps, a victorious game over is equivalent to a launch
+                    Call.launchZone();
+                }else{
+                    Events.fire(new GameOverEvent(alive));
+                }
                 state.gameOver = true;
-                Events.fire(new GameOverEvent(alive));
             }
         }
     }
@@ -154,6 +160,9 @@ public class Logic implements ApplicationListener{
                 world.removeBlock(tile);
             }
             state.launched = true;
+            state.gameOver = true;
+            //manually fire game over event now
+            Events.fire(new GameOverEvent(defaultTeam));
         });
     }
 

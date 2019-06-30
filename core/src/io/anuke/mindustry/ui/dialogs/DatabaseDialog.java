@@ -46,20 +46,20 @@ public class DatabaseDialog extends FloatingDialog{
                 list.left();
 
                 int maxWidth = Core.graphics.isPortrait() ? 7 : 13;
-                int size = 8 * 5;
+                float size = Vars.iconsize;
 
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-tree-locked");
+                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
                     image.addListener(new HandCursorListener());
                     list.add(image).size(size).pad(3);
 
                     if(unlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip(t -> t.add(unlock.localizedName())));
+                        image.addListener(new Tooltip(t -> t.background("button").add(unlock.localizedName())));
                     }
 
                     if((++count) % maxWidth == 0){

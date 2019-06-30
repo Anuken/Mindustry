@@ -33,32 +33,21 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
 
             if(entity == null) return;
 
-            if(targetItem == null){
-                findItem();
-            }
+            findItem();
 
-            //core full
+            //core full of the target item, do nothing
             if(targetItem != null && entity.block.acceptStack(targetItem, 1, entity.tile, MinerDrone.this) == 0){
                 MinerDrone.this.clearItem();
                 return;
             }
 
             //if inventory is full, drop it off.
-            if(item.amount >= getItemCapacity()){
+            if(item.amount >= getItemCapacity() || (targetItem != null && !acceptsItem(targetItem))){
                 setState(drop);
             }else{
-                if(targetItem != null && !acceptsItem(targetItem)){
-                    setState(drop);
-                    return;
-                }
-
-                if(retarget()){
-                    findItem();
-
-                    if(targetItem == null) return;
-
+                if(retarget() && targetItem != null){
                     target = world.indexer.findClosestOre(x, y, targetItem);
-                };
+                }
 
                 if(target instanceof Tile){
                     moveTo(type.range / 1.5f);
@@ -92,13 +81,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         }
 
         public void update(){
-            if(item.amount == 0){
-                setState(mine);
-                return;
-            }
-
-            if(item.item.type != ItemType.material){
-                item.amount = 0;
+            if(item.amount == 0 || item.item.type != ItemType.material){
                 setState(mine);
                 return;
             }
