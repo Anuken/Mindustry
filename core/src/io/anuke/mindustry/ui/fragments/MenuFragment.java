@@ -2,7 +2,9 @@ package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.*;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
@@ -12,7 +14,8 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
-    private Table container;
+    private Table container, submenu;
+    private Button currentMenu;
 
     @Override
     public void build(Group parent){
@@ -99,13 +102,27 @@ public class MenuFragment extends Fragment{
     }
 
     private void buildDesktop(){
-        container.table("dialogDim", t -> {
-            float isize = iconsizesmall;
-            float margin = 10f;
-            final String suffix = "-small";
+        float width = 230f;
+        String background = "dialogDim";
 
-            t.left().defaults().width(230f).height(70f).left();
+        container.left();
+        container.table(background, t -> {
+            t.defaults().width(width).height(70f);
 
+            buttons(t,
+                new Buttoni("$play", "icon-play-2",
+                    new Buttoni("$campaign", "icon-play-2", ui.deploy::show),
+                    new Buttoni("$joingame", "icon-add", ui.join::show),
+                    new Buttoni("$customgame", "icon-terrain", ui.custom::show),
+                    new Buttoni("$loadgame", "icon-load", ui.load::show)
+                ),
+                new Buttoni("$editor", "icon-editor", ui.maps::show),
+                new Buttoni("$settings", "icon-tools", ui.settings::show), //todo submenu
+                new Buttoni("$about.button", "icon-info", ui.about::show), //todo submenu
+                new Buttoni("$quit", "icon-exit", Core.app::exit)
+            );
+
+            /*
             t.addImageTextButton("$play", "icon-play-2" + suffix, "clear", isize, ui.deploy::show).marginLeft(margin);
             t.row();
 
@@ -113,24 +130,17 @@ public class MenuFragment extends Fragment{
             t.row();
 
             t.addImageTextButton("$customgame", "icon-play-custom" + suffix, "clear", isize, this::showCustomSelect).marginLeft(margin);
-            t.row();
+            t.row();*/
 
-            t.addImageTextButton("$editor", "icon-editor" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
-            t.row();
+        }).width(width).growY();
 
-            //t.addImageTextButton("$maps", "icon-map" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
-            //t.row();
+        container.table(background, t -> {
+            submenu = t;
+            t.top();
+            t.defaults().width(width).height(70f);
+            t.visible(() -> !t.getChildren().isEmpty());
 
-            t.addImageTextButton("$about.button", "icon-info" + suffix, "clear", isize, ui.about::show).marginLeft(margin);
-            t.row();
-
-            t.addImageTextButton("$settings", "icon-tools" + suffix, "clear", isize, ui.settings::show).marginLeft(margin);
-            t.row();
-
-            t.addImageTextButton("$quit", "icon-exit" + suffix, "clear", isize, Core.app::exit).marginLeft(margin);
-            t.row();
-
-        }).growY().margin(0f).expand().left().padLeft(200f);
+        }).width(width).growY();
 
         /*
         container.table(out -> {
@@ -167,6 +177,34 @@ public class MenuFragment extends Fragment{
         });*/
     }
 
+    private void buttons(Table t, Buttoni... buttons){
+        for(Buttoni b : buttons){
+            Button[] out = {null};
+            out[0] = t.addImageTextButton(b.text, b.icon + "-small", "clear-toggle",
+                    iconsizesmall, () -> {
+                if(currentMenu == out[0]){
+                    currentMenu = null;
+                    submenu.clearChildren();
+                }else{
+                    if(b.submenu != null){
+                        currentMenu = out[0];
+                        submenu.clearChildren();
+                        //correctly offset the button
+                        submenu.add().height(Core.graphics.getHeight() - out[0].getY(Align.topLeft));
+                        submenu.row();
+                        buttons(submenu, b.submenu);
+                    }else{
+                        currentMenu = null;
+                        submenu.clearChildren();
+                        b.runnable.run();
+                    }
+                }
+            }).marginLeft(11f).get();
+            out[0].update(() -> out[0].setChecked(currentMenu == out[0]));
+            t.row();
+        }
+    }
+
     private void showCustomSelect(){
         FloatingDialog dialog = new FloatingDialog("$play");
         dialog.setFillParent(false);
@@ -182,5 +220,26 @@ public class MenuFragment extends Fragment{
             dialog.hide();
         }));
         dialog.show();
+    }
+
+    private class Buttoni{
+        final String icon;
+        final String text;
+        final Runnable runnable;
+        final Buttoni[] submenu;
+
+        public Buttoni(String text, String icon, Runnable runnable){
+            this.icon = icon;
+            this.text = text;
+            this.runnable = runnable;
+            this.submenu = null;
+        }
+
+        public Buttoni(String text, String icon, Buttoni... buttons){
+            this.icon = icon;
+            this.text = text;
+            this.runnable = () -> {};
+            this.submenu = buttons;
+        }
     }
 }
