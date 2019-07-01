@@ -1,17 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.ui.MenuButton;
-import io.anuke.mindustry.ui.MobileButton;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
@@ -44,9 +39,9 @@ public class MenuFragment extends Fragment{
         //}
 
         //version info
-        parent.fill(c -> c.bottom().left().add(Strings.format("v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
-        (Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
-        .visible(() -> state.is(State.menu)));
+        //parent.fill(c -> c.bottom().left().add(Strings.format("v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
+        //(Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
+        //.visible(() -> state.is(State.menu)));
     }
 
     private void buildMobile(){
