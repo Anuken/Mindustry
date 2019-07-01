@@ -180,7 +180,13 @@ public class CoreBlock extends StorageBlock{
                     if(eater.entity().items.total() > 0){
                         Item i = eater.entity.items.take();
                         Tile target = state.teams.get(team).cores.first();
-                        Call.transferItemTo(i, 1, eater.entity().x, eater.entity().y, target);
+                        for(Tile eaterCheck : state.teams.get(team).eaters){
+                            if(eaterCheck.entity().items.total() < eaterCheck.block().itemCapacity){
+                                target = eaterCheck;
+                                break;
+                            }
+                        }
+                        Call.transferItemTo(i, Math.round(damage/10), eater.entity().x, eater.entity().y, target);
                     }
                 }
             }

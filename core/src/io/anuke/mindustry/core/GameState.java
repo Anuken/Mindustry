@@ -68,7 +68,7 @@ public class GameState{
         paused, playing, menu
     }
 
-    public Array<Team> getWeakest(){
+    public Team getWeakest(){
         int min = Integer.MAX_VALUE;
         for(int i=0; i < points.length; i++) {
             if(points[i]==-1)
@@ -76,10 +76,9 @@ public class GameState{
             if(min > points[i])
                 min = points[i];
         }
-        Array<Team> out = new Array<>();
         for(int i=0; i<Team.all.length; i++)
             if(points[i]==min)
-                out.add(Team.all[i]);
-        return out;
+                return Team.all[i];
+        return null;
     }
 }

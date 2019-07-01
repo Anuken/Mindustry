@@ -127,9 +127,7 @@ public class Logic implements ApplicationListener{
 
         calcPoints();
 
-        for(Team team : state.getWeakest()){
-            Call.eliminateTeam(team.ordinal());
-        }
+        Call.eliminateTeam(state.getWeakest().ordinal());
 
         Call.onRound();
     }
