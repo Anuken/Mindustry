@@ -120,11 +120,11 @@ public class MenuFragment extends Fragment{
             t.addImageTextButton("$customgame", "icon-play-custom" + suffix, "clear", isize, this::showCustomSelect).marginLeft(margin);
             t.row();
 
-            t.addImageTextButton("$editor", "icon-editor" + suffix, "clear", isize, () -> ui.loadAnd(ui.editor::show)).marginLeft(margin);
+            t.addImageTextButton("$editor", "icon-editor" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
             t.row();
 
-            t.addImageTextButton("$maps", "icon-map" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
-            t.row();
+            //t.addImageTextButton("$maps", "icon-map" + suffix, "clear", isize, ui.maps::show).marginLeft(margin);
+            //t.row();
 
             t.addImageTextButton("$about.button", "icon-info" + suffix, "clear", isize, ui.about::show).marginLeft(margin);
             t.row();

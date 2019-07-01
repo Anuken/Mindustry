@@ -21,7 +21,17 @@ public class MapsDialog extends FloatingDialog{
         super("$maps");
 
         addCloseButton();
-        buttons.addImageTextButton("$editor.importmap", "icon-add", iconsize, () -> {
+
+        buttons.addImageTextButton("$editor.newmap", "icon-add", iconsize, () -> {
+            ui.showTextInput("$editor.newmap", "$name", "", text -> {
+                ui.loadAnd(() -> {
+                    ui.editor.show();
+                    ui.editor.editor.getTags().put("name", text);
+                });
+            });
+        }).size(230f, 64f);
+
+        buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
                 world.maps.tryCatchMapError(() -> {
                     if(MapIO.isImage(file)){
@@ -61,6 +71,8 @@ public class MapsDialog extends FloatingDialog{
                 });
             }, true, FileChooser.anyMapFiles);
         }).size(230f, 64f);
+
+        buttons.remove();
 
         shown(this::setup);
         onResize(() -> {
@@ -107,6 +119,8 @@ public class MapsDialog extends FloatingDialog{
             maps.add("$maps.none");
         }
 
+        cont.add(buttons).growX();
+        cont.row();
         cont.add(pane).uniformX();
     }
 
