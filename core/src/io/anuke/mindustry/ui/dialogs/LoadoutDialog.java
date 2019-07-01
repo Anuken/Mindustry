@@ -2,10 +2,9 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.function.Predicate;
+import io.anuke.arc.function.Supplier;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.mindustry.type.*;
-
-import java.util.function.Supplier;
 
 import static io.anuke.mindustry.Vars.content;
 
