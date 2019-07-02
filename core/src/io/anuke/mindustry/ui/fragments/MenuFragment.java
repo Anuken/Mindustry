@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -24,10 +24,11 @@ public class MenuFragment extends Fragment{
     private Texture logo = new Texture("sprites/logo.png");
     private Table container, submenu;
     private Button currentMenu;
-    private MenuRenderer renderer = new MenuRenderer();
+    private MenuRenderer renderer;
 
     @Override
     public void build(Group parent){
+        renderer = new MenuRenderer();
 
         Core.scene.table().addRect((a, b, w, h) -> {
             renderer.render();
@@ -39,6 +40,7 @@ public class MenuFragment extends Fragment{
 
             if(!mobile){
                 buildDesktop();
+                Events.on(ResizeEvent.class, event -> buildDesktop());
             }else{
                 buildMobile();
                 Events.on(ResizeEvent.class, event -> buildMobile());
@@ -67,11 +69,11 @@ public class MenuFragment extends Fragment{
 
             boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
             float logoscl = (int)Unit.dp.scl(1);
-            float logow = Math.min(logo.getWidth() * logoscl, 768);
+            float logow = Math.min(Math.min(logo.getWidth() * logoscl, 768), Core.graphics.getWidth() - 10);
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             Draw.color();
-            Draw.rect(Draw.wrap(logo), (int)(w / 2), (int)(h - 10 - logoh - Unit.dp.scl(portrait ? 30f : 0)) + logoh / 2, logow, logoh);
+            Draw.rect(Draw.wrap(logo), (int)(w / 2), (int)(h - 10 - logoh) + logoh / 2, logow, logoh);
         }).visible(() -> state.is(State.menu)).grow().get().touchable(Touchable.disabled);
     }
 
@@ -130,10 +132,15 @@ public class MenuFragment extends Fragment{
     }
 
     private void buildDesktop(){
+        container.clear();
+        container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
+
+
         float width = 230f;
-        String background = "dialogDim";
+        String background = "flat";
 
         container.left();
+        container.add().width(Core.graphics.getWidth()/10f);
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
 
@@ -208,7 +215,7 @@ public class MenuFragment extends Fragment{
     private void buttons(Table t, Buttoni... buttons){
         for(Buttoni b : buttons){
             Button[] out = {null};
-            out[0] = t.addImageTextButton(b.text, b.icon + "-small", "clear-toggle",
+            out[0] = t.addImageTextButton(b.text, b.icon + "-small", "clear-toggle-menu",
                     iconsizesmall, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;

@@ -138,6 +138,16 @@
       over: flat-over,
       disabled: flat,
       disabledFontColor: gray
+    },
+    clear-toggle-menu: {
+      font: default-font,
+      fontColor: white,
+      checked: flat-down,
+      down: flat-down,
+      up: clear,
+      over: flat-over,
+      disabled: flat,
+      disabledFontColor: gray
     }
     toggle: {
       font: default-font,
