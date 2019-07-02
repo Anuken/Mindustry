@@ -75,23 +75,8 @@ public class UI implements ApplicationListener{
         Core.scene = new Scene(skin);
         Core.input.addProcessor(Core.scene);
 
-        Dialog.setShowAction(() -> sequence(
-            alpha(0f),
-            originCenter(),
-            moveToAligned(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center),
-            scaleTo(0.0f, 1f),
-            parallel(
-                scaleTo(1f, 1f, 0.1f, Interpolation.fade),
-                fadeIn(0.1f, Interpolation.fade)
-            )
-        ));
-
-        Dialog.setHideAction(() -> sequence(
-            parallel(
-                scaleTo(0.01f, 0.01f, 0.1f, Interpolation.fade),
-                fadeOut(0.1f, Interpolation.fade)
-            )
-        ));
+        Dialog.setShowAction(() -> sequence());
+        Dialog.setHideAction(() -> sequence());
 
         Tooltips.getInstance().animations = false;
 

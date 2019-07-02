@@ -1,24 +1,38 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.*;
+import io.anuke.arc.Core;
+import io.anuke.arc.Events;
+import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.graphics.MenuRenderer;
+import io.anuke.mindustry.ui.MenuButton;
+import io.anuke.mindustry.ui.MobileButton;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
+    private Texture logo = new Texture("sprites/logo.png");
     private Table container, submenu;
     private Button currentMenu;
+    private MenuRenderer renderer = new MenuRenderer();
 
     @Override
     public void build(Group parent){
+
+        Core.scene.table().addRect((a, b, w, h) -> {
+            renderer.render();
+        });
+
         parent.fill(c -> {
             container = c;
             container.visible(() -> state.is(State.menu));
@@ -45,6 +59,20 @@ public class MenuFragment extends Fragment{
         //parent.fill(c -> c.bottom().left().add(Strings.format("v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
         //(Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
         //.visible(() -> state.is(State.menu)));
+
+        Core.scene.table().addRect((a, b, w, h) -> {
+            //Draw.shader(Shaders.menu);
+            // Fill.crect(0, 0, w, h);
+            //Draw.shader();
+
+            boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
+            float logoscl = (int)Unit.dp.scl(1);
+            float logow = Math.min(logo.getWidth() * logoscl, 768);
+            float logoh = logow * (float)logo.getHeight() / logo.getWidth();
+
+            Draw.color();
+            Draw.rect(Draw.wrap(logo), (int)(w / 2), (int)(h - 10 - logoh - Unit.dp.scl(portrait ? 30f : 0)) + logoh / 2, logow, logoh);
+        }).visible(() -> state.is(State.menu)).grow().get().touchable(Touchable.disabled);
     }
 
     private void buildMobile(){

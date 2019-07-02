@@ -88,15 +88,15 @@ public class DeployDialog extends FloatingDialog{
             button.row();
             button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
             button.row();
-            button.add().grow();
-            button.row();
 
-            button.addButton("$abandon", () -> {
+            row();
+
+            addButton("$abandon", () -> {
                 ui.showConfirm("$warning", "$abandon.text", () -> {
                     slot.delete();
                     setup();
                 });
-            }).growX().height(50f).pad(-12).padTop(10);
+            }).fillX().height(50f).pad(3);
 
         }}, new ItemsDisplay()).grow();
 
