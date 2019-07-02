@@ -11,7 +11,6 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -117,7 +116,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
+            full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
                 InputHandler input = control.input();

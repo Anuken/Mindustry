@@ -280,7 +280,9 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     @Override
     public void removed(){
-        map.remove(tile.pos());
+        if(tile != null){
+            map.remove(tile.pos());
+        }
         reset();
     }
 

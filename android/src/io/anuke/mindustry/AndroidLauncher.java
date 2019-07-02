@@ -146,7 +146,7 @@ public class AndroidLauncher extends AndroidApplication{
                 InputStream inStream;
                 if(myFile != null) inStream = new FileInputStream(myFile);
                 else inStream = getContentResolver().openInputStream(uri);
-                Core.app.post(() -> {
+                Core.app.post(() -> Core.app.post(() -> {
                     if(save){ //open save
                         System.out.println("Opening save.");
                         FileHandle file = Core.files.local("temp-save." + saveExtension);
@@ -172,7 +172,7 @@ public class AndroidLauncher extends AndroidApplication{
                             ui.editor.beginEditMap(file);
                         });
                     }
-                });
+                }));
             }
         }catch(IOException e){
             e.printStackTrace();

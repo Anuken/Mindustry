@@ -115,7 +115,7 @@ public class HudFragment extends Fragment{
                     int index = 0;
                     for(Element elem : children){
                         int fi = index++;
-                        Core.scene.add(elem);
+                        parent.add(elem);
                         elem.visible(() -> {
                             if(fi < 4){
                                 elem.setSize(size);
@@ -392,7 +392,7 @@ public class HudFragment extends Fragment{
             t.add("$saveload");
         });
 
-        blockfrag.build(Core.scene.root);
+        blockfrag.build(parent);
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
