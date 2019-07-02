@@ -4,13 +4,12 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.MenuRenderer;
@@ -30,13 +29,12 @@ public class MenuFragment extends Fragment{
     public void build(Group parent){
         renderer = new MenuRenderer();
 
-        Core.scene.table().addRect((a, b, w, h) -> {
+        parent.fill((x, y, w, h) -> {
             renderer.render();
         });
 
         parent.fill(c -> {
             container = c;
-            container.visible(() -> state.is(State.menu));
 
             if(!mobile){
                 buildDesktop();
@@ -62,19 +60,14 @@ public class MenuFragment extends Fragment{
         //(Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
         //.visible(() -> state.is(State.menu)));
 
-        Core.scene.table().addRect((a, b, w, h) -> {
-            //Draw.shader(Shaders.menu);
-            // Fill.crect(0, 0, w, h);
-            //Draw.shader();
-
-            boolean portrait = Core.graphics.getWidth() < Core.graphics.getHeight();
+        parent.fill((x, y, w, h) -> {
             float logoscl = (int)Unit.dp.scl(1);
             float logow = Math.min(Math.min(logo.getWidth() * logoscl, 768), Core.graphics.getWidth() - 10);
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             Draw.color();
-            Draw.rect(Draw.wrap(logo), (int)(w / 2), (int)(h - 10 - logoh) + logoh / 2, logow, logoh);
-        }).visible(() -> state.is(State.menu)).grow().get().touchable(Touchable.disabled);
+            Draw.rect(Draw.wrap(logo), (int)(Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2, logow, logoh);
+        }).touchable(Touchable.disabled);
     }
 
     private void buildMobile(){
@@ -157,16 +150,6 @@ public class MenuFragment extends Fragment{
                 new Buttoni("$quit", "icon-exit", Core.app::exit)
             );
 
-            /*
-            t.addImageTextButton("$play", "icon-play-2" + suffix, "clear", isize, ui.deploy::show).marginLeft(margin);
-            t.row();
-
-            t.addImageTextButton("$joingame", "icon-add" + suffix, "clear", isize, ui.join::show).marginLeft(margin);
-            t.row();
-
-            t.addImageTextButton("$customgame", "icon-play-custom" + suffix, "clear", isize, this::showCustomSelect).marginLeft(margin);
-            t.row();*/
-
         }).width(width).growY();
 
         container.table(background, t -> {
@@ -176,40 +159,6 @@ public class MenuFragment extends Fragment{
             t.visible(() -> !t.getChildren().isEmpty());
 
         }).width(width).growY();
-
-        /*
-        container.table(out -> {
-
-            float w = 200f;
-            float bw = w * 2f + 10f;
-
-            out.margin(16);
-            out.defaults().size(w, 66f).padTop(5).padRight(5);
-
-            out.add(new MenuButton("icon-play-2", "$play", ui.deploy::show)).width(bw).colspan(2);
-
-            out.row();
-
-            out.add(new MenuButton("icon-add", "$joingame", ui.join::show));
-
-            out.add(new MenuButton("icon-play-custom", "$customgame", this::showCustomSelect));
-
-            out.row();
-
-            out.add(new MenuButton("icon-editor", "$editor", () -> ui.loadAnd(ui.editor::show)));
-
-            out.add(new MenuButton("icon-map", "$maps", ui.maps::show));
-
-            out.row();
-
-            out.add(new MenuButton("icon-info", "$about.button", ui.about::show));
-
-            out.add(new MenuButton("icon-tools", "$settings", ui.settings::show));
-
-            out.row();
-
-            out.add(new MenuButton("icon-exit", "$quit", Core.app::exit)).width(bw).colspan(2);
-        });*/
     }
 
     private void buttons(Table t, Buttoni... buttons){

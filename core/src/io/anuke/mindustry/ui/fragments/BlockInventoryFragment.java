@@ -52,7 +52,6 @@ public class BlockInventoryFragment extends Fragment{
     @Override
     public void build(Group parent){
         table = new Table();
-        table.visible(() -> !state.is(State.menu));
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);

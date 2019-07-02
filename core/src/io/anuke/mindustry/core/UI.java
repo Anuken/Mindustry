@@ -13,12 +13,13 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.Tooltip.Tooltips;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.editor.MapEditorDialog;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
@@ -37,6 +38,8 @@ public class UI implements ApplicationListener{
     public PlayerListFragment listfrag;
     public BackgroundFragment backfrag;
     public LoadingFragment loadfrag;
+
+    public WidgetGroup menuGroup, hudGroup;
 
     public AboutDialog about;
     public GameOverDialog restart;
@@ -128,6 +131,9 @@ public class UI implements ApplicationListener{
 
     @Override
     public void init(){
+        menuGroup = new WidgetGroup();
+        hudGroup = new WidgetGroup();
+
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
         chatfrag = new ChatFragment();
@@ -160,12 +166,22 @@ public class UI implements ApplicationListener{
 
         Group group = Core.scene.root;
 
-        backfrag.build(group);
-        control.input().getFrag().build(group);
-        hudfrag.build(group);
-        menufrag.build(group);
-        chatfrag.container().build(group);
-        listfrag.build(group);
+        menuGroup.setFillParent(true);
+        menuGroup.touchable(Touchable.childrenOnly);
+        menuGroup.visible(() -> state.is(State.menu));
+        hudGroup.setFillParent(true);
+        hudGroup.touchable(Touchable.childrenOnly);
+        hudGroup.visible(() -> !state.is(State.menu));
+
+        Core.scene.add(menuGroup);
+        Core.scene.add(hudGroup);
+
+       // backfrag.build(group);
+        control.input().getFrag().build(hudGroup);
+        hudfrag.build(hudGroup);
+        menufrag.build(menuGroup);
+        chatfrag.container().build(hudGroup);
+        listfrag.build(hudGroup);
         loadfrag.build(group);
     }
 

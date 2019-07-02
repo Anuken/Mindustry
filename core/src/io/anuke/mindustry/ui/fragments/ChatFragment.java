@@ -15,14 +15,14 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.input;
 import static io.anuke.arc.Core.scene;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.maxTextLength;
+import static io.anuke.mindustry.Vars.mobile;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
@@ -61,7 +61,7 @@ public class ChatFragment extends Table{
                 }
             }
 
-            return !state.is(State.menu) && Net.active();
+            return Net.active();
         });
 
         update(() -> {

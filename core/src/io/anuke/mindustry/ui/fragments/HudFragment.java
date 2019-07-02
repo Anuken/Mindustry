@@ -58,14 +58,13 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
-            cont.top().left().visible(() -> !state.is(State.menu));
+            cont.top().left();
 
             if(mobile){
 
                 {
                     Table select = new Table();
 
-                    select.visible(() -> !state.is(State.menu));
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -124,7 +123,7 @@ public class HudFragment extends Fragment{
                                 elem.setSize(Unit.dp.scl(3f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
-                            return !state.is(State.menu);
+                            return true;
                         });
                     }
 
@@ -265,12 +264,11 @@ public class HudFragment extends Fragment{
         });
 
         //minimap
-        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
+        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap")));
 
         //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
-            t.visible(() -> !state.is(State.menu));
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
@@ -278,7 +276,7 @@ public class HudFragment extends Fragment{
         });
 
         parent.fill(t -> {
-            t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
+            t.visible(() -> netServer.isWaitingForPlayers());
             t.table("button", c -> c.add("$waiting.players"));
         });
 
@@ -331,7 +329,7 @@ public class HudFragment extends Fragment{
 
         //launch button
         parent.fill(t -> {
-            t.top().right().visible(() -> !state.is(State.menu));
+            t.top().right();
             TextButton[] testb = {null};
             TextButton button = Elements.newButton("$launch", () -> {
                 FloatingDialog dialog = new FloatingDialog("$launch");
@@ -390,7 +388,7 @@ public class HudFragment extends Fragment{
 
         //'saving' indicator
         parent.fill(t -> {
-            t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
+            t.bottom().visible(() -> control.saves.isSaving());
             t.add("$saveload");
         });
 
