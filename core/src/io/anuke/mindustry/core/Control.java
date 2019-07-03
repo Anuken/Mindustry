@@ -11,6 +11,7 @@ import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -269,6 +270,10 @@ public class Control implements ApplicationListener{
                 "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
+        }
+
+        for(int i = 0; i < TypeTrait.registeredTypes.size; i++){
+            Log.info("{0} = {1}", i, TypeTrait.getTypeByID(i).get().getClass().getSimpleName());
         }
     }
 

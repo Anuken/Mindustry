@@ -231,6 +231,22 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readEntities(DataInput stream) throws IOException{
+        /* Latest data:
+        0 = Player
+        1 = Fire
+        2 = Puddle
+        3 = Draug
+        4 = Spirit
+        5 = Phantom
+        6 = Dagger
+        7 = Crawler
+        8 = Titan
+        9 = Fortress
+        10 = Eruptor
+        11 = Wraith
+        12 = Ghoul
+        13 = Revenant
+         */
         byte groups = stream.readByte();
 
         for(int i = 0; i < groups; i++){
