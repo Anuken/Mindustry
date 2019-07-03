@@ -94,7 +94,7 @@ public class MapsDialog extends FloatingDialog{
             button.margin(9);
             button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
-            button.addImage("white").growX().pad(4).color(Color.GRAY);
+            button.addImage("whiteui").growX().pad(4).color(Color.GRAY);
             button.row();
             button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();

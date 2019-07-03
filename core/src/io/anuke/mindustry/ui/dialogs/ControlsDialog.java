@@ -15,7 +15,7 @@ public class ControlsDialog extends KeybindDialog{
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image("white"))
+        titleTable.add(new Image("whiteui"))
         .growX().height(3f).pad(4f).get().setColor(Pal.accent);
     }
 

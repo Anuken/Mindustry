@@ -532,7 +532,7 @@ public class HudFragment extends Fragment{
     }
 
     public void showLaunch(){
-        Image image = new Image("white");
+        Image image = new Image("whiteui");
         image.getColor().a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));

@@ -300,7 +300,16 @@ task pack(dependsOn: classes){
             workingDir = "../core/assets-raw/sprites_out/ui/icons"
         }
 
-        //antialias everything except UI elements (...for some reason)
+        copy{
+            from "../core/assets-raw/sprites_out/ui/icons"
+            into "../core/assets-raw/sprites_out/ui/"
+        }
+
+        delete{
+            delete "../core/assets-raw/sprites_out/ui/icons"
+        }
+
+        //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
             if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/"))) return
 
@@ -309,21 +318,6 @@ task pack(dependsOn: classes){
 
         //pack normal sprites
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
-
-        //delete old pack defintions
-        delete{
-            delete fileTree(dir: '../core/assets-raw/sprites_out/', include: '**/pack.json')
-        }
-
-        //rename pack definitions, generate fallback 1024x sprites
-        copy{
-            from '../core/assets-raw/sprites_out/'
-            into '../core/assets-raw/sprites_out/'
-            include '**/*.json'
-            rename 'pack_fallback.json', "pack.json"
-        }
-
-        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites_fallback.atlas")
     }
 }
 

@@ -211,7 +211,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(link != null && (link.pos() < tile.pos() || !Core.camera.bounds(Tmp.r1).contains(tile.drawx(), tile.drawy()))){
+            if(link != null && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
                 drawLaser(tile, link);
             }
         }
@@ -257,13 +257,8 @@ public class PowerNode extends PowerBlock{
         y2 -= t1.y;
 
         Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
-        //Lines.stroke(2f);
-        //Lines.line(x1, y1, x2, y2);
-        Lines.stroke(1f);
-        Lines.line(x1, y1, x2, y2);
-        Draw.reset();
-
-        //Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        Draw.color();
     }
 
 }

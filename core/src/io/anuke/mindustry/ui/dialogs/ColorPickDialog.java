@@ -25,7 +25,7 @@ public class ColorPickDialog extends Dialog{
         for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];
 
-            ImageButton button = table.addImageButton("white", "clear-toggle", 34, () -> {
+            ImageButton button = table.addImageButton("whiteui", "clear-toggle", 34, () -> {
                 cons.accept(color);
                 hide();
             }).size(48).get();

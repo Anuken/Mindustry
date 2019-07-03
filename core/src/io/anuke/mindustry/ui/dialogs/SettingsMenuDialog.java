@@ -48,7 +48,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image("white")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        titleTable.add(new Image("whiteui")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
