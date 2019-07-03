@@ -172,14 +172,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("fpscap", 125, 5, 125, 5,
-            s -> {
-            Core.app.setTargetFPS(s > 120 ? -1 : s);
-            return (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s));
-        });
+        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
-
-        Core.app.setTargetFPS(Core.settings.getInt("fpscap", 125) > 120 ? -1 : Core.settings.getInt("fpscap"));
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));

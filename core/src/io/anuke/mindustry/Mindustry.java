@@ -13,6 +13,7 @@ import static io.anuke.arc.Core.batch;
 import static io.anuke.mindustry.Vars.*;
 
 public class Mindustry extends ApplicationCore{
+    private long lastTime;
 
     @Override
     public void setup(){
@@ -50,6 +51,27 @@ public class Mindustry extends ApplicationCore{
                 Events.fire(new GameLoadEvent());
             }));
         }));
+    }
+
+    @Override
+    public void update(){
+        super.update();
+
+        int targetfps = Core.settings.getInt("fpscap", 120);
+
+        if(targetfps > 0 && targetfps <= 120){
+            long target = (1000 * 1000000) / targetfps; //target in nanos
+            long elapsed = Time.timeSinceNanos(lastTime);
+            if(elapsed < target){
+                try{
+                    Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
+                }catch(InterruptedException ignored){
+                    //ignore
+                }
+            }
+        }
+
+        lastTime = Time.nanos();
     }
 
     @Override
