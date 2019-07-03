@@ -264,7 +264,7 @@ task tileImages(){
     }
 }
 
-task pack(){
+task pack(dependsOn: classes){
 
     doLast{
         //cleanup old sprites
@@ -281,7 +281,6 @@ task pack(){
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
         javaexec{
-
             main = "io.anuke.mindustry.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in

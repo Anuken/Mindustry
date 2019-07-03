@@ -2,12 +2,9 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.GameLoadEvent;
 import io.anuke.mindustry.io.BundleLoader;
@@ -64,12 +61,12 @@ public class Mindustry extends ApplicationCore{
         Core.graphics.clear(Color.BLACK);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-        Texture icon = new Texture("sprites/logotext.png");
-        float width = Math.min(Core.graphics.getWidth() - 10f, icon.getWidth());
-        Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, width, (float)icon.getHeight() / icon.getWidth() * width);
-        Draw.flush();
+        //Texture icon = new Texture("sprites/logotext.png");
+        //float width = Math.min(Core.graphics.getWidth() - 10f, icon.getWidth());
+        //Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, width, (float)icon.getHeight() / icon.getWidth() * width);
+        //Draw.flush();
 
-        icon.dispose();
+        //icon.dispose();
     }
 
 }
