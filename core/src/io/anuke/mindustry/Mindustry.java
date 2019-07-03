@@ -60,27 +60,6 @@ public class Mindustry extends ApplicationCore{
         setup();
     }
 
-    @Override
-    public void update(){
-        long lastFrameTime = Time.nanos();
-
-        super.update();
-
-        int fpsCap = Core.settings.getInt("fpscap", 125);
-
-        if(fpsCap <= 120){
-            long target = (1000 * 1000000) / fpsCap; //target in nanos
-            long elapsed = Time.timeSinceNanos(lastFrameTime);
-            if(elapsed < target){
-                try{
-                    Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
-                }catch(InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     void drawLoading(){
         Core.graphics.clear(Color.BLACK);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
