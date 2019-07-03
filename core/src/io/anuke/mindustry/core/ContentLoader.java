@@ -7,10 +7,6 @@ import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.util.Log;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
@@ -43,6 +39,7 @@ public class ContentLoader{
         new Loadouts(),
         new TechTree(),
         new Zones(),
+        new TypeIDs(),
 
         //these are not really content classes, but this makes initialization easier
         new LegacyColorMapper(),
@@ -58,8 +55,6 @@ public class ContentLoader{
             Log.info("Content already loaded, skipping.");
             return;
         }
-
-        registerTypes();
 
         for(ContentType type : ContentType.values()){
             contentMap[type.ordinal()] = new Array<>();
@@ -231,15 +226,5 @@ public class ContentLoader{
 
     public Array<UnitType> units(){
         return getBy(ContentType.unit);
-    }
-
-    /**
-     * Registers sync IDs for all types of sync entities.
-     * Do not register units here!
-     */
-    private void registerTypes(){
-        TypeTrait.registerType(Player.class, Player::new);
-        TypeTrait.registerType(Fire.class, Fire::new);
-        TypeTrait.registerType(Puddle.class, Puddle::new);
     }
 }

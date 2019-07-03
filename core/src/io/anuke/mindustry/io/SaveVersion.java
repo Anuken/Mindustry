@@ -5,7 +5,8 @@ import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.BrokenBlock;
 import io.anuke.mindustry.maps.Map;
@@ -18,6 +19,9 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class SaveVersion extends SaveFileReader{
     public final int version;
+
+    //HACK stores the last read build of the save file, valid after read meta call
+    private int lastReadBuild;
 
     public SaveVersion(int version){
         this.version = version;
@@ -77,6 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+        lastReadBuild = map.getInt("build", -1);
 
         Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
@@ -221,7 +226,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     SaveTrait save = (SaveTrait)entity;
                     //each entity is a separate chunk.
                     writeChunk(stream, true, out -> {
-                        out.writeByte(save.getTypeID());
+                        out.writeByte(save.getTypeID().id);
                         out.writeByte(save.version());
                         save.writeSave(out);
                     });
@@ -231,7 +236,9 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readEntities(DataInput stream) throws IOException{
-        /* Latest data:
+        /*
+        Latest data:
+
         0 = Player
         1 = Fire
         2 = Puddle
@@ -246,7 +253,45 @@ public abstract class SaveVersion extends SaveFileReader{
         11 = Wraith
         12 = Ghoul
         13 = Revenant
+
+        Before removal of lightining/bullet:
+
+        0 = Player
+        1 = Fire
+        2 = Puddle
+        3 = Bullet
+        4 = Lightning
+        5 = Draug
+        6 = Spirit
+        7 = Phantom
+        8 = Dagger
+        9 = Crawler
+        10 = Titan
+        11 = Fortress
+        12 = Eruptor
+        13 = Wraith
+        14 = Ghoul
+        15 = Revenant
+
+        Before addition of new units:
+
+        0 = Player
+        1 = Fire
+        2 = Puddle
+        3 = Bullet
+        4 = Lightning
+        5 = Spirit
+        6 = Dagger
+        7 = Crawler
+        8 = Titan
+        9 = Fortress
+        10 = Eruptor
+        11 = Wraith
+        12 = Ghoul
+        13 = Phantom
+        14 = Revenant
          */
+
         byte groups = stream.readByte();
 
         for(int i = 0; i < groups; i++){
@@ -256,7 +301,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 readChunk(stream, true, in -> {
                     byte typeid = in.readByte();
                     byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
+                    SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
                     trait.readSave(in, version);
                 });
             }

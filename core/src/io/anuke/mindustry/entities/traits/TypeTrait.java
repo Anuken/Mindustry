@@ -1,6 +1,10 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.mindustry.game.TypeID;
+
 public interface TypeTrait{
+
+    TypeID getTypeID();
     /*
     int[] lastRegisteredID = {0};
     Array<Supplier<? extends TypeTrait>> registeredTypes = new Array<>();
