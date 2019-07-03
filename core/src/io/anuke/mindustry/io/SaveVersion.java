@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
@@ -240,6 +241,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 readChunk(stream, true, in -> {
                     byte typeid = in.readByte();
                     byte version = in.readByte();
+
+                    Log.info(typeid);
                     SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
                     trait.readSave(in, version);
                 });

@@ -22,6 +22,7 @@ public class MenuRenderer implements Disposable{
     private Matrix3 mat = new Matrix3();
     private FrameBuffer shadows;
     private CacheBatch batch;
+    private Texture texture = new Texture("sprites/backgrounds/background-1.png");
 
     public MenuRenderer(){
         Time.mark();
@@ -130,30 +131,36 @@ public class MenuRenderer implements Disposable{
     }
 
     public void render(){
-        float scaling = 4f;
-        camera.position.set(width * tilesize/2f, height * tilesize/2f);
-        camera.resize(Core.graphics.getWidth() / scaling,
-            Core.graphics.getHeight() /scaling);
-
-        mat.set(Draw.proj());
-        Draw.flush();
-        Draw.proj(camera.projection());
-        batch.setProjection(camera.projection());
-        batch.beginDraw();
-        batch.drawCache(cacheFloor);
-        batch.endDraw();
-        Draw.rect(Draw.wrap(shadows.getTexture()),
-            width * tilesize/2f - 4f, height * tilesize/2f - 4f,
-            width * tilesize, -height * tilesize);
-        Draw.flush();
-        batch.beginDraw();
-        batch.drawCache(cacheWall);
-        batch.endDraw();
-
-        Draw.proj(mat);
-        Draw.color(0f, 0f, 0f, darkness);
-        Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
         Draw.color();
+        float scale = 1f;
+        Draw.rect(Draw.wrap(texture), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, 2048 * scale, 2048 * scale);
+
+        if(false){
+            float scaling = 4f;
+            camera.position.set(width * tilesize / 2f, height * tilesize / 2f);
+            camera.resize(Core.graphics.getWidth() / scaling,
+            Core.graphics.getHeight() / scaling);
+
+            mat.set(Draw.proj());
+            Draw.flush();
+            Draw.proj(camera.projection());
+            batch.setProjection(camera.projection());
+            batch.beginDraw();
+            batch.drawCache(cacheFloor);
+            batch.endDraw();
+            Draw.rect(Draw.wrap(shadows.getTexture()),
+            width * tilesize / 2f - 4f, height * tilesize / 2f - 4f,
+            width * tilesize, -height * tilesize);
+            Draw.flush();
+            batch.beginDraw();
+            batch.drawCache(cacheWall);
+            batch.endDraw();
+
+            Draw.proj(mat);
+            Draw.color(0f, 0f, 0f, darkness);
+            Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
+            Draw.color();
+        }
     }
 
     @Override

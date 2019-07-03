@@ -115,7 +115,7 @@ public class HudFragment extends Fragment{
                     int index = 0;
                     for(Element elem : children){
                         int fi = index++;
-                        parent.add(elem);
+                        parent.addChild(elem);
                         elem.visible(() -> {
                             if(fi < 4){
                                 elem.setSize(size);
@@ -214,9 +214,7 @@ public class HudFragment extends Fragment{
                         float[] position = {0, 0};
 
                         t.row();
-                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", iconsize, () -> {
-
-                        }).fillX().update(b -> {
+                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", iconsize, () -> {}).fillX().update(b -> {
                             boolean[] found = {false};
                             if(b.isChecked()){
                                 Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
