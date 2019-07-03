@@ -83,7 +83,7 @@ public class LegacyTypeTable{
         Player::new,
         Fire::new,
         Puddle::new,
-        Bullet::new, //TODO reading these will crash
+        Bullet::new, //TODO reading these may crash
         Lightning::new,
         Draug::new,
         Spirit::new,
@@ -102,7 +102,7 @@ public class LegacyTypeTable{
         Player::new,
         Fire::new,
         Puddle::new,
-        Bullet::new, //TODO reading these will crash
+        Bullet::new, //TODO reading these may crash
         Lightning::new,
         Spirit::new,
         Dagger::new,
@@ -115,4 +115,15 @@ public class LegacyTypeTable{
         Phantom::new,
         Revenant::new
     };
+
+    public static Supplier[] getTable(int build){
+        if(build == -1 || build == 81){
+            //return most recent one since that's probably is; not guaranteed
+            return build81Table;
+        }else if(build == 80){
+            return build80Table;
+        }else{
+            return build79Table;
+        }
+    }
 }

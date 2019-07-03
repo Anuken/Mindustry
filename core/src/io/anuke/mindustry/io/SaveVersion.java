@@ -21,7 +21,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public final int version;
 
     //HACK stores the last read build of the save file, valid after read meta call
-    private int lastReadBuild;
+    protected int lastReadBuild;
 
     public SaveVersion(int version){
         this.version = version;
@@ -236,62 +236,6 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readEntities(DataInput stream) throws IOException{
-        /*
-        Latest data:
-
-        0 = Player
-        1 = Fire
-        2 = Puddle
-        3 = Draug
-        4 = Spirit
-        5 = Phantom
-        6 = Dagger
-        7 = Crawler
-        8 = Titan
-        9 = Fortress
-        10 = Eruptor
-        11 = Wraith
-        12 = Ghoul
-        13 = Revenant
-
-        Before removal of lightining/bullet:
-
-        0 = Player
-        1 = Fire
-        2 = Puddle
-        3 = Bullet
-        4 = Lightning
-        5 = Draug
-        6 = Spirit
-        7 = Phantom
-        8 = Dagger
-        9 = Crawler
-        10 = Titan
-        11 = Fortress
-        12 = Eruptor
-        13 = Wraith
-        14 = Ghoul
-        15 = Revenant
-
-        Before addition of new units:
-
-        0 = Player
-        1 = Fire
-        2 = Puddle
-        3 = Bullet
-        4 = Lightning
-        5 = Spirit
-        6 = Dagger
-        7 = Crawler
-        8 = Titan
-        9 = Fortress
-        10 = Eruptor
-        11 = Wraith
-        12 = Ghoul
-        13 = Phantom
-        14 = Revenant
-         */
-
         byte groups = stream.readByte();
 
         for(int i = 0; i < groups; i++){
