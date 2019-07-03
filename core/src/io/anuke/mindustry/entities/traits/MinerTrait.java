@@ -16,8 +16,6 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.*;
 
 public interface MinerTrait extends Entity{
-    TextureRegion mineLaserRegion = Core.atlas.find("minelaser");
-    TextureRegion mineLaserEndRegion = Core.atlas.find("minelaser-end");
 
     /** Returns the range at which this miner can mine blocks.*/
     default float getMiningRange(){
@@ -92,7 +90,7 @@ public interface MinerTrait extends Entity{
 
         Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
-        Shapes.laser(mineLaserRegion, mineLaserEndRegion, px, py, ex, ey, 0.75f);
+        Shapes.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
 
         if(unit instanceof Player && ((Player)unit).isLocal){
             Lines.stroke(1f, Pal.accent);
