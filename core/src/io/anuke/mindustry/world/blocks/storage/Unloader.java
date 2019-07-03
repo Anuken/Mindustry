@@ -1,17 +1,14 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.ItemSelection;
 
 import java.io.*;
@@ -81,7 +78,7 @@ public class Unloader extends Block{
         SortedUnloaderEntity entity = tile.entity();
 
         Draw.color(entity.sortItem == null ? Color.CLEAR : entity.sortItem.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 2f, 2f);
+        Fill.square(tile.worldx(), tile.worldy(), 1f);
         Draw.color();
     }
 
