@@ -4,8 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Intersector;
@@ -30,6 +29,7 @@ public class PowerNode extends PowerBlock{
 
     protected Vector2 t1 = new Vector2();
     protected Vector2 t2 = new Vector2();
+    protected TextureRegion laser, laserEnd;
 
     protected float laserRange = 6;
     protected int maxNodes = 3;
@@ -84,6 +84,14 @@ public class PowerNode extends PowerBlock{
             //reflow from other end
             og.reflow(other);
         }
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        laser = Core.atlas.find("laser");
+        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override
@@ -204,7 +212,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link)){
+            if(link != null){
                 drawLaser(tile, link);
             }
         }
@@ -255,8 +263,11 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
         //Lines.stroke(2f);
         //Lines.line(x1, y1, x2, y2);
+        Lines.stroke(3f);
+        Lines.line(x1, y1, x2, y2);
+        Draw.reset();
 
-        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.6f);
+        //Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
     }
 
 }

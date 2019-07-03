@@ -190,7 +190,7 @@ public class Renderer implements ApplicationListener{
         drawAllTeams(false);
 
         blocks.skipLayer(Layer.turret);
-        blocks.drawBlocks(Layer.laser);
+        blocks.drawBlocks(Layer.power);
 
         drawFlyerShadows();
 
