@@ -22,8 +22,8 @@ import io.anuke.mindustry.world.blocks.OreBlock;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuRenderer implements Disposable{
-    private static final int width = 100, height = 50;
     private static final float darkness = 0.3f;
+    private final int width = !mobile ? 90 : 60, height = !mobile ? 40 : 50;
 
     private int cacheFloor, cacheWall;
     private Camera camera = new Camera();
@@ -52,16 +52,20 @@ public class MenuRenderer implements Disposable{
         Simplex s3 = new Simplex(offset + 2);
         RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
         Block[] selected = Structs.select(
-            new Block[]{Blocks.moss, Blocks.sporePine},
             new Block[]{Blocks.sand, Blocks.sandRocks},
             new Block[]{Blocks.shale, Blocks.shaleRocks},
-            new Block[]{Blocks.ice, Blocks.icerocks}
+            new Block[]{Blocks.ice, Blocks.icerocks},
+            new Block[]{Blocks.sand, Blocks.sandRocks},
+            new Block[]{Blocks.shale, Blocks.shaleRocks},
+            new Block[]{Blocks.ice, Blocks.icerocks},
+            new Block[]{Blocks.moss, Blocks.sporePine}
         );
         Block[] selected2 = Structs.select(
-            new Block[]{Blocks.moss, Blocks.sporerocks},
+            new Block[]{Blocks.ignarock, Blocks.duneRocks},
             new Block[]{Blocks.ignarock, Blocks.duneRocks},
             new Block[]{Blocks.stone, Blocks.rocks},
             new Block[]{Blocks.stone, Blocks.rocks},
+            new Block[]{Blocks.moss, Blocks.sporerocks},
             new Block[]{Blocks.salt, Blocks.saltRocks}
         );
 
@@ -280,7 +284,7 @@ public class MenuRenderer implements Disposable{
         float tw = width * tilesize * 2;
         float th = height * tilesize * 2;
         float range = 500f;
-        float offset = -00f;
+        float offset = -600f;
 
         for(int i = 0; i < flyers; i++){
             Tmp.v1.trns(flyerRot, time * (2.5f + flyerType.speed));
