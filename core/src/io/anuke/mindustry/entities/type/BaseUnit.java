@@ -19,6 +19,7 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
@@ -78,6 +79,11 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public float drag(){
         return type.drag;
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return type.typeID;
     }
 
     public Tile getSpawner(){

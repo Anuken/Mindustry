@@ -101,7 +101,7 @@ public class ZoneInfoDialog extends FloatingDialog{
             }else{
                 cont.add(zone.localizedName()).color(Pal.accent).growX().center();
                 cont.row();
-                cont.addImage("white").color(Pal.accent).height(3).pad(6).growX();
+                cont.addImage("whiteui").color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
                 cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave), () -> loadout.show(zone, rebuildItems)).fillX().pad(3).disabled(b -> !zone.canConfigure());
                 cont.row();

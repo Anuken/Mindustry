@@ -1,27 +1,36 @@
 package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.*;
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.function.PositionConsumer;
+import io.anuke.arc.graphics.Camera;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
-import io.anuke.arc.math.Matrix3;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OreBlock;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuRenderer implements Disposable{
     private static final int width = 100, height = 50;
-    private static final float darkness = 0.1f;
+    private static final float darkness = 0.3f;
 
     private int cacheFloor, cacheWall;
     private Camera camera = new Camera();
     private Matrix3 mat = new Matrix3();
     private FrameBuffer shadows;
     private CacheBatch batch;
+    private float time = 0f;
+    private float flyerRot = 45f;
+    private int flyers = Mathf.chance(0.2) ? Mathf.random(30) : Mathf.random(12);
 
     public MenuRenderer(){
         Time.mark();
@@ -32,34 +41,109 @@ public class MenuRenderer implements Disposable{
 
     private void generate(){
         Tile[][] tiles = world.createTiles(width, height);
+        Array<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
         shadows = new FrameBuffer(width, height);
-        Simplex s1 = new Simplex(0);
-        Simplex s2 = new Simplex(1);
-        Simplex s3 = new Simplex(2);
+        int offset = Mathf.random(100000);
+        Simplex s1 = new Simplex(offset);
+        Simplex s2 = new Simplex(offset + 1);
+        Simplex s3 = new Simplex(offset + 2);
+        RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
+        Block[] selected = Structs.select(
+            new Block[]{Blocks.moss, Blocks.sporePine},
+            new Block[]{Blocks.sand, Blocks.sandRocks},
+            new Block[]{Blocks.shale, Blocks.shaleRocks},
+            new Block[]{Blocks.ice, Blocks.icerocks}
+        );
+        Block[] selected2 = Structs.select(
+            new Block[]{Blocks.moss, Blocks.sporerocks},
+            new Block[]{Blocks.ignarock, Blocks.duneRocks},
+            new Block[]{Blocks.stone, Blocks.rocks},
+            new Block[]{Blocks.stone, Blocks.rocks},
+            new Block[]{Blocks.salt, Blocks.saltRocks}
+        );
+
+        Block ore1 = ores.random();
+        ores.remove(ore1);
+        Block ore2 = ores.random();
+
+        double tr1 = Mathf.random(0.65f, 0.85f);
+        double tr2 = Mathf.random(0.65f, 0.85f);
+        boolean doheat = Mathf.chance(0.25);
+        boolean tendrils = Mathf.chance(0.25);
+        boolean tech = Mathf.chance(0.25);
+        int secSize = 10;
+
+        Block floord = selected[0], walld = selected[1];
+        Block floord2 = selected2[0], walld2 = selected2[1];
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                Block floor = Blocks.shale;
+                Block floor = floord;
                 Block ore = Blocks.air;
                 Block wall = Blocks.air;
 
                 if(s1.octaveNoise2D(3, 0.5, 1/20.0, x, y) > 0.5){
-                    wall = Blocks.shaleRocks;
+                    wall = walld;
                 }
 
                 if(s3.octaveNoise2D(3, 0.5, 1/20.0, x, y) > 0.5){
-                    floor = Blocks.stone;
+                    floor = floord2;
                     if(wall != Blocks.air){
-                        wall = Blocks.rocks;
+                        wall = walld2;
                     }
                 }
 
-                if(s2.octaveNoise2D(3, 0.3, 1/30.0, x, y) > 0.5){
-                    ore = Blocks.oreCopper;
+                if(s2.octaveNoise2D(3, 0.3, 1/30.0, x, y) > tr1){
+                    ore = ore1;
                 }
 
-                if(s2.octaveNoise2D(2, 0.2, 1/15.0, x, y+99999) > 0.7){
-                    ore = Blocks.oreLead;
+                if(s2.octaveNoise2D(2, 0.2, 1/15.0, x, y+99999) > tr2){
+                    ore = ore2;
+                }
+
+                if(doheat){
+                    double heat = s3.octaveNoise2D(4, 0.6, 1 / 50.0, x, y + 9999);
+                    double base = 0.65;
+
+                    if(heat > base){
+                        ore = Blocks.air;
+                        wall = Blocks.air;
+                        floor = Blocks.ignarock;
+
+                        if(heat > base + 0.1){
+                            floor = Blocks.hotrock;
+
+                            if(heat > base + 0.15){
+                                floor = Blocks.magmarock;
+                            }
+                        }
+                    }
+                }
+
+                if(tech){
+                    int mx = x % secSize, my = y % secSize;
+                    int sclx = x / secSize, scly = y / secSize;
+                    if(s1.octaveNoise2D(2, 1f / 10f, 0.5f, sclx, scly) > 0.4f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
+                        floor = Blocks.darkPanel3;
+                        if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 1){
+                            floor = Blocks.darkPanel4;
+                        }
+
+
+                        if(wall != Blocks.air && Mathf.chance(0.7)){
+                            wall = Blocks.darkMetal;
+                        }
+                    }
+                }
+
+                if(tendrils){
+                    if(rid.getValue(x, y, 1f / 17f) > 0f){
+                        floor = Mathf.chance(0.2) ? Blocks.sporeMoss : Blocks.moss;
+
+                        if(wall != Blocks.air){
+                            wall = Blocks.sporerocks;
+                        }
+                    }
                 }
 
                 Tile tile;
@@ -130,7 +214,8 @@ public class MenuRenderer implements Disposable{
     }
 
     public void render(){
-        float scaling = 4f;
+        time += Time.delta();
+        float scaling = Math.max(Unit.dp.scl(4f), Math.max(Core.graphics.getWidth() / ((width - 1f) * tilesize), Core.graphics.getHeight() / ((height - 1f) * tilesize)));
         camera.position.set(width * tilesize / 2f, height * tilesize / 2f);
         camera.resize(Core.graphics.getWidth() / scaling,
         Core.graphics.getHeight() / scaling);
@@ -150,10 +235,54 @@ public class MenuRenderer implements Disposable{
         batch.drawCache(cacheWall);
         batch.endDraw();
 
+        drawFlyers();
+
         Draw.proj(mat);
         Draw.color(0f, 0f, 0f, darkness);
         Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
         Draw.color();
+    }
+
+    private void drawFlyers(){
+        Draw.color(0f, 0f, 0f, 0.4f);
+
+        flyers((x, y) -> {
+            Draw.rect("wraith", x - 12f, y - 13f, flyerRot - 90);
+        });
+
+        flyers((x, y) -> {
+            Draw.rect("circle-shadow", x, y, 18f, 18f);
+        });
+        Draw.color();
+
+        flyers((x, y) -> {
+            float engineOffset = 5.5f, engineSize = 2f, rotation = flyerRot;
+
+            Draw.color(Pal.engine);
+            Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset), y + Angles.trnsy(rotation + 180, engineOffset),
+            engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f));
+
+            Draw.color(Color.WHITE);
+            Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset - 1f), y + Angles.trnsy(rotation + 180, engineOffset - 1f),
+            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f);
+            Draw.color();
+
+            Draw.rect("wraith", x, y, flyerRot - 90);
+        });
+    }
+
+    private void flyers(PositionConsumer cons){
+        float tw = width * tilesize * 2;
+        float th = height * tilesize * 2;
+        float range = 500f;
+        float offset = -300f;
+
+        for(int i = 0; i < flyers; i++){
+            Tmp.v1.trns(flyerRot, time * 3f);
+
+            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3f) + offset) % tw,
+            (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3f) + offset) % th);
+        }
     }
 
     @Override

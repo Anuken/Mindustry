@@ -189,10 +189,11 @@ public class Renderer implements ApplicationListener{
 
         drawAllTeams(false);
 
-        blocks.skipLayer(Layer.turret);
-        blocks.drawBlocks(Layer.laser);
+        blocks.drawBlocks(Layer.turret);
 
         drawFlyerShadows();
+
+        blocks.drawBlocks(Layer.power);
 
         drawAllTeams(true);
 
@@ -280,7 +281,6 @@ public class Renderer implements ApplicationListener{
 
             draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
             draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            blocks.drawTeamBlocks(Layer.turret, team);
 
             draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
             draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);

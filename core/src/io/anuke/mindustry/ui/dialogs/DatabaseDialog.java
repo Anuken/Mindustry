@@ -40,7 +40,7 @@ public class DatabaseDialog extends FloatingDialog{
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            table.addImage("whiteui").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();

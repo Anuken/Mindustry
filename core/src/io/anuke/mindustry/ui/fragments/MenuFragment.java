@@ -62,11 +62,11 @@ public class MenuFragment extends Fragment{
 
         parent.fill((x, y, w, h) -> {
             float logoscl = (int)Unit.dp.scl(1);
-            float logow = Math.min(Math.min(logo.getWidth() * logoscl, 768), Core.graphics.getWidth() - 10);
+            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Unit.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             Draw.color();
-            Draw.rect(Draw.wrap(logo), (int)(Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2, logow, logoh);
+            Draw.rect(Draw.wrap(logo), (int)(Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f), logow, logoh);
         }).touchable(Touchable.disabled);
     }
 

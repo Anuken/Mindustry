@@ -511,7 +511,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton("white", "clear-toggle-partial");
+                    ImageButton button = new ImageButton("whiteui", "clear-toggle-partial");
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -636,7 +636,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region)) continue;
 
-            ImageButton button = new ImageButton("white", "clear-toggle");
+            ImageButton button = new ImageButton("whiteui", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

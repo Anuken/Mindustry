@@ -474,7 +474,7 @@ public class NetServer implements ApplicationListener{
 
                 //write all entities now
                 dataStream.writeInt(entity.getID()); //write id
-                dataStream.writeByte(sync.getTypeID()); //write type ID
+                dataStream.writeByte(sync.getTypeID().id); //write type ID
                 sync.write(dataStream); //write entity
 
                 sent++;

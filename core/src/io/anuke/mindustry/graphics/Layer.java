@@ -10,7 +10,5 @@ public enum Layer{
     /** "High" blocks, like turrets. */
     turret,
     /** Power lasers. */
-    power,
-    /** Extra lasers, like healing turrets. */
-    laser
+    power
 }

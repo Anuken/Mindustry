@@ -2,25 +2,20 @@ package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class MendProjector extends Block{
     private static Color color = Color.valueOf("84f491");
@@ -130,13 +125,13 @@ public class MendProjector extends Block{
 
         Draw.color(color, phase, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        Draw.blend(Blending.additive);
+        //Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.blend();
+        //Draw.blend();
 
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.2f) * entity.heat);
-        Lines.circle(tile.drawx(), tile.drawy(), ((1f - f) * 8f) * size / 2f);
+        Lines.square(tile.drawx(), tile.drawy(), ((1f - f) * 8f) * size / 2f);
 
         Draw.reset();
     }

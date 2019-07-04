@@ -2,12 +2,9 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.GameLoadEvent;
 import io.anuke.mindustry.io.BundleLoader;
@@ -16,6 +13,7 @@ import static io.anuke.arc.Core.batch;
 import static io.anuke.mindustry.Vars.*;
 
 public class Mindustry extends ApplicationCore{
+    private long lastTime;
 
     @Override
     public void setup(){
@@ -56,41 +54,41 @@ public class Mindustry extends ApplicationCore{
     }
 
     @Override
-    public void init(){
-        setup();
-    }
-
-    @Override
     public void update(){
-        long lastFrameTime = Time.nanos();
-
         super.update();
 
-        int fpsCap = Core.settings.getInt("fpscap", 125);
+        int targetfps = Core.settings.getInt("fpscap", 120);
 
-        if(fpsCap <= 120){
-            long target = (1000 * 1000000) / fpsCap; //target in nanos
-            long elapsed = Time.timeSinceNanos(lastFrameTime);
+        if(targetfps > 0 && targetfps <= 120){
+            long target = (1000 * 1000000) / targetfps; //target in nanos
+            long elapsed = Time.timeSinceNanos(lastTime);
             if(elapsed < target){
                 try{
                     Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
-                }catch(InterruptedException e){
-                    e.printStackTrace();
+                }catch(InterruptedException ignored){
+                    //ignore
                 }
             }
         }
+
+        lastTime = Time.nanos();
+    }
+
+    @Override
+    public void init(){
+        setup();
     }
 
     void drawLoading(){
         Core.graphics.clear(Color.BLACK);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-        Texture icon = new Texture("sprites/logotext.png");
-        float width = Math.min(Core.graphics.getWidth() - 10f, icon.getWidth());
-        Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, width, (float)icon.getHeight() / icon.getWidth() * width);
-        Draw.flush();
+        //Texture icon = new Texture("sprites/logotext.png");
+        //float width = Math.min(Core.graphics.getWidth() - 10f, icon.getWidth());
+        //Draw.rect(Draw.wrap(icon), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, width, (float)icon.getHeight() / icon.getWidth() * width);
+        //Draw.flush();
 
-        icon.dispose();
+        //icon.dispose();
     }
 
 }

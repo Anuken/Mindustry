@@ -18,11 +18,11 @@ public class LoadingFragment extends Fragment{
             t.touchable(Touchable.enabled);
             t.add().height(70f).row();
 
-            t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.addImage("whiteui").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
             t.add("$loading").name("namelabel").pad(10f);
             t.row();
-            t.addImage("white").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.addImage("whiteui").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
 
             button = t.addButton("$cancel", () -> {

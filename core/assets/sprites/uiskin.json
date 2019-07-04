@@ -9,15 +9,15 @@
   },
   TintedDrawable: {
     dialogDim: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.9 }
     },
     guideDim: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.3 }
     },
     invis: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0 }
     }
     loadDim: {
@@ -25,27 +25,27 @@
       color: { r: 0, g: 0, b: 0, a: 0.8 }
     },
     chatfield: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.2 }
     },
     dark: {
-      name: white,
+      name: whiteui,
       color: { hex: "#000000ff" }
     },
     none: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0 }
     },
     flat: {
-      name: white,
+      name: whiteui,
       color: { r: 0.0, g: 0.0, b: 0.0, a: 0.6 }
     },
     flat-over: {
-      name: white,
+      name: whiteui,
       color: { hex: "#ffffff82" }
     },
     flat-down: {
-      name: white,
+      name: whiteui,
       color: { hex: "#ffd37fff" }
     }
   },
@@ -111,7 +111,7 @@
       up: info-banner
     },
     clear-partial: {
-      down: white,
+      down: whiteui,
       up: button-select,
       over: flat-down,
       font: default-font,
@@ -209,7 +209,7 @@
       over: flat-over
     },
     clear-full: {
-      down: white,
+      down: whiteui,
       up: button-select,
       over: flat-down
     },
