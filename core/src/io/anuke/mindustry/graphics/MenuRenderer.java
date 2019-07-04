@@ -13,6 +13,8 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
@@ -31,6 +33,7 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(30) : Mathf.random(12);
+    private UnitType flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.phantom, UnitTypes.phantom, UnitTypes.revenant);
 
     public MenuRenderer(){
         Time.mark();
@@ -246,17 +249,19 @@ public class MenuRenderer implements Disposable{
     private void drawFlyers(){
         Draw.color(0f, 0f, 0f, 0.4f);
 
+        float size = Math.max(flyerType.iconRegion.getWidth(), flyerType.iconRegion.getHeight()) * Draw.scl * 1.6f;
+
         flyers((x, y) -> {
-            Draw.rect("wraith", x - 12f, y - 13f, flyerRot - 90);
+            Draw.rect(flyerType.region, x - 12f, y - 13f, flyerRot - 90);
         });
 
         flyers((x, y) -> {
-            Draw.rect("circle-shadow", x, y, 18f, 18f);
+            Draw.rect("circle-shadow", x, y, size, size);
         });
         Draw.color();
 
         flyers((x, y) -> {
-            float engineOffset = 5.5f, engineSize = 2f, rotation = flyerRot;
+            float engineOffset = flyerType.engineOffset, engineSize = flyerType.engineSize, rotation = flyerRot;
 
             Draw.color(Pal.engine);
             Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset), y + Angles.trnsy(rotation + 180, engineOffset),
@@ -267,7 +272,7 @@ public class MenuRenderer implements Disposable{
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f);
             Draw.color();
 
-            Draw.rect("wraith", x, y, flyerRot - 90);
+            Draw.rect(flyerType.region, x, y, flyerRot - 90);
         });
     }
 
@@ -275,13 +280,13 @@ public class MenuRenderer implements Disposable{
         float tw = width * tilesize * 2;
         float th = height * tilesize * 2;
         float range = 500f;
-        float offset = -300f;
+        float offset = -00f;
 
         for(int i = 0; i < flyers; i++){
-            Tmp.v1.trns(flyerRot, time * 3f);
+            Tmp.v1.trns(flyerRot, time * (2.5f + flyerType.speed));
 
-            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3f) + offset) % tw,
-            (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3f) + offset) % th);
+            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % tw,
+            (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3.4f) + offset) % th);
         }
     }
 
