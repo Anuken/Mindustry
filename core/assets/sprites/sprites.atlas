@@ -10817,11 +10817,11 @@ discord-banner
   orig: 84, 45
   offset: 0, 0
   index: -1
-flat-down
+flat-down-base
   rotate: false
   xy: 403, 371
   size: 36, 27
-  split: 4, 4, 4, 4
+  split: 12, 12, 12, 12
   orig: 36, 27
   offset: 0, 0
   index: -1

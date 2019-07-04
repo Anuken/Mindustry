@@ -6,15 +6,15 @@ import io.anuke.arc.Graphics.Cursor.SystemCursor;
 import io.anuke.arc.freetype.FreeTypeFontGenerator;
 import io.anuke.arc.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Colors;
-import io.anuke.arc.graphics.g2d.BitmapFont;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.style.NinePatchDrawable;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.Tooltip.Tooltips;
@@ -70,15 +70,37 @@ public class UI implements ApplicationListener{
     public UI(){
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
+        {
+            AtlasRegion region = Core.atlas.find("flat-down-base");
+            int[] splits = region.splits;
+
+            ScaledNinePatchDrawable copy = new ScaledNinePatchDrawable(new NinePatch(region, splits[0], splits[1], splits[2], splits[3])){
+                public float getLeftWidth(){
+                    return 0;
+                }
+
+                public float getRightWidth(){
+                    return 0;
+                }
+
+                public float getTopHeight(){
+                    return 0;
+                }
+
+                public float getBottomHeight(){
+                    return 0;
+                }
+            };
+            copy.setMinWidth(0);
+            copy.setMinHeight(0);
+            copy.setTopHeight(0);
+            copy.setRightWidth(0);
+            copy.setBottomHeight(0);
+            copy.setLeftWidth(0);
+            skin.add("flat-down", copy, Drawable.class);
+        }
+
         skin.load(Core.files.internal("sprites/uiskin.json"));
-        NinePatchDrawable draw = (NinePatchDrawable)skin.getDrawable("flat-down");
-        draw.setMinWidth(0);
-        draw.setMinHeight(0);
-        draw.setTopHeight(0);
-        draw.setRightWidth(0);
-        draw.setBottomHeight(0);
-        draw.setLeftWidth(0);
-        //TODO fix
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);

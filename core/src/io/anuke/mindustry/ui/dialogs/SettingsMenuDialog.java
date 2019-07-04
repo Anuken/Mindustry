@@ -54,7 +54,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         cont.remove();
         buttons.remove();
 
-        menu = new Table();
+        menu = new Table("pane");
 
         Consumer<SettingsTable> s = table -> {
             table.row();
@@ -69,16 +69,18 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.top();
         prefs.margin(14f);
 
-        menu.defaults().size(300f, 60f).pad(3f);
-        menu.addButton("$settings.game", () -> visible(0));
+        String style = "clear";
+
+        menu.defaults().size(300f, 60f);
+        menu.addButton("$settings.game", style, () -> visible(0));
         menu.row();
-        menu.addButton("$settings.graphics", () -> visible(1));
+        menu.addButton("$settings.graphics", style, () -> visible(1));
         menu.row();
-        menu.addButton("$settings.sound", () -> visible(2));
+        menu.addButton("$settings.sound", style, () -> visible(2));
         menu.row();
-        menu.addButton("$settings.language", ui.language::show);
+        menu.addButton("$settings.language", style, ui.language::show);
         menu.row();
-        menu.addButton("$settings.controls", ui.controls::show).visible(() -> !mobile || Core.settings.getBool("keyboard"));
+        menu.addButton("$settings.controls", style, ui.controls::show).visible(() -> !mobile || Core.settings.getBool("keyboard"));
 
         prefs.clearChildren();
         prefs.add(menu);
