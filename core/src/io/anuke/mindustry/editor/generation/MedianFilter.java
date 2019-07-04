@@ -28,7 +28,7 @@ public class MedianFilter extends GenerateFilter{
             for(int y = -rad; y <= rad; y++){
                 if(Mathf.dst2(x, y) > rad*rad) continue;
 
-                GenTile tile = in.tile(in.x + x, in.y + y);
+                GenTile tile = in.tile((in.x + x) / in.scaling, (in.y + y) / in.scaling);
                 blocks.add(tile.block);
                 floors.add(tile.floor);
             }
