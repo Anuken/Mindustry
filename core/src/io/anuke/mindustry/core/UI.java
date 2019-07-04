@@ -14,6 +14,7 @@ import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.style.NinePatchDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.Tooltip.Tooltips;
@@ -26,7 +27,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
-import static io.anuke.arc.scene.actions.Actions.*;
+import static io.anuke.arc.scene.actions.Actions.sequence;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
@@ -70,6 +71,14 @@ public class UI implements ApplicationListener{
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
         skin.load(Core.files.internal("sprites/uiskin.json"));
+        NinePatchDrawable draw = (NinePatchDrawable)skin.getDrawable("flat-down");
+        draw.setMinWidth(0);
+        draw.setMinHeight(0);
+        draw.setTopHeight(0);
+        draw.setRightWidth(0);
+        draw.setBottomHeight(0);
+        draw.setLeftWidth(0);
+        //TODO fix
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
             font.setUseIntegerPositions(true);

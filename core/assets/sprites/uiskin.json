@@ -36,17 +36,17 @@
       name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0 }
     },
-    flat: {
+    flat-trans: {
       name: whiteui,
       color: { r: 0.0, g: 0.0, b: 0.0, a: 0.6 }
     },
+    flat: {
+      name: whiteui,
+      color: { r: 0.0, g: 0.0, b: 0.0, a: 1 }
+    },
     flat-over: {
       name: whiteui,
-      color: { hex: "#ffffff82" }
-    },
-    flat-down: {
-      name: whiteui,
-      color: { hex: "#ffd37fff" }
+      color: { hex: "#454545ff" }
     }
   },
   ButtonStyle: {
@@ -71,12 +71,12 @@
       up: button
     },
     node: {
-      disabled: content-background-locked,
+      disabled: button,
       font: default-font,
       fontColor: white,
       disabledFontColor: gray,
-      up: content-background,
-      over: content-background-over
+      up: button-over,
+      over: button-down
     },
     right: {
       over: button-right-over,
@@ -169,8 +169,8 @@
       imageUpColor: white
     },
     node: {
-      up: content-background,
-      over: content-background-over
+      up: button-over,
+      over: button-down
     },
     right: {
       over: button-right-over,
@@ -222,6 +222,12 @@
       down: flat-down,
       checked: flat-down,
       up: flat,
+      over: flat-over
+    },
+    clear-toggle-trans: {
+      down: flat-down,
+      checked: flat-down,
+      up: flat-trans,
       over: flat-over
     },
     clear-toggle-partial: {

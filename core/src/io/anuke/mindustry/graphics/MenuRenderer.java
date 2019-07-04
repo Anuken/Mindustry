@@ -23,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class MenuRenderer implements Disposable{
     private static final float darkness = 0.3f;
-    private final int width = !mobile ? 90 : 60, height = !mobile ? 40 : 50;
+    private final int width = !mobile ? 100 : 60, height = !mobile ? 50 : 40;
 
     private int cacheFloor, cacheWall;
     private Camera camera = new Camera();

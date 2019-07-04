@@ -4,7 +4,9 @@ import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.math.Interpolation;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -154,11 +156,27 @@ public class MenuFragment extends Fragment{
 
         container.table(background, t -> {
             submenu = t;
+            t.getColor().a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
             t.visible(() -> !t.getChildren().isEmpty());
 
         }).width(width).growY();
+    }
+
+    private void fadeInMenu(){
+        submenu.clearActions();
+        submenu.actions(Actions.alpha(1f, 0.15f, Interpolation.fade));
+    }
+
+    private void fadeOutMenu(){
+        //nothing to fade out
+        if(submenu.getChildren().isEmpty()){
+            return;
+        }
+
+        submenu.clearActions();
+        submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interpolation.fade), Actions.run(() -> submenu.clearChildren()));
     }
 
     private void buttons(Table t, Buttoni... buttons){
@@ -168,18 +186,19 @@ public class MenuFragment extends Fragment{
                     iconsizesmall, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;
-                    submenu.clearChildren();
+                    fadeOutMenu();
                 }else{
                     if(b.submenu != null){
                         currentMenu = out[0];
                         submenu.clearChildren();
+                        fadeInMenu();
                         //correctly offset the button
                         submenu.add().height(Core.graphics.getHeight() - out[0].getY(Align.topLeft));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{
                         currentMenu = null;
-                        submenu.clearChildren();
+                        fadeOutMenu();
                         b.runnable.run();
                     }
                 }
