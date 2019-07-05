@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
@@ -20,7 +21,32 @@ public class MapsDialog extends FloatingDialog{
     public MapsDialog(){
         super("$maps");
 
-        addCloseButton();
+        buttons.remove();
+
+        keyDown(key -> {
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+                Core.app.post(this::hide);
+            }
+        });
+
+        shown(this::setup);
+        onResize(() -> {
+            if(dialog != null){
+                dialog.hide();
+            }
+            setup();
+        });
+    }
+
+    void setup(){
+        buttons.clearChildren();
+
+        if(Core.graphics.isPortrait()){
+            buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f*2f, 64f).colspan(2);
+            buttons.row();
+        }else{
+            buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f, 64f);
+        }
 
         buttons.addImageTextButton("$editor.newmap", "icon-add", iconsize, () -> {
             ui.showTextInput("$editor.newmap", "$name", "", text -> {
@@ -29,7 +55,7 @@ public class MapsDialog extends FloatingDialog{
                     ui.editor.editor.getTags().put("name", text);
                 });
             });
-        }).size(230f, 64f);
+        }).size(210f, 64f);
 
         buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
             Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
@@ -70,19 +96,8 @@ public class MapsDialog extends FloatingDialog{
 
                 });
             }, true, FileChooser.anyMapFiles);
-        }).size(230f, 64f);
+        }).size(210f, 64f);
 
-        buttons.remove();
-
-        shown(this::setup);
-        onResize(() -> {
-            if(dialog != null){
-                dialog.hide();
-            }
-        });
-    }
-
-    void setup(){
         cont.clear();
 
         Table maps = new Table();

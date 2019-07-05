@@ -281,7 +281,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", "icon-check", "node", iconsize, () -> unlock(node))
+                    b.addImageTextButton("$research", "icon-check-small", "node", iconsizesmall, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });
@@ -306,7 +306,7 @@ public class TechTreeDialog extends FloatingDialog{
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
 
-                    Lines.stroke(Unit.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.locked : Pal.accent);
+                    Lines.stroke(Unit.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

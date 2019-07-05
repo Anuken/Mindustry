@@ -68,10 +68,12 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    select.addImageButton("icon-menu-large", "clear", iconsize, ui.paused::show);
-                    flip = select.addImageButton("icon-arrow-up", "clear", iconsize, this::toggleMenus).get();
+                    String style = "clear-trans";
 
-                    select.addImageButton("icon-pause", "clear", iconsize, () -> {
+                    select.addImageButton("icon-menu-large", style, iconsize, ui.paused::show);
+                    flip = select.addImageButton("icon-arrow-up", style, iconsize, this::toggleMenus).get();
+
+                    select.addImageButton("icon-pause", style, iconsize, () -> {
                         if(Net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -86,7 +88,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", "clear", iconsize, () -> {
+                    select.addImageButton("icon-settings", style, iconsize, () -> {
                         if(Net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
@@ -106,7 +108,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImage("blank").color(Pal.accent).width(3f).fillY();
+                    select.addImage("whiteui").color(Pal.gray).width(4f).fillY();
 
                     float size = Unit.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
@@ -120,7 +122,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(Unit.dp.scl(3f), size);
+                                elem.setSize(Unit.dp.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return true;
@@ -131,7 +133,7 @@ public class HudFragment extends Fragment{
                 }
 
                 cont.row();
-                cont.addImage("blank").height(3f).color(Pal.accent).fillX();
+                cont.addImage("whiteui").height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
 
@@ -164,7 +166,7 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                wavesMain.add(stack).width(dsize * 4 + 3f);
+                wavesMain.add(stack).width(dsize * 4 + 4f);
                 wavesMain.row();
                 wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
@@ -244,7 +246,7 @@ public class HudFragment extends Fragment{
                             }
                         });
                     }
-                }).width(dsize * 4 + 3f);
+                }).width(dsize * 4 + 4f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
 

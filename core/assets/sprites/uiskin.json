@@ -224,6 +224,11 @@
       up: flat,
       over: flat-over
     },
+    clear-trans: {
+      down: flat-down,
+      up: flat-trans,
+      over: flat-over
+    },
     clear-toggle-trans: {
       down: flat-down,
       checked: flat-down,

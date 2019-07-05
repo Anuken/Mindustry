@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Interpolation;
@@ -14,10 +15,9 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.graphics.MenuRenderer;
-import io.anuke.mindustry.ui.MenuButton;
 import io.anuke.mindustry.ui.MobileButton;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -52,23 +52,24 @@ public class MenuFragment extends Fragment{
         //.visible(() -> state.is(State.menu)));
 
         //info icon
-        //if(mobile){
-        //    parent.fill(c -> c.top().left().addButton("", "info", ui.about::show).size(84, 45)
-        //    .visible(() -> state.is(State.menu)));
-        //}
+        if(mobile){
+            parent.fill(c -> c.bottom().left().addButton("", "info", ui.about::show).size(84, 45));
+        }
 
-        //version info
-        //parent.fill(c -> c.bottom().left().add(Strings.format("v{0} {1}-{2} {3}{4}", Version.number, Version.modifier, Version.type,
-        //(Version.build == -1 ? "custom build" : "build " + Version.build), Version.revision == 0 ? "" : "." + Version.revision)).color(Color.DARK_GRAY)
-        //.visible(() -> state.is(State.menu)));
+        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
             float logoscl = (int)Unit.dp.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Unit.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
+            float fx = (int)(Core.graphics.getWidth() / 2f);
+            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f);
+
             Draw.color();
-            Draw.rect(Draw.wrap(logo), (Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f), logow, logoh);
+            Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
+            Core.scene.skin.font().setColor(Color.WHITE);
+            Core.scene.skin.font().draw(versionText, fx, fy - logoh/2f, Align.center);
         }).touchable(Touchable.disabled);
     }
 
@@ -82,7 +83,7 @@ public class MenuFragment extends Fragment{
 
         MobileButton
         play = new MobileButton("icon-play-2", isize, "$campaign", ui.deploy::show),
-        custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
+        custom = new MobileButton("icon-play-custom", isize, "$customgame", ui.custom::show),
         maps = new MobileButton("icon-load", isize, "$loadgame", ui.load::show),
         join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
         editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
@@ -91,6 +92,7 @@ public class MenuFragment extends Fragment{
         exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
+            container.marginTop(60f);
             container.add(play);
             container.add(join);
             container.add(custom);
@@ -107,6 +109,7 @@ public class MenuFragment extends Fragment{
                 table.add(exit);
             }).colspan(4);
         }else{
+            container.marginTop(0f);
             container.add(play);
             container.add(maps);
             container.row();
@@ -147,8 +150,8 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$loadgame", "icon-load", ui.load::show)
                 ),
                 new Buttoni("$editor", "icon-editor", ui.maps::show),
-                new Buttoni("$settings", "icon-tools", ui.settings::show), //todo submenu
-                new Buttoni("$about.button", "icon-info", ui.about::show), //todo submenu
+                new Buttoni("$settings", "icon-tools", ui.settings::show),
+                new Buttoni("$about.button", "icon-info", ui.about::show),
                 new Buttoni("$quit", "icon-exit", Core.app::exit)
             );
 
@@ -206,23 +209,6 @@ public class MenuFragment extends Fragment{
             out[0].update(() -> out[0].setChecked(currentMenu == out[0]));
             t.row();
         }
-    }
-
-    private void showCustomSelect(){
-        FloatingDialog dialog = new FloatingDialog("$play");
-        dialog.setFillParent(false);
-        dialog.addCloseButton();
-        dialog.cont.defaults().size(210f, 64f);
-        dialog.cont.add(new MenuButton("icon-editor", "$newgame", () -> {
-            dialog.hide();
-            ui.custom.show();
-        }));
-        dialog.cont.row();
-        dialog.cont.add(new MenuButton("icon-load", "$loadgame", () -> {
-            ui.load.show();
-            dialog.hide();
-        }));
-        dialog.show();
     }
 
     private class Buttoni{

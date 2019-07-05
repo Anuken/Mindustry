@@ -245,7 +245,7 @@ public class PlacementFragment extends Fragment{
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("blank").color(Pal.locked).colspan(3).height(4).growX();
+                frame.addImage("whiteui").color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);

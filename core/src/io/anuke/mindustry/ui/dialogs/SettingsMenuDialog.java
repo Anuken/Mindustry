@@ -43,6 +43,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
+
+            rebuildMenu();
         });
 
         setFillParent(true);
@@ -69,18 +71,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.top();
         prefs.margin(14f);
 
-        String style = "clear";
-
-        menu.defaults().size(300f, 60f);
-        menu.addButton("$settings.game", style, () -> visible(0));
-        menu.row();
-        menu.addButton("$settings.graphics", style, () -> visible(1));
-        menu.row();
-        menu.addButton("$settings.sound", style, () -> visible(2));
-        menu.row();
-        menu.addButton("$settings.language", style, ui.language::show);
-        menu.row();
-        menu.addButton("$settings.controls", style, ui.controls::show).visible(() -> !mobile || Core.settings.getBool("keyboard"));
+        rebuildMenu();
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -114,6 +105,25 @@ public class SettingsMenuDialog extends SettingsDialog{
         hidden(this::back);
 
         addSettings();
+    }
+
+    void rebuildMenu(){
+        menu.clearChildren();
+
+        String style = "clear";
+
+        menu.defaults().size(300f, 60f);
+        menu.addButton("$settings.game", style, () -> visible(0));
+        menu.row();
+        menu.addButton("$settings.graphics", style, () -> visible(1));
+        menu.row();
+        menu.addButton("$settings.sound", style, () -> visible(2));
+        menu.row();
+        menu.addButton("$settings.language", style, ui.language::show);
+        if(!mobile || Core.settings.getBool("keyboard")){
+            menu.row();
+            menu.addButton("$settings.controls", style, ui.controls::show);
+        }
     }
 
     void addSettings(){
@@ -239,6 +249,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     private void back(){
+        rebuildMenu();
         prefs.clearChildren();
         prefs.add(menu);
     }

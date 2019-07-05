@@ -4,14 +4,13 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Align;
+import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -58,10 +57,8 @@ public class DeployDialog extends FloatingDialog{
         }
 
         Stack stack = new Stack();
-        stack.add(new View());
 
         if(control.saves.getZoneSlot() != null){
-            stack.add(new Image("whiteui", new Color(0f, 0f, 0f, 0.9f)));
             stack.add(new Table(t -> {
                 SaveSlot slot = control.saves.getZoneSlot();
 
@@ -99,6 +96,8 @@ public class DeployDialog extends FloatingDialog{
                     });
                 }).fillX().height(50f).pad(3);
             }));
+        }else{
+            stack.add(new View());
         }
 
         stack.add(new ItemsDisplay());
@@ -174,7 +173,7 @@ public class DeployDialog extends FloatingDialog{
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.allChildren){
-                    Lines.stroke(Unit.dp.scl(3f), node.zone.locked() || child.zone.locked() ? Pal.locked : Pal.accent);
+                    Lines.stroke(Unit.dp.scl(3f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.accent);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

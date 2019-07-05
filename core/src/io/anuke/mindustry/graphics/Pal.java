@@ -52,7 +52,7 @@ public class Pal{
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
-    locked = Color.valueOf("454545"),
+    gray = Color.valueOf("454545"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
