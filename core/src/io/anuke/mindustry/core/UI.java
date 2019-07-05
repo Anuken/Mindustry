@@ -57,7 +57,6 @@ public class UI implements ApplicationListener{
     public BansDialog bans;
     public AdminsDialog admins;
     public TraceDialog traces;
-    public ChangelogDialog changelog;
     public DatabaseDialog database;
     public ContentInfoDialog content;
     public DeployDialog deploy;
@@ -172,7 +171,6 @@ public class UI implements ApplicationListener{
         settings = new SettingsMenuDialog();
         host = new HostDialog();
         paused = new PausedDialog();
-        changelog = new ChangelogDialog();
         about = new AboutDialog();
         bans = new BansDialog();
         admins = new AdminsDialog();

@@ -69,7 +69,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.xxlarge);
+        return icon(Icon.large);
     }
 
     @Override
