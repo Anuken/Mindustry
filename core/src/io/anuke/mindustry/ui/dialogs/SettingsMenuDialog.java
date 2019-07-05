@@ -54,7 +54,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         cont.remove();
         buttons.remove();
 
-        menu = new Table("pane");
+        menu = new Table("button");
 
         Consumer<SettingsTable> s = table -> {
             table.row();

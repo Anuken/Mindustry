@@ -70,36 +70,7 @@ public class UI implements ApplicationListener{
     public UI(){
         Skin skin = new Skin(Core.atlas);
         generateFonts(skin);
-        {
-            AtlasRegion region = Core.atlas.find("flat-down-base");
-            int[] splits = region.splits;
-
-            ScaledNinePatchDrawable copy = new ScaledNinePatchDrawable(new NinePatch(region, splits[0], splits[1], splits[2], splits[3])){
-                public float getLeftWidth(){
-                    return 0;
-                }
-
-                public float getRightWidth(){
-                    return 0;
-                }
-
-                public float getTopHeight(){
-                    return 0;
-                }
-
-                public float getBottomHeight(){
-                    return 0;
-                }
-            };
-            copy.setMinWidth(0);
-            copy.setMinHeight(0);
-            copy.setTopHeight(0);
-            copy.setRightWidth(0);
-            copy.setBottomHeight(0);
-            copy.setLeftWidth(0);
-            skin.add("flat-down", copy, Drawable.class);
-        }
-
+        loadExtraStyle(skin);
         skin.load(Core.files.internal("sprites/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
@@ -123,6 +94,25 @@ public class UI implements ApplicationListener{
         Colors.put("stat", Pal.stat);
 
         loadCursors();
+    }
+
+    void loadExtraStyle(Skin skin){
+        AtlasRegion region = Core.atlas.find("flat-down-base");
+        int[] splits = region.splits;
+
+        ScaledNinePatchDrawable copy = new ScaledNinePatchDrawable(new NinePatch(region, splits[0], splits[1], splits[2], splits[3])){
+            public float getLeftWidth(){ return 0; }
+            public float getRightWidth(){ return 0; }
+            public float getTopHeight(){ return 0; }
+            public float getBottomHeight(){ return 0; }
+        };
+        copy.setMinWidth(0);
+        copy.setMinHeight(0);
+        copy.setTopHeight(0);
+        copy.setRightWidth(0);
+        copy.setBottomHeight(0);
+        copy.setLeftWidth(0);
+        skin.add("flat-down", copy, Drawable.class);
     }
 
     void loadCursors(){
