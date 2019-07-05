@@ -68,7 +68,7 @@ public class MenuFragment extends Fragment{
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             Draw.color();
-            Draw.rect(Draw.wrap(logo), (int)(Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f), logow, logoh);
+            Draw.rect(Draw.wrap(logo), (Core.graphics.getWidth() / 2), (int)(Core.graphics.getHeight() - 10 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f), logow, logoh);
         }).touchable(Touchable.disabled);
     }
 
@@ -81,11 +81,11 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-        play = new MobileButton("icon-play-2", isize, "$play", ui.deploy::show),
-        maps = new MobileButton("icon-map", isize, "$maps", ui.maps::show),
+        play = new MobileButton("icon-play-2", isize, "$campaign", ui.deploy::show),
         custom = new MobileButton("icon-play-custom", isize, "$customgame", this::showCustomSelect),
+        maps = new MobileButton("icon-load", isize, "$loadgame", ui.load::show),
         join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
-        editor = new MobileButton("icon-editor", isize, "$editor", () -> ui.loadAnd(ui.editor::show)),
+        editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
         tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
         donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
         exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());

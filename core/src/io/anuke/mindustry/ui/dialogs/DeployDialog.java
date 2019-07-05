@@ -4,14 +4,14 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -57,48 +57,53 @@ public class DeployDialog extends FloatingDialog{
             Core.settings.save();
         }
 
-        cont.stack(control.saves.getZoneSlot() == null ? new View() : new Table(){{
-            SaveSlot slot = control.saves.getZoneSlot();
+        Stack stack = new Stack();
+        stack.add(new View());
 
-            TextButton[] b = {null};
+        if(control.saves.getZoneSlot() != null){
+            stack.add(new Image("whiteui", new Color(0f, 0f, 0f, 0.9f)));
+            stack.add(new Table(t -> {
+                SaveSlot slot = control.saves.getZoneSlot();
 
-            TextButton button = addButton(Core.bundle.format("resume", slot.getZone().localizedName()), () -> {
-                if(b[0].childrenPressed()) return;
+                TextButton button = t.addButton(Core.bundle.format("resume", slot.getZone().localizedName()), () -> {
 
-                hide();
-                ui.loadAnd(() -> {
-                    try{
-                        control.saves.getZoneSlot().load();
-                        state.set(State.playing);
-                    }catch(SaveException e){ //make sure to handle any save load errors!
-                        e.printStackTrace();
-                        if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
-                        Core.app.post(() -> ui.showInfo("$save.corrupted"));
-                        show();
-                    }
-                });
-            }).size(230f).get();
-            b[0] = button;
+                    hide();
+                    ui.loadAnd(() -> {
+                        try{
+                            control.saves.getZoneSlot().load();
+                            state.set(State.playing);
+                        }catch(SaveException e){ //make sure to handle any save load errors!
+                            e.printStackTrace();
+                            if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
+                            Core.app.post(() -> ui.showInfo("$save.corrupted"));
+                            show();
+                        }
+                    });
+                }).size(230f).get();
 
-            String color = "[lightgray]";
+                String color = "[lightgray]";
 
-            button.defaults().colspan(2);
-            button.row();
-            button.add(Core.bundle.format("save.wave", color + slot.getWave()));
-            button.row();
-            button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
-            button.row();
+                button.defaults().colspan(2);
+                button.row();
+                button.add(Core.bundle.format("save.wave", color + slot.getWave()));
+                button.row();
+                button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
+                button.row();
 
-            row();
+                t.row();
 
-            addButton("$abandon", () -> {
-                ui.showConfirm("$warning", "$abandon.text", () -> {
-                    slot.delete();
-                    setup();
-                });
-            }).fillX().height(50f).pad(3);
+                t.addButton("$abandon", () -> {
+                    ui.showConfirm("$warning", "$abandon.text", () -> {
+                        slot.delete();
+                        setup();
+                    });
+                }).fillX().height(50f).pad(3);
+            }));
+        }
 
-        }}, new ItemsDisplay()).grow();
+        stack.add(new ItemsDisplay());
+
+        cont.add(stack).grow();
 
         //set up direct and indirect children
         for(ZoneNode node : nodes){

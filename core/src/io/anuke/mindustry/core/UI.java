@@ -37,7 +37,6 @@ public class UI implements ApplicationListener{
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
     public PlayerListFragment listfrag;
-    public BackgroundFragment backfrag;
     public LoadingFragment loadfrag;
 
     public WidgetGroup menuGroup, hudGroup;
@@ -159,7 +158,6 @@ public class UI implements ApplicationListener{
         hudfrag = new HudFragment();
         chatfrag = new ChatFragment();
         listfrag = new PlayerListFragment();
-        backfrag = new BackgroundFragment();
         loadfrag = new LoadingFragment();
 
         editor = new MapEditorDialog();
@@ -197,7 +195,6 @@ public class UI implements ApplicationListener{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-       // backfrag.build(group);
         control.input().getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);

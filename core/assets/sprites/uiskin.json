@@ -112,7 +112,7 @@
     },
     clear-partial: {
       down: whiteui,
-      up: button-select,
+      up: pane,
       over: flat-down,
       font: default-font,
       fontColor: white,
@@ -210,7 +210,7 @@
     },
     clear-full: {
       down: whiteui,
-      up: button-select,
+      up: pane,
       over: flat-down
     },
     clear-partial: {
