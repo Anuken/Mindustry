@@ -32,7 +32,7 @@ public class BlendFilter extends GenerateFilter{
             for(int y = -rad; y <= rad; y++){
                 if(Mathf.dst2(x, y) > rad*rad) continue;
 
-                if(in.tile(in.x + x, in.y + y).floor == flooronto.id){
+                if(in.tile((in.x + x) / in.scaling, (in.y + y) / in.scaling).floor == flooronto.id){
                     found = true;
                     break outer;
                 }

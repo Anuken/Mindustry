@@ -11,6 +11,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -30,6 +31,9 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(BlockStat.boostEffect);
+        stats.remove(BlockStat.damage);
+        //damages every 5 ticks, at least in meltdown's case
+        stats.add(BlockStat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
     }
 
     @Override

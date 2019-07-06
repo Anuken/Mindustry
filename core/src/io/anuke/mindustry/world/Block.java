@@ -301,7 +301,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.large);
+        return icon(Icon.medium);
     }
 
     @Override

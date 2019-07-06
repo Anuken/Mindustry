@@ -15,7 +15,6 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -234,71 +233,6 @@ public class MapEditor{
                 }
 
                 drawer.accept(tile(wx, wy));
-            }
-        }
-    }
-
-    public void draw_DEPRECATED(int x, int y, boolean paint, Block drawBlock, double chance){
-        boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
-        Tile[][] tiles = world.getTiles();
-
-        if(drawBlock.isMultiblock()){
-            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
-            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
-
-            int offsetx = -(drawBlock.size - 1) / 2;
-            int offsety = -(drawBlock.size - 1) / 2;
-
-            for(int dx = 0; dx < drawBlock.size; dx++){
-                for(int dy = 0; dy < drawBlock.size; dy++){
-                    int worldx = dx + offsetx + x;
-                    int worldy = dy + offsety + y;
-
-                    if(Structs.inBounds(worldx, worldy, width(), height())){
-                        Tile tile = tiles[worldx][worldy];
-
-                        Block block = tile.block();
-
-                        //bail out if there's anything blocking the way
-                        if(block.isMultiblock() || block instanceof BlockPart){
-                            return;
-                        }
-
-                        renderer.updatePoint(worldx, worldy);
-                    }
-                }
-            }
-
-            world.setBlock(tiles[x][y], drawBlock, drawTeam);
-        }else{
-            for(int rx = -brushSize; rx <= brushSize; rx++){
-                for(int ry = -brushSize; ry <= brushSize; ry++){
-                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
-                        int wx = x + rx, wy = y + ry;
-
-                        if(wx < 0 || wy < 0 || wx >= width() || wy >= height() || (paint && !isfloor && tiles[wx][wy].block() == Blocks.air)){
-                            continue;
-                        }
-
-                        Tile tile = tiles[wx][wy];
-
-                        if(!isfloor && (tile.isLinked() || tile.block().isMultiblock())){
-                            world.removeBlock(tile.link());
-                        }
-
-                        if(isfloor){
-                            tile.setFloor((Floor)drawBlock);
-                        }else{
-                            tile.setBlock(drawBlock);
-                            if(drawBlock.synthetic()){
-                                tile.setTeam(drawTeam);
-                            }
-                            if(drawBlock.rotate){
-                                tile.rotation((byte)rotation);
-                            }
-                        }
-                    }
-                }
             }
         }
     }

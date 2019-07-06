@@ -23,7 +23,7 @@ public class FloatingDialog extends Dialog{
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage("white", Pal.accent)
+        titleTable.addImage("whiteui", Pal.accent)
         .growX().height(3f).pad(4f);
 
         hidden(() -> {

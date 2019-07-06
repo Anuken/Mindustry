@@ -263,6 +263,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void save(){
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
+        editor.getTags().remove("width");
+        editor.getTags().remove("height");
         player.dead = true;
 
         if(name.isEmpty()){
@@ -332,7 +334,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public Dialog show(){
-        return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f), Actions.fadeIn(0.3f)));
+        return super.show(Core.scene, Actions.sequence());
     }
 
     @Override
@@ -511,7 +513,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton("white", "clear-toggle-partial");
+                    ImageButton button = new ImageButton("whiteui", "clear-toggle-partial");
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -636,7 +638,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region)) continue;
 
-            ImageButton button = new ImageButton("white", "clear-toggle");
+            ImageButton button = new ImageButton("whiteui", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

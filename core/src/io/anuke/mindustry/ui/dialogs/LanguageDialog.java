@@ -29,7 +29,7 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Strings.capitalize(loc.getDisplayName(loc)), "toggle");
+            TextButton button = new TextButton(Strings.capitalize(loc.getDisplayName(loc)), "clear-toggle");
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());
@@ -37,7 +37,7 @@ public class LanguageDialog extends FloatingDialog{
                 Log.info("Setting locale: {0}", loc.toString());
                 ui.showInfo("$language.restart");
             });
-            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).pad(2).row();
+            langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();
         }
 
         cont.add(pane);

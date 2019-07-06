@@ -9,15 +9,15 @@
   },
   TintedDrawable: {
     dialogDim: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.9 }
     },
     guideDim: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.3 }
     },
     invis: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0 }
     }
     loadDim: {
@@ -25,28 +25,28 @@
       color: { r: 0, g: 0, b: 0, a: 0.8 }
     },
     chatfield: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0.2 }
     },
     dark: {
-      name: white,
+      name: whiteui,
       color: { hex: "#000000ff" }
     },
     none: {
-      name: white,
+      name: whiteui,
       color: { r: 0, g: 0, b: 0, a: 0 }
     },
-    flat: {
-      name: white,
+    flat-trans: {
+      name: whiteui,
       color: { r: 0.0, g: 0.0, b: 0.0, a: 0.6 }
     },
-    flat-over: {
-      name: white,
-      color: { hex: "#ffffff82" }
+    flat: {
+      name: whiteui,
+      color: { r: 0.0, g: 0.0, b: 0.0, a: 1 }
     },
-    flat-down: {
-      name: white,
-      color: { hex: "#ffd37fff" }
+    flat-over: {
+      name: whiteui,
+      color: { hex: "#454545ff" }
     }
   },
   ButtonStyle: {
@@ -71,12 +71,12 @@
       up: button
     },
     node: {
-      disabled: content-background-locked,
+      disabled: button,
       font: default-font,
       fontColor: white,
       disabledFontColor: gray,
-      up: content-background,
-      over: content-background-over
+      up: button-over,
+      over: button-down
     },
     right: {
       over: button-right-over,
@@ -111,8 +111,8 @@
       up: info-banner
     },
     clear-partial: {
-      down: white,
-      up: button-select,
+      down: whiteui,
+      up: pane,
       over: flat-down,
       font: default-font,
       fontColor: white,
@@ -138,6 +138,16 @@
       over: flat-over,
       disabled: flat,
       disabledFontColor: gray
+    },
+    clear-toggle-menu: {
+      font: default-font,
+      fontColor: white,
+      checked: flat-down,
+      down: flat-down,
+      up: clear,
+      over: flat-over,
+      disabled: flat,
+      disabledFontColor: gray
     }
     toggle: {
       font: default-font,
@@ -159,8 +169,8 @@
       imageUpColor: white
     },
     node: {
-      up: content-background,
-      over: content-background-over
+      up: button-over,
+      over: button-down
     },
     right: {
       over: button-right-over,
@@ -199,8 +209,8 @@
       over: flat-over
     },
     clear-full: {
-      down: white,
-      up: button-select,
+      down: whiteui,
+      up: pane,
       over: flat-down
     },
     clear-partial: {
@@ -212,6 +222,17 @@
       down: flat-down,
       checked: flat-down,
       up: flat,
+      over: flat-over
+    },
+    clear-trans: {
+      down: flat-down,
+      up: flat-trans,
+      over: flat-over
+    },
+    clear-toggle-trans: {
+      down: flat-down,
+      checked: flat-down,
+      up: flat-trans,
       over: flat-over
     },
     clear-toggle-partial: {

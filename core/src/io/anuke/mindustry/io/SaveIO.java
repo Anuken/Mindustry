@@ -6,6 +6,7 @@ import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
+import io.anuke.mindustry.io.versions.Save2;
 import io.anuke.mindustry.world.WorldContext;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
     public static final byte[] header = {77, 83, 65, 86};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Array<SaveVersion> versionArray = Array.with(new Save1());
+    public static final Array<SaveVersion> versionArray = Array.with(new Save1(), new Save2());
 
     static{
         for(SaveVersion version : versionArray){

@@ -16,6 +16,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.impl.SolidEntity;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Liquid;
@@ -141,6 +142,11 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     public float getFlammability(){
         return liquid.flammability * amount;
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return TypeIDs.puddle;
     }
 
     @Override
@@ -280,7 +286,9 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
     @Override
     public void removed(){
-        map.remove(tile.pos());
+        if(tile != null){
+            map.remove(tile.pos());
+        }
         reset();
     }
 

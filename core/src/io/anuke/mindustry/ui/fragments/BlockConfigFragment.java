@@ -24,6 +24,19 @@ public class BlockConfigFragment extends Fragment{
     public void build(Group parent){
         table.visible(false);
         parent.addChild(table);
+
+        //hacky way to hide block config when in menu
+        //TODO remove?
+        Core.scene.add(new Element(){
+            @Override
+            public void act(float delta){
+                super.act(delta);
+                if(state.is(State.menu)){
+                    table.visible(false);
+                    configTile = null;
+                }
+            }
+        });
     }
 
     public boolean isShown(){
@@ -47,11 +60,6 @@ public class BlockConfigFragment extends Fragment{
         Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
         table.update(() -> {
-            if(state.is(State.menu)){
-                hideConfig();
-                return;
-            }
-
             if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
                 hideConfig();
                 return;

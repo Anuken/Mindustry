@@ -28,7 +28,7 @@ public class ItemSelection{
         for(Item item : items){
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
-            ImageButton button = cont.addImageButton("white", "clear-toggle", 24, () -> control.input().frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.addImageButton("whiteui", "clear-toggle", 24, () -> control.input().frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Icon.medium));
             button.update(() -> button.setChecked(holder.get() == item));

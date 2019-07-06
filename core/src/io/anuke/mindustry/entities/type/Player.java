@@ -12,11 +12,11 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
@@ -113,6 +113,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         setNet(tile.drawx(), tile.drawy());
         clearItem();
         heal();
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return TypeIDs.player;
     }
 
     @Override

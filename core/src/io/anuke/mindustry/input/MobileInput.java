@@ -261,7 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Table table){
-        table.addImage("blank").color(Pal.accent).height(3f).colspan(4).growX();
+        table.addImage("whiteui").color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 

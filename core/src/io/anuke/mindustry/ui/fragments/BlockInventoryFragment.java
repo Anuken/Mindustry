@@ -52,7 +52,7 @@ public class BlockInventoryFragment extends Fragment{
     @Override
     public void build(Group parent){
         table = new Table();
-        table.visible(() -> !state.is(State.menu));
+        table.setName("inventory");
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);
@@ -70,10 +70,11 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     public void hide(){
-        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false), Actions.run(() -> {
-            table.clear();
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
+            table.clearChildren();
+            table.clearListeners();
             table.update(null);
-        }));
+        }), Actions.visible(false));
         table.touchable(Touchable.disabled);
         tile = null;
     }
@@ -83,9 +84,11 @@ public class BlockInventoryFragment extends Fragment{
         IntSet container = new IntSet();
 
         table.clearChildren();
+        table.clearActions();
         table.background("inventory");
         table.touchable(Touchable.enabled);
         table.update(() -> {
+
             if(state.is(State.menu) || tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0){
                 hide();
             }else{
@@ -171,9 +174,13 @@ public class BlockInventoryFragment extends Fragment{
 
         updateTablePosition();
 
+        table.visible(true);
+
         if(actions){
-            table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-            Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+            table.setScale(0f, 1f);
+            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        }else{
+            table.setScale(1f, 1f);
         }
     }
 

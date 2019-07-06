@@ -2,9 +2,7 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.GL20;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
@@ -23,8 +21,8 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
-import java.nio.IntBuffer;
 
+import static io.anuke.arc.Core.batch;
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,10 +41,7 @@ public class Control implements ApplicationListener{
     private InputHandler input;
 
     public Control(){
-        IntBuffer buf = BufferUtils.newIntBuffer(1);
-        Core.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
-        int maxSize = buf.get(0);
-
+        batch = new SpriteBatch();
         saves = new Saves();
         data = new GlobalData();
 
@@ -55,7 +50,7 @@ public class Control implements ApplicationListener{
         Effects.setShakeFalloff(10000f);
 
         content.initialize(Content::init);
-        Core.atlas = new TextureAtlas(maxSize < 2048 ? "sprites/sprites_fallback.atlas" : "sprites/sprites.atlas");
+        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load, true);
 
