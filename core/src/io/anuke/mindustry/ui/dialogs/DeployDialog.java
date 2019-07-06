@@ -94,7 +94,7 @@ public class DeployDialog extends FloatingDialog{
                         slot.delete();
                         setup();
                     });
-                }).fillX().height(50f).pad(3);
+                }).width(230f).height(50f).padTop(3);
             }));
         }else{
             stack.add(new View());
