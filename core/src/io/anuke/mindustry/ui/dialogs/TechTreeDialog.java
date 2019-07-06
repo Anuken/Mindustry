@@ -20,6 +20,7 @@ import io.anuke.arc.util.Align;
 import io.anuke.mindustry.content.TechTree;
 import io.anuke.mindustry.content.TechTree.TechNode;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.ItemsDisplay;
 import io.anuke.mindustry.ui.TreeLayout;
@@ -266,7 +267,7 @@ public class TechTreeDialog extends FloatingDialog{
                             for(ItemStack req : node.requirements){
                                 t.table(list -> {
                                     list.left();
-                                    list.addImage(req.item.getContentIcon()).size(8 * 3).padRight(3);
+                                    list.addImage(req.item.icon(Item.Icon.medium)).size(8 * 3).padRight(3);
                                     list.add(req.item.localizedName()).color(Color.LIGHT_GRAY);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
                                     .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.LIGHT_GRAY : Color.SCARLET));

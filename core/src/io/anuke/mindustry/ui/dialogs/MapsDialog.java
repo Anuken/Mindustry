@@ -174,7 +174,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.row();
 
-        table.addImageTextButton("$editor.openin", "icon-load-map", iconsize, () -> {
+        table.addImageTextButton("$editor.openin", "icon-load-map-small", iconsizesmall, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
@@ -185,7 +185,7 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$delete", "icon-trash-16", iconsize, () -> {
+        table.addImageTextButton("$delete", "icon-trash-16-small", iconsizesmall, () -> {
             ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
                 world.maps.removeMap(map);
                 dialog.hide();

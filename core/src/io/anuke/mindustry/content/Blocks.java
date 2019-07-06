@@ -31,6 +31,8 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Blocks implements ContentList{
+    public static final BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
+
     public static Block
 
     //environment
@@ -1586,8 +1588,6 @@ public class Blocks implements ContentList{
 
         //endregion
         //region units
-
-        BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
 
         draugFactory = new UnitFactory("draug-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 120));

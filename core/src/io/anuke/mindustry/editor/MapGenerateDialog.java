@@ -92,7 +92,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     setScaling(Scaling.none);
                 }});
                 visible(() -> generating && !updateEditorOnChange);
-            }}).size(mobile ? 300f : 400f).padRight(6);
+            }}).size(mobile ? 300f : 400f).padRight(10);
             t.pane(p -> filterTable = p).width(300f).get().setScrollingDisabled(true, false);
         }).grow();
 
@@ -119,51 +119,57 @@ public class MapGenerateDialog extends FloatingDialog{
         filterTable.top();
 
         for(GenerateFilter filter : filters){
-            filterTable.table(t -> {
-                t.add(filter.name()).padTop(5).color(Pal.accent).growX().left();
+            //main container
+            filterTable.table("button", c -> {
+                //icons to perform actions
+                c.table(t -> {
+                    t.add(filter.name()).padTop(5).color(Pal.accent).growX().left();
 
-                t.row();
+                    t.row();
 
-                t.table(b -> {
-                    b.left();
-                    b.defaults().size(50f);
-                    b.addImageButton("icon-refresh-small", iconsizesmall, () -> {
-                        filter.randomize();
-                        update();
-                    });
+                    t.table(b -> {
+                        String style = "clear";
+                        b.left();
+                        b.defaults().size(50f);
+                        b.addImageButton("icon-refresh-small", style, iconsizesmall, () -> {
+                            filter.randomize();
+                            update();
+                        });
 
-                    b.addImageButton("icon-arrow-up-small", iconsizesmall, () -> {
-                        int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.max(0, idx - 1));
-                        rebuildFilters();
-                        update();
+                        b.addImageButton("icon-arrow-up-small", style, iconsizesmall, () -> {
+                            int idx = filters.indexOf(filter);
+                            filters.swap(idx, Math.max(0, idx - 1));
+                            rebuildFilters();
+                            update();
+                        });
+                        b.addImageButton("icon-arrow-down-small",style,  iconsizesmall, () -> {
+                            int idx = filters.indexOf(filter);
+                            filters.swap(idx, Math.min(filters.size - 1, idx + 1));
+                            rebuildFilters();
+                            update();
+                        });
+                        b.addImageButton("icon-trash-small", style, iconsizesmall, () -> {
+                            filters.remove(filter);
+                            rebuildFilters();
+                            update();
+                        });
                     });
-                    b.addImageButton("icon-arrow-down-small", iconsizesmall, () -> {
-                        int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
-                        rebuildFilters();
-                        update();
-                    });
-                    b.addImageButton("icon-trash-small", iconsizesmall, () -> {
-                        filters.remove(filter);
-                        rebuildFilters();
-                        update();
-                    });
-                }).growX();
-            }).fillX();
-            filterTable.row();
-            filterTable.table("underline", f -> {
-                f.left();
-                for(FilterOption option : filter.options){
-                    option.changed = this::update;
+                }).fillX();
+                c.row();
+                //all the options
+                c.table(f -> {
+                    f.left();
+                    for(FilterOption option : filter.options){
+                        option.changed = this::update;
 
-                    f.table(t -> {
-                        t.left();
-                        option.build(t);
-                    }).growX().left();
-                    f.row();
-                }
-            }).pad(3).padTop(0).width(280f);
+                        f.table(t -> {
+                            t.left();
+                            option.build(t);
+                        }).growX().left();
+                        f.row();
+                    }
+                }).grow().left().pad(2);
+            }).width(280f).pad(3);
             filterTable.row();
         }
 

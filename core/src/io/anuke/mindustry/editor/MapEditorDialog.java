@@ -334,7 +334,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public Dialog show(){
-        return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f), Actions.fadeIn(0.3f)));
+        return super.show(Core.scene, Actions.sequence());
     }
 
     @Override

@@ -56,6 +56,7 @@ public class Pal{
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
+    noplace = Color.valueOf("ffa697"),
     removeBack = Color.valueOf("a73e3e"),
     placeRotate = accent,
     breakInvalid = Color.valueOf("d44b3d"),

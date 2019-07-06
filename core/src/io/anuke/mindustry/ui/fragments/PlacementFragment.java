@@ -11,6 +11,7 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -151,7 +152,8 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
+                            Color color = block.buildVisibility == Blocks.padVisible && !block.buildVisibility.get() ? Pal.noplace :
+                                        state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -200,6 +202,10 @@ public class PlacementFragment extends Fragment{
                                 if(unlocked(lastDisplay)){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
                                     .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                }
+                                if(lastDisplay.buildVisibility == Blocks.padVisible && !lastDisplay.buildVisibility.get()){
+                                    header.row();
+                                    header.add("$attackpvponly").width(230f).wrap().colspan(3).left();
                                 }
                             }).growX().left();
                             topTable.row();
@@ -298,7 +304,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.buildCategory == cat && block.isVisible()){
+            if(block.buildCategory == cat && (block.isVisible() || block.buildVisibility == Blocks.padVisible)){
                 returnArray.add(block);
             }
         }
