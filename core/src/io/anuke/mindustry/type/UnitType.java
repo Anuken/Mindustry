@@ -65,11 +65,8 @@ public class UnitType extends UnlockableContent{
         weapon.load();
         iconRegion = Core.atlas.find("unit-icon-" + name, Core.atlas.find(name));
         region = Core.atlas.find(name);
-
-        if(!isFlying){
-            legRegion = Core.atlas.find(name + "-leg");
-            baseRegion = Core.atlas.find(name + "-base");
-        }
+        legRegion = Core.atlas.find(name + "-leg");
+        baseRegion = Core.atlas.find(name + "-base");
     }
 
     @Override

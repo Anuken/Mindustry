@@ -47,9 +47,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
         buildQueue().clear();
 
         for(BuildRequest request : removal){
-            if(!((request.breaking && world.tile(request.x, request.y).block() == Blocks.air) ||
-            (!request.breaking && (world.tile(request.x, request.y).rotation() == request.rotation || !request.block.rotate)
-            && world.tile(request.x, request.y).block() == request.block))){
+            Tile tile = world.tile(request.x, request.y);
+
+            if(!(tile == null || (request.breaking && tile.block() == Blocks.air) ||
+            (!request.breaking && (tile.rotation() == request.rotation || !request.block.rotate) && tile.block() == request.block))){
                 buildQueue().addLast(request);
             }
         }

@@ -13,8 +13,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
@@ -310,11 +309,11 @@ public class Blocks implements ContentList{
         saltRocks = new StaticWall("saltrocks"){{
         }};
 
-        sporePine = new StaticWall("spore-pine"){{
+        sporePine = new StaticTree("spore-pine"){{
             variants = 0;
         }};
 
-        pine = new StaticWall("pine"){{
+        pine = new StaticTree("pine"){{
             variants = 0;
         }};
 

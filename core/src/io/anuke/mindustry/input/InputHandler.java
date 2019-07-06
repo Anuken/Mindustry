@@ -42,7 +42,7 @@ public abstract class InputHandler implements InputProcessor{
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
-    public final OverlayFragment frag = new OverlayFragment(this);
+    public final OverlayFragment frag = new OverlayFragment();
 
     public Block block;
     public int rotation;

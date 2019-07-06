@@ -135,7 +135,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("blank").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
+            content.addImage("whiteui").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
             content.row();
         });
 

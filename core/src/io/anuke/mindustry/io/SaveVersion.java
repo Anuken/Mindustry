@@ -1,6 +1,7 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.mindustry.entities.Entities;
@@ -253,7 +254,6 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readContentHeader(DataInput stream) throws IOException{
-
         byte mapped = stream.readByte();
 
         MappableContent[][] map = new MappableContent[ContentType.values().length][0];

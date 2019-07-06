@@ -80,10 +80,6 @@ public class AboutDialog extends FloatingDialog{
 
         buttons.addButton("$credits", this::showCredits).size(200f, 64f);
 
-        if(!ios && !OS.isMac){
-            buttons.addButton("$changelog.title", ui.changelog::show).size(200f, 64f);
-        }
-
         if(Core.graphics.isPortrait()){
             for(Cell<?> cell : buttons.getCells()){
                 cell.width(140f);
@@ -98,7 +94,7 @@ public class AboutDialog extends FloatingDialog{
         dialog.cont.add("$credits.text");
         dialog.cont.row();
         if(!contributors.isEmpty()){
-            dialog.cont.addImage("blank").color(Pal.accent).fillX().height(3f).pad(3f);
+            dialog.cont.addImage("whiteui").color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
             dialog.cont.add("$contributors");
             dialog.cont.row();
