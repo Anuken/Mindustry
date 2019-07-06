@@ -27,7 +27,7 @@ public class PowerNode extends PowerBlock{
     //last distribution block placed
     private static int lastPlaced = -1;
 
-    protected Vector2 t1 = new Vector2();
+    protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
 
     protected float laserRange = 6;
@@ -211,7 +211,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(link != null && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
+            if(linkValid(tile, link) && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
                 drawLaser(tile, link);
             }
         }
@@ -248,13 +248,13 @@ public class PowerNode extends PowerBlock{
         x2 = target.drawx(), y2 = target.drawy();
 
         float angle1 = Angles.angle(x1, y1, x2, y2);
-
         t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
+        t2.trns(angle1 + 180f, target.block().size * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
-        x2 -= t1.x;
-        y2 -= t1.y;
+        x2 += t2.x;
+        y2 += t2.y;
 
         Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
         Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);

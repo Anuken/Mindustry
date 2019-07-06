@@ -21,6 +21,7 @@ public class Mindustry extends ApplicationCore{
         });
 
         Time.mark();
+
         Vars.init();
         Log.setUseColors(false);
         BundleLoader.load();
@@ -34,8 +35,6 @@ public class Mindustry extends ApplicationCore{
         add(ui = new UI());
         add(netServer = new NetServer());
         add(netClient = new NetClient());
-
-        Events.fire(new GameLoadEvent());
     }
 
     @Override
@@ -64,5 +63,6 @@ public class Mindustry extends ApplicationCore{
         super.init();
 
         Log.info("Time to load [total]: {0}", Time.elapsed());
+        Events.fire(new GameLoadEvent());
     }
 }
