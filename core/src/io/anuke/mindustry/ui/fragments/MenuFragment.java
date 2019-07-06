@@ -82,14 +82,14 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-        play = new MobileButton("icon-play-2", isize, "$campaign", ui.deploy::show),
-        custom = new MobileButton("icon-play-custom", isize, "$customgame", ui.custom::show),
-        maps = new MobileButton("icon-load", isize, "$loadgame", ui.load::show),
-        join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
-        editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
-        tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-        donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
-        exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
+            play = new MobileButton("icon-play-2", isize, "$campaign", ui.deploy::show),
+            custom = new MobileButton("icon-play-custom", isize, "$customgame", ui.custom::show),
+            maps = new MobileButton("icon-load", isize, "$loadgame", ui.load::show),
+            join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
+            editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
+            tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
+            donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
+            exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
@@ -135,7 +135,7 @@ public class MenuFragment extends Fragment{
 
 
         float width = 230f;
-        String background = "flat";
+        String background = "flat-trans";
 
         container.left();
         container.add().width(Core.graphics.getWidth()/10f);

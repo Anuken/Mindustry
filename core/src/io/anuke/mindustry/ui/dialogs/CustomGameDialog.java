@@ -12,8 +12,7 @@ import io.anuke.mindustry.ui.BorderImage;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class
-CustomGameDialog extends FloatingDialog{
+public class CustomGameDialog extends FloatingDialog{
     private MapPlayDialog dialog = new MapPlayDialog();
 
     public CustomGameDialog(){
@@ -33,6 +32,7 @@ CustomGameDialog extends FloatingDialog{
 
         Table maps = new Table();
         maps.marginRight(14);
+        maps.marginBottom(55f);
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
