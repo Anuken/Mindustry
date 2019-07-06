@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.game.EventType.DisposeEvent;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.graphics.MenuRenderer;
@@ -26,6 +27,13 @@ public class MenuFragment extends Fragment{
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
+
+    public MenuFragment(){
+        Events.on(DisposeEvent.class, event -> {
+            renderer.dispose();
+            logo.dispose();
+        });
+    }
 
     @Override
     public void build(Group parent){
