@@ -1590,12 +1590,12 @@ public class Blocks implements ContentList{
         //region units
 
         draugFactory = new UnitFactory("draug-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 120));
+            requirements(Category.units, ItemStack.with(Items.copper, 60, Items.lead, 140));
             type = UnitTypes.draug;
             produceTime = 5000;
             size = 2;
             maxSpawn = 2;
-            consumes.power(0.5f);
+            consumes.power(1.1f);
             consumes.items();
         }};
 
