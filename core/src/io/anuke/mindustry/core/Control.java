@@ -2,8 +2,7 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureAtlas;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.TextField;
@@ -23,6 +22,7 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.IOException;
 
+import static io.anuke.arc.Core.batch;
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
 
@@ -41,6 +41,7 @@ public class Control implements ApplicationListener{
     private InputHandler input;
 
     public Control(){
+        batch = new SpriteBatch();
         saves = new Saves();
         data = new GlobalData();
 
