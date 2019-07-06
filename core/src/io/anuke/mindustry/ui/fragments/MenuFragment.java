@@ -146,7 +146,7 @@ public class MenuFragment extends Fragment{
                 new Buttoni("$play", "icon-play-2",
                     new Buttoni("$campaign", "icon-play-2", ui.deploy::show),
                     new Buttoni("$joingame", "icon-add", ui.join::show),
-                    new Buttoni("$customgame", "icon-terrain", ui.custom::show),
+                    new Buttoni("$customgame", "icon-editor", ui.custom::show),
                     new Buttoni("$loadgame", "icon-load", ui.load::show)
                 ),
                 new Buttoni("$editor", "icon-editor", ui.maps::show),

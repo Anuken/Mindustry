@@ -14,13 +14,21 @@ public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
+    Map lastMap;
 
     public MapPlayDialog(){
         super("");
         setFillParent(false);
+
+        onResize(() -> {
+            if(lastMap != null){
+                show(lastMap);
+            }
+        });
     }
 
     public void show(Map map){
+        this.lastMap = map;
         title.setText(map.name());
         cont.clearChildren();
 

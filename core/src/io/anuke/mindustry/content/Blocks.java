@@ -1308,7 +1308,7 @@ public class Blocks implements ContentList{
             inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 260 * size * size;
+            health = 200 * size * size;
         }};
 
         scorch = new ItemTurret("scorch"){{
@@ -1444,7 +1444,7 @@ public class Blocks implements ContentList{
             burstSpacing = 3f;
             shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
-            health = 360;
+            health = 240 * size * size;;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1521,7 +1521,7 @@ public class Blocks implements ContentList{
             shootShake = 2f;
             range = 290f;
 
-            health = 550;
+            health = 130 * size * size;
         }};
 
         cyclone = new ItemTurret("cyclone"){{

@@ -213,8 +213,6 @@ public class MenuRenderer implements Disposable{
             }
         }
 
-        //Draw.rect("error", world.width() * tilesize/2f, world.height() * tilesize/2f, 100f, 100f);
-
         cacheWall = batch.endCache();
 
         Core.batch = prev;
@@ -281,15 +279,15 @@ public class MenuRenderer implements Disposable{
     }
 
     private void flyers(PositionConsumer cons){
-        float tw = width * tilesize * 2;
-        float th = height * tilesize * 2;
+        float tw = width * tilesize * 2.5f;
+        float th = height * tilesize * 1.5f;
         float range = 500f;
         float offset = -600f;
 
         for(int i = 0; i < flyers; i++){
-            Tmp.v1.trns(flyerRot, time * (2.5f + flyerType.speed));
+            Tmp.v1.trns(flyerRot, time * (2f + flyerType.speed));
 
-            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % tw,
+            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % (tw + Mathf.randomSeed(i + 5, 0, 500)),
             (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3.4f) + offset) % th);
         }
     }
