@@ -43,7 +43,7 @@ public class Mindustry extends ApplicationCore{
 
         int targetfps = Core.settings.getInt("fpscap", 120);
 
-        if(targetfps > 0 && targetfps <= 120){
+        if(targetfps > 0 && targetfps <= 240){
             long target = (1000 * 1000000) / targetfps; //target in nanos
             long elapsed = Time.timeSinceNanos(lastTime);
             if(elapsed < target){

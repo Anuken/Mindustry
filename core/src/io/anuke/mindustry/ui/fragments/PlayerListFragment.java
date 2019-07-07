@@ -9,6 +9,7 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -81,15 +82,15 @@ public class PlayerListFragment extends Fragment{
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Pal.accent);
+                    Draw.color(Pal.gray);
                     Draw.alpha(parentAlpha);
-                    Lines.stroke(Unit.dp.scl(3f));
+                    Lines.stroke(Unit.dp.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }
             };
             table.margin(8);
-            table.add(new Image(user.mech.iconRegion)).grow();
+            table.add(new Image(user.mech.getContentIcon()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
@@ -135,7 +136,7 @@ public class PlayerListFragment extends Fragment{
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("whiteui").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
+            content.addImage("whiteui").height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
             content.row();
         });
 
