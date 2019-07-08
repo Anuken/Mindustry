@@ -143,17 +143,15 @@ public class Generators{
                         }
                     }
 
-                    if(regions.length > 1){
-                        image.save(block.name + "-icon-full");
-                    }
+                    image.save(block.name + "-icon-full");
 
                     image.save("../editor/" + block.name + "-icon-editor");
 
                     for(Icon icon : Icon.values()){
-                        if(icon.size == 0 || (icon.size == image.width && icon.size == image.height)) continue;
+                        if(icon.size == 0) continue;
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save(block.name + "-icon-" + icon.name());
+                        scaled.save("../ui/" + block.name + "-icon-" + icon.name());
                     }
 
                     Color average = new Color();
