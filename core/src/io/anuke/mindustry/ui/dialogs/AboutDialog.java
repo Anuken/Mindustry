@@ -20,7 +20,7 @@ public class AboutDialog extends FloatingDialog{
         super("$about.button");
 
         shown(() -> {
-            contributors = Array.with(Core.files.internal("contributors").readString().split("\n"));
+            contributors = Array.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
             Core.app.post(this::setup);
         });
 
