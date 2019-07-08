@@ -32,7 +32,7 @@ public class MenuRenderer implements Disposable{
     private CacheBatch batch;
     private float time = 0f;
     private float flyerRot = 45f;
-    private int flyers = Mathf.chance(0.2) ? Mathf.random(30) : Mathf.random(12);
+    private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
     private UnitType flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.phantom, UnitTypes.phantom, UnitTypes.revenant);
 
     public MenuRenderer(){
@@ -279,10 +279,10 @@ public class MenuRenderer implements Disposable{
     }
 
     private void flyers(PositionConsumer cons){
-        float tw = width * tilesize * 2.5f;
-        float th = height * tilesize * 1.5f;
+        float tw = width * tilesize * 1f + tilesize;
+        float th = height * tilesize * 1f + tilesize;
         float range = 500f;
-        float offset = -600f;
+        float offset = -100f;
 
         for(int i = 0; i < flyers; i++){
             Tmp.v1.trns(flyerRot, time * (2f + flyerType.speed));

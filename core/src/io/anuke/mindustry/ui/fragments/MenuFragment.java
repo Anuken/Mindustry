@@ -132,7 +132,7 @@ public class MenuFragment extends Fragment{
                 table.defaults().set(container.defaults());
 
                 if(Platform.instance.canDonate()) table.add(donate);
-                table.add(exit);
+                if(!ios) table.add(exit);
             }).colspan(2);
         }
     }
