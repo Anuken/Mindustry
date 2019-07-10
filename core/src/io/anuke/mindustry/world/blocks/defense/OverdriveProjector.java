@@ -98,8 +98,10 @@ public class OverdriveProjector extends Block{
                     if(other == null) continue;
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
-                        other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                        other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
+                        if(other.entity.timeScale <= realBoost){
+                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
+                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
+                        }
                         healed.add(other.pos());
                     }
                 }
