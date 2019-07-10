@@ -383,9 +383,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Table tools = new Table().top();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                Table[] lastTable = {null};
 
                 Consumer<EditorTool> addTool = tool -> {
-                    Table[] lastTable = {null};
 
                     ImageButton button = new ImageButton("icon-" + tool.name() + "-small", "clear-toggle");
                     button.clicked(() -> {

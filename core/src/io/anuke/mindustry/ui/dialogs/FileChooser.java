@@ -12,12 +12,11 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.iconsize;
+import static io.anuke.mindustry.Vars.*;
 
 public class FileChooser extends FloatingDialog{
     private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
@@ -35,9 +34,9 @@ public class FileChooser extends FloatingDialog{
     private int lastWidth = Core.graphics.getWidth(), lastHeight = Core.graphics.getHeight();
 
     public static final Predicate<String> pngFiles = str -> str.equals("png");
-    public static final Predicate<String> anyMapFiles = str -> str.equals(Vars.oldMapExtension) || str.equals(Vars.mapExtension);
-    public static final Predicate<String> mapFiles = str -> str.equals(Vars.mapExtension);
-    public static final Predicate<String> saveFiles = str -> str.equals(Vars.saveExtension);
+    public static final Predicate<String> anyMapFiles = str -> str.equals(oldMapExtension) || str.equals(mapExtension);
+    public static final Predicate<String> mapFiles = str -> str.equals(mapExtension);
+    public static final Predicate<String> saveFiles = str -> str.equals(saveExtension);
 
     public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
         super(title);
