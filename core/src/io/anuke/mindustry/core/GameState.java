@@ -7,6 +7,7 @@ import io.anuke.mindustry.entities.type.base.BaseDrone;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Item;
 
 import static io.anuke.mindustry.Vars.*;
 public class GameState{

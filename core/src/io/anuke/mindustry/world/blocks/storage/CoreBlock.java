@@ -5,13 +5,10 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Log;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.effect.ItemTransfer;
 import io.anuke.mindustry.entities.traits.SpawnerTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.Team;
@@ -22,6 +19,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.distribution.ItemsEater;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
@@ -177,17 +175,9 @@ public class CoreBlock extends StorageBlock{
         public void damage(float damage, Team team){
             if(state.rules.resourcesWar){
                 for(Tile eater : state.teams.get(getTeam()).eaters){
-                    if(eater.entity().items.total() > 0){
-                        Item i = eater.entity.items.take();
-                        Tile target = state.teams.get(team).cores.first();
-                        for(Tile eaterCheck : state.teams.get(team).eaters){
-                            if(eaterCheck.entity().items.total() < eaterCheck.block().itemCapacity){
-                                target = eaterCheck;
-                                break;
-                            }
-                        }
-                        Call.transferItemTo(i, Math.round(damage/10), eater.entity().x, eater.entity().y, target);
-                    }
+                    int points = eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
+                    eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned = Math.max(0, points-(int)damage);
+                    state.teams.get(team).eaters.first().<ItemsEater.ItemsEaterEntity>entity().pointsEarned+=damage;
                 }
             }
             damage(damage);

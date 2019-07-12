@@ -6,7 +6,6 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
@@ -125,8 +124,6 @@ public class Logic implements ApplicationListener{
         state.eliminationtime = state.rules.eliminationTime;
         state.round++;
 
-        calcPoints();
-
         Call.eliminateTeam(state.getWeakest().ordinal());
 
         Call.onRound();
@@ -134,24 +131,15 @@ public class Logic implements ApplicationListener{
 
     public void calcPoints(){
         for(Team team : Team.all){
-            Teams.TeamData teamData = state.teams.get(team);
             int points = -1;
-            if(teamData.cores.size!=0 || Structs.filter(Player.class, playerGroup.all().toArray(), (p)->p.getTeam()==team).length!=0){
+            if(state.teams.get(team).cores.size!=0 || state.teams.isActive(team)){
                 points = 0;
-                for(Tile t : teamData.eaters){
-                    points += calcPoints(t);
+                for(Tile eater : state.teams.get(team).eaters){
+                    points += eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
                 }
             }
             state.points[team.ordinal()] = points;
         }
-    }
-
-    public int calcPoints(Tile t){
-        int points = 0;
-        for(int i=0; i<content.items().size; i++){
-            points += (int)(t.entity.items.get(content.items().get(i)) * itemsValues[i]);
-        }
-        return points;
     }
 
     @Remote(called = Loc.both)

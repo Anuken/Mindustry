@@ -128,6 +128,8 @@ public class Vars{
     public static float[] itemsValues = {
         1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f
     };
+    /**  */
+    public static float buffTime = 60 * 60;
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
