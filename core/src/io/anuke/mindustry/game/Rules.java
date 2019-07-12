@@ -65,7 +65,7 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Loadout */
+    /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 200));
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
