@@ -1213,7 +1213,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 5000;
+            itemCapacity = 4000;
             size = 3;
         }};
 
