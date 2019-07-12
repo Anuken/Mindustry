@@ -11,7 +11,7 @@ import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.PackrConfig
 
 def JDK_DIR = "$System.env.PACKR_DIR"
-def ICON_DIR = new File("core/assets/sprites/icon.icns")
+def ICON_DIR = new File("core/assets/icons/icon.icns")
 
 ext.getPlatform = {
     def lc = project.hasProperty("platform") ? platform.toLowerCase() : ""

@@ -4,13 +4,16 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Zones;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -30,7 +33,7 @@ public class DeployDialog extends FloatingDialog{
     private ZoneInfoDialog info = new ZoneInfoDialog();
 
     public DeployDialog(){
-        super("");
+        super("", "fulldialog");
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
@@ -57,6 +60,26 @@ public class DeployDialog extends FloatingDialog{
         }
 
         Stack stack = new Stack();
+
+        stack.add(new Image(new Texture("sprites/backgrounds/stars.png"){{
+            setFilter(TextureFilter.Linear);
+        }}){{
+            //setColor(Color.fromGray(0.3f));
+            //setScale(3f);
+        }}.setScaling(Scaling.fill));
+
+        stack.add(new Image(new Texture("sprites/backgrounds/planet-zero.png"){{
+            setFilter(TextureFilter.Linear);
+        }}){{
+            float[] time = {0};
+            setColor(Color.fromGray(0.3f));
+            setScale(1.5f);
+            update(() -> {
+                setOrigin(Align.center);
+                time[0] += Core.graphics.getDeltaTime() * 10f;
+                setTranslation(Mathf.sin(time[0], 60f, 70f), Mathf.cos(time[0], 140f, 80f));
+            });
+        }}.setScaling(Scaling.fit));
 
         if(control.saves.getZoneSlot() != null){
             stack.add(new Table(t -> {

@@ -264,6 +264,12 @@
       titleFont: default-font,
       background: window-empty,
       titleFontColor: accent
+    },
+    fulldialog: {
+      stageBackground: dark,
+      titleFont: default-font,
+      background: window-empty,
+      titleFontColor: accent
     }
   },
   KeybindDialogStyle: {
