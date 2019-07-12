@@ -10,6 +10,8 @@ import io.anuke.arc.util.serialization.Json;
 import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.io.LegacyMapIO;
 import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -18,7 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands"};
+    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands", "tendrils", "caldera"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
@@ -108,6 +110,31 @@ public class Maps implements Disposable{
             MapIO.writeMap(file, map);
 
             if(!headless){
+                //by default, it does not have an enemy core or any other cores
+                map.tags.put("enemycore", "false");
+                map.tags.put("othercore", "false");
+                IntSet teams = new IntSet();
+
+                for(int x = 0; x < map.width; x++){
+                    for(int y = 0; y < map.height; y++){
+                        Tile tile = world.getTiles()[x][y];
+
+                        if(tile.block() instanceof CoreBlock){
+                            teams.add(tile.getTeamID());
+                        }
+                    }
+                }
+
+                if(teams.size > 1){
+                    //map must have other team's cores
+                    map.tags.put("othercore", "true");
+                }
+
+                if(teams.contains(waveTeam.ordinal())){
+                    //map must have default enemy team's core
+                    map.tags.put("enemycore", "true");
+                }
+
                 map.texture = new Texture(MapIO.generatePreview(world.getTiles()));
             }
             maps.add(map);

@@ -5,7 +5,8 @@ import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.IntQueue;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -95,7 +96,7 @@ public class Pathfinder{
      */
     private void update(Tile tile, Team team){
         //make sure team exists
-        if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null){
+        if(paths != null && paths[team.ordinal()] != null && paths[team.ordinal()].weights != null && Structs.inBounds(tile.x, tile.y, paths[team.ordinal()].weights)){
             PathData path = paths[team.ordinal()];
 
             if(path.weights[tile.x][tile.y] <= 0.1f){

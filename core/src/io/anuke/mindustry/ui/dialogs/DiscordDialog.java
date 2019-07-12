@@ -22,9 +22,9 @@ public class DiscordDialog extends Dialog{
             t.background("button").margin(0);
 
             t.table(img -> {
-                img.addImage("white").height(h - 5).width(40f).color(color);
+                img.addImage("whiteui").height(h - 5).width(40f).color(color);
                 img.row();
-                img.addImage("white").height(5).width(40f).color(color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.addImage("whiteui").height(5).width(40f).color(color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
             t.table(i -> {

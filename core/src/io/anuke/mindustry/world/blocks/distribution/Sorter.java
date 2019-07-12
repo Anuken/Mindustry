@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.*;
@@ -54,7 +54,7 @@ public class Sorter extends Block{
         if(entity.sortItem == null) return;
 
         Draw.color(entity.sortItem.color);
-        Draw.rect("blank", tile.worldx(), tile.worldy(), 4f, 4f);
+        Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 

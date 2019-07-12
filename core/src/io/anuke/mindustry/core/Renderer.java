@@ -1,7 +1,6 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
@@ -21,6 +20,7 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.impl.EffectEntity;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.DisposeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
@@ -42,7 +42,6 @@ public class Renderer implements ApplicationListener{
     private float shakeIntensity, shaketime;
 
     public Renderer(){
-        batch = new SpriteBatch(4096);
         camera = new Camera();
         Lines.setCircleVertices(20);
         Shaders.init();
@@ -113,7 +112,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile){
+            }else if(!mobile || settings.getBool("keyboard")){
                 camera.position.lerpDelta(position, 0.08f);
             }
 
@@ -131,6 +130,7 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         shieldBuffer.dispose();
         blocks.dispose();
+        Events.fire(new DisposeEvent());
     }
 
     void updateShake(float scale){
@@ -163,9 +163,9 @@ public class Renderer implements ApplicationListener{
 
         blocks.floor.drawFloor();
 
-        drawAndInterpolate(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
-        drawAndInterpolate(puddleGroup);
-        drawAndInterpolate(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+        draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
+        draw(puddleGroup);
+        draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
 
@@ -189,18 +189,19 @@ public class Renderer implements ApplicationListener{
 
         drawAllTeams(false);
 
-        blocks.skipLayer(Layer.turret);
-        blocks.drawBlocks(Layer.laser);
+        blocks.drawBlocks(Layer.turret);
 
         drawFlyerShadows();
 
+        blocks.drawBlocks(Layer.power);
+
         drawAllTeams(true);
 
-        drawAndInterpolate(bulletGroup);
-        drawAndInterpolate(effectGroup);
+        draw(bulletGroup);
+        draw(effectGroup);
 
         overlays.drawBottom();
-        drawAndInterpolate(playerGroup, p -> true, Player::drawBuildRequests);
+        draw(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(Entities.countInBounds(shieldGroup) > 0){
             if(settings.getBool("animatedshields")){
@@ -223,7 +224,7 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        drawAndInterpolate(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+        draw(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
 
         Draw.color();
         Draw.flush();
@@ -240,12 +241,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                drawAndInterpolate(group, unit -> !unit.isDead(), draw::accept);
+                draw(group, unit -> !unit.isDead(), draw::accept);
             }
         }
 
         if(!playerGroup.isEmpty()){
-            drawAndInterpolate(playerGroup, unit -> !unit.isDead(), draw::accept);
+            draw(playerGroup, unit -> !unit.isDead(), draw::accept);
         }
 
         Draw.color();
@@ -257,12 +258,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                drawAndInterpolate(group, unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+                draw(group, unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
             }
         }
 
         if(!playerGroup.isEmpty()){
-            drawAndInterpolate(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
+            draw(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
         Draw.color();
@@ -275,27 +276,26 @@ public class Renderer implements ApplicationListener{
             if(group.count(p -> p.isFlying() == flying) +
             playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
+            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
-            blocks.drawTeamBlocks(Layer.turret, team);
+            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
 
-            drawAndInterpolate(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-            drawAndInterpolate(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
+            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
         }
     }
 
-    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group){
-        drawAndInterpolate(group, t -> true, DrawTrait::draw);
+    public <T extends DrawTrait> void draw(EntityGroup<T> group){
+        draw(group, t -> true, DrawTrait::draw);
     }
 
-    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw){
-        drawAndInterpolate(group, toDraw, DrawTrait::draw);
+    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw){
+        draw(group, toDraw, DrawTrait::draw);
     }
 
-    public <T extends DrawTrait> void drawAndInterpolate(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
+    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
         Entities.draw(group, toDraw, drawer);
     }
 

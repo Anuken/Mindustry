@@ -263,6 +263,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void save(){
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
+        editor.getTags().remove("width");
+        editor.getTags().remove("height");
         player.dead = true;
 
         if(name.isEmpty()){
@@ -332,7 +334,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public Dialog show(){
-        return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f), Actions.fadeIn(0.3f)));
+        return super.show(Core.scene, Actions.sequence());
     }
 
     @Override
@@ -381,18 +383,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Table tools = new Table().top();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                Table[] lastTable = {null};
 
                 Consumer<EditorTool> addTool = tool -> {
-                    Table[] lastTable = {null};
 
-                    ImageButton button = new ImageButton("icon-" + tool.name(), "clear-toggle");
+                    ImageButton button = new ImageButton("icon-" + tool.name() + "-small", "clear-toggle");
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
                             lastTable[0].remove();
                         }
                     });
-                    button.resizeImage(iconsize);
+                    button.resizeImage(iconsizesmall);
                     button.update(() -> button.setChecked(view.getTool() == tool));
                     group.add(button);
 
@@ -462,16 +464,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton("icon-menu-large", "clear", iconsize, menu::show);
+                tools.addImageButton("icon-menu-large-small", "clear", iconsizesmall, menu::show);
 
-                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", iconsize, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton("icon-grid-small", "clear-toggle", iconsizesmall, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton("icon-undo", "clear", iconsize, editor::undo).get();
-                ImageButton redo = tools.addImageButton("icon-redo", "clear", iconsize, editor::redo).get();
+                ImageButton undo = tools.addImageButton("icon-undo-small", "clear", iconsizesmall, editor::undo).get();
+                ImageButton redo = tools.addImageButton("icon-redo-small", "clear", iconsizesmall, editor::redo).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -493,7 +495,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", iconsize, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton("icon-arrow-16-small", "clear", iconsizesmall, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -511,7 +513,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton("white", "clear-toggle-partial");
+                    ImageButton button = new ImageButton("whiteui", "clear-toggle-partial");
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -636,7 +638,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region)) continue;
 
-            ImageButton button = new ImageButton("white", "clear-toggle");
+            ImageButton button = new ImageButton("whiteui", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

@@ -279,20 +279,6 @@ public class Tile implements Position, TargetTrait{
         return tmpArray;
     }
 
-    /** Returns the block the multiblock is linked to, or null if it is not linked to any block.
-    public Tile getLinked(){
-        if(!isLinked()){
-            return null;
-        }else{
-            return world.tile(x + linkX(rotation), y + linkY(rotation));
-        }
-    }
-
-    public Tile target(){
-        Tile link = getLinked();
-        return link == null ? this : link;
-    }*/
-
     public Rectangle getHitbox(Rectangle rect){
         return rect.setSize(block().size * tilesize).setCenter(drawx(), drawy());
     }
@@ -346,7 +332,7 @@ public class Tile implements Position, TargetTrait{
 
         //+26
 
-        if(link().synthetic()){
+        if(link().synthetic() && link().solid()){
             cost += Mathf.clamp(link().block.health / 10f, 0, 20);
         }
 

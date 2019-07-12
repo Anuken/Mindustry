@@ -41,7 +41,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 if(target == null){
                     setState(patrol);
                 }
-            };
+            }
 
             if(target != null){
                 attack(type.attackLength);

@@ -97,7 +97,7 @@ public class JoinDialog extends FloatingDialog{
                 if(!buttons[0].childrenPressed()){
                     connect(server.ip, server.port);
                 }
-            }).width(targetWidth()).height(155f).pad(4f).get();
+            }).width(targetWidth()).height(130f).pad(4f).get();
 
             button.getLabel().setWrap(true);
 
@@ -190,14 +190,11 @@ public class JoinDialog extends FloatingDialog{
         server.content.clear();
 
         server.content.table(t -> {
-            t.add("[lightgray]" + host.name).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
             t.row();
-            t.add(versionString).left();
+            t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players == 0 ? host.players : "[accent]" + host.players + "[lightgray]") : Core.bundle.format("players.single", "[accent]" + host.players + "[lightgray]"))).left();
             t.row();
-            t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
-            Core.bundle.format("players.single", host.players))).left();
-            t.row();
-            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
         }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
@@ -226,7 +223,7 @@ public class JoinDialog extends FloatingDialog{
                 Core.settings.save();
             }).grow().pad(8).get().setMaxLength(maxNameLength);
 
-            ImageButton button = t.addImageButton("white", "clear-full", 40, () -> {
+            ImageButton button = t.addImageButton("whiteui", "clear-full", 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));

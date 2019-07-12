@@ -5,13 +5,15 @@ import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.*;
+import io.anuke.arc.util.Structs;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.impl.TimedEntity;
 import io.anuke.mindustry.entities.traits.SaveTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.*;
@@ -73,6 +75,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
         if(tile != null && map.containsKey(tile.pos())){
             map.get(tile.pos()).time += intensity * Time.delta();
         }
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return TypeIDs.fire;
     }
 
     @Override

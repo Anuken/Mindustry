@@ -82,6 +82,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
 
         public void update(){
             if(item.amount == 0 || item.item.type != ItemType.material){
+                clearItem();
                 setState(mine);
                 return;
             }
@@ -93,11 +94,11 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
             TileEntity tile = (TileEntity)target;
 
             if(dst(target) < type.range){
-                if(tile.tile.block().acceptStack(item.item, item.amount, tile.tile, MinerDrone.this) == item.amount){
+                if(tile.tile.block().acceptStack(item.item, item.amount, tile.tile, MinerDrone.this) > 0){
                     Call.transferItemTo(item.item, item.amount, x, y, tile.tile);
-                    item.amount = 0;
                 }
 
+                clearItem();
                 setState(mine);
             }
 

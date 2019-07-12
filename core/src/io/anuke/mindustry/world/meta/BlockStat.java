@@ -39,6 +39,7 @@ public enum BlockStat{
     powerShot(StatCategory.shooting),
     targetsAir(StatCategory.shooting),
     targetsGround(StatCategory.shooting),
+    damage(StatCategory.shooting),
     ammo(StatCategory.shooting),
 
     booster(StatCategory.optional),

@@ -83,7 +83,7 @@ public class LiquidSource extends Block{
 
         for(int i = 0; i < items.size; i++){
             final int f = i;
-            ImageButton button = cont.addImageButton("clear", "clear-toggle", 24, () -> control.input().frag.config.hideConfig()).size(38).group(group).get();
+            ImageButton button = cont.addImageButton("clear", "clear-toggle-trans", 24, () -> control.input().frag.config.hideConfig()).size(38).group(group).get();
             button.changed(() -> {
                 Call.setLiquidSourceLiquid(null, tile, button.isChecked() ? items.get(f) : null);
                 control.input().frag.config.hideConfig();

@@ -73,8 +73,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             for(ZoneRequirement other : zone.zoneRequirements){
                                 r.addImage("icon-terrain").padRight(4);
                                 r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.LIGHT_GRAY);
-                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check" : "icon-cancel")
-                                .color(other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check-small" : "icon-cancel-small", other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
                         });
@@ -89,8 +88,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             for(Block block : zone.blockRequirements){
                                 r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
                                 r.add(block.localizedName).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isUnlocked(block) ? "icon-check" : "icon-cancel")
-                                .color(data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.addImage(data.isUnlocked(block) ? "icon-check-small" : "icon-cancel-small", data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
 
@@ -101,7 +99,7 @@ public class ZoneInfoDialog extends FloatingDialog{
             }else{
                 cont.add(zone.localizedName()).color(Pal.accent).growX().center();
                 cont.row();
-                cont.addImage("white").color(Pal.accent).height(3).pad(6).growX();
+                cont.addImage("whiteui").color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
                 cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave), () -> loadout.show(zone, rebuildItems)).fillX().pad(3).disabled(b -> !zone.canConfigure());
                 cont.row();

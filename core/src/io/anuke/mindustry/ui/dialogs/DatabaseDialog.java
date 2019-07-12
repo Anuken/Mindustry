@@ -2,9 +2,12 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
+import io.anuke.arc.scene.event.ClickListener;
 import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Content;
@@ -40,22 +43,26 @@ public class DatabaseDialog extends FloatingDialog{
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage("white").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            table.addImage("whiteui").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();
 
                 int maxWidth = Core.graphics.isPortrait() ? 7 : 13;
-                float size = Vars.iconsize;
 
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked");
+                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked", Pal.gray);
                     image.addListener(new HandCursorListener());
-                    list.add(image).size(size).pad(3);
+                    list.add(image).size(unlocked(unlock) ? 8*4 : Vars.iconsize).pad(3);
+                    ClickListener listener = new ClickListener();
+                    image.addListener(listener);
+                    if(!Vars.mobile){
+                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.LIGHT_GRAY : Color.WHITE, 0.4f * Time.delta()));
+                    }
 
                     if(unlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));

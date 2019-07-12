@@ -40,7 +40,7 @@ public class Rules{
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
     /** Radius around enemy wave drop zones.*/
-    public float dropZoneRadius = 380f;
+    public float dropZoneRadius = 300f;
     /** Player respawn time in ticks. */
     public float respawnTime = 60 * 4;
     /** Time between waves in ticks. */

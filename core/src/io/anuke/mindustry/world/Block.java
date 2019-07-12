@@ -301,7 +301,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.large);
+        return icon(Icon.medium);
     }
 
     @Override
@@ -591,7 +591,8 @@ public class Block extends BlockStorage{
 
     public TextureRegion icon(Icon icon){
         if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
+            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ?
+                getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
     }
@@ -701,10 +702,11 @@ public class Block extends BlockStorage{
     }
 
     public enum Icon{
+        //these are stored in the UI atlases
         small(8 * 3),
         medium(8 * 4),
         large(8 * 6),
-        /** uses whatever the size of the block is */
+        /** uses whatever the size of the block is. this is always stored in the main game atlas! */
         full(0);
 
         public final int size;
