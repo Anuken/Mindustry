@@ -66,19 +66,19 @@ public class Rules{
     /** Determines if gamemode is resourceswar mode */
     public boolean resourcesWar = false;
     /** Determines how often weakest team should be eliminated in ticks */
-    public float eliminationTime = 240 * 60;
+    public float eliminationTime = 300 * 60;
     /** Determines if resourceswar is in rushmode */
     public boolean rushGame = false;
     /** First points threshold */
-    public int firstThreshold = 200;
+    public int firstThreshold = 2000;
     /** How points threshold is incremented */
-    public int bumpThreshold = 100;
+    public int bumpThreshold = 1000;
     /** Are random buffs enabled */
     public boolean buffing = true;
     /** How long buff should lasts in ticks */
     public float buffTime = 60 * 60;
     /** Time between buffs in ticks */
-    public float buffSpacing = 30 * 60;
+    public float buffSpacing = 60 * 60;
     /** How activated buff multiplies value of consumed item */
     public float buffMultiplier = 2f;
 

@@ -126,7 +126,7 @@ public class Vars{
     public static final String saveExtension = "msav";
     /** item value, index is id of item */
     public static float[] itemsValues = {
-        1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f
+        0.1f, 0.1f, 0.5f, 0.5f, 0.1f, 0.2f, 1f, 1f, 0.1f, 0.5f, 1f, 1.5f, 1.5f, 1.5f, 2f, 2f
     };
 
     /** list of all locales that can be switched to */
