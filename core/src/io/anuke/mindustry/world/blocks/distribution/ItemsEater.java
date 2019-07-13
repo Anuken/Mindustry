@@ -2,7 +2,9 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
+import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Items;
+import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
@@ -54,6 +56,7 @@ public class ItemsEater extends Block{
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
         tile.<ItemsEater.ItemsEaterEntity>entity().pointsEarned += itemsValues[item.id] * (state.buffedItem != null && state.buffedItem == item ? state.rules.buffMultiplier : 1f);
+        Effects.effect((state.buffedItem != null && state.buffedItem == item) ? Fx.itemsIncomeBuffed : Fx.itemsIncome, tile.getX(), tile.getY());
     }
 
     @Override

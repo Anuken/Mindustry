@@ -32,7 +32,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch, itemsStolen, itemsIncome, itemsIncomeBuffed;
 
     @Override
     public void load(){
@@ -1202,6 +1202,30 @@ public class Fx implements ContentList{
             Lines.stroke(3f * e.fout());
             Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
             Draw.reset();
+        });
+
+        itemsStolen = new Effect(50, e -> {
+            Draw.color(Pal.health);
+            Draw.alpha(e.fout());
+            Lines.stroke(e.finpow() * 2f);
+            Lines.poly(e.x, e.y, 24, 2f + e.finpow() * 4f);
+            Draw.color();
+        });
+
+        itemsIncome = new Effect(50, e -> {
+            Draw.color(Pal.heal);
+            Draw.alpha(e.fout());
+            Lines.stroke(e.finpow() * 2f);
+            Lines.poly(e.x, e.y, 24, 2f + e.finpow() * 4f);
+            Draw.color();
+        });
+
+        itemsIncomeBuffed = new Effect(50, e -> {
+            Draw.color(Color.SKY);
+            Draw.alpha(e.fout());
+            Lines.stroke(e.finpow() * 2f);
+            Lines.poly(e.x, e.y, 24, 2f + e.finpow() * 4f);
+            Draw.color();
         });
     }
 }
