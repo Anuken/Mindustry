@@ -1,29 +1,25 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.ObjectSet.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Zones;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.SaveIO.SaveException;
-import io.anuke.mindustry.type.Zone;
-import io.anuke.mindustry.type.Zone.ZoneRequirement;
-import io.anuke.mindustry.ui.ItemsDisplay;
-import io.anuke.mindustry.ui.TreeLayout;
-import io.anuke.mindustry.ui.TreeLayout.TreeNode;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.io.SaveIO.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Zone.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,6 +27,7 @@ public class DeployDialog extends FloatingDialog{
     private final float nodeSize = Unit.dp.scl(210f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
+    private Rectangle bounds = new Rectangle();
 
     public DeployDialog(){
         super("", "fulldialog");
@@ -40,6 +37,8 @@ public class DeployDialog extends FloatingDialog{
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(50f);
         layout.layout(root);
+        bounds.set(layout.getBounds());
+        bounds.y += nodeSize*0.4f;
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", "icon-tree", iconsize, () -> ui.tech.show()).size(230f, 64f);
@@ -187,11 +186,25 @@ public class DeployDialog extends FloatingDialog{
             dragged((x, y) -> {
                 panX += x;
                 panY += y;
+                clamp();
             });
+        }
+
+        void clamp(){
+            float pad = nodeSize;
+
+            float ox = width/2f, oy = height/2f;
+            float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
+            float rw = bounds.width, rh = bounds.height;
+            rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
+            ry = Mathf.clamp(ry, pad, Core.graphics.getHeight() - rh - pad);
+            panX = rx - bounds.x - ox;
+            panY = ry - bounds.y - oy;
         }
 
         @Override
         public void draw(){
+            clamp();
             float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(ZoneNode node : nodes){
