@@ -59,20 +59,28 @@ public class Rules{
     public int respawns = 5;
     /** Hold wave timer until all enemies are destroyed. */
     public boolean waitForWaveToEnd = false;
-    /** Determinates if gamemode is attack mode */
+    /** Determines if gamemode is attack mode */
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Determinates if gamemode is resourceswar mode */
+    /** Determines if gamemode is resourceswar mode */
     public boolean resourcesWar = false;
-    /** Determinates how often weakest team should be eliminated in ticks */
+    /** Determines how often weakest team should be eliminated in ticks */
     public float eliminationTime = 240 * 60;
-    /** Determinates if resourceswar is in rushmode */
+    /** Determines if resourceswar is in rushmode */
     public boolean rushGame = false;
     /** First points threshold */
     public int firstThreshold = 200;
-    /** How threshold is incremented */
+    /** How points threshold is incremented */
     public int bumpThreshold = 100;
+    /** Are random buffs enabled */
+    public boolean buffing = true;
+    /** How long buff should lasts in ticks */
+    public float buffTime = 60 * 60;
+    /** Time between buffs in ticks */
+    public float buffSpacing = 30 * 60;
+    /** How activated buff multiplies value of consumed item */
+    public float buffMultiplier = 2f;
 
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */

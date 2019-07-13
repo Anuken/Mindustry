@@ -90,6 +90,10 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.eliminationspacing", false, f -> rules.eliminationTime = f * 60f, () -> rules.eliminationTime / 60f, () -> rules.resourcesWar && !rules.rushGame);
         number("$rules.pointsthreshold", true, i -> rules.firstThreshold = (int) i, () -> rules.firstThreshold, () -> rules.resourcesWar && rules.rushGame);
         number("$rules.pointsthresholdbump", true, i -> rules.bumpThreshold = (int) i, () -> rules.bumpThreshold, () -> rules.resourcesWar && rules.rushGame);
+        check("$rules.buffing", b -> rules.buffing = b, () -> rules.buffing, ()->rules.resourcesWar);
+        number("$rules.bufftime", false, f -> rules.buffTime = f * 60f, () -> rules.buffTime / 60f, () -> rules.buffing);
+        number("$rules.buffspacing", false, f -> rules.buffSpacing = f * 60f, () -> rules.buffSpacing / 60f, () -> rules.buffing);
+        number("$rules.buffmultiplier", false, f -> rules.buffMultiplier = f, () -> rules.buffMultiplier, () -> rules.buffing);
     }
 
     void number(String text, FloatConsumer cons, FloatProvider prov){

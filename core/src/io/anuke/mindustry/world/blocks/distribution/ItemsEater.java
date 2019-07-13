@@ -8,14 +8,14 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.ui.Bar;
+import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.storage.StorageBlock;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.Vars.itemsValues;
 
-public class ItemsEater extends StorageBlock{
+public class ItemsEater extends Block{
     public static final ItemStack[][] requirementsInRound = {
             ItemStack.with(Items.copper, 50),
             ItemStack.with(Items.copper, 50, Items.lead, 100),
@@ -28,6 +28,7 @@ public class ItemsEater extends StorageBlock{
         solid = true;
         update = true;
         destructible = true;
+        hasItems = true;
         health = 150;
         flags = EnumSet.of(BlockFlag.target);
     }
@@ -52,7 +53,7 @@ public class ItemsEater extends StorageBlock{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        tile.<ItemsEater.ItemsEaterEntity>entity().pointsEarned += itemsValues[item.id];
+        tile.<ItemsEater.ItemsEaterEntity>entity().pointsEarned += itemsValues[item.id] * (state.buffedItem != null && state.buffedItem == item ? state.rules.buffMultiplier : 1f);
     }
 
     @Override
@@ -66,6 +67,6 @@ public class ItemsEater extends StorageBlock{
     }
 
     public class ItemsEaterEntity extends TileEntity{
-        public int pointsEarned = 0;
+        public float pointsEarned = 0f;
     }
 }

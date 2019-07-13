@@ -35,6 +35,10 @@ public class GameState{
     public int[] points = new int[Team.all.length];
     /** Points. Used in resources-war mode */
     public int pointsThreshold = rules.firstThreshold;
+    /** Currently buffed item. Used in resources-war mode */
+    public Item buffedItem = null;
+    /** If there is buffed item set, keep time remain for buffed item. Else it counts time until next buff */
+    public float buffTime;
 
     public int enemies(){
         return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));

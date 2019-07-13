@@ -661,6 +661,12 @@ public class HudFragment extends Fragment{
             }
             return builder;
         }).pad(8f).left().growX();
+        textButton.row();
+        textButton.add(new Bar(
+                () -> "[LIGHT_GRAY]"+((state.buffedItem == null) ? Core.bundle.get("nextBuff") : state.buffedItem.localizedName),
+                () -> (state.buffedItem == null) ? Pal.darkerGray : state.buffedItem.color,
+                () -> (state.buffedItem == null) ? state.buffTime/state.rules.buffSpacing : state.buffTime/state.rules.buffTime
+        )).visible(state.rules.buffing).pad(8f).left().growX();
 
         textButton.setDisabled(true);
         textButton.visible(() -> state.rules.resourcesWar);

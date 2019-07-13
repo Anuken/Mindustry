@@ -175,7 +175,7 @@ public class CoreBlock extends StorageBlock{
         public void damage(float damage, Team team){
             if(state.rules.resourcesWar){
                 for(Tile eater : state.teams.get(getTeam()).eaters){
-                    int points = eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
+                    float points = eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
                     eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned = Math.max(0, points-(int)damage);
                     state.teams.get(team).eaters.first().<ItemsEater.ItemsEaterEntity>entity().pointsEarned+=damage;
                 }

@@ -103,6 +103,8 @@ public class Logic implements ApplicationListener{
         state.round = 1;
         state.pointsThreshold = state.rules.firstThreshold;
         Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[0];
+        state.buffTime = state.rules.buffSpacing;
+        state.buffedItem = null;
 
         Time.clear();
         Entities.clear();
@@ -135,7 +137,7 @@ public class Logic implements ApplicationListener{
             if(state.teams.get(team).cores.size!=0 || state.teams.isActive(team)){
                 points = 0;
                 for(Tile eater : state.teams.get(team).eaters){
-                    points += eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
+                    points += (int)eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
                 }
             }
             state.points[team.ordinal()] = points;
@@ -250,6 +252,19 @@ public class Logic implements ApplicationListener{
 
                 if(!Net.client() && state.rules.resourcesWar){
                     calcPoints();
+                }
+
+                if(!Net.client() && state.rules.resourcesWar && !state.gameOver && state.rules.buffing){
+                    state.buffTime = Math.max(state.buffTime - Time.delta(), 0);
+                    if(state.buffTime <= 0){
+                        if(state.buffedItem == null){
+                            state.buffedItem = content.items().random();
+                            state.buffTime = state.rules.buffTime;
+                        }else{
+                            state.buffedItem = null;
+                            state.buffTime = state.rules.buffSpacing;
+                        }
+                    }
                 }
 
                 if(!Net.client() && state.rules.resourcesWar && state.rules.rushGame){
