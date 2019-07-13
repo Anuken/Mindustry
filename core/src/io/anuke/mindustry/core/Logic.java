@@ -162,11 +162,9 @@ public class Logic implements ApplicationListener{
             world.tile(tile.pos()).block().onDestroyed(tile);
             world.removeBlock(tile);
         }
-        if(player.getTeam() == t){
-            for(Player p : playerGroup.all()){
-                if(p.getTeam() == t){
-                    p.kill();
-                }
+        for(Player p : playerGroup.all()){
+            if(p.getTeam() == t){
+                p.kill();
             }
         }
 
@@ -246,7 +244,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if(state.rules.resourcesWar && !state.rules.rushGame && !state.gameOver){
+                if(state.rules.resourcesWar && !state.rules.rushGame && !state.gameOver && !netServer.isWaitingForPlayers()){
                     state.eliminationtime = Math.max(state.eliminationtime - Time.delta(), 0);
                 }
 
@@ -254,7 +252,7 @@ public class Logic implements ApplicationListener{
                     calcPoints();
                 }
 
-                if(!Net.client() && state.rules.resourcesWar && !state.gameOver && state.rules.buffing){
+                if(!Net.client() && state.rules.resourcesWar && !state.gameOver && state.rules.buffing && !netServer.isWaitingForPlayers()){
                     state.buffTime = Math.max(state.buffTime - Time.delta(), 0);
                     if(state.buffTime <= 0){
                         if(state.buffedItem == null){

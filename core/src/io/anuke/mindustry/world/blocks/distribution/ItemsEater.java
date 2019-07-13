@@ -39,7 +39,7 @@ public class ItemsEater extends Block{
     public void setBars(){
         super.setBars();
         bars.add("points.bar", e -> new Bar(() -> Core.bundle.format("points.regular", e.tile.<ItemsEaterEntity>entity().pointsEarned), () -> Pal.ammo, () ->
-                (state.points[e.getTeam().ordinal()]==0) ? 1f : (float)e.tile.<ItemsEaterEntity>entity().pointsEarned / (float)state.points[e.getTeam().ordinal()]));
+                (state.points[e.getTeam().ordinal()]==0) ? 1f : e.tile.<ItemsEaterEntity>entity().pointsEarned / (float)state.points[e.getTeam().ordinal()]));
     }
 
     @Override
@@ -55,8 +55,10 @@ public class ItemsEater extends Block{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        tile.<ItemsEater.ItemsEaterEntity>entity().pointsEarned += itemsValues[item.id] * (state.buffedItem != null && state.buffedItem == item ? state.rules.buffMultiplier : 1f);
-        Effects.effect((state.buffedItem != null && state.buffedItem == item) ? Fx.itemsIncomeBuffed : Fx.itemsIncome, tile.getX(), tile.getY());
+        if(!netServer.isWaitingForPlayers()){
+            tile.<ItemsEater.ItemsEaterEntity>entity().pointsEarned += itemsValues[item.id] * (state.buffedItem != null && state.buffedItem == item ? state.rules.buffMultiplier : 1f);
+            Effects.effect((state.buffedItem != null && state.buffedItem == item) ? Fx.itemsIncomeBuffed : Fx.itemsIncome, tile.getX(), tile.getY());
+        }
     }
 
     @Override
