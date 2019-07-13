@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
@@ -33,6 +34,7 @@ public class TechTreeDialog extends FloatingDialog{
     private final float nodeSize = Unit.dp.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    private Rectangle bounds = new Rectangle();
     private ItemsDisplay items;
 
     public TechTreeDialog(){
@@ -68,6 +70,7 @@ public class TechTreeDialog extends FloatingDialog{
         layout.gapBetweenNodes = Unit.dp.scl(40f);
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
+        bounds.set(layout.getBounds());
         copyInfo(node);
     }
 
@@ -311,6 +314,8 @@ public class TechTreeDialog extends FloatingDialog{
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }
+
+            Lines.rect(bounds.x + Core.graphics.getWidth()/2f, bounds.y + Core.graphics.getHeight()/2f, bounds.width, bounds.height);
 
             Draw.reset();
             super.draw();
