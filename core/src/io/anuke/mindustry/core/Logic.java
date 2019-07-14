@@ -129,7 +129,10 @@ public class Logic implements ApplicationListener{
         state.eliminationtime = state.rules.eliminationTime;
         state.round++;
 
-        Call.eliminateTeam(state.getWeakest().ordinal());
+        Team team = state.getWeakest();
+        if(team!=null){
+            Call.eliminateTeam(team.ordinal());
+        }
 
         Call.onRound();
     }
@@ -137,7 +140,7 @@ public class Logic implements ApplicationListener{
     public void calcPoints(){
         for(Team team : Team.all){
             int points = -1;
-            if(state.teams.get(team).cores.size!=0 || state.teams.isActive(team)){
+            if(state.teams.get(team).cores.size!=0 && state.teams.isActive(team)){
                 points = 0;
                 for(Tile eater : state.teams.get(team).eaters){
                     points += (int)eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
@@ -152,8 +155,10 @@ public class Logic implements ApplicationListener{
         //bump requirements
         Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[(state.round > ItemsEater.requirementsInRound.length) ?
                 ItemsEater.requirementsInRound.length-1 : state.round -1];
-        player.respawns = state.rules.respawns;
-        state.pointsThreshold += state.rules.bumpThreshold;
+        if(player != null){
+            player.respawns = state.rules.respawns;
+            state.pointsThreshold += state.rules.bumpThreshold;
+        }
     }
 
     @Remote(called = Loc.both)

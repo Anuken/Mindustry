@@ -173,7 +173,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void damage(float damage, Team team){
-            if(state.rules.resourcesWar){
+            if(state.rules.resourcesWar && state.teams.get(team).eaters.size != 0){
                 for(Tile eater : state.teams.get(getTeam()).eaters){
                     ItemsEater.ItemsEaterEntity eaterEntity = eater.entity();
                     ItemsEater.ItemsEaterEntity damagerEntity = state.teams.get(team).eaters.first().entity();
