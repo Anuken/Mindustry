@@ -62,10 +62,7 @@ public class DeployDialog extends FloatingDialog{
 
         stack.add(new Image(new Texture("sprites/backgrounds/stars.png"){{
             setFilter(TextureFilter.Linear);
-        }}){{
-            //setColor(Color.fromGray(0.3f));
-            //setScale(3f);
-        }}.setScaling(Scaling.fill));
+        }}).setScaling(Scaling.fill));
 
         stack.add(new Image(new Texture("sprites/backgrounds/planet-zero.png"){{
             setFilter(TextureFilter.Linear);
@@ -76,7 +73,7 @@ public class DeployDialog extends FloatingDialog{
             update(() -> {
                 setOrigin(Align.center);
                 time[0] += Core.graphics.getDeltaTime() * 10f;
-                setTranslation(Mathf.sin(time[0], 60f, 70f), Mathf.cos(time[0], 140f, 80f));
+                setTranslation(Mathf.sin(time[0], 60f, 70f) + panX / 30f, Mathf.cos(time[0], 140f, 80f) + (panY + 200) / 30f);
             });
         }}.setScaling(Scaling.fit));
 

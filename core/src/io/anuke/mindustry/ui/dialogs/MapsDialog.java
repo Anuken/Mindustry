@@ -51,6 +51,7 @@ public class MapsDialog extends FloatingDialog{
         buttons.addImageTextButton("$editor.newmap", "icon-add", iconsize, () -> {
             ui.showTextInput("$editor.newmap", "$name", "", text -> {
                 ui.loadAnd(() -> {
+                    hide();
                     ui.editor.show();
                     ui.editor.editor.getTags().put("name", text);
                 });

@@ -10,8 +10,7 @@ import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.DisposeEvent;
@@ -38,6 +37,13 @@ public class MenuFragment extends Fragment{
     @Override
     public void build(Group parent){
         renderer = new MenuRenderer();
+
+        Group group = new WidgetGroup();
+        group.setFillParent(true);
+        group.visible(() -> !ui.editor.isShown());
+        parent.addChild(group);
+
+        parent = group;
 
         parent.fill((x, y, w, h) -> {
             renderer.render();
