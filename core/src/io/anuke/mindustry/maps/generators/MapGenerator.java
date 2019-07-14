@@ -62,6 +62,10 @@ public class MapGenerator extends Generator{
         decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01), new Decoration(Blocks.ignarock, Blocks.pebbles, 0.03f));
     }
 
+    public Map getMap(){
+        return map;
+    }
+
     @Override
     public void init(Loadout loadout){
         this.loadout = loadout;

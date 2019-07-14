@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Zone.ZoneRequirement;
@@ -13,7 +14,7 @@ import io.anuke.mindustry.world.Block.Icon;
 import static io.anuke.mindustry.Vars.*;
 
 public class ZoneInfoDialog extends FloatingDialog{
-    private ZoneLoadoutDialog loadout = new ZoneLoadoutDialog();
+    private LoadoutDialog loadout = new LoadoutDialog();
 
     public ZoneInfoDialog(){
         super("");
@@ -101,23 +102,40 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.row();
                 cont.addImage("whiteui").color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
-                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave), () -> loadout.show(zone, rebuildItems)).fillX().pad(3).disabled(b -> !zone.canConfigure());
-                cont.row();
-                cont.table(res -> {
-                    res.add("$zone.resources").padRight(6);
-                    if(zone.resources.length > 0){
-                        for(Item item : zone.resources){
-                            res.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
+                cont.table(desc -> {
+                    desc.left().defaults().left().width(400f);
+                    desc.add(zone.description).wrap().padBottom(8f);
+                    desc.row();
+
+                    desc.table(t -> {
+                        t.left();
+                        t.add("$zone.resources").padRight(6);
+
+                        if(zone.resources.length > 0){
+                            for(Item item : zone.resources){
+                                t.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
+                            }
+                        }else{
+                            t.add("$none");
                         }
-                    }else{
-                        res.add("$none");
+                    });
+
+                    Rules rules = zone.getRules();
+
+                    desc.row();
+                    desc.add(Core.bundle.format("zone.objective", Core.bundle.get(!rules.attackMode ? "zone.objective.survival" : "zone.objective.attack")));
+
+                    if(zone.bestWave() > 0){
+                        desc.row();
+                        desc.add(Core.bundle.format("bestwave", zone.bestWave()));
                     }
                 });
 
-                if(zone.bestWave() > 0){
-                    cont.row();
-                    cont.add(Core.bundle.format("bestwave", zone.bestWave()));
-                }
+                cont.row();
+
+                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave),
+                () -> loadout.show(zone.loadout.core().itemCapacity, zone::getStartingItems, zone::resetStartingItems, zone::updateLaunchCost, rebuildItems, item -> data.getItem(item) > 0 && item.type == ItemType.material)
+                ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
         });
         cont.row();

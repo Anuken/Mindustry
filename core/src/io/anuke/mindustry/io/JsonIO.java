@@ -14,6 +14,7 @@ public class JsonIO{
     private static Json json = new Json(){{
         setIgnoreUnknownFields(true);
         setElementType(Rules.class, "spawns", SpawnGroup.class);
+        setElementType(Rules.class, "loadout", ItemStack.class);
 
         setSerializer(Zone.class, new Serializer<Zone>(){
             @Override
@@ -55,6 +56,21 @@ public class JsonIO{
                 TeamData out = new TeamData(team, EnumSet.of(new Team[]{}));
                 out.brokenBlocks = new LongQueue(blocks);
                 return out;
+            }
+        });
+
+        setSerializer(ItemStack.class, new Serializer<ItemStack>(){
+            @Override
+            public void write(Json json, ItemStack object, Class knownType){
+                json.writeObjectStart();
+                json.writeValue("item", object.item);
+                json.writeValue("amount", object.amount);
+                json.writeObjectEnd();
+            }
+
+            @Override
+            public ItemStack read(Json json, JsonValue jsonData, Class type){
+                return new ItemStack(json.getSerializer(Item.class).read(json, jsonData.get("item"), Item.class), jsonData.getInt("amount"));
             }
         });
     }};
