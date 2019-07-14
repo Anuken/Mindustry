@@ -175,8 +175,6 @@ public class Logic implements ApplicationListener{
                 p.kill();
             }
         }
-
-        Events.fire(new TeamEliminatedEvent(t));
     }
 
     private void checkGameOver(){

@@ -62,7 +62,6 @@ public class UI implements ApplicationListener{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
-    public EliminatedDialog eliminated;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -181,7 +180,6 @@ public class UI implements ApplicationListener{
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
-        eliminated = new EliminatedDialog();
 
         Group group = Core.scene.root;
 
