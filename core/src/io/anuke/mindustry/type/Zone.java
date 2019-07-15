@@ -1,21 +1,18 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.content.Loadouts;
-import io.anuke.mindustry.game.EventType.ZoneConfigureCompleteEvent;
-import io.anuke.mindustry.game.EventType.ZoneRequireCompleteEvent;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.maps.generators.*;
+import io.anuke.mindustry.world.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -40,6 +37,16 @@ public class Zone extends UnlockableContent{
     public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
+    }
+
+    public Rules getRules(){
+        if(generator instanceof MapGenerator){
+            return ((MapGenerator)generator).getMap().rules();
+        }else{
+            Rules rules = new Rules();
+            this.rules.accept(rules);
+            return rules;
+        }
     }
 
     public boolean isBossWave(int wave){
@@ -121,7 +128,8 @@ public class Zone extends UnlockableContent{
 
     /** Whether this zone has met its condition; if true, the player can leave. */
     public boolean metCondition(){
-        return state.wave >= conditionWave;
+        //players can't leave in attack mode.
+        return state.wave >= conditionWave && !state.rules.attackMode;
     }
 
     public boolean canConfigure(){

@@ -70,7 +70,7 @@ public class PausedDialog extends FloatingDialog{
 
         }else{
             cont.defaults().size(120f).pad(5);
-            float isize = 14f * 4;
+            float isize = iconsize;
 
             cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
             cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);

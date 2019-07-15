@@ -134,8 +134,8 @@ public class WaveInfoDialog extends FloatingDialog{
 
         if(groups != null){
             for(SpawnGroup group : groups){
-                table.table("clear", t -> {
-                    t.margin(6f).defaults().pad(2).padLeft(5f).growX().left();
+                table.table("button", t -> {
+                    t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.addButton(b -> {
                         b.left();
                         b.addImage(group.type.iconRegion).size(30f).padRight(3);
@@ -202,7 +202,7 @@ public class WaveInfoDialog extends FloatingDialog{
                         t.remove();
                         updateWaves();
                     }).growX().pad(-6f).padTop(5);
-                }).width(340f).pad(5);
+                }).width(340f).pad(16);
                 table.row();
             }
         }else{

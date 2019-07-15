@@ -12,7 +12,7 @@ import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.ui.GridImage;
@@ -237,9 +237,7 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        if(Core.scene.getKeyboardFocus() != null && isDescendantOf(Core.scene.getKeyboardFocus())){
-            editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
-        }
+        editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
         if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){

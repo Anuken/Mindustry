@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
@@ -78,6 +79,7 @@ public class MapIO{
             Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
             int black = Color.rgba8888(Color.BLACK);
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+            IntSet teams = new IntSet();
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
@@ -93,15 +95,7 @@ public class MapIO{
                 public void setTeam(Team team){
                     super.setTeam(team);
                     if(block instanceof CoreBlock){
-                        if(team != defaultTeam){
-                            //map must have other team's cores
-                            map.tags.put("othercore", "true");
-                        }
-
-                        if(team == waveTeam){
-                            //map must have default enemy team's core
-                            map.tags.put("enemycore", "true");
-                        }
+                        teams.add(team.ordinal());
                     }
                 }
             };
@@ -130,6 +124,16 @@ public class MapIO{
                     return tile;
                 }
             }));
+
+            if(teams.size > 1){
+                //map must have other team's cores
+                map.tags.put("othercore", "true");
+            }
+
+            if(teams.contains(waveTeam.ordinal())){
+                //map must have default enemy team's core
+                map.tags.put("enemycore", "true");
+            }
 
             floors.drawPixmap(walls, 0, 0);
             walls.dispose();

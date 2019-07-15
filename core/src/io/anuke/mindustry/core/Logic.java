@@ -15,8 +15,10 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.gen.BrokenBlock;
+import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
@@ -87,9 +89,11 @@ public class Logic implements ApplicationListener{
         //add starting items
         if(!world.isZone()){
             for(Team team : Team.all){
-                if(state.teams.isActive(team)){
-                    for(Tile core : state.teams.get(team).cores){
-                        core.entity.items.add(Items.copper, 200);
+                if(!state.teams.get(team).cores.isEmpty()){
+                    TileEntity entity = state.teams.get(team).cores.first().entity;
+                    entity.items.clear();
+                    for(ItemStack stack : state.rules.loadout){
+                        entity.items.add(stack.item, stack.amount);
                     }
                 }
             }
@@ -137,8 +141,13 @@ public class Logic implements ApplicationListener{
             }
 
             if(alive != null && !state.gameOver){
+                if(world.isZone() && alive == defaultTeam){
+                    //in attack maps, a victorious game over is equivalent to a launch
+                    Call.launchZone();
+                }else{
+                    Events.fire(new GameOverEvent(alive));
+                }
                 state.gameOver = true;
-                Events.fire(new GameOverEvent(alive));
             }
         }
     }
@@ -161,6 +170,9 @@ public class Logic implements ApplicationListener{
                 world.removeBlock(tile);
             }
             state.launched = true;
+            state.gameOver = true;
+            //manually fire game over event now
+            Events.fire(new GameOverEvent(defaultTeam));
         });
     }
 

@@ -12,5 +12,6 @@ public enum ContentType{
     weather,
     effect,
     zone,
-    loadout
+    loadout,
+    typeid
 }

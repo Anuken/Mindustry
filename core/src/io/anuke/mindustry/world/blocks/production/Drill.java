@@ -5,8 +5,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
@@ -116,7 +115,7 @@ public class Drill extends Block{
 
         if(entity.dominantItem != null && drawMineItem){
             Draw.color(entity.dominantItem.color);
-            Draw.rect("blank", tile.drawx(), tile.drawy(), 2f, 2f);
+            Fill.square(tile.drawx(), tile.drawy(), 1f);
             Draw.color();
         }
     }

@@ -42,7 +42,7 @@ public abstract class InputHandler implements InputProcessor{
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
-    public final OverlayFragment frag = new OverlayFragment(this);
+    public final OverlayFragment frag = new OverlayFragment();
 
     public Block block;
     public int rotation;
@@ -324,7 +324,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y) && Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validBreak(player.getTeam(), x, y);
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){

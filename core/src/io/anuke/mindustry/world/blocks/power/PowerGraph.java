@@ -40,6 +40,7 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tile producer : producers){
+            if(producer.entity == null) continue;
             powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
         }
         return powerProduced;

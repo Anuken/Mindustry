@@ -10,6 +10,7 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
@@ -86,7 +87,7 @@ public class PlayerListFragment extends Fragment{
                     super.draw();
                     Draw.color((state.rules.pvp) ? user.getTeam().color : Pal.accent);
                     Draw.alpha(parentAlpha);
-                    Lines.stroke(Unit.dp.scl(3f));
+                    Lines.stroke(Unit.dp.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }
@@ -134,14 +135,14 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", "clear-partial", iconsize,
+                    t.addImageButton("icon-ban-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton("icon-cancel", "clear-partial", iconsize,
+                    t.addImageButton("icon-cancel-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "clear-toggle-partial", iconsize, () -> {
+                    t.addImageButton("icon-admin-small", "clear-toggle-partial", iconsizesmall, () -> {
                         if(Net.client()) return;
 
                         String id = user.uuid;
@@ -157,14 +158,14 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom", "clear-partial", iconsize, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", "clear-partial", iconsizesmall, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("blank").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
+            content.addImage("whiteui").height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
             content.row();
         });
 

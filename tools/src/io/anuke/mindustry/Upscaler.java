@@ -14,8 +14,9 @@ import io.anuke.arc.util.Time;
 
 public class Upscaler{
     static Res[] resolutions = {
+        new Res(Vars.iconsizesmall, "-small"),
+        new Res(Vars.iconsizemed, "-med"),
         new Res(Vars.iconsize, ""),
-        new Res(Vars.iconsizesmall, "-small")
     };
 
     public static void main(String[] args){
@@ -37,11 +38,12 @@ public class Upscaler{
 
         Log.info("Upscaling icons...");
         Time.mark();
+        FileHandle[] list = file.list();
 
         for(Res res : resolutions){
             SquareMarcher marcher = new SquareMarcher(res.size);
 
-            for(FileHandle img : file.list()){
+            for(FileHandle img : list){
                 if(img.extension().equals("png")){
                     marcher.render(new Pixmap(img), img.sibling(img.nameWithoutExtension() + res.suffix + ".png"));
                 }

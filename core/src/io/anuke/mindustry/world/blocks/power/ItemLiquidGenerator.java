@@ -36,7 +36,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected Effects.Effect generateEffect = Fx.generatespark;
     protected Effects.Effect explodeEffect = Fx.generatespark;
     protected Color heatColor = Color.valueOf("ff9b59");
-    protected TextureRegion topRegion;
+    protected TextureRegion topRegion, liquidRegion;
     protected boolean randomlyExplode = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
@@ -59,6 +59,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
         if(hasItems){
             topRegion = Core.atlas.find(name + "-top");
         }
+        liquidRegion = Core.atlas.find(name + "-liquid");
     }
 
     @Override
@@ -151,13 +152,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
         if(hasLiquids){
             Draw.color(entity.liquids.current().color);
             Draw.alpha(entity.liquids.currentAmount() / liquidCapacity);
-            drawLiquidCenter(tile);
+            Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
             Draw.color();
         }
-    }
-
-    public void drawLiquidCenter(Tile tile){
-        Draw.rect("blank", tile.drawx(), tile.drawy(), 2, 2);
     }
 
     protected float getItemEfficiency(Item item){

@@ -20,6 +20,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
@@ -112,6 +113,19 @@ public class MobileInput extends InputHandler implements GestureListener{
             Tile other = req.tile();
 
             if(other == null || req.remove) continue;
+
+            r1.setSize(req.block.size * tilesize);
+            r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+
+            if(r2.overlaps(r1)){
+                return true;
+            }
+        }
+
+        for(BuildRequest req : player.buildQueue()){
+            Tile other = world.tile(req.x, req.y);
+
+            if(other == null || req.breaking) continue;
 
             r1.setSize(req.block.size * tilesize);
             r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
@@ -261,11 +275,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Table table){
-        table.addImage("blank").color(Pal.accent).height(3f).colspan(4).growX();
+        table.addImage("whiteui").color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton("icon-break", "clear-toggle-partial", iconsize, () -> {
+        table.addImageButton("icon-break-small", "clear-toggle-partial", iconsizesmall, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
             if(mode == breaking){
@@ -274,17 +288,17 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).update(l -> l.setChecked(mode == breaking));
 
         //diagonal swap button
-        table.addImageButton("icon-diagonal", "clear-toggle-partial", iconsize, () -> {
+        table.addImageButton("icon-diagonal-small", "clear-toggle-partial", iconsizesmall, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton("icon-arrow", "clear-partial", iconsize, () -> rotation = Mathf.mod(rotation + 1, 4))
+        table.addImageButton("icon-arrow-small", "clear-partial", iconsizesmall, () -> rotation = Mathf.mod(rotation + 1, 4))
         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
 
         //confirm button
-        table.addImageButton("icon-check", "clear-partial", iconsize, () -> {
+        table.addImageButton("icon-check-small", "clear-partial", iconsizesmall, () -> {
             for(PlaceRequest request : selection){
                 Tile tile = request.tile();
 
@@ -475,7 +489,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //call tap events
         if(pointer == 0 && !selecting && mode == none){
-            tryTapPlayer(worldx, worldy);
+            if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
+                //shoot on touch down when in keyboard mode
+                player.isShooting = true;
+            }
         }
 
         return false;
@@ -598,6 +615,27 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = none;
         }
 
+        //zoom things
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
+            renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
+        }
+
+        if(!Core.settings.getBool("keyboard")){
+            //move camera around
+            float camSpeed = 6f;
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
+        }
+
+        if(Core.settings.getBool("keyboard")){
+            if(Core.input.keyRelease(Binding.select)){
+                player.isShooting = false;
+            }
+
+            if(player.isShooting && !canShoot()){
+                player.isShooting = false;
+            }
+        }
+
         //reset state when not placing
         if(mode == none){
             selecting = false;
@@ -678,7 +716,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene.hasDialog()) return false;
+        if(Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
@@ -723,6 +761,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean zoom(float initialDistance, float distance){
+        if(Core.settings.getBool("keyboard")) return false;
         if(lastDistance == -1) lastDistance = initialDistance;
 
         float amount = (Mathf.sign(distance > lastDistance) * 0.04f) * Time.delta();

@@ -264,7 +264,7 @@ task tileImages(){
     }
 }
 
-task pack(){
+task pack(dependsOn: classes){
 
     doLast{
         //cleanup old sprites
@@ -281,7 +281,6 @@ task pack(){
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
         javaexec{
-
             main = "io.anuke.mindustry.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in
@@ -294,36 +293,31 @@ task pack(){
                 jvmArgs "-XstartOnFirstThread"
             }
 
+            jvmArgs("-Djava.awt.headless=true")
             main = "io.anuke.mindustry.Upscaler"
             classpath = sourceSets.main.runtimeClasspath
             standardInput = System.in
             workingDir = "../core/assets-raw/sprites_out/ui/icons"
         }
 
-        //antialias everything except UI elements (...for some reason)
+        copy{
+            from "../core/assets-raw/sprites_out/ui/icons"
+            into "../core/assets-raw/sprites_out/ui/"
+        }
+
+        delete{
+            delete "../core/assets-raw/sprites_out/ui/icons"
+        }
+
+        //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && !file.toString().replace("\\", "/").contains("/icons/"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/"))) return
 
             antialias(file.file)
         }
 
         //pack normal sprites
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
-
-        //delete old pack defintions
-        delete{
-            delete fileTree(dir: '../core/assets-raw/sprites_out/', include: '**/pack.json')
-        }
-
-        //rename pack definitions, generate fallback 1024x sprites
-        copy{
-            from '../core/assets-raw/sprites_out/'
-            into '../core/assets-raw/sprites_out/'
-            include '**/*.json'
-            rename 'pack_fallback.json', "pack.json"
-        }
-
-        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites_fallback.atlas")
     }
 }
 
@@ -332,6 +326,7 @@ task genSprites(dependsOn: classes, type: JavaExec){
 
     main = "io.anuke.mindustry.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
+    jvmArgs("-Djava.awt.headless=true")
     standardInput = System.in
     workingDir = genFolder
 }

@@ -3,11 +3,8 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.ObjectMap;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.PropertiesUtils;
-import io.anuke.arc.util.io.Streams;
 import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.arc.util.serialization.JsonValue.ValueType;
 import io.anuke.arc.util.serialization.JsonWriter.OutputType;
@@ -53,7 +50,7 @@ public class CrashSender{
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
                 new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
-                new BufferedOutputStream(new FileOutputStream(file), Streams.DEFAULT_BUFFER_SIZE).write(parseException(exception).getBytes());
+                Files.write(file.toPath(), parseException(exception).getBytes());
                 Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
 
                 writeListener.accept(file);

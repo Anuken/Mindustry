@@ -53,7 +53,7 @@ public class Net{
                 error = Core.bundle.get("error.unreachable");
             }else if(type.contains("timeout")){
                 error = Core.bundle.get("error.timedout");
-            }else if(error.equals("alreadyconnected")){
+            }else if(error.equals("alreadyconnected") || error.contains("connection is closed")){
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
                 error = Core.bundle.get("error.any") + "\n" + Strings.parseException(e, true);

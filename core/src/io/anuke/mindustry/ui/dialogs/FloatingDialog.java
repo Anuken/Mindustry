@@ -18,12 +18,12 @@ public class FloatingDialog extends Dialog{
     private boolean wasPaused;
     protected boolean shouldPause;
 
-    public FloatingDialog(String title){
-        super(title, "dialog");
+    public FloatingDialog(String title, String style){
+        super(title, style);
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage("white", Pal.accent)
+        titleTable.addImage("whiteui", Pal.accent)
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -52,6 +52,10 @@ public class FloatingDialog extends Dialog{
                 done[0] = true;
             }
         })));
+    }
+
+    public FloatingDialog(String title){
+        this(title, "dialog");
     }
 
     protected void onResize(Runnable run){

@@ -25,6 +25,7 @@ public class RepairPoint extends Block{
     protected float repairSpeed = 0.3f;
     protected float powerUse;
     protected TextureRegion baseRegion;
+    protected TextureRegion laser, laserEnd;
 
     public RepairPoint(String name){
         super(name);
@@ -32,7 +33,7 @@ public class RepairPoint extends Block{
         solid = true;
         flags = EnumSet.of(BlockFlag.repair);
         layer = Layer.turret;
-        layer2 = Layer.laser;
+        layer2 = Layer.power;
         hasPower = true;
         outlineIcon = true;
     }
@@ -42,6 +43,8 @@ public class RepairPoint extends Block{
         super.load();
 
         baseRegion = Core.atlas.find(name + "-base");
+        laser = Core.atlas.find("laser");
+        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override
@@ -79,9 +82,9 @@ public class RepairPoint extends Block{
             float len = 5f;
 
             Draw.color(Color.valueOf("e8ffd7"));
-            Shapes.laser("laser", "laser-end",
-            tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
-            entity.target.x, entity.target.y, entity.strength);
+            Shapes.laser(laser, laserEnd,
+                tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
+                entity.target.x, entity.target.y, entity.strength);
             Draw.color();
         }
     }

@@ -9,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.BlockPart;
 
 public enum EditorTool{
     zoom,
@@ -107,6 +108,11 @@ public enum EditorTool{
 
             //mode 0 or 1, fill everything with the floor/tile or replace it
             if(mode == 0 || mode == -1){
+                //can't fill parts or multiblocks
+                if(tile.block() instanceof BlockPart || tile.block().isMultiblock()){
+                    return;
+                }
+
                 Predicate<Tile> tester;
                 Consumer<Tile> setter;
 

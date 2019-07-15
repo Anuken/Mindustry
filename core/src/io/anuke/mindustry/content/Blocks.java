@@ -13,8 +13,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
@@ -32,6 +31,8 @@ import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.world;
 
 public class Blocks implements ContentList{
+    public static final BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
+
     public static Block
 
     //environment
@@ -310,11 +311,11 @@ public class Blocks implements ContentList{
         saltRocks = new StaticWall("saltrocks"){{
         }};
 
-        sporePine = new StaticWall("spore-pine"){{
+        sporePine = new StaticTree("spore-pine"){{
             variants = 0;
         }};
 
-        pine = new StaticWall("pine"){{
+        pine = new StaticTree("pine"){{
             variants = 0;
         }};
 
@@ -1212,7 +1213,7 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
 
             health = 1100;
-            itemCapacity = 5000;
+            itemCapacity = 4000;
             size = 3;
         }};
 
@@ -1307,7 +1308,7 @@ public class Blocks implements ContentList{
             inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 260 * size * size;
+            health = 200 * size * size;
         }};
 
         scorch = new ItemTurret("scorch"){{
@@ -1443,7 +1444,7 @@ public class Blocks implements ContentList{
             burstSpacing = 3f;
             shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
-            health = 360;
+            health = 240 * size * size;;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1520,7 +1521,7 @@ public class Blocks implements ContentList{
             shootShake = 2f;
             range = 290f;
 
-            health = 550;
+            health = 130 * size * size;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -1588,15 +1589,13 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
-        BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
-
         draugFactory = new UnitFactory("draug-factory"){{
-            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 120));
+            requirements(Category.units, ItemStack.with(Items.copper, 60, Items.lead, 140));
             type = UnitTypes.draug;
             produceTime = 5000;
             size = 2;
             maxSpawn = 2;
-            consumes.power(0.5f);
+            consumes.power(1.1f);
             consumes.items();
         }};
 

@@ -12,11 +12,11 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
@@ -113,6 +113,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         setNet(tile.drawx(), tile.drawy());
         clearItem();
         heal();
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return TypeIDs.player;
     }
 
     @Override
@@ -564,10 +569,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             data.unlockContent(mech);
         }
 
-        if(mobile){
-            updateFlying();
+        if(mobile && !Core.settings.getBool("keyboard")){
+            updateTouch();
         }else{
-            updateMech();
+            updateKeyboard();
         }
 
         isTyping = ui.chatfrag.chatOpen();
@@ -579,7 +584,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
     }
 
-    protected void updateMech(){
+    protected void updateKeyboard(){
         Tile tile = world.tileWorld(x, y);
 
         isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
@@ -646,7 +651,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
     }
 
-    protected void updateFlying(){
+    protected void updateTouch(){
         if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
@@ -657,6 +662,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
         float attractDst = 15f;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
 
         if(moveTarget != null && !moveTarget.isDead()){
             targetX = moveTarget.getX();
@@ -680,7 +686,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             moveTarget = null;
         }
 
-        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(speed);
         movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
         if(dst(targetX, targetY) < attractDst){

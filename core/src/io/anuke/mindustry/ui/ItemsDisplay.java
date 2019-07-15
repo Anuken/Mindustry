@@ -26,7 +26,7 @@ public class ItemsDisplay extends Table{
         top().left();
         margin(0);
 
-        table("flat", t -> {
+        table("button", t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
             t.add("$launcheditems").colspan(3).left().padBottom(5);
             t.row();
