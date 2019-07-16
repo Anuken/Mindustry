@@ -118,6 +118,7 @@ public class Logic implements ApplicationListener{
         state.pointsThreshold = state.rules.firstThreshold;
         state.buffTime = state.rules.buffSpacing;
         state.buffedItem = null;
+        Arrays.fill(state.lifes, state.rules.enableLifes ? state.rules.lifesCount : 1);
 
         Time.clear();
         Entities.clear();
@@ -135,11 +136,11 @@ public class Logic implements ApplicationListener{
         Events.fire(new WaveEvent());
     }
 
-    public void eliminateWeakest(){
+    public void round(){
         state.eliminationtime = state.rules.eliminationTime;
         state.round++;
 
-        //TODO is this efficient?
+        //TODO this is such horrible code
         //filter only active teams
         Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.teams.isActive(t));
         //sort in ascending order
@@ -154,10 +155,28 @@ public class Logic implements ApplicationListener{
                     state.teams.get(s2).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount)
             ));
 
-            Call.sendChatMessage("Tie breaker!");
-            Call.eliminateTeam(tiedTeams[0].ordinal());
+            Call.sendMessage("Tie breaker!");
+            state.lifes[tiedTeams[0].ordinal()] -= 1;
+
         }else{
-            Call.eliminateTeam(activeTeams[0].ordinal());
+            state.lifes[activeTeams[0].ordinal()] -= 1;
+        }
+
+        if(state.points(activeTeams[activeTeams.length-1]) == state.points(activeTeams[activeTeams.length-2]) && activeTeams.length >= 2 && state.rules.enableLifes){
+            Team[] tiedTeams = Structs.filter(Team.class, activeTeams, t -> state.points(activeTeams[activeTeams.length-1]) == state.points(t));
+            Arrays.sort(tiedTeams, (s1, s2) -> (int)(
+                    state.teams.get(s2).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount) -
+                            state.teams.get(s1).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount)
+            ));
+            state.lifes[tiedTeams[0].ordinal()] += 1;
+        }else if(activeTeams.length >= 2 && state.rules.enableLifes){
+            state.lifes[activeTeams[activeTeams.length-1].ordinal()] += 1;
+        }
+
+        for(int i = 0; i<state.lifes.length; i++){
+            if(state.lifes[i]==0){
+                Call.eliminateTeam(i);
+            }
         }
 
         Events.fire(new RoundEvent());
@@ -275,14 +294,14 @@ public class Logic implements ApplicationListener{
 
                         //regular mode condition checking
                         if(state.eliminationtime <=0 && !state.rules.rushGame){
-                            eliminateWeakest();
+                            round();
                         }
 
                         //rush mode condition checking
                         if(state.rules.rushGame)
                             for(int i=0; i<state.points.length; i++)
                                 if(state.points[i] >= state.pointsThreshold)
-                                    eliminateWeakest();
+                                    round();
                     }
 
                     //buffing

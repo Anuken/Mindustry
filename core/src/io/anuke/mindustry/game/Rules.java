@@ -67,6 +67,8 @@ public class Rules{
     public boolean editor = false;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 200));
+
+    // resources war
     /** Determines if gamemode is resourceswar mode */
     public boolean resourcesWar = false;
     /** Determines how often weakest team should be eliminated in ticks */
@@ -85,6 +87,10 @@ public class Rules{
     public float buffSpacing = 60 * 60;
     /** How activated buff multiplies value of consumed item */
     public float buffMultiplier = 2f;
+    /** If false, the weakest player gets eliminated. If true, the weakest team lost one life, and the best gains one*/
+    public boolean enableLifes = true;
+    /** How many lifes every team has on start */
+    public int lifesCount = 2;
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

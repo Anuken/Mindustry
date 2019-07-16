@@ -39,6 +39,8 @@ public class GameState{
     public Item buffedItem = null;
     /** If there is buffed item set, keep time remain for buffed item. Else it counts time until next buff */
     public float buffTime;
+    /** How many lifes team have, used in resources-war mode */
+    public int[] lifes = new int[Team.all.length];
 
     public int enemies(){
         return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));

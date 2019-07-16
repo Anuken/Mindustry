@@ -271,13 +271,14 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onStateSnapshot(float waveTime, int wave, int enemies, float elimnationTime, int buffedItemId, float buffTime, int round, int[] points, short coreDataLen, byte[] coreData){
+    public static void onStateSnapshot(float waveTime, int wave, int enemies, float elimnationTime, int buffedItemId, float buffTime, int round, int[] points, int[] lives, short coreDataLen, byte[] coreData){
         try{
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
             state.eliminationtime = elimnationTime;
             state.round = round;
+            state.lifes = lives;
             state.points = points;
             state.buffTime = buffTime;
             state.buffedItem = (buffedItemId == -1) ? null : content.item(buffedItemId);

@@ -27,6 +27,8 @@ public class PlayerListFragment extends Fragment{
     private Interval timer = new Interval();
     private StringBuilder builder = new StringBuilder();
     private IntFormat pointsFormat = new IntFormat("points.lightgray");
+    private IntFormat livesFormat = new IntFormat("lifes");
+
 
     @Override
     public void build(Group parent){
@@ -156,6 +158,10 @@ public class PlayerListFragment extends Fragment{
                     builder.setLength(0);
                     if(state.rules.resourcesWar && state.teams.isActive(user.getTeam())){
                         builder.append(pointsFormat.get(state.points(user.getTeam())));
+                    }
+                    if(state.rules.resourcesWar && state.rules.enableLifes && state.teams.isActive(user.getTeam())){
+                        builder.append("    ");
+                        builder.append(livesFormat.get(state.lifes[user.getTeam().ordinal()]));
                     }
                     return builder.toString();
                 }).left().padBottom(6).marginLeft(5);
