@@ -269,37 +269,41 @@ public class Logic implements ApplicationListener{
                     state.eliminationtime = Math.max(state.eliminationtime - Time.delta(), 0);
                 }
 
-                if(!Net.client() && state.rules.resourcesWar){
-                    calculatePoints();
-                }
+                //resources war main loop
+                if(state.rules.resourcesWar && !state.gameOver && !netServer.isWaitingForPlayers()){
+                    if(!Net.client()){
+                        calculatePoints();
 
-                if(!Net.client() && state.rules.resourcesWar && !state.gameOver && state.rules.buffing && !netServer.isWaitingForPlayers()){
-                    state.buffTime = Math.max(state.buffTime - Time.delta(), 0);
-                    if(state.buffTime <= 0){
-                        if(state.buffedItem == null){
-                            state.buffedItem = content.items().random();
-                            state.buffTime = state.rules.buffTime;
-                        }else{
-                            state.buffedItem = null;
-                            state.buffTime = state.rules.buffSpacing;
-                        }
-                    }
-                }
-
-                if(!Net.client() && state.rules.resourcesWar && state.rules.rushGame && !state.gameOver){
-                    for(int i=0; i<state.points.length; i++){
-                        if(state.points[i] >= state.pointsThreshold){
+                        //regular mode condition checking
+                        if(state.eliminationtime <=0 && !state.rules.rushGame){
                             eliminateWeakest();
                         }
+
+                        //rush mode condition checking
+                        if(state.rules.rushGame)
+                            for(int i=0; i<state.points.length; i++)
+                                if(state.points[i] >= state.pointsThreshold)
+                                    eliminateWeakest();
                     }
+
+                    //buffing
+                    if(state.rules.buffing){
+                        state.buffTime = Math.max(state.buffTime - Time.delta(), 0);
+                        if(state.buffTime <= 0){
+                            if(state.buffedItem == null){
+                                state.buffedItem = content.items().random();
+                                state.buffTime = state.rules.buffTime;
+                            }else{
+                                state.buffedItem = null;
+                                state.buffTime = state.rules.buffSpacing;
+                            }
+                        }
+                    }
+
                 }
 
                 if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
-                }
-
-                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar && !state.rules.rushGame && !state.gameOver){
-                    eliminateWeakest();
                 }
 
                 if(!headless){
