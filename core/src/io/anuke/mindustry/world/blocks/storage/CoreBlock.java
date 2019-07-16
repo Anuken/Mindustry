@@ -177,6 +177,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void damage(float damage, Team team){
             if(state.rules.resourcesWar && state.teams.get(team).eaters.size != 0){
+                boolean stolen = false;
                 for(Tile eater : state.teams.get(getTeam()).eaters){
                     ItemEater.ItemEaterEntity eaterEntity = eater.entity();
                     ItemEater.ItemEaterEntity damagerEntity = state.teams.get(team).eaters.first().entity();
@@ -187,8 +188,11 @@ public class CoreBlock extends StorageBlock{
                         Effects.effect(Fx.itemsIncome, damagerEntity.getX(), damagerEntity.getY());
                         eaterEntity.pointsEarned -= pointsTaken;
                         damagerEntity.pointsEarned += pointsTaken;
-                        nextSteal = 60 * 1f;
+                        stolen = true;
                     }
+                }
+                if(stolen){
+                    nextSteal = 60 * 1f;
                 }
             }
             damage(damage);
