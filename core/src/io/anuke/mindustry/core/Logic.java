@@ -25,7 +25,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
-import io.anuke.mindustry.world.blocks.distribution.ItemsEater;
+import io.anuke.mindustry.world.blocks.distribution.ItemEater;
 
 import java.util.Arrays;
 
@@ -168,7 +168,7 @@ public class Logic implements ApplicationListener{
             int points = 0;
             if(state.teams.isActive(team)){
                 for(Tile eater : state.teams.get(team).eaters){
-                    points += (int)eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
+                    points += (int)eater.<ItemEater.ItemEaterEntity>entity().pointsEarned;
                 }
             }
             state.points[team.ordinal()] = points;

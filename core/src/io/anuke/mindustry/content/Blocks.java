@@ -84,7 +84,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //mode specific
-    itemsEater;
+    itemEater;
 
     @Override
     public void load(){
@@ -1747,8 +1747,8 @@ public class Blocks implements ContentList{
         //endregion
         //region mode specific
 
-        itemsEater = new ItemsEater("items-eater"){{
-            requirements(Category.distribution, ItemStack.with(Items.lead, 100));
+        itemEater = new ItemEater("item-eater"){{
+            requirements(Category.distribution, ()-> state.rules.resourcesWar, ItemStack.with(Items.lead, 100));
             size = 2;
         }};
 

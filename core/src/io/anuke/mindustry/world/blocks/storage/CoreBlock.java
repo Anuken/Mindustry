@@ -19,7 +19,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.distribution.ItemsEater;
+import io.anuke.mindustry.world.blocks.distribution.ItemEater;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
@@ -175,8 +175,8 @@ public class CoreBlock extends StorageBlock{
         public void damage(float damage, Team team){
             if(state.rules.resourcesWar && state.teams.get(team).eaters.size != 0){
                 for(Tile eater : state.teams.get(getTeam()).eaters){
-                    ItemsEater.ItemsEaterEntity eaterEntity = eater.entity();
-                    ItemsEater.ItemsEaterEntity damagerEntity = state.teams.get(team).eaters.first().entity();
+                    ItemEater.ItemEaterEntity eaterEntity = eater.entity();
+                    ItemEater.ItemEaterEntity damagerEntity = state.teams.get(team).eaters.first().entity();
                     float pointsTaken = (eaterEntity.pointsEarned - damage) > 0 ? (eaterEntity.pointsEarned - damage) : 0;
                     eaterEntity.pointsEarned -= pointsTaken;
                     damagerEntity.pointsEarned += pointsTaken;
