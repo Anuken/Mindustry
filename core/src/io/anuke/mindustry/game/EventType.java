@@ -48,6 +48,10 @@ public class EventType{
 
     }
 
+    public static class RoundEvent{
+
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

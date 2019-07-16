@@ -18,13 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.Vars.itemsValues;
 
 public class ItemsEater extends Block{
-    public static final ItemStack[][] requirementsInRound = {
-            ItemStack.with(Items.copper, 50),
-            ItemStack.with(Items.copper, 50, Items.lead, 100),
-            ItemStack.with(Items.copper, 100, Items.lead, 300),
-            ItemStack.with(Items.copper, 100, Items.lead, 300, Items.graphite, 50, Items.silicon, 50)
-    };
-
+    
     public ItemsEater(String name) {
         super(name);
         solid = true;

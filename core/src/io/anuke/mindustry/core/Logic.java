@@ -6,6 +6,7 @@ import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
+import io.anuke.arc.util.Structs;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
@@ -26,6 +27,8 @@ import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import io.anuke.mindustry.world.blocks.distribution.ItemsEater;
 
+import java.util.Arrays;
+
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -43,6 +46,14 @@ public class Logic implements ApplicationListener{
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
             }
+            if(!state.rules.resourcesWar){
+                for(Player p : playerGroup.all()){
+                    p.respawns = state.rules.respawns;
+                }
+            }
+        });
+
+        Events.on(RoundEvent.class, event -> {
             for (Player p : playerGroup.all()) {
                 p.respawns = state.rules.respawns;
             }
@@ -105,7 +116,6 @@ public class Logic implements ApplicationListener{
         state.eliminationtime = state.rules.eliminationTime;
         state.round = 1;
         state.pointsThreshold = state.rules.firstThreshold;
-        Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[0];
         state.buffTime = state.rules.buffSpacing;
         state.buffedItem = null;
 
@@ -129,35 +139,40 @@ public class Logic implements ApplicationListener{
         state.eliminationtime = state.rules.eliminationTime;
         state.round++;
 
-        Team team = state.getWeakest();
-        if(team!=null){
-            Call.eliminateTeam(team.ordinal());
+        //TODO is this efficient?
+        //filter only active teams
+        Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.points[t.ordinal()]!=-1);
+        //sort in ascending order
+        Arrays.sort(activeTeams, (s1, s2) -> state.points[s1.ordinal()] - state.points[s2.ordinal()]);
+        //if 2 firsts are equal there is an tie
+        if(state.points[activeTeams[0].ordinal()] == state.points[activeTeams[1].ordinal()]){
+            //filter teams with tie
+            Team[] tiedTeams = Structs.filter(Team.class, activeTeams, t -> state.points[activeTeams[0].ordinal()] == state.points[t.ordinal()]);
+            //sort
+            Arrays.sort(tiedTeams, (s1, s2) -> (int)(
+                    state.teams.get(s1).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount) -
+                    state.teams.get(s2).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount)
+            ));
+
+            Call.sendChatMessage("Tie breaker!");
+            Call.eliminateTeam(tiedTeams[0].ordinal());
+        }else{
+            Call.eliminateTeam(activeTeams[0].ordinal());
         }
 
-        Call.onRound();
+        Events.fire(new RoundEvent());
     }
 
-    public void calcPoints(){
+    public void calculatePoints(){
         for(Team team : Team.all){
             int points = -1;
-            if(state.teams.get(team).cores.size!=0 && state.teams.isActive(team)){
+            if(state.teams.isActive(team)){
                 points = 0;
                 for(Tile eater : state.teams.get(team).eaters){
                     points += (int)eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
                 }
             }
             state.points[team.ordinal()] = points;
-        }
-    }
-
-    @Remote(called = Loc.both)
-    public static void onRound(){
-        //bump requirements
-        Blocks.itemsEater.buildRequirements = ItemsEater.requirementsInRound[(state.round > ItemsEater.requirementsInRound.length) ?
-                ItemsEater.requirementsInRound.length-1 : state.round -1];
-        if(player != null){
-            player.respawns = state.rules.respawns;
-            state.pointsThreshold += state.rules.bumpThreshold;
         }
     }
 
@@ -255,7 +270,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!Net.client() && state.rules.resourcesWar){
-                    calcPoints();
+                    calculatePoints();
                 }
 
                 if(!Net.client() && state.rules.resourcesWar && !state.gameOver && state.rules.buffing && !netServer.isWaitingForPlayers()){
@@ -271,7 +286,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if(!Net.client() && state.rules.resourcesWar && state.rules.rushGame){
+                if(!Net.client() && state.rules.resourcesWar && state.rules.rushGame && !state.gameOver){
                     for(int i=0; i<state.points.length; i++){
                         if(state.points[i] >= state.pointsThreshold){
                             eliminateWeakest();
@@ -283,7 +298,7 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
-                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar && !state.rules.rushGame){
+                if(!Net.client() && state.eliminationtime <=0 && state.rules.resourcesWar && !state.rules.rushGame && !state.gameOver){
                     eliminateWeakest();
                 }
 

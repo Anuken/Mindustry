@@ -72,18 +72,4 @@ public class GameState{
     public enum State{
         paused, playing, menu
     }
-
-    public Team getWeakest(){
-        int min = Integer.MAX_VALUE;
-        for(int i=0; i < points.length; i++) {
-            if(points[i]==-1)
-                continue;
-            if(min > points[i])
-                min = points[i];
-        }
-        for(int i=0; i<Team.all.length; i++)
-            if(points[i]==min)
-                return Team.all[i];
-        return null;
-    }
 }

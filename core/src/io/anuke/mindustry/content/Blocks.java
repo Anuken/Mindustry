@@ -1748,7 +1748,7 @@ public class Blocks implements ContentList{
         //region mode specific
 
         itemsEater = new ItemsEater("items-eater"){{
-            requirements(Category.distribution,()->state.rules.resourcesWar, requirementsInRound[0]);
+            requirements(Category.distribution, ItemStack.with(Items.lead, 100));
             size = 2;
         }};
 

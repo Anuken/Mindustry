@@ -78,7 +78,7 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = state.rules.pvp ? "PvP" : state.rules.waves ? "Survival" : "Attack";
+            presence.state = state.rules.pvp ? "PvP" : state.rules.resourcesWar  ? "Resources war" : state.rules.waves ? "Survival" : "Attack";
             if(world.getMap() == null){
                 presence.details = "Unknown Map";
             }else if(!state.rules.waves){

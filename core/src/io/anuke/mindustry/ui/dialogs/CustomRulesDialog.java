@@ -54,9 +54,8 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("$rules.title.respawns");
-        //limited respawns don't work on PvP, commented out until they're fixed
-        //check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns);
-        //number("$rules.respawns", true, f -> rules.respawns = (int)f, () -> rules.respawns, () -> rules.limitedRespawns);
+        check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns, ()->!rules.pvp || rules.resourcesWar);
+        number("$rules.respawns", true, f -> rules.respawns = (int)f, () -> rules.respawns, () -> rules.limitedRespawns);
         number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
 
         title("$rules.title.resourcesbuilding");
