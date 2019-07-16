@@ -1,32 +1,25 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.actions.RelativeTemporalAction;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
-import io.anuke.arc.util.Align;
-import io.anuke.mindustry.content.TechTree;
-import io.anuke.mindustry.content.TechTree.TechNode;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.ui.ItemsDisplay;
-import io.anuke.mindustry.ui.TreeLayout;
-import io.anuke.mindustry.ui.TreeLayout.TreeNode;
-import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.style.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.TreeLayout.*;
+import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -71,6 +64,7 @@ public class TechTreeDialog extends FloatingDialog{
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
         bounds.set(layout.getBounds());
+        bounds.y += nodeSize*1.5f;
         copyInfo(node);
     }
 
@@ -218,7 +212,20 @@ public class TechTreeDialog extends FloatingDialog{
                 moved = true;
                 panX += x;
                 panY += y;
+                clamp();
             });
+        }
+
+        void clamp(){
+            float pad = nodeSize;
+
+            float ox = width/2f, oy = height/2f;
+            float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
+            float rw = bounds.width, rh = bounds.height;
+            rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
+            ry = Mathf.clamp(ry, pad, Core.graphics.getHeight() - rh - pad);
+            panX = rx - bounds.x - ox;
+            panY = ry - bounds.y - oy;
         }
 
         void unlock(TechNode node){
@@ -303,6 +310,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         @Override
         public void draw(){
+            clamp();
             float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(TechTreeNode node : nodes){
@@ -314,8 +322,6 @@ public class TechTreeDialog extends FloatingDialog{
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }
-
-            Lines.rect(bounds.x + Core.graphics.getWidth()/2f, bounds.y + Core.graphics.getHeight()/2f, bounds.width, bounds.height);
 
             Draw.reset();
             super.draw();

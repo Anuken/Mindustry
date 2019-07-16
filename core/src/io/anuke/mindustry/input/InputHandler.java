@@ -324,7 +324,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean validBreak(int x, int y){
-        return Build.validBreak(player.getTeam(), x, y) && Mathf.dst(player.x, player.y, x * tilesize, y * tilesize) < Player.placeDistance;
+        return Build.validBreak(player.getTeam(), x, y);
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){

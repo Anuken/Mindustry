@@ -20,6 +20,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
@@ -112,6 +113,19 @@ public class MobileInput extends InputHandler implements GestureListener{
             Tile other = req.tile();
 
             if(other == null || req.remove) continue;
+
+            r1.setSize(req.block.size * tilesize);
+            r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+
+            if(r2.overlaps(r1)){
+                return true;
+            }
+        }
+
+        for(BuildRequest req : player.buildQueue()){
+            Tile other = world.tile(req.x, req.y);
+
+            if(other == null || req.breaking) continue;
 
             r1.setSize(req.block.size * tilesize);
             r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());

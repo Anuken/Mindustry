@@ -1,29 +1,25 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.collection.ObjectSet.ObjectSetIterator;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.ObjectSet.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Zones;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.SaveIO.SaveException;
-import io.anuke.mindustry.type.Zone;
-import io.anuke.mindustry.type.Zone.ZoneRequirement;
-import io.anuke.mindustry.ui.ItemsDisplay;
-import io.anuke.mindustry.ui.TreeLayout;
-import io.anuke.mindustry.ui.TreeLayout.TreeNode;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.io.SaveIO.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Zone.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,6 +27,7 @@ public class DeployDialog extends FloatingDialog{
     private final float nodeSize = Unit.dp.scl(210f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
+    private Rectangle bounds = new Rectangle();
 
     public DeployDialog(){
         super("", "fulldialog");
@@ -40,6 +37,8 @@ public class DeployDialog extends FloatingDialog{
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(50f);
         layout.layout(root);
+        bounds.set(layout.getBounds());
+        bounds.y += nodeSize*0.4f;
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", "icon-tree", iconsize, () -> ui.tech.show()).size(230f, 64f);
@@ -63,10 +62,7 @@ public class DeployDialog extends FloatingDialog{
 
         stack.add(new Image(new Texture("sprites/backgrounds/stars.png"){{
             setFilter(TextureFilter.Linear);
-        }}){{
-            //setColor(Color.fromGray(0.3f));
-            //setScale(3f);
-        }}.setScaling(Scaling.fill));
+        }}).setScaling(Scaling.fill));
 
         stack.add(new Image(new Texture("sprites/backgrounds/planet-zero.png"){{
             setFilter(TextureFilter.Linear);
@@ -77,7 +73,7 @@ public class DeployDialog extends FloatingDialog{
             update(() -> {
                 setOrigin(Align.center);
                 time[0] += Core.graphics.getDeltaTime() * 10f;
-                setTranslation(Mathf.sin(time[0], 60f, 70f), Mathf.cos(time[0], 140f, 80f));
+                setTranslation(Mathf.sin(time[0], 60f, 70f) + panX / 30f, Mathf.cos(time[0], 140f, 80f) + (panY + 200) / 30f);
             });
         }}.setScaling(Scaling.fit));
 
@@ -187,11 +183,25 @@ public class DeployDialog extends FloatingDialog{
             dragged((x, y) -> {
                 panX += x;
                 panY += y;
+                clamp();
             });
+        }
+
+        void clamp(){
+            float pad = nodeSize;
+
+            float ox = width/2f, oy = height/2f;
+            float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
+            float rw = bounds.width, rh = bounds.height;
+            rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
+            ry = Mathf.clamp(ry, pad, Core.graphics.getHeight() - rh - pad);
+            panX = rx - bounds.x - ox;
+            panY = ry - bounds.y - oy;
         }
 
         @Override
         public void draw(){
+            clamp();
             float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
 
             for(ZoneNode node : nodes){
