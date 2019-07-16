@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.scene.Group;
@@ -25,6 +24,8 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
+    private StringBuilder builder = new StringBuilder();
+    private IntFormat pointsFormat = new IntFormat("points.lightgray");
 
     @Override
     public void build(Group parent){
@@ -100,10 +101,10 @@ public class PlayerListFragment extends Fragment{
 
             button.add(table).size(h);
             button.labelWrap(()->{
-                StringBuilder builder = new StringBuilder();
+                builder.setLength(0);
                 builder.append("[#" + user.color.toString().toUpperCase() + "]"+ user.name);
                 if(state.rules.resourcesWar && state.points[user.getTeam().ordinal()]!=-1){
-                    builder.append("\n" + "[LIGHT_GRAY]" + new IntFormat("points.lightgray").get(state.points[user.getTeam().ordinal()]));
+                    builder.append("\n" + "[LIGHT_GRAY]" + pointsFormat.get(state.points[user.getTeam().ordinal()]));
                 }
                 return builder.toString();
             }).width(170f).pad(10);
