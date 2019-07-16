@@ -141,13 +141,13 @@ public class Logic implements ApplicationListener{
 
         //TODO is this efficient?
         //filter only active teams
-        Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.points[t.ordinal()]!=-1);
+        Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.teams.isActive(t));
         //sort in ascending order
-        Arrays.sort(activeTeams, (s1, s2) -> state.points[s1.ordinal()] - state.points[s2.ordinal()]);
+        Arrays.sort(activeTeams, (s1, s2) -> state.points(s1) - state.points(s2));
         //if 2 firsts are equal there is an tie
-        if(state.points[activeTeams[0].ordinal()] == state.points[activeTeams[1].ordinal()]){
+        if(state.points(activeTeams[0]) == state.points(activeTeams[1])){
             //filter teams with tie
-            Team[] tiedTeams = Structs.filter(Team.class, activeTeams, t -> state.points[activeTeams[0].ordinal()] == state.points[t.ordinal()]);
+            Team[] tiedTeams = Structs.filter(Team.class, activeTeams, t -> state.points(activeTeams[0]) == state.points(t));
             //sort
             Arrays.sort(tiedTeams, (s1, s2) -> (int)(
                     state.teams.get(s1).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount) -
@@ -165,9 +165,8 @@ public class Logic implements ApplicationListener{
 
     public void calculatePoints(){
         for(Team team : Team.all){
-            int points = -1;
+            int points = 0;
             if(state.teams.isActive(team)){
-                points = 0;
                 for(Tile eater : state.teams.get(team).eaters){
                     points += (int)eater.<ItemsEater.ItemsEaterEntity>entity().pointsEarned;
                 }

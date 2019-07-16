@@ -653,7 +653,7 @@ public class HudFragment extends Fragment{
         textButton.left().labelWrap(()->{
             builder.setLength(0);
             if(state.teams.isActive(player.getTeam())){
-                builder.append(pointsf.get(state.points[player.getTeam().ordinal()]));
+                builder.append(pointsf.get(state.points(player.getTeam())));
                 builder.append("\n");
             }
             if(!state.rules.rushGame){

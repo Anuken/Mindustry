@@ -32,8 +32,11 @@ public class ItemsEater extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("points.bar", e -> new Bar(() -> Core.bundle.format("points.regular", e.tile.<ItemsEaterEntity>entity().pointsEarned), () -> Pal.ammo, () ->
-                (state.points[e.getTeam().ordinal()]==0) ? 1f : e.tile.<ItemsEaterEntity>entity().pointsEarned / (float)state.points[e.getTeam().ordinal()]));
+        bars.add("points.bar", e -> new Bar(
+                () -> Core.bundle.format("points.regular", (state.points(e.getTeam()) == -1) ? 0 : e.tile.<ItemsEaterEntity>entity().pointsEarned),
+                () -> Pal.ammo,
+                () -> (state.points[e.getTeam().ordinal()] == -1) ? 0f :(state.points(e.getTeam()) == 0) ? 1f : (int)(e.tile.<ItemsEaterEntity>entity().pointsEarned / state.points[e.getTeam().ordinal()])
+        ));
     }
 
     @Override

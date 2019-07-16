@@ -31,7 +31,7 @@ public class GameState{
     public int enemies;
     /** Current game state. */
     private State state = State.menu;
-    /** Points. Used in resources-war mode. -1 means team is unactive */
+    /** Points. Used in resources-war mode */
     public int[] points = new int[Team.all.length];
     /** Points. Used in resources-war mode */
     public int pointsThreshold = rules.firstThreshold;
@@ -71,5 +71,9 @@ public class GameState{
 
     public enum State{
         paused, playing, menu
+    }
+
+    public int points(Team team){
+        return points[team.ordinal()];
     }
 }

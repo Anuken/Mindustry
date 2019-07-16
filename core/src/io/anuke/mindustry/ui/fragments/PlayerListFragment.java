@@ -72,7 +72,7 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
 
         if(state.rules.resourcesWar){
-            playerGroup.all().sort((p1, p2) -> state.points[p2.getTeam().ordinal()]-state.points[p1.getTeam().ordinal()]);
+            playerGroup.all().sort((p1, p2) -> state.points(p2.getTeam())-state.points(p1.getTeam()));
         }else{
             playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
         }
@@ -103,8 +103,8 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap(()->{
                 builder.setLength(0);
                 builder.append("[#" + user.color.toString().toUpperCase() + "]"+ user.name);
-                if(state.rules.resourcesWar && state.points[user.getTeam().ordinal()]!=-1){
-                    builder.append("\n" + "[LIGHT_GRAY]" + pointsFormat.get(state.points[user.getTeam().ordinal()]));
+                if(state.rules.resourcesWar && state.teams.isActive(user.getTeam())){
+                    builder.append("\n" + pointsFormat.get(state.points(user.getTeam())));
                 }
                 return builder.toString();
             }).width(170f).pad(10);
