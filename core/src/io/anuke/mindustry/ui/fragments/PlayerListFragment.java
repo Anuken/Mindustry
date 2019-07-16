@@ -11,6 +11,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
@@ -72,11 +73,13 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
 
         if(state.rules.resourcesWar){
-            playerGroup.all().sort((p1, p2) -> state.points(p2.getTeam())-state.points(p1.getTeam()));
+            playerGroup.all().sort((p1, p2) -> state.points(p2.getTeam())-state.points(p1.getTeam()) + p1.getTeam().compareTo(p2.getTeam()));
         }else{
             playerGroup.all().sort((p1, p2) -> p1.getTeam().compareTo(p2.getTeam()));
         }
-        playerGroup.all().each(user -> {
+
+        for(int i=0; i<playerGroup.all().size; i++){
+            Player user = playerGroup.all().get(i);
             NetConnection connection = user.con;
 
             if(connection == null && Net.server() && !user.isLocal) return;
@@ -103,9 +106,6 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap(()->{
                 builder.setLength(0);
                 builder.append("[#" + user.color.toString().toUpperCase() + "]"+ user.name);
-                if(state.rules.resourcesWar && state.teams.isActive(user.getTeam())){
-                    builder.append("\n" + pointsFormat.get(state.points(user.getTeam())));
-                }
                 return builder.toString();
             }).width(170f).pad(10);
             button.add().grow();
@@ -148,11 +148,21 @@ public class PlayerListFragment extends Fragment{
                 }).padRight(12).size(bs + 10f, bs);
             }
 
+            content.row();
+            if(i == 0 || playerGroup.all().get(i-1).getTeam() != user.getTeam()){
+                content.addImage("whiteui").height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX().padTop(6).padBottom(6);
+                content.row();
+                content.labelWrap(()->{
+                    builder.setLength(0);
+                    if(state.rules.resourcesWar && state.teams.isActive(user.getTeam())){
+                        builder.append(pointsFormat.get(state.points(user.getTeam())));
+                    }
+                    return builder.toString();
+                }).left().padBottom(6).marginLeft(5);
+                content.row();
+            }
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
-            content.row();
-            content.addImage("whiteui").height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
-            content.row();
-        });
+        }
 
         content.marginBottom(5);
     }
