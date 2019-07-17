@@ -220,10 +220,15 @@ public class Logic implements ApplicationListener{
 
             for(Team team : Team.all){
                 if(state.teams.get(team).cores.size > 0){
-                    if(alive != null){
-                        return;
+                    for(Player p : playerGroup.all()){
+                        if(p.getTeam() == team){
+                            if(alive != null){
+                                return;
+                            }
+                            alive = team;
+                            break;
+                        }
                     }
-                    alive = team;
                 }
             }
 
