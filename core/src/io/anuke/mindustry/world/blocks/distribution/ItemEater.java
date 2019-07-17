@@ -31,7 +31,7 @@ public class ItemEater extends Block{
     public void setBars(){
         super.setBars();
         bars.add("points.bar", e -> new Bar(
-                () -> Core.bundle.format("points.regular", (state.points(e.getTeam()) == -1) ? 0 : e.tile.<ItemEaterEntity>entity().pointsEarned),
+                () -> Core.bundle.format("points.regular", (state.points(e.getTeam()) == -1) ? 0 : (int) e.tile.<ItemEaterEntity>entity().pointsEarned),
                 () -> Pal.ammo,
                 () -> (state.points[e.getTeam().ordinal()] == -1) ? 0f :(state.points(e.getTeam()) == 0) ? 1f : (int)(e.tile.<ItemEaterEntity>entity().pointsEarned / state.points[e.getTeam().ordinal()])
         ));

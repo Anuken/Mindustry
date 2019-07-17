@@ -142,7 +142,7 @@ public class Logic implements ApplicationListener{
 
         //TODO this is such horrible code
         //filter only active teams
-        Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.teams.isActive(t));
+        Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.teams.isActive(t) && playerGroup.all().select(p->p.getTeam()==t).size>0);
         //sort in ascending order
         Arrays.sort(activeTeams, (s1, s2) -> state.points(s1) - state.points(s2));
         //if 2 firsts are equal there is an tie
@@ -162,20 +162,21 @@ public class Logic implements ApplicationListener{
             state.lifes[activeTeams[0].ordinal()] -= 1;
         }
 
-        if(state.points(activeTeams[activeTeams.length-1]) == state.points(activeTeams[activeTeams.length-2]) && activeTeams.length >= 2 && state.rules.enableLifes){
+        if(state.points(activeTeams[activeTeams.length-1]) == state.points(activeTeams[activeTeams.length-2]) && activeTeams.length > 2 && state.rules.enableLifes){
             Team[] tiedTeams = Structs.filter(Team.class, activeTeams, t -> state.points(activeTeams[activeTeams.length-1]) == state.points(t));
             Arrays.sort(tiedTeams, (s1, s2) -> (int)(
                     state.teams.get(s2).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount) -
                             state.teams.get(s1).cores.first().entity().items.sum((item, amount) -> itemsValues[item.id] * amount)
             ));
             state.lifes[tiedTeams[0].ordinal()] += 1;
-        }else if(activeTeams.length >= 2 && state.rules.enableLifes){
+        }else if(activeTeams.length > 2 && state.rules.enableLifes){
             state.lifes[activeTeams[activeTeams.length-1].ordinal()] += 1;
         }
 
         for(int i = 0; i<state.lifes.length; i++){
             if(state.lifes[i]==0){
                 Call.eliminateTeam(i);
+                state.lifes[i] -= 1;
             }
         }
 
