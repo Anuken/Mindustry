@@ -140,7 +140,7 @@ public class Logic implements ApplicationListener{
         state.eliminationtime = state.rules.eliminationTime;
         state.round++;
 
-        //TODO this is such horrible code
+        //TODO this is such a horrible code, but idk how to make it more simple
         //filter only active teams
         Team[] activeTeams = Structs.filter(Team.class, Team.all, t -> state.teams.isActive(t) && playerGroup.all().select(p->p.getTeam()==t).size>0);
         //sort in ascending order

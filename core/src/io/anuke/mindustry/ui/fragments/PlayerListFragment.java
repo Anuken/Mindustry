@@ -159,7 +159,7 @@ public class PlayerListFragment extends Fragment{
                     if(state.rules.resourcesWar && state.teams.isActive(user.getTeam())){
                         builder.append(pointsFormat.get(state.points(user.getTeam())));
                     }
-                    if(state.rules.resourcesWar && state.rules.enableLifes && state.teams.isActive(user.getTeam())){
+                    if(state.rules.resourcesWar && state.rules.enableLifes && state.teams.isActive(user.getTeam()) && state.lifes[user.getTeam().ordinal()] != -1){
                         builder.append("    ");
                         builder.append(livesFormat.get(state.lifes[user.getTeam().ordinal()]));
                     }
