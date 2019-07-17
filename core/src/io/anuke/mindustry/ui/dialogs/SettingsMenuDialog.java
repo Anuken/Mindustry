@@ -184,6 +184,10 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
+        graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
+            Core.settings.put("uiscalechanged", true);
+            return s + "%";
+        });
         graphics.sliderPref("fpscap", 241, 5, 241, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
 

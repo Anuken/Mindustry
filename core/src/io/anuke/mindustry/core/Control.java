@@ -1,29 +1,28 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import static io.anuke.arc.Core.batch;
-import static io.anuke.arc.Core.scene;
+import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -45,9 +44,9 @@ public class Control implements ApplicationListener{
         saves = new Saves();
         data = new GlobalData();
 
-        Core.input.setCatch(KeyCode.BACK, true);
+        Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
 
-        Effects.setShakeFalloff(10000f);
+        Core.input.setCatch(KeyCode.BACK, true);
 
         content.initialize(Content::init);
         Core.atlas = new TextureAtlas("sprites/sprites.atlas");
@@ -264,6 +263,37 @@ public class Control implements ApplicationListener{
                 "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
                 dialog.show();
             });
+        }
+
+        if(Core.settings.getBool("uiscalechanged", false)){
+            FloatingDialog dialog = new FloatingDialog("$confirm");
+
+            float[] countdown = {60 * 11};
+            Runnable exit = () -> {
+                Core.settings.put("uiscale", 100);
+                Core.settings.put("uiscalechanged", false);
+                settings.save();
+                dialog.hide();
+                Core.app.exit();
+            };
+
+            dialog.setFillParent(false);
+            dialog.cont.label(() -> {
+                if(countdown[0] <= 0){
+                    exit.run();
+                }
+                return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
+            }).pad(10f).expand().left();
+
+            dialog.buttons.defaults().size(200f, 60f);
+            dialog.buttons.addButton("$uiscale.cancel", exit);
+
+            dialog.buttons.addButton("$ok", () -> {
+                Core.settings.put("uiscalechanged", false);
+                dialog.hide();
+            });
+
+            Core.app.post(dialog::show);
         }
     }
 

@@ -14,7 +14,7 @@ public class Effects{
     private static final EffectContainer container = new EffectContainer();
     private static Array<Effect> effects = new Array<>();
     private static ScreenshakeProvider shakeProvider;
-    private static float shakeFalloff = 1000f;
+    private static float shakeFalloff = 10000f;
     private static EffectProvider provider = (effect, color, x, y, rotation, data) -> {
         EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
         entity.effect = effect;
