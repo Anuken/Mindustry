@@ -85,7 +85,7 @@ public class NuclearReactor extends PowerGenerator{
         if(fuel > 0){
             entity.heat += fullness * heating * Math.min(entity.delta(), 4f);
 
-            if(entity.timer.get(timerFuel, itemDuration)){
+            if(entity.timer.get(timerFuel, itemDuration / entity.timeScale)){
                 entity.cons.trigger();
             }
         }

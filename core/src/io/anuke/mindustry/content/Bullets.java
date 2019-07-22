@@ -115,6 +115,7 @@ public class Bullets implements ContentList{
             lifetime = 70f;
             bulletWidth = bulletHeight = 14f;
             collidesTiles = false;
+            ammoMultiplier = 2f;
             splashDamageRadius = 45f;
             splashDamage = 50f;
             backColor = Pal.missileYellowBack;
@@ -170,6 +171,7 @@ public class Bullets implements ContentList{
         flakExplosive = new FlakBulletType(4f, 5){{
             //default bullet type, no changes
             shootEffect = Fx.shootBig;
+            ammoMultiplier = 2f;
         }};
 
         flakSurge = new FlakBulletType(4f, 7){{
@@ -186,6 +188,7 @@ public class Bullets implements ContentList{
             drag = -0.01f;
             splashDamageRadius = 30f;
             splashDamage = 30f;
+            ammoMultiplier = 2f;
             lifetime = 150f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;

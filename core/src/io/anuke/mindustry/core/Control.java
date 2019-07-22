@@ -116,7 +116,7 @@ public class Control implements ApplicationListener{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != null){
+            if(state.rules.zone != null && !Net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null){
                     saves.getZoneSlot().delete();

@@ -130,7 +130,7 @@ public enum EditorTool{
                     Block dest = tile.block();
                     if(dest == editor.drawBlock) return;
                     tester = t -> t.block() == dest;
-                    setter = t -> t.setBlock(editor.drawBlock);
+                    setter = t -> t.setBlock(editor.drawBlock, editor.drawTeam);
                 }
 
                 //replace only when the mode is 0 using the specified functions

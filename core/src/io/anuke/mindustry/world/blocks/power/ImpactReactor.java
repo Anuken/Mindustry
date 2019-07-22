@@ -79,7 +79,7 @@ public class ImpactReactor extends PowerGenerator{
                 entity.warmup = 1f;
             }
 
-            if(entity.timer.get(timerUse, itemDuration)){
+            if(entity.timer.get(timerUse, itemDuration / entity.timeScale)){
                 entity.cons.trigger();
             }
         }else{
