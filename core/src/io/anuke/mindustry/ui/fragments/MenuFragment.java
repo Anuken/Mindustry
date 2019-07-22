@@ -210,7 +210,7 @@ public class MenuFragment extends Fragment{
                         submenu.clearChildren();
                         fadeInMenu();
                         //correctly offset the button
-                        submenu.add().height(Core.graphics.getHeight() - out[0].getY(Align.topLeft));
+                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / Unit.dp.scl(1f));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{
