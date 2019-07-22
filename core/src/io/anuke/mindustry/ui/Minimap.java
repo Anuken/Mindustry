@@ -23,7 +23,7 @@ public class Minimap extends Table{
 
             @Override
             public void act(float delta){
-                setPosition(margin, margin);
+                setPosition(Unit.dp.scl(margin), Unit.dp.scl(margin));
 
                 super.act(delta);
             }

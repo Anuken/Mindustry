@@ -13,7 +13,7 @@ public class Zones implements ContentList{
     public static Zone
     groundZero, desertWastes,
     craters, frozenForest, ruinousShores, stainedMountains, tarFields,
-    saltFlats, overgrowth, impact0078,
+    saltFlats, overgrowth, impact0078, crags,
     desolateRift, nuclearComplex;
 
     @Override
@@ -162,17 +162,27 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
         }};
 
-        /*
         impact0078 = new Zone("impact0078", new MapGenerator("impact0078").dist(2f)){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
             conditionWave = 3;
             launchPeriod = 2;
-            zoneRequirements = ZoneRequirement.with(tarFields, 20);
+            zoneRequirements = ZoneRequirement.with(frozenForest, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
-        }};*/
+        }};
+
+        crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
+            loadout = Loadouts.basicFoundation;
+            baseLaunchCost = ItemStack.with();
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
+            conditionWave = 3;
+            launchPeriod = 2;
+            zoneRequirements = ZoneRequirement.with(stainedMountains, 40);
+            blockRequirements = new Block[]{Blocks.thermalGenerator};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
+        }};
 
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
