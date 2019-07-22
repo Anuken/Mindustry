@@ -9,7 +9,7 @@ buildscript{
 
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.6'
-        classpath "com.badlogicgames.gdx:gdx-tools:1.9.9"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
     }
 }
@@ -22,7 +22,7 @@ allprojects{
         versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.9'
+        gdxVersion = '1.9.10'
         roboVMVersion = '2.3.6'
         arcHash = null
 

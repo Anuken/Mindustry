@@ -96,6 +96,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
             Core.files.absolute(url.getPath()).copyTo(file);
 
+            //TODO detect if it's a map or save
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
                 if(SaveIO.isSaveValid(file)){
