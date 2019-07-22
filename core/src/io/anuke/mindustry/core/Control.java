@@ -290,6 +290,7 @@ public class Control implements ApplicationListener{
 
             dialog.buttons.addButton("$ok", () -> {
                 Core.settings.put("uiscalechanged", false);
+                settings.save();
                 dialog.hide();
             });
 

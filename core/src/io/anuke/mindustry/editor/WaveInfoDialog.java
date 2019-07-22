@@ -52,19 +52,19 @@ public class WaveInfoDialog extends FloatingDialog{
             dialog.cont.defaults().size(210f, 64f);
             dialog.cont.addButton("$waves.copy", () -> {
                 ui.showInfoFade("$waves.copied");
-                Core.app.getClipboard().setContents(world.maps.writeWaves(groups));
+                Core.app.setClipboardText(world.maps.writeWaves(groups));
                 dialog.hide();
             }).disabled(b -> groups == null);
             dialog.cont.row();
             dialog.cont.addButton("$waves.load", () -> {
                 try{
-                    groups = world.maps.readWaves(Core.app.getClipboard().getContents());
+                    groups = world.maps.readWaves(Core.app.getClipboardText());
                     buildGroups();
                 }catch(Exception e){
                     ui.showError("$waves.invalid");
                 }
                 dialog.hide();
-            }).disabled(b -> Core.app.getClipboard().getContents() == null || Core.app.getClipboard().getContents().isEmpty());
+            }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());
             dialog.cont.row();
             dialog.cont.addButton("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
                 groups = JsonIO.copy(defaultWaves.get());

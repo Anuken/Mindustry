@@ -39,12 +39,12 @@ public class DiscordDialog extends Dialog{
 
         buttons.addButton("$back", this::hide);
         buttons.addButton("$copylink", () -> {
-            Core.app.getClipboard().setContents(discordURL);
+            Core.app.setClipboardText(discordURL);
         });
         buttons.addButton("$openlink", () -> {
             if(!Core.net.openURI(discordURL)){
                 ui.showError("$linkfail");
-                Core.app.getClipboard().setContents(discordURL);
+                Core.app.setClipboardText(discordURL);
             }
         });
     }

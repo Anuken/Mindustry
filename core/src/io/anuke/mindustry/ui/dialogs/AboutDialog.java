@@ -65,7 +65,7 @@ public class AboutDialog extends FloatingDialog{
             table.addImageButton("icon-link", iconsize, () -> {
                 if(!Core.net.openURI(link.link)){
                     ui.showError("$linkfail");
-                    Core.app.getClipboard().setContents(link.link);
+                    Core.app.setClipboardText(link.link);
                 }
             }).size(h - 5, h);
 

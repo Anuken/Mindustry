@@ -11,7 +11,7 @@ import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.graphics.Pal;
@@ -185,7 +185,10 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
 
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
-            Core.settings.put("uiscalechanged", true);
+            if(Core.graphics.getFrameId() > 10){
+                Log.info("changed");
+                Core.settings.put("uiscalechanged", true);
+            }
             return s + "%";
         });
         graphics.sliderPref("fpscap", 241, 5, 241, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
