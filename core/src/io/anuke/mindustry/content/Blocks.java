@@ -734,29 +734,35 @@ public class Blocks implements ContentList{
         int wallHealthMultiplier = 4;
 
         scrapWall = new Wall("scrap-wall"){{
+            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 60 * wallHealthMultiplier;
             variants = 5;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
+            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
         }};
 
         scrapWallHuge = new Wall("scrap-wall-huge"){{
+            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
         }};
 
         scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
+            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
         }};
 
         thruster = new Wall("thruster"){{
+            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 55 * 16 * wallHealthMultiplier;
+            rotate = true;
             size = 4;
         }};
 

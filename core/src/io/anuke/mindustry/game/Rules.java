@@ -24,7 +24,7 @@ public class Rules{
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether enemy units drop random items on death. */
-    public boolean unitDrops;
+    public boolean unitDrops = true;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */

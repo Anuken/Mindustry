@@ -88,22 +88,22 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
-        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.004))){{
-            startingItems = ItemStack.list(Items.copper, 200);
-            conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(groundZero, 10);
-            blockRequirements = new Block[]{Blocks.router};
-            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand, Items.scrap};
-        }};
-
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
-            zoneRequirements = ZoneRequirement.with(craters, 10);
+            zoneRequirements = ZoneRequirement.with(groundZero, 10);
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
+        }};
+
+        craters = new Zone("craters", new MapGenerator("craters", 1).dist(0).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.004))){{
+            startingItems = ItemStack.list(Items.copper, 200);
+            conditionWave = 10;
+            zoneRequirements = ZoneRequirement.with(frozenForest, 10);
+            blockRequirements = new Block[]{Blocks.router};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand, Items.scrap};
         }};
 
         overgrowth = new Zone("overgrowth", new MapGenerator("overgrowth")){{
@@ -111,7 +111,7 @@ public class Zones implements ContentList{
             conditionWave = 12;
             launchPeriod = 4;
             loadout = Loadouts.basicNucleus;
-            zoneRequirements = ZoneRequirement.with(frozenForest, 40);
+            zoneRequirements = ZoneRequirement.with(craters, 40);
             blockRequirements = new Block[]{Blocks.router};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium, Items.scrap};
         }};
@@ -162,17 +162,6 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
         }};
 
-        impact0078 = new Zone("impact0078", new MapGenerator("impact0078").dist(2f)){{
-            loadout = Loadouts.basicNucleus;
-            baseLaunchCost = ItemStack.with();
-            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
-            conditionWave = 3;
-            launchPeriod = 2;
-            zoneRequirements = ZoneRequirement.with(nuclearComplex, 40);
-            blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
-        }};
-
         crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
@@ -194,6 +183,17 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
+        }};
+
+        impact0078 = new Zone("impact0078", new MapGenerator("impact0078").dist(2f)){{
+            loadout = Loadouts.basicNucleus;
+            baseLaunchCost = ItemStack.with();
+            startingItems = ItemStack.list(Items.copper, 2000, Items.lead, 2000, Items.graphite, 500, Items.titanium, 500, Items.silicon, 500);
+            conditionWave = 3;
+            launchPeriod = 2;
+            zoneRequirements = ZoneRequirement.with(nuclearComplex, 40);
+            blockRequirements = new Block[]{Blocks.thermalGenerator};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
         }};
     }
 }

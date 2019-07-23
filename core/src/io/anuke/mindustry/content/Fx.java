@@ -37,8 +37,7 @@ public class Fx implements ContentList{
     @Override
     public void load(){
 
-        none = new Effect(0, 0f, e -> {
-        });
+        none = new Effect(0, 0f, e -> {});
 
         unitSpawn = new Effect(30f, e -> {
             if(!(e.data instanceof BaseUnit)) return;

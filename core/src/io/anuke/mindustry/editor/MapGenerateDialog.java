@@ -82,7 +82,7 @@ public class MapGenerateDialog extends FloatingDialog{
         texture = new Texture(pixmap);
 
         cont.clear();
-        cont.table("flat", t -> {
+        cont.table(t -> {
             t.margin(8f);
             t.stack(new BorderImage(texture){{
                 setScaling(Scaling.fit);

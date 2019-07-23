@@ -9,6 +9,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
@@ -122,7 +123,7 @@ public class MapsDialog extends FloatingDialog{
             button.margin(9);
             button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
             button.row();
-            button.addImage("whiteui").growX().pad(4).color(Color.GRAY);
+            button.addImage("whiteui").growX().pad(4).color(Pal.gray);
             button.row();
             button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();

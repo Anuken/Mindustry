@@ -80,7 +80,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         cont.clear();
         cont.stack(new Table("clear", main -> {
-            main.pane(t -> table = t).growX().growY().get().setScrollingDisabled(true, false);
+            main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
             main.addButton("$add", () -> {
                 if(groups == null) groups = new Array<>();
@@ -109,7 +109,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 }
             }).growX().height(70f);
             m.row();
-            m.pane(t -> preview = t).grow().get().setScrollingDisabled(true, false);
+            m.pane(t -> preview = t).grow().get().setScrollingDisabled(true, true);
             m.row();
             m.addButton("+", () -> {
             }).update(t -> {
