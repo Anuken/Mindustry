@@ -1,17 +1,14 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.io.CounterInputStream;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.mindustry.entities.traits.SaveTrait;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.BrokenBlock;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -270,8 +267,6 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(map);
-
-        remapContent();
     }
 
     public void writeContentHeader(DataOutput stream) throws IOException{

@@ -1,14 +1,14 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -22,25 +22,24 @@ public class Tile implements Position, TargetTrait{
     public short x, y;
     protected Block block;
     protected Floor floor;
+    protected Floor overlay;
     /** Rotation, 0-3. Also used to store offload location, in which case it can be any number.*/
     protected byte rotation;
     /** Team ordinal. */
     protected byte team;
-    /** Ore that is on top of this (floor) block. */
-    protected short overlay = 0;
 
     public Tile(int x, int y){
         this.x = (short)x;
         this.y = (short)y;
-        block = floor = (Floor)Blocks.air;
+        block = floor = overlay = (Floor)Blocks.air;
     }
 
     public Tile(int x, int y, int floor, int overlay, int wall){
         this.x = (short)x;
         this.y = (short)y;
         this.floor = (Floor)content.block(floor);
+        this.overlay = (Floor)content.block(overlay);
         this.block = content.block(wall);
-        this.overlay = (short)overlay;
 
         //update entity and create it if needed
         changed();
@@ -114,7 +113,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public Floor overlay(){
-        return (Floor)content.block(overlay);
+        return overlay;
     }
 
     @SuppressWarnings("unchecked")
@@ -157,12 +156,12 @@ public class Tile implements Position, TargetTrait{
     /**This resets the overlay!*/
     public void setFloor(Floor type){
         this.floor = type;
-        this.overlay = 0;
+        this.overlay = (Floor)Blocks.air;
     }
 
     /** Sets the floor, preserving overlay.*/
     public void setFloorUnder(Floor floor){
-        Block overlay = overlay();
+        Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
     }
@@ -176,7 +175,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public short overlayID(){
-        return overlay;
+        return overlay.id;
     }
 
     public short blockID(){
@@ -188,7 +187,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void setOverlayID(short ore){
-        this.overlay = ore;
+        this.overlay = (Floor)content.block(ore);
     }
 
     public void setOverlay(Block block){
@@ -304,7 +303,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public Item drop(){
-        return overlay == 0 || ((Floor)content.block(overlay)).itemDrop == null ? floor.itemDrop : ((Floor)content.block(overlay)).itemDrop;
+        return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
 
     public void updateOcclusion(){
@@ -431,6 +430,6 @@ public class Tile implements Position, TargetTrait{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + content.block(overlay) + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (entity == null ? "null" : (entity.getClass())) + ":" + getTeam();
     }
 }

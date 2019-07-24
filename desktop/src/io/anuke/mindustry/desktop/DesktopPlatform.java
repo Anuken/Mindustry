@@ -15,7 +15,7 @@ import io.anuke.mindustry.ui.dialogs.FileChooser;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.net.NetworkInterface;
-import java.util.Enumeration;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 

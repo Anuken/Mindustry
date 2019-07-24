@@ -99,7 +99,7 @@ public class EditorTile extends Tile{
         }
 
         if(overlayID() == overlay) return;
-        op(OpType.overlay, this.overlay);
+        op(OpType.overlay, this.overlay.id);
         super.setOverlayID(overlay);
     }
 

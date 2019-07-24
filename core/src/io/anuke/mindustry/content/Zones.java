@@ -25,7 +25,7 @@ public class Zones implements ContentList{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.sand};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead};
         }};
 
         desertWastes = new Zone("desertWastes", new DesertWastesGenerator(260, 260)){{
@@ -170,7 +170,7 @@ public class Zones implements ContentList{
             launchPeriod = 2;
             zoneRequirements = ZoneRequirement.with(stainedMountains, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
@@ -193,7 +193,7 @@ public class Zones implements ContentList{
             launchPeriod = 2;
             zoneRequirements = ZoneRequirement.with(nuclearComplex, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
         }};
     }
 }
