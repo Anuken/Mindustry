@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor.generation;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.Pack;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
@@ -19,6 +20,9 @@ public abstract class GenerateFilter{
     public FilterOption[] options;
 
     protected abstract void apply();
+
+    //draw any additional guides
+    public void draw(Image image){}
 
     protected float noise(float x, float y, float scl, float mag){
         return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x + o, y + o) * mag;

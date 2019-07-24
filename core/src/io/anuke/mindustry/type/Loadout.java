@@ -1,14 +1,12 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.game.Content;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Vars.defaultTeam;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Loadout extends Content{
     private final Array<Tile> outArray = new Array<>();
@@ -70,6 +68,8 @@ public class Loadout extends Content{
             int rx = Pos.x(entry.key);
             int ry = Pos.y(entry.key);
             Tile tile = world.tile(x + rx, y + ry);
+            if(tile == null) continue;
+
             world.setBlock(tile, entry.value.block, defaultTeam);
             tile.rotation((byte)entry.value.rotation);
             if(entry.value.ore != null){

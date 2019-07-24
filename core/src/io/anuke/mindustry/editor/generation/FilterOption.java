@@ -24,28 +24,32 @@ public abstract class FilterOption{
 
     public abstract void build(Table table);
 
-    public Runnable changed = () -> {
-    };
+    public Runnable changed = () -> {};
 
     static class SliderOption extends FilterOption{
         final String name;
         final FloatProvider getter;
         final FloatConsumer setter;
-        final float min, max;
+        final float min, max, step;
 
         SliderOption(String name, FloatProvider getter, FloatConsumer setter, float min, float max){
+            this(name, getter, setter, min, max, (max - min) / 200);
+        }
+
+        SliderOption(String name, FloatProvider getter, FloatConsumer setter, float min, float max, float step){
             this.name = name;
             this.getter = getter;
             this.setter = setter;
             this.min = min;
             this.max = max;
+            this.step = step;
         }
 
         @Override
         public void build(Table table){
             table.add("$filter.option." + name);
             table.row();
-            Slider slider = table.addSlider(min, max, (max - min) / 200f, setter).growX().get();
+            Slider slider = table.addSlider(min, max, step, setter).growX().get();
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);

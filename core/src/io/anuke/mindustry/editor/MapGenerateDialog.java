@@ -30,7 +30,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapGenerateDialog extends FloatingDialog{
     private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
-        RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new
+        RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new,
+        MirrorFilter::new
     };
     private final MapEditor editor;
 
@@ -84,9 +85,19 @@ public class MapGenerateDialog extends FloatingDialog{
         cont.clear();
         cont.table(t -> {
             t.margin(8f);
-            t.stack(new BorderImage(texture){{
-                setScaling(Scaling.fit);
-            }}, new Stack(){{
+            t.stack(new BorderImage(texture){
+                {
+                    setScaling(Scaling.fit);
+                }
+
+                @Override
+                public void draw(){
+                    super.draw();
+                    for(GenerateFilter filter : filters){
+                        filter.draw(this);
+                    }
+                }
+            }, new Stack(){{
                 add(new Image("loadDim"));
                 add(new Image("icon-refresh"){{
                     setScaling(Scaling.none);
