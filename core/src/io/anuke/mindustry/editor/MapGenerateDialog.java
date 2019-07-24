@@ -1,28 +1,25 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Supplier;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.graphics.Texture;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
-import io.anuke.arc.util.async.AsyncExecutor;
-import io.anuke.arc.util.async.AsyncResult;
-import io.anuke.mindustry.content.Blocks;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Pixmap.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.async.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.editor.generation.*;
-import io.anuke.mindustry.editor.generation.GenerateFilter.GenerateInput;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.editor.generation.GenerateFilter.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -104,7 +101,19 @@ public class MapGenerateDialog extends FloatingDialog{
                 }});
                 visible(() -> generating && !updateEditorOnChange);
             }}).size(mobile ? 300f : 400f).padRight(10);
-            t.pane(p -> filterTable = p).width(300f).get().setScrollingDisabled(true, false);
+            t.pane(p -> filterTable = p).width(300f).marginRight(6).update(pane -> {
+                if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
+                    return;
+                }
+
+                Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
+
+                if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
+                    Core.scene.setScrollFocus(pane);
+                }else{
+                    Core.scene.setScrollFocus(null);
+                }
+            }).get().setScrollingDisabled(true, false);
         }).grow();
 
         buffer1 = create();
