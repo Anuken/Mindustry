@@ -371,7 +371,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         float amount = 10f, baseSize = 60f;
 
         float size = mobile ? (int)(Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
-        Math.min(Core.graphics.getDisplayMode().height / amount, baseSize);
+        Math.min(Core.graphics.getHeight() / amount, baseSize);
 
         clearChildren();
         table(cont -> {

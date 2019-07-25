@@ -1,18 +1,19 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.Platform;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -108,7 +109,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Core.graphics.isPortrait() ? 2 : 4;
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Unit.dp.scl(230)), 1, 8);
         float mapsize = 200f;
 
         int i = 0;
