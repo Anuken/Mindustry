@@ -6,6 +6,7 @@ sourceSets.main.java.srcDirs = ["src/"]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
+def IKVM_DIR = System.env.IKVM_HOME
 
 import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.PackrConfig
@@ -173,5 +174,40 @@ task packrZip(){
         }
 
         finalizedBy 'rzip'
+    }
+}
+
+task ikZip(type: Zip){
+    def filename = "$appName-windows-${version}"
+
+    from "build/libs/$filename"
+    archiveBaseName = "$appName-windows"
+}
+
+task ikdist{
+    dependsOn dist
+    finalizedBy ikZip
+
+    doLast{
+        def filename = "$appName-windows-${version}"
+        def folder = "build/libs/$filename"
+        def args = ["mono", "$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
+        if(file("../core/assets/sprites/icon.ico").exists()){
+            args += ["-win32icon:../core/assets/sprites/icon.ico"]
+        }
+
+        exec{
+            commandLine args
+        }
+
+        copy{
+            from file("build/libs/${filename}.exe")
+            into file(folder)
+        }
+
+        copy{
+            from "$IKVM_DIR/libraries"
+            into folder
+        }
     }
 }
