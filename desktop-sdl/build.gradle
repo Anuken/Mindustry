@@ -1,0 +1,75 @@
+apply plugin: "java"
+
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
+project.ext.assetsDir = new File("../core/assets")
+
+def IKVM_DIR = System.env.IKVM_HOME
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+
+    if(System.getProperty("os.name").toLowerCase().contains("mac")){
+        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+    }
+}
+
+task dist(type: Jar, dependsOn: classes) {
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+    from files(project.assetsDir);
+
+    //use target = all for all platforms
+    def target = project.hasProperty("target") ? project.properties["target"] : "windows";
+    if(target == "windows") exclude('**.so', "**.dylib")
+    if(target == "mac") exclude('**.so', "**.dll")
+    if(target == "linux") exclude('**.dll', "**.dylib")
+    archivesBaseName = appName + "-" + target
+
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+task ikZip(type: Zip){
+    def filename = "$appName-windows-${version}"
+
+    from "build/libs/$filename"
+    archiveBaseName = "$appName-windows"
+}
+
+task ikdist{
+    dependsOn dist
+    finalizedBy ikZip
+
+    doLast{
+        def filename = "$appName-windows-${version}"
+        def folder = "build/libs/$filename"
+        def args = ["mono", "$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
+        if(file("../core/assets/sprites/icon.ico").exists()){
+            args += ["-win32icon:../core/assets/sprites/icon.ico"]
+        }
+
+        exec{
+            commandLine args
+        }
+
+        copy{
+            from file("build/libs/${filename}.exe")
+            into file(folder)
+        }
+
+        copy{
+            from "$IKVM_DIR/libraries"
+            into folder
+        }
+    }
+}
+
