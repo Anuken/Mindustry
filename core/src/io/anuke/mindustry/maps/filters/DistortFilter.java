@@ -1,7 +1,7 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
 import io.anuke.mindustry.editor.MapGenerateDialog.GenTile;
-import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
+import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.content;
@@ -18,7 +18,7 @@ public class DistortFilter extends GenerateFilter{
 
     @Override
     public void apply(){
-        GenTile tile = in.tile(in.x / (in.scaling) + (noise(in.x, in.y, scl, mag) - mag / 2f) / in.scaling, in.y / (in.scaling) + (noise(in.x, in.y + o, scl, mag) - mag / 2f) / in.scaling);
+        GenTile tile = in.tile(in.x + noise(in.x, in.y, scl, mag) - mag / 2f, in.y + noise(in.x, in.y + o, scl, mag) - mag / 2f);
 
         in.floor = content.block(tile.floor);
         if(!content.block(tile.block).synthetic() && !in.block.synthetic()) in.block = content.block(tile.block);

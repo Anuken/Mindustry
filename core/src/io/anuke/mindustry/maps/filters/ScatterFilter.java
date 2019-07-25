@@ -1,11 +1,11 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
-import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
+import io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
+import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.editor.generation.FilterOption.*;
+import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
 public class ScatterFilter extends GenerateFilter{
     float chance = 0.1f;

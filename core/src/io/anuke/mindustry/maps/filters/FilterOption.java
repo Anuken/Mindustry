@@ -1,15 +1,16 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
-import io.anuke.arc.Core;
+
+import io.anuke.arc.*;
 import io.anuke.arc.function.*;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
-import io.anuke.arc.scene.ui.Slider;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.arc.scene.style.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.updateEditorOnChange;

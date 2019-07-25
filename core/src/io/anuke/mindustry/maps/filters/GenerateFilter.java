@@ -1,16 +1,14 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.noise.RidgedPerlin;
-import io.anuke.arc.util.noise.Simplex;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.MapEditor;
-import io.anuke.mindustry.editor.MapGenerateDialog.GenTile;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.editor.MapGenerateDialog.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 public abstract class GenerateFilter{
     protected transient float o = (float)(Math.random() * 10000000.0);
@@ -19,10 +17,37 @@ public abstract class GenerateFilter{
 
     public FilterOption[] options;
 
+    public final void apply(GenerateInput in){
+        this.in = in;
+        apply();
+        //remove extra ores on liquids
+        if(((Floor)in.floor).isLiquid){
+            in.ore = Blocks.air;
+        }
+    }
+
+    /** sets up the options; this is necessary since the constructor can't access subclass variables. */
+    protected void options(FilterOption... options){
+        this.options = options;
+    }
+
+    /** apply the actual filter on the input */
     protected abstract void apply();
 
-    //draw any additional guides
+    /** draw any additional guides */
     public void draw(Image image){}
+
+    /** localized display name */
+    public String name(){
+        return Core.bundle.get("filter." + getClass().getSimpleName().toLowerCase().replace("filter", ""), getClass().getSimpleName().replace("Filter", ""));
+    }
+
+    /** set the seed to a random number */
+    public void randomize(){
+        seed = Mathf.random(99999999);
+    }
+
+    //utility generation functions
 
     protected float noise(float x, float y, float scl, float mag){
         return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x + o, y + o) * mag;
@@ -36,46 +61,29 @@ public abstract class GenerateFilter{
         return in.pnoise.getValue((int)(x + o), (int)(y + o), 1f / scl) * mag;
     }
 
-    public void randomize(){
-        seed = Mathf.random(99999999);
-    }
-
     protected float chance(){
         return Mathf.randomSeed(Pack.longInt(in.x, in.y + (int)o));
     }
 
-    public void options(FilterOption... options){
-        this.options = options;
-    }
-
-    public String name(){
-        return Core.bundle.get("filter." + getClass().getSimpleName().toLowerCase().replace("filter", ""), getClass().getSimpleName().replace("Filter", ""));
-    }
-
-    public final void apply(GenerateInput in){
-        this.in = in;
-        apply();
-        //remove extra ores on liquids
-        if(((Floor)in.floor).isLiquid){
-            in.ore = Blocks.air;
-        }
-    }
-
+    /** an input for generating at a certain coordinate. should only be instantiated once. */
     public static class GenerateInput{
+        /** input floor */
         public Floor srcfloor;
+        /** input block */
         public Block srcblock;
+        /** input overlay */
         public Block srcore;
-        public int x, y, width, height, scaling;
+        /** input size parameters */
+        public int x, y, width, height;
 
-        public MapEditor editor;
+        /** output parameters */
         public Block floor, block, ore;
 
         Simplex noise = new Simplex();
         RidgedPerlin pnoise = new RidgedPerlin(0, 1);
         TileProvider buffer;
 
-        public void begin(MapEditor editor, int x, int y, Block floor, Block block, Block ore){
-            this.editor = editor;
+        public void apply(int x, int y, Block floor, Block block, Block ore){
             this.floor = this.srcfloor = (Floor)floor;
             this.block = this.srcblock = block;
             this.ore = srcore = ore;
@@ -83,11 +91,10 @@ public abstract class GenerateFilter{
             this.y = y;
         }
 
-        public void setFilter(GenerateFilter filter, int width, int height, int scaling, TileProvider buffer){
+        public void begin(GenerateFilter filter, int width, int height, TileProvider buffer){
             this.buffer = buffer;
             this.width = width;
             this.height = height;
-            this.scaling = scaling;
             noise.setSeed(filter.seed);
             pnoise.setSeed((int)(filter.seed + 1));
         }

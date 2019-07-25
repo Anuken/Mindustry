@@ -5,17 +5,18 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.editor.generation.*;
-import io.anuke.mindustry.editor.generation.GenerateFilter.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.filters.*;
+import io.anuke.mindustry.maps.filters.GenerateFilter.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
@@ -262,12 +263,12 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         for(GenerateFilter filter : filters){
-            input.setFilter(filter, editor.width(), editor.height(), 1, (x, y) -> dset(editor.tile(x, y)));
+            input.begin(filter, editor.width(), editor.height(), (x, y) -> dset(editor.tile(x, y)));
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
                     Tile tile = editor.tile(x, y);
-                    input.begin(editor, x, y, tile.floor(), tile.block(), tile.overlay());
+                    input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
                     writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.rotation());
                 }
@@ -318,13 +319,13 @@ public class MapGenerateDialog extends FloatingDialog{
                 }
 
                 for(GenerateFilter filter : copy){
-                    input.setFilter(filter, pixmap.getWidth(), pixmap.getHeight(), scaling, (x, y) -> buffer1[x][y]);
+                    input.begin(filter, editor.width(), editor.height(), (x, y) -> buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1)][Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)]);
                     //read from buffer1 and write to buffer2
                     for(int px = 0; px < pixmap.getWidth(); px++){
                         for(int py = 0; py < pixmap.getHeight(); py++){
                             int x = px * scaling, y = py * scaling;
                             GenTile tile = buffer1[px][py];
-                            input.begin(editor, x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
+                            input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
                             filter.apply(input);
                             buffer2[px][py].set(input.floor, input.block, input.ore, Team.all[tile.team], tile.rotation);
                         }
@@ -389,6 +390,5 @@ public class MapGenerateDialog extends FloatingDialog{
         void set(Tile other){
             set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.rotation());
         }
-
     }
 }

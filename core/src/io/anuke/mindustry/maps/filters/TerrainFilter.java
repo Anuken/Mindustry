@@ -1,13 +1,13 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
-import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
+import io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
+import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.editor.generation.FilterOption.floorsOnly;
-import static io.anuke.mindustry.editor.generation.FilterOption.wallsOnly;
+import static io.anuke.mindustry.maps.filters.FilterOption.floorsOnly;
+import static io.anuke.mindustry.maps.filters.FilterOption.wallsOnly;
 
 public class TerrainFilter extends GenerateFilter{
     float scl = 40, threshold = 0.9f, octaves = 3f, falloff = 0.5f, magnitude = 1f, circleScl = 2.1f;
@@ -28,7 +28,7 @@ public class TerrainFilter extends GenerateFilter{
 
     @Override
     public void apply(){
-        float noise = noise(in.x, in.y, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.editor.width(), (float)in.y / in.editor.height(), 0.5f, 0.5f) * circleScl;
+        float noise = noise(in.x, in.y, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
 
         in.floor = floor;
         in.ore = Blocks.air;

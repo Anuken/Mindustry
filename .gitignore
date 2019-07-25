@@ -20,6 +20,7 @@ logs/
 /server/build/
 /test_files/
 /annotations/build/
+/desktop-sdl/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/

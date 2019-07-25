@@ -1,4 +1,4 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -7,7 +7,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.editor.MapGenerateDialog.*;
-import io.anuke.mindustry.editor.generation.FilterOption.*;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
 import io.anuke.mindustry.graphics.*;
 
 import static io.anuke.mindustry.Vars.content;
@@ -29,7 +29,7 @@ public class MirrorFilter extends GenerateFilter{
         v1.add(in.width/2f, in.height/2f);
         v2.add(in.width/2f, in.height/2f);
 
-        v3.set(in.x / in.scaling, in.y / in.scaling);
+        v3.set(in.x, in.y);
 
         if(!left(v1, v2, v3)){
             mirror(v3, v1.x, v1.y, v2.x, v2.y);

@@ -1,11 +1,11 @@
-package io.anuke.mindustry.editor.generation;
+package io.anuke.mindustry.maps.filters;
 
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.editor.generation.FilterOption.SliderOption;
+import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.editor.generation.FilterOption.BlockOption;
-import static io.anuke.mindustry.editor.generation.FilterOption.oresOnly;
+import static io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
+import static io.anuke.mindustry.maps.filters.FilterOption.oresOnly;
 
 public class OreFilter extends GenerateFilter{
     public float scl = 50, threshold = 0.72f, octaves = 3f, falloff = 0.4f;
