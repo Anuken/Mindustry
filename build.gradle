@@ -134,6 +134,23 @@ project(":desktop"){
     }
 }
 
+project(":desktop-sdl"){
+    apply plugin: "java"
+
+    dependencies{
+        compile project(":core")
+        compile project(":net")
+
+        if(debugged()) compile project(":debug")
+
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+        compile arcModule("backends:backend-sdl")
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
+    }
+}
+
 project(":ios"){
     apply plugin: "java"
     apply plugin: "robovm"

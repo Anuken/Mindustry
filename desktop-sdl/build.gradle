@@ -3,7 +3,7 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
+project.ext.mainClassName = "io.anuke.mindustry.desktopsdl.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def IKVM_DIR = System.env.IKVM_HOME
@@ -17,6 +17,14 @@ task run(dependsOn: classes, type: JavaExec) {
 
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+    }
+
+    if(project.hasProperty("args")){
+        args Eval.me(project.getProperties()["args"])
+    }
+
+    if(args.contains("debug")){
+        main = "io.anuke.mindustry.DebugLauncher"
     }
 }
 
@@ -55,6 +63,8 @@ task ikdist{
         def args = ["mono", "$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
         if(file("../core/assets/sprites/icon.ico").exists()){
             args += ["-win32icon:../core/assets/sprites/icon.ico"]
+        }else if(file("../core/assets/icons/icon.ico").exists()){
+            args += ["-win32icon:../core/assets/icons/icon.ico"]
         }
 
         exec{

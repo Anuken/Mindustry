@@ -64,6 +64,11 @@ public class MapPlayDialog extends FloatingDialog{
         cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
+        //only maps with survival are valid for high scores
+        if(Gamemode.survival.valid(map)){
+            cont.row();
+            cont.label((() -> Core.bundle.format("level.highscore", map.getHightScore()))).pad(3f);
+        }
 
         buttons.clearChildren();
         addCloseButton();

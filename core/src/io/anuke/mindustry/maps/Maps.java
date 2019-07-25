@@ -253,7 +253,7 @@ public class Maps implements Disposable{
         }
 
         maps.add(map);
-        maps.sort();
+        //maps.sort();
     }
 
     private void loadCustomMaps(){

@@ -1,4 +1,4 @@
-include 'desktop', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'desktop-sdl', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def use = { String name ->
     include(name)
@@ -29,6 +29,7 @@ if(!hasProperty("release")){
         use(':Arc:extensions:arcnet')
         use(':Arc:extensions:packer')
         use(':Arc:backends')
+        use(':Arc:backends:backend-sdl')
         use(':Arc:backends:backend-lwjgl3')
         use(':Arc:backends:backend-android')
         use(':Arc:backends:backend-robovm')

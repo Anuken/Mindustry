@@ -1,14 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -36,7 +37,7 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = (Core.graphics.isPortrait() ? 2 : 4);
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Unit.dp.scl(200)), 1, 8);
         float images = 146f;
 
         int i = 0;
@@ -49,12 +50,27 @@ public class CustomGameDialog extends FloatingDialog{
 
             ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
             image.margin(5);
-            image.getImageCell().size(images);
             image.top();
+
+            Image img = image.getImage();
+            img.remove();
+
             image.row();
-            image.add("[accent]" + map.name()).pad(3f).growX().wrap().get().setAlignment(Align.center, Align.center);
+            image.table(t -> {
+                t.left();
+                for(Gamemode mode : Gamemode.all){
+                    if(mode.valid(map) && Core.atlas.has("icon-mode-" + mode.name())){
+                        t.addImage("icon-mode-" + mode.name()).size(16f).pad(4f);
+                    }
+                }
+            }).left();
             image.row();
-            image.label((() -> Core.bundle.format("level.highscore", map.getHightScore()))).pad(3f);
+            image.add(map.name()).pad(1f).growX().wrap().left().get().setEllipsis(true);
+            image.row();
+            image.addImage("whiteui", Pal.gray).growX().pad(3).height(4f);
+            image.row();
+            image.add(img).size(images);
+
 
             BorderImage border = new BorderImage(map.texture, 3f);
             border.setScaling(Scaling.fit);
