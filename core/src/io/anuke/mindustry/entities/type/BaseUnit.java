@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -86,7 +85,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.typeID;
     }
 
-    public Tile getSpawner(){
+    public @Nullable Tile getSpawner(){
         return world.tile(spawner);
     }
 

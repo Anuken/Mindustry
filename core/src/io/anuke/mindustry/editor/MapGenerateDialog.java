@@ -101,7 +101,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 }});
                 visible(() -> generating && !updateEditorOnChange);
             }}).size(mobile ? 300f : 400f).padRight(10);
-            t.pane(p -> filterTable = p).width(300f).marginRight(6).update(pane -> {
+            t.pane(p -> filterTable = p.marginRight(6)).width(300f).update(pane -> {
                 if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
                     return;
                 }

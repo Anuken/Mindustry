@@ -74,6 +74,10 @@ public class Map implements Comparable<Map>{
         return tags.get("othercore", "true").equals("true");
     }
 
+    public boolean attribute(MapAttribute attr){
+        return tags.getBool(attr.name());
+    }
+
     public String author(){
         return tag("author");
     }
