@@ -30,7 +30,7 @@ public class CrashSender{
             if(Version.number == 0){
                 try{
                     ObjectMap<String, String> map = new ObjectMap<>();
-                    PropertiesUtils.load(map, new InputStreamReader(new FileInputStream("version.properties")));
+                    PropertiesUtils.load(map, new InputStreamReader(CrashSender.class.getResourceAsStream("/version.properties")));
 
                     Version.type = map.get("type");
                     Version.number = Integer.parseInt(map.get("number"));
