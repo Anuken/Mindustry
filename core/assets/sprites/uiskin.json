@@ -156,7 +156,7 @@
       down: button-down,
       up: button,
       over: button-over,
-      disabled: button,
+      disabled: button-disabled,
       disabledFontColor: gray
     }
   },

@@ -1,11 +1,11 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.StringMap;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Texture;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Rules;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.JsonIO;
 
 public class Map implements Comparable<Map>{
@@ -23,6 +23,10 @@ public class Map implements Comparable<Map>{
     public Texture texture;
     /** Build that this map was created in. -1 = unknown or custom build. */
     public int build;
+    /** All teams present on this map.*/
+    public IntSet teams = new IntSet();
+    /** Number of enemy spawns on this map.*/
+    public int spawns = 0;
 
     public Map(FileHandle file, int width, int height, StringMap tags, boolean custom, int version, int build){
         this.custom = custom;
@@ -63,20 +67,16 @@ public class Map implements Comparable<Map>{
     }
 
     /** Whether this map has a core of the enemy 'wave' team. Default: true.
-     * Used for checking Attack mode validity.*/
+     * Used for checking Attack mode validity.
     public boolean hasEnemyCore(){
         return tags.get("enemycore", "true").equals("true");
     }
 
     /** Whether this map has a core of any team except the default player team. Default: true.
-     * Used for checking PvP mode validity.*/
+     * Used for checking PvP mode validity.
     public boolean hasOtherCores(){
         return tags.get("othercore", "true").equals("true");
-    }
-
-    public boolean attribute(MapAttribute attr){
-        return tags.getBool(attr.name());
-    }
+    }*/
 
     public String author(){
         return tag("author");

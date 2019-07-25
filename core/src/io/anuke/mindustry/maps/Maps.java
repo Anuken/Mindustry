@@ -1,26 +1,25 @@
 package io.anuke.mindustry.maps;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.ExceptionRunnable;
-import io.anuke.arc.graphics.Texture;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.serialization.Json;
-import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.io.LegacyMapIO;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands", "tendrils", "caldera", "glacier", "vein"};
+    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands", "tendrils", "caldera", "glacier", "veins"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
@@ -110,29 +109,22 @@ public class Maps implements Disposable{
             MapIO.writeMap(file, map);
 
             if(!headless){
-                //by default, it does not have an enemy core or any other cores
-                map.tags.put("enemycore", "false");
-                map.tags.put("othercore", "false");
-                IntSet teams = new IntSet();
+                //reset attributes
+                map.teams.clear();
+                map.spawns = 0;
 
                 for(int x = 0; x < map.width; x++){
                     for(int y = 0; y < map.height; y++){
                         Tile tile = world.getTiles()[x][y];
 
                         if(tile.block() instanceof CoreBlock){
-                            teams.add(tile.getTeamID());
+                            map.teams.add(tile.getTeamID());
+                        }
+
+                        if(tile.overlay() == Blocks.spawn){
+                            map.spawns ++;
                         }
                     }
-                }
-
-                if(teams.size > 1){
-                    //map must have other team's cores
-                    map.tags.put("othercore", "true");
-                }
-
-                if(teams.contains(waveTeam.ordinal())){
-                    //map must have default enemy team's core
-                    map.tags.put("enemycore", "true");
                 }
 
                 map.texture = new Texture(MapIO.generatePreview(world.getTiles()));

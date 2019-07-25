@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Core;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
@@ -32,9 +32,9 @@ public class MapPlayDialog extends FloatingDialog{
         title.setText(map.name());
         cont.clearChildren();
 
-        //reset to a valid mode after switching to attack
-        if((selectedGamemode == Gamemode.attack && !map.hasEnemyCore()) || (selectedGamemode == Gamemode.pvp && !map.hasOtherCores())){
-            selectedGamemode = Gamemode.survival;
+        //reset to any valid mode after switching to attack (one must exist)
+        if(!selectedGamemode.valid(map)){
+            selectedGamemode = Structs.find(Gamemode.all, m -> m.valid(map));
         }
 
         rules = map.rules();
@@ -50,14 +50,10 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            if((mode == Gamemode.attack && !map.hasEnemyCore()) || (mode == Gamemode.pvp && !map.hasOtherCores())){
-                continue;
-            }
-
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
                 rules = mode.apply(map.rules());
-            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f);
+            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
