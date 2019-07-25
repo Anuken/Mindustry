@@ -48,7 +48,7 @@ public class DesktopPlatform extends Platform{
 
             dialog.accept(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
-                            "Your graphics card does not support OpenGL 2.0!\n" +
+                            "Your graphics card does not support OpenGL 2.1!\n" +
                                     "Try to update your graphics drivers.\n\n" +
                                     "(If that doesn't work, your computer just doesn't support Mindustry.)"));
             badGPU = true;

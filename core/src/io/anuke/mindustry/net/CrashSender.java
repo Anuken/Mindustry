@@ -1,21 +1,21 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.io.PropertiesUtils;
-import io.anuke.arc.util.serialization.JsonValue;
-import io.anuke.arc.util.serialization.JsonValue.ValueType;
-import io.anuke.arc.util.serialization.JsonWriter.OutputType;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Version;
+import io.anuke.arc.util.io.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.JsonValue.*;
+import io.anuke.arc.util.serialization.JsonWriter.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.file.*;
+import java.time.*;
+import java.time.format.*;
 
 public class CrashSender{
 
@@ -30,7 +30,7 @@ public class CrashSender{
             if(Version.number == 0){
                 try{
                     ObjectMap<String, String> map = new ObjectMap<>();
-                    PropertiesUtils.load(map, new InputStreamReader(CrashSender.class.getResourceAsStream("version.properties")));
+                    PropertiesUtils.load(map, new InputStreamReader(new FileInputStream("version.properties")));
 
                     Version.type = map.get("type");
                     Version.number = Integer.parseInt(map.get("number"));
@@ -43,6 +43,7 @@ public class CrashSender{
                         Version.build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
                     }
                 }catch(Throwable ignored){
+                    ignored.printStackTrace();
                     Log.err("Failed to parse version.");
                 }
             }
