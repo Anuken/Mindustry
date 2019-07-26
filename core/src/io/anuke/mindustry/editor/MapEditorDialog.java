@@ -60,7 +60,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor = new MapEditor();
         view = new MapView(editor);
         infoDialog = new MapInfoDialog(editor);
-        generateDialog = new MapGenerateDialog(editor);
+        generateDialog = new MapGenerateDialog(editor, true);
 
         menu = new FloatingDialog("$menu");
         menu.addCloseButton();
@@ -81,7 +81,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.row();
 
             t.addImageTextButton("$editor.generate", "icon-editor", isize, () -> {
-                generateDialog.show();
+                generateDialog.show(generateDialog::applyToEditor);
                 menu.hide();
             });
 

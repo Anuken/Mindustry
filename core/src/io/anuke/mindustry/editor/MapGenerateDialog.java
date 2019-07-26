@@ -32,6 +32,7 @@ public class MapGenerateDialog extends FloatingDialog{
         MirrorFilter::new
     };
     private final MapEditor editor;
+    private final boolean applied;
 
     private Pixmap pixmap;
     private Texture texture;
@@ -46,19 +47,24 @@ public class MapGenerateDialog extends FloatingDialog{
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
+    private Consumer<Array<GenerateFilter>> applier;
 
-    public MapGenerateDialog(MapEditor editor){
+    /** @param applied whether or not to use the applied in-game mode. */
+    public MapGenerateDialog(MapEditor editor, boolean applied){
         super("$editor.generate");
         this.editor = editor;
+        this.applied = applied;
 
         shown(this::setup);
         addCloseButton();
-        buttons.addButton("$editor.apply", () -> {
-            ui.loadAnd(() -> {
-                apply();
-                hide();
-            });
-        }).size(160f, 64f);
+        if(applied){
+            buttons.addButton("$editor.apply", () -> {
+                ui.loadAnd(() -> {
+                    apply();
+                    hide();
+                });
+            }).size(160f, 64f);
+        }
         buttons.addButton("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
@@ -67,6 +73,76 @@ public class MapGenerateDialog extends FloatingDialog{
         }).size(160f, 64f);
 
         buttons.addImageTextButton("$add", "icon-add", iconsize, this::showAdd).height(64f).width(140f);
+
+        if(!applied){
+            hidden(this::apply);
+        }
+    }
+
+    public void show(Array<GenerateFilter> filters, Consumer<Array<GenerateFilter>> applier){
+        this.filters = filters;
+        this.applier = applier;
+        show();
+    }
+
+    public void show(Consumer<Array<GenerateFilter>> applier){
+        show(this.filters, applier);
+    }
+
+    /** Applies the specified filters to the editor. */
+    public void applyToEditor(Array<GenerateFilter> filters){
+        //writeback buffer
+        GenTile[][] writeTiles = new GenTile[editor.width()][editor.height()];
+
+        for(int x = 0; x < editor.width(); x++){
+            for(int y = 0; y < editor.height(); y++){
+                writeTiles[x][y] = new GenTile();
+            }
+        }
+
+        for(GenerateFilter filter : filters){
+            input.begin(filter, editor.width(), editor.height(), (x, y) -> dset(editor.tile(x, y)));
+            //write to buffer
+            for(int x = 0; x < editor.width(); x++){
+                for(int y = 0; y < editor.height(); y++){
+                    Tile tile = editor.tile(x, y);
+                    input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
+                    filter.apply(input);
+                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.rotation());
+                }
+            }
+
+            editor.load(() -> {
+                //read from buffer back into tiles
+                for(int x = 0; x < editor.width(); x++){
+                    for(int y = 0; y < editor.height(); y++){
+                        Tile tile = editor.tile(x, y);
+                        GenTile write = writeTiles[x][y];
+
+                        tile.rotation(write.rotation);
+                        tile.setFloor((Floor)content.block(write.floor));
+                        tile.setBlock(content.block(write.block));
+                        tile.setTeam(Team.all[write.team]);
+                        tile.setOverlay(content.block(write.ore));
+                    }
+                }
+            });
+        }
+
+        //reset undo stack as generation... messes things up
+        editor.load(editor::checkLinkedTiles);
+        editor.renderer().updateAll();
+        editor.clearOp();
+    }
+
+    public void addDefaultOres(Array<GenerateFilter> filters){
+        int index = 0;
+        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreCoal, Blocks.oreLead, Blocks.oreTitanium, Blocks.oreThorium}){
+            OreFilter filter = new OreFilter();
+            filter.threshold += index ++ * 0.025f;
+            filter.ore = block;
+            filters.add(filter);
+        }
     }
 
     void setup(){
@@ -140,6 +216,7 @@ public class MapGenerateDialog extends FloatingDialog{
         filterTable.top();
 
         for(GenerateFilter filter : filters){
+
             //main container
             filterTable.table("button", c -> {
                 //icons to perform actions
@@ -206,6 +283,9 @@ public class MapGenerateDialog extends FloatingDialog{
         int i = 0;
         for(Supplier<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
+
+            if(!applied && filter.buffered) continue;
+
             selection.cont.addButton(filter.name(), () -> {
                 filters.add(filter);
                 rebuildFilters();
@@ -216,14 +296,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         selection.cont.addButton("Default Ores", () -> {
-            int index = 0;
-            for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreCoal, Blocks.oreLead, Blocks.oreTitanium, Blocks.oreThorium}){
-                OreFilter filter = new OreFilter();
-                filter.threshold += index ++ * 0.02f;
-                filter.ore = block;
-                filters.add(filter);
-            }
-
+            addDefaultOres(filters);
             rebuildFilters();
             update();
             selection.hide();
@@ -253,48 +326,7 @@ public class MapGenerateDialog extends FloatingDialog{
             texture = null;
         }
 
-        //writeback buffer
-        GenTile[][] writeTiles = new GenTile[editor.width()][editor.height()];
-
-        for(int x = 0; x < editor.width(); x++){
-            for(int y = 0; y < editor.height(); y++){
-                writeTiles[x][y] = new GenTile();
-            }
-        }
-
-        for(GenerateFilter filter : filters){
-            input.begin(filter, editor.width(), editor.height(), (x, y) -> dset(editor.tile(x, y)));
-            //write to buffer
-            for(int x = 0; x < editor.width(); x++){
-                for(int y = 0; y < editor.height(); y++){
-                    Tile tile = editor.tile(x, y);
-                    input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
-                    filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.rotation());
-                }
-            }
-
-            editor.load(() -> {
-                //read from buffer back into tiles
-                for(int x = 0; x < editor.width(); x++){
-                    for(int y = 0; y < editor.height(); y++){
-                        Tile tile = editor.tile(x, y);
-                        GenTile write = writeTiles[x][y];
-
-                        tile.rotation(write.rotation);
-                        tile.setFloor((Floor)content.block(write.floor));
-                        tile.setBlock(content.block(write.block));
-                        tile.setTeam(Team.all[write.team]);
-                        tile.setOverlay(content.block(write.ore));
-                    }
-                }
-            });
-        }
-
-        //reset undo stack as generation... messes things up
-        editor.load(editor::checkLinkedTiles);
-        editor.renderer().updateAll();
-        editor.clearOp();
+        applier.accept(filters);
     }
 
     void update(){
@@ -371,7 +403,7 @@ public class MapGenerateDialog extends FloatingDialog{
         public byte team, rotation;
         public short block, floor, ore;
 
-        void set(Block floor, Block wall, Block ore, Team team, int rotation){
+        public void set(Block floor, Block wall, Block ore, Team team, int rotation){
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
@@ -379,7 +411,7 @@ public class MapGenerateDialog extends FloatingDialog{
             this.rotation = (byte)rotation;
         }
 
-        void set(GenTile other){
+        public void set(GenTile other){
             this.floor = other.floor;
             this.block = other.block;
             this.ore = other.ore;
@@ -387,8 +419,9 @@ public class MapGenerateDialog extends FloatingDialog{
             this.rotation = other.rotation;
         }
 
-        void set(Tile other){
+        public GenTile set(Tile other){
             set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.rotation());
+            return this;
         }
     }
 }

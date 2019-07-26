@@ -15,7 +15,8 @@ public abstract class GenerateFilter{
     protected transient long seed;
     protected transient GenerateInput in;
 
-    public FilterOption[] options;
+    public transient boolean buffered = false;
+    public transient FilterOption[] options;
 
     public final void apply(GenerateInput in){
         this.in = in;

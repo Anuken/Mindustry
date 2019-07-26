@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.Texture;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.maps.filters.*;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
@@ -59,24 +60,17 @@ public class Map implements Comparable<Map>{
         Vars.data.modified();
     }
 
-    /** This creates a new instance.*/
+    /** This creates a new instance of Rules.*/
     public Rules rules(){
         Rules result = JsonIO.read(Rules.class, tags.get("rules", "{}"));
         if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
         return result;
     }
 
-    /** Whether this map has a core of the enemy 'wave' team. Default: true.
-     * Used for checking Attack mode validity.
-    public boolean hasEnemyCore(){
-        return tags.get("enemycore", "true").equals("true");
+    /** Returns the generation filters that this map uses on load.*/
+    public Array<GenerateFilter> filters(){
+        return JsonIO.read(Array.class, tags.get("genfilters", "{}"));
     }
-
-    /** Whether this map has a core of any team except the default player team. Default: true.
-     * Used for checking PvP mode validity.
-    public boolean hasOtherCores(){
-        return tags.get("othercore", "true").equals("true");
-    }*/
 
     public String author(){
         return tag("author");

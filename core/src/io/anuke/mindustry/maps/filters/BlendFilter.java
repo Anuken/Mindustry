@@ -13,6 +13,7 @@ public class BlendFilter extends GenerateFilter{
     Block flooronto = Blocks.stone, floor = Blocks.ice;
 
     {
+        buffered = true;
         options(
         new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
         new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOnly),

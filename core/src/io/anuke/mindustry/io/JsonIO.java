@@ -2,12 +2,14 @@ package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.LongQueue;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.TeamData;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 @SuppressWarnings("unchecked")
 public class JsonIO{
@@ -37,6 +39,37 @@ public class JsonIO{
             @Override
             public Item read(Json json, JsonValue jsonData, Class type){
                 return Vars.content.getByName(ContentType.item, jsonData.asString());
+            }
+        });
+
+        //TODO extremely hacky and disgusting
+        for(Block block : Vars.content.blocks()){
+            Class type = block.getClass();
+            if(type.isAnonymousClass()) type = type.getSuperclass();
+            Log.info(type);
+
+            setSerializer(type, new Serializer<Block>(){
+                @Override
+                public void write(Json json, Block object, Class knownType){
+                    json.writeValue(object.name);
+                }
+
+                @Override
+                public Block read(Json json, JsonValue jsonData, Class type){
+                    return Vars.content.getByName(ContentType.block, jsonData.asString());
+                }
+            });
+        }
+
+        setSerializer(Block.class, new Serializer<Block>(){
+            @Override
+            public void write(Json json, Block object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Block read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.block, jsonData.asString());
             }
         });
 

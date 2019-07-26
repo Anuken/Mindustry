@@ -10,6 +10,7 @@ public class DistortFilter extends GenerateFilter{
     float scl = 40, mag = 5;
 
     {
+        buffered = true;
         options(
             new SliderOption("scale", () -> scl, f -> scl = f, 1f, 400f),
             new SliderOption("mag", () -> mag, f -> mag = f, 0.5f, 100f)

@@ -1,25 +1,26 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.annotations.Annotations.Nullable;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.MapIO;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.editor.MapGenerateDialog.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.maps.generators.Generator;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.maps.filters.*;
+import io.anuke.mindustry.maps.filters.GenerateFilter.*;
+import io.anuke.mindustry.maps.generators.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.BlockPart;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -172,12 +173,6 @@ public class World implements ApplicationListener{
         generating = true;
     }
 
-    /** Call to signal the beginning of loading the map with a custom set of tiles. */
-    public void beginMapLoad(Tile[][] tiles){
-        this.tiles = tiles;
-        generating = true;
-    }
-
     /**
      * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
      * A WorldLoadEvent will be fire.
@@ -226,9 +221,8 @@ public class World implements ApplicationListener{
     }
 
     public void loadMap(Map map){
-
         try{
-            MapIO.loadMap(map);
+            SaveIO.load(map.file, new FilterContext(map));
         }catch(Exception e){
             Log.err(e);
             if(!headless){
@@ -313,50 +307,6 @@ public class World implements ApplicationListener{
                 }
             }
         }
-    }
-
-    /**
-     * Raycast, but with world coordinates.
-     */
-    public Point2 raycastWorld(float x, float y, float x2, float y2){
-        return raycast(Math.round(x / tilesize), Math.round(y / tilesize),
-        Math.round(x2 / tilesize), Math.round(y2 / tilesize));
-    }
-
-    /**
-     * Input is in block coordinates, not world coordinates.
-     * @return null if no collisions found, block position otherwise.
-     */
-    public Point2 raycast(int x0f, int y0f, int x1, int y1){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
-        while(true){
-
-            if(!passable(x0, y0)){
-                return Tmp.g1.set(x0, y0);
-            }
-            if(x0 == x1 && y0 == y1) break;
-
-            e2 = 2 * err;
-            if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-
-            if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-        return null;
     }
 
     public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
@@ -489,7 +439,7 @@ public class World implements ApplicationListener{
         boolean accept(int x, int y);
     }
 
-    class Context implements WorldContext{
+    private class Context implements WorldContext{
         @Override
         public Tile tile(int x, int y){
             return tiles[x][y];
@@ -518,6 +468,47 @@ public class World implements ApplicationListener{
         @Override
         public void end(){
             endMapLoad();
+        }
+    }
+
+    /** World context that applies filters after generation end. */
+    private class FilterContext extends Context{
+        final Map map;
+
+        FilterContext(Map map){
+            this.map = map;
+        }
+
+        @Override
+        public void end(){
+            Array<GenerateFilter> filters = map.filters();
+            if(!filters.isEmpty()){
+                //input for filter queries
+                GenerateInput input = new GenerateInput();
+                GenTile gtile = new GenTile();
+
+                for(GenerateFilter filter : filters){
+                    input.begin(filter, width(), height(), (x, y) -> gtile.set(tiles[x][y]));
+
+                    //actually apply the filter
+                    for(int x = 0; x < width(); x++){
+                        for(int y = 0; y < height(); y++){
+                            Tile tile = rawTile(x, y);
+                            input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
+                            filter.apply(input);
+
+                            tile.setFloor((Floor)input.floor);
+                            tile.setOverlay(input.ore);
+
+                            if(!tile.block().synthetic()){
+                                tile.setBlock(input.block);
+                            }
+                        }
+                    }
+                }
+            }
+
+            super.end();
         }
     }
 }

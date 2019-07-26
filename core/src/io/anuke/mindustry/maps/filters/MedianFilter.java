@@ -13,6 +13,7 @@ public class MedianFilter extends GenerateFilter{
     IntArray blocks = new IntArray(), floors = new IntArray();
 
     {
+        buffered = true;
         options(
             new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
             new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)

@@ -1,23 +1,19 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.noise.Simplex;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Loadout;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
-import io.anuke.mindustry.world.blocks.storage.StorageBlock;
+import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Vars.defaultTeam;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapGenerator extends Generator{
     private Map map;
@@ -82,7 +78,7 @@ public class MapGenerator extends Generator{
             }
         }
 
-        MapIO.loadMap(map);
+        SaveIO.load(map.file);
         Array<Point2> players = new Array<>();
         Array<Point2> enemies = new Array<>();
 

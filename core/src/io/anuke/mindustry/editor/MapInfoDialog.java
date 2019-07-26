@@ -1,24 +1,25 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.scene.ui.TextArea;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.ui.dialogs.CustomRulesDialog;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
+    private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
 
     public MapInfoDialog(MapEditor editor){
         super("$editor.mapinfo");
         this.editor = editor;
         this.waveInfo = new WaveInfoDialog(editor);
+        this.generate = new MapGenerateDialog(editor, false);
 
         addCloseButton();
 
@@ -63,6 +64,13 @@ public class MapInfoDialog extends FloatingDialog{
             t.row();
             t.add("$editor.waves").padRight(8).left();
             t.addButton("$edit", waveInfo::show).left().width(200f);
+
+            t.row();
+            t.add("$editor.generation").padRight(8).left();
+            t.addButton("$edit",
+                () -> generate.show(JsonIO.read(Array.class, editor.getTags().get("genfilters", "{}")),
+                filters -> editor.getTags().put("genfilters", JsonIO.write(filters)))
+            ).left().width(200f);
 
             name.change();
             description.change();
