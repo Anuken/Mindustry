@@ -203,6 +203,10 @@ public class Maps implements Disposable{
                 new ScatterFilter(){{
                     flooronto = Blocks.ice;
                     block = Blocks.snowrock;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.sand;
+                    block = Blocks.sandBoulder;
                 }}
             );
 

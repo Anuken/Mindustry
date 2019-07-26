@@ -500,7 +500,7 @@ public class World implements ApplicationListener{
                             tile.setFloor((Floor)input.floor);
                             tile.setOverlay(input.ore);
 
-                            if(!tile.block().synthetic()){
+                            if(!tile.block().synthetic() && !input.block.synthetic()){
                                 tile.setBlock(input.block);
                             }
                         }

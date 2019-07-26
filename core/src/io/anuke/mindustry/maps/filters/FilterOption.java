@@ -22,6 +22,7 @@ public abstract class FilterOption{
     public static final Predicate<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full)));
     public static final Predicate<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full)));
     public static final Predicate<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> anyOptional = b -> floorsOnly.test(b) || wallsOnly.test(b) || oresOnly.test(b) || b == Blocks.air;
 
     public abstract void build(Table table);
 

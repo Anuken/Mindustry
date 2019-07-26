@@ -38,7 +38,7 @@ public class Blocks implements ContentList{
     //environment
     air, spawn, deepwater, water, taintedWater, tar, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
     holostone, rocks, sporerocks, icerocks, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, sandBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -347,6 +347,10 @@ public class Blocks implements ContentList{
         }};
 
         shaleBoulder = new Rock("shale-boulder"){{
+            variants = 2;
+        }};
+
+        sandBoulder = new Rock("sand-boulder"){{
             variants = 2;
         }};
 

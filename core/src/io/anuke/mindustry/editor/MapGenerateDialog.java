@@ -220,7 +220,7 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(filterTable.getParent().getWidth() / Unit.dp.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Unit.dp.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -238,7 +238,6 @@ public class MapGenerateDialog extends FloatingDialog{
 
                     t.table(b -> {
                         String style = "clear";
-                        b.left();
                         b.defaults().size(50f);
                         b.addImageButton("icon-refresh-small", style, iconsizesmall, () -> {
                             filter.randomize();
@@ -267,7 +266,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 c.row();
                 //all the options
                 c.table(f -> {
-                    f.left();
+                    f.left().top();
                     for(FilterOption option : filter.options){
                         option.changed = this::update;
 
@@ -277,8 +276,8 @@ public class MapGenerateDialog extends FloatingDialog{
                         }).growX().left();
                         f.row();
                     }
-                }).grow().left().pad(2);
-            }).width(280f).pad(3).top().left();
+                }).grow().left().pad(2).top();
+            }).width(280f).pad(3).top().left().fillY();
             if(++i % cols == 0){
                 filterTable.row();
             }
