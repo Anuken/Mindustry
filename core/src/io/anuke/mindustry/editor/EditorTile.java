@@ -92,6 +92,11 @@ public class EditorTile extends Tile{
     }
 
     @Override
+    public void setOverlay(Block overlay){
+        setOverlayID(overlay.id);
+    }
+
+    @Override
     public void setOverlayID(short overlay){
         if(state.is(State.playing)){
             super.setOverlayID(overlay);

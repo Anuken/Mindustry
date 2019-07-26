@@ -8,7 +8,7 @@ import static io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
 import static io.anuke.mindustry.maps.filters.FilterOption.oresOnly;
 
 public class OreFilter extends GenerateFilter{
-    public float scl = 45, threshold = 0.73f, octaves = 3f, falloff = 0.4f;
+    public float scl = 43, threshold = 0.705f, octaves = 3f, falloff = 0.4f;
     public Block ore = Blocks.oreCopper;
 
     {

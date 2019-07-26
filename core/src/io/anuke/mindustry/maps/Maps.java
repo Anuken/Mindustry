@@ -186,25 +186,35 @@ public class Maps implements Disposable{
     @SuppressWarnings("unchecked")
     public Array<GenerateFilter> readFilters(String str){
         if(str == null || str.isEmpty()){
-            return Array.with(
-            //stone
-            new ScatterFilter(){{
-                flooronto = Blocks.stone;
-                block = Blocks.rock;
-            }},
-            new ScatterFilter(){{
-                flooronto = Blocks.shale;
-                block = Blocks.shaleBoulder;
-            }},
-            new ScatterFilter(){{
-                flooronto = Blocks.snow;
-                block = Blocks.snowrock;
-            }},
-            new ScatterFilter(){{
-                flooronto = Blocks.ice;
-                block = Blocks.snowrock;
-            }}
+            //create default filters list
+            Array<GenerateFilter> filters =  Array.with(
+                new ScatterFilter(){{
+                    flooronto = Blocks.stone;
+                    block = Blocks.rock;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.shale;
+                    block = Blocks.shaleBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.snow;
+                    block = Blocks.snowrock;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.ice;
+                    block = Blocks.snowrock;
+                }}
             );
+
+            int index = 0;
+            for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
+                OreFilter filter = new OreFilter();
+                filter.threshold += index ++ * 0.019f;
+                filter.ore = block;
+                filters.add(filter);
+            }
+
+            return filters;
         }else{
             return JsonIO.read(Array.class, str);
         }

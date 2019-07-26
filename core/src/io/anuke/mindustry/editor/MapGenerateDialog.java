@@ -29,7 +29,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new,
-        MirrorFilter::new
+        MirrorFilter::new, ClearFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -63,6 +63,12 @@ public class MapGenerateDialog extends FloatingDialog{
                     apply();
                     hide();
                 });
+            }).size(160f, 64f);
+        }else{
+            buttons.addButton("$settings.reset", () -> {
+                filters.set(world.maps.readFilters(""));
+                rebuildFilters();
+                update();
             }).size(160f, 64f);
         }
         buttons.addButton("$editor.randomize", () -> {
@@ -137,9 +143,9 @@ public class MapGenerateDialog extends FloatingDialog{
 
     public void addDefaultOres(Array<GenerateFilter> filters){
         int index = 0;
-        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreCoal, Blocks.oreLead, Blocks.oreTitanium, Blocks.oreThorium}){
+        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
             OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.025f;
+            filter.threshold += index ++ * 0.019f;
             filter.ore = block;
             filters.add(filter);
         }

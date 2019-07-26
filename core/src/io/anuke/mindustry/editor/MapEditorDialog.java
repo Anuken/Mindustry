@@ -20,6 +20,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
@@ -32,7 +33,7 @@ import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OverlayFloor;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
@@ -588,6 +589,28 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.Z)){
                 editor.undo();
+            }
+
+            //more undocumented features, fantastic
+            if(Core.input.keyTap(KeyCode.T)){
+
+                //clears all 'decoration' from the map
+                for(int x = 0; x < editor.width(); x++){
+                    for(int y = 0; y < editor.height(); y++){
+                        Tile tile = editor.tile(x, y);
+                        if(tile.block().breakable && tile.block() instanceof Rock){
+                            tile.setBlock(Blocks.air);
+                            editor.renderer().updatePoint(x, y);
+                        }
+
+                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
+                            tile.setOverlay(Blocks.air);
+                            editor.renderer().updatePoint(x, y);
+                        }
+                    }
+                }
+
+                editor.flushOp();
             }
 
             if(Core.input.keyTap(KeyCode.Y)){
