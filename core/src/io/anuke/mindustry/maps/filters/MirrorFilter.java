@@ -43,8 +43,19 @@ public class MirrorFilter extends GenerateFilter{
     @Override
     public void draw(Image image){
         super.draw(image);
+
+        Vector2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
+        float imageWidth = vsize.x;
+        float imageHeight = vsize.y;
+
         float size = Math.max(image.getWidth() *2, image.getHeight()*2);
-        Consumer<Vector2> clamper = v -> v.clamp(image.getX(),  image.getX() + image.getWidth(), image.getY(), image.getY() + image.getHeight());
+        Consumer<Vector2> clamper = v ->
+            v.clamp(
+                image.getX() + image.getWidth()/2f - imageWidth/2f,
+                image.getX() + image.getWidth()/2f + imageWidth/2f,
+                image.getY() + image.getHeight()/2f - imageHeight/2f,
+                image.getY() + image.getHeight()/2f + imageHeight/2f);
+
         clamper.accept(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
         clamper.accept(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()).rotate(180f).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
 

@@ -83,6 +83,8 @@ public class MapGenerateDialog extends FloatingDialog{
         if(!applied){
             hidden(this::apply);
         }
+
+        onResize(() -> rebuildFilters());
     }
 
     public void show(Array<GenerateFilter> filters, Consumer<Array<GenerateFilter>> applier){
@@ -183,8 +185,8 @@ public class MapGenerateDialog extends FloatingDialog{
                     setScaling(Scaling.none);
                 }});
                 visible(() -> generating && !updateEditorOnChange);
-            }}).size(mobile ? 300f : 400f).padRight(10);
-            t.pane(p -> filterTable = p.marginRight(6)).width(300f).update(pane -> {
+            }}).grow().padRight(10);
+            t.pane(p -> filterTable = p.marginRight(6)).update(pane -> {
                 if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
                     return;
                 }
@@ -196,7 +198,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 }else{
                     Core.scene.setScrollFocus(null);
                 }
-            }).get().setScrollingDisabled(true, false);
+            }).grow().get().setScrollingDisabled(true, false);
         }).grow();
 
         buffer1 = create();
@@ -218,8 +220,10 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void rebuildFilters(){
+        int cols = Math.max((int)(filterTable.getParent().getWidth() / Unit.dp.scl(290f)), 1);
         filterTable.clearChildren();
-        filterTable.top();
+        filterTable.top().left();
+        int i = 0;
 
         for(GenerateFilter filter : filters){
 
@@ -227,6 +231,7 @@ public class MapGenerateDialog extends FloatingDialog{
             filterTable.table("button", c -> {
                 //icons to perform actions
                 c.table(t -> {
+                    t.top();
                     t.add(filter.name()).padTop(5).color(Pal.accent).growX().left();
 
                     t.row();
@@ -273,8 +278,10 @@ public class MapGenerateDialog extends FloatingDialog{
                         f.row();
                     }
                 }).grow().left().pad(2);
-            }).width(280f).pad(3);
-            filterTable.row();
+            }).width(280f).pad(3).top().left();
+            if(++i % cols == 0){
+                filterTable.row();
+            }
         }
 
         if(filters.isEmpty()){
