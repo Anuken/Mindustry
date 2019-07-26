@@ -9,6 +9,8 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.maps.filters.*;
 
+import static io.anuke.mindustry.Vars.world;
+
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
     public final boolean custom;
@@ -69,7 +71,7 @@ public class Map implements Comparable<Map>{
 
     /** Returns the generation filters that this map uses on load.*/
     public Array<GenerateFilter> filters(){
-        return JsonIO.read(Array.class, tags.get("genfilters", "{}"));
+        return world.maps.readFilters(tags.get("genfilters", ""));
     }
 
     public String author(){

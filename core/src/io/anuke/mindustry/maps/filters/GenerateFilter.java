@@ -68,12 +68,7 @@ public abstract class GenerateFilter{
 
     /** an input for generating at a certain coordinate. should only be instantiated once. */
     public static class GenerateInput{
-        /** input floor */
-        public Floor srcfloor;
-        /** input block */
-        public Block srcblock;
-        /** input overlay */
-        public Block srcore;
+
         /** input size parameters */
         public int x, y, width, height;
 
@@ -85,9 +80,9 @@ public abstract class GenerateFilter{
         TileProvider buffer;
 
         public void apply(int x, int y, Block floor, Block block, Block ore){
-            this.floor = this.srcfloor = (Floor)floor;
-            this.block = this.srcblock = block;
-            this.ore = srcore = ore;
+            this.floor = floor;
+            this.block = block;
+            this.ore = ore;
             this.x = x;
             this.y = y;
         }

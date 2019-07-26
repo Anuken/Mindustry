@@ -29,7 +29,7 @@ public class NoiseFilter extends GenerateFilter{
 
         if(noise > threshold){
             in.floor = floor;
-            if(wallsOnly.test(in.srcblock)) in.block = block;
+            if(wallsOnly.test(in.block)) in.block = block;
         }
     }
 }

@@ -1,13 +1,10 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.collection.LongQueue;
-import io.anuke.arc.util.*;
-import io.anuke.arc.util.serialization.Json;
-import io.anuke.arc.util.serialization.JsonValue;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -46,7 +43,6 @@ public class JsonIO{
         for(Block block : Vars.content.blocks()){
             Class type = block.getClass();
             if(type.isAnonymousClass()) type = type.getSuperclass();
-            Log.info(type);
 
             setSerializer(type, new Serializer<Block>(){
                 @Override

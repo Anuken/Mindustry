@@ -191,7 +191,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public void setOverlay(Block block){
-        setOverlayID(block.id);
+        this.overlay = (Floor)block;
     }
 
     public void clearOverlay(){

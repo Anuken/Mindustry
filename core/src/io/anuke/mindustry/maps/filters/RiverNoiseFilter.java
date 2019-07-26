@@ -30,7 +30,7 @@ public class RiverNoiseFilter extends GenerateFilter{
         if(noise >= threshold){
             in.floor = floor;
 
-            if(in.srcblock.solid){
+            if(in.block.solid){
                 in.block = block;
             }
 

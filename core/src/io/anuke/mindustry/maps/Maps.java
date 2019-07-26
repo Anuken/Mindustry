@@ -10,6 +10,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.filters.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
@@ -179,6 +180,34 @@ public class Maps implements Disposable{
 
         maps.remove(map);
         map.file.delete();
+    }
+
+    /** Reads JSON of filters, returning a new default array if not found.*/
+    @SuppressWarnings("unchecked")
+    public Array<GenerateFilter> readFilters(String str){
+        if(str == null || str.isEmpty()){
+            return Array.with(
+            //stone
+            new ScatterFilter(){{
+                flooronto = Blocks.stone;
+                block = Blocks.rock;
+            }},
+            new ScatterFilter(){{
+                flooronto = Blocks.shale;
+                block = Blocks.shaleBoulder;
+            }},
+            new ScatterFilter(){{
+                flooronto = Blocks.snow;
+                block = Blocks.snowrock;
+            }},
+            new ScatterFilter(){{
+                flooronto = Blocks.ice;
+                block = Blocks.snowrock;
+            }}
+            );
+        }else{
+            return JsonIO.read(Array.class, str);
+        }
     }
 
     public String writeWaves(Array<SpawnGroup> groups){

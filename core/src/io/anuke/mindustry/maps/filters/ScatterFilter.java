@@ -8,8 +8,8 @@ import io.anuke.mindustry.world.Block;
 import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
 public class ScatterFilter extends GenerateFilter{
-    float chance = 0.1f;
-    Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
+    protected float chance = 0.014f;
+    protected Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
 
     {
         options(
@@ -23,7 +23,7 @@ public class ScatterFilter extends GenerateFilter{
     @Override
     public void apply(){
 
-        if(block != Blocks.air && (in.srcfloor == flooronto || flooronto == Blocks.air) && in.srcblock == Blocks.air && chance() <= chance){
+        if(block != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && in.block == Blocks.air && chance() <= chance){
             if(!block.isOverlay()){
                 in.block = block;
             }else{
@@ -31,7 +31,7 @@ public class ScatterFilter extends GenerateFilter{
             }
         }
 
-        if(floor != Blocks.air && (in.srcfloor == flooronto || flooronto == Blocks.air) && chance() <= chance){
+        if(floor != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && chance() <= chance){
             in.floor = floor;
         }
     }
