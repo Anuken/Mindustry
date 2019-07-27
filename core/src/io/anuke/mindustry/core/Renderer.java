@@ -154,6 +154,7 @@ public class Renderer implements ApplicationListener{
                 bloom.dispose();
             }
             bloom = new Bloom(true);
+            bloom.setClearColor(0f, 0f, 0f, 0f);
         }catch(Exception e){
             e.printStackTrace();
             settings.put("bloom", false);
@@ -240,7 +241,6 @@ public class Renderer implements ApplicationListener{
 
         Draw.flush();
         if(bloom != null && !pixelator.enabled()){
-            bloom.setClearColor(0f, 0f, 0f, 0f);
             bloom.capture();
         }
 
