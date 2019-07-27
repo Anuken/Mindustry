@@ -11,20 +11,21 @@ import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
 public class BlendFilter extends GenerateFilter{
     float radius = 2f;
-    Block block = Blocks.stone, floor = Blocks.ice;
+    Block block = Blocks.stone, floor = Blocks.ice, ignore = Blocks.air;
 
     {
         buffered = true;
         options(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
-        new BlockOption("block", () -> block, b -> block = b, anyOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly)
+            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
+            new BlockOption("block", () -> block, b -> block = b, anyOptional),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+            new BlockOption("ignore", () -> ignore, b -> ignore = b, floorsOptional)
         );
     }
 
     @Override
     public void apply(){
-        if(in.floor == block || block == Blocks.air) return;
+        if(in.floor == block || block == Blocks.air || in.floor == ignore) return;
 
         int rad = (int)radius;
         boolean found = false;
