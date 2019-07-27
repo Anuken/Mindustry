@@ -7,6 +7,7 @@ project.ext.mainClassName = "io.anuke.mindustry.desktopsdl.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def IKVM_DIR = System.env.IKVM_HOME
+def getTarget = { return project.hasProperty("target") ? project.properties["target"] : "windows" }
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -35,7 +36,7 @@ task dist(type: Jar, dependsOn: classes) {
     from files(project.assetsDir);
 
     //use target = all for all platforms
-    def target = project.hasProperty("target") ? project.properties["target"] : "windows";
+    def target = getTarget()
     if(target == "windows") exclude('**.so', "**.dylib")
     if(target == "mac") exclude('**.so', "**.dll")
     if(target == "linux") exclude('**.dll', "**.dylib")
@@ -50,7 +51,7 @@ task ikZip(type: Zip){
     def filename = "$appName-windows-${version}"
 
     from "build/libs/$filename"
-    archiveBaseName = "$appName-windows"
+    archiveBaseName = "$appName-${getTarget()}"
 }
 
 task ikdist{

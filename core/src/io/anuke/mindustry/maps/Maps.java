@@ -20,7 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Maps implements Disposable{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands", "tendrils", "caldera", "glacier", "shattered", "wasteland", "veins", "canyon"};
+    private static String[] defaultMapNames = {"fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "canyon", "spiral", "triad", "veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
