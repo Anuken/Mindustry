@@ -1,16 +1,11 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.backends.lwjgl3.Lwjgl3Application;
-import io.anuke.arc.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.Pixmaps;
-import io.anuke.arc.graphics.g2d.SpriteBatch;
-import io.anuke.arc.graphics.g2d.TextureAtlas;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.*;
+import io.anuke.arc.backends.sdl.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.util.*;
 
 public class Upscaler{
     static Res[] resolutions = {
@@ -20,13 +15,13 @@ public class Upscaler{
     };
 
     public static void main(String[] args){
-        new Lwjgl3Application(new ApplicationListener(){
+        new SdlApplication(new ApplicationListener(){
             @Override
             public void init(){
                 scale();
             }
-        }, new Lwjgl3ApplicationConfiguration(){{
-            setInitialVisible(false);
+        }, new SdlConfig(){{
+            initialVisible = false;
         }});
     }
 
