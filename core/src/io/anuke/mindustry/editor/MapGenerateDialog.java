@@ -307,7 +307,7 @@ public class MapGenerateDialog extends FloatingDialog{
             if(++i % 2 == 0) selection.cont.row();
         }
 
-        selection.cont.addButton("Default Ores", () -> {
+        selection.cont.addButton("$filter.defaultores", () -> {
             addDefaultOres(filters);
             rebuildFilters();
             update();
