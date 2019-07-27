@@ -35,6 +35,7 @@ public class Renderer implements ApplicationListener{
     public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
+    private Bloom bloom;
     private Color clearColor;
     private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
     private float camerascale = targetscale;
@@ -43,6 +44,9 @@ public class Renderer implements ApplicationListener{
 
     public Renderer(){
         camera = new Camera();
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
         Lines.setCircleVertices(20);
         Shaders.init();
 
@@ -130,7 +134,46 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         shieldBuffer.dispose();
         blocks.dispose();
+        if(bloom != null){
+            bloom.dispose();
+            bloom = null;
+        }
         Events.fire(new DisposeEvent());
+    }
+
+    @Override
+    public void resize(int width, int height){
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
+    }
+
+    void setupBloom(){
+        try{
+            if(bloom != null){
+                bloom.dispose();
+            }
+            bloom = new Bloom(true);
+            bloom.setClearColor(0f, 0f, 0f, 0f);
+        }catch(Exception e){
+            e.printStackTrace();
+            settings.put("bloom", false);
+            settings.save();
+            ui.showError("$error.bloom");
+        }
+    }
+
+    public void toggleBloom(boolean enabled){
+        if(enabled){
+            if(bloom == null){
+                setupBloom();
+            }
+        }else{
+            if(bloom != null){
+                bloom.dispose();
+                bloom = null;
+            }
+        }
     }
 
     void updateShake(float scale){
@@ -197,8 +240,18 @@ public class Renderer implements ApplicationListener{
 
         drawAllTeams(true);
 
+        Draw.flush();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.capture();
+        }
+
         draw(bulletGroup);
         draw(effectGroup);
+
+        Draw.flush();
+        if(bloom != null && !pixelator.enabled()){
+            bloom.render();
+        }
 
         overlays.drawBottom();
         draw(playerGroup, p -> true, Player::drawBuildRequests);
