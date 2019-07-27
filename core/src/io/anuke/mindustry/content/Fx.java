@@ -443,10 +443,10 @@ public class Fx implements ContentList{
             Draw.color();
         });
 
-        fire = new Effect(35f, e -> {
+        fire = new Effect(50f, e -> {
             Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
 
-            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
+            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 9f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
             });
 
