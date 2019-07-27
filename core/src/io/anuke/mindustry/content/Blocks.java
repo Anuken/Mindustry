@@ -770,7 +770,6 @@ public class Blocks implements ContentList{
         thruster = new Wall("thruster"){{
             requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 55 * 16 * wallHealthMultiplier;
-            rotate = true;
             size = 4;
         }};
 
