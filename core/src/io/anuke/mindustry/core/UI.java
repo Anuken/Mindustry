@@ -89,6 +89,7 @@ public class UI implements ApplicationListener{
         });
 
         Colors.put("accent", Pal.accent);
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
         Colors.put("stat", Pal.stat);
 
         loadCursors();

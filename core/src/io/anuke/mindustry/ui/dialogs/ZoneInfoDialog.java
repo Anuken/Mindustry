@@ -103,8 +103,8 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.addImage("whiteui").color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
                 cont.table(desc -> {
-                    desc.left().defaults().left().width(400f);
-                    desc.add(zone.description).wrap().padBottom(8f);
+                    desc.left().defaults().left().width(500f);
+                    desc.add(zone.description).wrap().pad(2).padBottom(8f);
                     desc.row();
 
                     desc.table(t -> {

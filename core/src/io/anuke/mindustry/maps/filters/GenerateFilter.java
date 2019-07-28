@@ -6,7 +6,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.editor.MapGenerateDialog.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -95,12 +94,12 @@ public abstract class GenerateFilter{
             pnoise.setSeed((int)(filter.seed + 1));
         }
 
-        GenTile tile(float x, float y){
+        Tile tile(float x, float y){
             return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 
         public interface TileProvider{
-            GenTile get(int x, int y);
+            Tile get(int x, int y);
         }
     }
 }

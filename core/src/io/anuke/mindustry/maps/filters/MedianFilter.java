@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.filters;
 
-import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.editor.MapGenerateDialog.GenTile;
-import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -29,9 +29,9 @@ public class MedianFilter extends GenerateFilter{
             for(int y = -rad; y <= rad; y++){
                 if(Mathf.dst2(x, y) > rad*rad) continue;
 
-                GenTile tile = in.tile(in.x + x, in.y + y);
-                blocks.add(tile.block);
-                floors.add(tile.floor);
+                Tile tile = in.tile(in.x + x, in.y + y);
+                blocks.add(tile.block().id);
+                floors.add(tile.floor().id);
             }
         }
 

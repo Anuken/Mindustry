@@ -9,7 +9,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.editor.MapGenerateDialog.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -485,10 +484,9 @@ public class World implements ApplicationListener{
             if(!filters.isEmpty()){
                 //input for filter queries
                 GenerateInput input = new GenerateInput();
-                GenTile gtile = new GenTile();
 
                 for(GenerateFilter filter : filters){
-                    input.begin(filter, width(), height(), (x, y) -> gtile.set(tiles[x][y]));
+                    input.begin(filter, width(), height(), (x, y) -> tiles[x][y]);
 
                     //actually apply the filter
                     for(int x = 0; x < width(); x++){

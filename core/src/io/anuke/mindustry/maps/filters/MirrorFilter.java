@@ -6,19 +6,17 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.editor.MapGenerateDialog.*;
-import io.anuke.mindustry.maps.filters.FilterOption.*;
 import io.anuke.mindustry.graphics.*;
-
-import static io.anuke.mindustry.Vars.content;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
+import io.anuke.mindustry.world.*;
 
 public class MirrorFilter extends GenerateFilter{
     private final Vector2 v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2();
 
-    float angle = 45;
+    int angle = 45;
 
     {
-        options(new SliderOption("angle", () -> angle, f -> angle = f, 0, 360, 45));
+        options(new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45));
     }
 
     @Override
@@ -33,10 +31,10 @@ public class MirrorFilter extends GenerateFilter{
 
         if(!left(v1, v2, v3)){
             mirror(v3, v1.x, v1.y, v2.x, v2.y);
-            GenTile tile = in.tile(v3.x, v3.y);
-            in.floor = content.block(tile.floor);
-            in.block = content.block(tile.block);
-            in.ore = content.block(tile.ore);
+            Tile tile = in.tile(v3.x, v3.y);
+            in.floor = tile.floor();
+            in.block = tile.block();
+            in.ore = tile.overlay();
         }
     }
 
@@ -45,8 +43,8 @@ public class MirrorFilter extends GenerateFilter{
         super.draw(image);
 
         Vector2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
-        float imageWidth = vsize.x;
-        float imageHeight = vsize.y;
+        float imageWidth = Math.max(vsize.x, vsize.y);
+        float imageHeight = Math.max(vsize.y, vsize.x);
 
         float size = Math.max(image.getWidth() *2, image.getHeight()*2);
         Consumer<Vector2> clamper = v ->
@@ -65,13 +63,19 @@ public class MirrorFilter extends GenerateFilter{
     }
 
     void mirror(Vector2 p, float x0, float y0, float x1, float y1){
-        float dx = x1 - x0;
-        float dy = y1 - y0;
+        //special case: uneven map mirrored at 45 degree angle
+        if(in.width != in.height && angle % 90 != 0){
+            p.x = (p.x - in.width/2f) * -1 + in.width/2f;
+            p.y = (p.y - in.height/2f) * -1 + in.height/2f;
+        }else{
+            float dx = x1 - x0;
+            float dy = y1 - y0;
 
-        float a  = (dx * dx - dy * dy) / (dx * dx + dy*dy);
-        float b  = 2 * dx * dy / (dx*dx + dy*dy);
+            float a = (dx * dx - dy * dy) / (dx * dx + dy * dy);
+            float b = 2 * dx * dy / (dx * dx + dy * dy);
 
-        p.set((a * (p.x - x0) + b*(p.y - y0) + x0), (b * (p.x - x0) - a*(p.y - y0) + y0));
+            p.set((a * (p.x - x0) + b * (p.y - y0) + x0), (b * (p.x - x0) - a * (p.y - y0) + y0));
+        }
     }
 
     boolean left(Vector2 a, Vector2 b, Vector2 c){

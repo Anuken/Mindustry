@@ -48,6 +48,13 @@ public class MapGenerateDialog extends FloatingDialog{
 
     private GenTile[][] buffer1, buffer2;
     private Consumer<Array<GenerateFilter>> applier;
+    private CachedTile ctile = new CachedTile(){
+        //nothing.
+        @Override
+        protected void changed(){
+
+        }
+    };
 
     /** @param applied whether or not to use the applied in-game mode. */
     public MapGenerateDialog(MapEditor editor, boolean applied){
@@ -84,7 +91,7 @@ public class MapGenerateDialog extends FloatingDialog{
             hidden(this::apply);
         }
 
-        onResize(() -> rebuildFilters());
+        onResize(this::rebuildFilters);
     }
 
     public void show(Array<GenerateFilter> filters, Consumer<Array<GenerateFilter>> applier){
@@ -109,7 +116,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         for(GenerateFilter filter : filters){
-            input.begin(filter, editor.width(), editor.height(), (x, y) -> dset(editor.tile(x, y)));
+            input.begin(filter, editor.width(), editor.height(), editor::tile);
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
@@ -363,7 +370,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 }
 
                 for(GenerateFilter filter : copy){
-                    input.begin(filter, editor.width(), editor.height(), (x, y) -> buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1)][Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)]);
+                    input.begin(filter, editor.width(), editor.height(), (x, y) -> buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1)][Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)].tile());
                     //read from buffer1 and write to buffer2
                     for(int px = 0; px < pixmap.getWidth(); px++){
                         for(int py = 0; py < pixmap.getHeight(); py++){
@@ -411,7 +418,7 @@ public class MapGenerateDialog extends FloatingDialog{
         });
     }
 
-    public static class GenTile{
+    private class GenTile{
         public byte team, rotation;
         public short block, floor, ore;
 
@@ -434,6 +441,15 @@ public class MapGenerateDialog extends FloatingDialog{
         public GenTile set(Tile other){
             set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.rotation());
             return this;
+        }
+
+        Tile tile(){
+            ctile.setFloor((Floor)content.block(floor));
+            ctile.setBlock(content.block(block));
+            ctile.setOverlay(content.block(ore));
+            ctile.rotation(rotation);
+            ctile.setTeam(Team.all[team]);
+            return ctile;
         }
     }
 }
