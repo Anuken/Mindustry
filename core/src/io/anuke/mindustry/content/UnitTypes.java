@@ -90,8 +90,8 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
-            maxVelocity = 1.2f;
-            speed = 0.26f;
+            maxVelocity = 1.25f;
+            speed = 0.28f;
             drag = 0.4f;
             hitsize = 8f;
             mass = 1.75f;

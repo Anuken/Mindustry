@@ -95,6 +95,7 @@ public class Zones implements ContentList{
             baseLaunchCost = ItemStack.with();
             startingItems = ItemStack.list(Items.copper, 400);
             conditionWave = 10;
+            blockRequirements = new Block[]{Blocks.junction, Blocks.router};
             zoneRequirements = ZoneRequirement.with(groundZero, 10);
             resources = new Item[]{Items.copper, Items.lead, Items.coal};
         }};
@@ -103,7 +104,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 200);
             conditionWave = 10;
             zoneRequirements = ZoneRequirement.with(frozenForest, 10);
-            blockRequirements = new Block[]{Blocks.router};
+            blockRequirements = new Block[]{Blocks.mender, Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand, Items.scrap};
         }};
 
@@ -113,7 +114,7 @@ public class Zones implements ContentList{
             launchPeriod = 4;
             loadout = Loadouts.basicNucleus;
             zoneRequirements = ZoneRequirement.with(craters, 40);
-            blockRequirements = new Block[]{Blocks.router};
+            blockRequirements = new Block[]{Blocks.cultivator, Blocks.sporePress};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium, Items.scrap};
         }};
 
@@ -124,7 +125,7 @@ public class Zones implements ContentList{
             conditionWave = 20;
             launchPeriod = 20;
             zoneRequirements = ZoneRequirement.with(desertWastes, 20, craters, 15);
-            blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator};
+            blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator, Blocks.kiln};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
@@ -183,7 +184,7 @@ public class Zones implements ContentList{
             conditionWave = 30;
             launchPeriod = 15;
             zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
-            blockRequirements = new Block[]{Blocks.thermalGenerator};
+            blockRequirements = new Block[]{Blocks.thermalGenerator, Blocks.laserDrill};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
         }};
 
