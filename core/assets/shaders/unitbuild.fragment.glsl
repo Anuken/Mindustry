@@ -43,8 +43,10 @@ void main() {
 	vec4 c = texture2D(u_texture, v_texCoord.xy);
 
     if(1.0-abs(coords.x - 0.5)*2.0 < 1.0-u_progress){
-        c = vec4(0.0);
+    //    c = vec4(0.0);
     }
+
+    c.a *= u_progress;
 
     if(c.a > 0.01){
         float f = abs(sin(coords.x*2.0 + u_time));

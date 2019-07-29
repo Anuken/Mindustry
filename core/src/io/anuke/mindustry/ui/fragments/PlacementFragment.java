@@ -11,7 +11,7 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.UnlockEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
@@ -53,8 +53,10 @@ public class PlacementFragment extends Fragment{
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
-            control.input().block = null;
-            rebuild();
+            Core.app.post(() -> {
+                control.input().block = null;
+                rebuild();
+            });
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -115,7 +117,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> !state.is(State.menu) && ui.hudfrag.shown());
+            full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
                 InputHandler input = control.input();
@@ -142,7 +144,7 @@ public class PlacementFragment extends Fragment{
 
                         ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
                             if(unlocked(block)){
-                                input.block = block;
+                                input.block = input.block == block ? null : block;
                             }
                         }).size(46f).group(group).get();
 
@@ -150,7 +152,8 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
+                            Color color = block.buildVisibility == Blocks.padVisible && !block.buildVisibility.get() ? Pal.noplace :
+                                        state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -161,6 +164,12 @@ public class PlacementFragment extends Fragment{
                                 hovered = null;
                             }
                         });
+                    }
+                    //add missing elements to even out table size
+                    if(index < 4){
+                        for(int i = 0; i < 4-index; i++){
+                            blockTable.add().size(46f);
+                        }
                     }
                     blockTable.act(0f);
                 };
@@ -193,6 +202,10 @@ public class PlacementFragment extends Fragment{
                                 if(unlocked(lastDisplay)){
                                     header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
                                     .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                }
+                                if(lastDisplay.buildVisibility == Blocks.padVisible && !lastDisplay.buildVisibility.get()){
+                                    header.row();
+                                    header.add("$attackpvponly").width(230f).wrap().colspan(3).left();
                                 }
                             }).growX().left();
                             topTable.row();
@@ -238,7 +251,7 @@ public class PlacementFragment extends Fragment{
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("blank").color(Pal.accent).colspan(3).height(3).growX();
+                frame.addImage("whiteui").color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
                 frame.table("pane-2", blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
@@ -262,11 +275,11 @@ public class PlacementFragment extends Fragment{
                         if(f++ % 2 == 0) categories.row();
 
                         if(categoryEmpty[cat.ordinal()]){
-                            categories.addImage("flat");
+                            categories.addImage("flat-trans");
                             continue;
                         }
 
-                        categories.addImageButton("icon-" + cat.name(), "clear-toggle", 16 * 2, () -> {
+                        categories.addImageButton("icon-" + cat.name() + "-med", "clear-toggle-trans", iconsizemed, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat));
@@ -291,7 +304,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.buildCategory == cat && block.isVisible()){
+            if(block.buildCategory == cat && (block.isVisible() || block.buildVisibility == Blocks.padVisible)){
                 returnArray.add(block);
             }
         }
@@ -336,6 +349,6 @@ public class PlacementFragment extends Fragment{
 
     /** Returns the block currently being hovered over in the world. */
     Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : null;
+        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
     }
 }

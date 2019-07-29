@@ -40,7 +40,7 @@ public class Conduit extends LiquidBlock{
 
         ConduitEntity entity = tile.entity();
         entity.blendbits = 0;
-        entity.blendshadowrot = -1;
+        entity.blendrot = 0;
 
         if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
             entity.blendbits = 3;
@@ -52,10 +52,8 @@ public class Conduit extends LiquidBlock{
             entity.blendbits = 4;
         }else if(blends(tile, 1)){
             entity.blendbits = 5;
-            entity.blendshadowrot = 0;
         }else if(blends(tile, 3)){
             entity.blendbits = 1;
-            entity.blendshadowrot = 1;
         }
     }
 
@@ -116,6 +114,6 @@ public class Conduit extends LiquidBlock{
         public float smoothLiquid;
 
         byte blendbits;
-        int blendshadowrot;
+        int blendrot;
     }
 }

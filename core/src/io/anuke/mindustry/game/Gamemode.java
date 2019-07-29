@@ -1,15 +1,18 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.*;
+import io.anuke.arc.function.*;
+import io.anuke.mindustry.maps.*;
 
-/** Defines preset rule sets.. */
+import static io.anuke.mindustry.Vars.waveTeam;
+
+/** Defines preset rule sets. */
 public enum Gamemode{
     survival(rules -> {
         rules.waveTimer = true;
         rules.waves = true;
         rules.unitDrops = true;
-    }),
+    }, map -> map.spawns > 0),
     sandbox(rules -> {
         rules.infiniteResources = true;
         rules.waves = true;
@@ -21,7 +24,7 @@ public enum Gamemode{
         rules.unitDrops = true;
         rules.waves = false;
         rules.attackMode = true;
-    }),
+    }, map -> map.teams.contains(waveTeam.ordinal())),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
@@ -33,7 +36,7 @@ public enum Gamemode{
         rules.unitBuildSpeedMultiplier = 3f;
         rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
-    }),
+    }, map -> map.teams.size > 1),
     editor(true, rules -> {
         rules.infiniteResources = true;
         rules.editor = true;
@@ -44,21 +47,38 @@ public enum Gamemode{
     });
 
     private final Consumer<Rules> rules;
+    private final Predicate<Map> validator;
+
     public final boolean hidden;
+    public final static Gamemode[] all = values();
 
     Gamemode(Consumer<Rules> rules){
         this(false, rules);
     }
 
     Gamemode(boolean hidden, Consumer<Rules> rules){
+         this(hidden, rules, m -> true);
+    }
+
+    Gamemode(Consumer<Rules> rules, Predicate<Map> validator){
+        this(false, rules, validator);
+    }
+
+    Gamemode(boolean hidden, Consumer<Rules> rules, Predicate<Map> validator){
         this.rules = rules;
         this.hidden = hidden;
+        this.validator = validator;
     }
 
     /** Applies this preset to this ruleset. */
     public Rules apply(Rules in){
         rules.accept(in);
         return in;
+    }
+
+    /** @return whether this mode can be played on the specified map. */
+    public boolean valid(Map map){
+        return validator.test(map);
     }
 
     public String description(){

@@ -9,7 +9,6 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.world;
 
 public class DrawOperation{
     private MapEditor editor;
@@ -66,7 +65,7 @@ public class DrawOperation{
                 tile.setFloor((Floor)content.block(to));
             }else if(type == OpType.block.ordinal()){
                 Block block = content.block(to);
-                world.setBlock(tile, block, tile.getTeam(), tile.rotation());
+                tile.setBlock(block, tile.getTeam(), tile.rotation());
             }else if(type == OpType.rotation.ordinal()){
                 tile.rotation(to);
             }else if(type == OpType.team.ordinal()){

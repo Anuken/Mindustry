@@ -37,7 +37,7 @@ public class AdminsDialog extends FloatingDialog{
 
             res.labelWrap("[LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.addImageButton("icon-cancel", 14 * 3, () -> {
+            res.addImageButton("icon-cancel", iconsize, () -> {
                 ui.showConfirm("$confirm", "$confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     playerGroup.all().each(player -> {

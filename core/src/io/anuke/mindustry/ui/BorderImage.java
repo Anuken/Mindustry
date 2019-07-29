@@ -7,7 +7,7 @@ import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.mindustry.graphics.Pal;
 
 public class BorderImage extends Image{
-    private float thickness = 3f;
+    private float thickness = 4f;
 
     public BorderImage(){
 
@@ -34,7 +34,7 @@ public class BorderImage extends Image{
         float scaleX = getScaleX();
         float scaleY = getScaleY();
 
-        Draw.color(Pal.accent);
+        Draw.color(Pal.gray);
         Draw.alpha(parentAlpha);
         Lines.stroke(Unit.dp.scl(thickness));
         Lines.rect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);

@@ -37,8 +37,6 @@ public class Vars{
     public static final String donationURL = "https://anuke.itch.io/mindustry/purchase";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
-    /** URL for Github API for releases */
-    public static final String releasesURL = "https://api.github.com/repos/Anuken/Mindustry/releases";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
     /** maximum distance between mine and core that supports automatic transferring */
@@ -47,6 +45,8 @@ public class Vars{
     public static final Team defaultTeam = Team.blue;
     /** team of the enemy in waves/sectors */
     public static final Team waveTeam = Team.red;
+    /** whether to enable editing of units in the editor */
+    public static final boolean enableUnitEditing = false;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
@@ -55,6 +55,14 @@ public class Vars{
     public static final float itemSize = 5f;
     /** extra padding around the world; units outside this bound will begin to self-destruct. */
     public static final float worldBounds = 100f;
+    /** default size of UI icons.*/
+    public static final int iconsize = 48;
+    /** size of UI icons (small)*/
+    public static final int iconsizesmall = 32;
+    /** size of UI icons (medium)*/
+    public static final int iconsizemed = 30;
+    /** size of UI icons (medium)*/
+    public static final int iconsizetiny = 16;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */
@@ -84,6 +92,10 @@ public class Vars{
     };
     /** default server port */
     public static final int port = 6567;
+    /** multicast discovery port.*/
+    public static final int multicastPort = 20151;
+    /** multicast group for discovery.*/
+    public static final String multicastGroup = "227.2.7.7";
     /** if true, UI is not drawn */
     public static boolean disableUI;
     /** if true, game is set up in mobile mode, even on desktop. used for debugging */
@@ -120,6 +132,7 @@ public class Vars{
     public static GameState state;
     public static GlobalData data;
     public static EntityCollisions collisions;
+    public static DefaultWaves defaultWaves;
 
     public static Control control;
     public static Logic logic;
@@ -168,6 +181,7 @@ public class Vars{
             content.setVerbose();
         }
 
+        defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
 
         playerGroup = Entities.addGroup(Player.class).enableMapping();

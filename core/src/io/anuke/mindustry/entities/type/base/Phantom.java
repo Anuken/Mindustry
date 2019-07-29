@@ -1,5 +1,5 @@
 package io.anuke.mindustry.entities.type.base;
 
-public class Phantom extends Drone{
+public class Phantom extends BuilderDrone{
 
 }

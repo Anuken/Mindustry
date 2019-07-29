@@ -1,5 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.annotations.Annotations.Loc;
+import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
@@ -19,11 +21,10 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -47,31 +48,32 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 59;
-    private float isize = 40;
 
     private float coreAttackTime;
     private float lastCoreHP;
+    private Team lastTeam;
     private float coreAttackOpacity = 0f;
 
     public void build(Group parent){
 
         //menu at top left
         parent.fill(cont -> {
-            cont.top().left().visible(() -> !state.is(State.menu));
+            cont.top().left();
 
             if(mobile){
 
                 {
                     Table select = new Table();
 
-                    select.visible(() -> !state.is(State.menu));
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    select.addImageButton("icon-menu", "clear", isize, ui.paused::show);
-                    flip = select.addImageButton("icon-arrow-up", "clear", isize, this::toggleMenus).get();
+                    String style = "clear-trans";
 
-                    select.addImageButton("icon-pause", "clear", isize, () -> {
+                    select.addImageButton("icon-menu-large", style, iconsize, ui.paused::show);
+                    flip = select.addImageButton("icon-arrow-up", style, iconsize, this::toggleMenus).get();
+
+                    select.addImageButton("icon-pause", style, iconsize, () -> {
                         if(Net.active()){
                             ui.listfrag.toggle();
                         }else{
@@ -86,7 +88,7 @@ public class HudFragment extends Fragment{
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", "clear", isize, () -> {
+                    select.addImageButton("icon-settings", style, iconsize, () -> {
                         if(Net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
@@ -102,27 +104,28 @@ public class HudFragment extends Fragment{
                         if(Net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database-small");
+                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
                         }
                     }).get();
 
-                    select.addImage("blank").color(Pal.accent).width(3f).fillY();
+                    select.addImage("whiteui").color(Pal.gray).width(4f).fillY();
 
                     float size = Unit.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
+                    //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
                     int index = 0;
                     for(Element elem : children){
                         int fi = index++;
-                        Core.scene.add(elem);
+                        parent.addChild(elem);
                         elem.visible(() -> {
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(3f, size);
+                                elem.setSize(Unit.dp.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
-                            return !state.is(State.menu);
+                            return true;
                         });
                     }
 
@@ -130,19 +133,26 @@ public class HudFragment extends Fragment{
                 }
 
                 cont.row();
-                cont.addImage("blank").height(3f).color(Pal.accent).fillX();
+                cont.addImage("whiteui").height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
 
             cont.update(() -> {
-                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen()){
+                if(!Core.input.keyDown(Binding.gridMode) && Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.chatOpen() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
                     toggleMenus();
                 }
             });
 
             Table wavesMain, editorMain;
+            boolean[] prev = {false};
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(e -> wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight());
+            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight()).update(s -> {
+                ((Table)s.getParent()).getCell(s).height((wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight()) / Unit.dp.scl(1f));
+                if(prev[0] != wavesMain.isVisible()){
+                    s.getParent().pack();
+                    prev[0] = wavesMain.isVisible();
+                }
+            });
 
             {
                 wavesMain.visible(() -> shown && !state.isEditor());
@@ -156,7 +166,7 @@ public class HudFragment extends Fragment{
 
                 addWaveTable(waves);
                 addPlayButton(btable);
-                wavesMain.add(stack).width(dsize * 4 + 3f);
+                wavesMain.add(stack).width(dsize * 4 + 4f);
                 wavesMain.row();
                 wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
@@ -172,7 +182,7 @@ public class HudFragment extends Fragment{
                         teams.left();
                         int i = 0;
                         for(Team team : Team.all){
-                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> player.setTeam(team))
+                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
@@ -184,68 +194,59 @@ public class HudFragment extends Fragment{
                         }
                     }).left();
 
-                    t.row();
-                    t.addImageTextButton("$editor.spawn", "icon-add", 8*3, () -> {
-                        FloatingDialog dialog = new FloatingDialog("$editor.spawn");
-                        int i = 0;
-                        for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                            dialog.cont.addImageButton("white", 48, () -> {
-                                BaseUnit unit = type.create(player.getTeam());
-                                unit.set(player.x, player.y);
-                                unit.rotation = player.rotation;
-                                unit.add();
-                                //trigger the entity to become visible
-                                unitGroups[player.getTeam().ordinal()].updateEvents();
-                                collisions.updatePhysics( unitGroups[player.getTeam().ordinal()]);
-                                dialog.hide();
-                            }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
-                            if(++i % 4 == 0) dialog.cont.row();
-                        }
-                        dialog.addCloseButton();
-                        dialog.setFillParent(false);
-                        dialog.show();
-                    }).fillX();
+                    if(enableUnitEditing){
 
-                    float[] size = {0};
-                    float[] position = {0, 0};
-
-                    t.row();
-                    t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", 8*3, () -> {
-
-                    }).fillX().update(b -> {
-                        boolean[] found = {false};
-                        if(b.isChecked()){
-                            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                            if(e == null){
-                                Vector2 world = Core.input.mouseWorld();
-                                Units.nearby(world.x, world.y, 1f, 1f, unit -> {
-                                    if(!found[0] && unit instanceof BaseUnit){
-                                        if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
-                                            Effects.effect(Fx.spawn, unit);
-                                            unit.remove();
-                                            unitGroups[unit.getTeam().ordinal()].updateEvents();
-                                            collisions.updatePhysics(unitGroups[unit.getTeam().ordinal()]);
-                                        }
-                                        found[0] = true;
-                                        unit.hitbox(Tmp.r1);
-                                        size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width*2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
-                                        position[0] = unit.x;
-                                        position[1] = unit.y;
-                                    }
-                                });
-                                //TODO check for unit removal, remove unit if needed
+                        t.row();
+                        t.addImageTextButton("$editor.spawn", "icon-add", iconsize, () -> {
+                            FloatingDialog dialog = new FloatingDialog("$editor.spawn");
+                            int i = 0;
+                            for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
+                                dialog.cont.addImageButton("white", 48, () -> {
+                                    Call.spawnUnitEditor(player, type);
+                                    dialog.hide();
+                                }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                                if(++i % 4 == 0) dialog.cont.row();
                             }
-                        }
+                            dialog.addCloseButton();
+                            dialog.setFillParent(false);
+                            dialog.show();
+                        }).fillX();
 
-                        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
-                        Lines.poly(position[0], position[1], 4, size[0]/2f);
-                        Draw.reset();
+                        float[] size = {0};
+                        float[] position = {0, 0};
 
-                        if(!found[0]){
-                            size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
-                        }
-                    });
-                }).width(dsize * 4 + 3f);
+                        t.row();
+                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", iconsize, () -> {}).fillX().update(b -> {
+                            boolean[] found = {false};
+                            if(b.isChecked()){
+                                Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                if(e == null){
+                                    Vector2 world = Core.input.mouseWorld();
+                                    Units.nearby(world.x, world.y, 1f, 1f, unit -> {
+                                        if(!found[0] && unit instanceof BaseUnit){
+                                            if(Core.input.keyTap(KeyCode.MOUSE_LEFT)){
+                                                Call.removeUnitEditor(player, (BaseUnit)unit);
+                                            }
+                                            found[0] = true;
+                                            unit.hitbox(Tmp.r1);
+                                            size[0] = Mathf.lerpDelta(size[0], Tmp.r1.width * 2f + Mathf.absin(Time.time(), 10f, 5f), 0.1f);
+                                            position[0] = unit.x;
+                                            position[1] = unit.y;
+                                        }
+                                    });
+                                }
+                            }
+
+                            Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                            Lines.poly(position[0], position[1], 4, size[0] / 2f);
+                            Draw.reset();
+
+                            if(!found[0]){
+                                size[0] = Mathf.lerpDelta(size[0], 0f, 0.2f);
+                            }
+                        });
+                    }
+                }).width(dsize * 4 + 4f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
 
@@ -263,33 +264,19 @@ public class HudFragment extends Fragment{
         });
 
         //minimap
-        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> !state.is(State.menu) && Core.settings.getBool("minimap")));
+        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap")));
 
         //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
-            t.visible(() -> !state.is(State.menu));
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
-        //out of bounds warning
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
-            t.visible(() -> !state.is(State.menu));
-            t.table("flat", c -> c.add("")
-            .update(l -> {
-                l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f)));
-                l.setText(Core.bundle.format("outofbounds", (int)((boundsCountdown - player.destructTime) / 60f)));
-            }).get().setAlignment(Align.center, Align.center)).margin(6).update(u -> {
-                u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(player.isOutOfBounds()), 0.1f);
-            }).get().color.a = 0f;
-        });
-
-        parent.fill(t -> {
-            t.visible(() -> netServer.isWaitingForPlayers() && !state.is(State.menu));
+            t.visible(() -> netServer.isWaitingForPlayers());
             t.table("button", c -> c.add("$waiting.players"));
         });
 
@@ -306,13 +293,19 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
-                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 ||
-                state.teams.get(player.getTeam()).cores.first().entity == null){
+                if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 || state.teams.get(player.getTeam()).cores.first().entity == null){
                     coreAttackTime = 0f;
                     return false;
                 }
 
                 float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
+
+                if(lastTeam != player.getTeam()){
+                    lastCoreHP = curr;
+                    lastTeam = player.getTeam();
+                    return false;
+                }
+
                 if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
                     coreAttackTime = notifDuration;
                 }
@@ -326,6 +319,7 @@ public class HudFragment extends Fragment{
                 }
 
                 coreAttackTime -= Time.delta();
+                lastTeam = player.getTeam();
 
                 return coreAttackOpacity > 0;
             });
@@ -335,7 +329,7 @@ public class HudFragment extends Fragment{
 
         //launch button
         parent.fill(t -> {
-            t.top().right().visible(() -> !state.is(State.menu));
+            t.top().right();
             TextButton[] testb = {null};
             TextButton button = Elements.newButton("$launch", () -> {
                 FloatingDialog dialog = new FloatingDialog("$launch");
@@ -363,10 +357,10 @@ public class HudFragment extends Fragment{
             button.getStyle().disabledFontColor = Color.WHITE;
             button.margin(16f);
             button.visible(() ->
-            world.isZone() &&
-            world.getZone().metCondition() &&
-            !Net.client() &&
-            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
+                world.isZone() &&
+                world.getZone().metCondition() &&
+                !Net.client() &&
+                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
 
             button.update(() -> {
                 if(world.getZone() == null){
@@ -388,17 +382,41 @@ public class HudFragment extends Fragment{
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.is(State.paused) && !Net.active());
+            t.top().visible(() -> state.isPaused());
             t.table("button", top -> top.add("$paused").pad(6f));
         });
 
         //'saving' indicator
         parent.fill(t -> {
-            t.bottom().visible(() -> !state.is(State.menu) && control.saves.isSaving());
+            t.bottom().visible(() -> control.saves.isSaving());
             t.add("$saveload");
         });
 
-        blockfrag.build(Core.scene.root);
+        blockfrag.build(parent);
+    }
+
+    @Remote(targets = Loc.both, forward = true, called = Loc.both)
+    public static void setPlayerTeamEditor(Player player, Team team){
+        if(state.isEditor()){
+            player.setTeam(team);
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void spawnUnitEditor(Player player, UnitType type){
+        if(state.isEditor()){
+            BaseUnit unit = type.create(player.getTeam());
+            unit.set(player.x, player.y);
+            unit.rotation = player.rotation;
+            unit.add();
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void removeUnitEditor(Player player, BaseUnit unit){
+        if(state.isEditor() && unit != null){
+            unit.remove();
+        }
     }
 
     public void showToast(String text){
@@ -409,7 +427,7 @@ public class HudFragment extends Fragment{
             }
         });
         table.margin(12);
-        table.addImage("icon-check").size(16 * 2).pad(3);
+        table.addImage("icon-check").size(iconsize).pad(3);
         table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
         table.pack();
 
@@ -512,7 +530,7 @@ public class HudFragment extends Fragment{
     }
 
     public void showLaunch(){
-        Image image = new Image("white");
+        Image image = new Image("whiteui");
         image.getColor().a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));
@@ -530,14 +548,33 @@ public class HudFragment extends Fragment{
         }
 
         shown = !shown;
+        if(flip != null){
+            flip.getParent().act(Core.graphics.getDeltaTime());
+        }
     }
 
     private void addWaveTable(TextButton table){
+        StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
-        IntFormat waitingf = new IntFormat("wave.waiting");
+        IntFormat waitingf = new IntFormat("wave.waiting", i -> {
+            ibuild.setLength(0);
+            int m = i/60;
+            int s = i % 60;
+            if(m <= 0){
+                ibuild.append(s);
+            }else{
+                ibuild.append(m);
+                ibuild.append(":");
+                if(s < 10){
+                    ibuild.append("0");
+                }
+                ibuild.append(s);
+            }
+            return ibuild.toString();
+        });
 
         table.clearChildren();
         table.touchable(Touchable.enabled);

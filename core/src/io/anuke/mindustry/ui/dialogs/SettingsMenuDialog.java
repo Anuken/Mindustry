@@ -11,8 +11,7 @@ import io.anuke.arc.scene.event.InputListener;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.graphics.Pal;
@@ -44,22 +43,24 @@ public class SettingsMenuDialog extends SettingsDialog{
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
+
+            rebuildMenu();
         });
 
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image("white")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        titleTable.add(new Image("whiteui")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
         buttons.remove();
 
-        menu = new Table();
+        menu = new Table("button");
 
         Consumer<SettingsTable> s = table -> {
             table.row();
-            table.addImageTextButton("$back", "icon-arrow-left", 10 * 3, this::back).size(240f, 60f).colspan(2).padTop(15f);
+            table.addImageTextButton("$back", "icon-arrow-left", iconsize, this::back).size(240f, 60f).colspan(2).padTop(15f);
         };
 
         game = new SettingsTable(s);
@@ -70,18 +71,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.top();
         prefs.margin(14f);
 
-        menu.defaults().size(300f, 60f).pad(3f);
-        menu.addButton("$settings.game", () -> visible(0));
-        menu.row();
-        menu.addButton("$settings.graphics", () -> visible(1));
-        menu.row();
-        menu.addButton("$settings.sound", () -> visible(2));
-        if(!Vars.mobile){
-            menu.row();
-            menu.addButton("$settings.controls", ui.controls::show);
-        }
-        menu.row();
-        menu.addButton("$settings.language", ui.language::show);
+        rebuildMenu();
 
         prefs.clearChildren();
         prefs.add(menu);
@@ -117,15 +107,34 @@ public class SettingsMenuDialog extends SettingsDialog{
         addSettings();
     }
 
+    void rebuildMenu(){
+        menu.clearChildren();
+
+        String style = "clear";
+
+        menu.defaults().size(300f, 60f);
+        menu.addButton("$settings.game", style, () -> visible(0));
+        menu.row();
+        menu.addButton("$settings.graphics", style, () -> visible(1));
+        menu.row();
+        menu.addButton("$settings.sound", style, () -> visible(2));
+        menu.row();
+        menu.addButton("$settings.language", style, ui.language::show);
+        if(!mobile || Core.settings.getBool("keyboard")){
+            menu.row();
+            menu.addButton("$settings.controls", style, ui.controls::show);
+        }
+    }
+
     void addSettings(){
         //TODO add when sound works again
         //sound.volumePrefs();
         sound.add("[LIGHT_GRAY]there is no sound implemented in v4 yet");
 
         game.screenshakePref();
-        game.checkPref("effects", true);
         if(mobile){
             game.checkPref("autotarget", true);
+            game.checkPref("keyboard", false);
         }
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
@@ -175,7 +184,14 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("fpscap", 125, 5, 125, 5, s -> (s > 120 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
+            if(Core.graphics.getFrameId() > 10){
+                Log.info("changed");
+                Core.settings.put("uiscalechanged", true);
+            }
+            return s + "%";
+        });
+        graphics.sliderPref("fpscap", 241, 5, 241, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
@@ -192,11 +208,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
             if(Core.settings.getBool("fullscreen")){
-                Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
+                Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
 
             if(Core.settings.getBool("borderlesswindow")){
-                Core.graphics.setUndecorated(true);
+                Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
         }else{
             graphics.checkPref("landscape", false, b -> {
@@ -212,12 +228,14 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        graphics.checkPref("effects", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", false);
         graphics.checkPref("animatedshields", !mobile);
+        graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
         graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false);
 
@@ -239,6 +257,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     private void back(){
+        rebuildMenu();
         prefs.clearChildren();
         prefs.add(menu);
     }

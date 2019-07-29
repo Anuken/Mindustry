@@ -57,7 +57,11 @@ public class Separator extends Block{
         }));
 
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+    }
 
+    @Override
+    public boolean canProduce(Tile tile){
+        return tile.entity.items.total() < itemCapacity;
     }
 
     @Override

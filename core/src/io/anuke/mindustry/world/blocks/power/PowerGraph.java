@@ -40,6 +40,7 @@ public class PowerGraph{
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Tile producer : producers){
+            if(producer.entity == null) continue;
             powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
         }
         return powerProduced;
@@ -149,6 +150,13 @@ public class PowerGraph{
     public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
             return;
+        }else if(!consumers.isEmpty() && consumers.first().isEnemyCheat()){
+            //when cheating, just set satisfaction to 1
+            for(Tile tile : consumers){
+                tile.entity.power.satisfaction = 1f;
+            }
+
+            return;
         }
 
         lastFrameUpdated = Core.graphics.getFrameId();
@@ -180,11 +188,6 @@ public class PowerGraph{
     }
 
     public void add(Tile tile){
-        if(tile.block().consumes.hasPower() && !tile.block().consumes.getPower().buffered){
-            //reset satisfaction to zero in case of direct consumer. There is no reason to clear power from buffered consumers.
-            tile.entity.power.satisfaction = 0.0f;
-        }
-
         tile.entity.power.graph = this;
         all.add(tile);
 

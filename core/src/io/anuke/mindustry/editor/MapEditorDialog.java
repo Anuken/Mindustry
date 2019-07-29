@@ -12,23 +12,28 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.style.TextureRegionDrawable;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.TextButton.TextButtonStyle;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.dialogs.FileChooser;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Block.Icon;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.OverlayFloor;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 
 import static io.anuke.mindustry.Vars.*;
@@ -56,12 +61,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor = new MapEditor();
         view = new MapView(editor);
         infoDialog = new MapInfoDialog(editor);
-        generateDialog = new MapGenerateDialog(editor);
+        generateDialog = new MapGenerateDialog(editor, true);
 
         menu = new FloatingDialog("$menu");
         menu.addCloseButton();
 
-        float isize = 16 * 2f;
+        float isize = iconsize;
         float swidth = 180f;
 
         menu.cont.table(t -> {
@@ -77,7 +82,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.row();
 
             t.addImageTextButton("$editor.generate", "icon-editor", isize, () -> {
-                generateDialog.show();
+                generateDialog.show(generateDialog::applyToEditor);
                 menu.hide();
             });
 
@@ -259,6 +264,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void save(){
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
+        editor.getTags().remove("width");
+        editor.getTags().remove("height");
         player.dead = true;
 
         if(name.isEmpty()){
@@ -267,7 +274,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }else{
             Map map = world.maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
-                ui.showError("$editor.save.overwrite");
+                handleSaveBuiltin(map);
             }else{
                 world.maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
@@ -276,6 +283,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.hide();
         saved = true;
+    }
+
+    /** Called when a built-in map save is attempted.*/
+    protected void handleSaveBuiltin(Map map){
+        ui.showError("$editor.save.overwrite");
     }
 
     /**
@@ -305,7 +317,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }).left().margin(0).get();
 
             button.clearChildren();
-            button.addImage(iconname).size(16 * 3).padLeft(10);
+            button.addImage(iconname).size(iconsize).padLeft(10);
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
@@ -323,7 +335,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public Dialog show(){
-        return super.show(Core.scene, Actions.sequence(Actions.alpha(0f), Actions.scaleTo(1f, 1f), Actions.fadeIn(0.3f)));
+        return super.show(Core.scene, Actions.sequence());
     }
 
     @Override
@@ -360,7 +372,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         float amount = 10f, baseSize = 60f;
 
         float size = mobile ? (int)(Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
-        Math.min(Core.graphics.getDisplayMode().height / amount, baseSize);
+        Math.min(Core.graphics.getHeight() / amount, baseSize);
 
         clearChildren();
         table(cont -> {
@@ -372,31 +384,97 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Table tools = new Table().top();
 
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                Table[] lastTable = {null};
 
                 Consumer<EditorTool> addTool = tool -> {
-                    ImageButton button = new ImageButton("icon-" + tool.name(), "clear-toggle");
-                    button.clicked(() -> view.setTool(tool));
-                    button.resizeImage(16 * 2f);
+
+                    ImageButton button = new ImageButton("icon-" + tool.name() + "-small", "clear-toggle");
+                    button.clicked(() -> {
+                        view.setTool(tool);
+                        if(lastTable[0] != null){
+                            lastTable[0].remove();
+                        }
+                    });
+                    button.resizeImage(iconsizesmall);
                     button.update(() -> button.setChecked(view.getTool() == tool));
                     group.add(button);
-                    if(tool == EditorTool.pencil)
-                        button.setChecked(true);
 
-                    tools.add(button);
+                    if(tool.altModes.length > 0){
+                        button.clicked(l -> {
+                            if(!mobile){
+                                //desktop: rightclick
+                                l.setButton(KeyCode.MOUSE_RIGHT);
+                            }
+                        }, e -> {
+                            //need to double tap
+                            if(mobile && e.getTapCount() < 2){
+                                return;
+                            }
+
+                            if(lastTable[0] != null){
+                                lastTable[0].remove();
+                            }
+
+                            Table table = new Table("dialogDim");
+                            table.defaults().size(300f, 70f);
+
+                            for(int i = 0; i < tool.altModes.length; i++){
+                                int mode = i;
+                                String name = tool.altModes[i];
+
+                                table.addButton(b -> {
+                                    b.left();
+                                    b.marginLeft(6);
+                                    b.setStyle(Core.scene.skin.get("clear-toggle", TextButtonStyle.class));
+                                    b.add(Core.bundle.get("toolmode." + name)).left();
+                                    b.row();
+                                    b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.LIGHT_GRAY).left();
+                                }, () -> {
+                                    tool.mode = (tool.mode == mode ? -1 : mode);
+                                    table.remove();
+                                }).update(b -> b.setChecked(tool.mode == mode));
+                                table.row();
+                            }
+
+                            table.update(() -> {
+                                Vector2 v = button.localToStageCoordinates(Tmp.v1.setZero());
+                                table.setPosition(v.x, v.y, Align.topLeft);
+                                if(!isShown()){
+                                    table.remove();
+                                    lastTable[0] = null;
+                                }
+                            });
+
+                            table.pack();
+                            table.act(Core.graphics.getDeltaTime());
+
+                            addChild(table);
+                            lastTable[0] = table;
+                        });
+                    }
+
+
+                    Label mode = new Label("");
+                    mode.setColor(Pal.remove);
+                    mode.update(() -> mode.setText(tool.mode == -1 ? "" : "M" + (tool.mode + 1) + " "));
+                    mode.setAlignment(Align.bottomRight, Align.bottomRight);
+                    mode.touchable(Touchable.disabled);
+
+                    tools.stack(button, mode);
                 };
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton("icon-menu-large", "clear", 16 * 2f, menu::show);
+                tools.addImageButton("icon-menu-large-small", "clear", iconsizesmall, menu::show);
 
-                ImageButton grid = tools.addImageButton("icon-grid", "clear-toggle", 16 * 2f, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton("icon-grid-small", "clear-toggle", iconsizesmall, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton("icon-undo", "clear", 16 * 2f, editor::undo).get();
-                ImageButton redo = tools.addImageButton("icon-redo", "clear", 16 * 2f, editor::redo).get();
+                ImageButton undo = tools.addImageButton("icon-undo-small", "clear", iconsizesmall, editor::undo).get();
+                ImageButton redo = tools.addImageButton("icon-redo-small", "clear", iconsizesmall, editor::redo).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -418,7 +496,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton("icon-arrow-16", "clear", 16 * 2f, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton("icon-arrow-16-small", "clear", iconsizesmall, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -436,7 +514,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton("white", "clear-toggle-partial");
+                    ImageButton button = new ImageButton("whiteui", "clear-toggle-partial");
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -473,13 +551,25 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void doInput(){
-        //tool select
-        for(int i = 0; i < EditorTool.values().length; i++){
-            if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
-                view.setTool(EditorTool.values()[i]);
-                break;
+
+        if(Core.input.ctrl()){
+            //alt mode select
+            //TODO these keycode are unusable, tweak later
+            for(int i = 0; i < view.getTool().altModes.length + 1; i++){
+                if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
+                    view.getTool().mode = i - 1;
+                }
+            }
+        }else{
+            //tool select
+            for(int i = 0; i < EditorTool.values().length; i++){
+                if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
+                    view.setTool(EditorTool.values()[i]);
+                    break;
+                }
             }
         }
+
 
         if(Core.input.keyTap(KeyCode.ESCAPE)){
             if(!menu.isShown()){
@@ -499,6 +589,28 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.Z)){
                 editor.undo();
+            }
+
+            //more undocumented features, fantastic
+            if(Core.input.keyTap(KeyCode.T)){
+
+                //clears all 'decoration' from the map
+                for(int x = 0; x < editor.width(); x++){
+                    for(int y = 0; y < editor.height(); y++){
+                        Tile tile = editor.tile(x, y);
+                        if(tile.block().breakable && tile.block() instanceof Rock){
+                            tile.setBlock(Blocks.air);
+                            editor.renderer().updatePoint(x, y);
+                        }
+
+                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
+                            tile.setOverlay(Blocks.air);
+                            editor.renderer().updatePoint(x, y);
+                        }
+                    }
+                }
+
+                editor.flushOp();
             }
 
             if(Core.input.keyTap(KeyCode.Y)){
@@ -549,7 +661,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region)) continue;
 
-            ImageButton button = new ImageButton("white", "clear-toggle");
+            ImageButton button = new ImageButton("whiteui", "clear-toggle");
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

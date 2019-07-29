@@ -1,22 +1,19 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.noise.Simplex;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Loadout;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
-import io.anuke.mindustry.world.blocks.storage.StorageBlock;
+import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapGenerator extends Generator{
     private Map map;
@@ -57,6 +54,14 @@ public class MapGenerator extends Generator{
         return this;
     }
 
+    {
+        decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01), new Decoration(Blocks.ignarock, Blocks.pebbles, 0.03f));
+    }
+
+    public Map getMap(){
+        return map;
+    }
+
     @Override
     public void init(Loadout loadout){
         this.loadout = loadout;
@@ -73,13 +78,13 @@ public class MapGenerator extends Generator{
             }
         }
 
-        MapIO.loadMap(map);
+        SaveIO.load(map.file);
         Array<Point2> players = new Array<>();
         Array<Point2> enemies = new Array<>();
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                if(tiles[x][y].block() instanceof CoreBlock){
+                if(tiles[x][y].block() instanceof CoreBlock && tiles[x][y].getTeam() == defaultTeam){
                     players.add(new Point2(x, y));
                     tiles[x][y].setBlock(Blocks.air);
                 }
@@ -125,7 +130,9 @@ public class MapGenerator extends Generator{
 
                     if(tile.block() == Blocks.air && !(decor.wall instanceof Floor) && tile.floor() == decor.floor && Mathf.chance(decor.chance)){
                         tile.setBlock(decor.wall);
-                    }else if(tile.floor() == decor.floor && decor.wall instanceof Floor && Mathf.chance(decor.chance)){
+                    }else if(tile.floor() == decor.floor && decor.wall.isOverlay() && Mathf.chance(decor.chance)){
+                        tile.setOverlay(decor.wall);
+                    }else if(tile.floor() == decor.floor && decor.wall.isFloor() && !decor.wall.isOverlay() && Mathf.chance(decor.chance)){
                         tile.setFloor((Floor)decor.wall);
                     }
                 }

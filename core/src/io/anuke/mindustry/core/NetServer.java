@@ -40,7 +40,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 430;
-    private final static float serverSyncTime = 20, kickDuration = 30 * 1000;
+    private final static float serverSyncTime = 15, kickDuration = 30 * 1000;
     private final static Vector2 vector = new Vector2();
     private final static Rectangle viewport = new Rectangle();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
@@ -274,7 +274,7 @@ public class NetServer implements ApplicationListener{
         long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.1f);
+        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.2f);
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;
@@ -282,8 +282,9 @@ public class NetServer implements ApplicationListener{
         player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;
-        player.getPlaceQueue().clear();
+        player.buildQueue().clear();
         for(BuildRequest req : requests){
+            if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
             if(tile == null) continue;
             //auto-skip done requests
@@ -292,11 +293,11 @@ public class NetServer implements ApplicationListener{
             }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                 continue;
             }
-            player.getPlaceQueue().addLast(req);
+            player.buildQueue().addLast(req);
         }
 
         vector.set(x - player.getInterpolator().target.x, y - player.getInterpolator().target.y);
-        //vector.limit(maxMove);
+        vector.limit(maxMove);
 
         float prevx = player.x, prevy = player.y;
         player.set(player.getInterpolator().target.x, player.getInterpolator().target.y);
@@ -473,7 +474,7 @@ public class NetServer implements ApplicationListener{
 
                 //write all entities now
                 dataStream.writeInt(entity.getID()); //write id
-                dataStream.writeByte(sync.getTypeID()); //write type ID
+                dataStream.writeByte(sync.getTypeID().id); //write type ID
                 sync.write(dataStream); //write entity
 
                 sent++;

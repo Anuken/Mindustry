@@ -13,7 +13,6 @@ import io.anuke.mindustry.entities.traits.Entity;
 import static io.anuke.mindustry.Vars.collisions;
 
 public class Entities{
-    public static final int maxLeafObjects = 4;
     private static final Array<EntityGroup<?>> groupArray = new Array<>();
     private static final IntMap<EntityGroup<?>> groups = new IntMap<>();
     private static final Rectangle viewport = new Rectangle();

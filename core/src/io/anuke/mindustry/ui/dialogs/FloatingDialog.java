@@ -11,18 +11,19 @@ import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Net;
 
+import static io.anuke.mindustry.Vars.iconsize;
 import static io.anuke.mindustry.Vars.state;
 
 public class FloatingDialog extends Dialog{
     private boolean wasPaused;
     protected boolean shouldPause;
 
-    public FloatingDialog(String title){
-        super(title, "dialog");
+    public FloatingDialog(String title, String style){
+        super(title, style);
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage("white", Pal.accent)
+        titleTable.addImage("whiteui", Pal.accent)
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -53,6 +54,10 @@ public class FloatingDialog extends Dialog{
         })));
     }
 
+    public FloatingDialog(String title){
+        this(title, "dialog");
+    }
+
     protected void onResize(Runnable run){
         Events.on(ResizeEvent.class, event -> {
             if(isShown()){
@@ -63,7 +68,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, this::hide).size(210f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){

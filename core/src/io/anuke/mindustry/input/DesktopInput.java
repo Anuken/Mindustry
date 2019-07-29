@@ -141,7 +141,7 @@ public class DesktopInput extends InputHandler{
 
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
-        //zoom and rotate things
+        //zoom things
         if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
@@ -214,7 +214,7 @@ public class DesktopInput extends InputHandler{
                 mode = placing;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.getPlaceQueue().size == 0 && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }
@@ -222,7 +222,7 @@ public class DesktopInput extends InputHandler{
                 player.isShooting = true;
             }
         }else if(Core.input.keyTap(Binding.deselect) && (block != null || mode != none || player.isBuilding()) &&
-        !(player.getCurrentRequest() != null && player.getCurrentRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
+        !(player.buildRequest() != null && player.buildRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
             if(block == null){
                 player.clearBuilding();
             }

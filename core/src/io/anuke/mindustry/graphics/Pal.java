@@ -11,6 +11,8 @@ public class Pal{
     bulletYellow = Color.valueOf("ffeec9"),
     bulletYellowBack = Color.valueOf("f9c87a"),
 
+    darkMetal = Color.valueOf("6e7080"),
+
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
 
@@ -50,10 +52,11 @@ public class Pal{
     bar = Color.SLATE,
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
-    locked = Color.valueOf("989aa4"),
+    gray = Color.valueOf("454545"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),
+    noplace = Color.valueOf("ffa697"),
     removeBack = Color.valueOf("a73e3e"),
     placeRotate = accent,
     breakInvalid = Color.valueOf("d44b3d"),

@@ -37,8 +37,7 @@ public class Fx implements ContentList{
     @Override
     public void load(){
 
-        none = new Effect(0, 0f, e -> {
-        });
+        none = new Effect(0, 0f, e -> {});
 
         unitSpawn = new Effect(30f, e -> {
             if(!(e.data instanceof BaseUnit)) return;
@@ -444,10 +443,10 @@ public class Fx implements ContentList{
             Draw.color();
         });
 
-        fire = new Effect(35f, e -> {
+        fire = new Effect(50f, e -> {
             Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
 
-            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 7f, (x, y) -> {
+            Angles.randLenVectors(e.id, 2, 2f + e.fin() * 9f, (x, y) -> {
                 Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 1.5f);
             });
 
@@ -583,7 +582,7 @@ public class Fx implements ContentList{
         spawnShockwave = new Effect(20f, 400f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.5f);
-            Lines.poly(e.x, e.y, 60, e.fin() * (e.rotation + 50f));
+            Lines.poly(e.x, e.y, 40, e.fin() * (e.rotation + 50f));
             Draw.reset();
         });
 
@@ -792,8 +791,9 @@ public class Fx implements ContentList{
             Draw.color(Color.LIGHT_GRAY, Color.GRAY, e.fin());
 
             for(int i : Mathf.signs){
+                float ex = e.x, ey = e.y, fout = e.fout();
                 Angles.randLenVectors(e.id, 4, 1f + e.finpow() * 11f, e.rotation + 90f * i, 20f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
+                    Fill.circle(ex + x, ey + y, fout * 1.5f);
                 });
             }
 
@@ -816,8 +816,9 @@ public class Fx implements ContentList{
             Draw.color(Color.LIGHT_GRAY);
 
             for(int i : Mathf.signs){
+                float ex = e.x, ey = e.y, fout = e.fout();
                 Angles.randLenVectors(e.id, 4, -e.finpow() * 15f, e.rotation + 90f * i, 25f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
+                    Fill.circle(ex + x, ey + y, fout * 2f);
                 });
             }
 

@@ -7,24 +7,22 @@ import io.anuke.arc.util.Tmp;
 
 public class Shapes{
 
-    public static void laser(String line, String edge, float x, float y, float x2, float y2, float scale){
+    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
         laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
     }
 
-    public static void laser(String line, String edge, float x, float y, float x2, float y2){
+    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
         laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
     }
 
-    public static void laser(String line, String edge, float x, float y, float x2, float y2, float rotation, float scale){
-        TextureRegion region = Core.atlas.find(edge);
-
+    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
         Tmp.v1.trns(rotation, 8f * scale * Draw.scl);
 
-        Draw.rect(Core.atlas.find(edge), x, y, region.getWidth() * scale * Draw.scl, region.getHeight() * scale * Draw.scl, rotation + 180);
-        Draw.rect(Core.atlas.find(edge), x2, y2, region.getWidth() * scale * Draw.scl, region.getHeight() * scale * Draw.scl, rotation);
+        Draw.rect(edge, x, y, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation + 180);
+        Draw.rect(edge, x2, y2, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation);
 
         Lines.stroke(12f * scale);
-        Lines.line(Core.atlas.find(line), x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
+        Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
         Lines.stroke(1f);
     }
 

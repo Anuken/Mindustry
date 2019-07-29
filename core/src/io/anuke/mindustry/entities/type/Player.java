@@ -12,11 +12,11 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
@@ -33,7 +33,7 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Player extends Unit implements BuilderTrait, ShooterTrait{
+public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
     private static final int timerShootLeft = 0;
@@ -113,6 +113,11 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         setNet(tile.drawx(), tile.drawy());
         clearItem();
         heal();
+    }
+
+    @Override
+    public TypeID getTypeID(){
+        return TypeIDs.player;
     }
 
     @Override
@@ -241,7 +246,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     }
 
     @Override
-    public Queue<BuildRequest> getPlaceQueue(){
+    public Queue<BuildRequest> buildQueue(){
         return placeQueue;
     }
 
@@ -362,7 +367,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     public void drawOver(){
         if(dead) return;
 
-        drawBuilding();
+        drawMechanics();
     }
 
     @Override
@@ -428,8 +433,8 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
         BuildRequest last = null;
-        for(BuildRequest request : getPlaceQueue()){
-            if(getCurrentRequest() == request && request.progress > 0.001f) continue;
+        for(BuildRequest request : buildQueue()){
+            if(request.progress > 0.01f || (buildRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
                 Block block = world.ltile(request.x, request.y).block();
@@ -551,7 +556,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         if(!isLocal){
             interpolate();
-            updateBuilding(); //building happens even with non-locals
+            updateMechanics(); //building happens even with non-locals
             status.update(this); //status effect updating also happens with non locals for effect purposes
             updateVelocityStatus(); //velocity too, for visual purposes
 
@@ -564,22 +569,22 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             data.unlockContent(mech);
         }
 
-        if(mobile){
-            updateFlying();
+        if(mobile && !Core.settings.getBool("keyboard")){
+            updateTouch();
         }else{
-            updateMech();
+            updateKeyboard();
         }
 
         isTyping = ui.chatfrag.chatOpen();
 
-        updateBuilding();
+        updateMechanics();
 
         if(!mech.flying){
             clampPosition();
         }
     }
 
-    protected void updateMech(){
+    protected void updateKeyboard(){
         Tile tile = world.tileWorld(x, y);
 
         isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
@@ -646,7 +651,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
         }
     }
 
-    protected void updateFlying(){
+    protected void updateTouch(){
         if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
             target = null;
         }
@@ -657,6 +662,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
 
         float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
         float attractDst = 15f;
+        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
 
         if(moveTarget != null && !moveTarget.isDead()){
             targetX = moveTarget.getX();
@@ -669,7 +675,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             }
 
             if(dst(moveTarget) <= 2f * Time.delta()){
-                if(tapping){
+                if(tapping && !isDead()){
                     Tile tile = ((TileEntity)moveTarget).tile;
                     tile.block().tapped(tile, this);
                 }
@@ -680,7 +686,7 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             moveTarget = null;
         }
 
-        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(isBoosting && !mech.flying ? mech.boostSpeed : mech.speed);
+        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(speed);
         movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
 
         if(dst(targetX, targetY) < attractDst){
@@ -855,13 +861,13 @@ public class Player extends Unit implements BuilderTrait, ShooterTrait{
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
             Tile stile = world.tile(spawner);
-            if(stile != null && stile.entity instanceof SpawnerTrait){
-                lastSpawner = (SpawnerTrait)stile.entity;
-            }
             Player player = headless ? this : Vars.player;
             player.readSaveSuper(stream, version);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;
+            if(stile != null && stile.entity instanceof SpawnerTrait){
+                player.lastSpawner = (SpawnerTrait)stile.entity;
+            }
         }
     }
 

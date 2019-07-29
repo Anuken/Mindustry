@@ -65,25 +65,25 @@ public class LoadDialog extends FloatingDialog{
             button.table(t -> {
                 t.right();
 
-                t.addImageButton("icon-floppy", "emptytoggle", 14 * 3, () -> {
+                t.addImageButton("icon-floppy", "emptytoggle", iconsize, () -> {
                     slot.setAutosave(!slot.isAutosave());
                 }).checked(slot.isAutosave()).right();
 
-                t.addImageButton("icon-trash", "empty", 14 * 3, () -> {
+                t.addImageButton("icon-trash", "empty", iconsize, () -> {
                     ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                         slot.delete();
                         setup();
                     });
-                }).size(14 * 3).right();
+                }).size(iconsize).right();
 
-                t.addImageButton("icon-pencil-small", "empty", 14 * 3, () -> {
+                t.addImageButton("icon-pencil", "empty", iconsize, () -> {
                     ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                         slot.setName(text);
                         setup();
                     });
-                }).size(14 * 3).right();
+                }).size(iconsize).right();
 
-                t.addImageButton("icon-save", "empty", 14 * 3, () -> {
+                t.addImageButton("icon-save", "empty", iconsize, () -> {
                     if(!ios){
                         Platform.instance.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
                             try{
@@ -102,7 +102,7 @@ public class LoadDialog extends FloatingDialog{
                             ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                         }
                     }
-                }).size(14 * 3).right();
+                }).size(iconsize).right();
 
 
             }).padRight(-10).growX();
@@ -147,7 +147,7 @@ public class LoadDialog extends FloatingDialog{
 
         if(ios) return;
 
-        slots.addImageTextButton("$save.import", "icon-add", 14 * 3, () -> {
+        slots.addImageTextButton("$save.import", "icon-add", iconsize, () -> {
             Platform.instance.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{

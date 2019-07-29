@@ -15,8 +15,9 @@ import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.traits.TypeTrait;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.RemoteReadClient;
@@ -24,6 +25,7 @@ import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.modules.ItemModule;
 
@@ -229,8 +231,8 @@ public class NetClient implements ApplicationListener{
                 int id = input.readInt();
                 byte typeID = input.readByte();
 
-                SyncTrait entity = (SyncTrait)group.getByID(id);
-                boolean add = false;
+                SyncTrait entity = group == null ? null : (SyncTrait)group.getByID(id);
+                boolean add = false, created = false;
 
                 if(entity == null && id == player.id){
                     entity = player;
@@ -239,15 +241,24 @@ public class NetClient implements ApplicationListener{
 
                 //entity must not be added yet, so create it
                 if(entity == null){
-                    entity = (SyncTrait)TypeTrait.getTypeByID(typeID).get(); //create entity from supplier
+                    entity = (SyncTrait)content.<TypeID>getByID(ContentType.typeid, typeID).constructor.get();
                     entity.resetID(id);
                     if(!netClient.isEntityUsed(entity.getID())){
                         add = true;
                     }
+                    created = true;
                 }
 
                 //read the entity
                 entity.read(input);
+
+                if(created && entity.getInterpolator() != null && entity.getInterpolator().target != null){
+                    //set initial starting position
+                    entity.setNet(entity.getInterpolator().target.x, entity.getInterpolator().target.y);
+                    if(entity instanceof Unit && entity.getInterpolator().targets.length > 0){
+                        ((Unit)entity).rotation = entity.getInterpolator().targets[0];
+                    }
+                }
 
                 if(add){
                     entity.add();
@@ -360,11 +371,11 @@ public class NetClient implements ApplicationListener{
         if(timer.get(0, playerSyncTime)){
             BuildRequest[] requests;
             //limit to 10 to prevent buffer overflows
-            int usedRequests = Math.min(player.getPlaceQueue().size, 10);
+            int usedRequests = Math.min(player.buildQueue().size, 10);
 
             requests = new BuildRequest[usedRequests];
             for(int i = 0; i < usedRequests; i++){
-                requests[i] = player.getPlaceQueue().get(i);
+                requests[i] = player.buildQueue().get(i);
             }
 
             Call.onClientShapshot(lastSent++, player.x, player.y,

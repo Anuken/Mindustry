@@ -1,7 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -19,6 +18,7 @@ import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
@@ -80,6 +80,15 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.drag;
     }
 
+    @Override
+    public TypeID getTypeID(){
+        return type.typeID;
+    }
+
+    public @Nullable Tile getSpawner(){
+        return world.tile(spawner);
+    }
+
     /** Initialize the type and team of this unit. Only call once! */
     public void init(UnitType type, Team team){
         if(this.type != null) throw new RuntimeException("This unit is already initialized!");
@@ -101,17 +110,16 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean targetHasFlag(BlockFlag flag){
-        return target instanceof TileEntity && ((TileEntity)target).tile.block().flags.contains(flag);
+        return (target instanceof TileEntity && ((TileEntity)target).tile.block().flags.contains(flag)) ||
+        (target instanceof Tile && ((Tile)target).block().flags.contains(flag));
     }
 
     public void setState(UnitState state){
         this.state.set(state);
     }
 
-    public void retarget(Runnable run){
-        if(timer.get(timerTarget, 20)){
-            run.run();
-        }
+    public boolean retarget(){
+        return timer.get(timerTarget, 20);
     }
 
     /** Only runs when the unit has a target. */

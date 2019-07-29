@@ -1,11 +1,9 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.BiConsumer;
 import io.anuke.arc.function.Consumer;
-import io.anuke.arc.net.HttpRequestBuilder;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
@@ -29,16 +27,7 @@ public class Net{
     private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
     private static ClientProvider clientProvider;
     private static ServerProvider serverProvider;
-
     private static IntMap<StreamBuilder> streams = new IntMap<>();
-
-    public static boolean hasClient(){
-        return clientProvider != null;
-    }
-
-    public static boolean hasServer(){
-        return serverProvider != null;
-    }
 
     /** Display a network error. Call on the graphics thread. */
     public static void showError(Throwable e){
@@ -52,24 +41,30 @@ public class Net{
 
             String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
             String type = t.getClass().toString().toLowerCase();
+            boolean isError = false;
 
             if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
                 error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch")){
                 error = Core.bundle.get("error.mismatch");
-            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address"))){
+            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.parseException(e, true).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Core.bundle.get("error.unreachable");
             }else if(type.contains("timeout")){
                 error = Core.bundle.get("error.timedout");
-            }else if(error.equals("alreadyconnected")){
+            }else if(error.equals("alreadyconnected") || error.contains("connection is closed")){
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
                 error = Core.bundle.get("error.any") + "\n" + Strings.parseException(e, true);
+                isError = true;
             }
 
-            ui.showText("", Core.bundle.format("connectfail", error));
+            if(isError){
+                ui.showError(Core.bundle.format("connectfail", error));
+            }else{
+                ui.showText("", Core.bundle.format("connectfail", error));
+            }
             ui.loadfrag.hide();
 
             if(Net.client()){
@@ -331,31 +326,6 @@ public class Net{
         serverProvider = null;
         server = false;
         active = false;
-    }
-
-    public static void http(String url, String method, Consumer<String> listener, Consumer<Throwable> failure){
-        http(url, method, null, listener, failure);
-    }
-
-    public static void http(String url, String method, String body, Consumer<String> listener, Consumer<Throwable> failure){
-        HttpRequest req = new HttpRequestBuilder().newRequest()
-        .method(method).url(url).content(body).build();
-
-        Core.net.sendHttpRequest(req, new HttpResponseListener(){
-            @Override
-            public void handleHttpResponse(HttpResponse httpResponse){
-                listener.accept(httpResponse.getResultAsString());
-            }
-
-            @Override
-            public void failed(Throwable t){
-                failure.accept(t);
-            }
-
-            @Override
-            public void cancelled(){
-            }
-        });
     }
 
     public enum SendMode{

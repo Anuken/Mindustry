@@ -1,11 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.ui.BorderImage;
@@ -13,21 +11,33 @@ import io.anuke.mindustry.ui.BorderImage;
 import static io.anuke.mindustry.Vars.*;
 
 public class MapPlayDialog extends FloatingDialog{
-    Difficulty difficulty = Difficulty.normal;
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
+    Map lastMap;
 
     public MapPlayDialog(){
         super("");
         setFillParent(false);
+
+        onResize(() -> {
+            if(lastMap != null){
+                show(lastMap);
+            }
+        });
     }
 
     public void show(Map map){
+        this.lastMap = map;
         title.setText(map.name());
         cont.clearChildren();
-        rules = map.rules();
 
+        //reset to any valid mode after switching to attack (one must exist)
+        if(!selectedGamemode.valid(map)){
+            selectedGamemode = Structs.find(Gamemode.all, m -> m.valid(map));
+        }
+
+        rules = map.rules();
         rules = selectedGamemode.apply(map.rules());
 
         Table selmode = new Table();
@@ -40,14 +50,10 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            if((mode == Gamemode.attack && !map.hasEnemyCore()) || (mode == Gamemode.pvp && !map.hasOtherCores())){
-                continue;
-            }
-
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
                 rules = mode.apply(map.rules());
-            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f);
+            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
             if(i++ % 2 == 1) modes.row();
         }
         selmode.add(modes);
@@ -55,40 +61,19 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-
-        Difficulty[] ds = Difficulty.values();
-
-        float s = 50f;
-
-        Table sdif = new Table();
-
-        sdif.add("$setting.difficulty.name").colspan(3);
-        sdif.row();
-        sdif.defaults().height(s + 4);
-        sdif.addImageButton("icon-arrow-left", 10 * 3, () -> {
-            difficulty = (ds[Mathf.mod(difficulty.ordinal() - 1, ds.length)]);
-            state.wavetime = difficulty.waveTime;
-        }).width(s);
-
-        sdif.addButton("", () -> {}).update(t -> {
-            t.setText(difficulty.toString());
-            t.touchable(Touchable.disabled);
-        }).width(180f);
-
-        sdif.addImageButton("icon-arrow-right", 10 * 3, () -> {
-            difficulty = (ds[Mathf.mod(difficulty.ordinal() + 1, ds.length)]);
-            state.wavetime = difficulty.waveTime;
-        }).width(s);
-        sdif.addButton("$customize", () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(140).padLeft(10);
-
-        cont.add(sdif);
+        cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
+        //only maps with survival are valid for high scores
+        if(Gamemode.survival.valid(map)){
+            cont.row();
+            cont.label((() -> Core.bundle.format("level.highscore", map.getHightScore()))).pad(3f);
+        }
 
         buttons.clearChildren();
         addCloseButton();
 
-        buttons.addImageTextButton("$play", "icon-play", 8*3, () -> {
+        buttons.addImageTextButton("$play", "icon-play", iconsize, () -> {
             control.playMap(map, rules);
             hide();
             ui.custom.hide();

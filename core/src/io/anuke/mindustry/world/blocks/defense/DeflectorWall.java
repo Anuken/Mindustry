@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.Time;
@@ -35,7 +35,7 @@ public class DeflectorWall extends Wall{
         Draw.color(Color.WHITE);
         Draw.alpha(entity.hit * 0.5f);
         Draw.blend(Blending.additive);
-        Draw.rect("blank", tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
+        Fill.rect(tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
         Draw.blend();
         Draw.reset();
 

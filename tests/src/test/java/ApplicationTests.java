@@ -1,6 +1,6 @@
 import io.anuke.arc.ApplicationCore;
+import io.anuke.arc.Core;
 import io.anuke.arc.backends.headless.HeadlessApplication;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -10,12 +10,14 @@ import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.base.Spirit;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.entities.type.base.*;
+import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
@@ -216,6 +218,16 @@ public class ApplicationTests{
     }
 
     @Test
+    void loadOldSave(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("build77.msav"));
+
+        //just tests if the map was loaded properly and didn't crash, no validity checks currently
+        assertEquals(276, world.width());
+        assertEquals(10, world.height());
+    }
+
+    @Test
     void inventoryDeposit(){
         depositTest(Blocks.surgeSmelter, Items.copper);
         depositTest(Blocks.vault, Items.copper);
@@ -238,8 +250,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -257,44 +269,11 @@ public class ApplicationTests{
     }
 
     @Test
-    void zoneEmptyWaves(){
-        for(Zone zone : content.zones()){
-            Array<SpawnGroup> spawns = zone.rules.get().spawns;
-            for(int i = 1; i <= 100; i++){
-                int total = 0;
-                for(SpawnGroup spawn : spawns){
-                    total += spawn.getUnitsSpawned(i);
-                }
-
-                assertNotEquals(0, total, "Zone " + zone + " has no spawned enemies at wave " + i);
-            }
-        }
-    }
-
-    @Test
-    void zoneOverflowWaves(){
-        for(Zone zone : content.zones()){
-            Array<SpawnGroup> spawns = zone.rules.get().spawns;
-
-            for(int i = 1; i <= 40; i++){
-                int total = 0;
-                for(SpawnGroup spawn : spawns){
-                    total += spawn.getUnitsSpawned(i);
-                }
-
-                if(total >= 140){
-                    fail("Zone '" + zone + "' has too many spawned enemies at wave " + i + " : " + total);
-                }
-            }
-        }
-    }
-
-    @Test
     void buildingDestruction(){
         initBuilding();
 
-        Spirit d1 = (Spirit)UnitTypes.spirit.create(Team.blue);
-        Spirit d2 = (Spirit)UnitTypes.spirit.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -321,7 +300,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tile[][] tiles = world.createTiles(256 + 20, 10);
+        Tile[][] tiles = world.createTiles(256*2 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){
@@ -334,6 +313,7 @@ public class ApplicationTests{
         for(int x = 5; x < tiles.length && i < content.blocks().size; ){
             Block block = content.block(i++);
             if(block.buildVisibility.get()){
+                x += block.size;
                 tiles[x][5].setBlock(block);
                 x += block.size;
             }

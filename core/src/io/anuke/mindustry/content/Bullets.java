@@ -12,7 +12,6 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shapes;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 
@@ -41,7 +40,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, pyraFlame, fuseShot, driverBolt, healBullet, frag, eruptorShot,
+    fireball, basicFlame, pyraFlame, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil, explode;
@@ -116,6 +115,7 @@ public class Bullets implements ContentList{
             lifetime = 70f;
             bulletWidth = bulletHeight = 14f;
             collidesTiles = false;
+            ammoMultiplier = 2f;
             splashDamageRadius = 45f;
             splashDamage = 50f;
             backColor = Pal.missileYellowBack;
@@ -142,7 +142,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 35f;
+            splashDamage = 27f;
             splashDamageRadius = 15f;
         }};
 
@@ -154,7 +154,7 @@ public class Bullets implements ContentList{
             bulletWidth = 6f;
             bulletHeight = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 26f;
+            splashDamage = 22f;
             splashDamageRadius = 24f;
         }};
 
@@ -171,6 +171,7 @@ public class Bullets implements ContentList{
         flakExplosive = new FlakBulletType(4f, 5){{
             //default bullet type, no changes
             shootEffect = Fx.shootBig;
+            ammoMultiplier = 2f;
         }};
 
         flakSurge = new FlakBulletType(4f, 7){{
@@ -180,19 +181,20 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
         }};
 
-        missileExplosive = new MissileBulletType(1.8f, 10, "missile"){{
+        missileExplosive = new MissileBulletType(2.7f, 10, "missile"){{
             bulletWidth = 8f;
             bulletHeight = 8f;
             bulletShrink = 0f;
             drag = -0.01f;
             splashDamageRadius = 30f;
             splashDamage = 30f;
+            ammoMultiplier = 2f;
             lifetime = 150f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
         }};
 
-        missileIncendiary = new MissileBulletType(2f, 12, "missile"){{
+        missileIncendiary = new MissileBulletType(2.9f, 12, "missile"){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             bulletWidth = 7f;
@@ -208,7 +210,7 @@ public class Bullets implements ContentList{
             incendAmount = 3;
         }};
 
-        missileSurge = new MissileBulletType(3.5f, 15, "bullet"){{
+        missileSurge = new MissileBulletType(4.4f, 15, "bullet"){{
             bulletWidth = 8f;
             bulletHeight = 8f;
             bulletShrink = 0f;
@@ -281,6 +283,7 @@ public class Bullets implements ContentList{
         standardCopper = new BasicBulletType(2.5f, 9, "bullet"){{
             bulletWidth = 7f;
             bulletHeight = 9f;
+            lifetime = 60f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
             ammoMultiplier = 1;
@@ -291,6 +294,7 @@ public class Bullets implements ContentList{
             bulletHeight = 12f;
             reloadMultiplier = 0.6f;
             ammoMultiplier = 2;
+            lifetime = 60f;
         }};
 
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
@@ -299,6 +303,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
             ammoMultiplier = 2;
+            lifetime = 60f;
         }};
 
         standardHoming = new BasicBulletType(3f, 9, "bullet"){{
@@ -307,6 +312,7 @@ public class Bullets implements ContentList{
             homingPower = 5f;
             reloadMultiplier = 1.4f;
             ammoMultiplier = 3;
+            lifetime = 60f;
         }};
 
         standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
@@ -318,6 +324,7 @@ public class Bullets implements ContentList{
             incendAmount = 1;
             incendChance = 0.3f;
             inaccuracy = 3f;
+            lifetime = 60f;
         }};
 
         standardGlaive = new BasicBulletType(4f, 7.5f, "bullet"){{
@@ -328,6 +335,7 @@ public class Bullets implements ContentList{
             incendSpread = 3f;
             incendAmount = 1;
             incendChance = 0.3f;
+            lifetime = 60f;
         }};
 
         standardMechSmall = new BasicBulletType(4f, 9, "bullet"){{
@@ -400,7 +408,7 @@ public class Bullets implements ContentList{
                 super.hit(b);
                 tile = tile.link();
 
-                if(tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
+                if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
                     Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
                     tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
                 }
@@ -573,42 +581,6 @@ public class Bullets implements ContentList{
                         Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rot(), baseLen * lenscales[i], CapStyle.none);
                     }
                 }
-                Draw.reset();
-            }
-        };
-
-        fuseShot = new BulletType(0.01f, 70){
-            int rays = 3;
-            float rayLength = 120f;
-
-            {
-                hitEffect = Fx.hitFuse;
-                shootEffect = smokeEffect = Fx.none;
-                lifetime = 10f;
-                despawnEffect = Fx.none;
-                pierce = true;
-            }
-
-            @Override
-            public void init(Bullet b){
-                for(int i = 0; i < rays; i++){
-                    Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
-                }
-            }
-
-            @Override
-            public void draw(Bullet b){
-                super.draw(b);
-                Draw.color(Color.WHITE, Pal.surge, b.fin());
-                //Draw.alpha(b.fout());
-                for(int i = 0; i < 7; i++){
-                    Tmp.v1.trns(b.rot(), i * 8f);
-                    float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                    Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
-                    Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
-                }
-                Shapes.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
-                Shapes.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
                 Draw.reset();
             }
         };

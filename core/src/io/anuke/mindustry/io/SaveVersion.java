@@ -1,15 +1,14 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.StringMap;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.io.CounterInputStream;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -18,6 +17,9 @@ import static io.anuke.mindustry.Vars.*;
 
 public abstract class SaveVersion extends SaveFileReader{
     public final int version;
+
+    //HACK stores the last read build of the save file, valid after read meta call
+    protected int lastReadBuild;
 
     public SaveVersion(int version){
         this.version = version;
@@ -76,7 +78,9 @@ public abstract class SaveVersion extends SaveFileReader{
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = DefaultWaves.get();
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+        lastReadBuild = map.getInt("build", -1);
+
         Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
@@ -92,13 +96,13 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //floor + overlay
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
+            Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
 
             for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                Tile nextTile = world.tile(j % world.width(), j / world.width());
+                Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
                 if(nextTile.floorID() != tile.floorID() || nextTile.overlayID() != tile.overlayID()){
                     break;
@@ -113,7 +117,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //blocks
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tile(i % world.width(), i / world.width());
+            Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
             if(tile.entity != null){
@@ -126,7 +130,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                    Tile nextTile = world.tile(j % world.width(), j / world.width());
+                    Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
                     if(nextTile.blockID() != tile.blockID()){
                         break;
@@ -220,7 +224,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     SaveTrait save = (SaveTrait)entity;
                     //each entity is a separate chunk.
                     writeChunk(stream, true, out -> {
-                        out.writeByte(save.getTypeID());
+                        out.writeByte(save.getTypeID().id);
                         out.writeByte(save.version());
                         save.writeSave(out);
                     });
@@ -239,7 +243,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 readChunk(stream, true, in -> {
                     byte typeid = in.readByte();
                     byte version = in.readByte();
-                    SaveTrait trait = (SaveTrait)TypeTrait.getTypeByID(typeid).get();
+                    SaveTrait trait = (SaveTrait)content.<TypeID>getByID(ContentType.typeid, typeid).constructor.get();
                     trait.readSave(in, version);
                 });
             }
@@ -247,7 +251,6 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readContentHeader(DataInput stream) throws IOException{
-
         byte mapped = stream.readByte();
 
         MappableContent[][] map = new MappableContent[ContentType.values().length][0];
@@ -283,6 +286,19 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(arr.size);
                 for(Content c : arr){
                     stream.writeUTF(((MappableContent)c).name);
+                }
+            }
+        }
+    }
+
+    /** sometimes it's necessary to remap IDs after the content header is read.*/
+    public void remapContent(){
+        for(Team team : Team.all){
+            if(state.teams.isActive(team)){
+                LongQueue queue = state.teams.get(team).brokenBlocks;
+                for(int i = 0; i < queue.size; i++){
+                    //remap broken block IDs
+                    queue.set(i, BrokenBlock.block(queue.get(i), content.block(BrokenBlock.block(queue.get(i))).id));
                 }
             }
         }

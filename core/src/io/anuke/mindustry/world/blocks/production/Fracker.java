@@ -40,6 +40,11 @@ public class Fracker extends SolidPump{
     public void drawCracks(Tile tile){}
 
     @Override
+    public boolean canProduce(Tile tile){
+        return tile.entity.liquids.get(result) < liquidCapacity;
+    }
+
+    @Override
     public void draw(Tile tile){
         FrackerEntity entity = tile.entity();
 

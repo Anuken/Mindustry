@@ -17,7 +17,7 @@ public class EntityGroup<T extends Entity>{
     private final Array<T> entitiesToRemove = new Array<>(false, 16);
     private final Array<T> entitiesToAdd = new Array<>(false, 16);
     private IntMap<T> map;
-    private QuadTree<T> tree;
+    private QuadTree tree;
     private Consumer<T> removeListener;
     private Consumer<T> addListener;
 
@@ -27,7 +27,7 @@ public class EntityGroup<T extends Entity>{
         this.type = type;
 
         if(useTree){
-            tree = new QuadTree<>(Entities.maxLeafObjects, new Rectangle(0, 0, 0, 0));
+            tree = new QuadTree<>(new Rectangle(0, 0, 0, 0));
         }
     }
 
@@ -124,7 +124,7 @@ public class EntityGroup<T extends Entity>{
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
         if(useTree){
-            tree = new QuadTree<>(Entities.maxLeafObjects, new Rectangle(x, y, w, h));
+            tree = new QuadTree<>(new Rectangle(x, y, w, h));
         }
     }
 

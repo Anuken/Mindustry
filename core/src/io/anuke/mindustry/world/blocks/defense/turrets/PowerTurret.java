@@ -2,6 +2,8 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 public abstract class PowerTurret extends CooledTurret{
     protected BulletType shootType;
@@ -10,6 +12,13 @@ public abstract class PowerTurret extends CooledTurret{
     public PowerTurret(String name){
         super(name);
         hasPower = true;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.damage, shootType.damage, StatUnit.none);
     }
 
     @Override

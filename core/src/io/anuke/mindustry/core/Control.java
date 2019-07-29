@@ -1,31 +1,28 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.GL20;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureAtlas;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.TextField;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.*;
 
-import java.io.IOException;
-import java.nio.IntBuffer;
+import java.io.*;
 
-import static io.anuke.arc.Core.scene;
+import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -43,19 +40,16 @@ public class Control implements ApplicationListener{
     private InputHandler input;
 
     public Control(){
-        IntBuffer buf = BufferUtils.newIntBuffer(1);
-        Core.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
-        int maxSize = buf.get(0);
-
+        batch = new SpriteBatch();
         saves = new Saves();
         data = new GlobalData();
 
+        Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
+
         Core.input.setCatch(KeyCode.BACK, true);
 
-        Effects.setShakeFalloff(10000f);
-
         content.initialize(Content::init);
-        Core.atlas = new TextureAtlas(maxSize < 2048 ? "sprites/sprites_fallback.atlas" : "sprites/sprites.atlas");
+        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
         content.initialize(Content::load, true);
 
@@ -122,7 +116,7 @@ public class Control implements ApplicationListener{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != null){
+            if(state.rules.zone != null && !Net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null){
                     saves.getZoneSlot().delete();
@@ -213,7 +207,7 @@ public class Control implements ApplicationListener{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadGenerator(zone.generator);
-            state.rules = zone.rules.get();
+            zone.rules.accept(state.rules);
             state.rules.zone = zone;
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){
@@ -270,6 +264,38 @@ public class Control implements ApplicationListener{
                 dialog.show();
             });
         }
+
+        if(Core.settings.getBool("uiscalechanged", false)){
+            FloatingDialog dialog = new FloatingDialog("$confirm");
+
+            float[] countdown = {60 * 11};
+            Runnable exit = () -> {
+                Core.settings.put("uiscale", 100);
+                Core.settings.put("uiscalechanged", false);
+                settings.save();
+                dialog.hide();
+                Core.app.exit();
+            };
+
+            dialog.setFillParent(false);
+            dialog.cont.label(() -> {
+                if(countdown[0] <= 0){
+                    exit.run();
+                }
+                return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
+            }).pad(10f).expand().left();
+
+            dialog.buttons.defaults().size(200f, 60f);
+            dialog.buttons.addButton("$uiscale.cancel", exit);
+
+            dialog.buttons.addButton("$ok", () -> {
+                Core.settings.put("uiscalechanged", false);
+                settings.save();
+                dialog.hide();
+            });
+
+            Core.app.post(dialog::show);
+        }
     }
 
     @Override
@@ -321,7 +347,7 @@ public class Control implements ApplicationListener{
                 Time.update();
             }
 
-            if(!scene.hasDialog() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
+            if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
                 Platform.instance.hide();
             }
         }

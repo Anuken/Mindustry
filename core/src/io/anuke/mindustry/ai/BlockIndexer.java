@@ -1,29 +1,26 @@
 package io.anuke.mindustry.ai;
 
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.TileChangeEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Teams.TeamData;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.arc.function.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Class used for indexing special target blocks for AI. */
 @SuppressWarnings("unchecked")
 public class BlockIndexer{
-    /** Size of one ore quadrant. */
-    private final static int oreQuadrantSize = 20;
-    /** Size of one structure quadrant. */
-    private final static int structQuadrantSize = 12;
+    /** Size of one quadrant. */
+    private final static int quadrantSize = 16;
 
     /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
@@ -75,7 +72,7 @@ public class BlockIndexer{
             //create bitset for each team type that contains each quadrant
             structQuadrants = new GridBits[Team.all.length];
             for(int i = 0; i < Team.all.length; i++){
-                structQuadrants[i] = new GridBits(Mathf.ceil(world.width() / (float)structQuadrantSize), Mathf.ceil(world.height() / (float)structQuadrantSize));
+                structQuadrants[i] = new GridBits(Mathf.ceil(world.width() / (float)quadrantSize), Mathf.ceil(world.height() / (float)quadrantSize));
             }
 
             for(int x = 0; x < world.width(); x++){
@@ -94,7 +91,7 @@ public class BlockIndexer{
 
             for(int x = 0; x < quadWidth(); x++){
                 for(int y = 0; y < quadHeight(); y++){
-                    updateQuadrant(world.tile(x * structQuadrantSize, y * structQuadrantSize));
+                    updateQuadrant(world.tile(x * quadrantSize, y * quadrantSize));
                 }
             }
 
@@ -164,13 +161,13 @@ public class BlockIndexer{
         TileEntity closest = null;
         float dst = 0;
 
-        for(int rx = Math.max((int)((x - range) / tilesize / structQuadrantSize), 0); rx <= (int)((x + range) / tilesize / structQuadrantSize) && rx < quadWidth(); rx++){
-            for(int ry = Math.max((int)((y - range) / tilesize / structQuadrantSize), 0); ry <= (int)((y + range) / tilesize / structQuadrantSize) && ry < quadHeight(); ry++){
+        for(int rx = Math.max((int)((x - range) / tilesize / quadrantSize), 0); rx <= (int)((x + range) / tilesize / quadrantSize) && rx < quadWidth(); rx++){
+            for(int ry = Math.max((int)((y - range) / tilesize / quadrantSize), 0); ry <= (int)((y + range) / tilesize / quadrantSize) && ry < quadHeight(); ry++){
 
                 if(!getQuad(team, rx, ry)) continue;
 
-                for(int tx = rx * structQuadrantSize; tx < (rx + 1) * structQuadrantSize && tx < world.width(); tx++){
-                    for(int ty = ry * structQuadrantSize; ty < (ry + 1) * structQuadrantSize && ty < world.height(); ty++){
+                for(int tx = rx * quadrantSize; tx < (rx + 1) * quadrantSize && tx < world.width(); tx++){
+                    for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
                         Tile other = world.ltile(tx, ty);
 
                         if(other == null) continue;
@@ -196,7 +193,7 @@ public class BlockIndexer{
     /**
      * Returns a set of tiles that have ores of the specified type nearby.
      * While each tile in the set is not guaranteed to have an ore directly on it,
-     * each tile will at least have an ore within {@link #oreQuadrantSize} / 2 blocks of it.
+     * each tile will at least have an ore within {@link #quadrantSize} / 2 blocks of it.
      * Only specific ore types are scanned. See {@link #scanOres}.
      */
     public ObjectSet<Tile> getOrePositions(Item item){
@@ -205,12 +202,12 @@ public class BlockIndexer{
 
     /** Find the closest ore block relative to a position. */
     public Tile findClosestOre(float xp, float yp, Item item){
-        Tile tile = Geometry.findClosest(xp, yp, world.indexer.getOrePositions(item));
+        Tile tile = Geometry.findClosest(xp, yp, getOrePositions(item));
 
         if(tile == null) return null;
 
-        for(int x = Math.max(0, tile.x - oreQuadrantSize / 2); x < tile.x + oreQuadrantSize / 2 && x < world.width(); x++){
-            for(int y = Math.max(0, tile.y - oreQuadrantSize / 2); y < tile.y + oreQuadrantSize / 2 && y < world.height(); y++){
+        for(int x = Math.max(0, tile.x - quadrantSize / 2); x < tile.x + quadrantSize / 2 && x < world.width(); x++){
+            for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
                 Tile res = world.tile(x, y);
                 if(res.block() == Blocks.air && res.drop() == item){
                     return res;
@@ -222,8 +219,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 &&
-        tile.getTeam() != Team.none){
+        if(tile.block().flags.size() > 0 && tile.getTeam() != Team.none){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
             for(BlockFlag flag : tile.block().flags){
@@ -239,16 +235,16 @@ public class BlockIndexer{
 
         if(ores == null) return;
 
-        int quadrantX = tile.x / oreQuadrantSize;
-        int quadrantY = tile.y / oreQuadrantSize;
+        int quadrantX = tile.x / quadrantSize;
+        int quadrantY = tile.y / quadrantSize;
         itemSet.clear();
 
-        Tile rounded = world.tile(Mathf.clamp(quadrantX * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
-        Mathf.clamp(quadrantY * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1));
+        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
+        Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
 
         //find all items that this quadrant contains
-        for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
-            for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
+        for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
+            for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                 Tile result = world.tile(x, y);
                 if(result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
 
@@ -273,8 +269,8 @@ public class BlockIndexer{
         if(structQuadrants == null) return;
 
         //this quadrant is now 'dirty', re-scan the whole thing
-        int quadrantX = tile.x / structQuadrantSize;
-        int quadrantY = tile.y / structQuadrantSize;
+        int quadrantX = tile.x / quadrantSize;
+        int quadrantY = tile.y / quadrantSize;
         int index = quadrantX + quadrantY * quadWidth();
 
         for(Team team : Team.all){
@@ -289,8 +285,8 @@ public class BlockIndexer{
             structQuadrants[data.team.ordinal()].set(quadrantX, quadrantY, false);
 
             outer:
-            for(int x = quadrantX * structQuadrantSize; x < world.width() && x < (quadrantX + 1) * structQuadrantSize; x++){
-                for(int y = quadrantY * structQuadrantSize; y < world.height() && y < (quadrantY + 1) * structQuadrantSize; y++){
+            for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
+                for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Tile result = world.ltile(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result.entity != null && result.getTeam() == data.team){
@@ -307,11 +303,11 @@ public class BlockIndexer{
     }
 
     private int quadWidth(){
-        return Mathf.ceil(world.width() / (float)structQuadrantSize);
+        return Mathf.ceil(world.width() / (float)quadrantSize);
     }
 
     private int quadHeight(){
-        return Mathf.ceil(world.height() / (float)structQuadrantSize);
+        return Mathf.ceil(world.height() / (float)quadrantSize);
     }
 
     private void scanOres(){
@@ -324,8 +320,8 @@ public class BlockIndexer{
 
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
-                int qx = (x / oreQuadrantSize);
-                int qy = (y / oreQuadrantSize);
+                int qx = (x / quadrantSize);
+                int qy = (y / quadrantSize);
 
                 Tile tile = world.tile(x, y);
 
@@ -333,8 +329,8 @@ public class BlockIndexer{
                 if(tile.drop() != null && scanOres.contains(tile.drop()) && tile.block() == Blocks.air){
                     ores.get(tile.drop()).add(world.tile(
                     //make sure to clamp quadrant middle position, since it might go off bounds
-                    Mathf.clamp(qx * oreQuadrantSize + oreQuadrantSize / 2, 0, world.width() - 1),
-                    Mathf.clamp(qy * oreQuadrantSize + oreQuadrantSize / 2, 0, world.height() - 1)));
+                    Mathf.clamp(qx * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
+                    Mathf.clamp(qy * quadrantSize + quadrantSize / 2, 0, world.height() - 1)));
                 }
             }
         }

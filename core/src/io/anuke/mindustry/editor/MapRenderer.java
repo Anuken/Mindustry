@@ -118,10 +118,12 @@ public class MapRenderer implements Disposable{
                 wx * tilesize + wall.offset(), wy * tilesize + wall.offset(),
                 region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.rotation() * 90 - 90);
             }else{
+                float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+
                 mesh.draw(idxWall, region,
-                wx * tilesize + wall.offset() + (tilesize - region.getWidth() * Draw.scl) / 2f,
-                wy * tilesize + wall.offset() + (tilesize - region.getHeight() * Draw.scl) / 2f,
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
+                wx * tilesize + wall.offset() + (tilesize - width) / 2f,
+                wy * tilesize + wall.offset() + (tilesize - height) / 2f,
+                width, height);
             }
         }else{
             region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
@@ -144,9 +146,15 @@ public class MapRenderer implements Disposable{
             region = Core.atlas.find("clear-editor");
         }
 
-        mesh.draw(idxDecal, region,
-            wx * tilesize + offsetX, wy * tilesize + offsetY,
-            region.getWidth() * Draw.scl, region.getHeight() * Draw.scl);
+        float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+        if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
+            offsetX = 0;
+            offsetY = 0;
+            width = tilesize;
+            height = tilesize;
+        }
+
+        mesh.draw(idxDecal, region, wx * tilesize + offsetX, wy * tilesize + offsetY, width, height);
         mesh.setColor(Color.WHITE);
     }
 

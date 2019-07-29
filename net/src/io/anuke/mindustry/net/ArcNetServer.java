@@ -1,23 +1,21 @@
 package io.anuke.mindustry.net;
 
-import com.dosse.upnp.UPnP;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
+import com.dosse.upnp.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.net.*;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Net.SendMode;
-import io.anuke.mindustry.net.Net.ServerProvider;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.*;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedSelectorException;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.concurrent.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class ArcNetServer implements ServerProvider{
     final Server server;
@@ -31,10 +29,11 @@ public class ArcNetServer implements ServerProvider{
 
     public ArcNetServer(){
         server = new Server(4096 * 2, 4096, new PacketSerializer());
-        server.setDiscoveryHandler((datagramChannel, fromAddress) -> {
+        server.setMulticast(multicastGroup, multicastPort);
+        server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
-            datagramChannel.send(buffer, fromAddress);
+            handler.respond(buffer);
         });
 
         NetListener listener = new NetListener(){

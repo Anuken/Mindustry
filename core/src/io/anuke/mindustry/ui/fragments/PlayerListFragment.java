@@ -9,6 +9,7 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.Interval;
+import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -81,21 +82,21 @@ public class PlayerListFragment extends Fragment{
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Pal.accent);
+                    Draw.color(Pal.gray);
                     Draw.alpha(parentAlpha);
-                    Lines.stroke(Unit.dp.scl(3f));
+                    Lines.stroke(Unit.dp.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }
             };
             table.margin(8);
-            table.add(new Image(user.mech.iconRegion)).grow();
+            table.add(new Image(user.mech.getContentIcon()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(14 * 2).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
+            button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
 
             if((Net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || Net.server())){
                 button.add().growY();
@@ -105,14 +106,14 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton("icon-ban", "clear-partial", 14 * 2,
+                    t.addImageButton("icon-ban-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmban", () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton("icon-cancel", "clear-partial", 16 * 2,
+                    t.addImageButton("icon-cancel-small", "clear-partial", iconsizesmall,
                     () -> ui.showConfirm("$confirm", "$confirmkick", () -> Call.onAdminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.addImageButton("icon-admin", "clear-toggle-partial", 14 * 2, () -> {
+                    t.addImageButton("icon-admin-small", "clear-toggle-partial", iconsizesmall, () -> {
                         if(Net.client()) return;
 
                         String id = user.uuid;
@@ -128,14 +129,14 @@ public class PlayerListFragment extends Fragment{
                     .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
-                    t.addImageButton("icon-zoom-small", "clear-partial", 14 * 2, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.addImageButton("icon-zoom-small", "clear-partial", iconsizesmall, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage("blank").height(3f).color(state.rules.pvp ? user.getTeam().color : Pal.accent).growX();
+            content.addImage("whiteui").height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
             content.row();
         });
 

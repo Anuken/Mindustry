@@ -127,7 +127,7 @@ public class UnitFactory extends Block{
         Shaders.build.progress = entity.buildTime / produceTime;
         Shaders.build.color.set(Pal.accent);
         Shaders.build.color.a = entity.speedScl;
-        Shaders.build.time = -entity.time / 10f;
+        Shaders.build.time = -entity.time / 20f;
 
         Draw.shader(Shaders.build);
         Draw.rect(region, tile.drawx(), tile.drawy());
@@ -137,7 +137,7 @@ public class UnitFactory extends Block{
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(
-        tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 2f * size - 2f),
+        tile.drawx() + Mathf.sin(entity.time, 20f, Vars.tilesize / 2f * size - 2f),
         tile.drawy(),
         90,
         size * Vars.tilesize - 4f);

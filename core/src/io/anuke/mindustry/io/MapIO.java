@@ -1,20 +1,18 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.StringMap;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.Pixmap.Format;
-import io.anuke.arc.util.io.CounterInputStream;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Pixmap.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
-import java.util.zip.InflaterInputStream;
+import java.util.zip.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -64,9 +62,8 @@ public class MapIO{
     }
 
     public static Pixmap generatePreview(Map map) throws IOException{
-        //by default, it does not have an enemy core or any other cores
-        map.tags.put("enemycore", "false");
-        map.tags.put("othercore", "false");
+        map.spawns = 0;
+        map.teams.clear();
 
         try(InputStream is = new InflaterInputStream(map.file.read(bufferSize)); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             SaveIO.readHeader(stream);
@@ -93,15 +90,7 @@ public class MapIO{
                 public void setTeam(Team team){
                     super.setTeam(team);
                     if(block instanceof CoreBlock){
-                        if(team != defaultTeam){
-                            //map must have other team's cores
-                            map.tags.put("othercore", "true");
-                        }
-
-                        if(team == waveTeam){
-                            //map must have default enemy team's core
-                            map.tags.put("enemycore", "true");
-                        }
+                        map.teams.add(team.ordinal());
                     }
                 }
             };
@@ -126,6 +115,9 @@ public class MapIO{
                         floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.none));
                     }else{
                         floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.none));
+                    }
+                    if(content.block(overlayID) == Blocks.spawn){
+                        map.spawns ++;
                     }
                     return tile;
                 }

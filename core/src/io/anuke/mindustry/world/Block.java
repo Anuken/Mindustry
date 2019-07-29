@@ -27,6 +27,8 @@ import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.OverlayFloor;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -36,6 +38,8 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;
+
+    private static final BooleanProvider invisible = () -> false;
 
     /** whether this block has a tile entity that updates */
     public boolean update;
@@ -102,7 +106,7 @@ public class Block extends BlockStorage{
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
-    public BooleanProvider buildVisibility = () -> false;
+    public BooleanProvider buildVisibility = invisible;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -131,6 +135,10 @@ public class Block extends BlockStorage{
 
     public boolean canBreak(Tile tile){
         return true;
+    }
+
+    public boolean isBuildable(){
+        return buildVisibility != invisible;
     }
 
     public void onProximityRemoved(Tile tile){
@@ -299,7 +307,7 @@ public class Block extends BlockStorage{
 
     @Override
     public TextureRegion getContentIcon(){
-        return icon(Icon.large);
+        return icon(Icon.medium);
     }
 
     @Override
@@ -345,7 +353,7 @@ public class Block extends BlockStorage{
             cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
         }
 
-        if(cracks == null || cracks[0][0].getTexture().isDisposed()){
+        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
                 for(int i = 0; i < crackRegions; i++){
@@ -589,7 +597,8 @@ public class Block extends BlockStorage{
 
     public TextureRegion icon(Icon icon){
         if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ? getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
+            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ?
+                getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
         }
         return icons[icon.ordinal()];
     }
@@ -658,6 +667,18 @@ public class Block extends BlockStorage{
         return buildVisibility.get() && !isHidden();
     }
 
+    public boolean isFloor(){
+        return this instanceof Floor;
+    }
+
+    public boolean isOverlay(){
+        return this instanceof OverlayFloor;
+    }
+
+    public Floor asFloor(){
+        return (Floor)this;
+    }
+
     @Override
     public boolean isHidden(){
         return !buildVisibility.get();
@@ -687,10 +708,11 @@ public class Block extends BlockStorage{
     }
 
     public enum Icon{
+        //these are stored in the UI atlases
         small(8 * 3),
         medium(8 * 4),
         large(8 * 6),
-        /** uses whatever the size of the block is */
+        /** uses whatever the size of the block is. this is always stored in the main game atlas! */
         full(0);
 
         public final int size;

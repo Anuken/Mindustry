@@ -1,23 +1,21 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.OS;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.io.PropertiesUtils;
-import io.anuke.arc.util.serialization.JsonValue;
-import io.anuke.arc.util.serialization.JsonValue.ValueType;
-import io.anuke.arc.util.serialization.JsonWriter.OutputType;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.Version;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.JsonValue.*;
+import io.anuke.arc.util.serialization.JsonWriter.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.file.*;
+import java.time.*;
+import java.time.format.*;
 
 public class CrashSender{
 
@@ -32,7 +30,7 @@ public class CrashSender{
             if(Version.number == 0){
                 try{
                     ObjectMap<String, String> map = new ObjectMap<>();
-                    PropertiesUtils.load(map, new InputStreamReader(CrashSender.class.getResourceAsStream("version.properties")));
+                    PropertiesUtils.load(map, new InputStreamReader(CrashSender.class.getResourceAsStream("/version.properties")));
 
                     Version.type = map.get("type");
                     Version.number = Integer.parseInt(map.get("number"));
@@ -45,8 +43,20 @@ public class CrashSender{
                         Version.build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
                     }
                 }catch(Throwable ignored){
+                    ignored.printStackTrace();
                     Log.err("Failed to parse version.");
                 }
+            }
+
+            try{
+                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
+                Files.write(file.toPath(), parseException(exception).getBytes());
+                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+
+                writeListener.accept(file);
+            }catch(Throwable ignored){
+                Log.err("Failed to save local crash report.");
             }
 
             try{
@@ -61,17 +71,6 @@ public class CrashSender{
             //do not send exceptions that occur for versions that can't be parsed
             if(Version.number == 0){
                 return;
-            }
-
-            try{
-                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
-                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
-                new BufferedOutputStream(new FileOutputStream(file), 2048).write(parseException(exception).getBytes());
-                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
-
-                writeListener.accept(file);
-            }catch(Throwable ignored){
-                Log.err("Failed to save local crash report.");
             }
 
             boolean netActive = false, netServer = false;
@@ -104,7 +103,7 @@ public class CrashSender{
 
             Log.info("Sending crash report.");
             //post to crash report URL
-            Net.http(Vars.crashReportURL, "POST", value.toJson(OutputType.json), r -> {
+            Core.net.httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
                 System.exit(1);

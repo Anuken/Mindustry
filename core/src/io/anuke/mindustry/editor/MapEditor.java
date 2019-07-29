@@ -2,6 +2,8 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
@@ -13,7 +15,6 @@ import io.anuke.mindustry.io.MapIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
-import io.anuke.mindustry.world.blocks.Floor;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -132,18 +133,19 @@ public class MapEditor{
         return world.height();
     }
 
-    public void draw(int x, int y, boolean paint){
-        draw(x, y, paint, drawBlock);
+    public void drawBlocksReplace(int x, int y){
+        drawBlocks(x, y, tile -> tile.block() != Blocks.air || drawBlock.isFloor());
     }
 
-    public void draw(int x, int y, boolean paint, Block drawBlock){
-        draw(x, y, paint, drawBlock, 1.0);
+    public void drawBlocks(int x, int y){
+        drawBlocks(x, y, false, tile -> true);
     }
 
-    public void draw(int x, int y, boolean paint, Block drawBlock, double chance){
-        boolean isfloor = drawBlock instanceof Floor && drawBlock != Blocks.air;
-        Tile[][] tiles = world.getTiles();
+    public void drawBlocks(int x, int y, Predicate<Tile> tester){
+        drawBlocks(x, y, false, tester);
+    }
 
+    public void drawBlocks(int x, int y, boolean square, Predicate<Tile> tester){
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
@@ -157,7 +159,7 @@ public class MapEditor{
                     int worldy = dy + offsety + y;
 
                     if(Structs.inBounds(worldx, worldy, width(), height())){
-                        Tile tile = tiles[worldx][worldy];
+                        Tile tile = tile(worldx, worldy);
 
                         Block block = tile.block();
 
@@ -171,36 +173,66 @@ public class MapEditor{
                 }
             }
 
-            world.setBlock(tiles[x][y], drawBlock, drawTeam);
+            world.setBlock(tile(x, y), drawBlock, drawTeam);
         }else{
-            for(int rx = -brushSize; rx <= brushSize; rx++){
-                for(int ry = -brushSize; ry <= brushSize; ry++){
-                    if(Mathf.dst(rx, ry) <= brushSize - 0.5f && (chance >= 0.999 || Mathf.chance(chance))){
-                        int wx = x + rx, wy = y + ry;
 
-                        if(wx < 0 || wy < 0 || wx >= width() || wy >= height() || (paint && !isfloor && tiles[wx][wy].block() == Blocks.air)){
-                            continue;
-                        }
+            boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
-                        Tile tile = tiles[wx][wy];
+            Consumer<Tile> drawer = tile -> {
+                if(!tester.test(tile)) return;
 
-                        if(!isfloor && (tile.isLinked() || tile.block().isMultiblock())){
-                            world.removeBlock(tile.link());
-                        }
+                //remove linked tiles blocking the way
+                if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
+                    world.removeBlock(tile.link());
+                }
 
-                        if(isfloor){
-                            tile.setFloor((Floor)drawBlock);
-                        }else{
-                            tile.setBlock(drawBlock);
-                            if(drawBlock.synthetic()){
-                                tile.setTeam(drawTeam);
-                            }
-                            if(drawBlock.rotate){
-                                tile.rotation((byte)rotation);
-                            }
-                        }
+                if(isFloor){
+                    tile.setFloor(drawBlock.asFloor());
+                }else{
+                    tile.setBlock(drawBlock);
+                    if(drawBlock.synthetic()){
+                        tile.setTeam(drawTeam);
+                    }
+                    if(drawBlock.rotate){
+                        tile.rotation((byte)rotation);
                     }
                 }
+            };
+
+            if(square){
+                drawSquare(x, y, drawer);
+            }else{
+                drawCircle(x, y, drawer);
+            }
+        }
+    }
+
+    public void drawCircle(int x, int y, Consumer<Tile> drawer){
+        for(int rx = -brushSize; rx <= brushSize; rx++){
+            for(int ry = -brushSize; ry <= brushSize; ry++){
+                if(Mathf.dst2(rx, ry) <= (brushSize - 0.5f) * (brushSize - 0.5f)){
+                    int wx = x + rx, wy = y + ry;
+
+                    if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                        continue;
+                    }
+
+                    drawer.accept(tile(wx, wy));
+                }
+            }
+        }
+    }
+
+    public void drawSquare(int x, int y, Consumer<Tile> drawer){
+        for(int rx = -brushSize; rx <= brushSize; rx++){
+            for(int ry = -brushSize; ry <= brushSize; ry++){
+                int wx = x + rx, wy = y + ry;
+
+                if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                    continue;
+                }
+
+                drawer.accept(tile(wx, wy));
             }
         }
     }

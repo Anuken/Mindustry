@@ -8,17 +8,32 @@ import io.anuke.mindustry.type.Weapon;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-    spirit, phantom,
+    draug, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
     @Override
     public void load(){
+        draug = new UnitType("draug", Draug.class, Draug::new){{
+            isFlying = true;
+            drag = 0.01f;
+            speed = 0.3f;
+            maxVelocity = 1.2f;
+            range = 50f;
+            health = 60;
+            minePower = 0.5f;
+            engineSize = 1.8f;
+            engineOffset = 5.7f;
+            weapon = new Weapon("you have incurred my wrath. prepare to die."){{
+                bullet = Bullets.lancerLaser;
+            }};
+        }};
+
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
             isFlying = true;
             drag = 0.01f;
-            speed = 0.2f;
-            maxVelocity = 0.8f;
+            speed = 0.4f;
+            maxVelocity = 1.6f;
             range = 50f;
             health = 60;
             engineSize = 1.8f;
@@ -26,6 +41,30 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("heal-blaster"){{
                 length = 1.5f;
                 reload = 40f;
+                width = 0.5f;
+                roundrobin = true;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBullet;
+            }};
+        }};
+
+        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
+            isFlying = true;
+            drag = 0.01f;
+            mass = 2f;
+            speed = 0.45f;
+            maxVelocity = 1.9f;
+            range = 70f;
+            itemCapacity = 70;
+            health = 220;
+            buildPower = 0.9f;
+            minePower = 1.1f;
+            engineOffset = 6.5f;
+            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
+            weapon = new Weapon("heal-blaster"){{
+                length = 1.5f;
+                reload = 20f;
                 width = 0.5f;
                 roundrobin = true;
                 ejectEffect = Fx.none;
@@ -51,8 +90,8 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
-            maxVelocity = 1.2f;
-            speed = 0.26f;
+            maxVelocity = 1.25f;
+            speed = 0.28f;
             drag = 0.4f;
             hitsize = 8f;
             mass = 1.75f;
@@ -213,30 +252,6 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
-            isFlying = true;
-            drag = 0.01f;
-            mass = 2f;
-            speed = 0.2f;
-            maxVelocity = 0.9f;
-            range = 70f;
-            itemCapacity = 70;
-            health = 220;
-            buildPower = 0.9f;
-            minePower = 1.1f;
-            engineOffset = 6.5f;
-            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
-            weapon = new Weapon("heal-blaster"){{
-                length = 1.5f;
-                reload = 20f;
-                width = 0.5f;
-                roundrobin = true;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBullet;
-            }};
-        }};
-
         revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
             health = 1000;
             mass = 5f;
@@ -288,6 +303,7 @@ public class UnitTypes implements ContentList{
                 reload = 180f;
                 width = 22f;
                 shots = 22;
+                shootCone = 100f;
                 shotDelay = 2;
                 inaccuracy = 10f;
                 roundrobin = true;
@@ -318,6 +334,7 @@ public class UnitTypes implements ContentList{
                 reload = 10f;
                 width = 32f;
                 shots = 1;
+                shootCone = 100f;
 
                 shake = 1f;
                 inaccuracy = 3f;

@@ -4,8 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Intersector;
@@ -28,8 +27,8 @@ public class PowerNode extends PowerBlock{
     //last distribution block placed
     private static int lastPlaced = -1;
 
-    protected Vector2 t1 = new Vector2();
-    protected Vector2 t2 = new Vector2();
+    protected Vector2 t1 = new Vector2(), t2 = new Vector2();
+    protected TextureRegion laser, laserEnd;
 
     protected float laserRange = 6;
     protected int maxNodes = 3;
@@ -84,6 +83,14 @@ public class PowerNode extends PowerBlock{
             //reflow from other end
             og.reflow(other);
         }
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        laser = Core.atlas.find("laser");
+        laserEnd = Core.atlas.find("laser-end");
     }
 
     @Override
@@ -204,7 +211,7 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link)){
+            if(linkValid(tile, link) && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
                 drawLaser(tile, link);
             }
         }
@@ -237,15 +244,12 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
-
         float x1 = tile.drawx(), y1 = tile.drawy(),
         x2 = target.drawx(), y2 = target.drawy();
 
         float angle1 = Angles.angle(x1, y1, x2, y2);
-        float angle2 = angle1 + 180f;
-
         t1.trns(angle1, tile.block().size * tilesize / 2f - 1.5f);
-        t2.trns(angle2, target.block().size * tilesize / 2f - 1.5f);
+        t2.trns(angle1 + 180f, target.block().size * tilesize / 2f - 1.5f);
 
         x1 += t1.x;
         y1 += t1.y;
@@ -253,10 +257,8 @@ public class PowerNode extends PowerBlock{
         y2 += t2.y;
 
         Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
-        //Lines.stroke(2f);
-        //Lines.line(x1, y1, x2, y2);
-
-        Shapes.laser("laser", "laser-end", x1, y1, x2, y2, 0.6f);
+        Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        Draw.color();
     }
 
 }
