@@ -39,6 +39,8 @@ import static io.anuke.mindustry.Vars.*;
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;
 
+    private static final BooleanProvider invisible = () -> false;
+
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -104,7 +106,7 @@ public class Block extends BlockStorage{
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
-    public BooleanProvider buildVisibility = () -> false;
+    public BooleanProvider buildVisibility = invisible;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -133,6 +135,10 @@ public class Block extends BlockStorage{
 
     public boolean canBreak(Tile tile){
         return true;
+    }
+
+    public boolean isBuildable(){
+        return buildVisibility != invisible;
     }
 
     public void onProximityRemoved(Tile tile){

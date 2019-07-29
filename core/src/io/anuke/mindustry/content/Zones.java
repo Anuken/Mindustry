@@ -34,6 +34,7 @@ public class Zones implements ContentList{
             launchPeriod = 10;
             loadout = Loadouts.advancedShard;
             zoneRequirements = ZoneRequirement.with(groundZero, 20);
+            blockRequirements = new Block[]{Blocks.combustionGenerator};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand};
             rules = r -> {
                 r.waves = true;
@@ -162,6 +163,7 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
         }};
 
+        /*
         crags = new Zone("crags", new MapGenerator("crags").dist(2f)){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
@@ -171,7 +173,7 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(stainedMountains, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
-        }};
+        }};*/
 
         nuclearComplex = new Zone("nuclearComplex", new MapGenerator("nuclearProductionComplex", 1)
         .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
@@ -185,6 +187,7 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
         }};
 
+        /*
         impact0078 = new Zone("impact0078", new MapGenerator("impact0078").dist(2f)){{
             loadout = Loadouts.basicNucleus;
             baseLaunchCost = ItemStack.with();
@@ -194,6 +197,6 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(nuclearComplex, 40);
             blockRequirements = new Block[]{Blocks.thermalGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium};
-        }};
+        }};*/
     }
 }

@@ -1,33 +1,32 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.freetype.FreeTypeFontGenerator;
-import io.anuke.arc.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.freetype.*;
+import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
-import io.anuke.arc.scene.ui.Tooltip.Tooltips;
+import io.anuke.arc.scene.ui.TextField.*;
+import io.anuke.arc.scene.ui.Tooltip.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.editor.MapEditorDialog;
-import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.editor.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
-import static io.anuke.arc.scene.actions.Actions.sequence;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
@@ -78,8 +77,11 @@ public class UI implements ApplicationListener{
         Core.scene = new Scene(skin);
         Core.input.addProcessor(Core.scene);
 
-        Dialog.setShowAction(() -> sequence());
-        Dialog.setHideAction(() -> sequence());
+        //Dialog.setShowAction(() -> sequence(translateTo(Core.graphics.getWidth(), 0f), translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
+        //Dialog.setHideAction(() -> sequence(translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
+
+        Dialog.setShowAction(Actions::sequence);
+        Dialog.setHideAction(Actions::sequence);
 
         Tooltips.getInstance().animations = false;
 
