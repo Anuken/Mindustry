@@ -117,7 +117,7 @@ public class DesktopPlatform extends Platform{
 
             String str = new String(Base64Coder.encode(result));
 
-            if(str.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+            if(str.equals("AAAAAAAAAOA=") || str.equals("AAAAAAAAAAA=")) throw new RuntimeException("Bad UUID.");
 
             return str;
         }catch(Exception e){
@@ -133,6 +133,6 @@ public class DesktopPlatform extends Platform{
         if(bytes == null) return false;
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");
+        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }
