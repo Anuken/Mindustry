@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.ItemFilterValue;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
     public final Predicate<Item> filter;
@@ -33,7 +33,7 @@ public class ConsumeItemFilter extends Consume{
     @Override
     public void build(Tile tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(filter, item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
+        content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Icon.large), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
