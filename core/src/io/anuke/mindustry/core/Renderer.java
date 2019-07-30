@@ -326,8 +326,7 @@ public class Renderer implements ApplicationListener{
         for(Team team : Team.all){
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
-            if(group.count(p -> p.isFlying() == flying) +
-            playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+            if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
             draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
