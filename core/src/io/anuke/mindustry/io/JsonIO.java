@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.type.*;
@@ -35,7 +36,9 @@ public class JsonIO{
 
             @Override
             public Item read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.item, jsonData.asString());
+                if(jsonData.asString() == null) return Items.copper;
+                Item i =  Vars.content.getByName(ContentType.item, jsonData.asString());
+                return i == null ? Items.copper : i;
             }
         });
 

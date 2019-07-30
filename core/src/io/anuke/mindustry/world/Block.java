@@ -584,6 +584,7 @@ public class Block extends BlockStorage{
     public void displayConsumption(Tile tile, Table table){
         table.left();
         for(Consume cons : consumes.all()){
+            if(cons.isOptional() && cons.isBoost()) continue;
             cons.build(tile, table);
         }
     }

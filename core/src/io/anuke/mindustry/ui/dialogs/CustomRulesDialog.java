@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Strings;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.core.Platform;
