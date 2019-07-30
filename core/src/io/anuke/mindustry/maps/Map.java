@@ -77,7 +77,7 @@ public class Map implements Comparable<Map>{
 
     /** Returns the generation filters that this map uses on load.*/
     public Array<GenerateFilter> filters(){
-        if(build != -1 && build < 83 && tags.get("genfilters", "").isEmpty()){
+        if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
             return Array.with();
         }
         return world.maps.readFilters(tags.get("genfilters", ""));
