@@ -2,6 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
@@ -52,6 +53,8 @@ public class Weapon{
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
 
+    public Sound shootSound = Core.audio.newSound(Core.files.internal("sounds/shoot.ogg"));
+
     public TextureRegion region;
 
     protected Weapon(String name){
@@ -88,6 +91,7 @@ public class Weapon{
         float baseX = shooter.getX(), baseY = shooter.getY();
 
         Weapon weapon = shooter.getWeapon();
+        weapon.shootSound.at(x, y);
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
