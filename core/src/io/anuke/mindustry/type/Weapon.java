@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.gen.Sounds;
 import io.anuke.mindustry.net.Net;
 
 public class Weapon{
@@ -53,7 +54,7 @@ public class Weapon{
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
 
-    public Sound shootSound = Core.audio.newSound(Core.files.internal("sounds/shoot.ogg"));
+    public Sound shootSound = Sounds.die;
 
     public TextureRegion region;
 
