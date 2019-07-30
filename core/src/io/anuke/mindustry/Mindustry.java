@@ -21,6 +21,7 @@ public class Mindustry extends ApplicationCore{
         });
 
         Time.mark();
+        UI.loadSystemCursors();
 
         Vars.init();
         Log.setUseColors(false);

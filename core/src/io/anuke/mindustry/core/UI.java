@@ -30,6 +30,9 @@ import io.anuke.mindustry.ui.fragments.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
+    private static final int cursorScaling = 1, outlineThickness = 3;
+    private static final Color outlineColor = Color.valueOf("444444");
+
     private FreeTypeFontGenerator generator;
 
     public MenuFragment menufrag;
@@ -93,8 +96,7 @@ public class UI implements ApplicationListener{
         Colors.put("accent", Pal.accent);
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
         Colors.put("stat", Pal.stat);
-
-        loadCursors();
+        loadExtraCursors();
     }
 
     void loadExtraStyle(Skin skin){
@@ -116,17 +118,17 @@ public class UI implements ApplicationListener{
         skin.add("flat-down", copy, Drawable.class);
     }
 
-    void loadCursors(){
-        int cursorScaling = 1, outlineThickness = 3;
-        Color outlineColor = Color.valueOf("444444");
-
-        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
-        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
+    public static void loadSystemCursors(){
         SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
         SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
         SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
 
         Core.graphics.restoreCursor();
+    }
+
+    void loadExtraCursors(){
+        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
+        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
     }
 
     void generateFonts(Skin skin){
@@ -202,6 +204,7 @@ public class UI implements ApplicationListener{
         chatfrag.container().build(hudGroup);
         listfrag.build(hudGroup);
         loadfrag.build(group);
+        new FadeInFragment().build(group);
     }
 
     @Override
