@@ -168,9 +168,6 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
-
-        Musics.menu.setLooping(true);
-       // Musics.menu.play();
     }
 
     void createPlayer(){
@@ -311,6 +308,19 @@ public class Control implements ApplicationListener{
 
         //autosave global data if it's modified
         data.checkSave();
+
+        if(state.is(State.menu)){
+            if(ui.deploy.isShown()){
+                mcont.silence(); //TODO deploy music
+            }else if(ui.editor.isShown()){
+                mcont.play(Musics.editor);
+            }else{
+                mcont.play(Musics.menu);
+            }
+        }else{
+            //TODO game music
+            mcont.silence();
+        }
 
         if(!state.is(State.menu)){
             input.update();
