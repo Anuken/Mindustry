@@ -64,14 +64,20 @@ public class Map implements Comparable<Map>{
 
     /** This creates a new instance of Rules.*/
     public Rules rules(){
-        Rules result = JsonIO.read(Rules.class, tags.get("rules", "{}"));
-        if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
-        return result;
+        try{
+            Rules result = JsonIO.read(Rules.class, tags.get("rules", "{}"));
+            if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
+            return result;
+        }catch(Exception e){
+            //error reading rules. ignore?
+            e.printStackTrace();
+            return new Rules();
+        }
     }
 
     /** Returns the generation filters that this map uses on load.*/
     public Array<GenerateFilter> filters(){
-        if(tags.getInt("build", -1) < 83 && tags.get("genfilters", "").isEmpty()){
+        if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
             return Array.with();
         }
         return world.maps.readFilters(tags.get("genfilters", ""));

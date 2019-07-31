@@ -30,31 +30,14 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         if(round++ != 0) return false; //only process 1 round
 
         try{
-            TypeSpec.Builder type = TypeSpec.classBuilder("Sounds").addModifiers(Modifier.PUBLIC);
-            HashSet<String> names = new HashSet<>();
-            Files.list(Paths.get("core/assets/sounds/")).forEach(p -> {
-                String name = p.getFileName().toString();
-                name = name.substring(0, name.indexOf("."));
-                if(names.contains(name)){
-                    Utils.messager.printMessage(Kind.ERROR, "Duplicate sound file name: " + p.toString() + "!");
-                }else{
-                    names.add(name);
-                }
-            });
-
-            Files.list(Paths.get("core/assets/sounds/")).forEach(p -> {
-                String fname = p.getFileName().toString();
-                String name = p.getFileName().toString();
-                name = name.substring(0, name.indexOf("."));
-                if(SourceVersion.isKeyword(name)){
-                    name = name + "s";
-                }
+            process("Sounds", "core/assets/sounds", (type, fname, name) ->
                 type.addField(FieldSpec.builder(ClassName.bestGuess("io.anuke.arc.audio.Sound"), name, Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                    .initializer(CodeBlock.builder().add("io.anuke.arc.Core.audio.newSound(io.anuke.arc.Core.files.internal($S))", "sounds/" + fname).build()).build());
-            });
+                .initializer(CodeBlock.builder().add("io.anuke.arc.Core.audio.newSound(io.anuke.arc.Core.files.internal($S))", "sounds/" + fname).build()).build()));
 
+            process("Musics", "core/assets/music", (type, fname, name) ->
+                type.addField(FieldSpec.builder(ClassName.bestGuess("io.anuke.arc.audio.Music"), name, Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
+                .initializer(CodeBlock.builder().add("io.anuke.arc.Core.audio.newMusic(io.anuke.arc.Core.files.internal($S))", "music/" + fname).build()).build()));
 
-            JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -65,5 +48,36 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return Collections.singleton("*");
+    }
+
+    void process(String classname, String path, Conser cons) throws Exception{
+        TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
+
+        HashSet<String> names = new HashSet<>();
+        Files.list(Paths.get(path)).forEach(p -> {
+            String fname = p.getFileName().toString();
+            String name = p.getFileName().toString();
+            name = name.substring(0, name.indexOf("."));
+
+            if(names.contains(name)){
+                Utils.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");
+            }else{
+                names.add(name);
+            }
+
+            if(SourceVersion.isKeyword(name)){
+                name = name + "s";
+            }
+
+            cons.consume(type, fname, name);
+
+        });
+
+
+        JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
+    }
+
+    interface Conser{
+        void consume(TypeSpec.Builder type, String fname, String name);
     }
 }

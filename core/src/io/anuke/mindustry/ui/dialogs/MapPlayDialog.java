@@ -22,7 +22,9 @@ public class MapPlayDialog extends FloatingDialog{
 
         onResize(() -> {
             if(lastMap != null){
+                Rules rules = this.rules;
                 show(lastMap);
+                this.rules = rules;
             }
         });
     }
@@ -53,6 +55,7 @@ public class MapPlayDialog extends FloatingDialog{
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
                 rules = mode.apply(map.rules());
+                Log.info("toggle rules " + rules);
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
             if(i++ % 2 == 1) modes.row();
         }

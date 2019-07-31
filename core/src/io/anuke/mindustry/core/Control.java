@@ -168,6 +168,8 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+
+        Musics.menu.play();
     }
 
     void createPlayer(){

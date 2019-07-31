@@ -232,6 +232,7 @@ public class MenuRenderer implements Disposable{
         batch.beginDraw();
         batch.drawCache(cacheFloor);
         batch.endDraw();
+        Draw.color();
         Draw.rect(Draw.wrap(shadows.getTexture()),
         width * tilesize / 2f - 4f, height * tilesize / 2f - 4f,
         width * tilesize, -height * tilesize);
