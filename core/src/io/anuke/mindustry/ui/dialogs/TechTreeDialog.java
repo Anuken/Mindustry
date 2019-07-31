@@ -319,6 +319,7 @@ public class TechTreeDialog extends FloatingDialog{
                     if(!child.visible) continue;
 
                     Lines.stroke(Unit.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Draw.alpha(parentAlpha);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

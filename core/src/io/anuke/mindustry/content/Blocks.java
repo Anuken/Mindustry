@@ -768,7 +768,6 @@ public class Blocks implements ContentList{
         }};
 
         thruster = new Wall("thruster"){{
-            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -1079,12 +1078,12 @@ public class Blocks implements ContentList{
         differentialGenerator = new SingleTypeGenerator(true, false, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 140, Items.titanium, 100, Items.lead, 200, Items.silicon, 130, Items.metaglass, 100));
             powerProduction = 16f;
-            itemDuration = 50f;
+            itemDuration = 60f;
             hasLiquids = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.2f);
+            consumes.liquid(Liquids.cryofluid, 0.18f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
