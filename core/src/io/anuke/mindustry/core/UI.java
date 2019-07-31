@@ -27,6 +27,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
+import static io.anuke.arc.scene.actions.Actions.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
@@ -80,11 +81,11 @@ public class UI implements ApplicationListener{
         Core.scene = new Scene(skin);
         Core.input.addProcessor(Core.scene);
 
-        //Dialog.setShowAction(() -> sequence(translateTo(Core.graphics.getWidth(), 0f), translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
-        //Dialog.setHideAction(() -> sequence(translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
+        Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
+        Dialog.setHideAction(() -> sequence(fadeOut(0.2f)));
 
-        Dialog.setShowAction(Actions::sequence);
-        Dialog.setHideAction(Actions::sequence);
+        //Dialog.setShowAction(Actions::sequence);
+        //Dialog.setHideAction(Actions::sequence);
 
         Tooltips.getInstance().animations = false;
 
@@ -97,6 +98,15 @@ public class UI implements ApplicationListener{
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
         Colors.put("stat", Pal.stat);
         loadExtraCursors();
+    }
+
+    /** Called from a static context to make the cursor appear immediately upon startup.*/
+    public static void loadSystemCursors(){
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
+
+        Core.graphics.restoreCursor();
     }
 
     void loadExtraStyle(Skin skin){
@@ -116,14 +126,6 @@ public class UI implements ApplicationListener{
         copy.setBottomHeight(0);
         copy.setLeftWidth(0);
         skin.add("flat-down", copy, Drawable.class);
-    }
-
-    public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
-
-        Core.graphics.restoreCursor();
     }
 
     void loadExtraCursors(){
