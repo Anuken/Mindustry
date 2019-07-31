@@ -84,9 +84,6 @@ public class UI implements ApplicationListener{
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
         Dialog.setHideAction(() -> sequence(fadeOut(0.2f)));
 
-        //Dialog.setShowAction(Actions::sequence);
-        //Dialog.setHideAction(Actions::sequence);
-
         Tooltips.getInstance().animations = false;
 
         Core.settings.setErrorHandler(e -> {
