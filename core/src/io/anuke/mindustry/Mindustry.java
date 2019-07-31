@@ -1,12 +1,12 @@
 package io.anuke.mindustry;
 
 import io.anuke.arc.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.game.EventType.GameLoadEvent;
-import io.anuke.mindustry.io.BundleLoader;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -26,6 +26,9 @@ public class Mindustry extends ApplicationCore{
         Vars.init();
         Log.setUseColors(false);
         BundleLoader.load();
+        Musics.load();
+        Sounds.load();
+
         content.load();
         content.loadColors();
 

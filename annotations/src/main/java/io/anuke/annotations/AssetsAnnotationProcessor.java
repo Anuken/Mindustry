@@ -30,13 +30,8 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         if(round++ != 0) return false; //only process 1 round
 
         try{
-            process("Sounds", "core/assets/sounds", (type, fname, name) ->
-                type.addField(FieldSpec.builder(ClassName.bestGuess("io.anuke.arc.audio.Sound"), name, Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                .initializer(CodeBlock.builder().add("io.anuke.arc.Core.audio.newSound(io.anuke.arc.Core.files.internal($S))", "sounds/" + fname).build()).build()));
-
-            process("Musics", "core/assets/music", (type, fname, name) ->
-                type.addField(FieldSpec.builder(ClassName.bestGuess("io.anuke.arc.audio.Music"), name, Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-                .initializer(CodeBlock.builder().add("io.anuke.arc.Core.audio.newMusic(io.anuke.arc.Core.files.internal($S))", "music/" + fname).build()).build()));
+            process("Sounds", "core/assets/sounds", "io.anuke.arc.audio.Sound", "newSound");
+            process("Musics", "core/assets/music", "io.anuke.arc.audio.Music", "newMusic");
 
             return true;
         }catch(Exception e){
@@ -50,8 +45,10 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         return Collections.singleton("*");
     }
 
-    void process(String classname, String path, Conser cons) throws Exception{
+    void process(String classname, String path, String rtype, String loadMethod) throws Exception{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
+        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         HashSet<String> names = new HashSet<>();
         Files.list(Paths.get(path)).forEach(p -> {
@@ -69,15 +66,15 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
                 name = name + "s";
             }
 
-            cons.consume(type, fname, name);
-
+            load.addStatement(name + " = io.anuke.arc.Core.audio."+loadMethod+"(io.anuke.arc.Core.files.internal($S))", path.substring(path.lastIndexOf("/") + 1) + "/" + fname);
+            dispose.addStatement(name + ".dispose()");
+            dispose.addStatement(name + " = null");
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+            //cons.consume(type, fname, name);
         });
 
-
+        type.addMethod(load.build());
+        type.addMethod(dispose.build());
         JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
-    }
-
-    interface Conser{
-        void consume(TypeSpec.Builder type, String fname, String name);
     }
 }

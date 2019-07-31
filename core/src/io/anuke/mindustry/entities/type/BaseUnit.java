@@ -60,6 +60,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
 
         unit.onSuperDeath();
+        unit.type.deathSound.at(unit);
 
         //visual only.
         if(Net.client()){

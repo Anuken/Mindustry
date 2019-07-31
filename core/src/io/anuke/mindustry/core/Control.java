@@ -169,7 +169,8 @@ public class Control implements ApplicationListener{
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
 
-        Musics.menu.play();
+        Musics.menu.setLooping(true);
+       // Musics.menu.play();
     }
 
     void createPlayer(){
@@ -230,6 +231,8 @@ public class Control implements ApplicationListener{
     public void dispose(){
         content.dispose();
         Net.dispose();
+        Musics.dispose();
+        Sounds.dispose();
         ui.editor.dispose();
     }
 

@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.units.Statuses;
 import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Teams.TeamData;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.net.Interpolator;
 import io.anuke.mindustry.net.Net;
@@ -108,6 +109,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Effects.effect(Fx.explosion, this);
         Effects.shake(2f, 2f, this);
 
+        Sounds.bang.at(this);
         item.amount = 0;
         drownTime = 0f;
         status.clear();

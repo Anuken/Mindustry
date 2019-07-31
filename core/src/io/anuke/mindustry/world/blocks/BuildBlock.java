@@ -15,7 +15,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
@@ -54,6 +54,7 @@ public class BuildBlock extends Block{
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
         Events.fire(new BlockBuildEndEvent(tile, team, true));
+        Sounds.breaks.at(tile);
     }
 
     @Remote(called = Loc.server)
@@ -74,6 +75,7 @@ public class BuildBlock extends Block{
             Core.app.post(() -> tile.block().playerPlaced(tile));
         }
         Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, team, false)));
+        Sounds.place.at(tile);
     }
 
     @Override
