@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # cd $HOME
 git config --global user.email $GHEMAIL
 git config --global user.name $GHUSERNAME
