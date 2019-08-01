@@ -1,30 +1,23 @@
 package io.anuke.mindustry.entities.type;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.util.Interval;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TypeID;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.units.UnitFactory.UnitFactoryEntity;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -166,22 +159,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public UnitState getStartState(){
         return null;
-    }
-
-    protected void drawItems(){
-        float backTrns = 4f;
-        if(item.amount > 0){
-            int stored = Mathf.clamp(item.amount / 6, 1, 8);
-
-            for(int i = 0; i < stored; i++){
-                float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 60f);
-                float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 3, 1f) - 1f;
-                Draw.rect(item.item.icon(Item.Icon.large),
-                x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                itemSize, itemSize, rotation);
-            }
-        }
     }
 
     public boolean isBoss(){

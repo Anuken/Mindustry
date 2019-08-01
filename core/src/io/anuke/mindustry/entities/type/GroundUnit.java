@@ -145,8 +145,6 @@ public abstract class GroundUnit extends BaseUnit{
             y + Angles.trnsy(tra, getWeapon().width * i, trY), w, type.weapon.region.getHeight() * Draw.scl, rotation - 90);
         }
 
-        drawItems();
-
         Draw.mixcol();
     }
 
