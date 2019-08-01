@@ -16,6 +16,8 @@ import io.anuke.mindustry.world.meta.values.*;
 
 import java.io.*;
 
+import static io.anuke.mindustry.Vars.*;
+
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 30;
     protected ObjectMap<Item, BulletType> ammo = new ObjectMap<>();
@@ -37,6 +39,15 @@ public class ItemTurret extends CooledTurret{
         stats.remove(BlockStat.itemCapacity);
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
         consumes.add(new ConsumeItemFilter(i -> ammo.containsKey(i)){
+            @Override
+            public void build(Tile tile, Table table){
+                MultiReqImage image = new MultiReqImage();
+                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Item.Icon.large)),
+                    () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
+
+                table.add(image).size(8 * 4);
+            }
+
             @Override
             public boolean valid(TileEntity entity){
                 //valid when there's any ammo in the turret

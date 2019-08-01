@@ -1577,7 +1577,7 @@ public class Blocks implements ContentList{
             shootCone = 24f;
 
             health = 155 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, false);
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
         }};
 
         meltdown = new LaserTurret("meltdown"){{
