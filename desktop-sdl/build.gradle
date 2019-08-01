@@ -6,7 +6,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.desktopsdl.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-def IKVM_DIR = "C:\\Users\\Anuke\\Documents\\ikvmbin-8.1.5717.0\\ikvm-8.1.5717.0\\bin"//System.env.IKVM_HOME
+def IKVM_DIR = System.env.IKVM_HOME
 def getTarget = { return project.hasProperty("target") ? project.properties["target"] : "windows" }
 
 task run(dependsOn: classes, type: JavaExec) {
@@ -33,11 +33,14 @@ task dist(type: Jar, dependsOn: classes) {
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir);
+    from files(project.assetsDir)
 
     //use target = all for all platforms
     def target = getTarget()
-    if(target == "windows") exclude('**.so', "**.dylib")
+    if(target.contains("windows")){
+        def prefix = target.contains("32") ? "64" : ""
+        exclude('**.so', "**.dylib", "sdl-arc${prefix}.dll", "gdx${prefix}.dll", "gdx-freetype${prefix}.dll")
+    }
     if(target == "mac") exclude('**.so', "**.dll")
     if(target == "linux") exclude('**.dll', "**.dylib")
     archivesBaseName = appName + "-" + target
@@ -79,7 +82,7 @@ task ikdist{
         }
 
         copy{
-            from "$IKVM_DIR/libraries"
+            from(getTarget().contains("32") ? "$IKVM_DIR/libraries_32" : "$IKVM_DIR/libraries")
             into folder
         }
     }
