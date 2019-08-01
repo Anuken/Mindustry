@@ -338,7 +338,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             rotation - 90);
         }
 
-        float backTrns = 4f;
+        float backTrns = 5f;
         if(item.amount > 0){
             ItemStack stack = item;
             int stored = Mathf.clamp(stack.amount / 6, 1, 8);
@@ -351,6 +351,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
                 itemSize, itemSize, rotation);
             }
+
+            Lines.stroke(1f, Pal.accent);
+            Lines.circle(x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns), 3f + Mathf.absin(Time.time(), 4f, 1f));
         }
 
         Draw.reset();
