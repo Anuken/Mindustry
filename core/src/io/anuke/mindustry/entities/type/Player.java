@@ -478,8 +478,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
-                    if(i % 2 == 0)
-                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 

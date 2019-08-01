@@ -228,7 +228,7 @@ public class Block extends BlockStorage{
         if(renderer.pixelator.enabled()) return;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("outlined-font");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
@@ -236,10 +236,13 @@ public class Block extends BlockStorage{
         layout.setText(font, text);
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 2;
+        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
-        Lines.stroke(1f, color);
+        dy -= 1f;
+        Lines.stroke(2f, Color.DARK_GRAY);
         Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 2f, dy);
+        Lines.stroke(1f, color);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.WHITE);
