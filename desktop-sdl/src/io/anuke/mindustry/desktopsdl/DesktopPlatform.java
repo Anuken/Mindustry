@@ -41,7 +41,7 @@ public class DesktopPlatform extends Platform{
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = r -> new Thread(r).start();
+        Consumer<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
@@ -58,7 +58,7 @@ public class DesktopPlatform extends Platform{
 
         CrashSender.send(e, file -> {
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath()));
+                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + (e.getMessage() == null ? "" : "\n" + e.getMessage())));
             }
         });
     }

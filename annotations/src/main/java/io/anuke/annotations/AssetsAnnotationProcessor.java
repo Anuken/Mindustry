@@ -2,12 +2,20 @@ package io.anuke.annotations;
 
 import com.squareup.javapoet.*;
 
-import javax.annotation.processing.*;
-import javax.lang.model.*;
-import javax.lang.model.element.*;
-import javax.tools.Diagnostic.*;
-import java.nio.file.*;
-import java.util.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic.Kind;
+import javax.tools.StandardLocation;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class AssetsAnnotationProcessor extends AbstractProcessor{
@@ -30,8 +38,13 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         if(round++ != 0) return false; //only process 1 round
 
         try{
-            process("Sounds", "core/assets/sounds", "io.anuke.arc.audio.Sound", "newSound");
-            process("Musics", "core/assets/music", "io.anuke.arc.audio.Music", "newMusic");
+
+            String path = Paths.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
+                        .toUri().toURL().toString().substring("file:/".length()))
+                        .getParent().getParent().getParent().getParent().getParent().getParent().toString();
+
+            process("Sounds", path + "/assets/sounds", "io.anuke.arc.audio.Sound", "newSound");
+            process("Musics", path + "/assets/music", "io.anuke.arc.audio.Music", "newMusic");
 
             return true;
         }catch(Exception e){
@@ -49,6 +62,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
 
         HashSet<String> names = new HashSet<>();
         Files.list(Paths.get(path)).forEach(p -> {

@@ -6,7 +6,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.desktopsdl.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-def IKVM_DIR = System.env.IKVM_HOME
+def IKVM_DIR = "C:\\Users\\Anuke\\Documents\\ikvmbin-8.1.5717.0\\ikvm-8.1.5717.0\\bin"//System.env.IKVM_HOME
 def getTarget = { return project.hasProperty("target") ? project.properties["target"] : "windows" }
 
 task run(dependsOn: classes, type: JavaExec) {
@@ -61,7 +61,8 @@ task ikdist{
     doLast{
         def filename = "$appName-windows-${version}"
         def folder = "build/libs/$filename"
-        def args = ["mono", "$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
+        def baseArgs = System.properties['os.name'].toLowerCase().contains('windows') ? [] : ["mono"]
+        def args = baseArgs + ["$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
         if(file("../core/assets/sprites/icon.ico").exists()){
             args += ["-win32icon:../core/assets/sprites/icon.ico"]
         }else if(file("../core/assets/icons/icon.ico").exists()){
