@@ -39,7 +39,7 @@ task dist(type: Jar, dependsOn: classes){
     def target = getTarget()
     if(target.contains("windows")){
         def prefix = target.contains("32") ? "64" : ""
-        exclude('**.so', "**.dylib", "sdl-arc${prefix}.dll", "gdx${prefix}.dll", "gdx-freetype${prefix}.dll")
+        exclude('**.so', "**.dylib", "sdl-arc${prefix}.dll", "gdx${prefix}.dll", "gdx-freetype${prefix}.dll", "**/music/**", "**/sounds/**")
     }
     if(target == "mac") exclude('**.so', "**.dll")
     if(target == "linux") exclude('**.dll', "**.dylib")
@@ -79,6 +79,16 @@ task ikdist{
         copy{
             from file("build/libs/${filename}.exe")
             into file(folder)
+        }
+
+        copy{
+            from files("../core/assets/music")
+            into file(folder + "/music")
+        }
+
+        copy{
+            from files("../core/assets/sounds")
+            into file(folder + "/sounds")
         }
 
         copy{

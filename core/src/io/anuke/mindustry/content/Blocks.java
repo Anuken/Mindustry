@@ -1140,7 +1140,7 @@ public class Blocks implements ContentList{
         pneumaticDrill = new Drill("pneumatic-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 35, Items.graphite, 15));
             tier = 3;
-            drillTime = 480;
+            drillTime = 400;
             size = 2;
             drawMineItem = true;
             consumes.liquid(Liquids.water, 0.06f).boost();
@@ -1161,7 +1161,7 @@ public class Blocks implements ContentList{
 
         blastDrill = new Drill("blast-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 130, Items.silicon, 120, Items.titanium, 100, Items.thorium, 150));
-            drillTime = 270;
+            drillTime = 280;
             size = 4;
             drawRim = true;
             hasPower = true;

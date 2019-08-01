@@ -1,25 +1,19 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.graphics.Blending;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -138,8 +132,24 @@ public class Drill extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile tile = world.tile(x, y);
         if(tile == null) return;
+
         countOre(tile);
-        drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
+
+        if(returnItem != null){
+            drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
+
+            float dx = x * tilesize + offset() - 31f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
+            Draw.mixcol(Color.DARK_GRAY, 1f);
+            Draw.rect(returnItem.icon(Item.Icon.large), dx, dy - 1);
+            Draw.reset();
+            Draw.rect(returnItem.icon(Item.Icon.large), dx, dy);
+        }else{
+            Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
+            Item item = to == null ? null : to.drop();
+            if(item != null){
+                drawPlaceText(Core.bundle.get("blocks.drilltierreq"), x, y, valid);
+            }
+        }
     }
 
     @Override
@@ -171,6 +181,9 @@ public class Drill extends Block{
     }
 
     void countOre(Tile tile){
+        returnItem = null;
+        returnCount = 0;
+
         oreCount.clear();
         itemArray.clear();
 
@@ -204,6 +217,7 @@ public class Drill extends Block{
 
         if(entity.dominantItem == null){
             countOre(tile);
+            if(returnItem == null) return;
             entity.dominantItem = returnItem;
             entity.dominantItems = returnCount;
         }
