@@ -133,7 +133,6 @@ public class Vars{
     public static GlobalData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
-    public static MusicControl mcont;
 
     public static Control control;
     public static Logic logic;
@@ -209,7 +208,6 @@ public class Vars{
 
         state = new GameState();
         data = new GlobalData();
-        mcont = new MusicControl();
 
         mobile = Core.app.getType() == ApplicationType.Android || Core.app.getType() == ApplicationType.iOS || testMobile;
         ios = Core.app.getType() == ApplicationType.iOS;

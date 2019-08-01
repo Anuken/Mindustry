@@ -5,6 +5,7 @@ import io.anuke.arc.audio.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 
+/** Controls playback of multiple music tracks.*/
 public class MusicControl{
     private static final float finTime = 80f, foutTime = 80f;
     private @Nullable Music current;
