@@ -7,6 +7,7 @@ import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Unit;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
@@ -252,23 +253,15 @@ public class Control implements ApplicationListener{
     public void init(){
         Platform.instance.updateRPC();
 
-        if(!Core.settings.getBool("4.0-warning-2", false)){
-
-            Time.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("VERY IMPORTANT");
-                dialog.buttons.addButton("$ok", () -> {
-                    dialog.hide();
-                    Core.settings.put("4.0-warning-2", true);
-                    Core.settings.save();
-                }).size(100f, 60f);
-                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final v4 release.[]\n\n " +
-                "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
-                "All current art and UI is unfinished, and will be changed before release. " +
-                "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
-                dialog.show();
+        //play tutorial on stop
+        if(!settings.getBool("tutorial", false)){
+            Core.app.post(() -> {
+                playZone(Zones.groundZero);
+                state.rules.tutorial = true;
             });
         }
 
+        //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             FloatingDialog dialog = new FloatingDialog("$confirm");
 
