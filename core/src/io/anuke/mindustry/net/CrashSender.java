@@ -50,12 +50,12 @@ public class CrashSender{
 
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
-                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
-                Files.write(file.toPath(), parseException(exception).getBytes());
                 Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+                Files.write(file.toPath(), parseException(exception).getBytes());
 
                 writeListener.accept(file);
-            }catch(Throwable ignored){
+            }catch(Throwable e){
+                e.printStackTrace();
                 Log.err("Failed to save local crash report.");
             }
 

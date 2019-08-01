@@ -33,6 +33,7 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Control implements ApplicationListener{
     public final Saves saves;
+    public final MusicControl music;
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
@@ -42,6 +43,7 @@ public class Control implements ApplicationListener{
     public Control(){
         batch = new SpriteBatch();
         saves = new Saves();
+        music = new MusicControl();
         data = new GlobalData();
 
         Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
@@ -228,6 +230,8 @@ public class Control implements ApplicationListener{
     public void dispose(){
         content.dispose();
         Net.dispose();
+        Musics.dispose();
+        Sounds.dispose();
         ui.editor.dispose();
     }
 
@@ -306,6 +310,19 @@ public class Control implements ApplicationListener{
 
         //autosave global data if it's modified
         data.checkSave();
+
+        if(state.is(State.menu)){
+            if(ui.deploy.isShown()){
+                music.silence(); //TODO deploy music
+            }else if(ui.editor.isShown()){
+                music.play(Musics.editor);
+            }else{
+                music.play(Musics.menu);
+            }
+        }else{
+            //TODO game music
+            music.silence();
+        }
 
         if(!state.is(State.menu)){
             input.update();

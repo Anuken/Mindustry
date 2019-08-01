@@ -1,18 +1,17 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.util.Align;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.ResizeEvent;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.arc.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 
-import static io.anuke.mindustry.Vars.iconsize;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class FloatingDialog extends Dialog{
     private boolean wasPaused;
@@ -32,7 +31,9 @@ public class FloatingDialog extends Dialog{
                     state.set(State.playing);
                 }
             }
+            Sounds.back.play();
         });
+        ClickListener.clicked = () -> Sounds.press.play();
 
         shown(() -> {
             if(shouldPause && !state.is(State.menu)){

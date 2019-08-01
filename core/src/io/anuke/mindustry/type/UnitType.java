@@ -1,14 +1,16 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.function.Supplier;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.entities.type.BaseUnit;
+import io.anuke.arc.*;
+import io.anuke.arc.audio.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
 public class UnitType extends UnlockableContent{
     public final TypeID typeID;
@@ -35,6 +37,7 @@ public class UnitType extends UnlockableContent{
     public Weapon weapon;
     public float weaponOffsetY, engineOffset = 6f, engineSize = 2f;
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
+    public Sound deathSound = Sounds.bang;
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 

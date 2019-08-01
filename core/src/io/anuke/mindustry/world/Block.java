@@ -1,38 +1,36 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.annotations.Annotations.CallSuper;
-import io.anuke.arc.Core;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.collection.Array;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.Function;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.effect.RubbleDecal;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
+import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OverlayFloor;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -98,6 +96,8 @@ public class Block extends BlockStorage{
     public boolean outlineIcon = false;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
+    /** Sounds made when this block breaks.*/
+    public Sound breakSound = Sounds.die;
 
     /** Cost of constructing this block. */
     public ItemStack[] buildRequirements = new ItemStack[]{};
