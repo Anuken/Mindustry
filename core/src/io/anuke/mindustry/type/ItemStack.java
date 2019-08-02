@@ -23,6 +23,14 @@ public class ItemStack implements Comparable<ItemStack>{
         return other != null && other.item == item && other.amount == amount;
     }
 
+    public static ItemStack[] mult(ItemStack[] stacks, int amount){
+        ItemStack[] copy = new ItemStack[stacks.length];
+        for(int i = 0; i < copy.length; i++){
+            copy[i] = new ItemStack(stacks[i].item, stacks[i].amount * amount);
+        }
+        return copy;
+    }
+
     public static ItemStack[] with(Object... items){
         ItemStack[] stacks = new ItemStack[items.length / 2];
         for(int i = 0; i < items.length; i += 2){
