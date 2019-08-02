@@ -28,8 +28,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapGenerateDialog extends FloatingDialog{
     private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
-        RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new,
-        MirrorFilter::new, ClearFilter::new
+        RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
