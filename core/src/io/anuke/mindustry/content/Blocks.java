@@ -543,7 +543,7 @@ public class Blocks implements ContentList{
         }};
 
         cryofluidMixer = new LiquidConverter("cryofluidmixer"){{
-            requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.thorium, 90));
+            requirements(Category.crafting, ItemStack.with(Items.lead, 130, Items.silicon, 80, Items.titanium, 120));
             outputLiquid = new LiquidStack(Liquids.cryofluid, 0.1f);
             craftTime = 60f;
             size = 2;
@@ -1294,7 +1294,7 @@ public class Blocks implements ContentList{
             );
             reload = 20f;
             restitution = 0.03f;
-            range = 95f;
+            range = 100;
             shootCone = 15f;
             ammoUseEffect = Fx.shellEjectSmall;
             health = 250;
@@ -1604,7 +1604,7 @@ public class Blocks implements ContentList{
         draugFactory = new UnitFactory("draug-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 60, Items.lead, 140));
             type = UnitTypes.draug;
-            produceTime = 5000;
+            produceTime = 2500;
             size = 2;
             maxSpawn = 2;
             consumes.power(1.1f);
@@ -1614,7 +1614,7 @@ public class Blocks implements ContentList{
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.metaglass, 70, Items.lead, 110, Items.silicon, 90));
             type = UnitTypes.spirit;
-            produceTime = 5700;
+            produceTime = 2850;
             size = 2;
             maxSpawn = 2;
             consumes.power(0.80f);
@@ -1624,7 +1624,7 @@ public class Blocks implements ContentList{
         phantomFactory = new UnitFactory("phantom-factory"){{
             requirements(Category.units, ItemStack.with(Items.titanium, 90, Items.thorium, 80, Items.lead, 110, Items.silicon, 210));
             type = UnitTypes.phantom;
-            produceTime = 7300;
+            produceTime = 3650;
             size = 2;
             maxSpawn = 2;
             consumes.power(2f);
@@ -1634,7 +1634,7 @@ public class Blocks implements ContentList{
         wraithFactory = new UnitFactory("wraith-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 60, Items.lead, 80, Items.silicon, 90));
             type = UnitTypes.wraith;
-            produceTime = 1500;
+            produceTime = 750;
             size = 2;
             consumes.power(0.6f);
             consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.titanium, 10));
@@ -1643,7 +1643,7 @@ public class Blocks implements ContentList{
         ghoulFactory = new UnitFactory("ghoul-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 150, Items.lead, 130, Items.silicon, 220));
             type = UnitTypes.ghoul;
-            produceTime = 2300;
+            produceTime = 1150;
             size = 3;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 20));
@@ -1652,7 +1652,7 @@ public class Blocks implements ContentList{
         revenantFactory = new UnitFactory("revenant-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.plastanium, 100, Items.titanium, 300, Items.lead, 300, Items.silicon, 400));
             type = UnitTypes.revenant;
-            produceTime = 4000;
+            produceTime = 2000;
             size = 4;
             consumes.power(3f);
             consumes.items(new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80));
@@ -1661,7 +1661,7 @@ public class Blocks implements ContentList{
         daggerFactory = new UnitFactory("dagger-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.lead, 110, Items.silicon, 70));
             type = UnitTypes.dagger;
-            produceTime = 1700;
+            produceTime = 850;
             size = 2;
             consumes.power(0.5f);
             consumes.items(new ItemStack(Items.silicon, 15));
@@ -1670,7 +1670,7 @@ public class Blocks implements ContentList{
         crawlerFactory = new UnitFactory("crawler-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.lead, 50, Items.silicon, 80));
             type = UnitTypes.crawler;
-            produceTime = 500;
+            produceTime = 250;
             size = 2;
             maxSpawn = 5;
             consumes.power(0.5f);
@@ -1680,7 +1680,7 @@ public class Blocks implements ContentList{
         titanFactory = new UnitFactory("titan-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.graphite, 100, Items.lead, 100, Items.silicon, 90));
             type = UnitTypes.titan;
-            produceTime = 2100;
+            produceTime = 1050;
             size = 3;
             consumes.power(0.60f);
             consumes.items(new ItemStack(Items.silicon, 30));
@@ -1689,7 +1689,7 @@ public class Blocks implements ContentList{
         fortressFactory = new UnitFactory("fortress-factory"){{
             requirements(Category.units, padVisible, ItemStack.with(Items.thorium, 80, Items.lead, 220, Items.silicon, 150));
             type = UnitTypes.fortress;
-            produceTime = 4000;
+            produceTime = 2000;
             size = 3;
             maxSpawn = 3;
             consumes.power(1.4f);
