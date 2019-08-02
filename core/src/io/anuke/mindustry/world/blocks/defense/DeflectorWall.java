@@ -67,7 +67,7 @@ public class DeflectorWall extends Wall{
         }
 
         bullet.updateVelocity();
-        bullet.resetOwner(entity, Team.none);
+        bullet.resetOwner(entity, Team.derelict);
         bullet.scaleTime(1f);
         bullet.supress();
 

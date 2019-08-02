@@ -219,7 +219,7 @@ public class BlockIndexer{
     }
 
     private void process(Tile tile){
-        if(tile.block().flags.size() > 0 && tile.getTeam() != Team.none){
+        if(tile.block().flags.size() > 0 && tile.getTeam() != Team.derelict){
             ObjectSet<Tile>[] map = getFlagged(tile.getTeam());
 
             for(BlockFlag flag : tile.block().flags){

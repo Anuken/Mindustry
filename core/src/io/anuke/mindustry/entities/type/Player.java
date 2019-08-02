@@ -715,10 +715,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                         if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
+                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
@@ -771,7 +771,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public void resetNoAdd(){
         status.clear();
-        team = Team.blue;
+        team = Team.sharded;
         item.amount = 0;
         placeQueue.clear();
         dead = true;

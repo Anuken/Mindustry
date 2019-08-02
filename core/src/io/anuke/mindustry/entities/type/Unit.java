@@ -45,7 +45,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final Statuses status = new Statuses();
     protected final ItemStack item = new ItemStack(content.item(0), 0);
 
-    protected Team team = Team.blue;
+    protected Team team = Team.sharded;
     protected float drownTime, hitTime;
 
     @Override

@@ -394,10 +394,10 @@ public class MapGenerateDialog extends FloatingDialog{
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
                         if(filters.isEmpty()){
                             Tile tile = editor.tile(px * scaling, py * scaling);
-                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), Team.none);
+                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), Team.derelict);
                         }else{
                             GenTile tile = buffer1[px][py];
-                            color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.none);
+                            color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.derelict);
                         }
                         pixmap.drawPixel(px, pixmap.getHeight() - 1 - py, color);
                     }

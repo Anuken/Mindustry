@@ -129,8 +129,8 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.blue);
-        assertEquals(world.tile(bx, by).getTeam(), Team.blue);
+        world.setBlock(world.tile(bx, by), Blocks.coreShard, Team.sharded);
+        assertEquals(world.tile(bx, by).getTeam(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
                 if(x == bx && by == y){
@@ -250,8 +250,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -272,8 +272,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.blue);
-        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.blue);
+        Phantom d1 = (Phantom)UnitTypes.phantom.create(Team.sharded);
+        Phantom d2 = (Phantom)UnitTypes.phantom.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -340,16 +340,16 @@ public class ApplicationTests{
         createMap();
 
         Tile core = world.tile(5, 5);
-        world.setBlock(core, Blocks.coreShard, Team.blue);
+        world.setBlock(core, Blocks.coreShard, Team.sharded);
         for(Item item : content.items()){
             core.entity.items.set(item, 3000);
         }
 
-        assertEquals(core, state.teams.get(Team.blue).cores.first());
+        assertEquals(core, state.teams.get(Team.sharded).cores.first());
     }
 
     void depositTest(Block block, Item item){
-        BaseUnit unit = UnitTypes.spirit.create(Team.none);
+        BaseUnit unit = UnitTypes.spirit.create(Team.derelict);
         Tile tile = new Tile(0, 0, Blocks.air.id, (byte)0, block.id);
         int capacity = tile.block().itemCapacity;
 

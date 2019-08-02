@@ -538,6 +538,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.table("underline", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
                     slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)(float)f]);
+                    for(int j = 0; j < MapEditor.brushSizes.length; j++){
+                        if(MapEditor.brushSizes[j] == editor.brushSize){
+                            slider.setValue(j);
+                        }
+                    }
 
                     t.top();
                     t.add("$editor.brush");

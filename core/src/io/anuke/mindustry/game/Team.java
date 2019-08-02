@@ -2,14 +2,15 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
+import io.anuke.mindustry.graphics.*;
 
 public enum Team{
-    none(Color.valueOf("4d4e58")),
-    blue(Color.valueOf("4169e1")),
-    red(Color.valueOf("e84737")),
-    green(Color.valueOf("1dc645")),
-    purple(Color.valueOf("ba5bd9")),
-    orange(Color.valueOf("e8c66a"));
+    derelict(Color.valueOf("4d4e58")),
+    sharded(Pal.accent),
+    crux(Color.valueOf("e82d2d")),
+    green(Color.valueOf("3ea56b")),
+    purple(Color.valueOf("8247b6")),
+    blue(Color.valueOf("ff7f50"));
 
     public final static Team[] all = values();
     public final Color color;
