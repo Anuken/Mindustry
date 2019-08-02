@@ -544,8 +544,8 @@ public class Blocks implements ContentList{
 
         cryofluidMixer = new LiquidConverter("cryofluidmixer"){{
             requirements(Category.crafting, ItemStack.with(Items.lead, 65, Items.silicon, 40, Items.titanium, 60));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.1f);
-            craftTime = 60f;
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.2f);
+            craftTime = 120f;
             size = 2;
             hasPower = true;
             hasItems = true;
@@ -556,7 +556,7 @@ public class Blocks implements ContentList{
 
             consumes.power(1f);
             consumes.item(Items.titanium);
-            consumes.liquid(Liquids.water, 0.1f);
+            consumes.liquid(Liquids.water, 0.2f);
 
             int liquidRegion = reg("-liquid"), topRegion = reg("-top"), bottomRegion = reg("-bottom");
 
