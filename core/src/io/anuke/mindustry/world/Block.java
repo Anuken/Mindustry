@@ -141,6 +141,10 @@ public class Block extends BlockStorage{
         return buildVisibility != invisible;
     }
 
+    public boolean isStatic(){
+        return cacheLayer == CacheLayer.walls;
+    }
+
     public void onProximityRemoved(Tile tile){
         if(tile.entity.power != null){
             tile.block().powerGraphRemoved(tile);

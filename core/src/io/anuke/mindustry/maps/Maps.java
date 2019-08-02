@@ -210,17 +210,22 @@ public class Maps implements Disposable{
                 }}
             );
 
-            int index = 0;
-            for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
-                OreFilter filter = new OreFilter();
-                filter.threshold += index ++ * 0.019f;
-                filter.ore = block;
-                filters.add(filter);
-            }
+            addDefaultOres(filters);
 
             return filters;
         }else{
             return JsonIO.read(Array.class, str);
+        }
+    }
+
+    public void addDefaultOres(Array<GenerateFilter> filters){
+        int index = 0;
+        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
+            OreFilter filter = new OreFilter();
+            filter.threshold += index ++ * 0.019f;
+            filter.scl += index;
+            filter.ore = block;
+            filters.add(filter);
         }
     }
 

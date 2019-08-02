@@ -1056,7 +1056,7 @@ public class Blocks implements ContentList{
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
-            itemDuration = 60f;
+            itemDuration = 120f;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -1069,7 +1069,7 @@ public class Blocks implements ContentList{
         turbineGenerator = new BurnerGenerator("turbine-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 6f;
-            itemDuration = 40f;
+            itemDuration = 90f;
             consumes.liquid(Liquids.water, 0.05f);
             hasLiquids = true;
             size = 2;
@@ -1078,7 +1078,7 @@ public class Blocks implements ContentList{
         differentialGenerator = new SingleTypeGenerator(true, false, "differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 16f;
-            itemDuration = 60f;
+            itemDuration = 120f;
             hasLiquids = true;
             size = 3;
 
@@ -1090,7 +1090,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 100, Items.silicon, 75, Items.phasefabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 3f;
-            itemDuration = 220f;
+            itemDuration = 440f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1108,6 +1108,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
             size = 3;
             health = 700;
+            itemDuration = 360f;
             powerProduction = 14f;
             consumes.item(Items.thorium);
             heating = 0.02f;
@@ -1119,7 +1120,7 @@ public class Blocks implements ContentList{
             size = 4;
             health = 900;
             powerProduction = 130f;
-            itemDuration = 90f;
+            itemDuration = 140f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.25f);
@@ -1618,7 +1619,7 @@ public class Blocks implements ContentList{
             size = 2;
             maxSpawn = 2;
             consumes.power(0.80f);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
+            consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.lead, 15));
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{
@@ -1628,7 +1629,7 @@ public class Blocks implements ContentList{
             size = 2;
             maxSpawn = 2;
             consumes.power(2f);
-            consumes.items(new ItemStack(Items.silicon, 70), new ItemStack(Items.lead, 80), new ItemStack(Items.titanium, 80));
+            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 10));
         }};
 
         wraithFactory = new UnitFactory("wraith-factory"){{
@@ -1637,7 +1638,7 @@ public class Blocks implements ContentList{
             produceTime = 750;
             size = 2;
             consumes.power(0.6f);
-            consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.titanium, 10));
+            consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 5));
         }};
 
         ghoulFactory = new UnitFactory("ghoul-factory"){{
@@ -1646,7 +1647,7 @@ public class Blocks implements ContentList{
             produceTime = 1150;
             size = 3;
             consumes.power(1.2f);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.titanium, 20));
+            consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
         }};
 
         revenantFactory = new UnitFactory("revenant-factory"){{
@@ -1655,7 +1656,7 @@ public class Blocks implements ContentList{
             produceTime = 2000;
             size = 4;
             consumes.power(3f);
-            consumes.items(new ItemStack(Items.silicon, 80), new ItemStack(Items.titanium, 80));
+            consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
         }};
 
         daggerFactory = new UnitFactory("dagger-factory"){{
@@ -1664,7 +1665,7 @@ public class Blocks implements ContentList{
             produceTime = 850;
             size = 2;
             consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.silicon, 15));
+            consumes.items(new ItemStack(Items.silicon, 6));
         }};
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
@@ -1674,7 +1675,7 @@ public class Blocks implements ContentList{
             size = 2;
             maxSpawn = 5;
             consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.coal, 5), new ItemStack(Items.silicon, 5));
+            consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.silicon, 4));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{
@@ -1683,7 +1684,7 @@ public class Blocks implements ContentList{
             produceTime = 1050;
             size = 3;
             consumes.power(0.60f);
-            consumes.items(new ItemStack(Items.silicon, 30));
+            consumes.items(new ItemStack(Items.silicon, 12));
         }};
 
         fortressFactory = new UnitFactory("fortress-factory"){{
@@ -1693,7 +1694,7 @@ public class Blocks implements ContentList{
             size = 3;
             maxSpawn = 3;
             consumes.power(1.4f);
-            consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.graphite, 30));
+            consumes.items(new ItemStack(Items.silicon, 20), new ItemStack(Items.graphite, 10));
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

@@ -11,7 +11,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
-import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
@@ -148,16 +147,6 @@ public class MapGenerateDialog extends FloatingDialog{
         editor.load(editor::checkLinkedTiles);
         editor.renderer().updateAll();
         editor.clearOp();
-    }
-
-    public void addDefaultOres(Array<GenerateFilter> filters){
-        int index = 0;
-        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
-            OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.019f;
-            filter.ore = block;
-            filters.add(filter);
-        }
     }
 
     void setup(){
@@ -315,7 +304,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         selection.cont.addButton("$filter.defaultores", () -> {
-            addDefaultOres(filters);
+            world.maps.addDefaultOres(filters);
             rebuildFilters();
             update();
             selection.hide();

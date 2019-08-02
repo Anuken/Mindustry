@@ -2,15 +2,16 @@ package io.anuke.mindustry.maps.filters;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.maps.filters.FilterOption.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.content;
-
 public class OreMedianFilter extends GenerateFilter{
-    float radius = 2;
-    float percentile = 0.5f;
-    IntArray blocks = new IntArray();
+    public float radius = 2;
+    public float percentile = 0.5f;
+
+    private IntArray blocks = new IntArray();
 
     {
         buffered = true;
@@ -22,13 +23,26 @@ public class OreMedianFilter extends GenerateFilter{
 
     @Override
     public void apply(){
+        if(in.ore == Blocks.spawn) return;
+
+        int cx = (in.x / 2) * 2;
+        int cy = (in.y / 2) * 2;
+        if(in.ore != Blocks.air){
+            if(!(in.tile(cx + 1, cy).overlay() == in.ore && in.tile(cx, cy).overlay() == in.ore && in.tile(cx + 1, cy + 1).overlay() == in.ore && in.tile(cx, cy + 1).overlay() == in.ore &&
+            !in.tile(cx + 1, cy).block().isStatic() && !in.tile(cx, cy).block().isStatic() && !in.tile(cx + 1, cy + 1).block().isStatic() && !in.tile(cx, cy + 1).block().isStatic())){
+                in.ore = Blocks.air;
+            }
+        }
+
         int rad = (int)radius;
+
         blocks.clear();
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){
                 if(Mathf.dst2(x, y) > rad*rad) continue;
 
                 Tile tile = in.tile(in.x + x, in.y + y);
+                if(tile.overlay() != Blocks.spawn)
                 blocks.add(tile.overlay().id);
             }
         }
@@ -36,8 +50,8 @@ public class OreMedianFilter extends GenerateFilter{
         blocks.sort();
 
         int index = Math.min((int)(blocks.size * percentile), blocks.size - 1);
-        int overlay = blocks.get(index), block = blocks.get(index);
+        int overlay = blocks.get(index);
 
-        in.ore = content.block(overlay);
+        in.ore = Vars.content.block(overlay);
     }
 }

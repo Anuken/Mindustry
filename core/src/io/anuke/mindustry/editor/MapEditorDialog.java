@@ -365,6 +365,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
         return view;
     }
 
+    public MapGenerateDialog getGenerateDialog(){
+        return generateDialog;
+    }
+
     public void resetSaved(){
         saved = false;
     }

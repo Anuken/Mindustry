@@ -4,7 +4,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.noise.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
@@ -19,8 +18,6 @@ public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
     private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
-    /** How much the landscape is randomly distorted. */
-    public float distortion = 3;
     /**
      * The amount of final enemy spawns used. -1 to use everything in the map.
      * This amount of enemy spawns is selected randomly from the map.
@@ -40,17 +37,6 @@ public class MapGenerator extends Generator{
 
     public MapGenerator decor(Decoration... decor){
         this.decorations.addAll(decor);
-        return this;
-    }
-
-    public MapGenerator dist(float distortion){
-        this.distortion = distortion;
-        return this;
-    }
-
-    public MapGenerator dist(float distortion, boolean floor){
-        this.distortion = distortion;
-        this.distortFloor = floor;
         return this;
     }
 
@@ -100,28 +86,9 @@ public class MapGenerator extends Generator{
             }
         }
 
-        Simplex simplex = new Simplex(Mathf.random(99999));
-
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                final double scl = 10;
                 Tile tile = tiles[x][y];
-                int newX = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x, y) * distortion + x), 0, width - 1);
-                int newY = Mathf.clamp((int)(simplex.octaveNoise2D(1, 1, 1.0 / scl, x + 9999, y + 9999) * distortion + y), 0, height - 1);
-
-                if(((tile.block() instanceof StaticWall
-                && tiles[newX][newY].block() instanceof StaticWall)
-                || (tile.block() == Blocks.air && !tiles[newX][newY].block().synthetic())
-                || (tiles[newX][newY].block() == Blocks.air && tile.block() instanceof StaticWall))){
-                    tile.setBlock(tiles[newX][newY].block());
-                }
-
-                if(distortFloor){
-                    tile.setFloor(tiles[newX][newY].floor());
-                    if(tiles[newX][newY].overlay() != Blocks.spawn && tile.overlay() != Blocks.spawn){
-                        tile.setOverlay(tiles[newX][newY].overlay());
-                    }
-                }
 
                 for(Decoration decor : decorations){
                     if(x > 0 && y > 0 && (tiles[x - 1][y].block() == decor.wall || tiles[x][y - 1].block() == decor.wall)){
