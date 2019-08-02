@@ -240,7 +240,7 @@ public class Block extends BlockStorage{
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.DARK_GRAY);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 2f, dy);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
         Lines.stroke(1f, color);
         Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 

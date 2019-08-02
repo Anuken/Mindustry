@@ -54,6 +54,12 @@
       down: button-down,
       up: button
     },
+    square: {
+      over: button-square-over,
+      disabled: button-disabled,
+      down: button-square-down,
+      up: button-square
+    },
     toggle: {
       checked: button-down,
       down: button-down,
@@ -69,6 +75,15 @@
       disabledFontColor: gray,
       down: button-down,
       up: button
+    },
+    square: {
+      font: default,
+      fontColor: white,
+      disabledFontColor: gray,
+      over: button-square-over,
+      disabled: button-disabled,
+      down: button-square-down,
+      up: button-square
     },
     node: {
       disabled: button,
@@ -298,8 +313,8 @@
       font: default,
       fontColor: white
     },
-    small: {
-      font: default,
+    outline: {
+      font: outline,
       fontColor: white
     }
   },
