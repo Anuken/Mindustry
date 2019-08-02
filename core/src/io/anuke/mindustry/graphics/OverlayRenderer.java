@@ -105,7 +105,7 @@ public class OverlayRenderer{
 
         Draw.reset();
 
-        //draw selected block bars and info
+        //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Tile tile = world.ltileWorld(vec.x, vec.y);
@@ -115,6 +115,7 @@ public class OverlayRenderer{
             }
         }
 
+        //draw selection overlay when dropping item
         if(input.isDroppingItem()){
             Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
@@ -125,9 +126,12 @@ public class OverlayRenderer{
 
             Tile tile = world.ltileWorld(v.x, v.y);
             if(tile != null && tile.interactable(player.getTeam()) && tile.block().acceptStack(player.item().item, player.item().amount, tile, player) > 0){
-                Draw.color(Pal.place);
-                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Time.time(), 5f, 1f));
-                Draw.color();
+                Lines.stroke(3f, Pal.gray);
+                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.stroke(1f, Pal.place);
+                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
+                Draw.reset();
+
             }
         }
     }

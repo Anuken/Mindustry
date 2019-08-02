@@ -1,11 +1,42 @@
 package io.anuke.mindustry.graphics;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Tmp;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
 
-public class Shapes{
+public class Drawf{
+
+    public static void dashCircle(float x, float y, float rad, Color color){
+        Lines.stroke(3f, Pal.gray);
+        Lines.dashCircle(x, y, rad);
+        Lines.stroke(1f, color);
+        Lines.dashCircle(x, y, rad);
+        Draw.reset();
+    }
+
+    public static void circles(float x, float y, float rad, Color color){
+        int vertices = 30;
+        Lines.stroke(3f, Pal.gray);
+        Lines.poly(x, y, vertices, rad);
+        Lines.stroke(1f, color);
+        Lines.poly(x, y, vertices, rad);
+        Draw.reset();
+    }
+
+    public static void arrow(float x, float y, float x2, float y2, float length, float radius){
+        float angle = Angles.angle(x, y, x2, y2);
+        float space = 2f;
+        Tmp.v1.set(x2, y2).sub(x, y).limit(length);
+        float vx = Tmp.v1.x + x, vy = Tmp.v1.y + y;
+
+        Draw.color(Pal.gray);
+        Fill.poly(vx, vy, 3, radius + space, angle);
+        Draw.color(Pal.accent);
+        Fill.poly(vx, vy, 3, radius, angle);
+        Draw.color();
+    }
 
     public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
         laser(line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);

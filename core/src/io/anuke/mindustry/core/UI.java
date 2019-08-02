@@ -148,11 +148,11 @@ public class UI implements ApplicationListener{
             incremental = true;
         }};
 
-        skin.add("outlined-font", generator.generateFont(outlined));
-        skin.add("default-font", generator.generateFont(param));
-        skin.add("default-font-chat", generator.generateFont(param));
-        skin.getFont("default-font").getData().markupEnabled = true;
-        skin.getFont("default-font").setOwnsTexture(false);
+        skin.add("outline", generator.generateFont(outlined));
+        skin.add("default", generator.generateFont(param));
+        skin.add("chat", generator.generateFont(param));
+        skin.getFont("default").getData().markupEnabled = true;
+        skin.getFont("default").setOwnsTexture(false);
     }
 
     @Override

@@ -113,7 +113,7 @@ public class Drill extends Block{
 
         if(entity.dominantItem != null && drawMineItem){
             Draw.color(entity.dominantItem.color);
-            Fill.square(tile.drawx(), tile.drawy(), 1f);
+            Draw.rect("drill-top", tile.drawx(), tile.drawy(), 1f);
             Draw.color();
         }
     }
@@ -149,6 +149,19 @@ public class Drill extends Block{
             if(item != null){
                 drawPlaceText(Core.bundle.get("blocks.drilltierreq"), x, y, valid);
             }
+        }
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        DrillEntity entity = tile.entity();
+
+        if(entity.dominantItem != null){
+            float dx = tile.drawx() - size * tilesize/2f, dy = tile.drawy() + size * tilesize/2f;
+            Draw.mixcol(Color.DARK_GRAY, 1f);
+            Draw.rect(entity.dominantItem.icon(Item.Icon.large), dx, dy);
+            Draw.reset();
+            Draw.rect(entity.dominantItem.icon(Item.Icon.medium), dx, dy);
         }
     }
 

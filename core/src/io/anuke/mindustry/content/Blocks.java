@@ -1501,11 +1501,11 @@ public class Blocks implements ContentList{
                     for(int i = 0; i < 7; i++){
                         Tmp.v1.trns(b.rot(), i * 8f);
                         float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
-                        Shapes.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
+                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() + 90);
+                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rot() - 90);
                     }
-                    Shapes.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
-                    Shapes.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
+                    Drawf.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rot());
+                    Drawf.tri(b.x, b.y, 20f * b.fout(), 10f, b.rot() + 180f);
                     Draw.reset();
                 }
             });

@@ -399,7 +399,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
 
             if(number){
-                Core.scene.skin.getFont("outlined-font").draw(item.amount + "",
+                Core.scene.skin.getFont("outline").draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
                     Pal.accent, 0.25f * itemtime, false, Align.center

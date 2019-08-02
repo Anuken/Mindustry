@@ -190,7 +190,7 @@ public class FileChooser extends FloatingDialog{
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.scene.skin.getFont("default-font"), navigation.getText());
+        layout.setText(Core.scene.skin.getFont("default"), navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);

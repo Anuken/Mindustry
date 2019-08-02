@@ -372,7 +372,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("default");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

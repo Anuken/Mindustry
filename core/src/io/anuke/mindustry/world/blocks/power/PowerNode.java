@@ -257,7 +257,7 @@ public class PowerNode extends PowerBlock{
         y2 += t2.y;
 
         Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
-        Shapes.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
         Draw.color();
     }
 
