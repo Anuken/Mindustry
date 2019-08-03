@@ -175,7 +175,6 @@ public class MapEditor{
 
             world.setBlock(tile(x, y), drawBlock, drawTeam);
         }else{
-
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
             Consumer<Tile> drawer = tile -> {

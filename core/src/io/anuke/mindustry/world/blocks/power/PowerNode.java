@@ -25,7 +25,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class PowerNode extends PowerBlock{
     //last distribution block placed
-    private static int lastPlaced = -1;
+    public static int lastPlaced = -1;
 
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
@@ -106,17 +106,13 @@ public class PowerNode extends PowerBlock{
     @Override
     public void playerPlaced(Tile tile){
         Tile before = world.tile(lastPlaced);
-        if(linkValid(tile, before) && before.block() instanceof PowerNode){
-            for(Tile near : before.entity.proximity()){
-                if(near == tile){
-                    lastPlaced = tile.pos();
-                    return;
-                }
-            }
+
+        if(linkValid(tile, before) && !before.entity.proximity().contains(tile)){
             Call.linkPowerNodes(null, tile, before);
         }
 
         lastPlaced = tile.pos();
+        super.playerPlaced(tile);
     }
 
     @Override
@@ -170,7 +166,9 @@ public class PowerNode extends PowerBlock{
         Lines.circle(tile.drawx(), tile.drawy(),
         tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
 
-        Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange * tilesize);
+        Drawf.circles(tile.drawx(), tile.drawy(), laserRange * tilesize);
+
+        Lines.stroke(1.5f);
 
         for(int x = (int)(tile.x - laserRange - 1); x <= tile.x + laserRange + 1; x++){
             for(int y = (int)(tile.y - laserRange - 1); y <= tile.y + laserRange + 1; y++){
@@ -199,7 +197,7 @@ public class PowerNode extends PowerBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Lines.stroke(1f);
         Draw.color(Pal.placing);
-        Lines.poly(x * tilesize + offset(), y * tilesize + offset(), 50, laserRange * tilesize);
+        Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
         Draw.reset();
     }
 
@@ -223,11 +221,11 @@ public class PowerNode extends PowerBlock{
         return tile.entity.power.links.contains(other.pos());
     }
 
-    protected boolean linkValid(Tile tile, Tile link){
+    public boolean linkValid(Tile tile, Tile link){
         return linkValid(tile, link, true);
     }
 
-    protected boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
+    public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
         if(tile == link || link == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){

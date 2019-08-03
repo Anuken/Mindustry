@@ -12,6 +12,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
@@ -27,6 +28,7 @@ import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -266,7 +268,27 @@ public class Block extends BlockStorage{
     }
 
     /** Called after the block is placed by this client. */
+    @CallSuper
     public void playerPlaced(Tile tile){
+
+        if(consumesPower && !outputsPower){
+            int range = 10;
+            tempTiles.clear();
+            Geometry.circle(tile.x, tile.y, range, (x, y) -> {
+                Tile other = world.tile(x, y);
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile)){
+                    tempTiles.add(other);
+                }
+            });
+            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+            if(!tempTiles.isEmpty()){
+                Call.linkPowerNodes(null, tempTiles.first(), tile);
+            }
+        }
+
+        if(outputsPower && !consumesPower){
+            PowerNode.lastPlaced = tile.pos();
+        }
     }
 
     public void removed(Tile tile){

@@ -16,8 +16,12 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void circles(float x, float y, float rad){
+        circles(x, y, rad, Pal.accent);
+    }
+
     public static void circles(float x, float y, float rad, Color color){
-        int vertices = 30;
+        int vertices = (int)(rad * 2);
         Lines.stroke(3f, Pal.gray);
         Lines.poly(x, y, vertices, rad);
         Lines.stroke(1f, color);
