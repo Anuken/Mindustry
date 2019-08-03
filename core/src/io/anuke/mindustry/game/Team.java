@@ -10,7 +10,7 @@ public enum Team{
     crux(Color.valueOf("e82d2d")),
     green(Color.valueOf("4dd98b")),
     purple(Color.valueOf("9a4bdf")),
-    blue(Color.valueOf("ff7f50"));
+    blue(Color.ROYAL.cpy());
 
     public final static Team[] all = values();
     public final Color color;

@@ -828,7 +828,7 @@ public class Blocks implements ContentList{
         }};
 
         door = new Door("door"){{
-            requirements(Category.defense, ItemStack.with(Items.titanium, 6, Items.silicon, 4));
+            requirements(Category.defense, ItemStack.with(Items.graphite, 6, Items.silicon, 4));
             health = 100 * wallHealthMultiplier;
         }};
 
@@ -1669,13 +1669,13 @@ public class Blocks implements ContentList{
         }};
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 25, Items.silicon, 40));
+            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 25, Items.silicon, 30));
             type = UnitTypes.crawler;
             produceTime = 250;
             size = 2;
-            maxSpawn = 5;
-            consumes.power(0.5f);
-            consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.silicon, 4));
+            maxSpawn = 6;
+            consumes.power(0.4f);
+            consumes.items(new ItemStack(Items.coal, 6));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{

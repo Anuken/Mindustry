@@ -147,7 +147,7 @@ public class Drill extends Block{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
             if(item != null){
-                drawPlaceText(Core.bundle.get("blocks.drilltierreq"), x, y, valid);
+                drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
             }
         }
     }

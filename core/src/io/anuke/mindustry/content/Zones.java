@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.Block;
 public class Zones implements ContentList{
     public static Zone
     groundZero, desertWastes,
-    craters, frozenForest, ruinousShores, stainedMountains, tarFields,
+    craters, frozenForest, ruinousShores, stainedMountains, tarFields, fungalPass,
     saltFlats, overgrowth, impact0078, crags,
     desolateRift, nuclearComplex;
 
@@ -107,16 +107,6 @@ public class Zones implements ContentList{
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.sand, Items.scrap};
         }};
 
-        overgrowth = new Zone("overgrowth", new MapGenerator("overgrowth")){{
-            startingItems = ItemStack.list(Items.copper, 1500, Items.lead, 1000, Items.silicon, 500, Items.metaglass, 250);
-            conditionWave = 12;
-            launchPeriod = 4;
-            loadout = Loadouts.basicNucleus;
-            zoneRequirements = ZoneRequirement.with(craters, 40);
-            blockRequirements = new Block[]{Blocks.cultivator, Blocks.sporePress};
-            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium, Items.scrap};
-        }};
-
         ruinousShores = new Zone("ruinousShores", new MapGenerator("ruinousShores", 1)){{
             loadout = Loadouts.basicFoundation;
             baseLaunchCost = ItemStack.with();
@@ -137,6 +127,23 @@ public class Zones implements ContentList{
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
             blockRequirements = new Block[]{Blocks.pneumaticDrill};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
+        }};
+
+        fungalPass = new Zone("fungalPass", new MapGenerator("fungalPass")){{
+            startingItems = ItemStack.list(Items.copper, 250, Items.lead, 250, Items.metaglass, 100, Items.graphite, 100);
+            zoneRequirements = ZoneRequirement.with(stainedMountains, 15);
+            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.crawlerFactory, Blocks.door};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand};
+        }};
+
+        overgrowth = new Zone("overgrowth", new MapGenerator("overgrowth")){{
+            startingItems = ItemStack.list(Items.copper, 1500, Items.lead, 1000, Items.silicon, 500, Items.metaglass, 250);
+            conditionWave = 12;
+            launchPeriod = 4;
+            loadout = Loadouts.basicNucleus;
+            zoneRequirements = ZoneRequirement.with(craters, 40, fungalPass, 10);
+            blockRequirements = new Block[]{Blocks.cultivator, Blocks.sporePress, Blocks.titanFactory, Blocks.wraithFactory};
+            resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium, Items.scrap};
         }};
 
         tarFields = new Zone("tarFields", new MapGenerator("tarFields")
@@ -180,7 +187,7 @@ public class Zones implements ContentList{
             startingItems = ItemStack.list(Items.copper, 1250, Items.lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;
             launchPeriod = 15;
-            zoneRequirements = ZoneRequirement.with(stainedMountains, 20);
+            zoneRequirements = ZoneRequirement.with(fungalPass, 8);
             blockRequirements = new Block[]{Blocks.thermalGenerator, Blocks.laserDrill};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
         }};

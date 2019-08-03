@@ -271,11 +271,11 @@ public class Block extends BlockStorage{
     @CallSuper
     public void playerPlaced(Tile tile){
 
-        if(consumesPower && !outputsPower){
+        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
-                Tile other = world.tile(x, y);
+                Tile other = world.ltile(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile)){
                     tempTiles.add(other);
                 }

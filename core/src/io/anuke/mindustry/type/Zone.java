@@ -156,7 +156,9 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void load(){
-        preview = new Texture(Core.files.internal("zones/" + name + ".png"));
+        if(Core.files.internal("zones/" + name + ".png").exists()){
+            preview = new Texture(Core.files.internal("zones/" + name + ".png"));
+        }
     }
 
     @Override
