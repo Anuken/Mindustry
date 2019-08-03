@@ -281,6 +281,10 @@ public class Block extends BlockStorage{
                 Call.linkPowerNodes(null, tempTiles.first(), tile);
             }
         }
+
+        if(outputsPower && !consumesPower){
+            PowerNode.lastPlaced = tile.pos();
+        }
     }
 
     public void removed(Tile tile){

@@ -25,7 +25,7 @@ import static io.anuke.mindustry.Vars.world;
 
 public class PowerNode extends PowerBlock{
     //last distribution block placed
-    private static int lastPlaced = -1;
+    public static int lastPlaced = -1;
 
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
@@ -105,19 +105,14 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void playerPlaced(Tile tile){
-        super.playerPlaced(tile);
         Tile before = world.tile(lastPlaced);
-        if(linkValid(tile, before) && before.block() instanceof PowerNode){
-            for(Tile near : before.entity.proximity()){
-                if(near == tile){
-                    lastPlaced = tile.pos();
-                    return;
-                }
-            }
+
+        if(linkValid(tile, before) && !before.entity.proximity().contains(tile)){
             Call.linkPowerNodes(null, tile, before);
         }
 
         lastPlaced = tile.pos();
+        super.playerPlaced(tile);
     }
 
     @Override
