@@ -35,6 +35,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Control implements ApplicationListener{
     public final Saves saves;
     public final MusicControl music;
+    public final Tutorial tutorial;
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
@@ -44,8 +45,8 @@ public class Control implements ApplicationListener{
     public Control(){
         batch = new SpriteBatch();
         saves = new Saves();
+        tutorial = new Tutorial();
         music = new MusicControl();
-        data = new GlobalData();
 
         Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
 
@@ -101,6 +102,7 @@ public class Control implements ApplicationListener{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
+            tutorial.reset();
 
             hiscore = false;
 
