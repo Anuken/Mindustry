@@ -211,8 +211,10 @@ public class Drill extends Block{
         }
 
         itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(item1.type == ItemType.material, item2.type == ItemType.material);
+            int type = Boolean.compare(item1 != Items.sand, item2 != Items.sand);
             if(type != 0) return type;
+            int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+            if(amounts != 0) return amounts;
             return Integer.compare(item1.id, item2.id);
         });
 
