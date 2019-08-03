@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextButton;
@@ -42,13 +43,16 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        table.touchable(Touchable.enabled);
         table.<Label>find("namelabel").setText(text);
         table.visible(true);
+        table.getColor().a = 1f;
         table.toFront();
     }
 
     public void hide(){
-        table.visible(false);
-        button.visible(false);
+        table.toFront();
+        table.touchable(Touchable.disabled);
+        table.actions(Actions.fadeOut(1f), Actions.visible(false));
     }
 }

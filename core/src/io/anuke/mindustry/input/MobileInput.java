@@ -215,13 +215,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             float offset = request.block.offset();
             TextureRegion region = placeDraw.region;
 
-            Draw.mixcol(Pal.accent, Mathf.clamp((1f - request.scale) / 0.5f));
+            Draw.mixcol(Pal.accent, Mathf.clamp((1f - request.scale) / 0.5f + 0.12f + Mathf.absin(Time.time(), 8f, 0.35f)));
             Draw.tint(Color.WHITE, Pal.breakInvalid, request.redness);
 
             Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
-            region.getWidth() * request.scale * Draw.scl * placeDraw.scalex,
-            region.getHeight() * request.scale * Draw.scl * placeDraw.scaley,
-            request.block.rotate ? placeDraw.rotation * 90 : 0);
+                region.getWidth() * request.scale * Draw.scl * placeDraw.scalex,
+                region.getHeight() * request.scale * Draw.scl * placeDraw.scaley,
+                request.block.rotate ? placeDraw.rotation * 90 : 0);
 
             Draw.mixcol(Pal.accent, 1f);
             for(int i = 0; i < 4; i++){

@@ -31,7 +31,7 @@ public abstract class BulletType extends Content{
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
     /** How many bullets get created per ammo item/liquid. */
-    public float ammoMultiplier = 1f;
+    public float ammoMultiplier = 2f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Recoil from shooter entities. */

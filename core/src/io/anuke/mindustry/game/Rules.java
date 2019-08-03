@@ -68,7 +68,7 @@ public class Rules{
     /** Whether the tutorial is enabled. False by default.*/
     public boolean tutorial = false;
     /** Starting items put in cores */
-    public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 200));
+    public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

@@ -54,6 +54,12 @@
       down: button-down,
       up: button
     },
+    square: {
+      over: button-square-over,
+      disabled: button-disabled,
+      down: button-square-down,
+      up: button-square
+    },
     toggle: {
       checked: button-down,
       down: button-down,
@@ -64,15 +70,24 @@
     default: {
       over: button-over,
       disabled: button-disabled,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
       down: button-down,
       up: button
     },
+    square: {
+      font: default,
+      fontColor: white,
+      disabledFontColor: gray,
+      over: button-square-over,
+      disabled: button-disabled,
+      down: button-square-down,
+      up: button-square
+    },
     node: {
       disabled: button,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
       up: button-over,
@@ -80,33 +95,33 @@
     },
     right: {
       over: button-right-over,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
       down: button-right-down,
       up: button-right
     },
     wave: {
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
       up: button-edge-4
     },
     clear: {
       over: flat-over,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
       down: flat-over,
       up: flat
     },
     discord: {
-      font: default-font,
+      font: default,
       fontColor: white,
       up: discord-banner
     },
     info: {
-      font: default-font,
+      font: default,
       fontColor: white,
       up: info-banner
     },
@@ -114,7 +129,7 @@
       down: whiteui,
       up: pane,
       over: flat-down,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray
     },
@@ -122,15 +137,15 @@
       down: flat-over,
       up: none,
       over: flat-over,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray
     },
     empty: {
-      font: default-font
+      font: default
     },
     clear-toggle: {
-      font: default-font,
+      font: default,
       fontColor: white,
       checked: flat-down,
       down: flat-down,
@@ -140,7 +155,7 @@
       disabledFontColor: gray
     },
     clear-toggle-menu: {
-      font: default-font,
+      font: default,
       fontColor: white,
       checked: flat-down,
       down: flat-down,
@@ -150,7 +165,7 @@
       disabledFontColor: gray
     }
     toggle: {
-      font: default-font,
+      font: default,
       fontColor: white,
       checked: button-down,
       down: button-down,
@@ -256,18 +271,18 @@
   },
   WindowStyle: {
     default: {
-      titleFont: default-font,
+      titleFont: default,
       titleFontColor: accent
     },
     dialog: {
       stageBackground: dialogDim,
-      titleFont: default-font,
+      titleFont: default,
       background: window-empty,
       titleFontColor: accent
     },
     fulldialog: {
       stageBackground: dark,
-      titleFont: default-font,
+      titleFont: default,
       background: window-empty,
       titleFontColor: accent
     }
@@ -295,17 +310,17 @@
   },
   LabelStyle: {
     default: {
-      font: default-font,
+      font: default,
       fontColor: white
     },
-    small: {
-      font: default-font,
+    outline: {
+      font: outline,
       fontColor: white
     }
   },
   TextFieldStyle: {
     default: {
-      font: default-font-chat,
+      font: chat,
       fontColor: white,
       disabledFontColor: gray,
       disabledBackground: underline-disabled,
@@ -313,17 +328,17 @@
       background: underline,
       invalidBackground: underline-red,
       cursor: cursor,
-      messageFont: default-font,
+      messageFont: default,
       messageFontColor: gray
     }
     textarea: {
-      font: default-font-chat,
+      font: chat,
       fontColor: white,
       disabledFontColor: gray,
       selection: selection,
       background: underline,
       cursor: cursor,
-      messageFont: default-font,
+      messageFont: default,
       messageFontColor: gray
     }
   },
@@ -335,7 +350,7 @@
       checkboxOver: check-over,
       checkboxOnDisabled: check-on-disabled,
       checkboxOffDisabled: check-disabled,
-      font: default-font,
+      font: default,
       fontColor: white,
       disabledFontColor: gray,
 

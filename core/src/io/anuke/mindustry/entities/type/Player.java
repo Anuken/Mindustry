@@ -65,7 +65,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String lastText;
     public float textFadeTime;
 
-    private float walktime;
+    private float walktime, itemtime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
     private Vector2 movement = new Vector2();
@@ -338,21 +338,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             rotation - 90);
         }
 
-        float backTrns = 4f;
-        if(item.amount > 0){
-            ItemStack stack = item;
-            int stored = Mathf.clamp(stack.amount / 6, 1, 8);
-
-            for(int i = 0; i < stored; i++){
-                float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 1, 60f);
-                float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 1f) - 1f;
-                Draw.rect(stack.item.icon(Item.Icon.large),
-                x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                itemSize, itemSize, rotation);
-            }
-        }
-
         Draw.reset();
     }
 
@@ -360,7 +345,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
-        Draw.color();
+        Draw.reset();
+        drawBackItems(itemtime, isLocal);
     }
 
     @Override
@@ -386,7 +372,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("default");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
@@ -478,8 +464,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
-                    if(i % 2 == 0)
-                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 
@@ -498,6 +483,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void update(){
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
+        itemtime = Mathf.lerpDelta(itemtime, Mathf.num(item.amount > 0), 0.1f);
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             velocity.set(0f, 0f);
@@ -729,10 +715,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                         if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
+                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
@@ -785,7 +771,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public void resetNoAdd(){
         status.clear();
-        team = Team.blue;
+        team = Team.sharded;
         item.amount = 0;
         placeQueue.clear();
         dead = true;

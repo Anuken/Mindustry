@@ -9,7 +9,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -101,9 +101,7 @@ public class MendProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Pal.accent);
-        Lines.dashCircle(x * tilesize, y * tilesize, range);
-        Draw.color();
+        Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
     }
 
     @Override
@@ -111,9 +109,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.entity();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
-        Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
-        Draw.color();
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, color);
     }
 
     @Override

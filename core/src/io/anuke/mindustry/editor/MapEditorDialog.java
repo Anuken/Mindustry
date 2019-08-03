@@ -335,7 +335,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public Dialog show(){
-        return super.show(Core.scene, Actions.sequence());
+        return super.show(Core.scene, Actions.sequence(Actions.alpha(1f)));
+    }
+
+    @Override
+    public void hide(){
+        super.hide(Actions.sequence(Actions.alpha(0f)));
     }
 
     @Override
@@ -358,6 +363,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     public MapView getView(){
         return view;
+    }
+
+    public MapGenerateDialog getGenerateDialog(){
+        return generateDialog;
     }
 
     public void resetSaved(){
@@ -533,6 +542,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.table("underline", t -> {
                     Slider slider = new Slider(0, MapEditor.brushSizes.length - 1, 1, false);
                     slider.moved(f -> editor.brushSize = MapEditor.brushSizes[(int)(float)f]);
+                    for(int j = 0; j < MapEditor.brushSizes.length; j++){
+                        if(MapEditor.brushSizes[j] == editor.brushSize){
+                            slider.setValue(j);
+                        }
+                    }
 
                     t.top();
                     t.add("$editor.brush");

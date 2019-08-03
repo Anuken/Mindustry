@@ -132,16 +132,27 @@ public class UI implements ApplicationListener{
 
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
-        FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
-        param.shadowColor = Color.DARK_GRAY;
-        param.shadowOffsetY = 2;
-        param.incremental = true;
 
-        skin.add("default-font", generator.generateFont(param));
-        skin.add("default-font-chat", generator.generateFont(param));
-        skin.getFont("default-font").getData().markupEnabled = true;
-        skin.getFont("default-font").setOwnsTexture(false);
+        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+            size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
+            shadowColor = Color.DARK_GRAY;
+            shadowOffsetY = 2;
+            incremental = true;
+        }};
+
+        FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
+            size = param.size;
+            borderColor = Color.DARK_GRAY;
+            borderWidth = 2f;
+            spaceX -= borderWidth;
+            incremental = true;
+        }};
+
+        skin.add("outline", generator.generateFont(outlined));
+        skin.add("default", generator.generateFont(param));
+        skin.add("chat", generator.generateFont(param));
+        skin.getFont("default").getData().markupEnabled = true;
+        skin.getFont("default").setOwnsTexture(false);
     }
 
     @Override

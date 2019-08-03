@@ -15,14 +15,14 @@ import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
+    protected Mech mech = Mechs.starter;
 
     public CoreBlock(String name){
         super(name);
@@ -40,10 +40,10 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
         Effects.effect(Fx.spawn, entity);
         entity.progress = 0;
-        entity.currentUnit = player;
-        entity.currentUnit.onRespawn(tile);
-        entity.currentUnit.applyImpulse(0, 8f);
-        entity.currentUnit = null;
+        entity.spawnPlayer = player;
+        entity.spawnPlayer.onRespawn(tile);
+        entity.spawnPlayer.applyImpulse(0, 8f);
+        entity.spawnPlayer = null;
     }
 
     @Override
@@ -94,8 +94,8 @@ public class CoreBlock extends StorageBlock{
             Draw.reset();
         }
 
-        if(entity.currentUnit != null){
-            Unit player = entity.currentUnit;
+        if(entity.spawnPlayer != null){
+            Unit player = entity.spawnPlayer;
 
             TextureRegion region = player.getIconRegion();
 
@@ -129,19 +129,19 @@ public class CoreBlock extends StorageBlock{
     public void update(Tile tile){
         CoreEntity entity = tile.entity();
 
-        if(entity.currentUnit != null){
-            if(!entity.currentUnit.isDead() || !entity.currentUnit.isAdded()){
-                entity.currentUnit = null;
+        if(entity.spawnPlayer != null){
+            if(!entity.spawnPlayer.isDead() || !entity.spawnPlayer.isAdded()){
+                entity.spawnPlayer = null;
                 return;
             }
 
-            entity.currentUnit.set(tile.drawx(), tile.drawy());
+            entity.spawnPlayer.set(tile.drawx(), tile.drawy());
             entity.heat = Mathf.lerpDelta(entity.heat, 1f, 0.1f);
             entity.time += entity.delta();
             entity.progress += 1f / state.rules.respawnTime * entity.delta();
 
             if(entity.progress >= 1f){
-                Call.onUnitRespawn(tile, entity.currentUnit);
+                Call.onUnitRespawn(tile, entity.spawnPlayer);
             }
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
@@ -154,17 +154,17 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
-        public Player currentUnit;
+        public Player spawnPlayer;
         float progress;
         float time;
         float heat;
 
         @Override
         public void updateSpawning(Player player){
-            if(!netServer.isWaitingForPlayers() && currentUnit == null){
-                currentUnit = player;
+            if(!netServer.isWaitingForPlayers() && spawnPlayer == null){
+                spawnPlayer = player;
                 progress = 0f;
-                player.mech = Mechs.starter;
+                player.mech = mech;
                 player.beginRespawning(this);
             }
         }

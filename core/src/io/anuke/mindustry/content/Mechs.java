@@ -32,6 +32,7 @@ public class Mechs implements ContentList{
                 mineSpeed = 1.5f;
                 mass = 1.2f;
                 speed = 0.5f;
+                itemCapacity = 40;
                 boostSpeed = 0.95f;
                 buildPower = 1.2f;
                 engineColor = Color.valueOf("ffd37f");
@@ -151,7 +152,7 @@ public class Mechs implements ContentList{
             {
                 drillPower = 2;
                 mineSpeed = 1.5f;
-                itemCapacity = 50;
+                itemCapacity = 80;
                 speed = 0.36f;
                 boostSpeed = 0.6f;
                 mass = 4f;

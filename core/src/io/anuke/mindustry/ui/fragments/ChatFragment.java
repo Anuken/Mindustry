@@ -50,7 +50,7 @@ public class ChatFragment extends Table{
         super();
 
         setFillParent(true);
-        font = scene.skin.getFont("default-font");
+        font = scene.skin.getFont("default");
 
         visible(() -> {
             if(!Net.active() && messages.size > 0){
@@ -106,7 +106,7 @@ public class ChatFragment extends Table{
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.skin.get(TextField.TextFieldStyle.class)));
         chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
-        chatfield.getStyle().font = scene.skin.getFont("default-font-chat");
+        chatfield.getStyle().font = scene.skin.getFont("chat");
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.setStyle(chatfield.getStyle());
 

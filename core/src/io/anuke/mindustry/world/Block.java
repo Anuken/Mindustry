@@ -12,6 +12,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
@@ -27,6 +28,7 @@ import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -141,6 +143,10 @@ public class Block extends BlockStorage{
         return buildVisibility != invisible;
     }
 
+    public boolean isStatic(){
+        return cacheLayer == CacheLayer.walls;
+    }
+
     public void onProximityRemoved(Tile tile){
         if(tile.entity.power != null){
             tile.block().powerGraphRemoved(tile);
@@ -228,7 +234,7 @@ public class Block extends BlockStorage{
         if(renderer.pixelator.enabled()) return;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("outline");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
@@ -236,10 +242,13 @@ public class Block extends BlockStorage{
         layout.setText(font, text);
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 2;
+        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
+        dy -= 1f;
+        Lines.stroke(2f, Color.DARK_GRAY);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
         Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 2f, dy);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.WHITE);
@@ -259,7 +268,27 @@ public class Block extends BlockStorage{
     }
 
     /** Called after the block is placed by this client. */
+    @CallSuper
     public void playerPlaced(Tile tile){
+
+        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
+            int range = 10;
+            tempTiles.clear();
+            Geometry.circle(tile.x, tile.y, range, (x, y) -> {
+                Tile other = world.ltile(x, y);
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile)){
+                    tempTiles.add(other);
+                }
+            });
+            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+            if(!tempTiles.isEmpty()){
+                Call.linkPowerNodes(null, tempTiles.first(), tile);
+            }
+        }
+
+        if(outputsPower && !consumesPower){
+            PowerNode.lastPlaced = tile.pos();
+        }
     }
 
     public void removed(Tile tile){

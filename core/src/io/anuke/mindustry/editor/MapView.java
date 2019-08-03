@@ -240,10 +240,6 @@ public class MapView extends Element implements GestureListener{
         editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
-        if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
-            return;
-        }
-
         if(grid){
             Draw.color(Color.GRAY);
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
@@ -302,7 +298,6 @@ public class MapView extends Element implements GestureListener{
         Lines.rect(x, y, width, height);
         Draw.reset();
 
-        ScissorStack.popScissors();
         ScissorStack.popScissors();
     }
 

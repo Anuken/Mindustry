@@ -1,22 +1,22 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.event.InputEvent;
-import io.anuke.arc.scene.event.InputListener;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.Setting;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 
+import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
@@ -127,9 +127,8 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     void addSettings(){
-        //TODO add when sound works again
-        //sound.volumePrefs();
-        sound.add("[LIGHT_GRAY]there is no sound implemented in v4 yet");
+        sound.sliderPref("musicvol", bundle.get("setting.musicvol.name", "Music Volume"), 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("sfxvol", bundle.get("setting.sfxvol.name", "SFX Volume"), 100, 0, 100, 1, i -> i + "%");
 
         game.screenshakePref();
         if(mobile){

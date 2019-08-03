@@ -75,7 +75,15 @@ public class MapsDialog extends FloatingDialog{
                         map = world.maps.makeLegacyMap(file);
                     }
 
-                    String name = map.tags.get("name");
+                    //when you attempt to import a save, it will have no name, so generate one
+                    String name = map.tags.getOr("name", () -> {
+                        String result = "unknown";
+                        int number = 0;
+                        while(world.maps.byName(result + number++) != null);
+                        return result + number;
+                    });
+
+                    //this will never actually get called, but it remains just in case
                     if(name == null){
                         ui.showError("$editor.errorname");
                         return;

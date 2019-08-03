@@ -17,6 +17,13 @@ public class ItemImage extends Stack{
         add(t);
     }
 
+    public ItemImage(TextureRegion region){
+        Table t = new Table().left().bottom();
+
+        add(new Image(region));
+        add(t);
+    }
+
     public ItemImage(ItemStack stack){
         add(new Image(stack.item.icon(Icon.large)));
 

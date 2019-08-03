@@ -70,7 +70,7 @@ public class CustomRulesDialog extends FloatingDialog{
                     () -> rules.loadout,
                     () -> {
                         rules.loadout.clear();
-                        rules.loadout.add(new ItemStack(Items.copper, 200));
+                        rules.loadout.add(new ItemStack(Items.copper, 100));
                     },
                     () -> {}, () -> {},
                     item -> item.type == ItemType.material

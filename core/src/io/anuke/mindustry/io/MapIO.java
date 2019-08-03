@@ -112,9 +112,9 @@ public class MapIO{
                 @Override
                 public Tile create(int x, int y, int floorID, int overlayID, int wallID){
                     if(overlayID != 0){
-                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.none));
+                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
                     }else{
-                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.none));
+                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.derelict));
                     }
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;

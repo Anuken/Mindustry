@@ -7,7 +7,6 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.defense.turrets.ItemTurret.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.meta.values.*;

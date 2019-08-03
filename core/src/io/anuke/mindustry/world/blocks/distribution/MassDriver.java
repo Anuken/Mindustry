@@ -1,28 +1,22 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.OrderedSet;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.pooling.Pool.Poolable;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.Pool.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -167,9 +161,7 @@ public class MassDriver extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Pal.accent);
-        Lines.dashCircle(x * tilesize, y*tilesize, range);
-        Draw.color();
+        Drawf.dashCircle(x * tilesize, y*tilesize, range, Pal.accent);
     }
 
     @Override
@@ -178,21 +170,17 @@ public class MassDriver extends Block{
 
         Draw.color(Pal.accent);
         Lines.stroke(1f);
-        Lines.poly(tile.drawx(), tile.drawy(), 20, (tile.block().size / 2f + 1) * tilesize + sin);
+        Drawf.circles(tile.drawx(), tile.drawy(), (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.accent);
 
         MassDriverEntity entity = tile.entity();
 
         if(linkValid(tile)){
             Tile target = world.tile(entity.link);
-
-            Draw.color(Pal.place);
-            Lines.poly(target.drawx(), target.drawy(), 20, (target.block().size / 2f + 1) * tilesize + sin);
-            Draw.reset();
+            Drawf.circles(target.drawx(), target.drawy(), (target.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
+            Drawf.arrow(tile.drawx(), tile.drawy(), target.drawx(), target.drawy(), size * tilesize + sin, 4f + sin);
         }
 
-        Draw.color(Pal.accent);
-        Lines.dashCircle(tile.drawx(), tile.drawy(), range);
-        Draw.color();
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), range, Pal.accent);
     }
 
     @Override

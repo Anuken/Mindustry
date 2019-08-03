@@ -299,7 +299,7 @@ public class Tile implements Position, TargetTrait{
     }
 
     public boolean interactable(Team team){
-        return getTeam() == Team.none || team == getTeam();
+        return getTeam() == Team.derelict || team == getTeam();
     }
 
     public Item drop(){
