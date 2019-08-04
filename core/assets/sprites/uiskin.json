@@ -64,7 +64,12 @@
       checked: button-down,
       down: button-down,
       up: button
-    }
+    },
+    wave: {
+      up: button-edge-4,
+      over: button-edge-over-4,
+      disabled: button-edge-4
+    },
   },
   TextButtonStyle: {
     default: {
