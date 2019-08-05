@@ -39,8 +39,8 @@ public abstract class BasicGenerator extends RandomGenerator{
                 int offsetX = x - 4, offsetY = y + 23;
                 for(int i = ores.size - 1; i >= 0; i--){
                     Block entry = ores.get(i);
-                    if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (50 + i * 2), offsetX, offsetY + i*999)) > 0.23f &&
-                    Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (40 + i * 4), offsetX, offsetY - i*999)) > 0.32f){
+                    if(Math.abs(0.5f - sim.octaveNoise2D(2, 0.7, 1f / (40 + i * 2), offsetX, offsetY + i*999)) > 0.26f &&
+                    Math.abs(0.5f - sim2.octaveNoise2D(1, 1, 1f / (30 + i * 4), offsetX, offsetY - i*999)) > 0.37f){
                         ore = entry;
                         break;
                     }

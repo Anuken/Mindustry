@@ -8,7 +8,7 @@ import io.anuke.arc.util.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 80f, foutTime = 80f;
+    private static final float finTime = 120f, foutTime = 120f;
     private @Nullable Music current;
     private float fade;
 

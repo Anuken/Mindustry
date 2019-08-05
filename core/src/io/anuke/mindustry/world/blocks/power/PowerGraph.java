@@ -20,6 +20,7 @@ public class PowerGraph{
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
+    private float lastPowerProduced, lastPowerNeeded;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -35,6 +36,23 @@ public class PowerGraph{
 
     public float getPowerBalance(){
         return powerBalance.getMean();
+    }
+
+    public float getLastPowerNeeded(){
+        return lastPowerNeeded;
+    }
+
+    public float getLastPowerProduced(){
+        return lastPowerProduced;
+    }
+
+    public float getSatisfaction(){
+        if(Mathf.isZero(lastPowerProduced)){
+            return 0f;
+        }else if(Mathf.isZero(lastPowerNeeded)){
+            return 1f;
+        }
+        return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
     }
 
     public float getPowerProduced(){
@@ -163,6 +181,9 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
+
+        lastPowerNeeded = powerNeeded;
+        lastPowerProduced = powerProduced;
 
         powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 

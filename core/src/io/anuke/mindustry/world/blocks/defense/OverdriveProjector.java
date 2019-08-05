@@ -74,7 +74,7 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime)){
+        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
             entity.cons.trigger();
         }
 

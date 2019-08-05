@@ -27,7 +27,7 @@ import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -638,7 +638,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     protected void updateTouch(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) &&
+            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range() && !(((TileEntity)target).block instanceof BuildBlock))){
             target = null;
         }
 

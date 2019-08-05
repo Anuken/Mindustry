@@ -276,7 +276,8 @@ public class Block extends BlockStorage{
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile)){
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
+                    !tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph)){
                     tempTiles.add(other);
                 }
             });

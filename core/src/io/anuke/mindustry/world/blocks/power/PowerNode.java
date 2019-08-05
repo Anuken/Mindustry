@@ -107,7 +107,8 @@ public class PowerNode extends PowerBlock{
 
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)){
+            if(other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
+               && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph){
                 Call.linkPowerNodes(null, tile, other);
             }
         });
@@ -255,8 +256,10 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
-        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        float fract = 1f-tile.entity.power.graph.getSatisfaction();
+
+        Draw.color(Color.WHITE, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.4f);
         Draw.color();
     }
 

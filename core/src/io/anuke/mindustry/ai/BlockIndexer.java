@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -118,7 +119,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.ordinal()];
         for(Tile tile : set){
-            if(tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()){
+            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) && !(tile.block() instanceof BuildBlock)){
                 returnArray.add(tile);
             }
         }
