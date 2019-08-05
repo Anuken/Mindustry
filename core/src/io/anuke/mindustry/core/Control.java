@@ -314,7 +314,7 @@ public class Control implements ApplicationListener{
 
         if(state.is(State.menu)){
             if(ui.deploy.isShown()){
-                music.silence(); //TODO deploy music
+                music.play(Musics.launch);
             }else if(ui.editor.isShown()){
                 music.play(Musics.editor);
             }else{
