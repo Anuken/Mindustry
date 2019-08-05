@@ -208,6 +208,7 @@ public class Control implements ApplicationListener{
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
+            Net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;

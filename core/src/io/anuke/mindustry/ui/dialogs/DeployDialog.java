@@ -17,6 +17,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.ui.*;
@@ -95,6 +96,8 @@ public class DeployDialog extends FloatingDialog{
 
                     hide();
                     ui.loadAnd(() -> {
+                        logic.reset();
+                        Net.reset();
                         try{
                             control.saves.getZoneSlot().load();
                             state.set(State.playing);

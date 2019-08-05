@@ -43,6 +43,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        table.clearActions();
         table.touchable(Touchable.enabled);
         table.<Label>find("namelabel").setText(text);
         table.visible(true);
@@ -51,6 +52,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void hide(){
+        table.clearActions();
         table.toFront();
         table.touchable(Touchable.disabled);
         table.actions(Actions.fadeOut(1f), Actions.visible(false));

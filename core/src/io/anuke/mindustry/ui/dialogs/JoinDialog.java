@@ -310,6 +310,7 @@ public class JoinDialog extends FloatingDialog{
 
         Time.runTask(2f, () -> {
             logic.reset();
+            Net.reset();
             Vars.netClient.beginConnecting();
             Net.connect(ip, port, () -> {
                 hide();

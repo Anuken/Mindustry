@@ -16,7 +16,7 @@ public enum Binding implements KeyBind{
     diagonal_placement(KeyCode.CONTROL_LEFT),
     pick(KeyCode.MOUSE_MIDDLE),
     dash(KeyCode.SHIFT_LEFT),
-    gridMode(KeyCode.GRAVE),
+    gridMode(KeyCode.BACKTICK),
     gridModeShift(KeyCode.ALT_LEFT),
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
