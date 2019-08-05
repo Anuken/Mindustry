@@ -137,7 +137,6 @@ public class LoadDialog extends FloatingDialog{
         for(SaveSlot slot : control.saves.getSaveSlots()) if(!slot.isHidden()) valids = true;
 
         if(!valids){
-
             slots.row();
             slots.addButton("$save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);

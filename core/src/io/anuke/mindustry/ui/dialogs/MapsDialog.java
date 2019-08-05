@@ -176,7 +176,7 @@ public class MapsDialog extends FloatingDialog{
             t.row();
             t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();
-            t.add(map.author()).growX().wrap().padTop(2);
+            t.add(map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();
