@@ -1613,13 +1613,13 @@ public class Blocks implements ContentList{
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
-            requirements(Category.units, ItemStack.with(Items.metaglass, 35, Items.lead, 55, Items.silicon, 45));
+            requirements(Category.units, ItemStack.with(Items.metaglass, 45, Items.lead, 55, Items.silicon, 45));
             type = UnitTypes.spirit;
-            produceTime = 2850;
+            produceTime = 3500;
             size = 2;
             maxSpawn = 2;
             consumes.power(0.80f);
-            consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.lead, 15));
+            consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 15));
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{

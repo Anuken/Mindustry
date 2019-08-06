@@ -1,10 +1,11 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.UnitType;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitType
@@ -90,16 +91,32 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
-            maxVelocity = 1.25f;
-            speed = 0.28f;
+            maxVelocity = 1.27f;
+            speed = 0.285f;
             drag = 0.4f;
             hitsize = 8f;
             mass = 1.75f;
-            health = 100;
+            health = 120;
             weapon = new Weapon("bomber"){{
                 reload = 12f;
                 ejectEffect = Fx.none;
-                bullet = Bullets.explode;
+                bullet = new BombBulletType(2f, 3f, "clear"){
+                    {
+                        hitEffect = Fx.pulverize;
+                        lifetime = 30f;
+                        speed = 1.1f;
+                        splashDamageRadius = 55f;
+                        splashDamage = 30f;
+                    }
+
+                    @Override
+                    public void init(Bullet b){
+                        if(b.getOwner() instanceof Unit){
+                            ((Unit)b.getOwner()).kill();
+                        }
+                        b.time(b.lifetime());
+                    }
+                };
             }};
         }};
 
