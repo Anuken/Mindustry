@@ -78,14 +78,14 @@ public class Zones implements ContentList{
         }};
 
         saltFlats = new Zone("saltFlats", new MapGenerator("saltFlats")){{
-            startingItems = ItemStack.list(Items.copper, 200, Items.silicon, 100, Items.lead, 200);
+            startingItems = ItemStack.list(Items.copper, 200, Items.silicon, 200, Items.lead, 200);
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
             loadout = Loadouts.basicFoundation;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
-            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.draugFactory};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
+            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.draugFactory, Blocks.door};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand, Items.titanium};
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)

@@ -209,6 +209,7 @@ public class PowerGraph{
     }
 
     public void add(Tile tile){
+        if(tile.entity == null || tile.entity.power == null) return;
         tile.entity.power.graph = this;
         all.add(tile);
 

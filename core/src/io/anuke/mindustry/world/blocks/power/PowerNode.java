@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -105,13 +106,19 @@ public class PowerNode extends PowerBlock{
             Call.linkPowerNodes(null, tile, before);
         }
 
+        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
+        && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
+
+        tempTiles.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
-               && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph){
-                Call.linkPowerNodes(null, tile, other);
+            if(valid.test(other)){
+                tempTiles.add(other);
             }
         });
+
+        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.each(valid, other -> Call.linkPowerNodes(null, tile, other));
 
         lastPlaced = tile.pos();
         super.playerPlaced(tile);

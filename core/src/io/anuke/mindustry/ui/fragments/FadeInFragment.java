@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
-import io.anuke.arc.util.*;
 
 /** Fades in a black overlay.*/
 public class FadeInFragment extends Fragment{
@@ -30,7 +29,7 @@ public class FadeInFragment extends Fragment{
             @Override
             public void act(float delta){
                 super.act(delta);
-                time += Time.delta() / duration;
+                time += 1f / duration;
                 if(time > 1){
                     remove();
                 }

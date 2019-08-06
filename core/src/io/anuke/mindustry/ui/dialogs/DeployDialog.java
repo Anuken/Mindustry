@@ -170,7 +170,7 @@ public class DeployDialog extends FloatingDialog{
         button.setDisabled(() -> hidden(zone));
         button.clicked(() -> info.show(zone));
 
-        if(zone.unlocked()){
+        if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style("outline").width(140).growX().get().setAlignment(Align.center);
         }else{
             button.addImage("icon-locked");
