@@ -46,7 +46,7 @@ public class Control implements ApplicationListener{
         music = new MusicControl();
         data = new GlobalData();
 
-        Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
+        Unit.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         Core.input.setCatch(KeyCode.BACK, true);
 

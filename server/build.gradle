@@ -36,6 +36,8 @@ task dist(type: Jar){
     from{ configurations.compile.collect{ zipTree(it) } }
     from files(project.assetsDir)
     exclude("sprites/**")
+    exclude("music/**")
+    exclude("sounds/**")
     exclude("fonts/**")
     exclude("com/badlogic/gdx/**")
     exclude("bundles/**")

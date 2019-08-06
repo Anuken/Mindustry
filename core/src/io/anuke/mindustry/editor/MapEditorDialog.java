@@ -1,40 +1,34 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.StringMap;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.TextButton.TextButtonStyle;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.TextButton.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Platform;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.JsonIO;
-import io.anuke.mindustry.io.MapIO;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.dialogs.FileChooser;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -378,10 +372,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float amount = 10f, baseSize = 60f;
-
-        float size = mobile ? (int)(Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / amount / Unit.dp.scl(1f)) :
-        Math.min(Core.graphics.getHeight() / amount, baseSize);
+        float size = 60f;
 
         clearChildren();
         table(cont -> {

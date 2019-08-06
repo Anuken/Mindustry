@@ -51,10 +51,10 @@ task dist(type: Jar, dependsOn: classes){
 }
 
 task ikZip(type: Zip){
-    def filename = "$appName-windows-${version}"
+    def filename = "$appName-${getTarget()}-${version}"
 
     from "build/libs/$filename"
-    archiveBaseName = "$appName-${getTarget()}"
+    archiveName = "$appName-${getTarget()}-${getVersionString()}.zip"
 }
 
 task ikdist{
@@ -62,7 +62,7 @@ task ikdist{
     finalizedBy ikZip
 
     doLast{
-        def filename = "$appName-windows-${version}"
+        def filename = "$appName-${getTarget()}-${version}"
         def folder = "build/libs/$filename"
         def baseArgs = System.properties['os.name'].toLowerCase().contains('windows') ? [] : ["mono"]
         def args = baseArgs + ["$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]

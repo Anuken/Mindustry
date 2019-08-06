@@ -230,8 +230,8 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    protected void drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return;
+    protected float drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         BitmapFont font = Core.scene.skin.getFont("outline");
@@ -240,6 +240,8 @@ public class Block extends BlockStorage{
         font.setUseIntegerPositions(false);
         font.getData().setScale(1f / 4f);
         layout.setText(font, text);
+
+        float width = layout.width;
 
         font.setColor(color);
         float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
@@ -255,6 +257,7 @@ public class Block extends BlockStorage{
         font.getData().setScale(1f);
         Draw.reset();
         Pools.free(layout);
+        return width;
     }
 
     public void draw(Tile tile){
