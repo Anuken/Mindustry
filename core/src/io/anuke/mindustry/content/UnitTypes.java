@@ -105,16 +105,18 @@ public class UnitTypes implements ContentList{
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
             maxVelocity = 0.8f;
-            speed = 0.18f;
+            speed = 0.22f;
             drag = 0.4f;
             mass = 3.5f;
             hitsize = 9f;
+            range = 10f;
             rotatespeed = 0.1f;
-            health = 440;
+            health = 460;
             immunities.add(StatusEffects.burning);
             weapon = new Weapon("flamethrower"){{
                 length = 1f;
                 reload = 14f;
+                range = 30f;
                 roundrobin = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;

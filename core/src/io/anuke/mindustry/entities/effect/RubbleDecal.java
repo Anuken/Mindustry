@@ -26,6 +26,11 @@ public class RubbleDecal extends Decal{
     }
 
     @Override
+    public float lifetime(){
+        return 8200f;
+    }
+
+    @Override
     public void drawDecal(){
         if(!Core.atlas.isFound(region)){
             remove();

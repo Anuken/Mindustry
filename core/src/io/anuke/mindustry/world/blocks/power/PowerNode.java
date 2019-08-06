@@ -235,7 +235,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
+        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){

@@ -30,6 +30,7 @@ public class MinimapDialog extends FloatingDialog{
             t.addRect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
                 Draw.color(Color.WHITE);
+                Draw.alpha(parentAlpha);
                 Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
                 if(renderer.minimap.getTexture() != null){

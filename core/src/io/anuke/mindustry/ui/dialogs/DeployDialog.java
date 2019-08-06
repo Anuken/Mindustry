@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.ObjectSet.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -14,6 +15,7 @@ import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
@@ -30,9 +32,12 @@ public class DeployDialog extends FloatingDialog{
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
+    private Texture nomap = new Texture("zones/nomap.png");
 
     public DeployDialog(){
         super("", "fulldialog");
+
+        Events.on(DisposeEvent.class, e -> nomap.dispose());
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
@@ -173,9 +178,10 @@ public class DeployDialog extends FloatingDialog{
         if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style("outline").width(140).growX().get().setAlignment(Align.center);
         }else{
-            button.addImage("icon-locked");
+            Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.WHITE).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
+            flasher.accept(button.addImage("icon-locked").get());
             button.row();
-            button.add("$locked");
+            flasher.accept(button.add("$locked").get());
         }
     }
 
@@ -193,13 +199,7 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                if(node.zone.unlocked() && node.zone.preview != null){
-                    stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview)
-                        .setScaling(Scaling.stretch)).color(Color.DARK_GRAY).grow()));
-                }else{
-                    stack.add(new Table(t -> t.margin(4f).add(new Image("whiteui", Color.BLACK).setScaling(Scaling.stretch)).grow()));
-                }
-
+                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview != null ? node.zone.preview : nomap).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button("square");
@@ -235,6 +235,7 @@ public class DeployDialog extends FloatingDialog{
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.allChildren){
                     Lines.stroke(UnitScl.dp.scl(4f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.gray);
+                    Draw.alpha(parentAlpha);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

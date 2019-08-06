@@ -1673,9 +1673,9 @@ public class Blocks implements ContentList{
             type = UnitTypes.crawler;
             produceTime = 250;
             size = 2;
-            maxSpawn = 6;
+            maxSpawn = 8;
             consumes.power(0.4f);
-            consumes.items(new ItemStack(Items.coal, 6));
+            consumes.items(new ItemStack(Items.coal, 5));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{
@@ -1699,7 +1699,8 @@ public class Blocks implements ContentList{
 
         repairPoint = new RepairPoint("repair-point"){{
             requirements(Category.units, ItemStack.with(Items.lead, 15, Items.copper, 15, Items.silicon, 15));
-            repairSpeed = 0.3f;
+            repairSpeed = 0.5f;
+            repairRadius = 65f;
             powerUse = 1f;
         }};
 
