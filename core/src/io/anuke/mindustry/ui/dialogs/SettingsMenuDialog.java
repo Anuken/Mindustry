@@ -13,6 +13,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 
@@ -32,6 +33,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
 
         hidden(() -> {
+            Sounds.back.play();
             if(!state.is(State.menu)){
                 if(!wasPaused || Net.active())
                     state.set(State.playing);
