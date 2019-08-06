@@ -16,7 +16,7 @@ import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.core.Platform;
@@ -106,7 +106,7 @@ public class AndroidLauncher extends AndroidApplication{
         };
 
         if(doubleScaleTablets && isTablet(this.getContext())){
-            Unit.dp.addition = 0.5f;
+            UnitScl.dp.addition = 0.5f;
         }
 
         config.hideStatusBar = true;

@@ -13,7 +13,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.actions.Actions;
 import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Fx;
@@ -38,7 +38,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private static final float maxPanSpeed = 1.3f;
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = io.anuke.arc.scene.ui.layout.Unit.dp.scl(60f);
+    private final float edgePan = UnitScl.dp.scl(60f);
 
     //gesture data
     private Vector2 vector = new Vector2();
@@ -765,7 +765,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(lastDistance == -1) lastDistance = initialDistance;
 
         float amount = (Mathf.sign(distance > lastDistance) * 0.04f) * Time.delta();
-        renderer.scaleCamera(io.anuke.arc.scene.ui.layout.Unit.dp.scl(amount));
+        renderer.scaleCamera(UnitScl.dp.scl(amount));
         lastDistance = distance;
         return true;
     }

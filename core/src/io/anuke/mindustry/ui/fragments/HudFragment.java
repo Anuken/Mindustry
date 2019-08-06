@@ -13,7 +13,7 @@ import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -102,7 +102,7 @@ public class HudFragment extends Fragment{
 
                     select.addImage("whiteui").color(Pal.gray).width(4f).fillY();
 
-                    float size = Unit.dp.scl(dsize);
+                    float size = UnitScl.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
@@ -114,7 +114,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(Unit.dp.scl(4f), size);
+                                elem.setSize(UnitScl.dp.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return true;
@@ -238,7 +238,7 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -UnitScl.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 

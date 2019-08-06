@@ -26,7 +26,7 @@ import io.anuke.mindustry.ui.TreeLayout.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
-    private final float nodeSize = Unit.dp.scl(230f);
+    private final float nodeSize = UnitScl.dp.scl(230f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
@@ -37,8 +37,8 @@ public class DeployDialog extends FloatingDialog{
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = layout.gapBetweenNodes = Unit.dp.scl(60f);
-        layout.gapBetweenNodes = Unit.dp.scl(120f);
+        layout.gapBetweenLevels = layout.gapBetweenNodes = UnitScl.dp.scl(60f);
+        layout.gapBetweenNodes = UnitScl.dp.scl(120f);
         layout.layout(root);
         bounds.set(layout.getBounds());
         bounds.y += nodeSize*0.4f;
@@ -234,7 +234,7 @@ public class DeployDialog extends FloatingDialog{
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.allChildren){
-                    Lines.stroke(Unit.dp.scl(4f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.gray);
+                    Lines.stroke(UnitScl.dp.scl(4f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.gray);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

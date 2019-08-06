@@ -131,7 +131,7 @@ public class UI implements ApplicationListener{
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
+            size = (int)(9 * 2 * Math.max(UnitScl.dp.scl(1f), 0.5f));
             shadowColor = Color.DARK_GRAY;
             shadowOffsetY = 2;
             incremental = true;

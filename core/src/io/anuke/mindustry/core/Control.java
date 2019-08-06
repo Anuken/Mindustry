@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
@@ -46,7 +46,7 @@ public class Control implements ApplicationListener{
         music = new MusicControl();
         data = new GlobalData();
 
-        Unit.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
+        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         Core.input.setCatch(KeyCode.BACK, true);
 
