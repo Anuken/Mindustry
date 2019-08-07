@@ -73,7 +73,7 @@ public class MenuFragment extends Fragment{
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
-            float logoscl = (int)UnitScl.dp.scl(1);
+            float logoscl = UnitScl.dp.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
