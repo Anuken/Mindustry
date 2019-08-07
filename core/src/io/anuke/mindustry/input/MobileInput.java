@@ -155,7 +155,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                     return req;
                 }
             }else{
-
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
 
@@ -248,7 +247,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Draws a placement icon for a specific block. */
     void drawPlace(int x, int y, Block block, int rotation, int prevX, int prevY, int prevRotation){
-        if(validPlace(x, y, block, rotation)){
+        if(validPlace(x, y, block, rotation) && !checkOverlapPlacement(x, y, block)){
             block.getPlaceDraw(placeDraw, rotation, prevX, prevY, prevRotation);
 
             Draw.color();
@@ -509,7 +508,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(mode == placing && isPlacing()){
                 iterateLine(lineStartX, lineStartY, tileX, tileY, l -> {
                     Tile tile = world.tile(l.x, l.y);
-                    if(tile != null && hasRequest(tile)){
+                    if(tile != null && checkOverlapPlacement(tile.x, tile.y, block)){
                         return;
                     }
 
