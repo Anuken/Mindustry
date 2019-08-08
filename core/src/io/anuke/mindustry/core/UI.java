@@ -140,7 +140,7 @@ public class UI implements ApplicationListener{
         FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
             size = param.size;
             borderColor = Color.DARK_GRAY;
-            borderWidth = 2f;
+            borderWidth = UnitScl.dp.scl(2f);
             spaceX -= borderWidth;
             incremental = true;
         }};

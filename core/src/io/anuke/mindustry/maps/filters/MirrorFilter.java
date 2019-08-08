@@ -24,8 +24,8 @@ public class MirrorFilter extends GenerateFilter{
         v1.trns(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
-        v1.add(in.width/2f, in.height/2f);
-        v2.add(in.width/2f, in.height/2f);
+        v1.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
+        v2.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
 
         v3.set(in.x, in.y);
 

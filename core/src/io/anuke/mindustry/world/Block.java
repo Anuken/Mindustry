@@ -238,7 +238,7 @@ public class Block extends BlockStorage{
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f);
+        font.getData().setScale(1f / 4f / UnitScl.dp.scl(1f));
         layout.setText(font, text);
 
         float width = layout.width;

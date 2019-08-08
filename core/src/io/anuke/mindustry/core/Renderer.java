@@ -48,7 +48,6 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom")){
             setupBloom();
         }
-        Lines.setCircleVertices(20);
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
