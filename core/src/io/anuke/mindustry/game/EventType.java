@@ -48,6 +48,11 @@ public class EventType{
 
     }
 
+    /** Called when the player places a line, mobile or desktop.*/
+    public static class LineConfirmEvent{
+
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

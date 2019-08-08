@@ -146,7 +146,7 @@ public class PlacementFragment extends Fragment{
                             if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
-                        }).size(46f).group(group).get();
+                        }).size(46f).group(group).name("block-" + block.name).get();
 
                         button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
 
@@ -282,7 +282,7 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton("icon-" + cat.name() + "-med", "clear-toggle-trans", iconsizemed, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
-                        }).group(group).update(i -> i.setChecked(currentCategory == cat));
+                        }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
                     }
                 }).touchable(Touchable.enabled);
 

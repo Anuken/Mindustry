@@ -10,6 +10,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.net.Net;
@@ -242,6 +243,7 @@ public class DesktopInput extends InputHandler{
                     rotation = l.rotation;
                     tryPlaceBlock(l.x, l.y);
                 });
+                Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
                 for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){

@@ -158,6 +158,12 @@ public class UI implements ApplicationListener{
 
         Core.scene.act();
         Core.scene.draw();
+
+        //draw overlay for buttons
+        if(state.rules.tutorial){
+            control.tutorial.draw();
+            Draw.flush();
+        }
     }
 
     @Override

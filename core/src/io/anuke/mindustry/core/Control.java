@@ -4,8 +4,9 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -20,6 +21,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 
@@ -226,6 +228,57 @@ public class Control implements ApplicationListener{
         });
     }
 
+    public void playTutorial(Zone zone){
+        ui.loadAnd(() -> {
+            logic.reset();
+            Net.reset();
+
+            world.beginMapLoad();
+
+            world.createTiles(zone.generator.width, zone.generator.height);
+            zone.generator.generate(world.getTiles());
+
+            Tile coreb = null;
+
+            out:
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    if(world.rawTile(x, y).block() instanceof CoreBlock){
+                        coreb = world.rawTile(x, y);
+                        break out;
+                    }
+                }
+            }
+
+            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
+                Tile tile = world.ltile(cx, cy);
+                if(tile != null && tile.getTeam() == defaultTeam && !(tile.block() instanceof CoreBlock)){
+                    world.removeBlock(tile);
+                }
+            });
+
+            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
+
+            world.endMapLoad();
+
+            zone.rules.accept(state.rules);
+            state.rules.zone = zone;
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.getStartingItems()){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+            Tile core = state.teams.get(defaultTeam).cores.first();
+            core.entity.items.clear();
+
+            state.set(State.playing);
+            control.saves.zoneSave();
+            logic.play();
+            state.rules.waveTimer = false;
+            state.rules.tutorial = true;
+        });
+    }
+
     public boolean isHighScore(){
         return hiscore;
     }
@@ -258,10 +311,7 @@ public class Control implements ApplicationListener{
 
         //play tutorial on stop
         if(!settings.getBool("tutorial", false)){
-            Core.app.post(() -> {
-                playZone(Zones.groundZero);
-                state.rules.tutorial = true;
-            });
+            Core.app.post(() -> playTutorial(Zones.groundZero));
         }
 
         //display UI scale changed dialog
@@ -331,6 +381,10 @@ public class Control implements ApplicationListener{
                         }
                     }
                 }
+            }
+
+            if(state.rules.tutorial){
+                tutorial.update();
             }
 
             //auto-update rpc every 5 seconds

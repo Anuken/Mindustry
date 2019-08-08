@@ -1,34 +1,25 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.input.GestureDetector;
-import io.anuke.arc.input.GestureDetector.GestureListener;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.input.*;
+import io.anuke.arc.input.GestureDetector.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
-import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
-import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
@@ -171,24 +162,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         removals.add(request);
     }
 
-    void showGuide(String type, BooleanProvider done){
-        if(!Core.settings.getBool(type, false)){
-            Core.scene.table("guideDim", t -> {
-                t.margin(10f);
-                t.touchable(Touchable.disabled);
-                t.top().table("button", s -> s.add("$" + type).growX().wrap().labelAlign(Align.center, Align.center)).growX();
-                t.update(() -> {
-                    if((done.get() || state.is(State.menu)) && t.getUserObject() == null){
-                        t.actions(Actions.delay(1f), Actions.fadeOut(1f, Interpolation.fade), Actions.remove());
-                        t.setUserObject("ha");
-                    }
-                });
-            });
-            Core.settings.put(type, true);
-            data.modified();
-        }
-    }
-
     boolean isLinePlacing(){
         return mode == placing && lineMode && Mathf.dst(lineStartX * tilesize, lineStartY * tilesize, Core.input.mouseWorld().x, Core.input.mouseWorld().y) >= 3 * tilesize;
     }
@@ -281,9 +254,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.addImageButton("icon-break-small", "clear-toggle-partial", iconsizesmall, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
-            if(mode == breaking){
-                showGuide("removearea", this::isAreaBreaking);
-            }
         }).update(l -> l.setChecked(mode == breaking));
 
         //diagonal swap button
@@ -516,6 +486,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     request.scale = 1f;
                     selection.add(request);
                 });
+                Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){
                 //normalize area
                 NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
@@ -650,10 +621,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         //if there is no mode and there's a recipe, switch to placing
         if(block != null && mode == none){
             mode = placing;
-        }
-
-        if(block != null){
-            showGuide("placeline", this::isLinePlacing);
         }
 
         if(block == null && mode == placing){

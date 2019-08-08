@@ -312,16 +312,21 @@ public class HudFragment extends Fragment{
             .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
+        parent.fill(t -> {
+             t.top().visible(() -> state.rules.tutorial);
+             t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(400f).pad(3f));
+        });
+
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.isPaused());
-            t.table("button", top -> top.add("$paused").pad(6f));
+            t.table("button-trans", top -> top.add("$paused").pad(5f));
         });
 
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saveload");
+            t.add("$saveload").style("outline");
         });
 
         blockfrag.build(parent);

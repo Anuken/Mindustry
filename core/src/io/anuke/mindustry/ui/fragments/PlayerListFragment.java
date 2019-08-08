@@ -43,7 +43,7 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            cont.table("button", pane -> {
+            cont.table("button-trans", pane -> {
                 pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
