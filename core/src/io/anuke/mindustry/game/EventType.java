@@ -53,6 +53,11 @@ public class EventType{
 
     }
 
+    /** Called when a turret recieves ammo, but only when the tutorial is active! */
+    public static class AmmoDeliverEvent{
+
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

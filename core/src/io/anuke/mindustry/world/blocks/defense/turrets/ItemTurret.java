@@ -1,11 +1,12 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.bullet.*;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -127,6 +128,11 @@ public class ItemTurret extends CooledTurret{
 
         //must not be found
         entity.ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+
+        //fire events for the tutorial
+        if(state.rules.tutorial){
+            Events.fire(new AmmoDeliverEvent());
+        }
     }
 
     @Override

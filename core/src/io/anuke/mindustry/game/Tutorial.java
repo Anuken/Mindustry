@@ -32,14 +32,19 @@ public class Tutorial{
         });
 
         Events.on(LineConfirmEvent.class, event -> events.add("lineconfirm"));
+        Events.on(AmmoDeliverEvent.class, event -> events.add("ammo"));
     }
 
+    /** update tutorial state, transition if needed */
     public void update(){
         if(stage.done.get()){
             next();
+        }else{
+            stage.update();
         }
     }
 
+    /** draw UI overlay */
     public void draw(){
         stage.draw();
     }
@@ -82,6 +87,23 @@ public class Tutorial{
                 outline("category-turrets");
                 outline("block-duo");
             }
+        },
+        drillturret(() -> event("ammo")){
+            void draw(){
+                outline("category-production");
+                outline("block-mechanical-drill");
+            }
+        },
+        waves(() -> Vars.state.wave > 2 && Vars.state.enemies() <= 0){
+            void begin(){
+                Vars.state.rules.waveTimer = true;
+            }
+
+            void update(){
+                if(Vars.state.wave > 2){
+                    Vars.state.rules.waveTimer = false;
+                }
+            }
         };
 
         protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && Vars.mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
@@ -98,10 +120,22 @@ public class Tutorial{
             this.done = done;
         }
 
+        /** displayed tutorial stage text.*/
         public String text(){
             return text.get(line);
         }
 
+        /** called every frame when this stage is active.*/
+        void update(){
+
+        }
+
+        /** called when a stage begins.*/
+        void begin(){
+
+        }
+
+        /** called when a stage needs to draw itself, usually over highlighted UI elements. */
         void draw(){
 
         }
