@@ -74,7 +74,7 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime)){
+        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
             entity.cons.trigger();
         }
 
@@ -84,12 +84,12 @@ public class OverdriveProjector extends Block{
 
             entity.charge = 0f;
 
-            int tileRange = (int)(realRange / tilesize);
+            int tileRange = (int)(realRange / tilesize + 1);
             healed.clear();
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
+                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
 
                     Tile other = world.ltile(x, y);
 

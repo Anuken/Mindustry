@@ -31,9 +31,6 @@ import static io.anuke.arc.scene.actions.Actions.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
-    private static final int cursorScaling = 1, outlineThickness = 3;
-    private static final Color outlineColor = Color.valueOf("444444");
-
     private FreeTypeFontGenerator generator;
 
     public MenuFragment menufrag;
@@ -99,9 +96,9 @@ public class UI implements ApplicationListener{
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
 
         Core.graphics.restoreCursor();
     }
@@ -126,15 +123,15 @@ public class UI implements ApplicationListener{
     }
 
     void loadExtraCursors(){
-        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
-        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
+        drillCursor = Core.graphics.newCursor("drill");
+        unloadCursor = Core.graphics.newCursor("unload");
     }
 
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
+            size = (int)(UnitScl.dp.scl(18f));
             shadowColor = Color.DARK_GRAY;
             shadowOffsetY = 2;
             incremental = true;
@@ -143,7 +140,7 @@ public class UI implements ApplicationListener{
         FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
             size = param.size;
             borderColor = Color.DARK_GRAY;
-            borderWidth = 2f;
+            borderWidth = UnitScl.dp.scl(2f);
             spaceX -= borderWidth;
             incremental = true;
         }};

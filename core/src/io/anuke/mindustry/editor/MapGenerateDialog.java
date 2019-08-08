@@ -216,7 +216,7 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Unit.dp.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / UnitScl.dp.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;

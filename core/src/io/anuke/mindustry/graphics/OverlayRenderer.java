@@ -85,9 +85,9 @@ public class OverlayRenderer{
                     float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
                     if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
                         Draw.color(Color.DARK_GRAY);
-                        Lines.poly(core.drawx(), core.drawy() - 2, 200, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.drawx(), core.drawy() - 2, state.rules.enemyCoreBuildRadius);
                         Draw.color(Pal.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                        Lines.poly(core.drawx(), core.drawy(), 200, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.drawx(), core.drawy(), state.rules.enemyCoreBuildRadius);
                     }
                 }
             }

@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -48,7 +48,7 @@ public class Control implements ApplicationListener{
         tutorial = new Tutorial();
         music = new MusicControl();
 
-        Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
+        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         Core.input.setCatch(KeyCode.BACK, true);
 
@@ -211,6 +211,7 @@ public class Control implements ApplicationListener{
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
+            Net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;
@@ -308,7 +309,7 @@ public class Control implements ApplicationListener{
 
         if(state.is(State.menu)){
             if(ui.deploy.isShown()){
-                music.silence(); //TODO deploy music
+                music.play(Musics.launch);
             }else if(ui.editor.isShown()){
                 music.play(Musics.editor);
             }else{

@@ -230,16 +230,18 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    protected void drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return;
+    protected float drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         BitmapFont font = Core.scene.skin.getFont("outline");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f);
+        font.getData().setScale(1f / 4f / UnitScl.dp.scl(1f));
         layout.setText(font, text);
+
+        float width = layout.width;
 
         font.setColor(color);
         float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
@@ -255,6 +257,7 @@ public class Block extends BlockStorage{
         font.getData().setScale(1f);
         Draw.reset();
         Pools.free(layout);
+        return width;
     }
 
     public void draw(Tile tile){
@@ -276,7 +279,8 @@ public class Block extends BlockStorage{
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile)){
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
+                    !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
                     tempTiles.add(other);
                 }
             });

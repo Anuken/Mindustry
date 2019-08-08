@@ -40,7 +40,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         try{
 
             String path = Paths.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                        .toUri().toURL().toString().substring("file:".length()))
+                        .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
                         .getParent().getParent().getParent().getParent().getParent().getParent().toString();
 
             process("Sounds", path + "/assets/sounds", "io.anuke.arc.audio.Sound", "newSound");

@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
@@ -77,7 +78,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, io.anuke.arc.scene.ui.layout.Unit.dp.scl(baseSize / 2f), io.anuke.arc.scene.ui.layout.Unit.dp.scl(baseSize / 2f));
+            Fill.rect(x + rx, y + ry, UnitScl.dp.scl(baseSize / 2f), UnitScl.dp.scl(baseSize / 2f));
         }
 
         Draw.color();

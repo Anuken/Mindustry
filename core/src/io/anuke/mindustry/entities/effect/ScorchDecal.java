@@ -34,7 +34,7 @@ public class ScorchDecal extends Decal{
 
     @Override
     public void drawDecal(){
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 3; i++){
             TextureRegion region = regions[Mathf.randomSeed(id - i, 0, scorches - 1)];
             float rotation = Mathf.randomSeed(id + i, 0, 360);
             float space = 1.5f + Mathf.randomSeed(id + i + 1, 0, 20) / 10f;

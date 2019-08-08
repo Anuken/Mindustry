@@ -45,6 +45,8 @@ public class NetClient implements ApplicationListener{
     private boolean connecting = false;
     /** If true, no message will be shown on disconnect. */
     private boolean quiet = false;
+    /** Whether to supress disconnect events completely.*/
+    private boolean quietReset = false;
     /** Counter for data timeout. */
     private float timeoutTime = 0f;
     /** Last sent client snapshot ID. */
@@ -94,8 +96,10 @@ public class NetClient implements ApplicationListener{
         });
 
         Net.handleClient(Disconnect.class, packet -> {
-            state.set(State.menu);
+            if(quietReset) return;
+
             connecting = false;
+            state.set(State.menu);
             logic.reset();
             Platform.instance.updateRPC();
 
@@ -325,11 +329,11 @@ public class NetClient implements ApplicationListener{
     private void finishConnecting(){
         state.set(State.playing);
         connecting = false;
-        ui.loadfrag.hide();
         ui.join.hide();
         Net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, Platform.instance::updateRPC);
+        Core.app.post(() -> ui.loadfrag.hide());
     }
 
     private void reset(){
@@ -337,6 +341,7 @@ public class NetClient implements ApplicationListener{
         removed.clear();
         timeoutTime = 0f;
         connecting = true;
+        quietReset = false;
         quiet = false;
         lastSent = 0;
 
@@ -348,8 +353,15 @@ public class NetClient implements ApplicationListener{
         connecting = true;
     }
 
+    /** Disconnects, resetting state to the menu. */
     public void disconnectQuietly(){
         quiet = true;
+        Net.disconnect();
+    }
+
+    /** Disconnects, causing no further changes or reset.*/
+    public void disconnectNoReset(){
+        quiet = quietReset = true;
         Net.disconnect();
     }
 

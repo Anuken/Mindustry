@@ -21,13 +21,33 @@ public class Drawf{
     }
 
     public static void circles(float x, float y, float rad, Color color){
-        int vertices = (int)(rad * 2);
         Lines.stroke(3f, Pal.gray);
-        Lines.poly(x, y, vertices, rad);
+        Lines.circle(x, y, rad);
         Lines.stroke(1f, color);
-        Lines.poly(x, y, vertices, rad);
+        Lines.circle(x, y, rad);
         Draw.reset();
     }
+
+    public static void square(float x, float y, float radius, Color color){
+        Lines.stroke(3f, Pal.gray);
+        Lines.square(x, y, radius + 1f, 45);
+        Lines.stroke(1f, color);
+        Lines.square(x, y, radius + 1f, 45);
+        Draw.reset();
+    }
+
+    public static void square(float x, float y, float radius){
+        square(x, y, radius, Pal.accent);
+    }
+
+    /*
+    public static void square(float x, float y, float radius){
+        Lines.stroke(1f, Pal.gray);
+        Lines.square(x, y - 1f, radius + 1f, 45);
+        Lines.stroke(1f, Pal.accent);
+        Lines.square(x, y, radius + 1f, 45);
+        Draw.reset();
+    }*/
 
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){
         float angle = Angles.angle(x, y, x2, y2);

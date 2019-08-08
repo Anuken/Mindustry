@@ -117,7 +117,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Unit.dp.scl(230)), 1, 8);
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / UnitScl.dp.scl(230)), 1, 8);
         float mapsize = 200f;
 
         int i = 0;
@@ -176,7 +176,7 @@ public class MapsDialog extends FloatingDialog{
             t.row();
             t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();
-            t.add(map.author()).growX().wrap().padTop(2);
+            t.add(map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();

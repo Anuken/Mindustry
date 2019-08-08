@@ -78,14 +78,13 @@ public class Zones implements ContentList{
         }};
 
         saltFlats = new Zone("saltFlats", new MapGenerator("saltFlats")){{
-            startingItems = ItemStack.list(Items.copper, 200, Items.silicon, 100, Items.lead, 200);
-            alwaysUnlocked = true;
-            conditionWave = 5;
-            launchPeriod = 5;
+            startingItems = ItemStack.list(Items.copper, 200, Items.silicon, 200, Items.lead, 200);
             loadout = Loadouts.basicFoundation;
+            conditionWave = 10;
+            launchPeriod = 5;
             zoneRequirements = ZoneRequirement.with(desertWastes, 60);
-            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.draugFactory};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
+            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.draugFactory, Blocks.door, Blocks.waterExtractor};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand, Items.titanium};
         }};
 
         frozenForest = new Zone("frozenForest", new MapGenerator("frozenForest", 1)
@@ -114,7 +113,7 @@ public class Zones implements ContentList{
             conditionWave = 20;
             launchPeriod = 20;
             zoneRequirements = ZoneRequirement.with(desertWastes, 20, craters, 15);
-            blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator, Blocks.kiln};
+            blockRequirements = new Block[]{Blocks.graphitePress, Blocks.combustionGenerator, Blocks.kiln, Blocks.mechanicalPump};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};
 
@@ -125,14 +124,14 @@ public class Zones implements ContentList{
             conditionWave = 10;
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(frozenForest, 15);
-            blockRequirements = new Block[]{Blocks.pneumaticDrill};
+            blockRequirements = new Block[]{Blocks.pneumaticDrill, Blocks.powerNode, Blocks.turbineGenerator};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
         }};
 
         fungalPass = new Zone("fungalPass", new MapGenerator("fungalPass")){{
             startingItems = ItemStack.list(Items.copper, 250, Items.lead, 250, Items.metaglass, 100, Items.graphite, 100);
             zoneRequirements = ZoneRequirement.with(stainedMountains, 15);
-            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.crawlerFactory, Blocks.door};
+            blockRequirements = new Block[]{Blocks.daggerFactory, Blocks.crawlerFactory, Blocks.door, Blocks.siliconSmelter};
             resources = new Item[]{Items.copper, Items.lead, Items.coal, Items.titanium, Items.sand};
         }};
 
@@ -153,7 +152,7 @@ public class Zones implements ContentList{
             conditionWave = 15;
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(ruinousShores, 20);
-            blockRequirements = new Block[]{Blocks.coalCentrifuge};
+            blockRequirements = new Block[]{Blocks.coalCentrifuge, Blocks.conduit, Blocks.wave};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
         }};
 
@@ -164,7 +163,7 @@ public class Zones implements ContentList{
             conditionWave = 3;
             launchPeriod = 2;
             zoneRequirements = ZoneRequirement.with(tarFields, 20);
-            blockRequirements = new Block[]{Blocks.thermalGenerator};
+            blockRequirements = new Block[]{Blocks.thermalGenerator, Blocks.thoriumReactor};
             resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand, Items.thorium};
         }};
 

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -105,12 +106,19 @@ public class PowerNode extends PowerBlock{
             Call.linkPowerNodes(null, tile, before);
         }
 
+        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
+        && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
+
+        tempTiles.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)){
-                Call.linkPowerNodes(null, tile, other);
+            if(valid.test(other)){
+                tempTiles.add(other);
             }
         });
+
+        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.each(valid, other -> Call.linkPowerNodes(null, tile, other));
 
         lastPlaced = tile.pos();
         super.playerPlaced(tile);
@@ -153,13 +161,12 @@ public class PowerNode extends PowerBlock{
         Lines.stroke(1f);
 
         Draw.color(Pal.accent);
-        Lines.poly(tile.drawx(), tile.drawy(), 50, laserRange * tilesize);
+        Drawf.circles(tile.drawx(), tile.drawy(), laserRange * tilesize);
         Draw.reset();
     }
 
     @Override
     public void drawConfigure(Tile tile){
-        TileEntity entity = tile.entity();
 
         Draw.color(Pal.accent);
 
@@ -177,15 +184,9 @@ public class PowerNode extends PowerBlock{
 
                 if(link != tile && linkValid(tile, link, false)){
                     boolean linked = linked(tile, link);
-                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
 
-                    Lines.circle(link.drawx(), link.drawy(),
-                    link.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
-
-                    if((entity.power.links.size >= maxNodes || (link.block() instanceof PowerNode && link.entity.power.links.size >= ((PowerNode)link.block()).maxNodes)) && !linked){
-                        Draw.color(Pal.breakInvalid);
-                        Lines.lineAngleCenter(link.drawx(), link.drawy(), 45, link.block().size * Mathf.sqrt2 * tilesize * 0.9f);
-                        Draw.color();
+                    if(linked){
+                        Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 1f, Pal.place);
                     }
                 }
             }
@@ -196,9 +197,24 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        Tile tile = world.tile(x, y);
+
+        if(tile == null) return;
+
         Lines.stroke(1f);
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
+
+        for(int cx = (int)(x - laserRange - 1); cx <= x + laserRange + 1; cx++){
+            for(int cy = (int)(y - laserRange - 1); cy <= y + laserRange + 1; cy++){
+                Tile link = world.ltile(cx, cy);
+
+                if(link != null && !(link.x == x && link.y == y) && link.block().hasPower && overlaps(x * tilesize + offset(), y *tilesize + offset(), link, laserRange * tilesize)){
+                    Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 2f, link.pos() == lastPlaced ? Pal.place : Pal.accent);
+                }
+            }
+        }
+
         Draw.reset();
     }
 
@@ -227,7 +243,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Tile tile, Tile link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
+        if(tile == link || link == null || link.entity == null || tile.entity == null || !link.block().hasPower || tile.getTeam() != link.getTeam()) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, link.<PowerNode>cblock().laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){
@@ -238,8 +254,12 @@ public class PowerNode extends PowerBlock{
         return false;
     }
 
+    protected boolean overlaps(float srcx, float srcy, Tile other, float range){
+        return Intersector.overlaps(Tmp.cr1.set(srcx, srcy, range), other.getHitbox(Tmp.r1));
+    }
+
     protected boolean overlaps(Tile src, Tile other, float range){
-        return Intersector.overlaps(Tmp.cr1.set(src.drawx(), src.drawy(), range), other.getHitbox(Tmp.r1));
+        return overlaps(src.drawx(), src.drawy(), other, range);
     }
 
     protected void drawLaser(Tile tile, Tile target){
@@ -255,8 +275,10 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        Draw.color(Pal.powerLight, Color.WHITE, Mathf.absin(Time.time(), 8f, 0.3f) + 0.2f);
-        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.6f);
+        float fract = 1f-tile.entity.power.graph.getSatisfaction();
+
+        Draw.color(Color.WHITE, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.4f);
         Draw.color();
     }
 

@@ -4,7 +4,7 @@ import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.Strings;
 import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Saves.SaveSlot;
@@ -31,9 +31,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
         Net.setServerProvider(new ArcNetServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
-            Unit.dp.addition = 0.5f;
+            UnitScl.dp.addition = 0.5f;
         }else{
-            Unit.dp.addition = -0.5f;
+            UnitScl.dp.addition = -0.5f;
         }
 
         Platform.instance = new Platform(){

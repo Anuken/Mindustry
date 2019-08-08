@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
@@ -27,7 +28,7 @@ import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -379,7 +380,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
+        font.getData().setScale(0.25f / UnitScl.dp.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
         Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
@@ -420,7 +421,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawBuildRequests(){
         BuildRequest last = null;
         for(BuildRequest request : buildQueue()){
-            if(request.progress > 0.01f || (buildRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
+            if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
                 Block block = world.ltile(request.x, request.y).block();
@@ -638,7 +639,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     protected void updateTouch(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) &&
+            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range() && !(((TileEntity)target).block instanceof BuildBlock))){
             target = null;
         }
 

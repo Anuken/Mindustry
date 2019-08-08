@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
@@ -402,7 +403,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 Core.scene.skin.getFont("outline").draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
-                    Pal.accent, 0.25f * itemtime, false, Align.center
+                    Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center
                 );
             }
         }

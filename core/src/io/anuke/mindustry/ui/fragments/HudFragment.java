@@ -1,42 +1,34 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.scene.utils.Elements;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.Packets.AdminAction;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.UnitType;
+import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -110,7 +102,7 @@ public class HudFragment extends Fragment{
 
                     select.addImage("whiteui").color(Pal.gray).width(4f).fillY();
 
-                    float size = Unit.dp.scl(dsize);
+                    float size = UnitScl.dp.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
@@ -122,7 +114,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(Unit.dp.scl(4f), size);
+                                elem.setSize(UnitScl.dp.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return true;
@@ -144,21 +136,14 @@ public class HudFragment extends Fragment{
             });
 
             Table wavesMain, editorMain;
-            boolean[] prev = {false};
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight()).update(s -> {
-                ((Table)s.getParent()).getCell(s).height((wavesMain.isVisible() ? wavesMain.getPrefHeight() : editorMain.getPrefHeight()) / Unit.dp.scl(1f));
-                if(prev[0] != wavesMain.isVisible()){
-                    s.getParent().pack();
-                    prev[0] = wavesMain.isVisible();
-                }
-            });
+            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight());
 
             {
                 wavesMain.visible(() -> shown && !state.isEditor());
-                wavesMain.left();
+                wavesMain.top().left();
                 Stack stack = new Stack();
-                TextButton waves = new TextButton("", "wave");
+                Button waves = new Button("wave");
                 Table btable = new Table().margin(0);
 
                 stack.add(waves);
@@ -253,7 +238,7 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Unit.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -UnitScl.dp.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
@@ -325,59 +310,6 @@ public class HudFragment extends Fragment{
             });
             t.table("button", top -> top.add("$coreattack").pad(2)
             .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
-        });
-
-        //launch button
-        parent.fill(t -> {
-            t.top().right();
-            TextButton[] testb = {null};
-            TextButton button = Elements.newButton("$launch", () -> {
-                FloatingDialog dialog = new FloatingDialog("$launch");
-                dialog.update(() -> {
-                    if(!testb[0].isVisible()){
-                        dialog.hide();
-                    }
-                });
-                dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-                dialog.buttons.defaults().size(200f, 54f).pad(2f);
-                dialog.setFillParent(false);
-                dialog.buttons.addButton("$cancel", dialog::hide);
-                dialog.buttons.addButton("$ok", () -> {
-                    dialog.hide();
-                    Call.launchZone();
-                });
-                dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
-                dialog.keyDown(KeyCode.BACK, dialog::hide);
-                dialog.show();
-
-            });
-
-            testb[0] = button;
-
-            button.getStyle().disabledFontColor = Color.WHITE;
-            button.margin(16f);
-            button.visible(() ->
-                world.isZone() &&
-                world.getZone().metCondition() &&
-                !Net.client() &&
-                state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning());
-
-            button.update(() -> {
-                if(world.getZone() == null){
-                    button.setText("");
-                    return;
-                }
-
-                button.setText(state.enemies() > 0 ? Core.bundle.format("launch.unable", state.enemies()) : Core.bundle.get("launch") + "\n" +
-                Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
-
-                button.getLabel().setColor(Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET,
-                Mathf.absin(Time.time(), 2f, 1f)));
-            });
-
-            button.setDisabled(() -> state.enemies() > 0);
-            button.getLabelCell().left().get().setAlignment(Align.left, Align.left);
-            t.add(button).size(250f, 80f);
         });
 
         //paused table
@@ -542,6 +474,37 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
+    private void showLaunchConfirm(){
+        FloatingDialog dialog = new FloatingDialog("$launch");
+        dialog.update(() -> {
+            if(!inLaunchWave()){
+                dialog.hide();
+            }
+        });
+        dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
+        dialog.buttons.addButton("$cancel", dialog::hide);
+        dialog.buttons.addButton("$ok", () -> {
+            dialog.hide();
+            Call.launchZone();
+        });
+        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.show();
+    }
+
+    private boolean inLaunchWave(){
+        return world.isZone() &&
+            world.getZone().metCondition() &&
+            !Net.client() &&
+            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning();
+    }
+
+    private boolean canLaunch(){
+        return inLaunchWave() && state.enemies() <= 0;
+    }
+
     private void toggleMenus(){
         if(flip != null){
             flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
@@ -553,7 +516,7 @@ public class HudFragment extends Fragment{
         }
     }
 
-    private void addWaveTable(TextButton table){
+    private void addWaveTable(Button table){
         StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
@@ -586,6 +549,22 @@ public class HudFragment extends Fragment{
             builder.append(wavef.get(state.wave));
             builder.append("\n");
 
+            if(inLaunchWave()){
+                builder.append("[#");
+                Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
+                builder.append("]");
+
+                if(!canLaunch()){
+                    builder.append(Core.bundle.get("launch.unable2"));
+                }else{
+                    builder.append(Core.bundle.get("launch"));
+                    builder.append("\n");
+                    builder.append(Core.bundle.format("launch.next", state.wave + world.getZone().launchPeriod));
+                    builder.append("\n");
+                }
+                builder.append("[]\n");
+            }
+
             if(state.enemies() > 0){
                 if(state.enemies() == 1){
                     builder.append(enemyf.get(state.enemies()));
@@ -604,8 +583,13 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(true);
+        table.setDisabled(() -> !canLaunch());
         table.visible(() -> state.rules.waves);
+        table.clicked(() -> {
+            if(canLaunch()){
+                showLaunchConfirm();
+            }
+        });
     }
 
     private void addPlayButton(Table table){
@@ -616,7 +600,6 @@ public class HudFragment extends Fragment{
                 state.wavetime = 0f;
             }
         }).growY().fillX().right().width(40f)
-        .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0
-        && !world.spawner.isSpawning());
+        .visible(() -> state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !world.spawner.isSpawning() && !inLaunchWave());
     }
 }

@@ -132,6 +132,11 @@ public class Net{
         active = false;
     }
 
+    public static void reset(){
+        closeServer();
+        netClient.disconnectNoReset();
+    }
+
     public static void disconnect(){
         clientProvider.disconnect();
         server = false;

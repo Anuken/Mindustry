@@ -24,8 +24,8 @@ public class MirrorFilter extends GenerateFilter{
         v1.trns(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
-        v1.add(in.width/2f, in.height/2f);
-        v2.add(in.width/2f, in.height/2f);
+        v1.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
+        v2.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
 
         v3.set(in.x, in.y);
 
@@ -57,7 +57,7 @@ public class MirrorFilter extends GenerateFilter{
         clamper.accept(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
         clamper.accept(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()).rotate(180f).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
 
-        Lines.stroke(Unit.dp.scl(3f), Pal.accent);
+        Lines.stroke(UnitScl.dp.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
         Draw.reset();
     }

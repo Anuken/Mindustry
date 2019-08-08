@@ -35,6 +35,7 @@ if(!hasProperty("release")){
         use(':Arc:backends:backend-robovm')
         use(':Arc:backends:backend-headless')
     }
+    
     if(new File(settingsDir, '../debug').exists()){
         use(':debug')
     }

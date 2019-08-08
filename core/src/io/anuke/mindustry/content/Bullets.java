@@ -1,19 +1,16 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BuildBlock;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -43,7 +40,7 @@ public class Bullets implements ContentList{
     fireball, basicFlame, pyraFlame, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
-    bombExplosive, bombIncendiary, bombOil, explode;
+    bombExplosive, bombIncendiary, bombOil;
 
     @Override
     public void load(){
@@ -471,6 +468,11 @@ public class Bullets implements ContentList{
             }
 
             @Override
+            public float range(){
+                return 50f;
+            }
+
+            @Override
             public void draw(Bullet b){
             }
         };
@@ -696,24 +698,6 @@ public class Bullets implements ContentList{
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
                     Puddle.deposit(tile, Liquids.oil, 5f);
                 }
-            }
-        };
-
-        explode = new BombBulletType(2f, 3f, "clear"){
-            {
-                hitEffect = Fx.pulverize;
-                lifetime = 30f;
-                speed = 1f;
-                splashDamageRadius = 50f;
-                splashDamage = 28f;
-            }
-
-            @Override
-            public void init(Bullet b){
-                if(b.getOwner() instanceof Unit){
-                    ((Unit)b.getOwner()).kill();
-                }
-                b.time(b.lifetime());
             }
         };
     }

@@ -59,6 +59,26 @@ public class Zone extends UnlockableContent{
         return metCondition() && wave % launchPeriod == 0;
     }
 
+    public boolean canUnlock(){
+        if(data.isUnlocked(this)){
+            return true;
+        }
+
+        for(ZoneRequirement other : zoneRequirements){
+            if(other.zone.bestWave() < other.wave){
+                return false;
+            }
+        }
+
+        for(Block other : blockRequirements){
+            if(!data.isUnlocked(other)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public ItemStack[] getLaunchCost(){
         if(launchCost == null){
             updateLaunchCost();

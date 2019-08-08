@@ -1,20 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.TextButton;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.SaveIO.SaveException;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.SaveIO.*;
+import io.anuke.mindustry.net.Net;
 
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -137,7 +137,6 @@ public class LoadDialog extends FloatingDialog{
         for(SaveSlot slot : control.saves.getSaveSlots()) if(!slot.isHidden()) valids = true;
 
         if(!valids){
-
             slots.row();
             slots.addButton("$save.none", () -> {
             }).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
@@ -170,6 +169,7 @@ public class LoadDialog extends FloatingDialog{
 
         ui.loadAnd(() -> {
             try{
+                Net.reset();
                 slot.load();
                 state.set(State.playing);
             }catch(SaveException e){
@@ -184,7 +184,6 @@ public class LoadDialog extends FloatingDialog{
     public void modifyButton(TextButton button, SaveSlot slot){
         button.clicked(() -> {
             if(!button.childrenPressed()){
-                int build = slot.getBuild();
                 runLoadSave(slot);
             }
         });

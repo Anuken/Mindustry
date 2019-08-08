@@ -151,29 +151,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                 hide();
                 control.playZone(zone);
             }
-        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).uniformY().get();
+        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 
         button.row();
         button.add(iteminfo);
-    }
-
-    private boolean canUnlock(Zone zone){
-        if(data.isUnlocked(zone)){
-            return true;
-        }
-
-        for(ZoneRequirement other : zone.zoneRequirements){
-            if(other.zone.bestWave() < other.wave){
-                return false;
-            }
-        }
-
-        for(Block other : zone.blockRequirements){
-            if(!data.isUnlocked(other)){
-                return false;
-            }
-        }
-
-        return true;
     }
 }
