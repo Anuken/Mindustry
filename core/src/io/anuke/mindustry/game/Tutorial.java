@@ -57,7 +57,7 @@ public class Tutorial{
 
     /** Resets tutorial state. */
     public void reset(){
-        stage = TutorialStage.values()[6];
+        stage = TutorialStage.values()[4];
         stage.begin();
         blocksPlaced.clear();
         events.clear();
@@ -246,11 +246,12 @@ public class Tutorial{
                 float angle = Angles.angle(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Tmp.v1.x + element.getWidth()/2f, Tmp.v1.y + element.getHeight()/2f);
                 Tmp.v2.trns(angle + 180f, size*1.4f);
                 float fs = UnitScl.dp.scl(40f);
-                float fs2 = UnitScl.dp.scl(50f);
+                float fs2 = UnitScl.dp.scl(56f);
 
                 Draw.color(Pal.gray);
                 Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs2, fs2, angle);
                 Draw.color(Pal.place);
+                Tmp.v2.setLength(Tmp.v2.len() - UnitScl.dp.scl(4));
                 Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs, fs, angle);
                 Draw.reset();
             }

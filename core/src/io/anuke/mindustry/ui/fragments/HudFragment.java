@@ -249,7 +249,7 @@ public class HudFragment extends Fragment{
         });
 
         //minimap
-        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap")));
+        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
 
         //spawner warning
         parent.fill(t -> {
@@ -314,8 +314,14 @@ public class HudFragment extends Fragment{
 
         //tutorial text
         parent.fill(t -> {
-             t.top().visible(() -> state.rules.tutorial);
-             t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(500f).pad(3f));
+            Runnable resize = () -> {
+                t.clearChildren();
+                t.top().right().visible(() -> state.rules.tutorial);
+                t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(!Core.graphics.isPortrait() ? 450f : 180f).pad(3f));
+            };
+
+            resize.run();
+            Events.on(ResizeEvent.class, e -> resize.run());
         });
 
         //paused table
@@ -444,7 +450,7 @@ public class HudFragment extends Fragment{
             lastUnlockLayout.clearChildren();
             lastUnlockLayout.defaults().size(size).pad(2);
 
-            for(int i = 0; i < esize && i <= cap; i++){
+            for(int i = 0; i < esize; i++){
                 lastUnlockLayout.add(elements.get(i));
 
                 if(i % col == col - 1){
