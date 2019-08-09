@@ -24,6 +24,7 @@ public class Tutorial{
 
     private ObjectSet<String> events = new ObjectSet<>();
     private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
+    private int sentence;
     public TutorialStage stage = TutorialStage.values()[0];
 
     public Tutorial(){
@@ -43,7 +44,7 @@ public class Tutorial{
 
     /** update tutorial state, transition if needed */
     public void update(){
-        if(stage.done.get()){
+        if(stage.done.get() && !canNext()){
             next();
         }else{
             stage.update();
@@ -52,15 +53,18 @@ public class Tutorial{
 
     /** draw UI overlay */
     public void draw(){
-        stage.draw();
+        if(!Core.scene.hasDialog()){
+            stage.draw();
+        }
     }
 
     /** Resets tutorial state. */
     public void reset(){
-        stage = TutorialStage.values()[4];
+        stage = TutorialStage.values()[0];
         stage.begin();
         blocksPlaced.clear();
         events.clear();
+        sentence = 0;
     }
 
     /** Goes on to the next tutorial step. */
@@ -69,11 +73,32 @@ public class Tutorial{
         stage.begin();
         blocksPlaced.clear();
         events.clear();
+        sentence = 0;
+    }
+
+    public boolean canNext(){
+        return sentence + 1 < stage.sentences.size;
+    }
+
+    public void nextSentence(){
+        if(canNext()){
+            sentence ++;
+        }
+    }
+
+    public boolean canPrev(){
+        return sentence > 0;
+    }
+
+    public void prevSentence(){
+        if(canPrev()){
+            sentence --;
+        }
     }
 
     public enum TutorialStage{
         intro(
-        line -> Core.bundle.format(line, item(Items.copper), mineCopper),
+        line -> Strings.format(line, item(Items.copper), mineCopper),
         () -> item(Items.copper) >= mineCopper
         ),
         drill(() -> placed(Blocks.mechanicalDrill, 1)){
@@ -90,7 +115,7 @@ public class Tutorial{
             }
         },
         conveyor(
-        line -> Core.bundle.format(line, Math.min(placed(Blocks.conveyor), 2), 2),
+        line -> Strings.format(line, Math.min(placed(Blocks.conveyor), 2), 2),
         () -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
             void draw(){
                 outline("category-distribution");
@@ -105,6 +130,13 @@ public class Tutorial{
         },
         drillturret(() -> event("ammo")),
         pause(() -> state.isPaused()){
+            void draw(){
+                if(mobile){
+                    outline("pause");
+                }
+            }
+        },
+        unpause(() -> !state.isPaused()){
             void draw(){
                 if(mobile){
                     outline("pause");
@@ -157,21 +189,23 @@ public class Tutorial{
 
         protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
         protected final Function<String, String> text;
+        protected final Array<String> sentences;
         protected final BooleanProvider done;
 
         TutorialStage(Function<String, String> text, BooleanProvider done){
             this.text = text;
             this.done = done;
+            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         TutorialStage(BooleanProvider done){
-            this.text = line -> Core.bundle.get(line);
-            this.done = done;
+            this(line -> line, done);
         }
 
         /** displayed tutorial stage text.*/
         public String text(){
-            return text.get(line);
+            String line = sentences.get(control.tutorial.sentence);
+            return line.contains("{") ? text.get(line) : line;
         }
 
         /** called every frame when this stage is active.*/

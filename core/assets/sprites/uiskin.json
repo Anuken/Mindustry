@@ -52,7 +52,9 @@
   ButtonStyle: {
     default: {
       down: button-down,
-      up: button
+      up: button,
+      over: button-over,
+      disabled: button-disabled
     },
     square: {
       over: button-square-over,

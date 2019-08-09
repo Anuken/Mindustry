@@ -13,7 +13,6 @@ import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -314,11 +313,20 @@ public class HudFragment extends Fragment{
 
         //tutorial text
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
             Runnable resize = () -> {
                 t.clearChildren();
                 t.top().right().visible(() -> state.rules.tutorial);
-                t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(!Core.graphics.isPortrait() ? 450f : 180f).pad(3f));
+                t.stack(new Button("default"){{
+                    marginLeft(48f);
+                    labelWrap(() -> control.tutorial.stage.text() + (control.tutorial.canNext() ? "\n\n" + Core.bundle.get("tutorial.next") : "")).width(!Core.graphics.isPortrait() ? 400f : 160f).pad(2f);
+                    clicked(() -> control.tutorial.nextSentence());
+                    setDisabled(() -> !control.tutorial.canNext());
+                }},
+                new Table(f -> {
+                    f.left().addImageButton("icon-arrow-left-small", "empty", iconsizesmall, () -> {
+                        control.tutorial.prevSentence();
+                    }).width(44f).growY().visible(() -> control.tutorial.canPrev());
+                }));
             };
 
             resize.run();

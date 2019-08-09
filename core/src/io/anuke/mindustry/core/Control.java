@@ -228,7 +228,8 @@ public class Control implements ApplicationListener{
         });
     }
 
-    public void playTutorial(Zone zone){
+    public void playTutorial(){
+        Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
             Net.reset();
@@ -313,7 +314,7 @@ public class Control implements ApplicationListener{
 
         //play tutorial on stop
         if(!settings.getBool("tutorial", false)){
-            Core.app.post(() -> playTutorial(Zones.groundZero));
+            Core.app.post(this::playTutorial);
         }
 
         //display UI scale changed dialog

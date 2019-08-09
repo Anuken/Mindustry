@@ -185,6 +185,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
+        game.pref(new Setting(){
+            @Override
+            public void add(SettingsTable table){
+                table.addButton("$tutorial.retake", () -> {
+                    control.playTutorial();
+                }).size(220f, 60f).pad(6).left();
+                table.add();
+                table.row();
+            }
+        });
+
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
             if(Core.graphics.getFrameId() > 10){
                 Log.info("changed");
