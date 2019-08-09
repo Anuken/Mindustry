@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.function.BooleanProvider;
 import io.anuke.arc.function.Supplier;
@@ -21,6 +21,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
@@ -100,6 +101,8 @@ public class BlockInventoryFragment extends Fragment{
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
+
+                        Events.fire(new WithdrawEvent());
                     }
                 }
 
@@ -152,6 +155,7 @@ public class BlockInventoryFragment extends Fragment{
                             lastItem = item;
                             holding = true;
                             holdTime = 0f;
+                            Events.fire(new WithdrawEvent());
                         }
                         return true;
                     }

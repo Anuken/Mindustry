@@ -68,6 +68,16 @@ public class EventType{
 
     }
 
+    /** Called when a player withdraws items from a block. Tutorial only.*/
+    public static class WithdrawEvent{
+
+    }
+
+    /** Called when a player deposits items to a block.*/
+    public static class DepositEvent{
+
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

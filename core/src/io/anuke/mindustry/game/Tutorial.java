@@ -37,6 +37,8 @@ public class Tutorial{
         Events.on(TurretAmmoDeliverEvent.class, event -> events.add("ammo"));
         Events.on(CoreItemDeliverEvent.class, event -> events.add("coreitem"));
         Events.on(BlockInfoEvent.class, event -> events.add("blockinfo"));
+        Events.on(DepositEvent.class, event -> events.add("deposit"));
+        Events.on(WithdrawEvent.class, event -> events.add("withdraw"));
     }
 
     /** update tutorial state, transition if needed */
@@ -55,7 +57,7 @@ public class Tutorial{
 
     /** Resets tutorial state. */
     public void reset(){
-        stage = TutorialStage.values()[0];
+        stage = TutorialStage.values()[6];
         stage.begin();
         blocksPlaced.clear();
         events.clear();
@@ -120,7 +122,13 @@ public class Tutorial{
                 }
             }
         },
-        waves(() -> state.wave > 2 && state.enemies() <= 0){
+        withdraw(() -> event("withdraw")){
+            void begin(){
+                state.teams.get(defaultTeam).cores.first().entity.items.add(Items.copper, 10);
+            }
+        },
+        deposit(() -> event("deposit")),
+        waves(() -> state.wave > 2 && state.enemies() <= 0 && !world.spawner.isSpawning()){
             void begin(){
                 state.rules.waveTimer = true;
                 logic.runWave();
