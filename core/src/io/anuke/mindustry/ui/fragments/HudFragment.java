@@ -314,6 +314,7 @@ public class HudFragment extends Fragment{
 
         //tutorial text
         parent.fill(t -> {
+            t.touchable(Touchable.disabled);
             Runnable resize = () -> {
                 t.clearChildren();
                 t.top().right().visible(() -> state.rules.tutorial);
@@ -326,7 +327,7 @@ public class HudFragment extends Fragment{
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.isPaused());
+            t.top().visible(() -> state.isPaused()).touchable(Touchable.disabled);
             t.table("button-trans", top -> top.add("$paused").pad(5f));
         });
 
