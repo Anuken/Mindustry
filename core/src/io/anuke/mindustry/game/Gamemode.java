@@ -28,7 +28,6 @@ public enum Gamemode{
     }, map -> map.teams.contains(waveTeam.ordinal())),
     pvp(rules -> {
         rules.pvp = true;
-        rules.enemyCoreBuildRadius = 600f;
         rules.respawnTime = 60 * 10;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
