@@ -275,6 +275,8 @@ public class Control implements ApplicationListener{
             control.saves.zoneSave();
             logic.play();
             state.rules.waveTimer = false;
+            state.rules.waveSpacing = 60f * 30;
+            state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
         });
     }

@@ -13,8 +13,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.UnlockEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
@@ -200,8 +199,10 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
-                                    .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                    header.addButton("?", "clear-partial", () -> {
+                                        ui.content.show(lastDisplay);
+                                        Events.fire(new BlockInfoEvent());
+                                    }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
                                 }
                                 if(lastDisplay.buildVisibility == Blocks.padVisible && !lastDisplay.buildVisibility.get()){
                                     header.row();

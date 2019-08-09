@@ -131,7 +131,7 @@ public class ItemTurret extends CooledTurret{
 
         //fire events for the tutorial
         if(state.rules.tutorial){
-            Events.fire(new AmmoDeliverEvent());
+            Events.fire(new TurretAmmoDeliverEvent());
         }
     }
 

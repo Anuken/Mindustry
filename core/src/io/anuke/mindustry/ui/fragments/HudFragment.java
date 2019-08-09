@@ -71,7 +71,7 @@ public class HudFragment extends Fragment{
                         }else{
                             state.set(state.is(State.paused) ? State.playing : State.paused);
                         }
-                    }).update(i -> {
+                    }).name("pause").update(i -> {
                         if(Net.active()){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
@@ -312,9 +312,10 @@ public class HudFragment extends Fragment{
             .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
+        //tutorial text
         parent.fill(t -> {
              t.top().visible(() -> state.rules.tutorial);
-             t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(400f).pad(3f));
+             t.table("button-trans", f -> f.labelWrap(() -> control.tutorial.stage.text()).width(500f).pad(3f));
         });
 
         //paused table
@@ -549,6 +550,7 @@ public class HudFragment extends Fragment{
 
         StringBuilder builder = new StringBuilder();
 
+        table.setName("waves");
         table.labelWrap(() -> {
             builder.setLength(0);
             builder.append(wavef.get(state.wave));

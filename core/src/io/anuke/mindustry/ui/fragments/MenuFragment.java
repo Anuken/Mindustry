@@ -45,9 +45,7 @@ public class MenuFragment extends Fragment{
 
         parent = group;
 
-        parent.fill((x, y, w, h) -> {
-            renderer.render();
-        });
+        parent.fill((x, y, w, h) -> renderer.render());
 
         parent.fill(c -> {
             container = c;

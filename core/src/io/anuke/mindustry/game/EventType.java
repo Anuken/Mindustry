@@ -54,7 +54,17 @@ public class EventType{
     }
 
     /** Called when a turret recieves ammo, but only when the tutorial is active! */
-    public static class AmmoDeliverEvent{
+    public static class TurretAmmoDeliverEvent{
+
+    }
+
+    /** Called when a core recieves ammo, but only when the tutorial is active! */
+    public static class CoreItemDeliverEvent{
+
+    }
+
+    /** Called when the player opens info for a specific block.*/
+    public static class BlockInfoEvent{
 
     }
 

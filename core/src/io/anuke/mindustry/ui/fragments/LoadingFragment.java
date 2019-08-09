@@ -55,6 +55,6 @@ public class LoadingFragment extends Fragment{
         table.clearActions();
         table.toFront();
         table.touchable(Touchable.disabled);
-        table.actions(Actions.fadeOut(1f), Actions.visible(false));
+        table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
     }
 }

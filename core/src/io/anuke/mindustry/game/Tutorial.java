@@ -9,16 +9,18 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
+import static io.anuke.mindustry.Vars.*;
+
 /** Handles tutorial state. */
 public class Tutorial{
-    private static final int mineCopper = 16;
+    private static final int mineCopper = 18;
+    private static final int blocksToBreak = 3, blockOffset = 5;
 
     private ObjectSet<String> events = new ObjectSet<>();
     private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
@@ -32,7 +34,9 @@ public class Tutorial{
         });
 
         Events.on(LineConfirmEvent.class, event -> events.add("lineconfirm"));
-        Events.on(AmmoDeliverEvent.class, event -> events.add("ammo"));
+        Events.on(TurretAmmoDeliverEvent.class, event -> events.add("ammo"));
+        Events.on(CoreItemDeliverEvent.class, event -> events.add("coreitem"));
+        Events.on(BlockInfoEvent.class, event -> events.add("blockinfo"));
     }
 
     /** update tutorial state, transition if needed */
@@ -52,6 +56,7 @@ public class Tutorial{
     /** Resets tutorial state. */
     public void reset(){
         stage = TutorialStage.values()[0];
+        stage.begin();
         blocksPlaced.clear();
         events.clear();
     }
@@ -59,6 +64,7 @@ public class Tutorial{
     /** Goes on to the next tutorial step. */
     public void next(){
         stage = TutorialStage.values()[Mathf.clamp(stage.ordinal() + 1, 0, TutorialStage.values().length)];
+        stage.begin();
         blocksPlaced.clear();
         events.clear();
     }
@@ -74,9 +80,16 @@ public class Tutorial{
                 outline("block-mechanical-drill");
             }
         },
+        blockinfo(() -> event("blockinfo")){
+            void draw(){
+                outline("category-production");
+                outline("block-mechanical-drill");
+                outline("blockinfo");
+            }
+        },
         conveyor(
-        line -> Core.bundle.format(line, placed(Blocks.conveyor), 3),
-        () -> placed(Blocks.conveyor, 3) && event("lineconfirm")){
+        line -> Core.bundle.format(line, Math.min(placed(Blocks.conveyor), 2), 2),
+        () -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
             void draw(){
                 outline("category-distribution");
                 outline("block-conveyor");
@@ -84,29 +97,57 @@ public class Tutorial{
         },
         turret(() -> placed(Blocks.duo, 1)){
             void draw(){
-                outline("category-turrets");
+                outline("category-turret");
                 outline("block-duo");
             }
         },
-        drillturret(() -> event("ammo")){
+        drillturret(() -> event("ammo")),
+        pause(() -> state.isPaused()){
             void draw(){
-                outline("category-production");
-                outline("block-mechanical-drill");
+                if(mobile){
+                    outline("pause");
+                }
             }
         },
-        waves(() -> Vars.state.wave > 2 && Vars.state.enemies() <= 0){
+        breaking(TutorialStage::blocksBroken){
             void begin(){
-                Vars.state.rules.waveTimer = true;
+                placeBlocks();
+            }
+
+            void draw(){
+                if(mobile){
+                    outline("breakmode");
+                }
+            }
+        },
+        waves(() -> state.wave > 2 && state.enemies() <= 0){
+            void begin(){
+                state.rules.waveTimer = true;
+                logic.runWave();
             }
 
             void update(){
-                if(Vars.state.wave > 2){
-                    Vars.state.rules.waveTimer = false;
+                if(state.wave > 2){
+                    state.rules.waveTimer = false;
                 }
             }
-        };
+        },
+        launch(() -> false){
+            void begin(){
+                state.rules.waveTimer = false;
+                state.wave = 5;
 
-        protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && Vars.mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
+                //end tutorial, never show it again
+                Core.settings.put("tutorial", true);
+                Core.settings.save();
+            }
+
+            void draw(){
+                outline("waves");
+            }
+        },;
+
+        protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
         protected final Function<String, String> text;
         protected final BooleanProvider done;
 
@@ -142,8 +183,27 @@ public class Tutorial{
 
         //utility
 
+        static void placeBlocks(){
+            Tile core = state.teams.get(defaultTeam).cores.first();
+            for(int i = 0; i < blocksToBreak; i++){
+                world.removeBlock(world.ltile(core.x + blockOffset, core.y + i));
+                world.tile(core.x + blockOffset, core.y + i).setBlock(Blocks.scrapWall);
+            }
+        }
+
+        static boolean blocksBroken(){
+            Tile core = state.teams.get(defaultTeam).cores.first();
+
+            for(int i = 0; i < blocksToBreak; i++){
+                if(world.tile(core.x + blockOffset, core.y + i).block() == Blocks.scrapWall){
+                    return false;
+                }
+            }
+            return true;
+        }
+
         static boolean event(String name){
-            return Vars.control.tutorial.events.contains(name);
+            return control.tutorial.events.contains(name);
         }
 
         static boolean placed(Block block, int amount){
@@ -151,11 +211,11 @@ public class Tutorial{
         }
 
         static int placed(Block block){
-            return Vars.control.tutorial.blocksPlaced.get(block, 0);
+            return control.tutorial.blocksPlaced.get(block, 0);
         }
 
         static int item(Item item){
-            return Vars.state.teams.get(Vars.defaultTeam).cores.isEmpty() ? 0 : Vars.state.teams.get(Vars.defaultTeam).cores.first().entity.items.get(item);
+            return state.teams.get(defaultTeam).cores.isEmpty() ? 0 : state.teams.get(defaultTeam).cores.first().entity.items.get(item);
         }
 
         static boolean toggled(String name){
@@ -173,6 +233,17 @@ public class Tutorial{
                 float sin = Mathf.sin(11f, UnitScl.dp.scl(4f));
                 Lines.stroke(UnitScl.dp.scl(7f), Pal.place);
                 Lines.rect(Tmp.v1.x - sin, Tmp.v1.y - sin, element.getWidth() + sin*2, element.getHeight() + sin*2);
+
+                float size = Math.max(element.getWidth(), element.getHeight()) + Mathf.absin(11f/2f, UnitScl.dp.scl(18f));
+                float angle = Angles.angle(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Tmp.v1.x + element.getWidth()/2f, Tmp.v1.y + element.getHeight()/2f);
+                Tmp.v2.trns(angle + 180f, size*1.4f);
+                float fs = UnitScl.dp.scl(40f);
+                float fs2 = UnitScl.dp.scl(50f);
+
+                Draw.color(Pal.gray);
+                Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs2, fs2, angle);
+                Draw.color(Pal.place);
+                Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs, fs, angle);
                 Draw.reset();
             }
         }

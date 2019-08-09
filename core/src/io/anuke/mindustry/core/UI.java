@@ -79,7 +79,7 @@ public class UI implements ApplicationListener{
         Core.input.addProcessor(Core.scene);
 
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
-        Dialog.setHideAction(() -> sequence(fadeOut(0.2f)));
+        Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
 

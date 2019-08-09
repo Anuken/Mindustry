@@ -254,7 +254,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.addImageButton("icon-break-small", "clear-toggle-partial", iconsizesmall, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
-        }).update(l -> l.setChecked(mode == breaking));
+        }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
         table.addImageButton("icon-diagonal-small", "clear-toggle-partial", iconsizesmall, () -> {
@@ -734,11 +734,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         renderer.scaleCamera(UnitScl.dp.scl(amount));
         lastDistance = distance;
         return true;
-    }
-
-    float clerp(float value, float min, float max){
-        final float alpha = 0.07f;
-        return value < min ? Mathf.lerpDelta(value, min, alpha) : value > max ? Mathf.lerpDelta(value, max, alpha) : value;
     }
 
     //endregion
