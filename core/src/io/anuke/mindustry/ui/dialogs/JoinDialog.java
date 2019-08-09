@@ -82,6 +82,8 @@ public class JoinDialog extends FloatingDialog{
             setup();
             refreshLocal();
             refreshRemote();
+
+            Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
         });
 
         onResize(this::setup);

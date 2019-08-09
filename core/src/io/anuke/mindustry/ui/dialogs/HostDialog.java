@@ -64,5 +64,9 @@ public class HostDialog extends FloatingDialog{
         }).width(w).height(70f);
 
         cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+
+        shown(() -> {
+            Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+        });
     }
 }
