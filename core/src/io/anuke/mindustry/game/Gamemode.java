@@ -22,7 +22,6 @@ public enum Gamemode{
     attack(rules -> {
         rules.enemyCheat = true;
         rules.unitDrops = true;
-        rules.waves = false;
         rules.attackMode = true;
         rules.waves = true;
     }, map -> map.teams.contains(waveTeam.ordinal())),

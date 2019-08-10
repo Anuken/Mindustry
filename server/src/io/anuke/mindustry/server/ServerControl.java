@@ -239,7 +239,7 @@ public class ServerControl implements ApplicationListener{
             lastMode = preset;
             try{
                 world.loadMap(result);
-                state.rules = preset.apply(result.rules());
+                state.rules = result.applyRules(preset);
                 logic.play();
 
                 info("Map loaded.");
@@ -706,7 +706,7 @@ public class ServerControl implements ApplicationListener{
             Call.onWorldDataBegin();
             run.run();
             logic.play();
-            state.rules = lastMode.apply(world.getMap().rules());
+            state.rules = world.getMap().applyRules(lastMode);
             for(Player p : players){
                 p.reset();
                 if(state.rules.pvp){

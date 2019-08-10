@@ -1,19 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.scene.ui.ScrollPane;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.BorderImage;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    Gamemode selectedGamemode = Gamemode.survival;
+    @NonNull Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
 
     public MapPlayDialog(){
@@ -37,10 +38,12 @@ public class MapPlayDialog extends FloatingDialog{
         //reset to any valid mode after switching to attack (one must exist)
         if(!selectedGamemode.valid(map)){
             selectedGamemode = Structs.find(Gamemode.all, m -> m.valid(map));
+            if(selectedGamemode == null){
+                selectedGamemode = Gamemode.survival;
+            }
         }
 
-        rules = map.rules();
-        rules = selectedGamemode.apply(map.rules());
+        rules = map.applyRules(selectedGamemode);
 
         Table selmode = new Table();
         selmode.add("$level.mode").colspan(4);
@@ -54,8 +57,7 @@ public class MapPlayDialog extends FloatingDialog{
 
             modes.addButton(mode.toString(), "toggle", () -> {
                 selectedGamemode = mode;
-                rules = mode.apply(map.rules());
-                Log.info("toggle rules " + rules);
+                rules = map.applyRules(mode);
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
             if(i++ % 2 == 1) modes.row();
         }
@@ -64,7 +66,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = (selectedGamemode == null ? map.rules() : selectedGamemode.apply(map.rules())))).width(230);
+        cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores

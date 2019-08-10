@@ -62,10 +62,24 @@ public class Map implements Comparable<Map>{
         Vars.data.modified();
     }
 
+    /** Returns the result of applying this map's rules to the specified gamemode.*/
+    public Rules applyRules(Gamemode mode){
+        //mode specific defaults have been applied
+        Rules out = new Rules();
+        mode.apply(out);
+
+        //now apply map-specific overrides
+        return rules(out);
+    }
+
     /** This creates a new instance of Rules.*/
     public Rules rules(){
+        return rules(new Rules());
+    }
+
+    public Rules rules(Rules base){
         try{
-            Rules result = JsonIO.read(Rules.class, tags.get("rules", "{}"));
+            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
             if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
             return result;
         }catch(Exception e){
