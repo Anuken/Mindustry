@@ -249,7 +249,7 @@ public class Generators{
                     Image image = new Image(32, 32);
                     Image shadow = ImagePacker.get(item.name + (i + 1));
 
-                    int offset = image.width / tilesize;
+                    int offset = image.width / tilesize - 1;
 
                     for(int x = 0; x < image.width; x++){
                         for(int y = offset; y < image.height; y++){

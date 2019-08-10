@@ -3,7 +3,8 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
@@ -41,6 +42,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
 
         shown(() -> {
+            back();
             if(!state.is(State.menu)){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
@@ -60,14 +62,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         menu = new Table("button");
 
-        Consumer<SettingsTable> s = table -> {
-            table.row();
-            table.addImageTextButton("$back", "icon-arrow-left", iconsize, this::back).size(240f, 60f).colspan(2).padTop(15f);
-        };
-
-        game = new SettingsTable(s);
-        graphics = new SettingsTable(s);
-        sound = new SettingsTable(s);
+        game = new SettingsTable();
+        graphics = new SettingsTable();
+        sound = new SettingsTable();
 
         prefs = new Table();
         prefs.top();
@@ -103,8 +100,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         add(pane).grow().top();
         row();
         add(buttons).fillX();
-
-        hidden(this::back);
 
         addSettings();
     }
@@ -193,6 +188,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }).size(220f, 60f).pad(6).left();
                 table.add();
                 table.row();
+                hide();
             }
         });
 
@@ -251,8 +247,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false);
 
-        //TODO is this necessary?
-        /*
         graphics.checkPref("linear", false, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
@@ -265,7 +259,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 TextureFilter filter = TextureFilter.Linear;
                 tex.setFilter(filter, filter);
             }
-        }*/
+        }
     }
 
     private void back(){
@@ -276,17 +270,23 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private void visible(int index){
         prefs.clearChildren();
-        Table table = new Table[]{game, graphics, sound}[index];
-        prefs.add(table);
+        prefs.add(new Table[]{game, graphics, sound}[index]);
     }
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$menu", "icon-arrow-left", 30f, this::hide).size(230f, 64f);
+        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, () -> {
+            if(prefs.getChildren().first() != menu){
+                back();
+            }else{
+                hide();
+            }
+        }).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
+            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
                 hide();
+            }
         });
     }
 }

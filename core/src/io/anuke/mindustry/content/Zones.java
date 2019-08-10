@@ -153,7 +153,7 @@ public class Zones implements ContentList{
             launchPeriod = 10;
             zoneRequirements = ZoneRequirement.with(ruinousShores, 20);
             blockRequirements = new Block[]{Blocks.coalCentrifuge, Blocks.conduit, Blocks.wave};
-            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.sand};
+            resources = new Item[]{Items.copper, Items.scrap, Items.lead, Items.coal, Items.titanium, Items.thorium, Items.sand};
         }};
 
         desolateRift = new Zone("desolateRift", new MapGenerator("desolateRift")){{

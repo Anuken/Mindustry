@@ -272,8 +272,6 @@ public class Control implements ApplicationListener{
             Tile core = state.teams.get(defaultTeam).cores.first();
             core.entity.items.clear();
 
-            state.set(State.playing);
-            control.saves.zoneSave();
             logic.play();
             state.rules.waveTimer = false;
             state.rules.waveSpacing = 60f * 30;
