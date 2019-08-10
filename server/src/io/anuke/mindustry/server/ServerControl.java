@@ -147,12 +147,7 @@ public class ServerControl implements ApplicationListener{
                     Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
                     Map previous = world.getMap();
-                    Map map = previous;
-                    if(maps.size > 1){
-                        while(map == previous) map = maps.random();
-                    }else if(!previous.custom && !world.maps.customMaps().isEmpty()){
-                        map = maps.first();
-                    }
+                    Map map = maps.random(previous);
 
                     Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
@@ -162,9 +157,7 @@ public class ServerControl implements ApplicationListener{
 
                     info("Selected next map to be {0}.", map.name());
 
-                    Map fmap = map;
-
-                    play(true, () -> world.loadMap(fmap));
+                    play(true, () -> world.loadMap(map));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);

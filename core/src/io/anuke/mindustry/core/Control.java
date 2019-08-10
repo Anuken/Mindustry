@@ -358,18 +358,7 @@ public class Control implements ApplicationListener{
         //autosave global data if it's modified
         data.checkSave();
 
-        if(state.is(State.menu)){
-            if(ui.deploy.isShown()){
-                music.play(Musics.launch);
-            }else if(ui.editor.isShown()){
-                music.play(Musics.editor);
-            }else{
-                music.play(Musics.menu);
-            }
-        }else{
-            //TODO game music
-            music.silence();
-        }
+        music.update();
 
         if(!state.is(State.menu)){
             input.update();

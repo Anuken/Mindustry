@@ -3,44 +3,162 @@ package io.anuke.mindustry.game;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.25f, musicWaveChance = 0.2f;
+
+    /** normal, ambient music, plays at any time */
+    public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+    /** darker music, used in times of conflict  */
+    public final Array<Music> darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
+    /** all music, both dark and ambient */
+    public final Array<Music> allMusic = Array.withArrays(ambientMusic, darkMusic);
+
+    private Music lastRandomPlayed;
+    private Interval timer = new Interval();
     private @Nullable Music current;
     private float fade;
+    private boolean silenced;
 
-    public void play(@Nullable Music music){
-        if(current != null){
-            current.setVolume(fade * Core.settings.getInt("musicvol") / 100f);
-        }
+    public MusicControl(){
+        Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
+            if(Mathf.chance(musicWaveChance)){
+                playRandom();
+            }
+        }));
+    }
 
-        if(current == null && music != null){
-            current = music;
-            current.setLooping(true);
-            current.setVolume(fade = 0f);
-            current.play();
-        }else if(current == music && music != null){
-            fade = Mathf.clamp(fade + Time.delta()/finTime);
-        }else if(current != null){
-            fade = Mathf.clamp(fade - Time.delta()/foutTime);
+    /** Update and play the right music track.*/
+    public void update(){
+        if(state.is(State.menu)){
+            if(ui.deploy.isShown()){
+                play(Musics.launch);
+            }else if(ui.editor.isShown()){
+                play(Musics.editor);
+            }else{
+                play(Musics.menu);
+            }
+        }else if(state.rules.editor){
+            play(Musics.editor);
+        }else{
+            //this just fades out the last track to make way for ingame music
+            silence();
 
-            if(fade <= 0.01f){
-                current.stop();
-                current = null;
-                if(music != null){
-                    current = music;
-                    current.setVolume(fade = 0f);
-                    current.setLooping(true);
-                    current.play();
+            //play music at intervals
+            if(timer.get(musicInterval)){
+                //chance to play it per interval
+                if(Mathf.chance(musicChance)){
+                    playRandom();
                 }
             }
         }
     }
 
-    public void silence(){
+    /** Plays a random track.*/
+    private void playRandom(){
+        if(isDark()){
+            playOnce(darkMusic.random(lastRandomPlayed));
+        }else{
+            playOnce(ambientMusic.random(lastRandomPlayed));
+        }
+    }
+
+    /** Whether to play dark music.*/
+    private boolean isDark(){
+        if(!state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity.healthf() < 0.85f){
+            //core damaged -> dark
+            return true;
+        }
+
+        if(state.enemies() > 25){
+            //many enemies -> dark
+            return true;
+        }
+
+        //it may be dark based on wave
+        if(Mathf.chance((float)(Math.log10((state.wave - 17f)/19f) + 1) / 4f)){
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Plays and fades in a music track. This must be called every frame.
+     * If something is already playing, fades out that track and fades in this new music.*/
+    private void play(@Nullable Music music){
+        //update volume of current track
+        if(current != null){
+            current.setVolume(fade * Core.settings.getInt("musicvol") / 100f);
+        }
+
+        //do not update once the track has faded out completely, just stop
+        if(silenced){
+            return;
+        }
+
+        if(current == null && music != null){
+            //begin playing in a new track
+            current = music;
+            current.setLooping(true);
+            current.setVolume(fade = 0f);
+            current.play();
+            silenced = false;
+        }else if(current == music && music != null){
+            //fade in the playing track
+            fade = Mathf.clamp(fade + Time.delta()/finTime);
+        }else if(current != null){
+            //fade out the current track
+            fade = Mathf.clamp(fade - Time.delta()/foutTime);
+
+            if(fade <= 0.01f){
+                //stop current track when it hits 0 volume
+                current.stop();
+                current = null;
+                silenced = true;
+                if(music != null){
+                    //play newly scheduled track
+                    current = music;
+                    current.setVolume(fade = 0f);
+                    current.setLooping(true);
+                    current.play();
+                    silenced = false;
+                }
+            }
+        }
+    }
+
+    /** Plays a music track once and only once. If something is already playing, does nothing.*/
+    private void playOnce(@NonNull Music music){
+        if(current != null) return; //do not interrupt already-playing tracks
+
+        //save last random track played to prevent duplicates
+        lastRandomPlayed = music;
+
+        //set fade to 1 and play it, stopping the current when it's done
+        fade = 1f;
+        current = music;
+        current.setVolume(1f);
+        current.setLooping(false);
+        current.setCompletionListener(m -> {
+            if(current == m){
+                current = null;
+                fade = 0f;
+            }
+        });
+        current.play();
+    }
+
+    /** Fades out the current track, unless it has already been silenced. */
+    private void silence(){
         play(null);
     }
 }

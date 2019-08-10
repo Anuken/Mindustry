@@ -1448,7 +1448,7 @@ public class Blocks implements ContentList{
 
             size = 2;
             range = 150f;
-            reload = 30f;
+            reload = 38f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
