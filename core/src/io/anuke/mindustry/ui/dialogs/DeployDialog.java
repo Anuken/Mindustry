@@ -59,13 +59,6 @@ public class DeployDialog extends FloatingDialog{
         titleTable.remove();
         margin(0f).marginBottom(8);
 
-        if(!Core.settings.getBool("zone-info", false)){
-            Core.app.post(() -> ui.showInfoText("TEMPORARY GUIDE ON HOW TO PLAY ZONES", "- deploy to zones by selecting them here\n- most zones require items to deploy\n- once you survive a set amount of waves, you can launch all the resources in your core\n- use these items to research in the tech tree or uncover new zones"));
-
-            Core.settings.put("zone-info", true);
-            Core.settings.save();
-        }
-
         Stack stack = new Stack();
 
         stack.add(new Image(new Texture("sprites/backgrounds/stars.png"){{

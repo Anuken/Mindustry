@@ -65,7 +65,7 @@ task ikdist{
         def filename = "$appName-${getTarget()}-${version}"
         def folder = "build/libs/$filename"
         def baseArgs = System.properties['os.name'].toLowerCase().contains('windows') ? [] : ["mono"]
-        def args = baseArgs + ["$IKVM_DIR/ikvmc.exe", "-target:winexe", "-static", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
+        def args = baseArgs + ["$IKVM_DIR/ikvmc.exe", "-target:winexe", "-out:build/libs/${filename}.exe", "build/libs/${filename}.jar"]
         if(file("../core/assets/sprites/icon.ico").exists()){
             args += ["-win32icon:../core/assets/sprites/icon.ico"]
         }else if(file("../core/assets/icons/icon.ico").exists()){

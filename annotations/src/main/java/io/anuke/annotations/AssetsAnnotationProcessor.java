@@ -63,7 +63,6 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-
         HashSet<String> names = new HashSet<>();
         Files.list(Paths.get(path)).forEach(p -> {
             String fname = p.getFileName().toString();
@@ -86,6 +85,10 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
             //cons.consume(type, fname, name);
         });
+
+        if(classname.equals("Sounds")){
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+        }
 
         type.addMethod(load.build());
         type.addMethod(dispose.build());

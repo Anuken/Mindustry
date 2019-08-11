@@ -317,6 +317,10 @@ public class UI implements ApplicationListener{
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
+        showConfirm(title, text, null, confirmed);
+    }
+
+    public void showConfirm(String title, String text, BooleanProvider hide, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
@@ -326,6 +330,13 @@ public class UI implements ApplicationListener{
             dialog.hide();
             confirmed.run();
         });
+        if(hide != null){
+            dialog.update(() -> {
+                if(hide.get()){
+                    dialog.hide();
+                }
+            });
+        }
         dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
         dialog.keyDown(KeyCode.BACK, dialog::hide);
         dialog.show();

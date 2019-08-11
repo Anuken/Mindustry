@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.function.BiConsumer;
@@ -18,6 +19,7 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -34,6 +36,7 @@ public abstract class Turret extends Block{
     protected Effect shootEffect = Fx.none;
     protected Effect smokeEffect = Fx.none;
     protected Effect ammoUseEffect = Fx.none;
+    protected Sound shootSound = Sounds.shoot;
 
     protected int ammoPerShot = 1;
     protected float ammoEjectBack = 1f;
@@ -276,6 +279,7 @@ public abstract class Turret extends Block{
 
         Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        shootSound.at(tile);
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);
