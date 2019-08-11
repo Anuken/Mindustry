@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.25f, musicWaveChance = 0.2f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.3f, musicWaveChance = 0.24f;
 
     /** normal, ambient music, plays at any time */
     public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
@@ -30,6 +30,7 @@ public class MusicControl{
     private boolean silenced;
 
     public MusicControl(){
+        //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
             if(Mathf.chance(musicWaveChance)){
                 playRandom();
@@ -40,6 +41,7 @@ public class MusicControl{
     /** Update and play the right music track.*/
     public void update(){
         if(state.is(State.menu)){
+            silenced = false;
             if(ui.deploy.isShown()){
                 play(Musics.launch);
             }else if(ui.editor.isShown()){
@@ -48,6 +50,7 @@ public class MusicControl{
                 play(Musics.menu);
             }
         }else if(state.rules.editor){
+            silenced = false;
             play(Musics.editor);
         }else{
             //this just fades out the last track to make way for ingame music
@@ -79,17 +82,13 @@ public class MusicControl{
             return true;
         }
 
-        if(state.enemies() > 25){
-            //many enemies -> dark
-            return true;
-        }
-
         //it may be dark based on wave
         if(Mathf.chance((float)(Math.log10((state.wave - 17f)/19f) + 1) / 4f)){
             return true;
         }
 
-        return false;
+        //dark based on enemies
+        return Mathf.chance(state.enemies() / 70f);
     }
 
     /** Plays and fades in a music track. This must be called every frame.

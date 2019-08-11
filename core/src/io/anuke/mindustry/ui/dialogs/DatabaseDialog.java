@@ -56,11 +56,11 @@ public class DatabaseDialog extends FloatingDialog{
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked", Pal.gray);
-                    image.addListener(new HandCursorListener());
                     list.add(image).size(unlocked(unlock) ? 8*4 : Vars.iconsize).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
-                    if(!Vars.mobile){
+                    if(!Vars.mobile && unlocked(unlock)){
+                        image.addListener(new HandCursorListener());
                         image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.LIGHT_GRAY : Color.WHITE, 0.4f * Time.delta()));
                     }
 

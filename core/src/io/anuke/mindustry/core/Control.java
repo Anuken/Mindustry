@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.Application.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -175,6 +176,10 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+
+        if(Core.app.getType() == ApplicationType.Android){
+            Sounds.empty.loop(0f, 1f, 0f);
+        }
     }
 
     void createPlayer(){

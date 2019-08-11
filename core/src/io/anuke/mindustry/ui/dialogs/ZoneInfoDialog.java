@@ -1,15 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.Button;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Zone.ZoneRequirement;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.type.Zone.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -142,6 +143,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {
             if(!data.isUnlocked(zone)){
+                Sounds.unlock.play();
                 data.unlockContent(zone);
                 ui.deploy.setup();
                 setup(zone);

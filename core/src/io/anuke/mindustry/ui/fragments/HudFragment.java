@@ -44,6 +44,7 @@ public class HudFragment extends Fragment{
     private float lastCoreHP;
     private Team lastTeam;
     private float coreAttackOpacity = 0f;
+    private long lastToast;
 
     public void build(Group parent){
 
@@ -372,25 +373,43 @@ public class HudFragment extends Fragment{
         }
     }
 
-    public void showToast(String text){
-        Table table = new Table("button");
-        table.update(() -> {
-            if(state.is(State.menu)){
-                table.remove();
-            }
-        });
-        table.margin(12);
-        table.addImage("icon-check").size(iconsize).pad(3);
-        table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
-        table.pack();
+    private void scheduleToast(Runnable run){
+        long duration = (int)(3.5 * 1000);
+        long since = Time.timeSinceMillis(lastToast);
+        if(since > duration){
+            lastToast = Time.millis();
+            run.run();
+        }else{
+            Time.runTask((duration - since) / 1000f * 60f, run);
+            lastToast += duration;
+        }
+    }
 
-        //create container table which will align and move
-        Table container = Core.scene.table();
-        container.top().add(table);
-        container.setTranslation(0, table.getPrefHeight());
-        container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
-        //nesting actions() calls is necessary so the right prefHeight() is used
-        Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
+    public void showToast(String text){
+        if(state.is(State.menu)) return;
+
+        scheduleToast(() -> {
+            Sounds.message.play();
+
+            Table table = new Table("button");
+            table.update(() -> {
+                if(state.is(State.menu)){
+                    table.remove();
+                }
+            });
+            table.margin(12);
+            table.addImage("icon-check").size(iconsize).pad(3);
+            table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
+            table.pack();
+
+            //create container table which will align and move
+            Table container = Core.scene.table();
+            container.top().add(table);
+            container.setTranslation(0, table.getPrefHeight());
+            container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(2.5f),
+            //nesting actions() calls is necessary so the right prefHeight() is used
+            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.remove())));
+        });
     }
 
     public boolean shown(){
@@ -400,46 +419,50 @@ public class HudFragment extends Fragment{
     /** Show unlock notification for a new recipe. */
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
-        if(content.getContentIcon() == null) return;
+        if(content.getContentIcon() == null || state.is(State.menu)) return;
+
+        Sounds.message.play();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
-            Table table = new Table("button");
-            table.update(() -> {
-                if(state.is(State.menu)){
-                    table.remove();
-                    lastUnlockLayout = null;
+            scheduleToast(() -> {
+                Table table = new Table("button");
+                table.update(() -> {
+                    if(state.is(State.menu)){
+                        table.remove();
+                        lastUnlockLayout = null;
+                        lastUnlockTable = null;
+                    }
+                });
+                table.margin(12);
+
+                Table in = new Table();
+
+                //create texture stack for displaying
+                Image image = new Image(content.getContentIcon());
+                image.setScaling(Scaling.fit);
+
+                in.add(image).size(48f).pad(2);
+
+                //add to table
+                table.add(in).padRight(8);
+                table.add("$unlocked");
+                table.pack();
+
+                //create container table which will align and move
+                Table container = Core.scene.table();
+                container.top().add(table);
+                container.setTranslation(0, table.getPrefHeight());
+                container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(2.5f),
+                //nesting actions() calls is necessary so the right prefHeight() is used
+                Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
                     lastUnlockTable = null;
-                }
+                    lastUnlockLayout = null;
+                }), Actions.remove())));
+
+                lastUnlockTable = container;
+                lastUnlockLayout = in;
             });
-            table.margin(12);
-
-            Table in = new Table();
-
-            //create texture stack for displaying
-            Image image = new Image(content.getContentIcon());
-            image.setScaling(Scaling.fit);
-
-            in.add(image).size(48f).pad(2);
-
-            //add to table
-            table.add(in).padRight(8);
-            table.add("$unlocked");
-            table.pack();
-
-            //create container table which will align and move
-            Table container = Core.scene.table();
-            container.top().add(table);
-            container.setTranslation(0, table.getPrefHeight());
-            container.actions(Actions.translateBy(0, -table.getPrefHeight(), 1f, Interpolation.fade), Actions.delay(4f),
-            //nesting actions() calls is necessary so the right prefHeight() is used
-            Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interpolation.fade), Actions.run(() -> {
-                lastUnlockTable = null;
-                lastUnlockLayout = null;
-            }), Actions.remove())));
-
-            lastUnlockTable = container;
-            lastUnlockLayout = in;
         }else{
             //max column size
             int col = 3;

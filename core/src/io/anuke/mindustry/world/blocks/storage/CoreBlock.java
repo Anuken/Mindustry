@@ -1,25 +1,22 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
 

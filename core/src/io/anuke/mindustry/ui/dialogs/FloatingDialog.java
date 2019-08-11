@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.input.*;
-import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -33,7 +32,6 @@ public class FloatingDialog extends Dialog{
             }
             Sounds.back.play();
         });
-        ClickListener.clicked = () -> Sounds.press.play();
 
         shown(() -> {
             if(shouldPause && !state.is(State.menu)){

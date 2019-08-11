@@ -23,6 +23,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.editor.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -87,6 +88,8 @@ public class UI implements ApplicationListener{
             e.printStackTrace();
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
+
+        ClickListener.clicked = () -> Sounds.press.play();
 
         Colors.put("accent", Pal.accent);
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
