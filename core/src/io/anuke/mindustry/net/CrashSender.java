@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
+import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
@@ -103,7 +104,7 @@ public class CrashSender{
 
             Log.info("Sending crash report.");
             //post to crash report URL
-            Core.net.httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
+            httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
                 System.exit(1);
@@ -124,6 +125,10 @@ public class CrashSender{
             death.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void httpPost(String url, String content, Consumer<HttpResponse> success, Consumer<Throwable> failure){
+        new NetJavaImpl().http(new HttpRequest().method(HttpMethod.POST).content(content).url(url), success, failure);
     }
 
     private static String parseException(Throwable e){
