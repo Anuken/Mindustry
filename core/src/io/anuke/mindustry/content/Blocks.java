@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -1337,6 +1338,7 @@ public class Blocks implements ContentList{
             targetAir = false;
             ammoUseEffect = Fx.none;
             health = 400;
+            shootSound = Sounds.flame;
         }};
 
         hail = new ArtilleryTurret("hail"){{
@@ -1352,6 +1354,7 @@ public class Blocks implements ContentList{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
+            shootSound = Sounds.artillery;
         }};
 
         wave = new LiquidTurret("wave"){{
@@ -1401,6 +1404,7 @@ public class Blocks implements ContentList{
             size = 2;
             health = 280 * size * size;
             targetAir = false;
+            shootSound = Sounds.phaser;
         }};
 
         arc = new PowerTurret("arc"){{
@@ -1417,6 +1421,7 @@ public class Blocks implements ContentList{
             recoil = 1f;
             size = 1;
             health = 260;
+            shootSound = Sounds.shock;
         }};
 
         swarmer = new BurstTurret("swarmer"){{
@@ -1434,6 +1439,7 @@ public class Blocks implements ContentList{
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
+            shootSound = Sounds.missile;
         }};
 
         salvo = new BurstTurret("salvo"){{
@@ -1474,6 +1480,7 @@ public class Blocks implements ContentList{
             size = 3;
 
             health = 220 * size * size;
+            shootSound = Sounds.shotgun;
 
             ammo(Items.graphite, new BulletType(0.01f, 105){
                 int rays = 1;
@@ -1535,6 +1542,7 @@ public class Blocks implements ContentList{
             range = 290f;
 
             health = 130 * size * size;
+            shootSound = Sounds.artillery;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
