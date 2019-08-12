@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
@@ -55,6 +56,8 @@ public class DeployDialog extends FloatingDialog{
     }
 
     public void setup(){
+        Platform.instance.updateRPC();
+
         cont.clear();
         titleTable.remove();
         margin(0f).marginBottom(8);
