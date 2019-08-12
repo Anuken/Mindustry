@@ -88,7 +88,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 buildGroups();
             }).growX().height(70f);
         }), new Label("$waves.none"){{
-            visible(groups::isEmpty);
+            visible(() -> groups.isEmpty());
             touchable(Touchable.disabled);
             setWrap(true);
             setAlignment(Align.center, Align.center);

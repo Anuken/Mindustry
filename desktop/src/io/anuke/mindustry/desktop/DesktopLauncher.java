@@ -15,7 +15,7 @@ public class DesktopLauncher{
             config.setMaximized(true);
             config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 0);
             config.setWindowedMode(900, 600);
-            config.setWindowIcon("icons/icon.png");
+            config.setWindowIcon("icons/icon_64.png");
 
             Platform.instance = new DesktopPlatform(arg);
 

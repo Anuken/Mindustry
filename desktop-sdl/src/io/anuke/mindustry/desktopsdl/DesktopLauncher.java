@@ -21,7 +21,7 @@ public class DesktopLauncher{
                 stencil = 0;
                 width = 900;
                 height = 700;
-                setWindowIcon(FileType.Internal, "icons/icon.png");
+                setWindowIcon(FileType.Internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
             DesktopPlatform.handleCrash(e);

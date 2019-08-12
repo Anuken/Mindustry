@@ -17,11 +17,12 @@ public class MirrorFilter extends GenerateFilter{
 
     {
         options(new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45));
+        buffered = true;
     }
 
     @Override
     protected void apply(){
-        v1.trns(angle - 90, 1f);
+        v1.trnsExact(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
         v1.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
