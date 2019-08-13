@@ -12,9 +12,9 @@ import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.impl.BaseEntity;
 import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -45,6 +45,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     private boolean dead = false;
     private boolean sleeping;
     private float sleepTime;
+    private @Nullable SoundLoop sound;
 
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
@@ -69,6 +70,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         x = tile.drawx();
         y = tile.drawy();
         block = tile.block();
+        if(block.idleSound != Sounds.none){
+            sound = new SoundLoop(block.idleSound, block.idleSoundVolume);
+        }
 
         health = block.health;
         timer = new Interval(block.timers);
@@ -232,6 +236,13 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     }
 
     @Override
+    public void removed(){
+        if(sound != null){
+            sound.stop();
+        }
+    }
+
+    @Override
     public void health(float health){
         this.health = health;
     }
@@ -284,6 +295,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         if(health <= 0){
             onDeath();
             return; //no need to update anymore
+        }
+
+        if(sound != null){
+            sound.update(x, y, block.shouldIdleSound(tile));
         }
 
         Block previous = block;

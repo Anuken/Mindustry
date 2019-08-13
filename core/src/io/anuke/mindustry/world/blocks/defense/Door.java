@@ -1,17 +1,17 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
+import io.anuke.arc.*;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.mindustry.content.Fx;
+import io.anuke.arc.math.geom.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
@@ -45,6 +45,7 @@ public class Door extends Wall{
             }else{
                 Effects.effect(door.closefx, tile.drawx(), tile.drawy());
             }
+            Sounds.door.at(tile);
         }
     }
 

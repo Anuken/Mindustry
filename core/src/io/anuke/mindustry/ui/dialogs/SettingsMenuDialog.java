@@ -184,6 +184,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             @Override
             public void add(SettingsTable table){
                 table.addButton("$tutorial.retake", () -> {
+                    hide();
                     control.playTutorial();
                 }).size(220f, 60f).pad(6).left();
                 table.add();

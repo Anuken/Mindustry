@@ -99,7 +99,11 @@ public class Block extends BlockStorage{
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
-    public Sound breakSound = Sounds.die;
+    public Sound breakSound = Sounds.boom;
+    /** The sound that this block makes while active.*/
+    public Sound idleSound = Sounds.none;
+    /** Idle sound base volume. */
+    public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
     public ItemStack[] buildRequirements = new ItemStack[]{};
@@ -205,6 +209,11 @@ public class Block extends BlockStorage{
             progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
         }
         return progressIncrease;
+    }
+
+    /** @return whether this block should play its idle sound.*/
+    public boolean shouldIdleSound(Tile tile){
+        return canProduce(tile);
     }
 
     public void drawLayer(Tile tile){

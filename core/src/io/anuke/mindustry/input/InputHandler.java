@@ -160,6 +160,7 @@ public abstract class InputHandler implements InputProcessor{
             if(((!frag.config.isShown() && tile.block().shouldShowConfigure(tile, player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (frag.config.isShown() && frag.config.getSelectedTile().block().onConfigureTileTapped(frag.config.getSelectedTile(), tile)))){
+                Sounds.click.at(tile);
                 frag.config.showConfig(tile);
             }
             //otherwise...

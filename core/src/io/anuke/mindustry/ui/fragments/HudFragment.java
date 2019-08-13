@@ -638,15 +638,17 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !world.spawner.isSpawning();
+        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !world.spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
         table.right().addImageButton("icon-play", "right", 30f, () -> {
             if(Net.client() && player.isAdmin){
                 Call.onAdminRequest(player, AdminAction.wave);
-            }else{
+            }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);
+            }else{
+                state.wavetime = 0f;
             }
         }).growY().fillX().right().width(40f)
         .visible(this::canSkipWave);

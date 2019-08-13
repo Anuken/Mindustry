@@ -1323,6 +1323,7 @@ public class Blocks implements ContentList{
             shootCone = 35f;
 
             health = 200 * size * size;
+            shootSound = Sounds.shootSnap;
         }};
 
         scorch = new ItemTurret("scorch"){{

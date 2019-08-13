@@ -1,7 +1,7 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.*;
 import io.anuke.arc.Application.*;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
