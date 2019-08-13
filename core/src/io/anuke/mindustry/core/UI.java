@@ -214,7 +214,7 @@ public class UI implements ApplicationListener{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input().getFrag().build(hudGroup);
+        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);

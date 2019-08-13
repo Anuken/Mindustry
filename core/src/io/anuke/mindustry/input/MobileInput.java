@@ -289,7 +289,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             removals.addAll(selection);
             selection.clear();
             selecting = false;
-        }).visible(() -> !selection.isEmpty());
+        }).visible(() -> !selection.isEmpty()).name("confirmplace");
 
         Core.scene.table(t -> {
            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));

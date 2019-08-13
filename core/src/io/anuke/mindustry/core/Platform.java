@@ -39,6 +39,11 @@ public abstract class Platform{
         });
     }
 
+    /** Request external read/write perms. Run callback when complete.*/
+    public void requestExternalPerms(Runnable callback){
+        callback.run();
+    }
+
     /** Update discord RPC. */
     public void updateRPC(){
     }

@@ -105,6 +105,7 @@ public class Tutorial{
             void draw(){
                 outline("category-production");
                 outline("block-mechanical-drill");
+                outline("confirmplace");
             }
         },
         blockinfo(() -> event("blockinfo")){

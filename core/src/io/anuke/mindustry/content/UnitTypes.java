@@ -102,6 +102,7 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("bomber"){{
                 reload = 12f;
                 ejectEffect = Fx.none;
+                shootSound = Sounds.explosion;
                 bullet = new BombBulletType(2f, 3f, "clear"){
                     {
                         hitEffect = Fx.pulverize;
@@ -233,6 +234,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
+                shootSound = Sounds.shootBig;
             }};
         }};
 
@@ -251,6 +253,7 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
             }};
         }};
 
@@ -274,7 +277,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 40f;
                 ignoreRotation = true;
                 bullet = Bullets.bombExplosive;
-                shootSound = Sounds.release;
+                shootSound = Sounds.none;
             }};
         }};
 

@@ -27,7 +27,7 @@ public class OverlayRenderer{
     private float buildFadeTime;
 
     public void drawBottom(){
-        InputHandler input = control.input();
+        InputHandler input = control.input;
 
         if(!input.isDrawing() || player.isDead()) return;
 
@@ -64,7 +64,7 @@ public class OverlayRenderer{
 
         if(player.isDead()) return; //dead players don't draw
 
-        InputHandler input = control.input();
+        InputHandler input = control.input;
 
         //draw config selected block
         if(input.frag.config.isShown()){

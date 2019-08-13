@@ -19,7 +19,7 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -70,7 +70,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Tile mining;
     private Vector2 movement = new Vector2();
     private boolean moved;
-    private SoundLoop sound = new SoundLoop(Sounds.thruster, 2f);
+    private SoundLoop boostSound = new SoundLoop(Sounds.thruster, 2f), buildSound = new SoundLoop(Sounds.build, 0.75f);
 
     //endregion
 
@@ -133,7 +133,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void removed(){
-        sound.stop();
+        boostSound.stop();
+        buildSound.stop();
     }
 
     @Override
@@ -513,7 +514,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             destructTime = 0f;
         }
 
-        sound.update(x, y, isBoosting && !isDead() && !mech.flying);
+        boostSound.update(x, y, isBoosting && !isDead() && !mech.flying);
+        BuildRequest request = buildRequest();
+        buildSound.update(request == null ? x : request.x * tilesize, request == null ? y : request.y * tilesize, isBuilding() && (Mathf.within(request.x * tilesize, request.y * tilesize, x, y, placeDistance) || state.isEditor()));
 
         if(isDead()){
             isBoosting = false;
@@ -606,7 +609,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             movement.x += xa * speed;
         }
 
-        Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(), control.input().getMouseY());
+        Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -629,7 +632,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                     rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
             }else{
-                float angle = control.input().mouseAngle(x, y);
+                float angle = control.input.mouseAngle(x, y);
                 this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
             }
         }
@@ -758,8 +761,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 }
 
             }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(),
-                control.input().getMouseY());
+                Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(),
+                control.input.getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;
 

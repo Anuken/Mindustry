@@ -193,6 +193,20 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
+        if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
+            game.pref(new Setting(){
+                @Override
+                public void add(SettingsTable table){
+                    table.addButton("$classic.export", () -> {
+                        control.checkClassicData();
+                    }).size(220f, 60f).pad(6).left();
+                    table.add();
+                    table.row();
+                    hide();
+                }
+            });
+        }
+
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
             if(Core.graphics.getFrameId() > 10){
                 Log.info("changed");

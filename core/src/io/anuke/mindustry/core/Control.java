@@ -1,7 +1,7 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.Application.*;
 import io.anuke.arc.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -39,11 +39,11 @@ public class Control implements ApplicationListener{
     public final Saves saves;
     public final MusicControl music;
     public final Tutorial tutorial;
+    public InputHandler input;
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
-    private InputHandler input;
 
     public Control(){
         batch = new SpriteBatch();
@@ -117,6 +117,7 @@ public class Control implements ApplicationListener{
                 hiscore = true;
                 world.getMap().setHighScore(state.wave);
             }
+            Sounds.wave.play();
         });
 
         Events.on(GameOverEvent.class, event -> {
@@ -177,8 +178,39 @@ public class Control implements ApplicationListener{
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
 
-        if(Core.app.getType() == ApplicationType.Android){
+        if(android){
             Sounds.empty.loop(0f, 1f, 0f);
+
+            checkClassicData();
+        }
+    }
+
+    //checks for existing 3.5 app data, android only
+    public void checkClassicData(){
+        try{
+            if(files.local("mindustry-maps").exists() || files.local("mindustry-saves").exists()){
+                settings.getBoolOnce("classic-backup-check", () -> {
+                    app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
+                        try{
+                            Platform.instance.requestExternalPerms(() -> {
+                                FileHandle external = files.external("MindustryClassic");
+                                if(files.local("mindustry-maps").exists()){
+                                    files.local("mindustry-maps").copyTo(external);
+                                }
+
+                                if(files.local("mindustry-saves").exists()){
+                                    files.local("mindustry-saves").copyTo(external);
+                                }
+                            });
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            ui.showError(Strings.parseException(e, true));
+                        }
+                    })));
+                });
+            }
+        }catch(Throwable t){
+            t.printStackTrace();
         }
     }
 
@@ -200,10 +232,6 @@ public class Control implements ApplicationListener{
         }
 
         Core.input.addProcessor(input);
-    }
-
-    public InputHandler input(){
-        return input;
     }
 
     public void playMap(Map map, Rules rules){

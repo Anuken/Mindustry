@@ -1,21 +1,18 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Blending;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -129,6 +126,8 @@ public class ImpactReactor extends PowerGenerator{
         FusionReactorEntity entity = tile.entity();
 
         if(entity.warmup < 0.4f) return;
+
+        Sounds.explosionbig.at(tile);
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(Fx.impactShockwave, tile.worldx(), tile.worldy());

@@ -53,7 +53,7 @@ public class PlacementFragment extends Fragment{
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> {
-                control.input().block = null;
+                control.input.block = null;
                 rebuild();
             });
         });
@@ -119,7 +119,7 @@ public class PlacementFragment extends Fragment{
             full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
-                InputHandler input = control.input();
+                InputHandler input = control.input;
 
                 //rebuilds the category table with the correct recipes
                 Runnable rebuildCategory = () -> {
@@ -336,8 +336,8 @@ public class PlacementFragment extends Fragment{
         }
 
         //block currently selected
-        if(control.input().block != null){
-            toDisplay = control.input().block;
+        if(control.input.block != null){
+            toDisplay = control.input.block;
         }
 
         //block hovered on in build menu

@@ -34,6 +34,7 @@ public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
     FileChooser chooser;
+    Runnable permCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -63,6 +64,24 @@ public class AndroidLauncher extends AndroidApplication{
                     return result;
                 }catch(Exception e){
                     return super.getUUID();
+                }
+            }
+
+            @Override
+            public void requestExternalPerms(Runnable callback){
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    callback.run();
+                }else{
+                    permCallback = callback;
+                    ArrayList<String> perms = new ArrayList<>();
+                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }
             }
 
@@ -123,7 +142,11 @@ public class AndroidLauncher extends AndroidApplication{
                 if(i != PackageManager.PERMISSION_GRANTED) return;
             }
             if(chooser != null){
-                chooser.show();
+                Core.app.post(chooser::show);
+            }
+            if(permCallback != null){
+                Core.app.post(permCallback);
+                permCallback = null;
             }
         }
     }

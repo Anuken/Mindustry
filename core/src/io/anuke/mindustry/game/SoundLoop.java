@@ -33,6 +33,7 @@ public class SoundLoop{
                 if(volume <= 0.001f){
                     sound.stop(id);
                     id = -1;
+                    return;
                 }
             }
             sound.setPan(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);

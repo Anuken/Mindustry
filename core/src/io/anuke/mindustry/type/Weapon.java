@@ -54,7 +54,7 @@ public class Weapon{
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
 
-    public Sound shootSound = Sounds.shoot;
+    public Sound shootSound = Sounds.pew;
 
     public TextureRegion region;
 
