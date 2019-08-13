@@ -170,8 +170,10 @@ public class EntityGroup<T extends Entity>{
     }
 
     public void clear(){
-        for(T entity : entityArray)
+        for(T entity : entityArray){
+            entity.removed();
             entity.setGroup(null);
+        }
 
         for(T entity : entitiesToAdd)
             entity.setGroup(null);
