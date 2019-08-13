@@ -45,9 +45,7 @@ public class MenuFragment extends Fragment{
 
         parent = group;
 
-        parent.fill((x, y, w, h) -> {
-            renderer.render();
-        });
+        parent.fill((x, y, w, h) -> renderer.render());
 
         parent.fill(c -> {
             container = c;
@@ -73,12 +71,12 @@ public class MenuFragment extends Fragment{
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
-            float logoscl = (int)Unit.dp.scl(1);
-            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Unit.dp.scl(20));
+            float logoscl = UnitScl.dp.scl(1);
+            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             float fx = (int)(Core.graphics.getWidth() / 2f);
-            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Unit.dp.scl(30f) : 0f);
+            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
 
             Draw.color();
             Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
@@ -161,7 +159,8 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$campaign", "icon-play-2", ui.deploy::show),
                     new Buttoni("$joingame", "icon-add", ui.join::show),
                     new Buttoni("$customgame", "icon-editor", ui.custom::show),
-                    new Buttoni("$loadgame", "icon-load", ui.load::show)
+                    new Buttoni("$loadgame", "icon-load", ui.load::show),
+                    new Buttoni("$tutorial", "icon-info", control::playTutorial)
                 ),
                 new Buttoni("$editor", "icon-editor", ui.maps::show),
                 new Buttoni("$settings", "icon-tools", ui.settings::show),
@@ -210,7 +209,7 @@ public class MenuFragment extends Fragment{
                         submenu.clearChildren();
                         fadeInMenu();
                         //correctly offset the button
-                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / Unit.dp.scl(1f));
+                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / UnitScl.dp.scl(1f));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{

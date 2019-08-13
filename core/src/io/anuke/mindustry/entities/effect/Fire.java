@@ -1,21 +1,18 @@
 package io.anuke.mindustry.entities.effect;
 
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.impl.TimedEntity;
-import io.anuke.mindustry.entities.traits.SaveTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.TypeID;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.entities.impl.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -100,6 +97,10 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
 
         if(Mathf.chance(0.05 * Time.delta())){
             Effects.effect(Fx.fireSmoke, x + Mathf.range(4f), y + Mathf.range(4f));
+        }
+
+        if(Mathf.chance(0.001 * Time.delta())){
+            Sounds.fire.at(this);
         }
 
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());

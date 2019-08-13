@@ -1,32 +1,29 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Nullable;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.effect.ScorchDecal;
-import io.anuke.mindustry.entities.impl.DestructibleEntity;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.entities.units.Statuses;
-import io.anuke.mindustry.game.EventType.UnitDestroyEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Teams.TeamData;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.net.Interpolator;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -49,7 +46,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     protected final Statuses status = new Statuses();
     protected final ItemStack item = new ItemStack(content.item(0), 0);
 
-    protected Team team = Team.blue;
+    protected Team team = Team.sharded;
     protected float drownTime, hitTime;
 
     @Override
@@ -108,6 +105,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Effects.effect(Fx.explosion, this);
         Effects.shake(2f, 2f, this);
 
+        Sounds.bang.at(this);
         item.amount = 0;
         drownTime = 0f;
         status.clear();
@@ -377,6 +375,40 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
+
+        drawBackItems(item.amount > 0 ? 1f : 0f, false);
+    }
+
+    public void drawBackItems(float itemtime, boolean number){
+        //draw back items
+        if(itemtime > 0.01f && item.item != null){
+            float backTrns = 5f;
+            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
+
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
+            Draw.rect(item.item.icon(Item.Icon.large),
+                x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns),
+                size, size, rotation);
+
+            Draw.mixcol();
+
+            Lines.stroke(1f, Pal.accent);
+            Lines.circle(
+                x + Angles.trnsx(rotation + 180f, backTrns),
+                y + Angles.trnsy(rotation + 180f, backTrns),
+                (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
+
+            if(number){
+                Core.scene.skin.getFont("outline").draw(item.amount + "",
+                    x + Angles.trnsx(rotation + 180f, backTrns),
+                    y + Angles.trnsy(rotation + 180f, backTrns) - 3,
+                    Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center
+                );
+            }
+        }
+
+        Draw.reset();
     }
 
     public TextureRegion getPowerCellRegion(){

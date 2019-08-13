@@ -1,10 +1,12 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.type.UnitType;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitType
@@ -46,6 +48,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBullet;
+                shootSound = Sounds.pew;
             }};
         }};
 
@@ -90,31 +93,51 @@ public class UnitTypes implements ContentList{
         }};
 
         crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
-            maxVelocity = 1.25f;
-            speed = 0.28f;
+            maxVelocity = 1.27f;
+            speed = 0.285f;
             drag = 0.4f;
             hitsize = 8f;
             mass = 1.75f;
-            health = 100;
+            health = 120;
             weapon = new Weapon("bomber"){{
                 reload = 12f;
                 ejectEffect = Fx.none;
-                bullet = Bullets.explode;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(2f, 3f, "clear"){
+                    {
+                        hitEffect = Fx.pulverize;
+                        lifetime = 30f;
+                        speed = 1.1f;
+                        splashDamageRadius = 55f;
+                        splashDamage = 30f;
+                    }
+
+                    @Override
+                    public void init(Bullet b){
+                        if(b.getOwner() instanceof Unit){
+                            ((Unit)b.getOwner()).kill();
+                        }
+                        b.time(b.lifetime());
+                    }
+                };
             }};
         }};
 
         titan = new UnitType("titan", Titan.class, Titan::new){{
             maxVelocity = 0.8f;
-            speed = 0.18f;
+            speed = 0.22f;
             drag = 0.4f;
             mass = 3.5f;
             hitsize = 9f;
+            range = 10f;
             rotatespeed = 0.1f;
-            health = 440;
+            health = 460;
             immunities.add(StatusEffects.burning);
             weapon = new Weapon("flamethrower"){{
+                shootSound = Sounds.flame;
                 length = 1f;
                 reload = 14f;
+                range = 30f;
                 roundrobin = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;
@@ -140,6 +163,7 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.artilleryUnit;
+                shootSound = Sounds.artillery;
             }};
         }};
 
@@ -161,6 +185,7 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.eruptorShot;
                 recoil = 1f;
                 width = 7f;
+                shootSound = Sounds.flame;
             }};
         }};
 
@@ -184,6 +209,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 5;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.flakSurge;
+                shootSound = Sounds.shootBig;
             }};
         }};
 
@@ -208,6 +234,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
+                shootSound = Sounds.shootBig;
             }};
         }};
 
@@ -226,6 +253,7 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
             }};
         }};
 
@@ -249,6 +277,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 40f;
                 ignoreRotation = true;
                 bullet = Bullets.bombExplosive;
+                shootSound = Sounds.none;
             }};
         }};
 
@@ -278,6 +307,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 velocityRnd = 0.2f;
                 spacing = 1f;
+                shootSound = Sounds.missile;
                 bullet = Bullets.missileRevenant;
             }};
         }};
@@ -311,6 +341,7 @@ public class UnitTypes implements ContentList{
                 velocityRnd = 0.2f;
                 spacing = 1f;
                 bullet = Bullets.missileRevenant;
+                shootSound = Sounds.missile;
             }};
         }};
 
@@ -341,6 +372,7 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.none;
                 bullet = Bullets.standardDenseBig;
+                shootSound = Sounds.shootBig;
             }};
         }};
     }

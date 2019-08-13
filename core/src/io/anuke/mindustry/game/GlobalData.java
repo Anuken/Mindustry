@@ -1,15 +1,13 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.game.EventType.UnlockEvent;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 /** Stores player unlocks. Clientside only. */
 public class GlobalData{
@@ -40,7 +38,9 @@ public class GlobalData{
     }
 
     public void addItem(Item item, int amount){
-        unlockContent(item);
+        if(amount > 0){
+            unlockContent(item);
+        }
         modified = true;
         items.getAndIncrement(item, 0, amount);
         state.stats.itemsDelivered.getAndIncrement(item, 0, amount);

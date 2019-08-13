@@ -23,10 +23,12 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.editor.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
+import static io.anuke.arc.scene.actions.Actions.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener{
@@ -77,11 +79,8 @@ public class UI implements ApplicationListener{
         Core.scene = new Scene(skin);
         Core.input.addProcessor(Core.scene);
 
-        //Dialog.setShowAction(() -> sequence(translateTo(Core.graphics.getWidth(), 0f), translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
-        //Dialog.setHideAction(() -> sequence(translateBy(-Core.graphics.getWidth(), 0f, 0.1f, Interpolation.fade)));
-
-        Dialog.setShowAction(Actions::sequence);
-        Dialog.setHideAction(Actions::sequence);
+        Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
+        Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
 
@@ -90,11 +89,21 @@ public class UI implements ApplicationListener{
             Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
         });
 
+        ClickListener.clicked = () -> Sounds.press.play();
+
         Colors.put("accent", Pal.accent);
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
         Colors.put("stat", Pal.stat);
+        loadExtraCursors();
+    }
 
-        loadCursors();
+    /** Called from a static context to make the cursor appear immediately upon startup.*/
+    public static void loadSystemCursors(){
+        SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
+        SystemCursor.hand.set(Core.graphics.newCursor("hand"));
+        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
+
+        Core.graphics.restoreCursor();
     }
 
     void loadExtraStyle(Skin skin){
@@ -116,31 +125,34 @@ public class UI implements ApplicationListener{
         skin.add("flat-down", copy, Drawable.class);
     }
 
-    void loadCursors(){
-        int cursorScaling = 1, outlineThickness = 3;
-        Color outlineColor = Color.valueOf("444444");
-
-        drillCursor = Core.graphics.newCursor("drill", cursorScaling, outlineColor, outlineThickness);
-        unloadCursor = Core.graphics.newCursor("unload", cursorScaling, outlineColor, outlineThickness);
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScaling, outlineColor, outlineThickness));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScaling, outlineColor, outlineThickness));
-
-        Core.graphics.restoreCursor();
+    void loadExtraCursors(){
+        drillCursor = Core.graphics.newCursor("drill");
+        unloadCursor = Core.graphics.newCursor("unload");
     }
 
     void generateFonts(Skin skin){
         generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
-        FreeTypeFontParameter param = new FreeTypeFontParameter();
-        param.size = (int)(9 * 2 * Math.max(Unit.dp.scl(1f), 0.5f));
-        param.shadowColor = Color.DARK_GRAY;
-        param.shadowOffsetY = 2;
-        param.incremental = true;
 
-        skin.add("default-font", generator.generateFont(param));
-        skin.add("default-font-chat", generator.generateFont(param));
-        skin.getFont("default-font").getData().markupEnabled = true;
-        skin.getFont("default-font").setOwnsTexture(false);
+        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+            size = (int)(UnitScl.dp.scl(18f));
+            shadowColor = Color.DARK_GRAY;
+            shadowOffsetY = 2;
+            incremental = true;
+        }};
+
+        FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
+            size = param.size;
+            borderColor = Color.DARK_GRAY;
+            borderWidth = UnitScl.dp.scl(2f);
+            spaceX -= borderWidth;
+            incremental = true;
+        }};
+
+        skin.add("outline", generator.generateFont(outlined));
+        skin.add("default", generator.generateFont(param));
+        skin.add("chat", generator.generateFont(param));
+        skin.getFont("default").getData().markupEnabled = true;
+        skin.getFont("default").setOwnsTexture(false);
     }
 
     @Override
@@ -149,6 +161,12 @@ public class UI implements ApplicationListener{
 
         Core.scene.act();
         Core.scene.draw();
+
+        //draw overlay for buttons
+        if(state.rules.tutorial){
+            control.tutorial.draw();
+            Draw.flush();
+        }
     }
 
     @Override
@@ -196,12 +214,13 @@ public class UI implements ApplicationListener{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input().getFrag().build(hudGroup);
+        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
         listfrag.build(hudGroup);
         loadfrag.build(group);
+        new FadeInFragment().build(group);
     }
 
     @Override
@@ -298,6 +317,10 @@ public class UI implements ApplicationListener{
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
+        showConfirm(title, text, null, confirmed);
+    }
+
+    public void showConfirm(String title, String text, BooleanProvider hide, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
@@ -307,6 +330,13 @@ public class UI implements ApplicationListener{
             dialog.hide();
             confirmed.run();
         });
+        if(hide != null){
+            dialog.update(() -> {
+                if(hide.get()){
+                    dialog.hide();
+                }
+            });
+        }
         dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
         dialog.keyDown(KeyCode.BACK, dialog::hide);
         dialog.show();

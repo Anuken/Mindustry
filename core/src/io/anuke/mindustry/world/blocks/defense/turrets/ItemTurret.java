@@ -1,20 +1,23 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.collection.OrderedMap;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.AmmoListValue;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 import java.io.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 30;
@@ -36,6 +39,27 @@ public class ItemTurret extends CooledTurret{
 
         stats.remove(BlockStat.itemCapacity);
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
+        consumes.add(new ConsumeItemFilter(i -> ammo.containsKey(i)){
+            @Override
+            public void build(Tile tile, Table table){
+                MultiReqImage image = new MultiReqImage();
+                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Item.Icon.large)),
+                    () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
+
+                table.add(image).size(8 * 4);
+            }
+
+            @Override
+            public boolean valid(TileEntity entity){
+                //valid when there's any ammo in the turret
+                return !((ItemTurretEntity)entity).ammo.isEmpty();
+            }
+
+            @Override
+            public void display(BlockStats stats){
+                //don't display
+            }
+        });
     }
 
     @Override
@@ -104,6 +128,11 @@ public class ItemTurret extends CooledTurret{
 
         //must not be found
         entity.ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+
+        //fire events for the tutorial
+        if(state.rules.tutorial){
+            Events.fire(new TurretAmmoDeliverEvent());
+        }
     }
 
     @Override

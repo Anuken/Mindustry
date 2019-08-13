@@ -1,12 +1,15 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
@@ -19,6 +22,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 
@@ -33,18 +37,21 @@ import static io.anuke.mindustry.Vars.*;
  */
 public class Control implements ApplicationListener{
     public final Saves saves;
+    public final MusicControl music;
+    public final Tutorial tutorial;
+    public InputHandler input;
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
-    private InputHandler input;
 
     public Control(){
         batch = new SpriteBatch();
         saves = new Saves();
-        data = new GlobalData();
+        tutorial = new Tutorial();
+        music = new MusicControl();
 
-        Unit.dp.product = settings.getInt("uiscale", 100) / 100f;
+        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         Core.input.setCatch(KeyCode.BACK, true);
 
@@ -98,6 +105,7 @@ public class Control implements ApplicationListener{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
+            tutorial.reset();
 
             hiscore = false;
 
@@ -109,6 +117,7 @@ public class Control implements ApplicationListener{
                 hiscore = true;
                 world.getMap().setHighScore(state.wave);
             }
+            Sounds.wave.play();
         });
 
         Events.on(GameOverEvent.class, event -> {
@@ -168,6 +177,41 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+
+        if(android){
+            Sounds.empty.loop(0f, 1f, 0f);
+
+            checkClassicData();
+        }
+    }
+
+    //checks for existing 3.5 app data, android only
+    public void checkClassicData(){
+        try{
+            if(files.local("mindustry-maps").exists() || files.local("mindustry-saves").exists()){
+                settings.getBoolOnce("classic-backup-check", () -> {
+                    app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
+                        try{
+                            Platform.instance.requestExternalPerms(() -> {
+                                FileHandle external = files.external("MindustryClassic");
+                                if(files.local("mindustry-maps").exists()){
+                                    files.local("mindustry-maps").copyTo(external);
+                                }
+
+                                if(files.local("mindustry-saves").exists()){
+                                    files.local("mindustry-saves").copyTo(external);
+                                }
+                            });
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            ui.showError(Strings.parseException(e, true));
+                        }
+                    })));
+                });
+            }
+        }catch(Throwable t){
+            t.printStackTrace();
+        }
     }
 
     void createPlayer(){
@@ -190,10 +234,6 @@ public class Control implements ApplicationListener{
         Core.input.addProcessor(input);
     }
 
-    public InputHandler input(){
-        return input;
-    }
-
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
@@ -206,6 +246,7 @@ public class Control implements ApplicationListener{
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
+            Net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;
@@ -220,6 +261,58 @@ public class Control implements ApplicationListener{
         });
     }
 
+    public void playTutorial(){
+        Zone zone = Zones.groundZero;
+        ui.loadAnd(() -> {
+            logic.reset();
+            Net.reset();
+
+            world.beginMapLoad();
+
+            world.createTiles(zone.generator.width, zone.generator.height);
+            zone.generator.generate(world.getTiles());
+
+            Tile coreb = null;
+
+            out:
+            for(int x = 0; x < world.width(); x++){
+                for(int y = 0; y < world.height(); y++){
+                    if(world.rawTile(x, y).block() instanceof CoreBlock){
+                        coreb = world.rawTile(x, y);
+                        break out;
+                    }
+                }
+            }
+
+            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
+                Tile tile = world.ltile(cx, cy);
+                if(tile != null && tile.getTeam() == defaultTeam && !(tile.block() instanceof CoreBlock)){
+                    world.removeBlock(tile);
+                }
+            });
+
+            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
+
+            world.endMapLoad();
+
+            zone.rules.accept(state.rules);
+            state.rules.zone = zone;
+            for(Tile core : state.teams.get(defaultTeam).cores){
+                for(ItemStack stack : zone.getStartingItems()){
+                    core.entity.items.add(stack.item, stack.amount);
+                }
+            }
+            Tile core = state.teams.get(defaultTeam).cores.first();
+            core.entity.items.clear();
+
+            logic.play();
+            state.rules.waveTimer = false;
+            state.rules.waveSpacing = 60f * 30;
+            state.rules.buildCostMultiplier = 0.3f;
+            state.rules.tutorial = true;
+        });
+    }
+
     public boolean isHighScore(){
         return hiscore;
     }
@@ -228,6 +321,8 @@ public class Control implements ApplicationListener{
     public void dispose(){
         content.dispose();
         Net.dispose();
+        Musics.dispose();
+        Sounds.dispose();
         ui.editor.dispose();
     }
 
@@ -248,23 +343,12 @@ public class Control implements ApplicationListener{
     public void init(){
         Platform.instance.updateRPC();
 
-        if(!Core.settings.getBool("4.0-warning-2", false)){
-
-            Time.run(5f, () -> {
-                FloatingDialog dialog = new FloatingDialog("VERY IMPORTANT");
-                dialog.buttons.addButton("$ok", () -> {
-                    dialog.hide();
-                    Core.settings.put("4.0-warning-2", true);
-                    Core.settings.save();
-                }).size(100f, 60f);
-                dialog.cont.add("Reminder: The alpha version you are about to play is very unstable, and is [accent]not representative of the final v4 release.[]\n\n " +
-                "\nThere is currently[scarlet] no sound implemented[]; this is intentional.\n" +
-                "All current art and UI is unfinished, and will be changed before release. " +
-                "\n\n[accent]Saves may be corrupted without warning between updates.").wrap().width(400f);
-                dialog.show();
-            });
+        //play tutorial on stop
+        if(!settings.getBool("playedtutorial", false)){
+            Core.app.post(() -> Core.app.post(this::playTutorial));
         }
 
+        //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             FloatingDialog dialog = new FloatingDialog("$confirm");
 
@@ -307,6 +391,8 @@ public class Control implements ApplicationListener{
         //autosave global data if it's modified
         data.checkSave();
 
+        music.update();
+
         if(!state.is(State.menu)){
             input.update();
 
@@ -318,6 +404,10 @@ public class Control implements ApplicationListener{
                         }
                     }
                 }
+            }
+
+            if(state.rules.tutorial){
+                tutorial.update();
             }
 
             //auto-update rpc every 5 seconds

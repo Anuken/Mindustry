@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class DesktopPlatform extends Platform{
     static boolean useDiscord = OS.is64Bit;
-    final static String applicationId = "398246104468291591";
+    final static String applicationId = "610508934456934412";
     String[] args;
 
     public DesktopPlatform(String[] args){
@@ -78,24 +78,23 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = state.rules.pvp ? "PvP" : state.rules.waves ? "Survival" : "Attack";
-            if(world.getMap() == null){
-                presence.details = "Unknown Map";
-            }else if(!state.rules.waves){
-                presence.details = Strings.capitalize(world.getMap().name());
-            }else{
-                presence.details = Strings.capitalize(world.getMap().name()) + " | Wave " + state.wave;
-                presence.largeImageText = "Wave " + state.wave;
-            }
+            String map = world.getMap() == null ? "Unknown Map" : world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
+            String mode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            String players =  Net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
 
-            if(Net.active() && playerGroup.size() > 1){
-                presence.state = (state.rules.pvp ? "PvP | " : "") + playerGroup.size() + " Players";
-            }else if(state.rules.waves){
-                presence.state = "Survival";
+            presence.state = mode + players;
+
+            if(!state.rules.waves){
+                presence.details = map;
+            }else{
+                presence.details = map + " | Wave " + state.wave;
+                presence.largeImageText = "Wave " + state.wave;
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 presence.state = "In Editor";
+            }else if(ui.deploy != null && ui.deploy.isShown()){
+                presence.state = "In Launch Selection";
             }else{
                 presence.state = "In Menu";
             }

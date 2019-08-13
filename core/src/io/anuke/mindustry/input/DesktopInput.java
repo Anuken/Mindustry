@@ -1,22 +1,20 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.input.PlaceUtils.NormalizeDrawResult;
-import io.anuke.mindustry.input.PlaceUtils.NormalizeResult;
+import io.anuke.arc.*;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -41,6 +39,7 @@ public class DesktopInput extends InputHandler{
             block.getPlaceDraw(placeDraw, rotation, prevX, prevY, prevRotation);
 
             Draw.color();
+            Draw.mixcol(Pal.accent, 0.12f + Mathf.absin(Time.time(), 8f, 0.35f));
             Draw.rect(placeDraw.region, x * tilesize + block.offset(), y * tilesize + block.offset(),
             placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
             placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
@@ -54,6 +53,7 @@ public class DesktopInput extends InputHandler{
                     Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
             }
             Draw.color();
+            Draw.mixcol();
         }else{
             Draw.color(Pal.removeBack);
             Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f - 1);
@@ -243,6 +243,7 @@ public class DesktopInput extends InputHandler{
                     rotation = l.rotation;
                     tryPlaceBlock(l.x, l.y);
                 });
+                Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
                 for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){

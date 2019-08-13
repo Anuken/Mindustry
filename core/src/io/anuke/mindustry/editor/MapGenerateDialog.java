@@ -11,7 +11,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
-import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
@@ -28,8 +27,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapGenerateDialog extends FloatingDialog{
     private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
-        RiverNoiseFilter::new, OreFilter::new, MedianFilter::new, BlendFilter::new,
-        MirrorFilter::new, ClearFilter::new
+        RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -150,16 +149,6 @@ public class MapGenerateDialog extends FloatingDialog{
         editor.clearOp();
     }
 
-    public void addDefaultOres(Array<GenerateFilter> filters){
-        int index = 0;
-        for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
-            OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.019f;
-            filter.ore = block;
-            filters.add(filter);
-        }
-    }
-
     void setup(){
         if(pixmap != null){
             pixmap.dispose();
@@ -227,7 +216,7 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Unit.dp.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / UnitScl.dp.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -315,7 +304,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         selection.cont.addButton("$filter.defaultores", () -> {
-            addDefaultOres(filters);
+            world.maps.addDefaultOres(filters);
             rebuildFilters();
             update();
             selection.hide();
@@ -394,10 +383,10 @@ public class MapGenerateDialog extends FloatingDialog{
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
                         if(filters.isEmpty()){
                             Tile tile = editor.tile(px * scaling, py * scaling);
-                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), Team.none);
+                            color = MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), Team.derelict);
                         }else{
                             GenTile tile = buffer1[px][py];
-                            color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.none);
+                            color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.derelict);
                         }
                         pixmap.drawPixel(px, pixmap.getHeight() - 1 - py, color);
                     }

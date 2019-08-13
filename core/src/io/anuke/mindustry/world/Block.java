@@ -1,38 +1,38 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.annotations.Annotations.CallSuper;
-import io.anuke.arc.Core;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.collection.Array;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.Function;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.g2d.TextureAtlas.AtlasRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.effect.RubbleDecal;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
+import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Bar;
-import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OverlayFloor;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -98,6 +98,12 @@ public class Block extends BlockStorage{
     public boolean outlineIcon = false;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
+    /** Sounds made when this block breaks.*/
+    public Sound breakSound = Sounds.boom;
+    /** The sound that this block makes while active.*/
+    public Sound idleSound = Sounds.none;
+    /** Idle sound base volume. */
+    public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
     public ItemStack[] buildRequirements = new ItemStack[]{};
@@ -139,6 +145,10 @@ public class Block extends BlockStorage{
 
     public boolean isBuildable(){
         return buildVisibility != invisible;
+    }
+
+    public boolean isStatic(){
+        return cacheLayer == CacheLayer.walls;
     }
 
     public void onProximityRemoved(Tile tile){
@@ -201,6 +211,11 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
+    /** @return whether this block should play its idle sound.*/
+    public boolean shouldIdleSound(Tile tile){
+        return canProduce(tile);
+    }
+
     public void drawLayer(Tile tile){
     }
 
@@ -224,28 +239,34 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    protected void drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return;
+    protected float drawPlaceText(String text, int x, int y, boolean valid){
+        if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("outline");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f);
+        font.getData().setScale(1f / 4f / UnitScl.dp.scl(1f));
         layout.setText(font, text);
 
+        float width = layout.width;
+
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 2;
+        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
+        dy -= 1f;
+        Lines.stroke(2f, Color.DARK_GRAY);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
         Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 2f, dy);
+        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.WHITE);
         font.getData().setScale(1f);
         Draw.reset();
         Pools.free(layout);
+        return width;
     }
 
     public void draw(Tile tile){
@@ -259,7 +280,28 @@ public class Block extends BlockStorage{
     }
 
     /** Called after the block is placed by this client. */
+    @CallSuper
     public void playerPlaced(Tile tile){
+
+        if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
+            int range = 10;
+            tempTiles.clear();
+            Geometry.circle(tile.x, tile.y, range, (x, y) -> {
+                Tile other = world.ltile(x, y);
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
+                    !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
+                    tempTiles.add(other);
+                }
+            });
+            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+            if(!tempTiles.isEmpty()){
+                Call.linkPowerNodes(null, tempTiles.first(), tile);
+            }
+        }
+
+        if(outputsPower && !consumesPower){
+            PowerNode.lastPlaced = tile.pos();
+        }
     }
 
     public void removed(Tile tile){
@@ -584,6 +626,7 @@ public class Block extends BlockStorage{
     public void displayConsumption(Tile tile, Table table){
         table.left();
         for(Consume cons : consumes.all()){
+            if(cons.isOptional() && cons.isBoost()) continue;
             cons.build(tile, table);
         }
     }

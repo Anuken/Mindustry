@@ -13,8 +13,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.EventType.UnlockEvent;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler;
@@ -54,7 +53,7 @@ public class PlacementFragment extends Fragment{
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> {
-                control.input().block = null;
+                control.input.block = null;
                 rebuild();
             });
         });
@@ -120,7 +119,7 @@ public class PlacementFragment extends Fragment{
             full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
-                InputHandler input = control.input();
+                InputHandler input = control.input;
 
                 //rebuilds the category table with the correct recipes
                 Runnable rebuildCategory = () -> {
@@ -146,7 +145,7 @@ public class PlacementFragment extends Fragment{
                             if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
-                        }).size(46f).group(group).get();
+                        }).size(46f).group(group).name("block-" + block.name).get();
 
                         button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
 
@@ -200,8 +199,10 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", "clear-partial", () -> ui.content.show(lastDisplay))
-                                    .size(8 * 5).padTop(-5).padRight(-5).right().grow();
+                                    header.addButton("?", "clear-partial", () -> {
+                                        ui.content.show(lastDisplay);
+                                        Events.fire(new BlockInfoEvent());
+                                    }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
                                 }
                                 if(lastDisplay.buildVisibility == Blocks.padVisible && !lastDisplay.buildVisibility.get()){
                                     header.row();
@@ -282,7 +283,7 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton("icon-" + cat.name() + "-med", "clear-toggle-trans", iconsizemed, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
-                        }).group(group).update(i -> i.setChecked(currentCategory == cat));
+                        }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
                     }
                 }).touchable(Touchable.enabled);
 
@@ -335,8 +336,8 @@ public class PlacementFragment extends Fragment{
         }
 
         //block currently selected
-        if(control.input().block != null){
-            toDisplay = control.input().block;
+        if(control.input.block != null){
+            toDisplay = control.input.block;
         }
 
         //block hovered on in build menu

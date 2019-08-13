@@ -55,9 +55,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawSelect(Tile tile){
-        Draw.color(Pal.accent);
-        Lines.dashCircle(tile.drawx(), tile.drawy(), repairRadius);
-        Draw.color();
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), repairRadius, Pal.accent);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class RepairPoint extends Block{
             float len = 5f;
 
             Draw.color(Color.valueOf("e8ffd7"));
-            Shapes.laser(laser, laserEnd,
+            Drawf.laser(laser, laserEnd,
                 tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
                 entity.target.x, entity.target.y, entity.strength);
             Draw.color();

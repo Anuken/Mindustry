@@ -27,7 +27,7 @@ public class OverlayRenderer{
     private float buildFadeTime;
 
     public void drawBottom(){
-        InputHandler input = control.input();
+        InputHandler input = control.input;
 
         if(!input.isDrawing() || player.isDead()) return;
 
@@ -64,7 +64,7 @@ public class OverlayRenderer{
 
         if(player.isDead()) return; //dead players don't draw
 
-        InputHandler input = control.input();
+        InputHandler input = control.input;
 
         //draw config selected block
         if(input.frag.config.isShown()){
@@ -85,9 +85,9 @@ public class OverlayRenderer{
                     float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
                     if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
                         Draw.color(Color.DARK_GRAY);
-                        Lines.poly(core.drawx(), core.drawy() - 2, 200, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.drawx(), core.drawy() - 2, state.rules.enemyCoreBuildRadius);
                         Draw.color(Pal.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                        Lines.poly(core.drawx(), core.drawy(), 200, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.drawx(), core.drawy(), state.rules.enemyCoreBuildRadius);
                     }
                 }
             }
@@ -105,7 +105,7 @@ public class OverlayRenderer{
 
         Draw.reset();
 
-        //draw selected block bars and info
+        //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vector2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Tile tile = world.ltileWorld(vec.x, vec.y);
@@ -115,6 +115,7 @@ public class OverlayRenderer{
             }
         }
 
+        //draw selection overlay when dropping item
         if(input.isDroppingItem()){
             Vector2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
@@ -125,9 +126,12 @@ public class OverlayRenderer{
 
             Tile tile = world.ltileWorld(v.x, v.y);
             if(tile != null && tile.interactable(player.getTeam()) && tile.block().acceptStack(player.item().item, player.item().amount, tile, player) > 0){
-                Draw.color(Pal.place);
-                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1 + Mathf.absin(Time.time(), 5f, 1f));
-                Draw.color();
+                Lines.stroke(3f, Pal.gray);
+                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.stroke(1f, Pal.place);
+                Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
+                Draw.reset();
+
             }
         }
     }

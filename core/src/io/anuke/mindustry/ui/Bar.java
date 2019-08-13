@@ -71,7 +71,7 @@ public class Bar extends Element{
 
         Draw.color();
 
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("default");
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 

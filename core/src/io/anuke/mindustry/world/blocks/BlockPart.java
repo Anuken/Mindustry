@@ -54,7 +54,8 @@ public class BlockPart extends Block{
 
     @Override
     public Tile linked(Tile tile){
-        return tile.getNearby(-dx, -dy);
+        Tile out = tile.getNearby(-dx, -dy);
+        return out == null ? tile : out;
     }
 
     @Override

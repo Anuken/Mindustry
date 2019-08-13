@@ -115,7 +115,6 @@ public abstract class FlyingUnit extends BaseUnit{
         Draw.rect(type.region, x, y, rotation - 90);
 
         drawWeapons();
-        drawItems();
 
         Draw.mixcol();
     }

@@ -115,7 +115,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        super.setTeam(Team.none);
+        super.setTeam(Team.derelict);
     }
 
     @Override

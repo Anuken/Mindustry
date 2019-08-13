@@ -75,7 +75,15 @@ public class MapsDialog extends FloatingDialog{
                         map = world.maps.makeLegacyMap(file);
                     }
 
-                    String name = map.tags.get("name");
+                    //when you attempt to import a save, it will have no name, so generate one
+                    String name = map.tags.getOr("name", () -> {
+                        String result = "unknown";
+                        int number = 0;
+                        while(world.maps.byName(result + number++) != null);
+                        return result + number;
+                    });
+
+                    //this will never actually get called, but it remains just in case
                     if(name == null){
                         ui.showError("$editor.errorname");
                         return;
@@ -109,7 +117,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Unit.dp.scl(230)), 1, 8);
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / UnitScl.dp.scl(230)), 1, 8);
         float mapsize = 200f;
 
         int i = 0;
@@ -168,7 +176,7 @@ public class MapsDialog extends FloatingDialog{
             t.row();
             t.add("$editor.author").padRight(10).color(Color.GRAY);
             t.row();
-            t.add(map.author()).growX().wrap().padTop(2);
+            t.add(map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
             t.add("$editor.description").padRight(10).color(Color.GRAY).top();
             t.row();

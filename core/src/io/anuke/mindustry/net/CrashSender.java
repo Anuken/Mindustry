@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
+import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
@@ -50,12 +51,12 @@ public class CrashSender{
 
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
-                new File(OS.getAppDataDirectoryString(Vars.appName)).mkdir();
-                Files.write(file.toPath(), parseException(exception).getBytes());
                 Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+                Files.write(file.toPath(), parseException(exception).getBytes());
 
                 writeListener.accept(file);
-            }catch(Throwable ignored){
+            }catch(Throwable e){
+                e.printStackTrace();
                 Log.err("Failed to save local crash report.");
             }
 
@@ -103,7 +104,7 @@ public class CrashSender{
 
             Log.info("Sending crash report.");
             //post to crash report URL
-            Core.net.httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
+            httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
                 System.exit(1);
@@ -124,6 +125,10 @@ public class CrashSender{
             death.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void httpPost(String url, String content, Consumer<HttpResponse> success, Consumer<Throwable> failure){
+        new NetJavaImpl().http(new HttpRequest().method(HttpMethod.POST).content(content).url(url), success, failure);
     }
 
     private static String parseException(Throwable e){

@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -52,9 +52,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Draw.color(Pal.accent);
-        Lines.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range);
-        Draw.color();
+        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
     }
 
     @Override
@@ -76,7 +74,7 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime)){
+        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
             entity.cons.trigger();
         }
 
@@ -86,12 +84,12 @@ public class OverdriveProjector extends Block{
 
             entity.charge = 0f;
 
-            int tileRange = (int)(realRange / tilesize);
+            int tileRange = (int)(realRange / tilesize + 1);
             healed.clear();
 
             for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
                 for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(Mathf.dst(x, y, tile.x, tile.y) > tileRange) continue;
+                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
 
                     Tile other = world.ltile(x, y);
 
@@ -114,9 +112,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.entity();
         float realRange = range + entity.phaseHeat * phaseRangeBoost;
 
-        Draw.color(color);
-        Lines.dashCircle(tile.drawx(), tile.drawy(), realRange);
-        Draw.color();
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), realRange, color);
     }
 
     @Override
@@ -128,9 +124,7 @@ public class OverdriveProjector extends Block{
 
         Draw.color(color, phase, entity.phaseHeat);
         Draw.alpha(entity.heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
-        //Draw.blend(Blending.additive);
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        //Draw.blend();
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.2f) * entity.heat);
         Lines.square(tile.drawx(), tile.drawy(), (1f - f) * 8f);

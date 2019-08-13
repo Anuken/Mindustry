@@ -17,9 +17,10 @@ import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
+
 public class DesktopPlatform extends Platform{
     static boolean useDiscord = OS.is64Bit;
-    final static String applicationId = "398246104468291591";
+    final static String applicationId = "610508934456934412";
     String[] args;
 
     public DesktopPlatform(String[] args){
@@ -41,7 +42,7 @@ public class DesktopPlatform extends Platform{
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = r -> new Thread(r).start();
+        Consumer<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
@@ -58,7 +59,7 @@ public class DesktopPlatform extends Platform{
 
         CrashSender.send(e, file -> {
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath()));
+                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + (e.getMessage() == null ? "" : "\n" + e.getMessage())));
             }
         });
     }
@@ -76,24 +77,23 @@ public class DesktopPlatform extends Platform{
         DiscordRichPresence presence = new DiscordRichPresence();
 
         if(!state.is(State.menu)){
-            presence.state = state.rules.pvp ? "PvP" : state.rules.waves ? "Survival" : "Attack";
-            if(world.getMap() == null){
-                presence.details = "Unknown Map";
-            }else if(!state.rules.waves){
-                presence.details = Strings.capitalize(world.getMap().name());
-            }else{
-                presence.details = Strings.capitalize(world.getMap().name()) + " | Wave " + state.wave;
-                presence.largeImageText = "Wave " + state.wave;
-            }
+            String map = world.getMap() == null ? "Unknown Map" : world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
+            String mode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            String players =  Net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
 
-            if(Net.active() && playerGroup.size() > 1){
-                presence.state = (state.rules.pvp ? "PvP | " : "") + playerGroup.size() + " Players";
-            }else if(state.rules.waves){
-                presence.state = "Survival";
+            presence.state = mode + players;
+
+            if(!state.rules.waves){
+                presence.details = map;
+            }else{
+                presence.details = map + " | Wave " + state.wave;
+                presence.largeImageText = "Wave " + state.wave;
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 presence.state = "In Editor";
+            }else if(ui.deploy != null && ui.deploy.isShown()){
+                presence.state = "In Launch Selection";
             }else{
                 presence.state = "In Menu";
             }
@@ -117,7 +117,7 @@ public class DesktopPlatform extends Platform{
 
             String str = new String(Base64Coder.encode(result));
 
-            if(str.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+            if(str.equals("AAAAAAAAAOA=") || str.equals("AAAAAAAAAAA=")) throw new RuntimeException("Bad UUID.");
 
             return str;
         }catch(Exception e){
@@ -133,6 +133,6 @@ public class DesktopPlatform extends Platform{
         if(bytes == null) return false;
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");
+        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }

@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.mindustry.graphics.Pal;
 
 public class ReqImage extends Stack{
@@ -21,7 +21,7 @@ public class ReqImage extends Stack{
 
             @Override
             public void draw(){
-                Lines.stroke(Unit.dp.scl(2f), Pal.removeBack);
+                Lines.stroke(UnitScl.dp.scl(2f), Pal.removeBack);
                 Lines.line(x, y - 2f + height, x + width, y - 2f);
                 Draw.color(Pal.remove);
                 Lines.line(x, y + height, x + width, y);

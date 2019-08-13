@@ -17,7 +17,7 @@ public abstract class Decal extends TimedEntity implements BelowLiquidTrait, Dra
 
     @Override
     public float lifetime(){
-        return 8200f;
+        return 3600;
     }
 
     @Override

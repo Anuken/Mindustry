@@ -1,19 +1,16 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.Effects;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BuildBlock;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -43,7 +40,7 @@ public class Bullets implements ContentList{
     fireball, basicFlame, pyraFlame, driverBolt, healBullet, frag, eruptorShot,
 
     //bombs
-    bombExplosive, bombIncendiary, bombOil, explode;
+    bombExplosive, bombIncendiary, bombOil;
 
     @Override
     public void load(){
@@ -115,7 +112,7 @@ public class Bullets implements ContentList{
             lifetime = 70f;
             bulletWidth = bulletHeight = 14f;
             collidesTiles = false;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 4f;
             splashDamageRadius = 45f;
             splashDamage = 50f;
             backColor = Pal.missileYellowBack;
@@ -137,7 +134,7 @@ public class Bullets implements ContentList{
 
         flakLead = new FlakBulletType(4.2f, 3){{
             lifetime = 60f;
-            ammoMultiplier = 3f;
+            ammoMultiplier = 4f;
             shootEffect = Fx.shootSmall;
             bulletWidth = 6f;
             bulletHeight = 8f;
@@ -148,7 +145,7 @@ public class Bullets implements ContentList{
 
         flakScrap = new FlakBulletType(4f, 3){{
             lifetime = 60f;
-            ammoMultiplier = 3f;
+            ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.5f;
             bulletWidth = 6f;
@@ -171,7 +168,7 @@ public class Bullets implements ContentList{
         flakExplosive = new FlakBulletType(4f, 5){{
             //default bullet type, no changes
             shootEffect = Fx.shootBig;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 4f;
         }};
 
         flakSurge = new FlakBulletType(4f, 7){{
@@ -188,7 +185,7 @@ public class Bullets implements ContentList{
             drag = -0.01f;
             splashDamageRadius = 30f;
             splashDamage = 30f;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 4f;
             lifetime = 150f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
@@ -286,14 +283,14 @@ public class Bullets implements ContentList{
             lifetime = 60f;
             shootEffect = Fx.shootSmall;
             smokeEffect = Fx.shootSmallSmoke;
-            ammoMultiplier = 1;
+            ammoMultiplier = 2;
         }};
 
         standardDense = new BasicBulletType(3.5f, 18, "bullet"){{
             bulletWidth = 9f;
             bulletHeight = 12f;
             reloadMultiplier = 0.6f;
-            ammoMultiplier = 2;
+            ammoMultiplier = 4;
             lifetime = 60f;
         }};
 
@@ -302,7 +299,7 @@ public class Bullets implements ContentList{
             bulletHeight = 13f;
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
-            ammoMultiplier = 2;
+            ammoMultiplier = 4;
             lifetime = 60f;
         }};
 
@@ -311,7 +308,7 @@ public class Bullets implements ContentList{
             bulletHeight = 9f;
             homingPower = 5f;
             reloadMultiplier = 1.4f;
-            ammoMultiplier = 3;
+            ammoMultiplier = 5;
             lifetime = 60f;
         }};
 
@@ -468,6 +465,11 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
+            }
+
+            @Override
+            public float range(){
+                return 50f;
             }
 
             @Override
@@ -696,24 +698,6 @@ public class Bullets implements ContentList{
                     Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
                     Puddle.deposit(tile, Liquids.oil, 5f);
                 }
-            }
-        };
-
-        explode = new BombBulletType(2f, 3f, "clear"){
-            {
-                hitEffect = Fx.pulverize;
-                lifetime = 30f;
-                speed = 1f;
-                splashDamageRadius = 50f;
-                splashDamage = 28f;
-            }
-
-            @Override
-            public void init(Bullet b){
-                if(b.getOwner() instanceof Unit){
-                    ((Unit)b.getOwner()).kill();
-                }
-                b.time(b.lifetime());
             }
         };
     }

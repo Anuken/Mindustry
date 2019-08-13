@@ -16,7 +16,7 @@ import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.core.Platform;
@@ -34,6 +34,7 @@ public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
     FileChooser chooser;
+    Runnable permCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -67,6 +68,24 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
+            public void requestExternalPerms(Runnable callback){
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    callback.run();
+                }else{
+                    permCallback = callback;
+                    ArrayList<String> perms = new ArrayList<>();
+                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+                }
+            }
+
+            @Override
             public void shareFile(FileHandle file){
             }
 
@@ -96,7 +115,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void endForceLandscape(){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
             }
 
             @Override
@@ -106,7 +125,7 @@ public class AndroidLauncher extends AndroidApplication{
         };
 
         if(doubleScaleTablets && isTablet(this.getContext())){
-            Unit.dp.addition = 0.5f;
+            UnitScl.dp.addition = 0.5f;
         }
 
         config.hideStatusBar = true;
@@ -123,7 +142,11 @@ public class AndroidLauncher extends AndroidApplication{
                 if(i != PackageManager.PERMISSION_GRANTED) return;
             }
             if(chooser != null){
-                chooser.show();
+                Core.app.post(chooser::show);
+            }
+            if(permCallback != null){
+                Core.app.post(permCallback);
+                permCallback = null;
             }
         }
     }

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
@@ -206,7 +207,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
      * Return the build requests currently active, or the one at the top of the queue.
      * May return null.
      */
-    default BuildRequest buildRequest(){
+    default @Nullable BuildRequest buildRequest(){
         return buildQueue().size == 0 ? null : buildQueue().first();
     }
 

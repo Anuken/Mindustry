@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
@@ -220,7 +220,7 @@ public class MenuRenderer implements Disposable{
 
     public void render(){
         time += Time.delta();
-        float scaling = Math.max(Unit.dp.scl(4f), Math.max(Core.graphics.getWidth() / ((width - 1f) * tilesize), Core.graphics.getHeight() / ((height - 1f) * tilesize)));
+        float scaling = Math.max(UnitScl.dp.scl(4f), Math.max(Core.graphics.getWidth() / ((width - 1f) * tilesize), Core.graphics.getHeight() / ((height - 1f) * tilesize)));
         camera.position.set(width * tilesize / 2f, height * tilesize / 2f);
         camera.resize(Core.graphics.getWidth() / scaling,
         Core.graphics.getHeight() / scaling);
@@ -232,6 +232,7 @@ public class MenuRenderer implements Disposable{
         batch.beginDraw();
         batch.drawCache(cacheFloor);
         batch.endDraw();
+        Draw.color();
         Draw.rect(Draw.wrap(shadows.getTexture()),
         width * tilesize / 2f - 4f, height * tilesize / 2f - 4f,
         width * tilesize, -height * tilesize);

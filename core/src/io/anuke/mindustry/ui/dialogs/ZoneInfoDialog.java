@@ -1,15 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.Button;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Zone.ZoneRequirement;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.type.Zone.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -104,7 +105,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.row();
                 cont.table(desc -> {
                     desc.left().defaults().left().width(Core.graphics.isPortrait() ? 350f : 500f);
-                    desc.pane(t -> t.marginRight(12f).add(zone.description).wrap().growX()).fillX().maxHeight(mobile ? 240f : 400f).pad(2).padBottom(8f).get().setScrollingDisabled(true, false);
+                    desc.pane(t -> t.marginRight(12f).add(zone.description).wrap().growX()).fillX().maxHeight(mobile ? 300f : 450f).pad(2).padBottom(8f).get().setScrollingDisabled(true, false);
                     desc.row();
 
                     desc.table(t -> {
@@ -142,6 +143,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {
             if(!data.isUnlocked(zone)){
+                Sounds.unlock.play();
                 data.unlockContent(zone);
                 ui.deploy.setup();
                 setup(zone);
@@ -151,29 +153,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                 hide();
                 control.playZone(zone);
             }
-        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !canUnlock(zone) : !data.hasItems(zone.getLaunchCost())).uniformY().get();
+        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 
         button.row();
         button.add(iteminfo);
-    }
-
-    private boolean canUnlock(Zone zone){
-        if(data.isUnlocked(zone)){
-            return true;
-        }
-
-        for(ZoneRequirement other : zone.zoneRequirements){
-            if(other.zone.bestWave() < other.wave){
-                return false;
-            }
-        }
-
-        for(Block other : zone.blockRequirements){
-            if(!data.isUnlocked(other)){
-                return false;
-            }
-        }
-
-        return true;
     }
 }

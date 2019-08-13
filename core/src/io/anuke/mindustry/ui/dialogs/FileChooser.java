@@ -9,7 +9,7 @@ import io.anuke.arc.graphics.g2d.GlyphLayout;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.core.Platform;
@@ -151,7 +151,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(Core.graphics.isPortrait() ? Core.graphics.getWidth() / Unit.dp.scl(1) : Core.graphics.getWidth() / Unit.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).width(Core.graphics.isPortrait() ? Core.graphics.getWidth() / UnitScl.dp.scl(1) : Core.graphics.getWidth() / UnitScl.dp.scl(2)).colspan(3).grow();
         content.row();
 
         if(!open){
@@ -190,7 +190,7 @@ public class FileChooser extends FloatingDialog{
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.scene.skin.getFont("default-font"), navigation.getText());
+        layout.setText(Core.scene.skin.getFont("default"), navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);

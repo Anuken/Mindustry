@@ -11,7 +11,7 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
@@ -240,10 +240,6 @@ public class MapView extends Element implements GestureListener{
         editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
-        if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
-            return;
-        }
-
         if(grid){
             Draw.color(Color.GRAY);
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
@@ -262,7 +258,7 @@ public class MapView extends Element implements GestureListener{
         float scaling = zoom * Math.min(width, height) / editor.width();
 
         Draw.color(Pal.accent);
-        Lines.stroke(Unit.dp.scl(2f));
+        Lines.stroke(UnitScl.dp.scl(2f));
 
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
@@ -298,11 +294,10 @@ public class MapView extends Element implements GestureListener{
         }
 
         Draw.color(Pal.accent);
-        Lines.stroke(Unit.dp.scl(3f));
+        Lines.stroke(UnitScl.dp.scl(3f));
         Lines.rect(x, y, width, height);
         Draw.reset();
 
-        ScissorStack.popScissors();
         ScissorStack.popScissors();
     }
 
@@ -325,7 +320,7 @@ public class MapView extends Element implements GestureListener{
     public boolean zoom(float initialDistance, float distance){
         if(!active()) return false;
         float nzoom = distance - initialDistance;
-        zoom += nzoom / 10000f / Unit.dp.scl(1f) * zoom;
+        zoom += nzoom / 10000f / UnitScl.dp.scl(1f) * zoom;
         clampZoom();
         return false;
     }

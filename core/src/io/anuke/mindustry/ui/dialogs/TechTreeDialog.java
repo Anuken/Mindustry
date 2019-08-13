@@ -15,6 +15,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -24,7 +25,7 @@ import io.anuke.mindustry.world.Block.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class TechTreeDialog extends FloatingDialog{
-    private final float nodeSize = Unit.dp.scl(60f);
+    private final float nodeSize = UnitScl.dp.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private Rectangle bounds = new Rectangle();
@@ -59,8 +60,8 @@ public class TechTreeDialog extends FloatingDialog{
 
     void treeLayout(){
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = Unit.dp.scl(60f);
-        layout.gapBetweenNodes = Unit.dp.scl(40f);
+        layout.gapBetweenLevels = UnitScl.dp.scl(60f);
+        layout.gapBetweenNodes = UnitScl.dp.scl(40f);
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
         bounds.set(layout.getBounds());
@@ -237,6 +238,7 @@ public class TechTreeDialog extends FloatingDialog{
             treeLayout();
             rebuild();
             Core.scene.act();
+            Sounds.unlock.play();
         }
 
         void rebuild(){
@@ -318,7 +320,8 @@ public class TechTreeDialog extends FloatingDialog{
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
 
-                    Lines.stroke(Unit.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Lines.stroke(UnitScl.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Draw.alpha(parentAlpha);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }
             }

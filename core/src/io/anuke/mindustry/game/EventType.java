@@ -48,6 +48,36 @@ public class EventType{
 
     }
 
+    /** Called when the player places a line, mobile or desktop.*/
+    public static class LineConfirmEvent{
+
+    }
+
+    /** Called when a turret recieves ammo, but only when the tutorial is active! */
+    public static class TurretAmmoDeliverEvent{
+
+    }
+
+    /** Called when a core recieves ammo, but only when the tutorial is active! */
+    public static class CoreItemDeliverEvent{
+
+    }
+
+    /** Called when the player opens info for a specific block.*/
+    public static class BlockInfoEvent{
+
+    }
+
+    /** Called when a player withdraws items from a block. Tutorial only.*/
+    public static class WithdrawEvent{
+
+    }
+
+    /** Called when a player deposits items to a block.*/
+    public static class DepositEvent{
+
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 

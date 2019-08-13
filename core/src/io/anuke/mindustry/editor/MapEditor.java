@@ -32,7 +32,7 @@ public class MapEditor{
     public int brushSize = 1;
     public int rotation;
     public Block drawBlock = Blocks.stone;
-    public Team drawTeam = Team.blue;
+    public Team drawTeam = Team.sharded;
 
     public StringMap getTags(){
         return tags;
@@ -175,7 +175,6 @@ public class MapEditor{
 
             world.setBlock(tile(x, y), drawBlock, drawTeam);
         }else{
-
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
             Consumer<Tile> drawer = tile -> {

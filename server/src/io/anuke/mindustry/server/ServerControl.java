@@ -147,12 +147,7 @@ public class ServerControl implements ApplicationListener{
                     Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
 
                     Map previous = world.getMap();
-                    Map map = previous;
-                    if(maps.size > 1){
-                        while(map == previous) map = maps.random();
-                    }else if(!previous.custom && !world.maps.customMaps().isEmpty()){
-                        map = maps.first();
-                    }
+                    Map map = maps.random(previous);
 
                     Call.onInfoMessage((state.rules.pvp
                     ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
@@ -162,9 +157,7 @@ public class ServerControl implements ApplicationListener{
 
                     info("Selected next map to be {0}.", map.name());
 
-                    Map fmap = map;
-
-                    play(true, () -> world.loadMap(fmap));
+                    play(true, () -> world.loadMap(map));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -239,7 +232,7 @@ public class ServerControl implements ApplicationListener{
             lastMode = preset;
             try{
                 world.loadMap(result);
-                state.rules = preset.apply(result.rules());
+                state.rules = result.applyRules(preset);
                 logic.play();
 
                 info("Map loaded.");
@@ -295,7 +288,7 @@ public class ServerControl implements ApplicationListener{
                 info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
 
                 if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[Team.red.ordinal()].size());
+                    info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
                 }else{
                     info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
                 }
@@ -340,7 +333,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             try{
-                Team team = arg.length == 0 ? Team.blue : Team.valueOf(arg[0]);
+                Team team = arg.length == 0 ? Team.sharded : Team.valueOf(arg[0]);
 
                 if(state.teams.get(team).cores.isEmpty()){
                     err("That team has no cores.");
@@ -627,7 +620,7 @@ public class ServerControl implements ApplicationListener{
 
             info("&lyCore destroyed.");
             inExtraRound = false;
-            Events.fire(new GameOverEvent(Team.red));
+            Events.fire(new GameOverEvent(Team.crux));
         });
 
         handler.register("info", "<IP/UUID/name...>", "Find player info(s). Can optionally check for all names or IPs a player has had.", arg -> {
@@ -706,7 +699,7 @@ public class ServerControl implements ApplicationListener{
             Call.onWorldDataBegin();
             run.run();
             logic.play();
-            state.rules = lastMode.apply(world.getMap().rules());
+            state.rules = world.getMap().applyRules(lastMode);
             for(Player p : players){
                 p.reset();
                 if(state.rules.pvp){

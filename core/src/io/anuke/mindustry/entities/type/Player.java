@@ -9,17 +9,17 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TypeID;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.input.Binding;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
 import io.anuke.mindustry.net.Net;
@@ -27,7 +27,7 @@ import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -65,11 +65,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String lastText;
     public float textFadeTime;
 
-    private float walktime;
+    private float walktime, itemtime;
     private Queue<BuildRequest> placeQueue = new Queue<>();
     private Tile mining;
     private Vector2 movement = new Vector2();
     private boolean moved;
+    private SoundLoop boostSound = new SoundLoop(Sounds.thruster, 2f), buildSound = new SoundLoop(Sounds.build, 0.75f);
 
     //endregion
 
@@ -109,6 +110,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         dead = false;
         spawner = null;
         respawns --;
+        Sounds.respawn.at(tile);
 
         setNet(tile.drawx(), tile.drawy());
         clearItem();
@@ -127,6 +129,12 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else{
             moveBy(x, y);
         }
+    }
+
+    @Override
+    public void removed(){
+        boostSound.stop();
+        buildSound.stop();
     }
 
     @Override
@@ -338,21 +346,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             rotation - 90);
         }
 
-        float backTrns = 4f;
-        if(item.amount > 0){
-            ItemStack stack = item;
-            int stored = Mathf.clamp(stack.amount / 6, 1, 8);
-
-            for(int i = 0; i < stored; i++){
-                float angT = i == 0 ? 0 : Mathf.randomSeedRange(i + 1, 60f);
-                float lenT = i == 0 ? 0 : Mathf.randomSeedRange(i + 2, 1f) - 1f;
-                Draw.rect(stack.item.icon(Item.Icon.large),
-                x + Angles.trnsx(rotation + 180f + angT, backTrns + lenT),
-                y + Angles.trnsy(rotation + 180f + angT, backTrns + lenT),
-                itemSize, itemSize, rotation);
-            }
-        }
-
         Draw.reset();
     }
 
@@ -360,7 +353,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawStats(){
         Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
-        Draw.color();
+        Draw.reset();
+        drawBackItems(itemtime, isLocal);
     }
 
     @Override
@@ -386,14 +380,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default-font");
+        BitmapFont font = Core.scene.skin.getFont("default");
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f));
+        font.getData().setScale(0.25f / UnitScl.dp.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
         Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
@@ -434,7 +428,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawBuildRequests(){
         BuildRequest last = null;
         for(BuildRequest request : buildQueue()){
-            if(request.progress > 0.01f || (buildRequest() == request && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
+            if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
                 Block block = world.ltile(request.x, request.y).block();
@@ -478,8 +472,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
-                    if(i % 2 == 0)
-                        Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
+                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
                 }
                 Draw.color();
 
@@ -498,6 +491,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void update(){
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
+        itemtime = Mathf.lerpDelta(itemtime, Mathf.num(item.amount > 0), 0.1f);
 
         if(Float.isNaN(x) || Float.isNaN(y)){
             velocity.set(0f, 0f);
@@ -519,6 +513,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else{
             destructTime = 0f;
         }
+
+        boostSound.update(x, y, isBoosting && !isDead() && !mech.flying);
+        BuildRequest request = buildRequest();
+        buildSound.update(request == null ? x : request.x * tilesize, request == null ? y : request.y * tilesize, isBuilding() && (Mathf.within(request.x * tilesize, request.y * tilesize, x, y, placeDistance) || state.isEditor()));
 
         if(isDead()){
             isBoosting = false;
@@ -611,7 +609,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             movement.x += xa * speed;
         }
 
-        Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(), control.input().getMouseY());
+        Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
         pointerX = vec.x;
         pointerY = vec.y;
         updateShooting();
@@ -634,7 +632,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                     rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
                 }
             }else{
-                float angle = control.input().mouseAngle(x, y);
+                float angle = control.input.mouseAngle(x, y);
                 this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
             }
         }
@@ -652,7 +650,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     protected void updateTouch(){
-        if(Units.invalidateTarget(target, this) && !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range())){
+        if(Units.invalidateTarget(target, this) &&
+            !(target instanceof TileEntity && ((TileEntity)target).damaged() && target.isValid() && target.getTeam() == team && mech.canHeal && dst(target) < getWeapon().bullet.range() && !(((TileEntity)target).block instanceof BuildBlock))){
             target = null;
         }
 
@@ -729,10 +728,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 if(target == null){
                     isShooting = false;
                     if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.none, u -> u.getTeam() != Team.none);
+                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                         if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.blue));
+                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
@@ -762,8 +761,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 }
 
             }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input().getMouseX(),
-                control.input().getMouseY());
+                Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(),
+                control.input.getMouseY());
                 pointerX = vec.x;
                 pointerY = vec.y;
 
@@ -785,7 +784,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public void resetNoAdd(){
         status.clear();
-        team = Team.blue;
+        team = Team.sharded;
         item.amount = 0;
         placeQueue.clear();
         dead = true;

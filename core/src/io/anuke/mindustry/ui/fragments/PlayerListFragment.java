@@ -7,7 +7,7 @@ import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.Unit;
+import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.Interval;
 import io.anuke.arc.util.Scaling;
 import io.anuke.mindustry.core.GameState.State;
@@ -43,7 +43,7 @@ public class PlayerListFragment extends Fragment{
                 }
             });
 
-            cont.table("button", pane -> {
+            cont.table("button-trans", pane -> {
                 pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
@@ -84,7 +84,7 @@ public class PlayerListFragment extends Fragment{
                     super.draw();
                     Draw.color(Pal.gray);
                     Draw.alpha(parentAlpha);
-                    Lines.stroke(Unit.dp.scl(4f));
+                    Lines.stroke(UnitScl.dp.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }

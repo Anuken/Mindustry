@@ -10,6 +10,7 @@ import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Fx;
@@ -37,7 +38,7 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
     private Color clearColor;
-    private float targetscale = io.anuke.arc.scene.ui.layout.Unit.dp.scl(4);
+    private float targetscale = UnitScl.dp.scl(4);
     private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private float shakeIntensity, shaketime;
@@ -47,7 +48,6 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom")){
             setupBloom();
         }
-        Lines.setCircleVertices(20);
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -152,6 +152,7 @@ public class Renderer implements ApplicationListener{
         try{
             if(bloom != null){
                 bloom.dispose();
+                bloom = null;
             }
             bloom = new Bloom(true);
             bloom.setClearColor(0f, 0f, 0f, 0f);
@@ -326,8 +327,7 @@ public class Renderer implements ApplicationListener{
         for(Team team : Team.all){
             EntityGroup<BaseUnit> group = unitGroups[team.ordinal()];
 
-            if(group.count(p -> p.isFlying() == flying) +
-            playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
+            if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
             draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
             draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
@@ -358,7 +358,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = io.anuke.arc.scene.ui.layout.Unit.dp.scl(1f);
+        float s = UnitScl.dp.scl(1f);
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 

@@ -1,18 +1,17 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.collection.OrderedMap;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.values.AmmoListValue;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class LiquidTurret extends Turret{
     protected ObjectMap<Liquid, BulletType> ammo = new ObjectMap<>();
@@ -32,6 +31,17 @@ public abstract class LiquidTurret extends Turret{
         super.setStats();
 
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
+        consumes.add(new ConsumeLiquidFilter(i -> ammo.containsKey(i), 1f){
+            @Override
+            public boolean valid(TileEntity entity){
+                return !((TurretEntity)entity).ammo.isEmpty();
+            }
+
+            @Override
+            public void display(BlockStats stats){
+
+            }
+        });
     }
 
     @Override
@@ -69,6 +79,7 @@ public abstract class LiquidTurret extends Turret{
 
         Effects.effect(type.shootEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(type.smokeEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
+        shootSound.at(tile);
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);

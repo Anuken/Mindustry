@@ -217,14 +217,14 @@ public class LegacyMapIO{
                             if(Structs.inBounds(worldx, worldy, pixmap.getWidth(), pixmap.getHeight())){
                                 Tile write = tiles[worldx][worldy];
                                 write.setBlock(BlockPart.get(dx - 1, dy - 1));
-                                write.setTeam(Team.blue);
+                                write.setTeam(Team.sharded);
                             }
                         }
                     }
 
                     //actual core parts
                     tile.setBlock(Blocks.coreShard);
-                    tile.setTeam(Team.blue);
+                    tile.setTeam(Team.sharded);
                 }
             }
         }

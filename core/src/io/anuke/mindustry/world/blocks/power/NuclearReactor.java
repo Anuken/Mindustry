@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
@@ -30,7 +31,7 @@ public class NuclearReactor extends PowerGenerator{
 
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
-    protected int itemDuration = 120; //time to consume 1 fuel
+    protected float itemDuration = 120; //time to consume 1 fuel
     protected float heating = 0.01f; //heating per frame * fullness
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
     protected int explosionRadius = 40;
@@ -117,6 +118,8 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void onDestroyed(Tile tile){
         super.onDestroyed(tile);
+
+        Sounds.explosionbig.at(tile);
 
         NuclearReactorEntity entity = tile.entity();
 

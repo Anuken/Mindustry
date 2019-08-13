@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.ContentList;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shapes;
+import io.anuke.mindustry.graphics.Drawf;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 
@@ -160,14 +160,14 @@ public class Fx implements ContentList{
         healWave = new Effect(22, e -> {
             Draw.color(Pal.heal);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 30, 4f + e.finpow() * 60f);
+            Lines.circle(e.x, e.y, 4f + e.finpow() * 60f);
             Draw.color();
         });
 
         heal = new Effect(11, e -> {
             Draw.color(Pal.heal);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 24, 2f + e.finpow() * 7f);
+            Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
             Draw.color();
         });
 
@@ -568,21 +568,21 @@ public class Fx implements ContentList{
         nuclearShockwave = new Effect(10f, 200f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.2f);
-            Lines.poly(e.x, e.y, 40, e.fin() * 140f);
+            Lines.circle(e.x, e.y, e.fin() * 140f);
             Draw.reset();
         });
 
         impactShockwave = new Effect(13f, 300f, e -> {
             Draw.color(Pal.lighterOrange, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 4f + 0.2f);
-            Lines.poly(e.x, e.y, 60, e.fin() * 200f);
+            Lines.circle(e.x, e.y, e.fin() * 200f);
             Draw.reset();
         });
 
         spawnShockwave = new Effect(20f, 400f, e -> {
             Draw.color(Color.WHITE, Color.LIGHT_GRAY, e.fin());
             Lines.stroke(e.fout() * 3f + 0.5f);
-            Lines.poly(e.x, e.y, 40, e.fin() * (e.rotation + 50f));
+            Lines.circle(e.x, e.y, e.fin() * (e.rotation + 50f));
             Draw.reset();
         });
 
@@ -614,7 +614,7 @@ public class Fx implements ContentList{
 
             e.scaled(5 + intensity * 2, i -> {
                 Lines.stroke(3.1f * i.fout());
-                Lines.poly(e.x, e.y, (int)(20 * intensity), (3f + i.fin() * 14f) * intensity);
+                Lines.circle(e.x, e.y, (3f + i.fin() * 14f) * intensity);
             });
 
             Draw.color(Color.GRAY);
@@ -672,16 +672,16 @@ public class Fx implements ContentList{
         shootSmall = new Effect(8, e -> {
             Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
             float w = 1f + 5 * e.fout();
-            Shapes.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
-            Shapes.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+            Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
+            Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
             Draw.reset();
         });
 
         shootHeal = new Effect(8, e -> {
             Draw.color(Pal.heal);
             float w = 1f + 5 * e.fout();
-            Shapes.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
-            Shapes.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+            Drawf.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
+            Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
             Draw.reset();
         });
 
@@ -698,16 +698,16 @@ public class Fx implements ContentList{
         shootBig = new Effect(9, e -> {
             Draw.color(Pal.lighterOrange, Pal.lightOrange, e.fin());
             float w = 1.2f + 7 * e.fout();
-            Shapes.tri(e.x, e.y, w, 25f * e.fout(), e.rotation);
-            Shapes.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+            Drawf.tri(e.x, e.y, w, 25f * e.fout(), e.rotation);
+            Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
             Draw.reset();
         });
 
         shootBig2 = new Effect(10, e -> {
             Draw.color(Pal.lightOrange, Color.GRAY, e.fin());
             float w = 1.2f + 8 * e.fout();
-            Shapes.tri(e.x, e.y, w, 29f * e.fout(), e.rotation);
-            Shapes.tri(e.x, e.y, w, 5f * e.fout(), e.rotation + 180f);
+            Drawf.tri(e.x, e.y, w, 29f * e.fout(), e.rotation);
+            Drawf.tri(e.x, e.y, w, 5f * e.fout(), e.rotation + 180f);
             Draw.reset();
         });
 
@@ -829,7 +829,7 @@ public class Fx implements ContentList{
             Draw.color(Pal.lancerLaser);
 
             for(int i : Mathf.signs){
-                Shapes.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i);
+                Drawf.tri(e.x, e.y, 4f * e.fout(), 29f, e.rotation + 90f * i);
             }
 
             Draw.reset();
@@ -867,7 +867,7 @@ public class Fx implements ContentList{
             Draw.color(Pal.lancerLaser);
 
             Angles.randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
-                Shapes.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.angle(x, y));
+                Drawf.tri(e.x + x, e.y + y, e.fslope() * 3f + 1, e.fslope() * 3f + 1, Mathf.angle(x, y));
             });
 
             Draw.reset();
@@ -1157,21 +1157,21 @@ public class Fx implements ContentList{
         launch = new Effect(28, e -> {
             Draw.color(Pal.command);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 40, 4f + e.finpow() * 120f);
+            Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
             Draw.color();
         });
 
         healWaveMend = new Effect(40, e -> {
             Draw.color(e.color);
             Lines.stroke(e.fout() * 2f);
-            Lines.poly(e.x, e.y, 30, e.finpow() * e.rotation);
+            Lines.circle(e.x, e.y, e.finpow() * e.rotation);
             Draw.color();
         });
 
         overdriveWave = new Effect(50, e -> {
             Draw.color(e.color);
             Lines.stroke(e.fout() * 1f);
-            Lines.poly(e.x, e.y, 30, e.finpow() * e.rotation);
+            Lines.circle(e.x, e.y, e.finpow() * e.rotation);
             Draw.color();
         });
 

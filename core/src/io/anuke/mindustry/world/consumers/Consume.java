@@ -48,6 +48,10 @@ public abstract class Consume{
         return optional;
     }
 
+    public boolean isBoost(){
+        return booster;
+    }
+
     public boolean isUpdate(){
         return update;
     }

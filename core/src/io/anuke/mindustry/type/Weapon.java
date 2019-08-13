@@ -1,22 +1,20 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.traits.ShooterTrait;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.audio.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.gen.Sounds;
 import io.anuke.mindustry.net.Net;
 
 public class Weapon{
@@ -56,6 +54,8 @@ public class Weapon{
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
 
+    public Sound shootSound = Sounds.pew;
+
     public TextureRegion region;
 
     protected Weapon(String name){
@@ -69,6 +69,7 @@ public class Weapon{
 
     @Remote(targets = Loc.server, called = Loc.both, unreliable = true)
     public static void onPlayerShootWeapon(Player player, float x, float y, float rotation, boolean left){
+
         if(player == null) return;
         //clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
         //messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
@@ -91,6 +92,7 @@ public class Weapon{
         float baseX = shooter.getX(), baseY = shooter.getY();
 
         Weapon weapon = shooter.getWeapon();
+        weapon.shootSound.at(x, y);
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){

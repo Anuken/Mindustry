@@ -79,7 +79,7 @@ public class Units{
 
     /** Returns the neareset enemy tile in a range. */
     public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        if(team == Team.none) return null;
+        if(team == Team.derelict) return null;
 
         for(Team enemy : state.teams.enemiesOf(team)){
             TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
@@ -102,7 +102,7 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static TargetTrait closestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred, Predicate<Tile> tilePred){
-        if(team == Team.none) return null;
+        if(team == Team.derelict) return null;
 
         Unit unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
@@ -114,7 +114,7 @@ public class Units{
 
     /** Returns the closest enemy of this team. Filter by predicate. */
     public static Unit closestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
-        if(team == Team.none) return null;
+        if(team == Team.derelict) return null;
 
         result = null;
         cdist = 0f;

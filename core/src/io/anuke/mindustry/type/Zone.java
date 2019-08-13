@@ -3,6 +3,7 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -27,6 +28,7 @@ public class Zone extends UnlockableContent{
     public int configureWave = 15;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
+    public Texture preview;
 
     protected ItemStack[] baseLaunchCost = {};
     protected Array<ItemStack> startingItems = new Array<>();
@@ -55,6 +57,26 @@ public class Zone extends UnlockableContent{
 
     public boolean isLaunchWave(int wave){
         return metCondition() && wave % launchPeriod == 0;
+    }
+
+    public boolean canUnlock(){
+        if(data.isUnlocked(this)){
+            return true;
+        }
+
+        for(ZoneRequirement other : zoneRequirements){
+            if(other.zone.bestWave() < other.wave){
+                return false;
+            }
+        }
+
+        for(Block other : blockRequirements){
+            if(!data.isUnlocked(other)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public ItemStack[] getLaunchCost(){
@@ -149,6 +171,13 @@ public class Zone extends UnlockableContent{
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;
+        }
+    }
+
+    @Override
+    public void load(){
+        if(Core.files.internal("zones/" + name + ".png").exists()){
+            preview = new Texture(Core.files.internal("zones/" + name + ".png"));
         }
     }
 

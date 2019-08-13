@@ -10,7 +10,7 @@ public class DistortFilter extends GenerateFilter{
     {
         buffered = true;
         options(
-            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 400f),
+            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 200f),
             new SliderOption("mag", () -> mag, f -> mag = f, 0.5f, 100f)
         );
     }

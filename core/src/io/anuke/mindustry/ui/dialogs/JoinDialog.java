@@ -82,6 +82,8 @@ public class JoinDialog extends FloatingDialog{
             setup();
             refreshLocal();
             refreshRemote();
+
+            Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
         });
 
         onResize(this::setup);
@@ -310,6 +312,7 @@ public class JoinDialog extends FloatingDialog{
 
         Time.runTask(2f, () -> {
             logic.reset();
+            Net.reset();
             Vars.netClient.beginConnecting();
             Net.connect(ip, port, () -> {
                 hide();
