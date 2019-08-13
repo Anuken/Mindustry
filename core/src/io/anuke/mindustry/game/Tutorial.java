@@ -20,7 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 /** Handles tutorial state. */
 public class Tutorial{
     private static final int mineCopper = 18;
-    private static final int blocksToBreak = 3, blockOffset = 5;
+    private static final int blocksToBreak = 3, blockOffset = -6;
 
     private ObjectSet<String> events = new ObjectSet<>();
     private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
@@ -179,7 +179,7 @@ public class Tutorial{
                 state.wave = 5;
 
                 //end tutorial, never show it again
-                Core.settings.put("tutorial", true);
+                Core.settings.put("playedtutorial", true);
                 Core.settings.save();
             }
 
@@ -230,7 +230,7 @@ public class Tutorial{
             Tile core = state.teams.get(defaultTeam).cores.first();
             for(int i = 0; i < blocksToBreak; i++){
                 world.removeBlock(world.ltile(core.x + blockOffset, core.y + i));
-                world.tile(core.x + blockOffset, core.y + i).setBlock(Blocks.scrapWall);
+                world.tile(core.x + blockOffset, core.y + i).setBlock(Blocks.scrapWall, defaultTeam);
             }
         }
 

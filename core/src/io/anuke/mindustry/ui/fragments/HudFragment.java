@@ -419,7 +419,8 @@ public class HudFragment extends Fragment{
     /** Show unlock notification for a new recipe. */
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
-        if(content.getContentIcon() == null || state.is(State.menu)) return;
+        //also don't play in the tutorial to prevent confusion
+        if(content.getContentIcon() == null || state.is(State.menu) || state.rules.tutorial) return;
 
         Sounds.message.play();
 

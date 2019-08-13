@@ -90,7 +90,7 @@ public class PausedDialog extends FloatingDialog{
     void showQuitConfirm(){
         ui.showConfirm("$confirm", state.rules.tutorial ? "$quit.confirm.tutorial" : "$quit.confirm", () -> {
             if(state.rules.tutorial){
-                Core.settings.put("tutorial", true);
+                Core.settings.put("playedtutorial", true);
                 Core.settings.save();
             }
             wasClient = Net.client();

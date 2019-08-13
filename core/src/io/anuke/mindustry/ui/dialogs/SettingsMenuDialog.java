@@ -141,40 +141,23 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.addButton("$settings.cleardata", () -> {
-                    FloatingDialog dialog = new FloatingDialog("$settings.cleardata");
-                    dialog.setFillParent(false);
-                    dialog.cont.defaults().size(230f, 60f).pad(3);
-                    dialog.addCloseButton();
-                    dialog.cont.addButton("$settings.clearunlocks", () -> {
-                        ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
-                            data.reset();
-                            dialog.hide();
-                        });
-                    });
-                    dialog.cont.row();
-                    dialog.cont.addButton("$settings.clearall", () -> {
-                        ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
-                            ObjectMap<String, Object> map = new ObjectMap<>();
-                            for(String value : Core.settings.keys()){
-                                if(value.contains("usid") || value.contains("uuid")){
-                                    map.put(value, Core.settings.getString(value));
-                                }
-                            }
-                            Core.settings.clear();
-                            Core.settings.putAll(map);
-                            Core.settings.save();
+                table.addButton("$settings.cleardata", () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+                    ObjectMap<String, Object> map = new ObjectMap<>();
+                    for(String value : Core.settings.keys()){
+                        if(value.contains("usid") || value.contains("uuid")){
+                            map.put(value, Core.settings.getString(value));
+                        }
+                    }
+                    Core.settings.clear();
+                    Core.settings.putAll(map);
+                    Core.settings.save();
 
-                            for(FileHandle file : dataDirectory.list()){
-                                file.deleteDirectory();
-                            }
+                    for(FileHandle file : dataDirectory.list()){
+                        file.deleteDirectory();
+                    }
 
-                            Core.app.exit();
-                        });
-                    });
-                    dialog.cont.row();
-                    dialog.show();
-                }).size(220f, 60f).pad(6).left();
+                    Core.app.exit();
+                })).size(220f, 60f).pad(6).left();
                 table.add();
                 table.row();
             }

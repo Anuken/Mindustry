@@ -344,8 +344,8 @@ public class Control implements ApplicationListener{
         Platform.instance.updateRPC();
 
         //play tutorial on stop
-        if(!settings.getBool("tutorial", false)){
-            Core.app.post(this::playTutorial);
+        if(!settings.getBool("playedtutorial", false)){
+            Core.app.post(() -> Core.app.post(this::playTutorial));
         }
 
         //display UI scale changed dialog

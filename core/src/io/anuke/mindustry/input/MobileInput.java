@@ -457,7 +457,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         selecting = hasRequest(cursor) && isPlacing() && mode == placing;
 
         //call tap events
-        if(pointer == 0 && !selecting && mode == none){
+        if(pointer == 0 && !selecting){
             if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
                 player.isShooting = true;
