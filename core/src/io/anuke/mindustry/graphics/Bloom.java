@@ -383,18 +383,21 @@ public class Bloom{
      * Call this when application is exiting.
      */
     public void dispose(){
-        if(disposeFBO)
-            frameBuffer.dispose();
+        try{
+            if(disposeFBO)
+                frameBuffer.dispose();
 
-        fullScreenQuad.dispose();
+            fullScreenQuad.dispose();
 
-        pingPongBuffer1.dispose();
-        pingPongBuffer2.dispose();
+            pingPongBuffer1.dispose();
+            pingPongBuffer2.dispose();
 
-        blurShader.dispose();
-        bloomShader.dispose();
-        tresholdShader.dispose();
+            blurShader.dispose();
+            bloomShader.dispose();
+            tresholdShader.dispose();
+        }catch(Exception ignored){
 
+        }
     }
 
     private static Mesh createFullScreenQuad(){

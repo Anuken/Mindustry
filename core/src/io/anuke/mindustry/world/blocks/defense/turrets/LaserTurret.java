@@ -104,6 +104,13 @@ public class LaserTurret extends PowerTurret{
         return new LaserTurretEntity();
     }
 
+    @Override
+    public boolean shouldIdleSound(Tile tile){
+        LaserTurretEntity entity = tile.entity();
+
+        return entity.bulletLife > 0 && entity.bullet != null;
+    }
+
     class LaserTurretEntity extends TurretEntity{
         Bullet bullet;
         float bulletLife;

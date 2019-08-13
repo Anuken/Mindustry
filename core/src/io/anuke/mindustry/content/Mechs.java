@@ -1,22 +1,18 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Blending;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.BombBulletType;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.type.Weapon;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
 
 public class Mechs implements ContentList{
     public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
@@ -79,6 +75,7 @@ public class Mechs implements ContentList{
                     inaccuracy = 0f;
                     ejectEffect = Fx.none;
                     bullet = Bullets.lightning;
+                    shootSound = Sounds.spark;
                 }};
             }
 
@@ -122,6 +119,7 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.none;
                     recoil = 2f;
                     bullet = Bullets.healBullet;
+                    shootSound = Sounds.pew;
                 }};
             }
 
@@ -173,6 +171,7 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.none;
                     shake = 3f;
                     bullet = Bullets.missileSwarm;
+                    shootSound = Sounds.shootBig;
                 }};
             }
 
@@ -267,6 +266,7 @@ public class Mechs implements ContentList{
                     velocityRnd = 0.2f;
                     spacing = 1f;
                     bullet = Bullets.missileJavelin;
+                    shootSound = Sounds.missile;
                 }};
             }
 
@@ -337,6 +337,7 @@ public class Mechs implements ContentList{
                         hitEffect = Fx.flakExplosion;
                         shootEffect = Fx.none;
                         smokeEffect = Fx.none;
+                        shootSound = Sounds.artillery;
                     }};
                 }};
             }
@@ -366,6 +367,7 @@ public class Mechs implements ContentList{
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardGlaive;
+                    shootSound = Sounds.shootSnap;
                 }};
             }
         };

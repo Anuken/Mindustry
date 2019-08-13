@@ -62,7 +62,7 @@ public abstract class GenerateFilter{
     }
 
     protected float chance(){
-        return Mathf.randomSeed(Pack.longInt(in.x, in.y + (int)o));
+        return Mathf.randomSeed(Pack.longInt(in.x, in.y + (int)seed));
     }
 
     /** an input for generating at a certain coordinate. should only be instantiated once. */

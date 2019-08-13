@@ -152,6 +152,7 @@ public class Renderer implements ApplicationListener{
         try{
             if(bloom != null){
                 bloom.dispose();
+                bloom = null;
             }
             bloom = new Bloom(true);
             bloom.setClearColor(0f, 0f, 0f, 0f);

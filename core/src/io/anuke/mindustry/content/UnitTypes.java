@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 
 public class UnitTypes implements ContentList{
@@ -47,6 +48,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBullet;
+                shootSound = Sounds.pew;
             }};
         }};
 
@@ -131,6 +133,7 @@ public class UnitTypes implements ContentList{
             health = 460;
             immunities.add(StatusEffects.burning);
             weapon = new Weapon("flamethrower"){{
+                shootSound = Sounds.flame;
                 length = 1f;
                 reload = 14f;
                 range = 30f;
@@ -159,6 +162,7 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.artilleryUnit;
+                shootSound = Sounds.artillery;
             }};
         }};
 
@@ -180,6 +184,7 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.eruptorShot;
                 recoil = 1f;
                 width = 7f;
+                shootSound = Sounds.flame;
             }};
         }};
 
@@ -203,6 +208,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 5;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.flakSurge;
+                shootSound = Sounds.shootBig;
             }};
         }};
 
@@ -268,6 +274,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 40f;
                 ignoreRotation = true;
                 bullet = Bullets.bombExplosive;
+                shootSound = Sounds.release;
             }};
         }};
 
@@ -297,6 +304,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 velocityRnd = 0.2f;
                 spacing = 1f;
+                shootSound = Sounds.missile;
                 bullet = Bullets.missileRevenant;
             }};
         }};
@@ -330,6 +338,7 @@ public class UnitTypes implements ContentList{
                 velocityRnd = 0.2f;
                 spacing = 1f;
                 bullet = Bullets.missileRevenant;
+                shootSound = Sounds.missile;
             }};
         }};
 
@@ -360,6 +369,7 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.none;
                 bullet = Bullets.standardDenseBig;
+                shootSound = Sounds.shootBig;
             }};
         }};
     }

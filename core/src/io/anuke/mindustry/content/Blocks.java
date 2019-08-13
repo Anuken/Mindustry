@@ -1374,6 +1374,7 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
+            shootSound = Sounds.splash;
 
             drawer = (tile, entity) -> {
                 Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
@@ -1405,7 +1406,7 @@ public class Blocks implements ContentList{
             size = 2;
             health = 280 * size * size;
             targetAir = false;
-            shootSound = Sounds.phaser;
+            shootSound = Sounds.laser;
         }};
 
         arc = new PowerTurret("arc"){{
@@ -1422,7 +1423,7 @@ public class Blocks implements ContentList{
             recoil = 1f;
             size = 1;
             health = 260;
-            shootSound = Sounds.shock;
+            shootSound = Sounds.spark;
         }};
 
         swarmer = new BurstTurret("swarmer"){{
@@ -1464,7 +1465,8 @@ public class Blocks implements ContentList{
             burstSpacing = 3f;
             shots = 4;
             ammoUseEffect = Fx.shellEjectBig;
-            health = 240 * size * size;;
+            health = 240 * size * size;
+            shootSound = Sounds.shootBig;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1561,6 +1563,7 @@ public class Blocks implements ContentList{
             rotatespeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
+            shootSound = Sounds.shootSnap;
 
             health = 145 * size * size;
         }};
@@ -1585,6 +1588,7 @@ public class Blocks implements ContentList{
             shots = 2;
             size = 4;
             shootCone = 24f;
+            shootSound = Sounds.shootBig;
 
             health = 155 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
@@ -1603,6 +1607,9 @@ public class Blocks implements ContentList{
             firingMoveFract = 0.5f;
             shootDuration = 220f;
             powerUse = 14f;
+            shootSound = Sounds.laserbig;
+            idleSound = Sounds.beam;
+            idleSoundVolume = 2f;
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);

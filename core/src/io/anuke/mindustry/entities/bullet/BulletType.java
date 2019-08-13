@@ -1,18 +1,17 @@
 package io.anuke.mindustry.entities.bullet;
 
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.StatusEffects;
+import io.anuke.arc.audio.*;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.traits.TargetTrait;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.StatusEffect;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 public abstract class BulletType extends Content{
     public float lifetime;
@@ -28,6 +27,8 @@ public abstract class BulletType extends Content{
     public Effect shootEffect = Fx.shootSmall;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
+    /** Sound made when hitting something or getting removed.*/
+    public Sound hitSound = Sounds.none;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
     /** How many bullets get created per ammo item/liquid. */
@@ -105,6 +106,7 @@ public abstract class BulletType extends Content{
 
     public void hit(Bullet b, float x, float y){
         Effects.effect(hitEffect, x, y, b.rot());
+        hitSound.at(b);
 
         Effects.shake(hitShake, hitShake, b);
 
@@ -127,6 +129,7 @@ public abstract class BulletType extends Content{
 
     public void despawned(Bullet b){
         Effects.effect(despawnEffect, b.x, b.y, b.rot());
+        hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0){
             hit(b);

@@ -16,9 +16,8 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.TypeID;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
@@ -71,6 +70,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Tile mining;
     private Vector2 movement = new Vector2();
     private boolean moved;
+    private SoundLoop sound = new SoundLoop(Sounds.thruster, 2f);
 
     //endregion
 
@@ -110,6 +110,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         dead = false;
         spawner = null;
         respawns --;
+        Sounds.respawn.at(tile);
 
         setNet(tile.drawx(), tile.drawy());
         clearItem();
@@ -128,6 +129,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else{
             moveBy(x, y);
         }
+    }
+
+    @Override
+    public void removed(){
+        sound.stop();
     }
 
     @Override
@@ -506,6 +512,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else{
             destructTime = 0f;
         }
+
+        sound.update(x, y, isBoosting && !isDead() && !mech.flying);
 
         if(isDead()){
             isBoosting = false;
