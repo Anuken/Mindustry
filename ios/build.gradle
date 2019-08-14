@@ -7,6 +7,33 @@ ext{
     mainClassName = "io.anuke.mindustry.IOSLauncher"
 }
 
+task copyAssets(){
+    delete{
+        delete "assets/"
+    }
+
+    copy{
+        from "../core/assets"
+        into "assets/"
+    }
+    
+    exec{
+        commandLine "sh", "./convert_audio.sh", "assets/sounds"
+    }
+
+    exec{
+        commandLine "sh", "./convert_audio.sh", "assets/music"
+    }
+
+    delete{
+        delete fileTree('assets') {
+            include '**/*.ogg'
+        }
+    }
+}
+
+build.dependsOn copyAssets
+
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
