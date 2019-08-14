@@ -108,6 +108,7 @@ public class PausedDialog extends FloatingDialog{
 
         if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial){
             state.set(State.menu);
+            logic.reset();
             return;
         }
 
@@ -119,6 +120,7 @@ public class PausedDialog extends FloatingDialog{
                 ui.showError("[accent]" + Core.bundle.get("savefail"));
             }
             state.set(State.menu);
+            logic.reset();
         });
     }
 }

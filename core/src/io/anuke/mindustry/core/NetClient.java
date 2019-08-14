@@ -176,6 +176,7 @@ public class NetClient implements ApplicationListener{
     public static void onKick(KickReason reason){
         netClient.disconnectQuietly();
         state.set(State.menu);
+        logic.reset();
 
         if(!reason.quiet){
             if(reason.extraText() != null){
