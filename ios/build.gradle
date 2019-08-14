@@ -8,6 +8,7 @@ ext{
 }
 
 task copyAssets(){
+    doLast{
     delete{
         delete "assets/"
     }
@@ -29,6 +30,7 @@ task copyAssets(){
         delete fileTree('assets') {
             include '**/*.ogg'
         }
+    }
     }
 }
 
