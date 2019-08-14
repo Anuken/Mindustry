@@ -66,6 +66,7 @@ public class MenuFragment extends Fragment{
         //info icon
         if(mobile){
             parent.fill(c -> c.bottom().left().addButton("", "info", ui.about::show).size(84, 45));
+            parent.fill(c -> c.bottom().right().addButton("", "discord", ui.discord::show).size(84, 45));
         }
 
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);

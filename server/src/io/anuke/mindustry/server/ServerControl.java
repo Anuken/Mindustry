@@ -14,7 +14,7 @@ import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.GameOverEvent;
 import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.MapException;
 import io.anuke.mindustry.net.Administration.PlayerInfo;

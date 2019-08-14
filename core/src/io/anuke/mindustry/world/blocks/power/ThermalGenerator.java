@@ -30,11 +30,6 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
-    public void placed(Tile tile){
-        super.placed(tile);
-    }
-
-    @Override
     public void onProximityAdded(Tile tile){
         super.onProximityAdded(tile);
 

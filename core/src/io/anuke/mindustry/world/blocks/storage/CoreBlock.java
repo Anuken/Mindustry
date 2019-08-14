@@ -79,6 +79,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void placed(Tile tile){
+        super.placed(tile);
         state.teams.get(tile.getTeam()).cores.add(tile);
     }
 
