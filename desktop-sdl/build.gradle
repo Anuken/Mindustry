@@ -37,10 +37,7 @@ task dist(type: Jar, dependsOn: classes){
 
     //use target = all for all platforms
     def target = getTarget()
-    if(target.contains("windows")){
-        def prefix = target.contains("32") ? "64" : ""
-        exclude('**.so', "**.dylib", "sdl-arc${prefix}.dll", "gdx${prefix}.dll", "gdx-freetype${prefix}.dll", "**/music/**", "**/sounds/**")
-    }
+    if(target.contains("windows")) exclude('**.so', "**.dylib", "**/music/**", "**/sounds/**")
     if(target == "mac") exclude('**.so', "**.dll")
     if(target == "linux") exclude('**.dll', "**.dylib")
     archivesBaseName = appName + "-" + target

@@ -32,7 +32,10 @@ task copyAssets(){
     }
 }
 
-build.dependsOn copyAssets
+createIPA.dependsOn copyAssets
+launchIPhoneSimulator.dependsOn copyAssets
+launchIOSDevice.dependsOn copyAssets
+launchIPadSimulator.dependsOn copyAssets
 
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
