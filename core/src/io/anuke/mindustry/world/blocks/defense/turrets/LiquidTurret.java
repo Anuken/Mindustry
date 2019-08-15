@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
@@ -19,6 +20,7 @@ public abstract class LiquidTurret extends Turret{
     public LiquidTurret(String name){
         super(name);
         hasLiquids = true;
+        activeSound = Sounds.spray;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -42,6 +44,12 @@ public abstract class LiquidTurret extends Turret{
 
             }
         });
+    }
+
+    @Override
+    public boolean shouldActiveSound(Tile tile){
+        TurretEntity entity = tile.entity();
+        return entity.target != null && hasAmmo(tile);
     }
 
     @Override
@@ -79,7 +87,7 @@ public abstract class LiquidTurret extends Turret{
 
         Effects.effect(type.shootEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(type.smokeEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        shootSound.at(tile);
+        //shootSound.at(tile);
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);

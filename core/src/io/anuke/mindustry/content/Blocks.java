@@ -1608,8 +1608,8 @@ public class Blocks implements ContentList{
             shootDuration = 220f;
             powerUse = 14f;
             shootSound = Sounds.laserbig;
-            idleSound = Sounds.beam;
-            idleSoundVolume = 2f;
+            activeSound = Sounds.beam;
+            activeSoundVolume = 2f;
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);

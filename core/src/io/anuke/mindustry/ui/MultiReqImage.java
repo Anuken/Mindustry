@@ -25,7 +25,9 @@ public class MultiReqImage extends Stack{
         if(valid != null){
             valid.visible(true);
         }else{
-            displays.get((int)(time) % displays.size).visible(true);
+            if(displays.size > 0){
+                displays.get((int)(time) % displays.size).visible(true);
+            }
         }
     }
 }

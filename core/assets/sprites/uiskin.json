@@ -132,11 +132,6 @@
       fontColor: white,
       up: info-banner
     },
-    discord: {
-      font: default,
-      fontColor: white,
-      up: info-banner
-    },
     clear-partial: {
       down: whiteui,
       up: pane,

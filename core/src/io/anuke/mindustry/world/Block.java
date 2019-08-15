@@ -101,7 +101,13 @@ public class Block extends BlockStorage{
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
     public Sound breakSound = Sounds.boom;
-    /** The sound that this block makes while active.*/
+
+    /** The sound that this block makes while active. One sound loop. Do not overuse.*/
+    public Sound activeSound = Sounds.none;
+    /** Active sound base volume. */
+    public float activeSoundVolume = 0.5f;
+
+    /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
     public Sound idleSound = Sounds.none;
     /** Idle sound base volume. */
     public float idleSoundVolume = 0.5f;
@@ -210,6 +216,11 @@ public class Block extends BlockStorage{
             progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
         }
         return progressIncrease;
+    }
+
+    /** @return whether this block should play its active sound.*/
+    public boolean shouldActiveSound(Tile tile){
+        return false;
     }
 
     /** @return whether this block should play its idle sound.*/

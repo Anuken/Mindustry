@@ -105,7 +105,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public boolean shouldIdleSound(Tile tile){
+    public boolean shouldActiveSound(Tile tile){
         LaserTurretEntity entity = tile.entity();
 
         return entity.bulletLife > 0 && entity.bullet != null;
