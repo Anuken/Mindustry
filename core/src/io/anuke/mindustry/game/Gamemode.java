@@ -44,7 +44,7 @@ public enum Gamemode{
         rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
         rules.respawnTime = 0f;
-    },),
+    }),
     co_op(rules -> {
         rules.pvp = true;
         rules.editor = true;
