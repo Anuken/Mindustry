@@ -127,7 +127,7 @@ public class Control implements ApplicationListener{
             Call.onGameOver(event.winner);
             if(state.rules.zone != null && !Net.client()){
                 //remove zone save on game over
-                if(saves.getZoneSlot() != null){
+                if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
                 }
             }

@@ -9,28 +9,28 @@ ext{
 
 task copyAssets(){
     doLast{
-    delete{
-        delete "assets/"
-    }
-
-    copy{
-        from "../core/assets"
-        into "assets/"
-    }
-    
-    exec{
-        commandLine "sh", "./convert_audio.sh", "assets/sounds"
-    }
-
-    exec{
-        commandLine "sh", "./convert_audio.sh", "assets/music"
-    }
-
-    delete{
-        delete fileTree('assets') {
-            include '**/*.ogg'
+        delete{
+            delete "assets/"
         }
-    }
+    
+        copy{
+            from "../core/assets"
+            into "assets/"
+        }
+        
+        exec{
+            commandLine "sh", "./convert_audio.sh", "assets/sounds"
+        }
+    
+        exec{
+            commandLine "sh", "./convert_audio.sh", "assets/music"
+        }
+    
+        delete{
+            delete fileTree('assets') {
+                include '**/*.ogg'
+            }
+        }
     }
 }
 
