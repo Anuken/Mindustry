@@ -45,7 +45,7 @@ public enum Gamemode{
         rules.waveTimer = false;
         rules.respawnTime = 0f;
     }),
-    co_op(rules -> {
+    coopertive(rules -> {
         rules.pvp = true;
         rules.editor = true;
         rules.respawnTime = 30 * 10;
