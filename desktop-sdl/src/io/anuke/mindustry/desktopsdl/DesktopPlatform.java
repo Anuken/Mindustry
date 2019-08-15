@@ -126,7 +126,7 @@ public class DesktopPlatform extends Platform{
     }
 
     private static void message(String message){
-        io.anuke.arc.backends.sdl.jni.SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
+        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
 
     private boolean validAddress(byte[] bytes){
