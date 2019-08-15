@@ -47,13 +47,11 @@ public enum Gamemode{
     }),
     coopertive(rules -> {
         rules.pvp = true;
-        rules.editor = true;
-        rules.respawnTime = 30 * 10;
-        rules.buildCostMultiplier = 1f;
-        rules.buildSpeedMultiplier = 1f;
+        rules.enemyCoreBuildRadius = 0f;
         rules.playerDamageMultiplier = 0f;
         rules.unitHealthMultiplier = 2f;
-    }, map -> map.spawns > 0, map -> map.teams.size > 1);
+        rules.attackMode = true;
+    });
 
     private final Consumer<Rules> rules;
     private final Predicate<Map> validator;
