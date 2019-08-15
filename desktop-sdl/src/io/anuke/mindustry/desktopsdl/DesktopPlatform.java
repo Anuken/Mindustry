@@ -1,6 +1,7 @@
 package io.anuke.mindustry.desktopsdl;
 
 import club.minnced.discord.rpc.*;
+import io.anuke.arc.backends.sdl.jni.SDL;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
@@ -10,7 +11,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.dialogs.*;
-import sdl.*;
 
 import java.net.*;
 import java.util.*;
@@ -126,7 +126,7 @@ public class DesktopPlatform extends Platform{
     }
 
     private static void message(String message){
-        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
+        io.anuke.arc.backends.sdl.jni.SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
 
     private boolean validAddress(byte[] bytes){
