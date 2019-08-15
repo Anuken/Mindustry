@@ -54,7 +54,7 @@ public class BuildBlock extends Block{
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
         Events.fire(new BlockBuildEndEvent(tile, team, true));
-        Sounds.breaks.at(tile);
+        Sounds.breaks.at(tile, Mathf.random(0.7f, 1.4f));
     }
 
     @Remote(called = Loc.server)
@@ -75,7 +75,7 @@ public class BuildBlock extends Block{
             Core.app.post(() -> tile.block().playerPlaced(tile));
         }
         Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, team, false)));
-        Sounds.place.at(tile);
+        Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
     }
 
     @Override

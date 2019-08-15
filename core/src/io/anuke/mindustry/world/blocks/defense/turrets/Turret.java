@@ -279,7 +279,7 @@ public abstract class Turret extends Block{
 
         Effects.effect(shootEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
         Effects.effect(smokeEffect, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        shootSound.at(tile);
+        shootSound.at(tile, Mathf.random(0.9f, 1.1f));
 
         if(shootShake > 0){
             Effects.shake(shootShake, shootShake, tile.entity);

@@ -9,7 +9,7 @@ public class SoundLoop{
     private static final float fadeSpeed = 0.05f;
 
     private final Sound sound;
-    private long id = -1;
+    private int id = -1;
     private float volume, baseVolume;
 
     public SoundLoop(Sound sound, float baseVolume){

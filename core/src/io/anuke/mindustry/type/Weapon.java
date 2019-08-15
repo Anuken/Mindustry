@@ -92,7 +92,7 @@ public class Weapon{
         float baseX = shooter.getX(), baseY = shooter.getY();
 
         Weapon weapon = shooter.getWeapon();
-        weapon.shootSound.at(x, y);
+        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
