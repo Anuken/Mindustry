@@ -44,7 +44,16 @@ public enum Gamemode{
         rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
         rules.respawnTime = 0f;
-    });
+    },
+    co_op(rules -> {
+        rules.pvp = true;
+        rules.editor = true;
+        rules.respawnTime = 30 * 10;
+        rules.buildCostMultiplier = 1f;
+        rules.buildSpeedMultiplier = 1f;
+        rules.playerDamageMultiplier = 0f;
+        rules.unitHealthMultiplier = 2f;
+    }, map -> map.spawns > 0,map -> map.teams.size > 1);
 
     private final Consumer<Rules> rules;
     private final Predicate<Map> validator;
