@@ -53,7 +53,7 @@ public enum Gamemode{
         rules.buildSpeedMultiplier = 1f;
         rules.playerDamageMultiplier = 0f;
         rules.unitHealthMultiplier = 2f;
-    }, map -> map.spawns > 0,map -> map.teams.size > 1);
+    });
 
     private final Consumer<Rules> rules;
     private final Predicate<Map> validator;
