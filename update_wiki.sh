@@ -5,5 +5,5 @@ cd ../Mindustry-Wiki-Generator
 ./gradlew run
 cd ../wiki
 git add .
-git commit -m "Update to match commit ${TRAVIS_COMMIT}"
+git commit -m "Update to match build ${TRAVIS_TAG}"
 git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryGame/wiki

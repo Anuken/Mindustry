@@ -51,7 +51,7 @@ task dist(type: Jar){
 
 task dzip(type: Zip){
     from getServerFolder()
-    archiveName "$appName-server-${getVersionString()}.zip"
+    archiveName "${generateDeployName('server')}.zip"
     destinationDir(file("../deploy/"))
 
     finalizedBy 'cleanup'

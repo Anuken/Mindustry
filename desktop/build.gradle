@@ -169,7 +169,7 @@ task packrZip(){
 
         task rzip(type: Zip){
             from "packr-out/"
-            archiveName "$appName-${getPlatform()}-${getVersionString()}.zip"
+            archiveName "${generateDeployName(getPlatform().toString())}.zip"
             destinationDir(file("packr-export"))
         }
 

@@ -20,8 +20,7 @@ import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tileGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
@@ -70,8 +69,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         x = tile.drawx();
         y = tile.drawy();
         block = tile.block();
-        if(block.idleSound != Sounds.none){
-            sound = new SoundLoop(block.idleSound, block.idleSoundVolume);
+        if(block.activeSound != Sounds.none){
+            sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
         }
 
         health = block.health;
@@ -298,7 +297,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         if(sound != null){
-            sound.update(x, y, block.shouldIdleSound(tile));
+            sound.update(x, y, block.shouldActiveSound(tile));
+        }
+
+        if(block.idleSound != Sounds.none && block.shouldIdleSound(tile)){
+            loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
         Block previous = block;

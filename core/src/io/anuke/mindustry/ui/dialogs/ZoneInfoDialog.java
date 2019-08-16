@@ -58,7 +58,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         rebuildItems.run();
 
-        cont.table(cont -> {
+        cont.pane(cont -> {
             if(zone.locked()){
                 cont.addImage("icon-locked");
                 cont.row();
@@ -138,6 +138,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 () -> loadout.show(zone.loadout.core().itemCapacity, zone::getStartingItems, zone::resetStartingItems, zone::updateLaunchCost, rebuildItems, item -> data.getItem(item) > 0 && item.type == ItemType.material)
                 ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
+            cont.marginRight(12f);
         });
         cont.row();
 

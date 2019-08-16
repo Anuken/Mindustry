@@ -28,7 +28,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public SaveMeta getMeta(DataInput stream) throws IOException{
         stream.readInt(); //length of data, doesn't matter here
         StringMap map = readStringMap(stream);
-        return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), JsonIO.read(Rules.class, map.get("rules", "{}")));
+        return new SaveMeta(map.getInt("version"), map.getLong("saved"), map.getLong("playtime"), map.getInt("build"), map.get("mapname"), map.getInt("wave"), JsonIO.read(Rules.class, map.get("rules", "{}")), map);
     }
 
     @Override

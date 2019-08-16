@@ -11,6 +11,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -106,6 +107,14 @@ public class PowerNode extends PowerBlock{
             Call.linkPowerNodes(null, tile, before);
         }
 
+        lastPlaced = tile.pos();
+        super.playerPlaced(tile);
+    }
+
+    @Override
+    public void placed(Tile tile){
+        if(Net.client()) return;
+
         Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
@@ -120,8 +129,7 @@ public class PowerNode extends PowerBlock{
         tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
         tempTiles.each(valid, other -> Call.linkPowerNodes(null, tile, other));
 
-        lastPlaced = tile.pos();
-        super.playerPlaced(tile);
+        super.placed(tile);
     }
 
     @Override

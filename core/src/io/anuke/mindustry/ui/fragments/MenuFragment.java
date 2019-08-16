@@ -66,6 +66,7 @@ public class MenuFragment extends Fragment{
         //info icon
         if(mobile){
             parent.fill(c -> c.bottom().left().addButton("", "info", ui.about::show).size(84, 45));
+            parent.fill(c -> c.bottom().right().addButton("", "discord", ui.discord::show).size(84, 45));
         }
 
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
@@ -100,7 +101,7 @@ public class MenuFragment extends Fragment{
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
             editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-            donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
+            donate = new MobileButton("icon-link", isize, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
@@ -108,8 +109,9 @@ public class MenuFragment extends Fragment{
             container.add(play);
             container.add(join);
             container.add(custom);
+            if(ios) container.row();
             container.add(maps);
-            container.row();
+            if(!ios) container.row();
 
             container.table(table -> {
                 table.defaults().set(container.defaults());
@@ -118,7 +120,7 @@ public class MenuFragment extends Fragment{
                 table.add(tools);
 
                 if(Platform.instance.canDonate()) table.add(donate);
-                table.add(exit);
+                if(!ios) table.add(exit);
             }).colspan(4);
         }else{
             container.marginTop(0f);

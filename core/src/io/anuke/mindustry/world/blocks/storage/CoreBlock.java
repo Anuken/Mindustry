@@ -30,8 +30,8 @@ public class CoreBlock extends StorageBlock{
         update = true;
         hasItems = true;
         flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
-        idleSound = Sounds.respawning;
-        idleSoundVolume = 1f;
+        activeSound = Sounds.respawning;
+        activeSoundVolume = 1f;
     }
 
     @Remote(called = Loc.server)
@@ -79,6 +79,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void placed(Tile tile){
+        super.placed(tile);
         state.teams.get(tile.getTeam()).cores.add(tile);
     }
 
@@ -155,7 +156,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public boolean shouldIdleSound(Tile tile){
+    public boolean shouldActiveSound(Tile tile){
         CoreEntity entity = tile.entity();
 
         return entity.spawnPlayer != null;

@@ -6,6 +6,7 @@ import io.anuke.arc.function.Consumer;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.geom.QuadTree;
 import io.anuke.arc.math.geom.Rectangle;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.Entity;
 
 public class EntityGroup<T extends Entity>{
@@ -170,8 +171,10 @@ public class EntityGroup<T extends Entity>{
     }
 
     public void clear(){
-        for(T entity : entityArray)
+        for(T entity : entityArray){
+            entity.removed();
             entity.setGroup(null);
+        }
 
         for(T entity : entitiesToAdd)
             entity.setGroup(null);

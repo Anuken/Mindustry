@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.6'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.7'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
         classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
     }
@@ -19,11 +19,11 @@ allprojects{
 
     ext{
         versionNumber = '4'
-        versionModifier = 'beta'
+        versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.6'
+        roboVMVersion = '2.3.7'
         arcHash = null
 
         debugged = {
@@ -57,9 +57,34 @@ allprojects{
             }
         }
 
+        generateDeployName = { String platform ->
+            if(platform == "windows"){
+                platform += "64"
+            }
+            platform = platform.capitalize()
+
+            if(platform.endsWith("64") || platform.endsWith("32")){
+                platform = "${platform.substring(0, platform.length() - 2)}-${platform.substring(platform.length() - 2)}bit"
+            }
+
+            return "[${platform}]${getModifierString()}[${getNeatVersionString()}]${appName}.zip"
+        }
+
         getVersionString = {
             String buildVersion = getBuildVersion()
             return "$versionNumber-$versionModifier-$buildVersion"
+        }
+
+        getNeatVersionString = {
+            String buildVersion = getBuildVersion()
+            return "v$buildVersion"
+        }
+
+        getModifierString = {
+            if(versionModifier != "release"){
+                return "[${versionModifier.toUpperCase()}]"
+            }
+            return ""
         }
 
         getBuildVersion = {

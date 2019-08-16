@@ -127,7 +127,7 @@ public class Control implements ApplicationListener{
             Call.onGameOver(event.winner);
             if(state.rules.zone != null && !Net.client()){
                 //remove zone save on game over
-                if(saves.getZoneSlot() != null){
+                if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
                 }
             }
@@ -392,6 +392,7 @@ public class Control implements ApplicationListener{
         data.checkSave();
 
         music.update();
+        loops.update();
 
         if(!state.is(State.menu)){
             input.update();
@@ -415,7 +416,7 @@ public class Control implements ApplicationListener{
                 Platform.instance.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

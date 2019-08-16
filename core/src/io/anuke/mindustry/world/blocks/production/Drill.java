@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -65,8 +66,8 @@ public class Drill extends Block{
         liquidCapacity = 5f;
         hasItems = true;
 
-        //idleSound = Sounds.drill;
-        //idleSoundVolume = 0.5f;
+        idleSound = Sounds.drill;
+        idleSoundVolume = 0.002f;
     }
 
     @Override

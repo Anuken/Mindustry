@@ -1,19 +1,17 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.LongArray;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.InputHandler.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
@@ -41,6 +39,9 @@ public class Conveyor extends Block{
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
+
+        idleSound = Sounds.conveyor;
+        idleSoundVolume = 0.004f;
     }
 
     private static int compareItems(long a, long b){
@@ -74,6 +75,12 @@ public class Conveyor extends Block{
         int frame = entity.clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * entity.timeScale)) % 4) : 0;
         Draw.rect(regions[Mathf.clamp(entity.blendbits, 0, regions.length - 1)][Mathf.clamp(frame, 0, regions[0].length - 1)], tile.drawx(), tile.drawy(),
         tilesize * entity.blendsclx, tilesize * entity.blendscly, rotation * 90);
+    }
+
+    @Override
+    public boolean shouldIdleSound(Tile tile){
+        ConveyorEntity entity = tile.entity();
+        return entity.clogHeat <= 0.5f ;
     }
 
     @Override

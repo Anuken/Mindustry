@@ -25,6 +25,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -100,7 +101,13 @@ public class Block extends BlockStorage{
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
     public Sound breakSound = Sounds.boom;
-    /** The sound that this block makes while active.*/
+
+    /** The sound that this block makes while active. One sound loop. Do not overuse.*/
+    public Sound activeSound = Sounds.none;
+    /** Active sound base volume. */
+    public float activeSoundVolume = 0.5f;
+
+    /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
     public Sound idleSound = Sounds.none;
     /** Idle sound base volume. */
     public float idleSoundVolume = 0.5f;
@@ -211,6 +218,11 @@ public class Block extends BlockStorage{
         return progressIncrease;
     }
 
+    /** @return whether this block should play its active sound.*/
+    public boolean shouldActiveSound(Tile tile){
+        return false;
+    }
+
     /** @return whether this block should play its idle sound.*/
     public boolean shouldIdleSound(Tile tile){
         return canProduce(tile);
@@ -282,6 +294,15 @@ public class Block extends BlockStorage{
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(Tile tile){
+        if(outputsPower && !consumesPower){
+            PowerNode.lastPlaced = tile.pos();
+        }
+    }
+
+    /** Called after the block is placed by anyone. */
+    @CallSuper
+    public void placed(Tile tile){
+        if(Net.client()) return;
 
         if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
             int range = 10;
@@ -289,7 +310,7 @@ public class Block extends BlockStorage{
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
-                    !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
+                !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
                     tempTiles.add(other);
                 }
             });
@@ -298,17 +319,9 @@ public class Block extends BlockStorage{
                 Call.linkPowerNodes(null, tempTiles.first(), tile);
             }
         }
-
-        if(outputsPower && !consumesPower){
-            PowerNode.lastPlaced = tile.pos();
-        }
     }
 
     public void removed(Tile tile){
-    }
-
-    /** Called after the block is placed by anyone. */
-    public void placed(Tile tile){
     }
 
     /** Called every frame a unit is on this tile. */

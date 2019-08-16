@@ -1,9 +1,9 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.traits.*;
 
 /**
  * Class for predicting shoot angles based on velocities of targets.
@@ -55,9 +55,7 @@ public class Predict{
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
     public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(),
-        dst.getTargetVelocityX() - src.getTargetVelocityX()/2f,
-        dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX(), dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
     }
 
     private static Vector2 quad(float a, float b, float c){

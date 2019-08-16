@@ -133,6 +133,7 @@ public class Vars{
     public static GlobalData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
+    public static LoopControl loops;
 
     public static Control control;
     public static Logic logic;
@@ -181,6 +182,7 @@ public class Vars{
             content.setVerbose();
         }
 
+        loops = new LoopControl();
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
 
