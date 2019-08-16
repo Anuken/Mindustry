@@ -67,7 +67,7 @@ allprojects{
                 platform = "${platform.substring(0, platform.length() - 2)}-${platform.substring(platform.length() - 2)}bit"
             }
 
-            return "[${platform}]${getModifierString()}[${getNeatVersionString()}]${appName}.zip"
+            return "[${platform}]${getModifierString()}[${getNeatVersionString()}]${appName}"
         }
 
         getVersionString = {
