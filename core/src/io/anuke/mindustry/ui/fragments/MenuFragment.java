@@ -101,7 +101,7 @@ public class MenuFragment extends Fragment{
             join = new MobileButton("icon-add", isize, "$joingame", ui.join::show),
             editor = new MobileButton("icon-editor", isize, "$editor", ui.maps::show),
             tools = new MobileButton("icon-tools", isize, "$settings", ui.settings::show),
-            donate = new MobileButton("icon-donate", isize, "$donate", () -> Core.net.openURI(donationURL)),
+            donate = new MobileButton("icon-link", isize, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton("icon-exit", isize, "$quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){

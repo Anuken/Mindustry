@@ -51,7 +51,7 @@ task ikZip(type: Zip){
     def filename = "$appName-${getTarget()}-${version}"
 
     from "build/libs/$filename"
-    archiveName = "$appName-${getTarget()}-${getVersionString()}.zip"
+    archiveName = "${generateDeployName(getTarget())}.zip"
 }
 
 task ikdist{
