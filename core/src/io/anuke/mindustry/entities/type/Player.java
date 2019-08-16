@@ -514,7 +514,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(!isDead() && isFlying()){
-            loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.4f);
+            loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.3f);
         }
 
         BuildRequest request = buildRequest();
