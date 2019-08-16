@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.3f, musicWaveChance = 0.24f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.45f, musicWaveChance = 0.35f;
 
     /** normal, ambient music, plays at any time */
     public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
