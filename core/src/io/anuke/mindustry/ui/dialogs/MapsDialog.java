@@ -43,7 +43,7 @@ public class MapsDialog extends FloatingDialog{
     void setup(){
         buttons.clearChildren();
 
-        if(Core.graphics.isPortrait()){
+        if(Core.graphics.isPortrait() && !ios){
             buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f*2f, 64f).colspan(2);
             buttons.row();
         }else{
@@ -60,54 +60,56 @@ public class MapsDialog extends FloatingDialog{
             });
         }).size(210f, 64f);
 
-        buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
-            Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
-                world.maps.tryCatchMapError(() -> {
-                    if(MapIO.isImage(file)){
-                        ui.showError("$editor.errorimage");
-                        return;
-                    }
+        if(!ios){
+            buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
+                Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
+                    world.maps.tryCatchMapError(() -> {
+                        if(MapIO.isImage(file)){
+                            ui.showError("$editor.errorimage");
+                            return;
+                        }
 
-                    Map map;
-                    if(file.extension().equalsIgnoreCase(mapExtension)){
-                        map = MapIO.createMap(file, true);
-                    }else{
-                        map = world.maps.makeLegacyMap(file);
-                    }
+                        Map map;
+                        if(file.extension().equalsIgnoreCase(mapExtension)){
+                            map = MapIO.createMap(file, true);
+                        }else{
+                            map = world.maps.makeLegacyMap(file);
+                        }
 
-                    //when you attempt to import a save, it will have no name, so generate one
-                    String name = map.tags.getOr("name", () -> {
-                        String result = "unknown";
-                        int number = 0;
-                        while(world.maps.byName(result + number++) != null);
-                        return result + number;
-                    });
-
-                    //this will never actually get called, but it remains just in case
-                    if(name == null){
-                        ui.showError("$editor.errorname");
-                        return;
-                    }
-
-                    Map conflict = world.maps.all().find(m -> m.name().equals(name));
-
-                    if(conflict != null && !conflict.custom){
-                        ui.showInfo(Core.bundle.format("editor.import.exists", name));
-                    }else if(conflict != null){
-                        ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                            world.maps.tryCatchMapError(() -> {
-                                world.maps.importMap(file);
-                                setup();
-                            });
+                        //when you attempt to import a save, it will have no name, so generate one
+                        String name = map.tags.getOr("name", () -> {
+                            String result = "unknown";
+                            int number = 0;
+                            while(world.maps.byName(result + number++) != null) ;
+                            return result + number;
                         });
-                    }else{
-                        world.maps.importMap(map.file);
-                        setup();
-                    }
 
-                });
-            }, true, FileChooser.anyMapFiles);
-        }).size(210f, 64f);
+                        //this will never actually get called, but it remains just in case
+                        if(name == null){
+                            ui.showError("$editor.errorname");
+                            return;
+                        }
+
+                        Map conflict = world.maps.all().find(m -> m.name().equals(name));
+
+                        if(conflict != null && !conflict.custom){
+                            ui.showInfo(Core.bundle.format("editor.import.exists", name));
+                        }else if(conflict != null){
+                            ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
+                                world.maps.tryCatchMapError(() -> {
+                                    world.maps.importMap(file);
+                                    setup();
+                                });
+                            });
+                        }else{
+                            world.maps.importMap(map.file);
+                            setup();
+                        }
+
+                    });
+                }, true, FileChooser.anyMapFiles);
+            }).size(210f, 64f);
+        }
 
         cont.clear();
 
