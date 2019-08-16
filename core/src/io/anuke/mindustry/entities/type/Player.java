@@ -70,7 +70,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Tile mining;
     private Vector2 movement = new Vector2();
     private boolean moved;
-    private SoundLoop boostSound = new SoundLoop(Sounds.thruster, 2f), buildSound = new SoundLoop(Sounds.build, 0.75f);
+    private SoundLoop buildSound = new SoundLoop(Sounds.build, 0.75f);
 
     //endregion
 
@@ -133,7 +133,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void removed(){
-        boostSound.stop();
         buildSound.stop();
     }
 
@@ -514,7 +513,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             destructTime = 0f;
         }
 
-        boostSound.update(x, y, isBoosting && !isDead() && !mech.flying);
+        if(!isDead() && isFlying()){
+            loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.4f);
+        }
+
         BuildRequest request = buildRequest();
         buildSound.update(request == null ? x : request.x * tilesize, request == null ? y : request.y * tilesize, isBuilding() && (Mathf.within(request.x * tilesize, request.y * tilesize, x, y, placeDistance) || state.isEditor()));
 
