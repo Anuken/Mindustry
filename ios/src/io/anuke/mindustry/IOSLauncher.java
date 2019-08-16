@@ -1,23 +1,22 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
-import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.scene.ui.layout.UnitScl;
-import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.io.SaveIO;
+import com.badlogic.gdx.backends.iosrobovm.*;
+import io.anuke.arc.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.ArcNetClient;
-import io.anuke.mindustry.net.ArcNetServer;
-import org.robovm.apple.foundation.NSAutoreleasePool;
-import org.robovm.apple.foundation.NSURL;
+import io.anuke.mindustry.net.*;
+import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 
-import java.io.IOException;
-import java.util.Collections;
+import java.io.*;
+import java.util.*;
+import java.util.zip.*;
 
 import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
@@ -40,6 +39,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void shareFile(FileHandle file){
+                Log.info("Attempting to share file " + file);
                 FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                 file.copyTo(to);
 
@@ -53,12 +53,20 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void beginForceLandscape(){
+                Log.info("begin force landscape");
                 forced = true;
+                UINavigationController.attemptRotationToDeviceOrientation();
+                //UIDevice.getCurrentDevice().set
+
+                //UIApplication.getSharedApplication().
+                //getViewController(UIApplication.getSharedApplication()).atte
+                //UIApplication.getSharedApplication()
             }
 
             @Override
             public void endForceLandscape(){
                 forced = false;
+                UINavigationController.attemptRotationToDeviceOrientation();
             }
         };
 
@@ -70,6 +78,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
     public UIInterfaceOrientationMask getSupportedInterfaceOrientations(UIApplication application, UIWindow window){
         return forced ? UIInterfaceOrientationMask.Landscape : UIInterfaceOrientationMask.All;
     }
+
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
@@ -87,22 +96,43 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
+        Core.app.post(() -> Core.app.post(() -> {
+            Core.scene.table("dialogDim", t -> {
+                t.visible(() -> {
+                    if(!forced) return false;
+                    t.toFront();
+                    UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                    return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+                });
+                t.add("Please rotate the phone to landscape mode to use the editor.").wrap().grow();
+            });
+        }));
+
         return b;
     }
 
     void openURL(NSURL url){
 
-        Core.app.post(() -> {
+        Core.app.post(() -> Core.app.post(() -> {
             FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
             Core.files.absolute(url.getPath()).copyTo(file);
 
-            //TODO detect if it's a map or save
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
                 if(SaveIO.isSaveValid(file)){
                     try{
-                        SaveSlot slot = control.saves.importSave(file);
-                        ui.load.runLoadSave(slot);
+                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.DEFAULT_BUFFER_SIZE))));
+                        if(meta.tags.containsKey("name")){
+                            //is map
+                            if(!ui.editor.isShown()){
+                                ui.editor.show();
+                            }
+
+                            ui.editor.beginEditMap(file);
+                        }else{
+                            SaveSlot slot = control.saves.importSave(file);
+                            ui.load.runLoadSave(slot);
+                        }
                     }catch(IOException e){
                         ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
                     }
@@ -110,16 +140,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     ui.showError("save.import.invalid");
                 }
 
-            }else if(file.extension().equalsIgnoreCase(mapExtension)){ //open map
-                Core.app.post(() -> {
-                    if(!ui.editor.isShown()){
-                        ui.editor.show();
-                    }
-
-                    ui.editor.beginEditMap(file);
-                });
             }
-        });
+        }));
     }
 
     public static void main(String[] argv){

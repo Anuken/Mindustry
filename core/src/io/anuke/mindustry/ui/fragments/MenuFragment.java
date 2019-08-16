@@ -109,8 +109,9 @@ public class MenuFragment extends Fragment{
             container.add(play);
             container.add(join);
             container.add(custom);
+            if(ios) container.row();
             container.add(maps);
-            container.row();
+            if(!ios) container.row();
 
             container.table(table -> {
                 table.defaults().set(container.defaults());
@@ -119,7 +120,7 @@ public class MenuFragment extends Fragment{
                 table.add(tools);
 
                 if(Platform.instance.canDonate()) table.add(donate);
-                table.add(exit);
+                if(!ios) table.add(exit);
             }).colspan(4);
         }else{
             container.marginTop(0f);
