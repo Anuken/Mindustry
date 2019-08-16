@@ -19,10 +19,12 @@ task copyAssets(){
         }
         
         exec{
+            ignoreExitValue true
             commandLine "sh", "./convert_audio.sh", "assets/sounds"
         }
     
         exec{
+            ignoreExitValue true
             commandLine "sh", "./convert_audio.sh", "assets/music"
         }
     
@@ -34,10 +36,7 @@ task copyAssets(){
     }
 }
 
-createIPA.dependsOn copyAssets
-launchIPhoneSimulator.dependsOn copyAssets
-launchIOSDevice.dependsOn copyAssets
-launchIPadSimulator.dependsOn copyAssets
+build.dependsOn copyAssets
 
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build

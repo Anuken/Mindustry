@@ -1,5 +1,6 @@
 package io.anuke.mindustry.io;
 
+import io.anuke.arc.collection.*;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.maps.Map;
 
@@ -13,8 +14,9 @@ public class SaveMeta{
     public Map map;
     public int wave;
     public Rules rules;
+    public StringMap tags;
 
-    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules){
+    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules, StringMap tags){
         this.version = version;
         this.build = build;
         this.timestamp = timestamp;
@@ -22,5 +24,6 @@ public class SaveMeta{
         this.map = world.maps.all().find(m -> m.name().equals(map));
         this.wave = wave;
         this.rules = rules;
+        this.tags = tags;
     }
 }

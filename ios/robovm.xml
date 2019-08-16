@@ -33,6 +33,7 @@
         <pattern>com.android.org.bouncycastle.crypto.digests.AndroidDigestFactoryOpenSSL</pattern>
         <pattern>org.apache.harmony.security.provider.cert.DRLCertFactory</pattern>
         <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
+        <pattern>org.robovm.apple.foundation.NSKeyValueCoder</pattern>
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
