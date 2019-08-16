@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.*;
 
 /**
@@ -23,8 +24,8 @@ public class Predict{
      * @return the intercept location
      */
     public static Vector2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v){
-        //dstvx /= Time.delta();
-        //dstvy /= Time.delta();
+        dstvx /= Time.delta();
+        dstvy /= Time.delta();
         float tx = dstx - srcx,
         ty = dsty - srcy;
 
@@ -54,9 +55,7 @@ public class Predict{
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
     public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(),
-        dst.getTargetVelocityX() - src.getTargetVelocityX()/2f,
-        dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX(), dst.getTargetVelocityY() - src.getTargetVelocityY(), v);
     }
 
     private static Vector2 quad(float a, float b, float c){

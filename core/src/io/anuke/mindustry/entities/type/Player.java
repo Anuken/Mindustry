@@ -750,8 +750,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                         rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                     }
 
-                    Vector2 intercept =
-                    Predict.intercept(x, y, target.getX(), target.getY(), target.velocity().x - velocity.x, target.velocity().y - velocity.y, getWeapon().bullet.speed);
+                    Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
 
                     pointerX = intercept.x;
                     pointerY = intercept.y;
