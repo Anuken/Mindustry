@@ -40,7 +40,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             @Override
             public void shareFile(FileHandle file){
                 Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name()/* + ".png"*/);
                 file.copyTo(to);
 
                 NSURL url = new NSURL(to.file());
@@ -56,11 +56,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 Log.info("begin force landscape");
                 forced = true;
                 UINavigationController.attemptRotationToDeviceOrientation();
-                //UIDevice.getCurrentDevice().set
-
-                //UIApplication.getSharedApplication().
-                //getViewController(UIApplication.getSharedApplication()).atte
-                //UIApplication.getSharedApplication()
             }
 
             @Override
@@ -104,7 +99,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
                     return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
                 });
-                t.add("Please rotate the phone to landscape mode to use the editor.").wrap().grow();
+                t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
             });
         }));
 
