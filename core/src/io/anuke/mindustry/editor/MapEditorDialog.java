@@ -87,7 +87,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            t.addImageTextButton("$editor.import", "icon-load-map", isize, () ->
+            if(!ios){
+                t.addImageTextButton("$editor.import", "icon-load-map", isize, () ->
                 createDialog("$editor.import",
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
@@ -115,24 +116,43 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         Log.err(e);
                     }
                 }), true, FileChooser.pngFiles))
-            );
+                );
+            }
 
-            t.addImageTextButton("$editor.export", "icon-save-map", isize, () ->
-                Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
-                    file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-                    FileHandle result = file;
+            Cell cell = t.addImageTextButton("$editor.export", "icon-save-map", isize, () -> {
+                if(!ios){
+                    Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
+                        file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
+                        FileHandle result = file;
+                        ui.loadAnd(() -> {
+                            try{
+                                if(!editor.getTags().containsKey("name")){
+                                    editor.getTags().put("name", result.nameWithoutExtension());
+                                }
+                                MapIO.writeMap(result, editor.createMap(result));
+                            }catch(Exception e){
+                                ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
+                                Log.err(e);
+                            }
+                        });
+                    }, false, FileChooser.mapFiles);
+                }else{
                     ui.loadAnd(() -> {
                         try{
-                            if(!editor.getTags().containsKey("name")){
-                                editor.getTags().put("name", result.nameWithoutExtension());
-                            }
+                            FileHandle result = Core.files.local(editor.getTags().get("name", "unknown") + "." + mapExtension);
                             MapIO.writeMap(result, editor.createMap(result));
+                            Platform.instance.shareFile(result);
                         }catch(Exception e){
                             ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
                             Log.err(e);
                         }
                     });
-                }, false, FileChooser.mapFiles));
+                }
+            });
+
+            if(ios){
+                cell.size(swidth * 2f + 10, 60f).colspan(2);
+            }
         });
 
         menu.cont.row();
