@@ -285,6 +285,10 @@ public interface BuilderTrait extends Entity, TeamTrait{
             this.breaking = true;
         }
 
+        public Tile tile(){
+            return world.tile(x, y);
+        }
+
         @Override
         public String toString(){
             return "BuildRequest{" +
