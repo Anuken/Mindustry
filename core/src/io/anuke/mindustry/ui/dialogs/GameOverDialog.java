@@ -1,11 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Stats.RankResult;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Item.Icon;
+import io.anuke.arc.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.Stats.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Item.*;
 
 import static io.anuke.mindustry.Vars.*;
 
