@@ -5,8 +5,7 @@ import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.collection.IntQueue;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.TileChangeEvent;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.Team;
@@ -87,7 +86,7 @@ public class Pathfinder{
     }
 
     private boolean passable(Tile tile, Team team){
-        return (!tile.solid()) || (tile.breakable() && (tile.getTeam() != team));
+        return ((!tile.solid()) || (tile.breakable() && (tile.getTeam() != team))) && tile.floor().drownTime <= 0f;
     }
 
     /**
