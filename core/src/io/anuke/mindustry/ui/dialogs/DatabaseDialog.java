@@ -78,6 +78,8 @@ public class DatabaseDialog extends FloatingDialog{
         }
 
         cont.add(pane);
+        
+        Core.scene.setScrollFocus(pane);
     }
 
     boolean unlocked(UnlockableContent content){

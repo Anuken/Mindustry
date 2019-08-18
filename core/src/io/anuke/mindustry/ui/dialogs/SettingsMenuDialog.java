@@ -102,6 +102,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         add(buttons).fillX();
 
         addSettings();
+        
+        Core.scene.setScrollFocus(pane);
     }
 
     void rebuildMenu(){

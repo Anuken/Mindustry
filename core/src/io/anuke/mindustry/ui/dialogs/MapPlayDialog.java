@@ -104,5 +104,7 @@ public class MapPlayDialog extends FloatingDialog{
         d.cont.add(pane);
         d.buttons.addButton("$ok", d::hide).size(110, 50).pad(10f);
         d.show();
+        
+        Core.scene.setScrollFocus(pane);
     }
 }

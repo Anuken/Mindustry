@@ -41,6 +41,8 @@ public class LanguageDialog extends FloatingDialog{
         }
 
         cont.add(pane);
+
+        Core.scene.setScrollFocus(pane);
     }
 
     public Locale getLocale(){

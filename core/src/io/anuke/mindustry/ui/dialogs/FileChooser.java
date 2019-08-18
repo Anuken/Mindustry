@@ -162,6 +162,8 @@ public class FileChooser extends FloatingDialog{
         content.add(buttons).growX();
 
         cont.add(content);
+        
+        Core.scene.setScrollFocus(pane);
     }
 
     private void updateFileFieldStatus(){

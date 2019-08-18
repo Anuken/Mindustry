@@ -88,5 +88,7 @@ public class CustomGameDialog extends FloatingDialog{
         }
 
         cont.add(pane).uniformX();
+        
+        Core.scene.setScrollFocus(pane);
     }
 }

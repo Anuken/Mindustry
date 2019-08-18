@@ -148,6 +148,8 @@ public class MapsDialog extends FloatingDialog{
         cont.add(buttons).growX();
         cont.row();
         cont.add(pane).uniformX();
+        
+        Core.scene.setScrollFocus(pane);
     }
 
     void showMapInfo(Map map){

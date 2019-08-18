@@ -40,17 +40,6 @@ public class FloatingDialog extends Dialog{
             }
         });
 
-        boolean[] done = {false};
-
-        shown(() -> Core.app.post(() ->
-        forEach(child -> {
-            if(done[0]) return;
-
-            if(child instanceof ScrollPane){
-                Core.scene.setScrollFocus(child);
-                done[0] = true;
-            }
-        })));
     }
 
     public FloatingDialog(String title){

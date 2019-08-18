@@ -256,6 +256,8 @@ public class JoinDialog extends FloatingDialog{
                 pane.getParent().invalidateHierarchy();
             }
         });
+
+        Core.scene.setScrollFocus(pane);
     }
 
     void refreshLocal(){
