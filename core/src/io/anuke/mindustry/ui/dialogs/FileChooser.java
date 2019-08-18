@@ -31,7 +31,6 @@ public class FileChooser extends FloatingDialog{
     private Predicate<FileHandle> filter;
     private Consumer<FileHandle> selectListener;
     private boolean open;
-    private int lastWidth = Core.graphics.getWidth(), lastHeight = Core.graphics.getHeight();
 
     public static final Predicate<String> pngFiles = str -> str.equals("png");
     public static final Predicate<String> anyMapFiles = str -> str.equals(oldMapExtension) || str.equals(mapExtension);
@@ -44,12 +43,14 @@ public class FileChooser extends FloatingDialog{
         this.filter = filter;
         this.selectListener = result;
 
-        update(() -> {
-            if(Core.graphics.getWidth() != lastWidth || Core.graphics.getHeight() != lastHeight){
-                updateFiles(false);
-                lastHeight = Core.graphics.getHeight();
-                lastWidth = Core.graphics.getWidth();
-            }
+        onResize(() -> {
+            cont.clear();
+            setupWidgets();
+        });
+
+        shown(() -> {
+            cont.clear();
+            setupWidgets();
         });
     }
 
@@ -121,8 +122,9 @@ public class FileChooser extends FloatingDialog{
         forward.resizeImage(isize);
 
         forward.clicked(() -> stack.forward());
-
         back.clicked(() -> stack.back());
+        forward.setDisabled(() -> !stack.canForward());
+        back.setDisabled(() -> !stack.canBack());
 
         ImageButton home = new ImageButton("icon-home");
         home.resizeImage(isize);
@@ -206,7 +208,7 @@ public class FileChooser extends FloatingDialog{
 
         //macs are confined to the Downloads/ directory
         if(!OS.isMac){
-            Image upimage = new Image("icon-folder-parent");
+            Image upimage = new Image("icon-folder-parent-small");
             TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
             upbutton.clicked(() -> {
                 directory = directory.parent();
@@ -214,7 +216,7 @@ public class FileChooser extends FloatingDialog{
                 updateFiles(true);
             });
 
-            upbutton.left().add(upimage).padRight(4f).size(iconsize);
+            upbutton.left().add(upimage).padRight(4f).size(iconsizesmall).padLeft(4);
             upbutton.getLabel().setAlignment(Align.left);
             upbutton.getCells().reverse();
 
@@ -248,9 +250,9 @@ public class FileChooser extends FloatingDialog{
                 button.setChecked(filename.equals(filefield.getText()));
             });
 
-            Image image = new Image(file.isDirectory() ? "icon-folder" : "icon-file-text");
+            Image image = new Image(file.isDirectory() ? "icon-folder-small" : "icon-file-text-small");
 
-            button.add(image).padRight(4f).size(iconsize);
+            button.add(image).padRight(4f).padLeft(4).size(iconsizesmall);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
             .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
@@ -271,17 +273,6 @@ public class FileChooser extends FloatingDialog{
         }else{
             return string.substring(0, max - 3).concat("...");
         }
-    }
-
-    @Override
-    public Dialog show(){
-        Time.runTask(2f, () -> {
-            cont.clear();
-            setupWidgets();
-            super.show();
-            Core.scene.setScrollFocus(pane);
-        });
-        return this;
     }
 
     public class FileHistory{
