@@ -1,10 +1,12 @@
 package io.anuke.mindustry.desktopsdl;
 
 import club.minnced.discord.rpc.*;
-import io.anuke.arc.backends.sdl.jni.SDL;
+import com.codedisaster.steamworks.*;
+import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -19,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopPlatform extends Platform{
-    static boolean useDiscord = OS.is64Bit;
+    static boolean useDiscord = OS.is64Bit, useSteam = true;
     final static String applicationId = "610508934456934412";
     String[] args;
 
@@ -39,6 +41,30 @@ public class DesktopPlatform extends Platform{
                 Log.err("Failed to initialize discord.", t);
             }
         }
+
+        if(useSteam){
+            try{
+                SteamAPI.loadLibraries();
+                if(!SteamAPI.init()){
+                    Log.info("Steam client not running.");
+                }else{
+                    //times per second
+                    float interval = 20f;
+                    //run steam callbacks
+                    Timer.schedule(() -> {
+                        if(SteamAPI.isSteamRunning()){
+                            SteamAPI.runCallbacks();
+                        }
+                    }, 1 / interval, 1f / interval);
+
+                    //steam shutdown hook
+                    Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+                }
+            }catch(Exception e){
+                Log.err("Failed to load Steam native libraries.");
+                e.printStackTrace();
+            }
+        }
     }
 
     static void handleCrash(Throwable e){
@@ -48,10 +74,10 @@ public class DesktopPlatform extends Platform{
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
 
             dialog.accept(() -> message(
-                    e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
-                            "Your graphics card does not support OpenGL 2.0!\n" +
-                                    "Try to update your graphics drivers.\n\n" +
-                                    "(If that doesn't work, your computer just doesn't support Mindustry.)"));
+            e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
+            "Your graphics card does not support OpenGL 2.0!\n" +
+            "Try to update your graphics drivers.\n\n" +
+            "(If that doesn't work, your computer just doesn't support Mindustry.)"));
             badGPU = true;
         }
 
@@ -79,7 +105,7 @@ public class DesktopPlatform extends Platform{
         if(!state.is(State.menu)){
             String map = world.getMap() == null ? "Unknown Map" : world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
             String mode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            String players =  Net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
+            String players = Net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
 
             presence.state = mode + players;
 
@@ -109,7 +135,7 @@ public class DesktopPlatform extends Platform{
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;
-            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement());
+            for(out = e.nextElement(); (out.getHardwareAddress() == null || !validAddress(out.getHardwareAddress())) && e.hasMoreElements(); out = e.nextElement()) ;
 
             byte[] bytes = out.getHardwareAddress();
             byte[] result = new byte[8];
