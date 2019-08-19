@@ -84,7 +84,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(defaultTeam);
+            player.setTeam(state.rules.pvp ? netServer.assignTeam(playerGroup.all()) : defaultTeam);
             player.setDead(true);
             player.add();
 
@@ -237,7 +237,7 @@ public class Control implements ApplicationListener{
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
-            world.loadMap(map);
+            world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
         });

@@ -157,7 +157,7 @@ public class ServerControl implements ApplicationListener{
 
                     info("Selected next map to be {0}.", map.name());
 
-                    play(true, () -> world.loadMap(map));
+                    play(true, () -> world.loadMap(map,  map.applyRules(lastMode)));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -231,7 +231,7 @@ public class ServerControl implements ApplicationListener{
             logic.reset();
             lastMode = preset;
             try{
-                world.loadMap(result);
+                world.loadMap(result,  result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
                 logic.play();
 
