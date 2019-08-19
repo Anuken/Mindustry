@@ -1,11 +1,9 @@
 package io.anuke.mindustry.net;
 
-import com.dosse.upnp.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.net.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -121,18 +119,6 @@ public class ArcNetServer implements ServerProvider{
 
     @Override
     public void host(int port) throws IOException{
-        //attempt to open default ports if they're not already open
-        //this only opens the default port due to security concerns (?)
-        if(port == Vars.port){
-            async(() -> {
-                try{
-                    if(!UPnP.isMappedTCP(port)) UPnP.openPortTCP(port);
-                    if(!UPnP.isMappedUDP(port)) UPnP.openPortUDP(port);
-                }catch(Throwable ignored){
-                }
-            });
-        }
-
         lastconnection = 0;
         connections.clear();
         missing.clear();
