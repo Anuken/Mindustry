@@ -2,6 +2,7 @@ package io.anuke.mindustry.desktopsdl;
 
 import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
+import io.anuke.arc.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -11,7 +12,9 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.net.*;
@@ -46,17 +49,19 @@ public class DesktopPlatform extends Platform{
             try{
                 SteamAPI.loadLibraries();
                 if(!SteamAPI.init()){
-                    Log.info("Steam client not running.");
+                    Log.info("Steam client not running. Make sure Steam is running!");
                 }else{
                     //times per second
                     float interval = 20f;
-                    //run steam callbacks
-                    Timer.schedule(() -> {
-                        if(SteamAPI.isSteamRunning()){
-                            SteamAPI.runCallbacks();
-                        }
-                    }, 1 / interval, 1f / interval);
 
+                    //run steam callbacks
+                    Events.on(GameLoadEvent.class, event -> {
+                        Timer.schedule(() -> {
+                            if(SteamAPI.isSteamRunning()){
+                                SteamAPI.runCallbacks();
+                            }
+                        }, 0f, 1f / interval);
+                    });
                     //steam shutdown hook
                     Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
                 }
