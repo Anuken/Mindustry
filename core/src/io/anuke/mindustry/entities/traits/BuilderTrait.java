@@ -135,7 +135,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     default void writeBuilding(DataOutput output) throws IOException{
         BuildRequest request = buildRequest();
 
-        if(request != null){
+        if(request != null && (request.block != null || request.breaking)){
             output.writeByte(request.breaking ? 1 : 0);
             output.writeInt(Pos.get(request.x, request.y));
             output.writeFloat(request.progress);
