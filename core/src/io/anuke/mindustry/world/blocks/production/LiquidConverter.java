@@ -13,6 +13,11 @@ public class LiquidConverter extends GenericCrafter{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void init(){
         ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
         cl.update(true);
