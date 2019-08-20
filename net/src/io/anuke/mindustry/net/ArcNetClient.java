@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.net.*;
+import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -84,7 +85,7 @@ public class ArcNetClient implements ClientProvider{
 
     @Override
     public void connect(String ip, int port, Runnable success){
-        runAsync(() -> {
+        Threads.daemon(() -> {
             try{
                 //just in case
                 client.stop();
@@ -99,7 +100,7 @@ public class ArcNetClient implements ClientProvider{
                 updateThread.setDaemon(true);
                 updateThread.start();
 
-                client.connect(5000, ip, port, port);
+                client.connect(5000, ip, port);
                 success.run();
             }catch(Exception e){
                 handleException(e);
@@ -115,11 +116,7 @@ public class ArcNetClient implements ClientProvider{
     @Override
     public void send(Object object, SendMode mode){
         try{
-            if(mode == SendMode.tcp){
-                client.sendTCP(object);
-            }else{
-                client.sendUDP(object);
-            }
+            client.sendTCP(object);
             //sending things can cause an under/overflow, catch it and disconnect instead of crashing
         }catch(BufferOverflowException | BufferUnderflowException e){
             Net.showError(e);
@@ -140,7 +137,7 @@ public class ArcNetClient implements ClientProvider{
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
-        runAsync(() -> {
+        Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
@@ -187,12 +184,6 @@ public class ArcNetClient implements ClientProvider{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
-    }
-
-    private void runAsync(Runnable run){
-        Thread thread = new Thread(run, "Client Async Run");
-        thread.setDaemon(true);
-        thread.start();
     }
 
     private void handleException(Exception e){

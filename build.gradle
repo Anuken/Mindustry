@@ -312,6 +312,5 @@ project(":net"){
     dependencies{
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
 }
