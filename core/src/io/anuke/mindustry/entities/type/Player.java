@@ -527,7 +527,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             spawner = null;
         }
 
-        avoidOthers();
+        if(isLocal || Net.server()){
+            avoidOthers();
+        }
 
         Tile tile = world.tileWorld(x, y);
 
