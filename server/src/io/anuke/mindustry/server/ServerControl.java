@@ -700,10 +700,11 @@ public class ServerControl implements ApplicationListener{
             run.run();
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
+
             for(Player p : players){
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam(new ArrayIterable<>(players)));
+                    p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p, p.con.id);
             }
