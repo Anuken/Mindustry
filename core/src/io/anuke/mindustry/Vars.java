@@ -108,6 +108,8 @@ public class Vars{
     public static boolean android;
     /** whether the game is running on a headless server */
     public static boolean headless;
+    /** whether steam is enabled for this game */
+    public static boolean steam;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
     public static FileHandle dataDirectory;
     /** data subdirectory used for screenshots */
@@ -216,6 +218,10 @@ public class Vars{
         android = Core.app.getType() == ApplicationType.Android;
 
         Core.settings.setAppName(appName);
+
+        if(steam){
+            Core.settings.setDataDirectory(Core.files.local("saves/"));
+        }
 
         dataDirectory = Core.settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");

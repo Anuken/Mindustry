@@ -47,6 +47,18 @@ task dist(type: Jar, dependsOn: classes){
     }
 }
 
+task steamdist(dependsOn: dist){
+    doLast{
+        copy{
+            from "build/libs/Mindustry-linux-release.jar"
+            into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+            rename { String fileName ->
+                fileName.replace("Mindustry-linux-release", "desktop-release")
+            }
+        }
+    }
+}
+
 task ikZip(type: Zip){
     def filename = "$appName-${getTarget()}-${version}"
 

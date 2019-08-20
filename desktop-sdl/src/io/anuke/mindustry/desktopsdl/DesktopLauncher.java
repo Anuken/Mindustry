@@ -3,6 +3,7 @@ import io.anuke.arc.Files.*;
 import io.anuke.arc.backends.sdl.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.desktopsdl.steam.*;
 import io.anuke.mindustry.net.*;
 
 public class DesktopLauncher{
@@ -12,7 +13,7 @@ public class DesktopLauncher{
             Platform.instance = new DesktopPlatform(arg);
 
             Net.setClientProvider(new ArcNetClient());
-            Net.setServerProvider(new ArcNetServer());
+            Net.setServerProvider(new ServerSteam(new ArcNetServer()));
 
             new SdlApplication(new Mindustry(), new SdlConfig(){{
                 title = "Mindustry";

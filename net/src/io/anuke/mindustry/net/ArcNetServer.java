@@ -220,11 +220,6 @@ public class ArcNetServer implements ServerProvider{
         }
     }
 
-    @Override
-    public void dispose(){
-        close();
-    }
-
     private void handleException(Throwable e){
         Time.run(0f, () -> {
             throw new RuntimeException(e);

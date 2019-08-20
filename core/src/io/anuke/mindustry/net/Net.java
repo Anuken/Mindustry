@@ -326,7 +326,7 @@ public class Net{
 
     public static void dispose(){
         if(clientProvider != null) clientProvider.dispose();
-        if(serverProvider != null) serverProvider.dispose();
+        if(serverProvider != null) serverProvider.close();
         clientProvider = null;
         serverProvider = null;
         server = false;
@@ -399,8 +399,5 @@ public class Net{
 
         /** Returns a connection by ID. */
         NetConnection getByID(int id);
-
-        /** Close all connections. */
-        void dispose();
     }
 }

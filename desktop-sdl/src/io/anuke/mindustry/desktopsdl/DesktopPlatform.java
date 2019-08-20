@@ -7,14 +7,15 @@ import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
-import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.desktopsdl.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.net.*;
@@ -46,6 +47,7 @@ public class DesktopPlatform extends Platform{
         }
 
         if(useSteam){
+            Vars.steam = true;
             try{
                 SteamAPI.loadLibraries();
                 if(!SteamAPI.init()){
@@ -53,14 +55,23 @@ public class DesktopPlatform extends Platform{
                 }else{
                     //times per second
                     float interval = 20f;
+                    Interval i = new Interval();
 
                     //run steam callbacks
                     Events.on(GameLoadEvent.class, event -> {
-                        Timer.schedule(() -> {
-                            if(SteamAPI.isSteamRunning()){
-                                SteamAPI.runCallbacks();
+                        //update callbacks
+                        Core.app.addListener(new ApplicationListener(){
+                            @Override
+                            public void update(){
+                                if(i.get(interval)){
+                                    if(SteamAPI.isSteamRunning()){
+                                        SteamAPI.runCallbacks();
+                                    }
+                                }
                             }
-                        }, 0f, 1f / interval);
+                        });
+
+                        Core.app.post(() -> new ClientSteam());
                     });
                     //steam shutdown hook
                     Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));

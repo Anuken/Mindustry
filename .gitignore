@@ -19,6 +19,8 @@ logs/
 /tools/build/
 /tests/build/
 /server/build/
+saves/
+steam_appid.txt
 /test_files/
 /annotations/build/
 /desktop-sdl/build/
