@@ -1,23 +1,22 @@
 package io.anuke.mindustry.desktop;
 
 import club.minnced.discord.rpc.*;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.backends.sdl.jni.SDL;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.net.CrashSender;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.ui.dialogs.FileChooser;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
-import java.net.NetworkInterface;
+import java.net.*;
 import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
+
 
 public class DesktopPlatform extends Platform{
     static boolean useDiscord = OS.is64Bit;
@@ -43,16 +42,16 @@ public class DesktopPlatform extends Platform{
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = r -> new Thread(r).start();
+        Consumer<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
 
-            dialog.accept(() -> TinyFileDialogs.tinyfd_messageBox("oh no",
+            dialog.accept(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
                             "Your graphics card does not support OpenGL 2.0!\n" +
                                     "Try to update your graphics drivers.\n\n" +
-                                    "(If that doesn't work, your computer just doesn't support Mindustry.)", "ok", "error", true));
+                                    "(If that doesn't work, your computer just doesn't support Mindustry.)"));
             badGPU = true;
         }
 
@@ -60,7 +59,7 @@ public class DesktopPlatform extends Platform{
 
         CrashSender.send(e, file -> {
             if(!fbgp){
-                dialog.accept(() -> TinyFileDialogs.tinyfd_messageBox("oh no", "A crash has occured. It has been saved in:\n" + file.getAbsolutePath(), "ok", "error", true));
+                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + (e.getMessage() == null ? "" : "\n" + e.getMessage())));
             }
         });
     }
@@ -118,7 +117,7 @@ public class DesktopPlatform extends Platform{
 
             String str = new String(Base64Coder.encode(result));
 
-            if(str.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
+            if(str.equals("AAAAAAAAAOA=") || str.equals("AAAAAAAAAAA=")) throw new RuntimeException("Bad UUID.");
 
             return str;
         }catch(Exception e){
@@ -126,10 +125,14 @@ public class DesktopPlatform extends Platform{
         }
     }
 
+    private static void message(String message){
+        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
+    }
+
     private boolean validAddress(byte[] bytes){
         if(bytes == null) return false;
         byte[] result = new byte[8];
         System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=");
+        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }
