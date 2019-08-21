@@ -106,7 +106,7 @@ public class PausedDialog extends FloatingDialog{
             return;
         }
 
-        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || Net.client()){
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || wasClient){
             state.set(State.menu);
             logic.reset();
             return;
