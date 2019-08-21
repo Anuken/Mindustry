@@ -32,35 +32,32 @@ task run(dependsOn: classes, type: JavaExec){
     }
 }
 
-["Windows", "Linux", "Mac", "All"].each{ target ->
-    task "dist$target"(type: Jar, dependsOn: classes){
-        from files(sourceSets.main.output.classesDirs)
-        from files(sourceSets.main.output.resourcesDir)
-        from {configurations.compile.collect {zipTree(it)}}
-        from files(project.assetsDir)
 
-        if(target.contains("windows")) exclude('**.so', "**.dylib")
-        if(target == "mac") exclude('**.so', "**.dll")
-        if(target == "linux") exclude('**.dll', "**.dylib")
-        archiveName = "$appName-${target}.jar"
+task dist(type: Jar, dependsOn: classes){
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+    from files(project.assetsDir)
 
-        manifest{
-            attributes 'Main-Class': project.mainClassName
-        }
+    archiveName = "${appName}.jar"
+
+    manifest{
+        attributes 'Main-Class': project.mainClassName
     }
 }
+
 
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
         def platformName = platform.toString().replace('64', '').replace('32', '').replace('MacOS', 'Mac')
 
-        dependsOn "dist$platformName"
+        dependsOn dist
 
         doLast{
             copy{
                 into "build/packr/"
-                rename("$appName-${platformName}.jar", "desktop.jar")
-                from "build/libs/$appName-${platformName}.jar"
+                rename("${appName}.jar", "desktop.jar")
+                from "build/libs/${appName}.jar"
             }
 
             delete{
@@ -75,8 +72,8 @@ PackrConfig.Platform.values().each{ platform ->
 
                 copy{
                     into "build/packr/output/jre"
-                    rename("$appName-${platformName}.jar", "desktop.jar")
-                    from "build/libs/$appName-${platformName}.jar"
+                    rename("${appName}.jar", "desktop.jar")
+                    from "build/libs/${appName}.jar"
                 }
             }else{
                 def config = new PackrConfig()
