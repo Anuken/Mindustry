@@ -118,7 +118,7 @@ PackrConfig.Platform.values().each{ platform ->
                 }
 
                 copy{
-                    into "build/packr/output"
+                    into "build/packr/output/jre"
                     rename("$appName-${platformName}.jar", "desktop.jar")
                     from "build/libs/$appName-${platformName}.jar"
                 }
@@ -136,7 +136,7 @@ PackrConfig.Platform.values().each{ platform ->
                     removePlatformLibs = ["desktop-sdl/build/packr/desktop.jar"]
 
                     vmArgs = ["Djava.net.preferIPv4Stack=true"]
-                    minimizeJre = "../desktop/packr_minimize.json"
+                    minimizeJre = "desktop/packr_minimize.json"
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 
                     if(platform == PackrConfig.Platform.MacOS){
@@ -146,9 +146,22 @@ PackrConfig.Platform.values().each{ platform ->
 
                 new Packr().pack(config)
 
+                if(platform == PackrConfig.Platform.Linux64){
+                    copy{
+                        into "build/packr/output/jre/"
+                        from "build/packr/output/desktop.jar"
+                    }
+
+                    delete{
+                        delete "build/packr/output/desktop.jar"
+                    }
+
+                    file("build/packr/output/config.json").text = file("build/packr/output/config.json").text.replace("desktop.jar", "jre/desktop.jar")
+                }
+
                 if(platform == PackrConfig.Platform.MacOS){
                     copy{
-                        into "build/packr/" + appName + ".app/Contents/"
+                        into "build/packr/${appName}.app/Contents/"
                         from "build/packr/Contents/"
                     }
 
