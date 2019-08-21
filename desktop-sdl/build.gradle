@@ -1,3 +1,6 @@
+import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.PackrConfig
+
 apply plugin: "java"
 
 sourceCompatibility = 1.8
@@ -7,7 +10,10 @@ project.ext.mainClassName = "io.anuke.mindustry.desktopsdl.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def IKVM_DIR = System.env.IKVM_HOME
-def getTarget = { return project.hasProperty("target") ? project.properties["target"] : "windows" }
+//def getTarget = { return project.hasProperty("target") ? project.properties["target"] : "windows" }
+
+def JDK_DIR = "$System.env.PACKR_DIR"
+def ICON_DIR = new File("core/assets/icons/icon.icns")
 
 task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
@@ -29,24 +35,27 @@ task run(dependsOn: classes, type: JavaExec){
     }
 }
 
-task dist(type: Jar, dependsOn: classes){
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir)
 
-    //use target = all for all platforms
-    def target = getTarget()
-    if(target.contains("windows")) exclude('**.so', "**.dylib")
-    if(target == "mac") exclude('**.so', "**.dll")
-    if(target == "linux") exclude('**.dll', "**.dylib")
-    archivesBaseName = appName + "-" + target
 
-    manifest{
-        attributes 'Main-Class': project.mainClassName
+["Windows", "Linux", "Mac", "All"].each{ target ->
+    task "dist$target"(type: Jar, dependsOn: classes){
+        from files(sourceSets.main.output.classesDirs)
+        from files(sourceSets.main.output.resourcesDir)
+        from {configurations.compile.collect {zipTree(it)}}
+        from files(project.assetsDir)
+
+        if(target.contains("windows")) exclude('**.so', "**.dylib")
+        if(target == "mac") exclude('**.so', "**.dll")
+        if(target == "linux") exclude('**.dll', "**.dylib")
+        archiveName = "$appName-${target}.jar"
+
+        manifest{
+            attributes 'Main-Class': project.mainClassName
+        }
     }
 }
 
+/*
 task ikZip(type: Zip){
     def filename = "$appName-${getTarget()}-${version}"
 
@@ -83,5 +92,85 @@ task ikdist{
             into folder
         }
     }
-}
+}*/
 
+PackrConfig.Platform.values().each{ platform ->
+    task "packr${platform.toString()}"{
+        def platformName = platform.toString().replace('64', '').replace('32', '').replace('MacOS', 'Mac')
+
+        dependsOn "dist$platformName"
+
+        doLast{
+            copy{
+                into "build/packr/"
+                rename("$appName-${platformName}.jar", "desktop.jar")
+                from "build/libs/$appName-${platformName}.jar"
+            }
+
+            delete{
+                delete "build/packr/output/"
+            }
+
+            if(platform == PackrConfig.Platform.Windows32 || platform == PackrConfig.Platform.Windows64){
+                copy{
+                    into "build/packr/output"
+                    from "${JDK_DIR}/templates/${platform.toString().toLowerCase()}"
+                }
+
+                copy{
+                    into "build/packr/output"
+                    rename("$appName-${platformName}.jar", "desktop.jar")
+                    from "build/libs/$appName-${platformName}.jar"
+                }
+            }else{
+                def config = new PackrConfig()
+                config.with{
+                    config.executable = appName
+                    config.platform = platform
+                    verbose = true
+                    bundleIdentifier = getPackage() + ".mac"
+                    iconResource = ICON_DIR
+                    outDir = file("build/packr/output")
+                    mainClass = project.ext.mainClassName
+                    classpath = ["desktop-sdl/build/packr/desktop.jar"]
+                    removePlatformLibs = ["desktop-sdl/build/packr/desktop.jar"]
+
+                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
+                    minimizeJre = "../desktop/packr_minimize.json"
+                    jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
+
+                    if(platform == PackrConfig.Platform.MacOS){
+                        vmArgs += "XstartOnFirstThread"
+                    }
+                }
+
+                new Packr().pack(config)
+
+                if(platform == PackrConfig.Platform.MacOS){
+                    copy{
+                        into "build/packr/" + appName + ".app/Contents/"
+                        from "build/packr/Contents/"
+                    }
+
+                    delete{
+                        delete "build/packr/Contents/"
+                    }
+                }
+            }
+        }
+
+        task "zip${platform.toString()}"(type: Zip){
+            from "build/packr/output"
+            archiveName "${generateDeployName(platform.toString())}.zip"
+            destinationDir(file("../deploy"))
+
+            doLast{
+                delete{
+                    delete "build/packr/"
+                }
+            }
+        }
+
+        finalizedBy "zip${platform.toString()}"
+    }
+}

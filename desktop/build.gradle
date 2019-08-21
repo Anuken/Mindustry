@@ -14,6 +14,7 @@ import com.badlogicgames.packr.PackrConfig
 def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/icons/icon.icns")
 
+/*
 ext.getPlatform = {
     def lc = project.hasProperty("platform") ? platform.toLowerCase() : ""
     if(lc == "windows64"){
@@ -27,7 +28,7 @@ ext.getPlatform = {
     }else{
         throw new InvalidUserDataException("Invalid platform. Set platform with -Pplatform=windows64/windows32/linux/mac")
     }
-}
+}*/
 
 task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
@@ -71,108 +72,66 @@ task dist(type: Jar){
     }
 }
 
-//note: call desktop:dist beforehand
-task packrCmd(){
-
-    doLast{
-        def config = new PackrConfig()
-        config.with{
-            config.executable = appName
-            verbose = true
-            platform = getPlatform()
-            bundleIdentifier = getPackage() + ".mac"
-            iconResource = ICON_DIR
-            outDir = file("packr-out/")
-            mainClass = project.ext.mainClassName
-            classpath = ["desktop/build/libs/desktop-release.jar"]
-            removePlatformLibs = ["desktop/build/libs/desktop-release.jar"]
-
-            vmArgs = ["Djava.net.preferIPv4Stack=true"]
-            minimizeJre = "desktop/packr_minimize.json"
-            jdk = JDK_DIR + "jdk-${getPlatform().toString().toLowerCase()}.zip"
-
-            if(getPlatform() == PackrConfig.Platform.MacOS){
-                vmArgs += "XstartOnFirstThread"
-            }
-        }
-
-        new Packr().pack(config)
-    }
-}
-
-task copyTemplate(){
-    doLast{
-        copy{
-            into "packr-out/"
-            from "${JDK_DIR}/templates/${getPlatform().toString().toLowerCase()}"
-        }
-
-        copy{
-            into "packr-out/"
-            from "build/libs/desktop-release.jar"
-        }
-    }
-}
-
-task packrZip(){
-    task clearOut(type: Delete){
+PackrConfig.Platform.values().each{ platform ->
+    task "packr${platform.toString()}"{
         doLast{
+            if(platform == PackrConfig.Platform.Windows32 || platform == PackrConfig.Platform.Windows64){
+                copy{
+                    into "packr-out/"
+                    from "${JDK_DIR}/templates/${platform.toString().toLowerCase()}"
+                }
+
+                copy{
+                    into "packr-out/"
+                    rename("desktop-release.jar", "desktop.jar")
+                    from "../desktop-sdl/build/libs/desktop.jar"
+                }
+            }else{
+                def config = new PackrConfig()
+                config.with{
+                    config.executable = appName
+                    config.platform = platform
+                    verbose = true
+                    bundleIdentifier = getPackage() + ".mac"
+                    iconResource = ICON_DIR
+                    outDir = file("packr-out/")
+                    mainClass = project.ext.mainClassName
+                    classpath = ["desktop-sdl/build/libs/desktop.jar"]
+                    removePlatformLibs = ["desktop-sdl/build/libs/desktop.jar"]
+
+                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
+                    minimizeJre = "desktop/packr_minimize.json"
+                    jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
+
+                    if(platform == PackrConfig.Platform.MacOS){
+                        vmArgs += "XstartOnFirstThread"
+                    }
+                }
+
+                new Packr().pack(config)
+
+                if(platform == PackrConfig.Platform.MacOS){
+                    copy{
+                        into "packr-out/" + appName + ".app/Contents/"
+                        from "packr-out/Contents/"
+                    }
+
+                    delete{
+                        delete "packr-out/Contents/"
+                    }
+                }
+            }
+
+            task "zip${platform.toString()}"(type: Zip){
+                from "packr-out/"
+                archiveName "${generateDeployName(platform.toString())}.zip"
+                destinationDir(file("packr-export"))
+            }
+
+            finalizedBy 'rzip'
+
             delete "packr-out/"
         }
     }
-
-    task fixMac(type: Copy){
-        dependsOn "packrCmd"
-
-        into "packr-out/" + appName + ".app/Contents/"
-        from "packr-out/Contents/"
-
-        doLast{
-            delete{
-                delete "packr-out/Contents/"
-            }
-        }
-    }
-
-    task fixWindows32(type: Copy){
-        dependsOn "packrCmd"
-
-        into "packr-out/jre/bin/"
-        from JDK_DIR + "zip.dll"
-        rename("zip.dll", "ojdkbuild_zlib.dll")
-
-        doLast{
-            copy{
-                into "packr-out/jre/bin/"
-                from JDK_DIR + "zip.dll"
-            }
-        }
-    }
-
-    finalizedBy "clearOut"
-
-    if(project.hasProperty("platform")){
-        def plat = getPlatform()
-        if(plat == PackrConfig.Platform.Windows32 || plat == PackrConfig.Platform.Windows64){
-            dependsOn "copyTemplate"
-        }else{
-            dependsOn "packrCmd"
-
-            if(getPlatform() == PackrConfig.Platform.MacOS){
-                dependsOn "fixMac"
-            }
-
-            if(getPlatform() == PackrConfig.Platform.Windows32){
-                dependsOn "fixWindows32"
-            }
-        }
-
-        task rzip(type: Zip){
-            from "packr-out/"
-            archiveName "${generateDeployName(getPlatform().toString())}.zip"
-            destinationDir(file("packr-export"))
-        }
-
-        finalizedBy 'rzip'
-    }
 }
+
