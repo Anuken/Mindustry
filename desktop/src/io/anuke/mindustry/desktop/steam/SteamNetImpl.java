@@ -8,8 +8,8 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
@@ -20,7 +20,7 @@ import java.io.*;
 import java.nio.*;
 import java.util.concurrent.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.ui;
 
 public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, ClientProvider, ServerProvider{
     final SteamNetworking snet = new SteamNetworking(this);
@@ -39,12 +39,13 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     SteamID currentLobby, currentServer;
 
     public SteamNetImpl(){
-
-        //start recieving packets
-        Threads.daemon(() -> {
+        Events.on(GameLoadEvent.class, e -> Core.app.addListener(new ApplicationListener(){
+            //read packets
             int length;
             SteamID from = new SteamID();
-            while(true){
+
+            @Override
+            public void update(){
                 while((length = snet.isP2PPacketAvailable(0)) != 0){
                     try{
                         readBuffer.position(0);
@@ -63,7 +64,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                                 }else{
                                     Log.err("Unknown user with ID: {0}", fromID);
                                 }
-                            }else if(Net.client() && currentServer != null && fromID == currentServer.getAccountID()){
+                            }else if(currentServer != null && fromID == currentServer.getAccountID()){
                                 Core.app.post(() -> Net.handleClientReceived(output));
                             }
                         });
@@ -71,10 +72,8 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                         e.printStackTrace();
                     }
                 }
-
-                Threads.sleep(1000 / 10);
             }
-        });
+        }));
     }
 
     @Override
@@ -84,7 +83,6 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void sendClient(Object object, SendMode mode){
-        Log.info("Attempt to send {0} {1}", object, mode);
         if(currentServer == null){
             Log.info("Not connected, quitting.");
             return;
@@ -236,7 +234,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void onLobbyKicked(SteamID steamID, SteamID steamID1, boolean b){
-
+        Log.info("Kicked: {0} {1} {2}", steamID, steamID1, b);
     }
 
     @Override
@@ -365,7 +363,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                 writeBuffer.flip();
                 //Log.info("Send {0} to {1} mode {2}", object, sid.getAccountID(), mode);
 
-                snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+                snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? object instanceof StreamChunk ? P2PSend.ReliableWithBuffering : P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
