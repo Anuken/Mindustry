@@ -172,6 +172,19 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
         return null;
     }
 
+    void disconnectSteamUser(SteamID steamid){
+        //a client left
+        int sid = steamid.getAccountID();
+        snet.closeP2PSessionWithUser(steamid);
+
+        if(steamConnections.containsKey(sid)){
+            SteamConnection con = steamConnections.get(sid);
+            Net.handleServerReceived(con.id, new Disconnect());
+            steamConnections.remove(sid);
+            connections.remove(con);
+        }
+    }
+
     @Override
     public void onFavoritesListChanged(int i, int i1, int i2, int i3, int i4, boolean b, int i5){
 
@@ -218,13 +231,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                 }
             }else{
                 //a client left
-                int id = who.getAccountID();
-                snet.closeP2PSessionWithUser(who);
-
-                if(steamConnections.containsKey(id)){
-                    Net.handleServerReceived(id, new Disconnect());
-                    steamConnections.remove(id);
-                }
+                disconnectSteamUser(who);
             }
         }
 
@@ -275,15 +282,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     public void onP2PSessionConnectFail(SteamID steamIDRemote, P2PSessionError sessionError){
         if(Net.server()){
             Log.info("{0} has disconnected: {1}", steamIDRemote.getAccountID(), sessionError);
-
-            if(Net.server()){
-                int id = steamIDRemote.getAccountID();
-
-                if(steamConnections.containsKey(id)){
-                    Net.handleServerReceived(id, new Disconnect());
-                    steamConnections.remove(id);
-                }
-            }
+            disconnectSteamUser(steamIDRemote);
         }else if(steamIDRemote == currentServer){
             Log.info("Disconnected! {1}: {0}", steamIDRemote.getAccountID(), sessionError);
             Net.handleClientReceived(new Disconnect());
