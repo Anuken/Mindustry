@@ -46,7 +46,7 @@ task dist(type: Jar, dependsOn: classes){
     }
 }
 
-task steamdist(dependsOn: dist){
+task steamtest(dependsOn: dist){
     doLast{
         copy{
             from "build/libs/Mindustry-linux-release.jar"
@@ -60,8 +60,6 @@ task steamdist(dependsOn: dist){
 
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
-        def platformName = platform.toString().replace('64', '').replace('32', '').replace('MacOS', 'Mac')
-
         dependsOn dist
 
         doLast{
@@ -134,6 +132,11 @@ PackrConfig.Platform.values().each{ platform ->
                     }
                 }
             }
+
+            copy{
+                from "build/packr/output"
+                into "../deploy/${platform.toString()}"
+            }
         }
 
         task "zip${platform.toString()}"(type: Zip){
@@ -149,5 +152,6 @@ PackrConfig.Platform.values().each{ platform ->
         }
 
         finalizedBy "zip${platform.toString()}"
+        
     }
 }

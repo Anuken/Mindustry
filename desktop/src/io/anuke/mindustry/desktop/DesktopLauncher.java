@@ -1,5 +1,6 @@
 package io.anuke.mindustry.desktop;
 
+import com.codedisaster.steamworks.*;
 import io.anuke.arc.Files.*;
 import io.anuke.arc.backends.sdl.*;
 import io.anuke.mindustry.*;
@@ -13,8 +14,13 @@ public class DesktopLauncher{
         try{
             Platform.instance = new DesktopPlatform(arg);
 
-            Net.setClientProvider(new ArcNetClient());
-            Net.setServerProvider(new SteamServerImpl(new ArcNetServer()));
+            if(SteamAPI.isSteamRunning()){
+                Net.setClientProvider(new ArcNetClient());
+                Net.setServerProvider(new SteamServerImpl(new ArcNetServer()));
+            }else{
+                Net.setClientProvider(new ArcNetClient());
+                Net.setServerProvider(new ArcNetServer());
+            }
 
             new SdlApplication(new Mindustry(), new SdlConfig(){{
                 title = "Mindustry";

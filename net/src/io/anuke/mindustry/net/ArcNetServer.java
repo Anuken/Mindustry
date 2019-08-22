@@ -50,7 +50,7 @@ public class ArcNetServer implements ServerProvider{
 
             @Override
             public void disconnected(Connection connection){
-                ArcConnection k = getByKryoID(connection.getID());
+                ArcConnection k = getByArcID(connection.getID());
                 if(k == null) return;
 
                 Disconnect c = new Disconnect();
@@ -64,7 +64,7 @@ public class ArcNetServer implements ServerProvider{
 
             @Override
             public void received(Connection connection, Object object){
-                ArcConnection k = getByKryoID(connection.getID());
+                ArcConnection k = getByArcID(connection.getID());
                 if(object instanceof FrameworkMessage || k == null) return;
 
                 Core.app.post(() -> {
@@ -131,7 +131,7 @@ public class ArcNetServer implements ServerProvider{
         Threads.daemon(server::stop);
     }
 
-    ArcConnection getByKryoID(int id){
+    ArcConnection getByArcID(int id){
         for(int i = 0; i < connections.size(); i++){
             ArcConnection con = connections.get(i);
             if(con.connection != null && con.connection.getID() == id){
@@ -164,7 +164,7 @@ public class ArcNetServer implements ServerProvider{
                 Log.info("Error sending packet. Disconnecting invalid client!");
                 connection.close();
 
-                ArcConnection k = getByKryoID(connection.getID());
+                ArcConnection k = getByArcID(connection.getID());
                 if(k != null) connections.remove(k);
             }
         }

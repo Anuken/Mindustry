@@ -11,28 +11,31 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
+import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
+import java.util.concurrent.*;
 
 public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback, SteamMatchmakingCallback{
     private final static int maxLobbyPlayers = 32;
 
-    private final PacketSerializer serializer = new PacketSerializer();
-    private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
-    private final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
-    private final SteamNetworking snet = new SteamNetworking(this);
-    private final SteamMatchmaking smat = new SteamMatchmaking(this);
-    private final SteamFriendsImpl friends = new SteamFriendsImpl();
-    private final ServerProvider server;
+    final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
+    final PacketSerializer serializer = new PacketSerializer();
+    final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
+    final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
+    final SteamNetworking snet = new SteamNetworking(this);
+    final SteamMatchmaking smat = new SteamMatchmaking(this);
+    final SteamFriendsImpl friends = new SteamFriendsImpl();
+    final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
+    //private final ServerProvider server;
 
     //maps steam ID -> valid net connection
-    private IntMap<SteamConnection> steamConnections = new IntMap<>();
-
-    private SteamID currentLobby;
+    IntMap<SteamConnection> steamConnections = new IntMap<>();
+    SteamID currentLobby;
 
     public SteamServerImpl(ServerProvider server){
-        this.server = server;
+        //this.server = server;
 
         //start recieving packets
         Threads.daemon(() -> {
@@ -68,13 +71,13 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
 
     @Override
     public void host(int port) throws IOException{
-        server.host(port);
+        //server.host(port);
         smat.createLobby(LobbyType.values()[Core.settings.getInt("lobbytype", 1)], maxLobbyPlayers);
     }
 
     @Override
     public void close(){
-        server.close();
+       // server.close();
         if(currentLobby != null){
             smat.leaveLobby(currentLobby);
             for(SteamConnection con : steamConnections.values()){
@@ -88,17 +91,24 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
 
     @Override
     public byte[] compressSnapshot(byte[] input){
-        return server.compressSnapshot(input);
+        return compressor.compress(input);
     }
 
     @Override
     public Iterable<? extends NetConnection> getConnections(){
-        return server.getConnections();
+        return connections;
     }
 
     @Override
     public NetConnection getByID(int id){
-        return server.getByID(id);
+        for(int i = 0; i < connections.size(); i++){
+            SteamConnection con = connections.get(i);
+            if(con.id == id){
+                return con;
+            }
+        }
+
+        return null;
     }
 
     //steam lobby overrides
@@ -183,6 +193,17 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
     public void onP2PSessionRequest(SteamID steamIDRemote){
         //accept users on request
         snet.acceptP2PSessionWithUser(steamIDRemote);
+        if(!steamConnections.containsKey(steamIDRemote.getAccountID())){
+            SteamConnection con = new SteamConnection(steamIDRemote);
+            Connect c = new Connect();
+            c.id = con.id;
+            c.addressTCP = "steam:" + steamIDRemote.getAccountID();
+
+            Log.debug("&bRecieved connection: {0}", c.addressTCP);
+
+            connections.add(con);
+            Core.app.post(() -> Net.handleServerReceived(c.id, c));
+        }
     }
 
     public class SteamConnection extends NetConnection{

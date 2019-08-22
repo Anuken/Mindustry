@@ -158,6 +158,7 @@ public class SteamClientImpl implements SteamNetworkingCallback, SteamMatchmakin
 
     @Override
     public void onLobbyInvite(SteamID steamIDUser, SteamID steamIDLobby, long gameID){
+        Log.info("lobby invite {0} {1} {2}", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
         ui.showConfirm("Someone has invited you to a game.", "But do you accept?", () -> {
             smat.joinLobby(steamIDLobby);
         });
@@ -172,6 +173,7 @@ public class SteamClientImpl implements SteamNetworkingCallback, SteamMatchmakin
         con.addressTCP = "steam:" + currentServer.getAccountID();
 
         Net.handleClientReceived(con);
+        Log.info("enter lobby {0} {1}", steamIDLobby.getAccountID(), response);
     }
 
     @Override
