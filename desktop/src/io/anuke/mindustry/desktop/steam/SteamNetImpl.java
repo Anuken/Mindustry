@@ -20,7 +20,7 @@ import java.io.*;
 import java.nio.*;
 import java.util.concurrent.*;
 
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, ClientProvider, ServerProvider{
     final SteamNetworking snet = new SteamNetworking(this);
@@ -51,6 +51,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                         snet.readP2PPacket(from, readBuffer, 0);
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readBuffer);
+                        Log.info("Read {0} of length {1} from {2}", output, length, fromID);
 
                         Core.app.post(() -> {
                             if(Net.server()){
@@ -277,23 +278,27 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     public void onP2PSessionRequest(SteamID steamIDRemote){
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
         if(Net.client()){
+            Log.info("Am client");
             if(steamIDRemote == currentServer){
                 snet.acceptP2PSessionWithUser(steamIDRemote);
             }
         }else if(Net.server()){
+            Log.info("Am server, accepting request.");
             //accept users on request
-            snet.acceptP2PSessionWithUser(steamIDRemote);
             if(!steamConnections.containsKey(steamIDRemote.getAccountID())){
                 SteamConnection con = new SteamConnection(steamIDRemote);
                 Connect c = new Connect();
                 c.id = con.id;
                 c.addressTCP = "steam:" + steamIDRemote.getAccountID();
 
-                Log.debug("&bRecieved connection: {0}", c.addressTCP);
+                Log.info("&bRecieved connection: {0}", c.addressTCP);
 
+                steamConnections.put(steamIDRemote.getAccountID(), con);
                 connections.add(con);
-                Core.app.post(() -> Net.handleServerReceived(c.id, c));
+                Net.handleServerReceived(c.id, c);
             }
+
+            snet.acceptP2PSessionWithUser(steamIDRemote);
         }
     }
 
