@@ -51,13 +51,11 @@ task steamtest(dependsOn: dist){
         copy{
             from "build/libs/Mindustry.jar"
             if(System.properties["os.name"].contains("Mac")){
-                into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+                into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Contents/Resources"
             }else{
                 into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
             }
-            rename { String fileName ->
-                fileName.replace("Mindustry-linux-release", "desktop-release")
-            }
+            rename("Mindustry.jar", "desktop.jar")
         }
     }
 }
