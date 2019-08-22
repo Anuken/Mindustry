@@ -20,6 +20,8 @@ logs/
 /tests/build/
 /server/build/
 saves/
+core/assets/saves/
+/core/assets/saves/
 steam_appid.txt
 /test_files/
 /annotations/build/
