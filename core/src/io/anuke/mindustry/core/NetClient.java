@@ -334,7 +334,7 @@ public class NetClient implements ApplicationListener{
         Net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, Platform.instance::updateRPC);
-        Log.info("> connect confirmation");
+        Log.info("> connect confirmation. net status: client={0} server={1}", Net.client(), Net.server());
         Core.app.post(() -> ui.loadfrag.hide());
     }
 

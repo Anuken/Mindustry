@@ -203,6 +203,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
         Connect con = new Connect();
         con.addressTCP = "steam:" + currentServer.getAccountID();
 
+        Net.setClientConnected();
         Net.handleClientReceived(con);
         Log.info("enter lobby {0} {1}", steamIDLobby.getAccountID(), response);
     }
@@ -281,7 +282,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     @Override
     public void onP2PSessionRequest(SteamID steamIDRemote){
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
-        if(Net.client()){
+        if(currentServer != null && !Net.server()){
             Log.info("Am client");
             if(steamIDRemote == currentServer){
                 snet.acceptP2PSessionWithUser(steamIDRemote);
