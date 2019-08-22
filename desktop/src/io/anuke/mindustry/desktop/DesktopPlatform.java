@@ -48,8 +48,6 @@ public class DesktopPlatform extends Platform{
         }
 
         if(useSteam){
-
-
             Events.on(GameLoadEvent.class, event -> {
                 Label[] label = {null};
                 Core.scene.table(t -> {
@@ -65,12 +63,17 @@ public class DesktopPlatform extends Platform{
                     public void print(String text, Object... args){
                         super.print(text, args);
                         String out = Log.format(text, false, args);
+
+                        int maxlen = 2048;
+
+                        if(label[0].getText().length() > maxlen){
+                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
+                        }
+
                         label[0].getText().append(out).append("\n");
                         label[0].invalidateHierarchy();
                     }
                 });
-
-
             });
 
             Vars.steam = true;
