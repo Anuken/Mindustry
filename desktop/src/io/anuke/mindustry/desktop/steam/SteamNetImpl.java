@@ -52,22 +52,17 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                         snet.readP2PPacket(from, readBuffer, 0);
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readBuffer);
-                        if(Net.server()){
-                            Log.info("Read {0} of length {1} from {2}", output, length, fromID);
-                        }
 
-                        Core.app.post(() -> {
-                            if(Net.server()){
-                                SteamConnection con = steamConnections.get(fromID);
-                                if(con != null){
-                                    Net.handleServerReceived(con.id, output);
-                                }else{
-                                    Log.err("Unknown user with ID: {0}", fromID);
-                                }
-                            }else if(currentServer != null && fromID == currentServer.getAccountID()){
-                                Core.app.post(() -> Net.handleClientReceived(output));
+                        if(Net.server()){
+                            SteamConnection con = steamConnections.get(fromID);
+                            if(con != null){
+                                Net.handleServerReceived(con.id, output);
+                            }else{
+                                Log.err("Unknown user with ID: {0}", fromID);
                             }
-                        });
+                        }else if(currentServer != null && fromID == currentServer.getAccountID()){
+                            Net.handleClientReceived(output);
+                        }
                     }catch(SteamException e){
                         e.printStackTrace();
                     }
@@ -139,7 +134,6 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void host(int port) throws IOException{
-        //TODO adjust max players
         smat.createLobby(LobbyType.values()[Core.settings.getInt("lobbytype", 1)], 32);
     }
 
@@ -214,7 +208,25 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     }
 
     @Override
-    public void onLobbyChatUpdate(SteamID steamID, SteamID steamID1, SteamID steamID2, ChatMemberStateChange chatMemberStateChange){
+    public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
+        Log.info("lobby {0}: {1} caused {2}'s change: {3}", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
+            if(Net.client()){
+                //host left, leave as well
+                if(who == currentServer){
+                    disconnect();
+                }
+            }else{
+                //a client left
+                int id = who.getAccountID();
+                snet.closeP2PSessionWithUser(who);
+
+                if(steamConnections.containsKey(id)){
+                    Net.handleServerReceived(id, new Disconnect());
+                    steamConnections.remove(id);
+                }
+            }
+        }
 
     }
 
@@ -230,7 +242,6 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void onLobbyMatchList(int i){
-
     }
 
     @Override
@@ -378,6 +389,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
         @Override
         public void close(){
             snet.closeP2PSessionWithUser(sid);
+            //smat.
         }
     }
 }
