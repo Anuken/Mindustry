@@ -82,7 +82,11 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void sendClient(Object object, SendMode mode){
-        if(currentServer == null) return;
+        Log.info("Attempt to send {0} {1}", object, mode);
+        if(currentServer == null){
+            Log.info("Not connected, quitting.");
+            return;
+        }
 
         try{
             writeBuffer.limit(writeBuffer.capacity());
@@ -357,6 +361,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                 writeBuffer.position(0);
                 serializer.write(writeBuffer, object);
                 writeBuffer.flip();
+                Log.info("Send {0} to {1} mode {2}", object, sid.getAccountID(), mode);
 
                 snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
