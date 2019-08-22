@@ -114,7 +114,7 @@ public class ArcNetClient implements ClientProvider{
     }
 
     @Override
-    public void send(Object object, SendMode mode){
+    public void sendClient(Object object, SendMode mode){
         try{
             client.sendTCP(object);
             //sending things can cause an under/overflow, catch it and disconnect instead of crashing

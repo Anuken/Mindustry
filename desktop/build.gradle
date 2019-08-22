@@ -53,7 +53,7 @@ task steamtest(dependsOn: dist){
             if(System.properties["os.name"].contains("Mac")){
                 into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Contents/Resources"
             }else{
-                into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+                into "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"
             }
             rename("Mindustry.jar", "desktop.jar")
         }

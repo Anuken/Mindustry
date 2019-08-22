@@ -15,8 +15,9 @@ public class DesktopLauncher{
             Platform.instance = new DesktopPlatform(arg);
 
             if(SteamAPI.isSteamRunning()){
-                Net.setClientProvider(new ArcNetClient());
-                Net.setServerProvider(new SteamServerImpl(new ArcNetServer()));
+                SteamNetImpl net = new SteamNetImpl();
+                Net.setClientProvider(net);
+                Net.setServerProvider(net);
             }else{
                 Net.setClientProvider(new ArcNetClient());
                 Net.setServerProvider(new ArcNetServer());

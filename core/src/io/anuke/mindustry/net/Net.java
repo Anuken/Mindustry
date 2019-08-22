@@ -178,9 +178,9 @@ public class Net{
      */
     public static void send(Object object, SendMode mode){
         if(server){
-            if(serverProvider != null) serverProvider.send(object, mode);
+            if(serverProvider != null) serverProvider.sendServer(object, mode);
         }else{
-            if(clientProvider != null) clientProvider.send(object, mode);
+            if(clientProvider != null) clientProvider.sendClient(object, mode);
         }
     }
 
@@ -188,21 +188,21 @@ public class Net{
      * Send an object to a certain client. Server-side only
      */
     public static void sendTo(int id, Object object, SendMode mode){
-        serverProvider.sendTo(id, object, mode);
+        serverProvider.sendServerTo(id, object, mode);
     }
 
     /**
      * Send an object to everyone EXCEPT certain client. Server-side only
      */
     public static void sendExcept(int id, Object object, SendMode mode){
-        serverProvider.sendExcept(id, object, mode);
+        serverProvider.sendServerExcept(id, object, mode);
     }
 
     /**
      * Send a stream to a specific client. Server-side only.
      */
     public static void sendStream(int id, Streamable stream){
-        serverProvider.sendStream(id, stream);
+        serverProvider.sendServerStream(id, stream);
     }
 
     /**
@@ -343,7 +343,7 @@ public class Net{
         void connect(String ip, int port, Runnable success) throws IOException;
 
         /** Send an object to the server. */
-        void send(Object object, SendMode mode);
+        void sendClient(Object object, SendMode mode);
 
         /** Update the ping. Should be done every second or so. */
         void updatePing();
@@ -368,7 +368,9 @@ public class Net{
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
 
         /** Close all connections. */
-        void dispose();
+        default void dispose(){
+            disconnect();
+        }
     }
 
     /** Server implementation. */
@@ -377,7 +379,7 @@ public class Net{
         void host(int port) throws IOException;
 
         /** Sends a large stream of data to a specific client. */
-        default void sendStream(int id, Streamable stream){
+        default void sendServerStream(int id, Streamable stream){
             NetConnection connection = getByID(id);
             if(connection == null) return;
             try{
@@ -402,13 +404,13 @@ public class Net{
             }
         }
 
-        default void send(Object object, SendMode mode){
+        default void sendServer(Object object, SendMode mode){
             for(NetConnection con : getConnections()){
                 con.send(object, mode);
             }
         }
 
-        default void sendTo(int id, Object object, SendMode mode){
+        default void sendServerTo(int id, Object object, SendMode mode){
             NetConnection conn = getByID(id);
             if(conn == null){
                 Log.err("Failed to find connection with ID {0}.", id);
@@ -417,7 +419,7 @@ public class Net{
             conn.send(object, mode);
         }
 
-        default void sendExcept(int id, Object object, SendMode mode){
+        default void sendServerExcept(int id, Object object, SendMode mode){
             for(NetConnection con : getConnections()){
                 if(con.id != id){
                     con.send(object, mode);
