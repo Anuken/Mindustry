@@ -54,7 +54,7 @@ public class DesktopPlatform extends Platform{
                 Label[] label = {null};
                 Core.scene.table(t -> {
                     t.top().left();
-                    t.update(() -> t.toFront());
+                    t.update(t::toFront);
                     t.table("guideDim", f -> {
                         label[0] = f.add("").get();
                     });

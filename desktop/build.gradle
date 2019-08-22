@@ -49,8 +49,12 @@ task dist(type: Jar, dependsOn: classes){
 task steamtest(dependsOn: dist){
     doLast{
         copy{
-            from "build/libs/Mindustry-linux-release.jar"
-            into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+            from "build/libs/Mindustry.jar"
+            if(System.properties["os.name"].contains("Mac")){
+                into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+            }else{
+                into "/home/anuke/.steam/steam/steamapps/common/Mindustry"
+            }
             rename { String fileName ->
                 fileName.replace("Mindustry-linux-release", "desktop-release")
             }
@@ -152,6 +156,6 @@ PackrConfig.Platform.values().each{ platform ->
         }
 
         finalizedBy "zip${platform.toString()}"
-        
+
     }
 }
