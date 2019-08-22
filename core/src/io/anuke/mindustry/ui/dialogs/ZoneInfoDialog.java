@@ -113,9 +113,16 @@ public class ZoneInfoDialog extends FloatingDialog{
                         t.add("$zone.resources").padRight(6);
 
                         if(zone.resources.length > 0){
-                            for(Item item : zone.resources){
-                                t.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
-                            }
+                            t.table(r -> {
+                                t.left();
+                                int i = 0;
+                                for(Item item : zone.resources){
+                                    r.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
+                                    if(++i % 4 == 0){
+                                        r.row();
+                                    }
+                                }
+                            });
                         }else{
                             t.add("$none");
                         }

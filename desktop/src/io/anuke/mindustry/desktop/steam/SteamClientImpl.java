@@ -1,4 +1,4 @@
-package io.anuke.mindustry.desktopsdl.steam;
+package io.anuke.mindustry.desktop.steam;
 
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamFriends.*;
@@ -6,12 +6,11 @@ import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.net.Net.*;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.desktop.steam.SteamServerImpl.*;
 
 import java.nio.*;
 
-public class ClientSteam implements SteamNetworkingCallback, SteamMatchmakingCallback{
+public class SteamClientImpl implements SteamNetworkingCallback, SteamMatchmakingCallback{
     private SteamNetworking snet;
     private SteamMatchmaking smat;
 
@@ -19,7 +18,7 @@ public class ClientSteam implements SteamNetworkingCallback, SteamMatchmakingCal
     //maps steam ID -> valid net connection
     private IntMap<SteamConnection> connections = new IntMap<>();
 
-    public ClientSteam(){
+    public SteamClientImpl(){
         //snet = new SteamNetworking(this);
         //smat = new SteamMatchmaking(this);
 
@@ -51,46 +50,6 @@ public class ClientSteam implements SteamNetworkingCallback, SteamMatchmakingCal
     @Override
     public void onP2PSessionRequest(SteamID steamIDRemote){
         snet.acceptP2PSessionWithUser(steamIDRemote);
-    }
-
-    class SteamConnection extends NetConnection{
-        public final SteamID connection;
-
-        public SteamConnection(int id, String address, SteamID connection){
-            super(id, address);
-            this.connection = connection;
-        }
-
-        @Override
-        public boolean isConnected(){
-            return false;//connection.isConnected();
-        }
-
-        @Override
-        public void send(Object object, SendMode mode){
-            //TODO
-            /*
-            try{
-                if(mode == SendMode.tcp){
-                    connection.sendTCP(object);
-                }else{
-                    connection.sendUDP(object);
-                }
-            }catch(Exception e){
-                Log.err(e);
-                Log.info("Error sending packet. Disconnecting invalid client!");
-                connection.close();
-
-                ArcNetServer.KryoConnection k = getByKryoID(connection.getID());
-                if(k != null) connections.remove(k);
-            }*/
-        }
-
-        @Override
-        public void close(){
-            //TODO
-            //if(connection.isConnected()) connection.close();
-        }
     }
 
     @Override
@@ -185,8 +144,8 @@ public class ClientSteam implements SteamNetworkingCallback, SteamMatchmakingCal
                 }
             });
 
-            friends.activateGameOverlay(OverlayDialog.Friends);
-            //friends.activateGameOverlayInviteDialog(steamIDLobby);
+            //friends.activateGameOverlay(OverlayDialog.Friends);
+            friends.activateGameOverlayInviteDialog(steamIDLobby);
         }
     }
 

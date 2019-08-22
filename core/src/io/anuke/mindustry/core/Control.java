@@ -84,7 +84,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(state.rules.pvp ? netServer.assignTeam(playerGroup.all()) : defaultTeam);
+            player.setTeam(state.rules.pvp ? netServer.assignTeam(player, playerGroup.all()) : defaultTeam);
             player.setDead(true);
             player.add();
 

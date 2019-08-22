@@ -294,9 +294,7 @@ public class Block extends BlockStorage{
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(Tile tile){
-        if(outputsPower && !consumesPower){
-            PowerNode.lastPlaced = tile.pos();
-        }
+
     }
 
     /** Called after the block is placed by anyone. */

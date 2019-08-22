@@ -1,4 +1,4 @@
-package io.anuke.mindustry.desktopsdl.steam;
+package io.anuke.mindustry.desktop.steam;
 
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamMatchmaking.*;
@@ -6,28 +6,28 @@ import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.desktopsdl.steam.ClientSteam.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
 
 import java.io.*;
 import java.nio.*;
 
-public class ServerSteam implements ServerProvider, SteamNetworkingCallback, SteamMatchmakingCallback{
+public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback, SteamMatchmakingCallback{
     private final static int maxLobbyPlayers = 32;
 
+    private final PacketSerializer serializer = new PacketSerializer();
+    private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
     private final SteamNetworking snet = new SteamNetworking(this);
     private final SteamMatchmaking smat = new SteamMatchmaking(this);
+    private final SteamFriendsImpl friends = new SteamFriendsImpl();
     private final ServerProvider server;
 
-    //buffer for steam API calls
-    private ByteBuffer steamBuffer = ByteBuffer.allocateDirect(1024 * 128);
     //maps steam ID -> valid net connection
     private IntMap<SteamConnection> steamConnections = new IntMap<>();
 
     private SteamID currentLobby;
 
-    public ServerSteam(ServerProvider server){
+    public SteamServerImpl(ServerProvider server){
         this.server = server;
     }
 
@@ -40,32 +40,15 @@ public class ServerSteam implements ServerProvider, SteamNetworkingCallback, Ste
     }
 
     @Override
-    public void sendStream(int id, Streamable stream){
-        server.sendStream(id, stream);
-    }
-
-    @Override
-    public void send(Object object, SendMode mode){
-        server.send(object, mode);
-    }
-
-    @Override
-    public void sendTo(int id, Object object, SendMode mode){
-        server.sendTo(id, object, mode);
-    }
-
-    @Override
-    public void sendExcept(int id, Object object, SendMode mode){
-        server.sendExcept(id, object, mode);
-    }
-
-    @Override
     public void close(){
         server.close();
         if(currentLobby != null){
             //TODO kick everyone who is in this lobby?
             smat.leaveLobby(currentLobby);
             currentLobby = null;
+            for(SteamConnection con : steamConnections.values()){
+                con.close();
+            }
         }
     }
 
@@ -75,7 +58,7 @@ public class ServerSteam implements ServerProvider, SteamNetworkingCallback, Ste
     }
 
     @Override
-    public Array<? extends NetConnection> getConnections(){
+    public Iterable<? extends NetConnection> getConnections(){
         return server.getConnections();
     }
 
@@ -156,5 +139,38 @@ public class ServerSteam implements ServerProvider, SteamNetworkingCallback, Ste
     public void onP2PSessionRequest(SteamID steamIDRemote){
         //accept users on request
         snet.acceptP2PSessionWithUser(steamIDRemote);
+    }
+
+    public class SteamConnection extends NetConnection{
+        final SteamID sid;
+
+        public SteamConnection(SteamID sid){
+            super(sid.getAccountID() + "");
+            this.sid = sid;
+        }
+
+        @Override
+        public void send(Object object, SendMode mode){
+            try{
+                writeBuffer.limit(writeBuffer.capacity());
+                writeBuffer.position(0);
+                serializer.write(writeBuffer, object);
+                writeBuffer.flip();
+
+                snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+            }catch(Exception e){
+                Log.err(e);
+                Log.info("Error sending packet. Disconnecting invalid client!");
+                close();
+
+                SteamConnection k = steamConnections.get(sid.getAccountID());
+                if(k != null) steamConnections.remove(sid.getAccountID());
+            }
+        }
+
+        @Override
+        public void close(){
+            snet.closeP2PSessionWithUser(sid);
+        }
     }
 }

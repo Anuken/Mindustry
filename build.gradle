@@ -155,23 +155,6 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
-        compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
-    }
-}
-
-project(":desktop-sdl"){
-    apply plugin: "java"
-
-    dependencies{
-        compile project(":core")
-        compile project(":net")
-
-        if(debugged()) compile project(":debug")
-
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-
         compile "com.code-disaster.steamworks4j:steamworks4j:$steamworksVersion"
         compile "com.code-disaster.steamworks4j:steamworks4j-server:$steamworksVersion"
 
@@ -317,4 +300,25 @@ project(":net"){
         compile project(":core")
         compile "org.lz4:lz4-java:1.4.1"
     }
+}
+
+task deployAll{
+    task cleanDeployOutput{
+        doFirst{
+            if("${getBuildVersion()}" == "custom build" || "${getBuildVersion()}" == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
+            if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
+
+            delete{
+                delete "deploy/"
+            }
+        }
+    }
+
+    dependsOn cleanDeployOutput
+    dependsOn "desktop:packrLinux64"
+    dependsOn "desktop:packrWindows64"
+    dependsOn "desktop:packrWindows32"
+    dependsOn "desktop:packrMacOS"
+    dependsOn "server:deploy"
+    dependsOn "android:deploy"
 }

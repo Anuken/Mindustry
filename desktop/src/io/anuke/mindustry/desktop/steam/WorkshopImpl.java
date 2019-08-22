@@ -1,4 +1,4 @@
-package io.anuke.mindustry.desktopsdl.steam;
+package io.anuke.mindustry.desktop.steam;
 
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamRemoteStorage.*;
