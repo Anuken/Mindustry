@@ -7,6 +7,7 @@ import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
@@ -51,6 +52,7 @@ public class DesktopPlatform extends Platform{
             Events.on(GameLoadEvent.class, event -> {
                 Label[] label = {null};
                 Core.scene.table(t -> {
+                    t.touchable(Touchable.disabled);
                     t.top().left();
                     t.update(t::toFront);
                     t.table("guideDim", f -> {

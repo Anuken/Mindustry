@@ -51,7 +51,9 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                         snet.readP2PPacket(from, readBuffer, 0);
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readBuffer);
-                        Log.info("Read {0} of length {1} from {2}", output, length, fromID);
+                        if(Net.server()){
+                            Log.info("Read {0} of length {1} from {2}", output, length, fromID);
+                        }
 
                         Core.app.post(() -> {
                             if(Net.server()){
@@ -61,7 +63,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                                 }else{
                                     Log.err("Unknown user with ID: {0}", fromID);
                                 }
-                            }else if(fromID == currentServer.getAccountID()){
+                            }else if(Net.client() && currentServer != null && fromID == currentServer.getAccountID()){
                                 Core.app.post(() -> Net.handleClientReceived(output));
                             }
                         });
@@ -361,7 +363,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
                 writeBuffer.position(0);
                 serializer.write(writeBuffer, object);
                 writeBuffer.flip();
-                Log.info("Send {0} to {1} mode {2}", object, sid.getAccountID(), mode);
+                //Log.info("Send {0} to {1} mode {2}", object, sid.getAccountID(), mode);
 
                 snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
