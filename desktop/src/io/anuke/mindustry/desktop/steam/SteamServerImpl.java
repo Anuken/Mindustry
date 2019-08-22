@@ -6,8 +6,11 @@ import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.async.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Packets.*;
 
 import java.io.*;
 import java.nio.*;
@@ -17,6 +20,7 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
 
     private final PacketSerializer serializer = new PacketSerializer();
     private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
+    private final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
     private final SteamNetworking snet = new SteamNetworking(this);
     private final SteamMatchmaking smat = new SteamMatchmaking(this);
     private final SteamFriendsImpl friends = new SteamFriendsImpl();
@@ -29,6 +33,35 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
 
     public SteamServerImpl(ServerProvider server){
         this.server = server;
+
+        //start recieving packets
+        Threads.daemon(() -> {
+            int length;
+            SteamID from = new SteamID();
+            while(true){
+                while((length = snet.isP2PPacketAvailable(0)) != 0){
+                    try{
+                        readBuffer.position(0);
+                        snet.readP2PPacket(from, readBuffer, 0);
+                        int fromID = from.getAccountID();
+                        Object output = serializer.read(readBuffer);
+
+                        Core.app.post(() -> {
+                            SteamConnection con = steamConnections.get(fromID);
+                            if(con != null){
+                                Net.handleServerReceived(con.id, output);
+                            }else{
+                                Log.err("Unknown user with ID: {0}", fromID);
+                            }
+                        });
+                    }catch(SteamException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                Threads.sleep(1000 / 10);
+            }
+        });
     }
 
     //server overrides
@@ -43,13 +76,14 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
     public void close(){
         server.close();
         if(currentLobby != null){
-            //TODO kick everyone who is in this lobby?
             smat.leaveLobby(currentLobby);
-            currentLobby = null;
             for(SteamConnection con : steamConnections.values()){
                 con.close();
             }
+            currentLobby = null;
         }
+
+        steamConnections.clear();
     }
 
     @Override
@@ -120,6 +154,7 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
         Log.info("Lobby {1} created? {0}", result, steamIDLobby.getAccountID());
         if(result == SteamResult.OK){
             currentLobby = steamIDLobby;
+            friends.friends.activateGameOverlayInviteDialog(currentLobby);
         }
     }
 
@@ -132,7 +167,16 @@ public class SteamServerImpl implements ServerProvider, SteamNetworkingCallback,
 
     @Override
     public void onP2PSessionConnectFail(SteamID steamIDRemote, P2PSessionError sessionError){
+        Log.info("{0} has disconnected: {1}", steamIDRemote.getAccountID(), sessionError);
 
+        if(Net.server()){
+            int id = steamIDRemote.getAccountID();
+
+            if(steamConnections.containsKey(id)){
+                Net.handleServerReceived(id, new Disconnect());
+                steamConnections.remove(id);
+            }
+        }
     }
 
     @Override
