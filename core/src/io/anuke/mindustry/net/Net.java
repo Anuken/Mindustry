@@ -91,6 +91,11 @@ public class Net{
         packetQueue.clear();
     }
 
+    public static void setClientConnected(){
+        active = true;
+        server = false;
+    }
+
     /**
      * Connect to an address.
      */
