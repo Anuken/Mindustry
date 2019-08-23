@@ -27,7 +27,7 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopPlatform extends Platform{
-    static boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = true;
+    static boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = false;
     final static String applicationId = "610508934456934412";
     String[] args;
 
