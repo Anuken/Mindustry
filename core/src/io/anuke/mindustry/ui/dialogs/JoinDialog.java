@@ -158,8 +158,7 @@ public class JoinDialog extends FloatingDialog{
 
             button.row();
 
-            server.content = button.table(t -> {
-            }).grow().get();
+            server.content = button.table(t -> {}).grow().get();
 
             remote.row();
         }
@@ -183,6 +182,11 @@ public class JoinDialog extends FloatingDialog{
 
     void setupServer(Server server, Host host){
         server.lastHost = host;
+        server.content.clear();
+        server.content.table(t -> setupHostTable(t, host)).expand().left().bottom().padLeft(12f).padBottom(8);
+    }
+
+    void setupHostTable(Table content, Host host){
         String versionString;
 
         if(host.version == -1){
@@ -199,15 +203,12 @@ public class JoinDialog extends FloatingDialog{
             versionString = Core.bundle.format("server.version", host.version, host.versionType);
         }
 
-        server.content.clear();
+        content.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
+        content.row();
+        content.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players == 0 ? host.players : "[accent]" + host.players + "[lightgray]") : Core.bundle.format("players.single", "[accent]" + host.players + "[lightgray]"))).left();
+        content.row();
+        content.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
 
-        server.content.table(t -> {
-            t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
-            t.row();
-            t.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players == 0 ? host.players : "[accent]" + host.players + "[lightgray]") : Core.bundle.format("players.single", "[accent]" + host.players + "[lightgray]"))).left();
-            t.row();
-            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
-        }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
     void setup(){
@@ -299,12 +300,11 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("[accent]" + host.name, "clear", () -> connect(host.address, port))
-        .width(w).height(80f).pad(4f).get();
-        button.left();
-        button.row();
-        button.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players) :
-        Core.bundle.format("players.single", host.players))).padBottom(5);
+        local.addButton(b -> {
+            b.margin(5f);
+            b.left();
+            setupHostTable(b, host);
+        }, "clear", () -> connect(host.address, port)).width(w).pad(4f).get();
     }
 
     void connect(String ip, int port){
