@@ -142,6 +142,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void discover(Consumer<Host> callback, Runnable done){
+        smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
         lobbyDoneCallback = done;
@@ -275,6 +276,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void onLobbyMatchList(int matches){
+        Log.info("found {0} matches", matches);
 
         if(lobbyDoneCallback != null){
             for(int i = 0; i < matches; i++){
