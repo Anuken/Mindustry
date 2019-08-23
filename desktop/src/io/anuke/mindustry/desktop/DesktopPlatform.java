@@ -57,9 +57,7 @@ public class DesktopPlatform extends Platform{
                         t.touchable(Touchable.disabled);
                         t.top().left();
                         t.update(t::toFront);
-                        t.table("guideDim", f -> {
-                            label[0] = f.add("").get();
-                        });
+                        t.table("guideDim", f -> label[0] = f.add("").get());
                     });
 
                     Log.setLogger(new LogHandler(){
@@ -143,7 +141,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void updateRPC(){
         if(!useDiscord) return;
-        Log.info("Updating discord RPC status.");
 
         DiscordRichPresence presence = new DiscordRichPresence();
 
