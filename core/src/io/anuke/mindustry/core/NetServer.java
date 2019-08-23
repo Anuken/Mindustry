@@ -85,6 +85,7 @@ public class NetServer implements ApplicationListener{
             String uuid = packet.uuid;
 
             NetConnection connection = Net.getConnection(id);
+            Log.info("\n\nGET CONNECT\n\n");
 
             if(connection == null ||
             admins.isIPBanned(connection.address)) return;
@@ -137,8 +138,6 @@ public class NetServer implements ApplicationListener{
                 kick(id, KickReason.nameEmpty);
                 return;
             }
-
-            Log.debug("Recieved connect packet for player '{0}' / UUID {1} / IP {2}", packet.name, uuid, connection.address);
 
             String ip = Net.getConnection(id).address;
 
