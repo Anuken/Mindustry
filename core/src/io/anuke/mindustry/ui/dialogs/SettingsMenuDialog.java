@@ -241,7 +241,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", false);
-        graphics.checkPref("animatedshields", !mobile);
+        if(Shaders.shield != null){
+            graphics.checkPref("animatedshields", !mobile);
+        }
         graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
         graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false);

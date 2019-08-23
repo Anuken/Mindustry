@@ -256,7 +256,7 @@ public class Renderer implements ApplicationListener{
         draw(playerGroup, p -> true, Player::drawBuildRequests);
 
         if(Entities.countInBounds(shieldGroup) > 0){
-            if(settings.getBool("animatedshields")){
+            if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.CLEAR);
