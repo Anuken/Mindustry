@@ -84,9 +84,6 @@ public class DesktopPlatform extends Platform{
                 if(!SteamAPI.init()){
                     Log.info("Steam client not running. Make sure Steam is running!");
                 }else{
-                    //times per second
-                    float interval = 20f;
-                    Interval i = new Interval();
 
                     //run steam callbacks
                     Events.on(GameLoadEvent.class, event -> {
@@ -94,10 +91,8 @@ public class DesktopPlatform extends Platform{
                         Core.app.addListener(new ApplicationListener(){
                             @Override
                             public void update(){
-                                if(i.get(interval)){
-                                    if(SteamAPI.isSteamRunning()){
-                                        SteamAPI.runCallbacks();
-                                    }
+                                if(SteamAPI.isSteamRunning()){
+                                    SteamAPI.runCallbacks();
                                 }
                             }
                         });
