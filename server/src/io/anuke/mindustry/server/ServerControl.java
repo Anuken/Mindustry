@@ -643,6 +643,13 @@ public class ServerControl implements ApplicationListener{
                 info("Nobody with that name could be found.");
             }
         });
+
+        handler.register("gc", "Trigger a grabage collection. Testing onlu.", arg -> {
+            int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            System.gc();
+            int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
+        });
     }
 
     private void readCommands(){

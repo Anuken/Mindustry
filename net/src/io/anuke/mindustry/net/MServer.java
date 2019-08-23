@@ -6,7 +6,6 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mnet.*;
-import io.anuke.mnet.MServerSocket;
 
 import java.io.*;
 import java.net.*;
@@ -18,11 +17,27 @@ public class MServer implements ServerProvider, ApplicationListener{
     MServerSocket socket;
 
     public MServer(){
-        Events.on(AppLoadEvent.class, e -> {
-            Core.app.addListener(this);
-        });
+        Events.on(AppLoadEvent.class, event -> Core.app.addListener(this));
     }
 
+    @Override
+    public void update(){
+        if(socket == null) return;
+
+        socket.update();
+        for(MSocket socket : socket.getSockets()){
+            MConnectionImpl c = socket.getUserData();
+            socket.update((s, msg) -> Core.app.post(() -> {
+                try{
+                    Net.handleServerReceived(c.id, msg);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }));
+        }
+    }
+
+    @Override
     public void host(int port) throws IOException{
         socket = new MServerSocket(port, con -> {
             MSocket sock = con.accept(null);
@@ -61,30 +76,17 @@ public class MServer implements ServerProvider, ApplicationListener{
         connections.clear();
     }
 
-    public void update(){
-        if(socket == null) return;
-
-        socket.update();
-        for(MSocket socket : socket.getSockets()){
-            MConnectionImpl c = socket.getUserData();
-            socket.update((s, msg) -> Core.app.post(() -> {
-                try{
-                    Net.handleServerReceived(c.id, msg);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }));
-        }
-    }
-
+    @Override
     public void close(){
         if(socket != null) socket.close();
     }
 
+    @Override
     public Iterable<? extends NetConnection> getConnections(){
         return connections;
     }
 
+    @Override
     public MConnectionImpl getByID(int id){
         for(MConnectionImpl n : connections){
             if(n.id == id){

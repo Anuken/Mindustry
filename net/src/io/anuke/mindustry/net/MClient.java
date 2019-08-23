@@ -7,8 +7,6 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mnet.*;
-import io.anuke.mnet.MSocket;
-import io.anuke.mnet.MSocketImpl;
 
 import java.io.*;
 import java.net.*;
@@ -21,13 +19,11 @@ public class MClient implements ClientProvider, ApplicationListener{
     MSocket socket;
 
     public MClient(){
-        Events.on(AppLoadEvent.class, e -> {
-            Core.app.addListener(this);
-        });
+        Events.on(AppLoadEvent.class, event -> Core.app.addListener(this));
     }
 
     public void connect(String ip, int port, Runnable success) throws IOException{
-        socket = new MSocketImpl(InetAddress.getByName(ip), port, new PacketSerializer());
+        socket = new MSocket(InetAddress.getByName(ip), port, new PacketSerializer());
         socket.addDcListener((sock, reason) -> Core.app.post(() -> Net.handleClientReceived(new Disconnect())));
         socket.connectAsync(null, 2000, response -> {
             if(response.getType() == ResponseType.ACCEPTED){
@@ -41,6 +37,20 @@ public class MClient implements ClientProvider, ApplicationListener{
                 Core.app.post(() -> Net.showError(new IOException("connection refused")));
             }
         });
+    }
+
+    @Override
+    public void update(){
+        if(socket == null) return;
+
+        socket.update((sock, object) -> Core.app.post(() -> {
+            try{
+                Net.handleClientReceived(object);
+            }catch(Exception e){
+                Net.showError(e);
+                netClient.disconnectQuietly();
+            }
+        }));
     }
 
     @Override
@@ -59,19 +69,6 @@ public class MClient implements ClientProvider, ApplicationListener{
         }else{
             socket.sendUnreliable(object);
         }
-    }
-
-    public void update(){
-        if(socket == null) return;
-
-        socket.update((sock, object) -> Core.app.post(() -> {
-            try{
-                Net.handleClientReceived(object);
-            }catch(Exception e){
-                Net.showError(e);
-                netClient.disconnectQuietly();
-            }
-        }));
     }
 
     public int getPing(){
