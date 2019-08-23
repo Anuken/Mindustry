@@ -30,7 +30,9 @@ public class MClient implements ClientProvider, ApplicationListener{
             if(response.getType() == ResponseType.ACCEPTED){
                 Core.app.post(() -> {
                     success.run();
-                    Net.handleClientReceived(new Connect());
+                    Connect c = new Connect();
+                    c.addressTCP = ip;
+                    Net.handleClientReceived(c);
                 });
             }else if(response.getType() == ResponseType.WRONG_STATE){
                 Core.app.post(() -> Net.showError(new IOException("alreadyconnected")));

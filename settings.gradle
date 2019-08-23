@@ -26,7 +26,6 @@ if(!hasProperty("release")){
         use(':Arc:extensions')
         use(':Arc:extensions:freetype')
         use(':Arc:extensions:recorder')
-        use(':Arc:extensions:arcnet')
         use(':Arc:extensions:mnet')
         use(':Arc:extensions:packer')
         use(':Arc:backends')

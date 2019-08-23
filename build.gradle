@@ -232,7 +232,6 @@ project(":core"){
         compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
-        compile arcModule("extensions:arcnet")
         compile arcModule("extensions:mnet")
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
