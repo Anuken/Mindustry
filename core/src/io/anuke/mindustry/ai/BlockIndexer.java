@@ -119,7 +119,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.ordinal()];
         for(Tile tile : set){
-            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) && !(tile.block() instanceof BuildBlock)){
+            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
             }
         }

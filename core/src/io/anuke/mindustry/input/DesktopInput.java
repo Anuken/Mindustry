@@ -131,7 +131,7 @@ public class DesktopInput extends InputHandler{
             player.isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !ui.chatfrag.chatOpen() && !(scene.getKeyboardFocus() instanceof TextField)){
+        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && (scene.getKeyboardFocus() == ui.minimap || !scene.hasDialog()) && !ui.chatfrag.chatOpen() && !(scene.getKeyboardFocus() instanceof TextField)){
             if(!ui.minimap.isShown()){
                 ui.minimap.show();
             }else{

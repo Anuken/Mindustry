@@ -26,8 +26,10 @@ public class Stats{
     public RankResult calculateRank(Zone zone, boolean launched){
         float score = 0;
 
-        //each new launch period adds onto the rank 'points'
-        if(wavesLasted >= zone.conditionWave){
+        if(launched && zone.getRules().attackMode){
+            score += 3f;
+        }else if(wavesLasted >= zone.conditionWave){
+            //each new launch period adds onto the rank 'points'
             score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.2f;
         }
 

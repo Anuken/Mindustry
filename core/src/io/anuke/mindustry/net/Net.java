@@ -1,19 +1,18 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.BiConsumer;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Streamable.StreamBuilder;
+import io.anuke.mindustry.net.Streamable.*;
+import net.jpountz.lz4.*;
 
-import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
+import java.io.*;
+import java.nio.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,6 +27,8 @@ public class Net{
     private static ClientProvider clientProvider;
     private static ServerProvider serverProvider;
     private static IntMap<StreamBuilder> streams = new IntMap<>();
+    private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+    private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     /** Display a network error. Call on the graphics thread. */
     public static void showError(Throwable e){
@@ -144,11 +145,11 @@ public class Net{
     }
 
     public static byte[] compressSnapshot(byte[] input){
-        return serverProvider.compressSnapshot(input);
+        return compressor.compress(input);
     }
 
     public static byte[] decompressSnapshot(byte[] input, int size){
-        return clientProvider.decompressSnapshot(input, size);
+        return decompressor.decompress(input, size);
     }
 
     /**
@@ -162,8 +163,8 @@ public class Net{
     /**
      * Returns a list of all connections IDs.
      */
-    public static Array<NetConnection> getConnections(){
-        return (Array<NetConnection>)serverProvider.getConnections();
+    public static Iterable<NetConnection> getConnections(){
+        return (Iterable<NetConnection>)serverProvider.getConnections();
     }
 
     /**
@@ -326,7 +327,7 @@ public class Net{
 
     public static void dispose(){
         if(clientProvider != null) clientProvider.dispose();
-        if(serverProvider != null) serverProvider.dispose();
+        if(serverProvider != null) serverProvider.close();
         clientProvider = null;
         serverProvider = null;
         server = false;
@@ -354,9 +355,6 @@ public class Net{
         /** Disconnect from the server. */
         void disconnect();
 
-        /** Decompress an input snapshot byte array. */
-        byte[] decompressSnapshot(byte[] input, int size);
-
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
          * Callback should be run on libGDX main thread.
@@ -377,30 +375,61 @@ public class Net{
         void host(int port) throws IOException;
 
         /** Sends a large stream of data to a specific client. */
-        void sendStream(int id, Streamable stream);
+        default void sendStream(int id, Streamable stream){
+            NetConnection connection = getByID(id);
+            if(connection == null) return;
+            try{
+                int cid;
+                StreamBegin begin = new StreamBegin();
+                begin.total = stream.stream.available();
+                begin.type = Registrator.getID(stream.getClass());
+                connection.send(begin, SendMode.tcp);
+                cid = begin.id;
 
-        /** Send an object to everyone connected. */
-        void send(Object object, SendMode mode);
+                while(stream.stream.available() > 0){
+                    byte[] bytes = new byte[Math.min(512, stream.stream.available())];
+                    stream.stream.read(bytes);
 
-        /** Send an object to a specific client ID. */
-        void sendTo(int id, Object object, SendMode mode);
+                    StreamChunk chunk = new StreamChunk();
+                    chunk.id = cid;
+                    chunk.data = bytes;
+                    connection.send(chunk, SendMode.tcp);
+                }
+            }catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
 
-        /** Send an object to everyone <i>except</i> a client ID. */
-        void sendExcept(int id, Object object, SendMode mode);
+        default void send(Object object, SendMode mode){
+            for(NetConnection con : getConnections()){
+                con.send(object, mode);
+            }
+        }
+
+        default void sendTo(int id, Object object, SendMode mode){
+            NetConnection conn = getByID(id);
+            if(conn == null){
+                Log.err("Failed to find connection with ID {0}.", id);
+                return;
+            }
+            conn.send(object, mode);
+        }
+
+        default void sendExcept(int id, Object object, SendMode mode){
+            for(NetConnection con : getConnections()){
+                if(con.id != id){
+                    con.send(object, mode);
+                }
+            }
+        }
 
         /** Close the server connection. */
         void close();
 
-        /** Compress an input snapshot byte array. */
-        byte[] compressSnapshot(byte[] input);
-
         /** Return all connected users. */
-        Array<? extends NetConnection> getConnections();
+        Iterable<? extends NetConnection> getConnections();
 
         /** Returns a connection by ID. */
         NetConnection getByID(int id);
-
-        /** Close all connections. */
-        void dispose();
     }
 }

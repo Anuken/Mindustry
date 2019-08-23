@@ -242,9 +242,9 @@ public class HudFragment extends Fragment{
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
-                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left();
+                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style("outline");
                 info.row();
-                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left();
+                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left().style("outline");
             }).top().left();
         });
 

@@ -67,7 +67,7 @@ public class Drill extends Block{
         hasItems = true;
 
         idleSound = Sounds.drill;
-        idleSoundVolume = 0.002f;
+        idleSoundVolume = 0.003f;
     }
 
     @Override

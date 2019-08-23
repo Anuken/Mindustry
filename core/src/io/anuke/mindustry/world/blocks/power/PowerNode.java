@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -20,9 +21,7 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    //last distribution block placed
-    public static int lastPlaced = -1;
-
+    protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
 
@@ -100,22 +99,10 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void playerPlaced(Tile tile){
-        Tile before = world.tile(lastPlaced);
-
-        if(linkValid(tile, before) && !before.entity.proximity().contains(tile)){
-            Call.linkPowerNodes(null, tile, before);
-        }
-
-        lastPlaced = tile.pos();
-        super.playerPlaced(tile);
-    }
-
-    @Override
     public void placed(Tile tile){
         if(Net.client()) return;
 
-        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
+        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
@@ -130,6 +117,28 @@ public class PowerNode extends PowerBlock{
         tempTiles.each(valid, other -> Call.linkPowerNodes(null, tile, other));
 
         super.placed(tile);
+    }
+
+    private void getPotentialLinks(Tile tile, Consumer<Tile> others){
+        Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
+        ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
+        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize)
+        && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
+
+        tempTiles.clear();
+        graphs.clear();
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+            Tile other = world.ltile(x, y);
+            if(valid.test(other)){
+                tempTiles.add(other);
+            }
+        });
+
+        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.each(valid, t -> {
+            graphs.add(t.entity.power.graph);
+            others.accept(t);
+        });
     }
 
     @Override
@@ -213,6 +222,11 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
+        getPotentialLinks(tile, other -> {
+            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
+        });
+
+        /*
         for(int cx = (int)(x - laserRange - 1); cx <= x + laserRange + 1; cx++){
             for(int cy = (int)(y - laserRange - 1); cy <= y + laserRange + 1; cy++){
                 Tile link = world.ltile(cx, cy);
@@ -221,7 +235,7 @@ public class PowerNode extends PowerBlock{
                     Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 2f, link.pos() == lastPlaced ? Pal.place : Pal.accent);
                 }
             }
-        }
+        }*/
 
         Draw.reset();
     }

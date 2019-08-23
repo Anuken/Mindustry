@@ -188,7 +188,8 @@
       up: button,
       over: button-over,
       imageDisabledColor: gray,
-      imageUpColor: white
+      imageUpColor: white,
+      disabled: button-disabled
     },
     node: {
       up: button-over,

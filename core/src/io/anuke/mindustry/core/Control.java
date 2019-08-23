@@ -84,7 +84,7 @@ public class Control implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(defaultTeam);
+            player.setTeam(state.rules.pvp ? netServer.assignTeam(player, playerGroup.all()) : defaultTeam);
             player.setDead(true);
             player.add();
 
@@ -237,7 +237,7 @@ public class Control implements ApplicationListener{
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
-            world.loadMap(map);
+            world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
         });
@@ -350,35 +350,37 @@ public class Control implements ApplicationListener{
 
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
-            FloatingDialog dialog = new FloatingDialog("$confirm");
+            Core.app.post(() -> Core.app.post(() -> {
+                FloatingDialog dialog = new FloatingDialog("$confirm");
+                dialog.setFillParent(true);
 
-            float[] countdown = {60 * 11};
-            Runnable exit = () -> {
-                Core.settings.put("uiscale", 100);
-                Core.settings.put("uiscalechanged", false);
-                settings.save();
-                dialog.hide();
-                Core.app.exit();
-            };
+                float[] countdown = {60 * 11};
+                Runnable exit = () -> {
+                    Core.settings.put("uiscale", 100);
+                    Core.settings.put("uiscalechanged", false);
+                    settings.save();
+                    dialog.hide();
+                    Core.app.exit();
+                };
 
-            dialog.setFillParent(false);
-            dialog.cont.label(() -> {
-                if(countdown[0] <= 0){
-                    exit.run();
-                }
-                return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
-            }).pad(10f).expand().left();
+                dialog.cont.label(() -> {
+                    if(countdown[0] <= 0){
+                        exit.run();
+                    }
+                    return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
+                }).pad(10f).expand().center();
 
-            dialog.buttons.defaults().size(200f, 60f);
-            dialog.buttons.addButton("$uiscale.cancel", exit);
+                dialog.buttons.defaults().size(200f, 60f);
+                dialog.buttons.addButton("$uiscale.cancel", exit);
 
-            dialog.buttons.addButton("$ok", () -> {
-                Core.settings.put("uiscalechanged", false);
-                settings.save();
-                dialog.hide();
-            });
+                dialog.buttons.addButton("$ok", () -> {
+                    Core.settings.put("uiscalechanged", false);
+                    settings.save();
+                    dialog.hide();
+                });
 
-            Core.app.post(dialog::show);
+                dialog.show();
+            }));
         }
     }
 

@@ -26,8 +26,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     protected IOSApplication createApplication(){
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
+        Net.setClientProvider(new MClient());
+        Net.setServerProvider(new MServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             UnitScl.dp.addition = 0.5f;
@@ -40,7 +40,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             @Override
             public void shareFile(FileHandle file){
                 Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name()/* + ".png"*/);
+                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                 file.copyTo(to);
 
                 NSURL url = new NSURL(to.file());
@@ -53,7 +53,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void beginForceLandscape(){
-                Log.info("begin force landscape");
                 forced = true;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }

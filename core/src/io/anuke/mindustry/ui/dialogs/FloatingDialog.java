@@ -39,18 +39,6 @@ public class FloatingDialog extends Dialog{
                 state.set(State.paused);
             }
         });
-
-        boolean[] done = {false};
-
-        shown(() -> Core.app.post(() ->
-        forEach(child -> {
-            if(done[0]) return;
-
-            if(child instanceof ScrollPane){
-                Core.scene.setScrollFocus(child);
-                done[0] = true;
-            }
-        })));
     }
 
     public FloatingDialog(String title){
@@ -59,8 +47,9 @@ public class FloatingDialog extends Dialog{
 
     protected void onResize(Runnable run){
         Events.on(ResizeEvent.class, event -> {
-            if(isShown()){
+            if(isShown() && Core.scene.getDialog() == this){
                 run.run();
+                updateScrollFocus();
             }
         });
     }

@@ -220,6 +220,10 @@ public class World implements ApplicationListener{
     }
 
     public void loadMap(Map map){
+        loadMap(map, new Rules());
+    }
+
+    public void loadMap(Map map, Rules checkRules){
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Exception e){
@@ -238,20 +242,21 @@ public class World implements ApplicationListener{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.get(defaultTeam).cores.size == 0){
+            if(state.teams.get(defaultTeam).cores.size == 0 && !checkRules.pvp){
                 ui.showError("$map.nospawn");
                 invalidMap = true;
-            }else if(state.rules.pvp){ //pvp maps need two cores to be valid
-                invalidMap = true;
+            }else if(checkRules.pvp){ //pvp maps need two cores to be valid
+                int teams = 0;
                 for(Team team : Team.all){
-                    if(state.teams.get(team).cores.size != 0 && team != defaultTeam){
-                        invalidMap = false;
+                    if(state.teams.get(team).cores.size != 0){
+                        teams ++;
                     }
                 }
-                if(invalidMap){
+                if(teams < 2){
+                    invalidMap = true;
                     ui.showError("$map.nospawn.pvp");
                 }
-            }else if(state.rules.attackMode){ //pvp maps need two cores to be valid
+            }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
                     ui.showError("$map.nospawn.attack");
