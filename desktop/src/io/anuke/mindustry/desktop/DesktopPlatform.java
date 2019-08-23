@@ -73,7 +73,6 @@ public class DesktopPlatform extends Platform{
     @Override
     public void updateRPC(){
         if(!useDiscord) return;
-        Log.info("Updating discord RPC status.");
 
         DiscordRichPresence presence = new DiscordRichPresence();
 

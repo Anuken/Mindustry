@@ -1,6 +1,6 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.function.*;
 import io.anuke.arc.net.*;
 import io.anuke.arc.net.FrameworkMessage.*;
 import io.anuke.arc.util.pooling.*;

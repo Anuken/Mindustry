@@ -39,6 +39,8 @@ public class MServer implements ServerProvider, ApplicationListener{
 
     @Override
     public void host(int port) throws IOException{
+        close();
+
         socket = new MServerSocket(port, con -> {
             MSocket sock = con.accept(null);
 
@@ -78,7 +80,10 @@ public class MServer implements ServerProvider, ApplicationListener{
 
     @Override
     public void close(){
-        if(socket != null) socket.close();
+        if(socket != null){
+            socket.close();
+            socket = null;
+        }
     }
 
     @Override

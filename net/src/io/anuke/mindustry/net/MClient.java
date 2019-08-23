@@ -3,6 +3,7 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.async.*;
+import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -23,7 +24,7 @@ public class MClient implements ClientProvider, ApplicationListener{
     }
 
     public void connect(String ip, int port, Runnable success) throws IOException{
-        socket = new MSocket(InetAddress.getByName(ip), port, new PacketSerializer());
+        socket = new MSocket(InetAddress.getByName(ip), port, PacketSerializer::new);
         socket.addDcListener((sock, reason) -> Core.app.post(() -> Net.handleClientReceived(new Disconnect())));
         socket.connectAsync(null, 2000, response -> {
             if(response.getType() == ResponseType.ACCEPTED){
@@ -43,14 +44,14 @@ public class MClient implements ClientProvider, ApplicationListener{
     public void update(){
         if(socket == null) return;
 
-        socket.update((sock, object) -> Core.app.post(() -> {
+        socket.update((sock, object) -> {
             try{
                 Net.handleClientReceived(object);
             }catch(Exception e){
                 Net.showError(e);
                 netClient.disconnectQuietly();
             }
-        }));
+        });
     }
 
     @Override
@@ -69,6 +70,8 @@ public class MClient implements ClientProvider, ApplicationListener{
         }else{
             socket.sendUnreliable(object);
         }
+
+        Pools.free(object);
     }
 
     public int getPing(){
