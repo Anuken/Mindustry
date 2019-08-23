@@ -67,6 +67,6 @@ public class Mindustry extends ApplicationCore{
         super.init();
 
         Log.info("Time to load [total]: {0}", Time.elapsed());
-        Events.fire(new GameLoadEvent());
+        Events.fire(new ClientLoadEvent());
     }
 }

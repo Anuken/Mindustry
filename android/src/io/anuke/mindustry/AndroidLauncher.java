@@ -129,8 +129,8 @@ public class AndroidLauncher extends AndroidApplication{
         }
 
         config.hideStatusBar = true;
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
+        Net.setClientProvider(new MClient());
+        Net.setServerProvider(new MServer());
         initialize(new Mindustry(), config);
         checkFiles(getIntent());
     }

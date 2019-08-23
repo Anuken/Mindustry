@@ -6,7 +6,6 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
@@ -18,7 +17,6 @@ import static io.anuke.mindustry.Vars.*;
 public class ArcNetServer implements ServerProvider{
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
-    final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
     Thread serverThread;
 
     public ArcNetServer(){
@@ -85,11 +83,6 @@ public class ArcNetServer implements ServerProvider{
         };
 
         server.addListener(listener);
-    }
-
-    @Override
-    public byte[] compressSnapshot(byte[] input){
-        return compressor.compress(input);
     }
 
     @Override
