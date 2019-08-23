@@ -154,7 +154,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void host(int port) throws IOException{
-        smat.createLobby(LobbyType.values()[Core.settings.getInt("lobbytype", 1)], 32);
+        smat.createLobby(LobbyType.values()[Core.settings.getInt("lobbytype", 2)], 32);
     }
 
     @Override
@@ -275,6 +275,7 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
 
     @Override
     public void onLobbyMatchList(int matches){
+
         if(lobbyDoneCallback != null){
             for(int i = 0; i < matches; i++){
                 SteamID lobby = smat.getLobbyByIndex(i);
