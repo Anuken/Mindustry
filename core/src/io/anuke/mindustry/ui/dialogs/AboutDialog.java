@@ -43,6 +43,10 @@ public class AboutDialog extends FloatingDialog{
                 continue;
             }
 
+            if(steam && (link.name.contains("itch") || link.name.contains("google"))){
+                continue;
+            }
+
             Table table = new Table("underline");
             table.margin(0);
             table.table(img -> {
