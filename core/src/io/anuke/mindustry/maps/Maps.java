@@ -215,7 +215,7 @@ public class Maps implements Disposable{
             return filters;
         }else{
             try{
-                return JsonIO.read(Array.class, str);
+                return JsonIO.read(Array.class, str.replace("mindustrz", "mindustry"));
             }catch(Exception e){
                 e.printStackTrace();
                 return readFilters("");
