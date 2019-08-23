@@ -8,8 +8,8 @@ public class ServerLauncher{
 
     public static void main(String[] args){
         try{
-            Net.setClientProvider(new ArcNetClient());
-            Net.setServerProvider(new ArcNetServer());
+            Net.setClientProvider(new MClient());
+            Net.setServerProvider(new MServer());
             new HeadlessApplication(new MindustryServer(args), null, throwable -> CrashSender.send(throwable, f -> {}));
         }catch(Throwable t){
             CrashSender.send(t, f -> {});

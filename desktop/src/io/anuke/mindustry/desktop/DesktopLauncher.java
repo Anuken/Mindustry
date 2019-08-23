@@ -1,4 +1,5 @@
 package io.anuke.mindustry.desktop;
+
 import io.anuke.arc.Files.*;
 import io.anuke.arc.backends.sdl.*;
 import io.anuke.mindustry.*;
@@ -11,8 +12,8 @@ public class DesktopLauncher{
         try{
             Platform.instance = new DesktopPlatform(arg);
 
-            Net.setClientProvider(new ArcNetClient());
-            Net.setServerProvider(new ArcNetServer());
+            Net.setClientProvider(new MClient());
+            Net.setServerProvider(new MServer());
 
             new SdlApplication(new Mindustry(), new SdlConfig(){{
                 title = "Mindustry";

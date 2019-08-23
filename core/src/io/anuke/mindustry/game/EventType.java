@@ -27,8 +27,13 @@ public class EventType{
         }
     }
 
-    /** Called when the game is first loaded. */
-    public static class GameLoadEvent{
+    /** Called when the client game is first loaded. */
+    public static class ClientLoadEvent{
+
+    }
+
+    /** Called when the core app is first loaded. */
+    public static class AppLoadEvent{
 
     }
 

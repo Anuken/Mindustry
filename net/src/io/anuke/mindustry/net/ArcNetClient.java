@@ -8,7 +8,6 @@ import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.net.*;
@@ -20,7 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class ArcNetClient implements ClientProvider{
     final Client client;
     final Supplier<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
-    final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public ArcNetClient(){
         client = new Client(8192, 4096, new PacketSerializer());
@@ -73,14 +71,6 @@ public class ArcNetClient implements ClientProvider{
         }catch(Exception e){
             return false;
         }
-    }
-
-
-    @Override
-    public byte[] decompressSnapshot(byte[] input, int size){
-        byte[] result = new byte[size];
-        decompressor.decompress(input, result);
-        return result;
     }
 
     @Override

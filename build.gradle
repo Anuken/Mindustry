@@ -229,9 +229,11 @@ project(":core"){
 
         compileJava.dependsOn(preGen)
 
+        compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
+        compile arcModule("extensions:mnet")
         if(localArc() && debugged()) compile arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -294,7 +296,6 @@ project(":net"){
 
     dependencies{
         compile project(":core")
-        compile "org.lz4:lz4-java:1.4.1"
     }
 }
 
