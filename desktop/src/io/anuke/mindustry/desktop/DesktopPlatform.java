@@ -27,7 +27,7 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopPlatform extends Platform{
-    static boolean useDiscord = OS.is64Bit, useSteam = true;
+    static boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = false;
     final static String applicationId = "610508934456934412";
     String[] args;
 
@@ -49,34 +49,36 @@ public class DesktopPlatform extends Platform{
         }
 
         if(useSteam){
-            Events.on(GameLoadEvent.class, event -> {
-                Label[] label = {null};
-                Core.scene.table(t -> {
-                    t.touchable(Touchable.disabled);
-                    t.top().left();
-                    t.update(t::toFront);
-                    t.table("guideDim", f -> {
-                        label[0] = f.add("").get();
+            if(showConsole){
+                Events.on(GameLoadEvent.class, event -> {
+                    Label[] label = {null};
+                    Core.scene.table(t -> {
+                        t.touchable(Touchable.disabled);
+                        t.top().left();
+                        t.update(t::toFront);
+                        t.table("guideDim", f -> {
+                            label[0] = f.add("").get();
+                        });
+                    });
+
+                    Log.setLogger(new LogHandler(){
+                        @Override
+                        public void print(String text, Object... args){
+                            super.print(text, args);
+                            String out = Log.format(text, false, args);
+
+                            int maxlen = 2048;
+
+                            if(label[0].getText().length() > maxlen){
+                                label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
+                            }
+
+                            label[0].getText().append(out).append("\n");
+                            label[0].invalidateHierarchy();
+                        }
                     });
                 });
-
-                Log.setLogger(new LogHandler(){
-                    @Override
-                    public void print(String text, Object... args){
-                        super.print(text, args);
-                        String out = Log.format(text, false, args);
-
-                        int maxlen = 2048;
-
-                        if(label[0].getText().length() > maxlen){
-                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
-                        }
-
-                        label[0].getText().append(out).append("\n");
-                        label[0].invalidateHierarchy();
-                    }
-                });
-            });
+            }
 
             Vars.steam = true;
             try{
@@ -85,7 +87,6 @@ public class DesktopPlatform extends Platform{
                     Log.info("Steam client not running. Make sure Steam is running!");
                 }else{
                     //times per second
-                    float interval = 20f;
                     Interval i = new Interval();
 
                     //run steam callbacks
@@ -94,10 +95,8 @@ public class DesktopPlatform extends Platform{
                         Core.app.addListener(new ApplicationListener(){
                             @Override
                             public void update(){
-                                if(i.get(interval)){
-                                    if(SteamAPI.isSteamRunning()){
-                                        SteamAPI.runCallbacks();
-                                    }
+                                if(SteamAPI.isSteamRunning()){
+                                    SteamAPI.runCallbacks();
                                 }
                             }
                         });

@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
@@ -75,6 +76,11 @@ public class JoinDialog extends FloatingDialog{
             if(renaming != null){
                 field.setText(renaming.displayIP());
             }
+        });
+
+        keyDown(KeyCode.F5, () -> {
+            refreshLocal();
+            refreshRemote();
         });
 
         shown(() -> {
@@ -267,7 +273,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.clear();
         local.background((Drawable)null);
-        local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
+        local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
