@@ -33,6 +33,7 @@ packr-out/
 config/
 changelog
 *.gif
+/core/assets/saves/
 
 version.properties
 
