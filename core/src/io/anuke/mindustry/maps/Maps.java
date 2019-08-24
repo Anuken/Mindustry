@@ -227,8 +227,8 @@ public class Maps implements Disposable{
         int index = 0;
         for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
             OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.019f;
-            filter.scl += index/2f;
+            filter.threshold += index ++ * 0.018f;
+            filter.scl += index/2.1f;
             filter.ore = block;
             filters.add(filter);
         }
