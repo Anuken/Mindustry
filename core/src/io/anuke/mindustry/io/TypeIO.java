@@ -3,6 +3,7 @@ package io.anuke.mindustry.io;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.arc.graphics.Color;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.Entities;
@@ -11,6 +12,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.AdminAction;
@@ -175,6 +177,16 @@ public class TypeIO{
     @ReadClass(Team.class)
     public static Team readTeam(ByteBuffer buffer){
         return Team.all[buffer.get()];
+    }
+
+    @WriteClass(UnitCommand.class)
+    public static void writeUnitCommand(ByteBuffer buffer, UnitCommand reason){
+        buffer.put((byte)reason.ordinal());
+    }
+
+    @ReadClass(UnitCommand.class)
+    public static UnitCommand readUnitCommand(ByteBuffer buffer){
+        return UnitCommand.all[buffer.get()];
     }
 
     @WriteClass(AdminAction.class)

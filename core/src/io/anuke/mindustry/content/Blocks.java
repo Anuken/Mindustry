@@ -1,16 +1,14 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -24,16 +22,13 @@ import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 import io.anuke.mindustry.world.blocks.units.*;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.Attribute;
-import io.anuke.mindustry.world.modules.LiquidModule;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
-    public static final BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
-
     public static Block
 
     //environment
@@ -79,7 +74,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
+    commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -1648,17 +1643,23 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 10));
         }};
 
-        wraithFactory = new UnitFactory("wraith-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
-            type = UnitTypes.wraith;
-            produceTime = 750;
+        commandCenter = new CommandCenter("command-center"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
             size = 2;
-            consumes.power(0.6f);
+            health = size * size * 55;
+        }};
+
+        wraithFactory = new UnitFactory("wraith-factory"){{
+            requirements(Category.units, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
+            type = UnitTypes.wraith;
+            produceTime = 700;
+            size = 2;
+            consumes.power(0.5f);
             consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 5));
         }};
 
         ghoulFactory = new UnitFactory("ghoul-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
+            requirements(Category.units, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
             type = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
@@ -1667,7 +1668,7 @@ public class Blocks implements ContentList{
         }};
 
         revenantFactory = new UnitFactory("revenant-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
+            requirements(Category.units, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
             type = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
@@ -1676,7 +1677,7 @@ public class Blocks implements ContentList{
         }};
 
         daggerFactory = new UnitFactory("dagger-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 55, Items.silicon, 35));
+            requirements(Category.units, ItemStack.with(Items.lead, 55, Items.silicon, 35));
             type = UnitTypes.dagger;
             produceTime = 850;
             size = 2;
@@ -1685,7 +1686,7 @@ public class Blocks implements ContentList{
         }};
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 25, Items.silicon, 30));
+            requirements(Category.units, ItemStack.with(Items.lead, 25, Items.silicon, 30));
             type = UnitTypes.crawler;
             produceTime = 250;
             size = 2;
@@ -1695,7 +1696,7 @@ public class Blocks implements ContentList{
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
+            requirements(Category.units, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
             type = UnitTypes.titan;
             produceTime = 1050;
             size = 3;
@@ -1704,7 +1705,7 @@ public class Blocks implements ContentList{
         }};
 
         fortressFactory = new UnitFactory("fortress-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
+            requirements(Category.units, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
             type = UnitTypes.fortress;
             produceTime = 2000;
             size = 3;

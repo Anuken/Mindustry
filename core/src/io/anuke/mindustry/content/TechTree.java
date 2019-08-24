@@ -254,6 +254,7 @@ public class TechTree implements ContentList{
                         });
 
                         node(daggerFactory, () -> {
+                            node(commandCenter, () -> {});
                             node(crawlerFactory, () -> {
                                 node(titanFactory, () -> {
                                     node(fortressFactory, () -> {
@@ -296,7 +297,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, 30 + block.buildRequirements[i].amount * 5);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, 30 + block.buildRequirements[i].amount * 6);
         }
 
         return new TechNode(block, requirements, children);

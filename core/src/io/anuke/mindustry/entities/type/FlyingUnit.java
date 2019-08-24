@@ -1,20 +1,19 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class FlyingUnit extends BaseUnit{
     protected float[] weaponAngles = {0, 0};
@@ -80,14 +79,40 @@ public abstract class FlyingUnit extends BaseUnit{
                     return;
                 }
 
-                target = getClosestCore();
-            };
+                target = getSpawner();
+                if(target == null) target = getClosestCore();
+            }
 
             if(target != null){
-                circle(60f + Mathf.absin(Time.time() + Mathf.randomSeed(id) * 1200f, 70f, 1200f));
+                circle(80f + Mathf.randomSeed(id) * 120);
             }
         }
-    };
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(retarget()){
+                target = getSpawner();
+
+                Tile repair = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
+                if(repair != null && damaged()) FlyingUnit.this.target = repair.entity;
+                if(target == null) target = getClosestCore();
+            }
+
+            circle(targetHasFlag(BlockFlag.repair) ? 20f : 60f + Mathf.randomSeed(id) * 50, 0.65f * type.speed);
+        }
+    };;
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+        command == UnitCommand.attack ? attack :
+        command == UnitCommand.patrol ? patrol :
+        null);
+    }
 
     @Override
     public void move(float x, float y){
