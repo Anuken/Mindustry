@@ -97,7 +97,7 @@ public class CrashSender{
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
-            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
+            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + (OS.is64Bit ? "64" : "32"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
 
             boolean[] sent = {false};

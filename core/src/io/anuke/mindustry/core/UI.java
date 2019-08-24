@@ -225,6 +225,7 @@ public class UI implements ApplicationListener{
 
     @Override
     public void resize(int width, int height){
+        if(Core.scene == null) return;
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
     }
