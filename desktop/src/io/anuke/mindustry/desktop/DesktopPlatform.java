@@ -31,7 +31,8 @@ public class DesktopPlatform extends Platform{
         if(useDiscord){
             try{
                 DiscordEventHandlers handlers = new DiscordEventHandlers();
-                DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "");
+                DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "1127400");
+                Log.info("Initialized Discord rich presence.");
 
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
             }catch(Throwable t){
@@ -71,7 +72,6 @@ public class DesktopPlatform extends Platform{
 
     @Override
     public void updateRPC(){
-
         if(!useDiscord) return;
 
         DiscordRichPresence presence = new DiscordRichPresence();
