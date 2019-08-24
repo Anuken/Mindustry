@@ -49,7 +49,6 @@ task dist(type: Jar, dependsOn: classes){
 
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
-        def platformName = platform.toString().replace('64', '').replace('32', '').replace('MacOS', 'Mac')
 
         dependsOn dist
 
@@ -114,12 +113,12 @@ PackrConfig.Platform.values().each{ platform ->
 
                 if(platform == PackrConfig.Platform.MacOS){
                     copy{
-                        into "build/packr/${appName}.app/Contents/"
-                        from "build/packr/Contents/"
+                        into "build/packr/output/${appName}.app/Contents/"
+                        from "build/packr/output/Contents/"
                     }
 
                     delete{
-                        delete "build/packr/Contents/"
+                        delete "build/packr/output/Contents/"
                     }
                 }
             }
