@@ -9,6 +9,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
+def enableTemplates = true
 def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/icons/icon.icns")
 
@@ -63,7 +64,7 @@ PackrConfig.Platform.values().each{ platform ->
                 delete "build/packr/output/"
             }
 
-            if(platform == PackrConfig.Platform.Windows32 || platform == PackrConfig.Platform.Windows64){
+            if(enableTemplates && (platform == PackrConfig.Platform.Windows64)){
                 copy{
                     into "build/packr/output"
                     from "${JDK_DIR}/templates/${platform.toString().toLowerCase()}"

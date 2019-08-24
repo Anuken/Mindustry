@@ -12,8 +12,8 @@ public class DesktopLauncher{
         try{
             Platform.instance = new DesktopPlatform(arg);
 
-            Net.setClientProvider(new MClient());
-            Net.setServerProvider(new MServer());
+            Net.setClientProvider(new ArcNetClient());
+            Net.setServerProvider(new ArcNetServer());
 
             new SdlApplication(new Mindustry(), new SdlConfig(){{
                 title = "Mindustry";

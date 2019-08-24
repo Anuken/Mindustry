@@ -26,8 +26,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     protected IOSApplication createApplication(){
-        Net.setClientProvider(new MClient());
-        Net.setServerProvider(new MServer());
+        Net.setClientProvider(new ArcNetClient());
+        Net.setServerProvider(new ArcNetServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             UnitScl.dp.addition = 0.5f;
