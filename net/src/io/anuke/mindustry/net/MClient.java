@@ -46,14 +46,19 @@ public class MClient implements ClientProvider, ApplicationListener{
     public void update(){
         if(socket == null) return;
 
-        socket.update((sock, object) -> {
-            try{
-                Net.handleClientReceived(object);
-            }catch(Exception e){
-                Net.showError(e);
-                netClient.disconnectQuietly();
-            }
-        });
+        try{
+            socket.update((sock, object) -> {
+                try{
+                    Net.handleClientReceived(object);
+                }catch(Exception e){
+                    Net.showError(e);
+                    netClient.disconnectQuietly();
+                }
+            });
+        }catch(Exception e){
+            Net.showError(e);
+            netClient.disconnectQuietly();
+        }
     }
 
     @Override
