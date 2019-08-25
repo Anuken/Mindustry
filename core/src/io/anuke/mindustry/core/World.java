@@ -190,7 +190,9 @@ public class World implements ApplicationListener{
             }
         }
 
-        addDarkness(tiles);
+        if(!headless){
+            addDarkness(tiles);
+        }
 
         Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
@@ -354,7 +356,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
+                if(tile.isDarkened()){
                     dark[x][y] = darkIterations;
                 }
             }
@@ -383,8 +385,20 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic()){
+                if(tile.isDarkened()){
                     tiles[x][y].rotation(dark[x][y]);
+                }
+                if(dark[x][y] == 4){
+                    boolean full = true;
+                    for(Point2 p : Geometry.d4){
+                        int px = p.x + x, py = p.y + y;
+                        if(Structs.inBounds(px, py, tiles) && !(tiles[px][py].isDarkened() && dark[px][py] == 4)){
+                            full = false;
+                            break;
+                        }
+                    }
+
+                    if(full) tiles[x][y].rotation(5);
                 }
             }
         }

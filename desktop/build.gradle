@@ -99,7 +99,7 @@ PackrConfig.Platform.values().each{ platform ->
 
                 new Packr().pack(config)
 
-                if(platform == PackrConfig.Platform.Linux64){
+                if(platform != PackrConfig.Platform.MacOS){
                     copy{
                         into "build/packr/output/jre/"
                         from "build/packr/output/desktop.jar"
@@ -121,6 +121,14 @@ PackrConfig.Platform.values().each{ platform ->
                     delete{
                         delete "build/packr/output/Contents/"
                     }
+                }
+            }
+
+            if((platform == PackrConfig.Platform.Windows64 || platform == PackrConfig.Platform.Windows32)){
+                copy{
+                    from "build/packr/output/jre/bin/msvcr100.dll"
+                    into "build/packr/output/"
+                    rename("msvcr100.dll", "MSVCR100.dll")
                 }
             }
         }
