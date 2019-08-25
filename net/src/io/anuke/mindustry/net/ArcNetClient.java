@@ -4,10 +4,10 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.net.*;
+import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.net.*;
@@ -19,7 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class ArcNetClient implements ClientProvider{
     final Client client;
     final Supplier<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
-    final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public ArcNetClient(){
         client = new Client(8192, 4096, new PacketSerializer());
@@ -74,30 +73,20 @@ public class ArcNetClient implements ClientProvider{
         }
     }
 
-
-    @Override
-    public byte[] decompressSnapshot(byte[] input, int size){
-        byte[] result = new byte[size];
-        decompressor.decompress(input, result);
-        return result;
-    }
-
     @Override
     public void connect(String ip, int port, Runnable success){
-        runAsync(() -> {
+        Threads.daemon(() -> {
             try{
                 //just in case
                 client.stop();
 
-                Thread updateThread = new Thread(() -> {
+                Threads.daemon("Net Client", () -> {
                     try{
                         client.run();
                     }catch(Exception e){
                         if(!(e instanceof ClosedSelectorException)) handleException(e);
                     }
-                }, "Net Client");
-                updateThread.setDaemon(true);
-                updateThread.start();
+                });
 
                 client.connect(5000, ip, port, port);
                 success.run();
@@ -140,7 +129,7 @@ public class ArcNetClient implements ClientProvider{
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
-        runAsync(() -> {
+        Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
@@ -187,12 +176,6 @@ public class ArcNetClient implements ClientProvider{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
-    }
-
-    private void runAsync(Runnable run){
-        Thread thread = new Thread(run, "Client Async Run");
-        thread.setDaemon(true);
-        thread.start();
     }
 
     private void handleException(Exception e){

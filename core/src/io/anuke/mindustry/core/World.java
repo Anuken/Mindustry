@@ -190,7 +190,9 @@ public class World implements ApplicationListener{
             }
         }
 
-        addDarkness(tiles);
+        if(!headless){
+            addDarkness(tiles);
+        }
 
         Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
@@ -220,6 +222,10 @@ public class World implements ApplicationListener{
     }
 
     public void loadMap(Map map){
+        loadMap(map, new Rules());
+    }
+
+    public void loadMap(Map map, Rules checkRules){
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Exception e){
@@ -238,20 +244,21 @@ public class World implements ApplicationListener{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.get(defaultTeam).cores.size == 0){
+            if(state.teams.get(defaultTeam).cores.size == 0 && !checkRules.pvp){
                 ui.showError("$map.nospawn");
                 invalidMap = true;
-            }else if(state.rules.pvp){ //pvp maps need two cores to be valid
-                invalidMap = true;
+            }else if(checkRules.pvp){ //pvp maps need two cores to be valid
+                int teams = 0;
                 for(Team team : Team.all){
-                    if(state.teams.get(team).cores.size != 0 && team != defaultTeam){
-                        invalidMap = false;
+                    if(state.teams.get(team).cores.size != 0){
+                        teams ++;
                     }
                 }
-                if(invalidMap){
+                if(teams < 2){
+                    invalidMap = true;
                     ui.showError("$map.nospawn.pvp");
                 }
-            }else if(state.rules.attackMode){ //pvp maps need two cores to be valid
+            }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
                     ui.showError("$map.nospawn.attack");
@@ -349,7 +356,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
+                if(tile.isDarkened()){
                     dark[x][y] = darkIterations;
                 }
             }
@@ -378,8 +385,20 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic()){
+                if(tile.isDarkened()){
                     tiles[x][y].rotation(dark[x][y]);
+                }
+                if(dark[x][y] == 4){
+                    boolean full = true;
+                    for(Point2 p : Geometry.d4){
+                        int px = p.x + x, py = p.y + y;
+                        if(Structs.inBounds(px, py, tiles) && !(tiles[px][py].isDarkened() && dark[px][py] == 4)){
+                            full = false;
+                            break;
+                        }
+                    }
+
+                    if(full) tiles[x][y].rotation(5);
                 }
             }
         }

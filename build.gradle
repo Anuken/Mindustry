@@ -154,23 +154,6 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
-        compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
-    }
-}
-
-project(":desktop-sdl"){
-    apply plugin: "java"
-
-    dependencies{
-        compile project(":core")
-        compile project(":net")
-
-        if(debugged()) compile project(":debug")
-
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
     }
@@ -246,6 +229,7 @@ project(":core"){
 
         compileJava.dependsOn(preGen)
 
+        compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
@@ -311,7 +295,26 @@ project(":net"){
 
     dependencies{
         compile project(":core")
-        compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
     }
+}
+
+task deployAll{
+    task cleanDeployOutput{
+        doFirst{
+            if("${getBuildVersion()}" == "custom build" || "${getBuildVersion()}" == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
+            if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
+
+            delete{
+                delete "deploy/"
+            }
+        }
+    }
+
+    dependsOn cleanDeployOutput
+    dependsOn "desktop:packrLinux64"
+    dependsOn "desktop:packrWindows64"
+    dependsOn "desktop:packrWindows32"
+    dependsOn "desktop:packrMacOS"
+    dependsOn "server:deploy"
+    dependsOn "android:deploy"
 }

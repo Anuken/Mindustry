@@ -22,7 +22,7 @@ public class FloorRenderer implements Disposable{
     private final static int chunksize = 64;
 
     private Chunk[][] cache;
-    private CacheBatch cbatch;
+    private MultiCacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntArray drawnLayers = new IntArray();
     private ObjectSet<CacheLayer> used = new ObjectSet<>();
@@ -185,7 +185,7 @@ public class FloorRenderer implements Disposable{
                     floor = tile.floor();
                 }
 
-                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls){
+                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.rotation() >= 5)){
                     tile.block().draw(tile);
                 }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.draw(tile);
@@ -204,8 +204,7 @@ public class FloorRenderer implements Disposable{
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize),
         chunksy = Mathf.ceil((float)(world.height()) / chunksize);
         cache = new Chunk[chunksx][chunksy];
-        SpriteCache sprites = new SpriteCache(world.width() * world.height() * 6, (world.width() / chunksize) * (world.height() / chunksize) * 2, false);
-        cbatch = new CacheBatch(sprites);
+        cbatch = new MultiCacheBatch(chunksize * chunksize * 4);
 
         Time.mark();
 

@@ -1,7 +1,7 @@
 package io.anuke.mindustry;
 
+import io.anuke.arc.*;
 import io.anuke.arc.Application.ApplicationType;
-import io.anuke.arc.Core;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.Serialization;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
@@ -222,5 +223,7 @@ public class Vars{
         customMapDirectory = dataDirectory.child("maps/");
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
+
+        Events.fire(new AppLoadEvent());
     }
 }

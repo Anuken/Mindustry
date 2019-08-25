@@ -20,6 +20,10 @@ public interface HealthTrait{
     default void onDeath(){
     }
 
+    default boolean damaged(){
+        return health() < maxHealth() - 0.0001f;
+    }
+
     default void damage(float amount){
         health(health() - amount);
         if(health() <= 0 && !isDead()){

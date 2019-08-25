@@ -1,5 +1,6 @@
 package io.anuke.mindustry.graphics;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
@@ -10,7 +11,7 @@ import io.anuke.arc.util.Time;
 public class Shaders{
     public static Shadow shadow;
     public static BlockBuild blockbuild;
-    public static Shield shield;
+    public static @Nullable Shield shield;
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;
@@ -19,7 +20,13 @@ public class Shaders{
     public static void init(){
         shadow = new Shadow();
         blockbuild = new BlockBuild();
-        shield = new Shield();
+        try{
+            shield = new Shield();
+        }catch(Throwable t){
+            //don't load shield shader
+            shield = null;
+            t.printStackTrace();
+        }
         build = new UnitBuild();
         fog = new FogShader();
         menu = new MenuShader();

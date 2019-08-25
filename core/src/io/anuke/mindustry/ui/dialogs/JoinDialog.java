@@ -1,21 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.style.Drawable;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Cell;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.net.Host;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Packets.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -97,9 +96,14 @@ public class JoinDialog extends FloatingDialog{
 
             TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), "clear", () -> {
                 if(!buttons[0].childrenPressed()){
-                    connect(server.ip, server.port);
+                    if(server.lastHost != null && server.lastHost.version != Version.build && Version.build != -1 && server.lastHost.version != -1){
+                        ui.showInfo("[scarlet]" + (server.lastHost.version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+                                Core.bundle.format("server.versions", Version.build, server.lastHost.version));
+                    }else{
+                        connect(server.ip, server.port);
+                    }
                 }
-            }).width(targetWidth()).height(130f).pad(4f).get();
+            }).width(targetWidth()).pad(4f).get();
 
             button.getLabel().setWrap(true);
 

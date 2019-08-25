@@ -1,33 +1,28 @@
 package io.anuke.mindustry.entities.traits;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.EventType.BuildSelectEvent;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.BuildBlock;
-import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.BuildBlock.*;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.removal;
-import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.tmptr;
+import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.*;
 
 /** Interface for units that build things.*/
 public interface BuilderTrait extends Entity, TeamTrait{
@@ -106,19 +101,14 @@ public interface BuilderTrait extends Entity, TeamTrait{
             unit.rotation = Mathf.slerpDelta(unit.rotation, unit.angleTo(entity), 0.4f);
         }
 
-        //progress is synced, thus not updated clientside
-        if(!Net.client()){
-            //deconstructing is 2x as fast
-            if(current.breaking){
-                entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
-            }else{
-                entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
-            }
-
-            current.progress = entity.progress();
+        //deconstructing is 2x as fast
+        if(current.breaking){
+            entity.deconstruct(unit, core, 2f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }else{
-            entity.progress = current.progress;
+            entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }
+
+        current.progress = entity.progress;
     }
 
     /** Returns the queue for storing build requests. */
@@ -135,7 +125,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     default void writeBuilding(DataOutput output) throws IOException{
         BuildRequest request = buildRequest();
 
-        if(request != null){
+        if(request != null && (request.block != null || request.breaking)){
             output.writeByte(request.breaking ? 1 : 0);
             output.writeInt(Pos.get(request.x, request.y));
             output.writeFloat(request.progress);
@@ -174,7 +164,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
             if(applyChanges){
                 buildQueue().addLast(request);
             }else if(isBuilding()){
-                buildRequest().progress = progress;
+                BuildRequest last = buildRequest();
+                last.progress = progress;
+                if(last.tile() != null && last.tile().entity instanceof BuildEntity){
+                    ((BuildEntity)last.tile().entity).progress = progress;
+                }
             }
         }
     }

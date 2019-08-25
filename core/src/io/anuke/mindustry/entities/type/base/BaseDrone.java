@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.type.base;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.mindustry.entities.type.FlyingUnit;
-import io.anuke.mindustry.entities.units.UnitState;
+import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -32,6 +32,11 @@ public abstract class BaseDrone extends FlyingUnit{
             }
         }
     };
+
+    @Override
+    public void onCommand(UnitCommand command){
+        //do nothing, normal commands are not applicable here
+    }
 
     @Override
     protected void updateRotation(){

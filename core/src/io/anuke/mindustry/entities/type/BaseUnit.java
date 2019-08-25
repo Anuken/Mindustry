@@ -16,6 +16,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -25,7 +26,6 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Base class for AI units. */
 public abstract class BaseUnit extends Unit implements ShooterTrait{
-
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
@@ -81,6 +81,22 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public @Nullable Tile getSpawner(){
         return world.tile(spawner);
+    }
+
+    public boolean isCommanded(){
+        return world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && world.indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
+    }
+
+    public UnitCommand getCommand(){
+        if(isCommanded()){
+            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+        }
+        return null;
+    }
+
+    /**Called when a command is recieved from the command center.*/
+    public void onCommand(UnitCommand command){
+
     }
 
     /** Initialize the type and team of this unit. Only call once! */
@@ -303,6 +319,10 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         state.set(getStartState());
 
         health(maxHealth());
+
+        if(isCommanded()){
+            onCommand(getCommand());
+        }
     }
 
     @Override

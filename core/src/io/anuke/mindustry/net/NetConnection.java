@@ -3,6 +3,8 @@ package io.anuke.mindustry.net;
 import io.anuke.mindustry.net.Net.SendMode;
 
 public abstract class NetConnection{
+    private static int lastID;
+
     public final int id;
     public final String address;
 
@@ -18,8 +20,9 @@ public abstract class NetConnection{
     public boolean hasBegunConnecting = false;
     public float viewWidth, viewHeight, viewX, viewY;
 
-    public NetConnection(int id, String address){
-        this.id = id;
+    /** Assigns this connection a unique ID. No two connections will ever have the same ID.*/
+    public NetConnection(String address){
+        this.id = lastID++;
         this.address = address;
     }
 

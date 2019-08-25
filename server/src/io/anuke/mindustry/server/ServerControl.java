@@ -157,7 +157,7 @@ public class ServerControl implements ApplicationListener{
 
                     info("Selected next map to be {0}.", map.name());
 
-                    play(true, () -> world.loadMap(map));
+                    play(true, () -> world.loadMap(map,  map.applyRules(lastMode)));
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -231,7 +231,7 @@ public class ServerControl implements ApplicationListener{
             logic.reset();
             lastMode = preset;
             try{
-                world.loadMap(result);
+                world.loadMap(result,  result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
                 logic.play();
 
@@ -643,6 +643,13 @@ public class ServerControl implements ApplicationListener{
                 info("Nobody with that name could be found.");
             }
         });
+
+        handler.register("gc", "Trigger a grabage collection. Testing onlu.", arg -> {
+            int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            System.gc();
+            int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
+        });
     }
 
     private void readCommands(){
@@ -700,10 +707,11 @@ public class ServerControl implements ApplicationListener{
             run.run();
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
+
             for(Player p : players){
                 p.reset();
                 if(state.rules.pvp){
-                    p.setTeam(netServer.assignTeam(new ArrayIterable<>(players)));
+                    p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
                 netServer.sendWorldData(p, p.con.id);
             }
