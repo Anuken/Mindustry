@@ -198,7 +198,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
-        graphics.sliderPref("fpscap", 241, 5, 241, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 5, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
@@ -207,7 +207,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 if(b){
                     Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
-                    Core.graphics.setWindowedMode(600, 480);
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
                 }
             });
 
