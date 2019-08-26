@@ -20,25 +20,38 @@ public class Mindustry extends ApplicationCore{
             return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
         });
 
-        Time.mark();
+        Bench.begin("cursors");
         UI.loadSystemCursors();
 
+        Bench.begin("vars");
         Vars.init();
         Log.setUseColors(false);
+        Bench.begin("bundle");
         BundleLoader.load();
+
+        Bench.begin("music");
         Musics.load();
+        Bench.begin("sound");
         Sounds.load();
 
+        Bench.begin("content");
         content.load();
         content.loadColors();
 
+        Bench.begin("logic");
         add(logic = new Logic());
+        Bench.begin("world");
         add(world = new World());
+        Bench.begin("control");
         add(control = new Control());
+        Bench.begin("renderer");
         add(renderer = new Renderer());
+        Bench.begin("ui");
         add(ui = new UI());
+        Bench.begin("net");
         add(netServer = new NetServer());
         add(netClient = new NetClient());
+        Bench.begin("init");
     }
 
     @Override
@@ -65,8 +78,8 @@ public class Mindustry extends ApplicationCore{
     @Override
     public void init(){
         super.init();
+        Bench.end();
 
-        Log.info("Time to load [total]: {0}", Time.elapsed());
         Events.fire(new ClientLoadEvent());
     }
 }
