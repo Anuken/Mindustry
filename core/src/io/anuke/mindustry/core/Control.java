@@ -46,7 +46,6 @@ public class Control implements ApplicationListener{
     private boolean wasPaused = false;
 
     public Control(){
-        batch = new SpriteBatch();
         saves = new Saves();
         tutorial = new Tutorial();
         music = new MusicControl();

@@ -2,6 +2,7 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Application.ApplicationType;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.Structs;
@@ -25,7 +26,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 @SuppressWarnings("unchecked")
-public class Vars{
+public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** IO buffer size. */
@@ -156,6 +157,16 @@ public class Vars{
 
     /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
+
+    @Override
+    public void loadAsync(){
+        init();
+    }
+
+    @Override
+    public void loadSync(){
+
+    }
 
     public static void init(){
         Serialization.init();
