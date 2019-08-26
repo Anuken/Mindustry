@@ -197,18 +197,16 @@ public class UnitTypes implements ContentList{
             hitsize = 20f;
             rotatespeed = 0.06f;
             health = 3000;
-            weapon = new Weapon("chaos"){{
-                length = 8f;
+            weapon = new Weapon("Chaoser"){{            
+                shake = 4f;
+                length = 6f;
                 reload = 50f;
-                width = 17f;
-                roundrobin = true;
-                recoil = 3f;
-                shake = 2f;
-                shots = 4;
-                spacing = 4f;
                 shotDelay = 5;
-                ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.flakSurge;
+                roundrobin = true;
+                shots = 4;
+                inaccuracy = 0f;
+                ejectEffect = Fx.none;
+                bullet = Bullets.lightning;
                 shootSound = Sounds.shootBig;
             }};
         }};
