@@ -5,7 +5,7 @@ def use = { String name ->
     project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
 }
 
-Properties properties = new Properties()
+def properties = new Properties()
 
 if(new File(settingsDir, 'local.properties').exists()){
     properties.load(new File(settingsDir, 'local.properties').newDataInputStream())

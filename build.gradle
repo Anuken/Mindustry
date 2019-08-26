@@ -119,6 +119,7 @@ allprojects{
                 props.load(new FileInputStream(pfile))
 
                 String buildid = getBuildVersion()
+                println("Compiling with build: '$buildid'")
 
                 props["type"] = versionType
                 props["number"] = versionNumber
@@ -199,6 +200,7 @@ project(":core"){
 
     task preGen{
         generateLocales()
+        writeVersion()
     }
 
     dependencies{
