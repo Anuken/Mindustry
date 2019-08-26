@@ -1690,8 +1690,8 @@ public class Blocks implements ContentList{
             type = UnitTypes.crawler;
             produceTime = 300;
             size = 2;
-            maxSpawn = 8;
-            consumes.power(0.4f);
+            maxSpawn = 6;
+            consumes.power(0.5f);
             consumes.items(new ItemStack(Items.coal, 10));
         }};
 
