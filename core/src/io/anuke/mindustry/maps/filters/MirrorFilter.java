@@ -33,7 +33,9 @@ public class MirrorFilter extends GenerateFilter{
             mirror(v3, v1.x, v1.y, v2.x, v2.y);
             Tile tile = in.tile(v3.x, v3.y);
             in.floor = tile.floor();
-            in.block = tile.block();
+            if(!tile.block().synthetic()){
+                in.block = tile.block();
+            }
             in.ore = tile.overlay();
         }
     }
