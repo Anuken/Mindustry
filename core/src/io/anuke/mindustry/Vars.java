@@ -239,10 +239,6 @@ public class Vars implements Loadable{
         tmpDirectory = dataDirectory.child("tmp/");
 
         maps.load();
-        if(!headless){
-            content.loadColors();
-            maps.loadPreviews();
-        }
     }
 
     public static void loadSettings(){
@@ -250,6 +246,8 @@ public class Vars implements Loadable{
         Core.settings.defaults("locale", "default");
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
+
+        if(!loadLocales) return;
 
         try{
             //try loading external bundle

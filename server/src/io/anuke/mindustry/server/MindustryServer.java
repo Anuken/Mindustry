@@ -17,11 +17,11 @@ public class MindustryServer implements ApplicationListener{
     public void init(){
         Core.settings.setDataDirectory(Core.files.local("config"));
         loadLocales = false;
-        Vars.init();
-
         headless = true;
 
-        loadSettings();
+        Vars.loadSettings();
+        Vars.init();
+        content.createContent();
 
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());

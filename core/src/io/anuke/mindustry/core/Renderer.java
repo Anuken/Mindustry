@@ -43,9 +43,6 @@ public class Renderer implements ApplicationListener{
 
     public Renderer(){
         camera = new Camera();
-        if(settings.getBool("bloom")){
-            setupBloom();
-        }
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -91,6 +88,13 @@ public class Renderer implements ApplicationListener{
         });
 
         clearColor = new Color(0f, 0f, 0f, 1f);
+    }
+
+    @Override
+    public void init(){
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
     }
 
     @Override

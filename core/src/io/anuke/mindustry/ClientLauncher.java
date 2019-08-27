@@ -8,6 +8,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -19,7 +20,7 @@ import static io.anuke.mindustry.Vars.*;
 public class ClientLauncher extends ApplicationCore{
     private static final int loadingFPS = 20;
 
-    private float smoothProgress, smoothTime;
+    private float smoothProgress;
     private long lastTime;
     private long beginTime;
     private boolean finished = false;
@@ -42,11 +43,22 @@ public class ClientLauncher extends ApplicationCore{
         UI.loadDefaultFont();
         UI.loadSystemCursors();
 
+        //1. bundles
+        //2. rest of vars
         assets.load(new Vars());
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
 
+        assets.loadRun("maps", Map.class, () -> {
+            maps.loadPreviews();
+        });
+
         Musics.load();
         Sounds.load();
+
+        assets.loadRun("contentcreate", Content.class, () -> {
+            content.createContent();
+            content.loadColors();
+        });
 
         add(logic = new Logic());
         add(control = new Control());
@@ -55,7 +67,7 @@ public class ClientLauncher extends ApplicationCore{
         add(netServer = new NetServer());
         add(netClient = new NetClient());
 
-        assets.loadRun("Content", ContentLoader.class, () -> {
+        assets.loadRun("contentinit", ContentLoader.class, () -> {
             content.init();
             content.load();
         });
@@ -133,7 +145,6 @@ public class ClientLauncher extends ApplicationCore{
 
     void drawLoading(){
         smoothProgress = Mathf.lerpDelta(smoothProgress, assets.getProgress(), 0.1f);
-        smoothTime += Time.delta();
 
         Core.graphics.clear(Pal.darkerGray);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
@@ -163,7 +174,7 @@ public class ClientLauncher extends ApplicationCore{
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("content") ? "content" : name.contains("msav") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+                String key = name.contains("content") ? "content" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
                 font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - UnitScl.dp.scl(10f), Align.center);
             }
         }

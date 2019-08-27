@@ -4,7 +4,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.game.*;
@@ -42,14 +41,8 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
-    public ContentLoader(){
-        //hack; allows content to initialize itself by referring to Mins.content, even though it hasn't been fully constructed yet
-        Vars.content = this;
-        createContent();
-    }
-
     /** Creates all content types. */
-    private void createContent(){
+    public void createContent(){
         if(loaded){
             Log.info("Content already loaded, skipping.");
             return;

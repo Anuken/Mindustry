@@ -323,8 +323,6 @@ public class Maps{
             }catch(Exception ignored){
             }
         }
-
-
     }
 
     public void createNewPreview(Map map){
