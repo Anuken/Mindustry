@@ -19,6 +19,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.graphics.MenuRenderer;
 import io.anuke.mindustry.ui.MobileButton;
 
+import static io.anuke.arc.Core.assets;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
@@ -27,22 +28,11 @@ public class MenuFragment extends Fragment{
     private MenuRenderer renderer;
 
     public MenuFragment(){
+        assets.load("sprites/logo.png", Texture.class);
+        assets.finishLoading();
         Events.on(DisposeEvent.class, event -> {
             renderer.dispose();
         });
-    }
-
-    public static void drawLogo(){
-        Texture logo = Core.assets.get("sprites/logo.png");
-        float logoscl = UnitScl.dp.scl(1);
-        float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
-        float logoh = logow * (float)logo.getHeight() / logo.getWidth();
-
-        float fx = (int)(Core.graphics.getWidth() / 2f);
-        float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
-
-        Draw.color();
-        Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
     }
 
     @Override

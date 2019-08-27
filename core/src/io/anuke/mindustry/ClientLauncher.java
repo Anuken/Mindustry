@@ -11,6 +11,7 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.maps.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -35,9 +36,8 @@ public class ClientLauncher extends ApplicationCore{
 
         batch = new SpriteBatch();
         assets = new AssetManager();
+        assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
         atlas = TextureAtlas.blankAtlas();
-        assets.load("sprites/logo.png", Texture.class);
-        assets.finishLoading();
 
         UI.loadDefaultFont();
         UI.loadSystemCursors();
@@ -139,27 +139,14 @@ public class ClientLauncher extends ApplicationCore{
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float height = UnitScl.dp.scl(50f);
-        Texture logo = Core.assets.get("sprites/logo.png");
-        float logoscl = UnitScl.dp.scl(1);
-        float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
-        float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
-        float fx = (int)(Core.graphics.getWidth() / 2f);
-        float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
-
-        Draw.color();
-
-        //Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
-
-        Lines.stroke(graphics.getWidth()*10, Color.BLACK);
-        Tmp.v1.set(graphics.getWidth(), graphics.getHeight()).scl(smoothProgress);
+        Draw.color(Color.BLACK);
         Fill.poly(graphics.getWidth()/2f, graphics.getHeight()/2f, 6, Mathf.dst(graphics.getWidth()/2f, graphics.getHeight()/2f) * smoothProgress);
-        //Lines.line(0, 0, Tmp.v1.x, Tmp.v1.y, CapStyle.none);
         Draw.reset();
 
         float w = graphics.getWidth()*0.6f;
 
-        Draw.color(Pal.darkerGray);
+        Draw.color(Color.BLACK);
         Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, w, height);
 
         Draw.color(Pal.accent);

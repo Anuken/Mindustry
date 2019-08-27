@@ -61,6 +61,10 @@ public class Map implements Comparable<Map>{
         return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
     }
 
+    public FileHandle cacheFile(){
+        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + "-cache.dat");
+    }
+
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
         Vars.data.modified();
@@ -124,11 +128,11 @@ public class Map implements Comparable<Map>{
     @Override
     public int compareTo(Map map){
         int type = -Boolean.compare(custom, map.custom);
-        if(type != 0){
-            return type;
-        }else{
-            return name().compareTo(map.name());
-        }
+        if(type != 0) return type;
+        int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));
+        if(modes != 0) return modes;
+
+        return name().compareTo(map.name());
     }
 
     @Override

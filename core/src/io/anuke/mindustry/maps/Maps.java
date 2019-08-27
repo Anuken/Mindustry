@@ -3,14 +3,17 @@ package io.anuke.mindustry.maps;
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.MapPreviewLoader.*;
 import io.anuke.mindustry.maps.filters.*;
@@ -48,6 +51,12 @@ public class Maps{
 
     public Map byName(String name){
         return maps.find(m -> m.name().equals(name));
+    }
+
+    public Maps(){
+        Events.on(ClientLoadEvent.class, event -> {
+            maps.sort();
+        });
     }
 
     /**
@@ -299,16 +308,23 @@ public class Maps{
     }
 
     public void loadPreviews(){
-        Core.assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
+
         for(Map map : maps){
             //try to load preview
             if(map.previewFile().exists()){
                 //this may fail, but calls createNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
             }else{
-                createNewPreview(map);
+                Core.app.post(() -> createNewPreview(map));
+            }
+
+            try{
+                readCache(map);
+            }catch(Exception ignored){
             }
         }
+
+
     }
 
     public void createNewPreview(Map map){
@@ -317,11 +333,41 @@ public class Maps{
             //this has to be done synchronously!
             Pixmap pix = MapIO.generatePreview(map);
             Core.app.post(() -> map.texture = new Texture(pix));
-            executor.submit(() -> map.previewFile().writePNG(pix));
+            executor.submit(() -> {
+                try{
+                    map.previewFile().writePNG(pix);
+                    writeCache(map);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            });
         }catch(IOException e){
             Log.err("Failed to generate preview!", e);
             //TODO create error texture instead?
-            map.texture = new Texture("zones/nomap.png");
+            Core.app.post(() -> map.texture = new Texture("zones/nomap.png"));
+        }
+    }
+
+    private void writeCache(Map map) throws IOException{
+        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.DEFAULT_BUFFER_SIZE))){
+            stream.write(0);
+            stream.writeInt(map.spawns);
+            stream.write(map.teams.size);
+            IntSetIterator iter = map.teams.iterator();
+            while(iter.hasNext){
+                stream.write(iter.next());
+            }
+        }
+    }
+
+    private void readCache(Map map) throws IOException{
+        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.DEFAULT_BUFFER_SIZE))){
+            stream.read(); //version
+            map.spawns = stream.readInt();
+            int teamsize = stream.readByte();
+            for(int i = 0; i < teamsize; i++){
+                map.teams.add(stream.read());
+            }
         }
     }
 
@@ -343,7 +389,7 @@ public class Maps{
         }
 
         maps.add(map);
-        //maps.sort();
+        maps.sort();
     }
 
     private void loadCustomMaps(){
