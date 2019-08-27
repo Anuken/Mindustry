@@ -1686,13 +1686,13 @@ public class Blocks implements ContentList{
         }};
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
-            requirements(Category.units, ItemStack.with(Items.lead, 25, Items.silicon, 30));
+            requirements(Category.units, ItemStack.with(Items.lead, 45, Items.silicon, 30));
             type = UnitTypes.crawler;
-            produceTime = 250;
+            produceTime = 300;
             size = 2;
             maxSpawn = 8;
             consumes.power(0.4f);
-            consumes.items(new ItemStack(Items.coal, 5));
+            consumes.items(new ItemStack(Items.coal, 10));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{

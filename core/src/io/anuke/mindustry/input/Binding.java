@@ -21,6 +21,7 @@ public enum Binding implements KeyBind{
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),
+    fullscreen(KeyCode.F11),
     pause(KeyCode.SPACE),
     minimap(KeyCode.M),
     toggle_menus(KeyCode.C),

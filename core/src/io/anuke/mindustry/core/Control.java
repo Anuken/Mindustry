@@ -396,6 +396,17 @@ public class Control implements ApplicationListener{
         music.update();
         loops.update();
 
+        if(Core.input.keyTap(Binding.fullscreen)){
+            boolean full = settings.getBool("fullscreen");
+            if(full){
+                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
+            }else{
+                graphics.setFullscreenMode(graphics.getDisplayMode());
+            }
+            settings.put("fullscreen", !full);
+            settings.save();
+        }
+
         if(!state.is(State.menu)){
             input.update();
 
