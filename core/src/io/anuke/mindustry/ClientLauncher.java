@@ -159,11 +159,12 @@ public class ClientLauncher extends ApplicationCore{
         if(assets.isLoaded("outline")){
             BitmapFont font = assets.get("outline");
             font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f + UnitScl.dp.scl(10f), Align.center);
+            font.draw(bundle.get("loading", "").replace("[accent]", ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f + height / 2f + UnitScl.dp.scl(20), Align.center);
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("msav") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "content";
-                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - 10f, Align.center);
+                String key = name.contains("content") ? "content" : name.contains("msav") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - UnitScl.dp.scl(10f), Align.center);
             }
         }
         Draw.flush();
