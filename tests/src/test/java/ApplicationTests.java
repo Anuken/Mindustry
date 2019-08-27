@@ -43,6 +43,7 @@ public class ApplicationTests{
                 public void setup(){
                     headless = true;
                     Vars.init();
+                    content.createContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
