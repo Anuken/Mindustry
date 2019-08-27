@@ -1,33 +1,33 @@
 package io.anuke.mindustry.server;
 
 import io.anuke.arc.*;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.Array.ArrayIterable;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Array.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.CommandHandler.*;
-import io.anuke.arc.util.Timer.Task;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.arc.util.Timer.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapException;
-import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.type.*;
 
 import java.io.*;
 import java.net.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
 import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
@@ -144,7 +144,7 @@ public class ServerControl implements ApplicationListener{
 
             if(Core.settings.getBool("shuffle")){
                 if(maps.all().size > 0){
-                    Array<Map> maps = maps.customMaps().size == 0 ? maps.defaultMaps() : maps.customMaps();
+                    Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
 
                     Map previous = world.getMap();
                     Map map = maps.random(previous);

@@ -22,7 +22,6 @@ import io.anuke.mindustry.ui.MobileButton;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
-    private Texture logo = new Texture("sprites/logo.png");
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
@@ -30,8 +29,20 @@ public class MenuFragment extends Fragment{
     public MenuFragment(){
         Events.on(DisposeEvent.class, event -> {
             renderer.dispose();
-            logo.dispose();
         });
+    }
+
+    public static void drawLogo(){
+        Texture logo = Core.assets.get("sprites/logo.png");
+        float logoscl = UnitScl.dp.scl(1);
+        float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
+        float logoh = logow * (float)logo.getHeight() / logo.getWidth();
+
+        float fx = (int)(Core.graphics.getWidth() / 2f);
+        float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
+
+        Draw.color();
+        Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
     }
 
     @Override
@@ -72,6 +83,7 @@ public class MenuFragment extends Fragment{
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
+            Texture logo = Core.assets.get("sprites/logo.png");
             float logoscl = UnitScl.dp.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
@@ -81,6 +93,7 @@ public class MenuFragment extends Fragment{
 
             Draw.color();
             Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
+
             Core.scene.skin.font().setColor(Color.WHITE);
             Core.scene.skin.font().draw(versionText, fx, fy - logoh/2f, Align.center);
         }).touchable(Touchable.disabled);

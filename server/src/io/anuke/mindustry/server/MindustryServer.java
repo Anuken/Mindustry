@@ -24,7 +24,6 @@ public class MindustryServer implements ApplicationListener{
         loadSettings();
 
         Core.app.addListener(logic = new Logic());
-        Core.app.addListener(world = new World());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
 

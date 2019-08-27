@@ -41,16 +41,13 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
+                    headless = true;
                     Vars.init();
 
-                    headless = true;
-
-                    load();
-                    content.createContent();
-
                     add(logic = new Logic());
-                    add(world = new World());
                     add(netServer = new NetServer());
+
+                    content.init();
                 }
 
                 @Override

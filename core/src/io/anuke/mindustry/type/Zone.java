@@ -42,7 +42,7 @@ public class Zone extends UnlockableContent{
         super(name);
         this.generator = generator;
 
-        if(!headless){
+        if(!headless && Core.assets != null){
             FileHandle file = Core.files.internal("zones/" + name + ".png");
             if(file.exists()){
                 Core.assets.load(new AssetDescriptor<>(file, Texture.class)).loaded = t -> preview = (Texture)t;

@@ -36,11 +36,11 @@ public class ClientLauncher extends ApplicationCore{
         batch = new SpriteBatch();
         assets = new AssetManager();
         atlas = TextureAtlas.blankAtlas();
+        assets.load("sprites/logo.png", Texture.class);
+        assets.finishLoading();
 
-        Time.mark();
         UI.loadDefaultFont();
         UI.loadSystemCursors();
-        Log.info("UI init: {0}", Time.elapsed());
 
         assets.load(new Vars());
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
@@ -88,16 +88,17 @@ public class ClientLauncher extends ApplicationCore{
 
     @Override
     public void update(){
-        if(!assets.update(1000 / loadingFPS)){
+        if(!finished){
             drawLoading();
-        }else{
-            if(!finished){
-                Log.info("Time to load: {0}", Time.timeSinceMillis(beginTime));
-                post();
+            if(assets.update(1000 / loadingFPS)){
+                Log.info("Total time to load: {0}", Time.timeSinceMillis(beginTime));
+                for(ApplicationListener listener : modules){
+                    listener.init();
+                }
                 finished = true;
                 Events.fire(new ClientLoadEvent());
             }
-
+        }else{
             super.update();
         }
 
@@ -134,18 +135,43 @@ public class ClientLauncher extends ApplicationCore{
         smoothProgress = Mathf.lerpDelta(smoothProgress, assets.getProgress(), 0.1f);
         smoothTime += Time.delta();
 
-        Core.graphics.clear(Color.BLACK);
+        Core.graphics.clear(Pal.darkerGray);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
+
         float height = UnitScl.dp.scl(50f);
+        Texture logo = Core.assets.get("sprites/logo.png");
+        float logoscl = UnitScl.dp.scl(1);
+        float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
+        float logoh = logow * (float)logo.getHeight() / logo.getWidth();
+
+        float fx = (int)(Core.graphics.getWidth() / 2f);
+        float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
+
+        Draw.color();
+
+        //Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
+
+        Lines.stroke(graphics.getWidth()*10, Color.BLACK);
+        Tmp.v1.set(graphics.getWidth(), graphics.getHeight()).scl(smoothProgress);
+        Fill.poly(graphics.getWidth()/2f, graphics.getHeight()/2f, 6, Mathf.dst(graphics.getWidth()/2f, graphics.getHeight()/2f) * smoothProgress);
+        //Lines.line(0, 0, Tmp.v1.x, Tmp.v1.y, CapStyle.none);
+        Draw.reset();
+
+        float w = graphics.getWidth()*0.6f;
 
         Draw.color(Pal.darkerGray);
-        Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, graphics.getWidth(), height);
-        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(smoothTime, 5f, 1f) * 0.5f);
-        Fill.crect(0, graphics.getHeight()/2f - height/2f, graphics.getWidth() * smoothProgress, height);
+        Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, w, height);
+
+        Draw.color(Pal.accent);
+        Fill.crect(graphics.getWidth()/2f-w/2f, graphics.getHeight()/2f - height/2f, w * smoothProgress, height);
+
+        for(int i : Mathf.signs){
+            Fill.tri(graphics.getWidth()/2f + w/2f*i, graphics.getHeight()/2f + height/2f, graphics.getWidth()/2f + w/2f*i, graphics.getHeight()/2f - height/2f, graphics.getWidth()/2f + w/2f*i + height/2f*i, graphics.getHeight()/2f);
+        }
 
         if(assets.isLoaded("outline")){
             BitmapFont font = assets.get("outline");
-            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f, Align.center);
+            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f + UnitScl.dp.scl(10f), Align.center);
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();

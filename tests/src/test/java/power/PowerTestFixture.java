@@ -32,7 +32,6 @@ public class PowerTestFixture{
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
         Vars.content = new ContentLoader();
-        Vars.content.createContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
