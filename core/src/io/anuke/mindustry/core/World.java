@@ -6,7 +6,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
@@ -21,13 +20,9 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
-public class World implements ApplicationListener{
-    public final Maps maps = new Maps();
-    public final BlockIndexer indexer = new BlockIndexer();
-    public final WaveSpawner spawner = new WaveSpawner();
-    public final Pathfinder pathfinder = new Pathfinder();
+public class World{
     public final Context context = new Context();
 
     private Map currentMap;
@@ -36,17 +31,7 @@ public class World implements ApplicationListener{
     private boolean generating, invalidMap;
 
     public World(){
-        maps.load();
-    }
 
-    @Override
-    public void init(){
-        maps.loadLegacyMaps();
-    }
-
-    @Override
-    public void dispose(){
-        maps.dispose();
     }
 
     public boolean isInvalidMap(){

@@ -15,7 +15,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Handles tutorial state. */
 public class Tutorial{
@@ -161,7 +161,7 @@ public class Tutorial{
             }
         },
         deposit(() -> event("deposit")),
-        waves(() -> state.wave > 2 && state.enemies() <= 0 && !world.spawner.isSpawning()){
+        waves(() -> state.wave > 2 && state.enemies() <= 0 && !spawner.isSpawning()){
             void begin(){
                 state.rules.waveTimer = true;
                 logic.runWave();

@@ -14,7 +14,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class Junction extends Block{
     protected float speed = 26; //frames taken to go through this junction

@@ -10,7 +10,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.Entity;
 
-import static io.anuke.mindustry.Vars.collisions;
+import static io.anuke.mindustry.Min.collisions;
 
 public class Entities{
     private static final Array<EntityGroup<?>> groupArray = new Array<>();

@@ -7,8 +7,8 @@ import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.playerColors;
+import static io.anuke.mindustry.Min.player;
+import static io.anuke.mindustry.Min.playerColors;
 
 public class ColorPickDialog extends Dialog{
     private Consumer<Color> cons;

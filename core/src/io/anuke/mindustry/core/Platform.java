@@ -9,7 +9,7 @@ import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.scene.ui.TextField;
 import io.anuke.arc.util.serialization.Base64Coder;
 
-import static io.anuke.mindustry.Vars.mobile;
+import static io.anuke.mindustry.Min.mobile;
 
 public abstract class Platform{
     /** Each separate game platform should set this instance to their own implementation. */

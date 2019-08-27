@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Class used for indexing special target blocks for AI. */
 @SuppressWarnings("unchecked")
@@ -24,7 +24,7 @@ public class BlockIndexer{
     private final static int quadrantSize = 16;
 
     /** Set of all ores that are being scanned. */
-    private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
+    private final ObjectSet<Item> scanOres = new ObjectSet<>();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores;
@@ -57,6 +57,8 @@ public class BlockIndexer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
+            scanOres.clear();
+            scanOres.addAll(Item.getAllOres());
             damagedTiles = new ObjectSet[Team.all.length];
             flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
 

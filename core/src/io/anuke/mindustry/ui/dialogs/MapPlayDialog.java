@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();

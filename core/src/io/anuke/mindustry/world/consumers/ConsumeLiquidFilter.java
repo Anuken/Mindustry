@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.BlockStats;
 import io.anuke.mindustry.world.meta.values.LiquidFilterValue;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public final Predicate<Liquid> filter;

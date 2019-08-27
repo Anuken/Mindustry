@@ -13,7 +13,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.meta.StatValue;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     private final ObjectMap<T, BulletType> map;

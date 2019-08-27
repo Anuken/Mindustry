@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate{
@@ -65,7 +65,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         };
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new Mindustry(), config);
+        return new IOSApplication(new ClientLauncher(), config);
     }
 
     @Override

@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class ItemFilterValue implements StatValue{
     private final Predicate<Item> filter;

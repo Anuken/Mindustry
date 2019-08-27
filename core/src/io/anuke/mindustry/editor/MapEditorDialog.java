@@ -30,7 +30,7 @@ import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
     public final MapEditor editor;
@@ -93,11 +93,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
                 Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
-                    world.maps.tryCatchMapError(() -> {
+                    maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("$editor.errorimage");
                         }else if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                            editor.beginEdit(world.maps.makeLegacyMap(file));
+                            editor.beginEdit(maps.makeLegacyMap(file));
                         }else{
                             editor.beginEdit(MapIO.createMap(file, true));
                         }
@@ -286,11 +286,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
             infoDialog.show();
             Core.app.post(() -> ui.showError("$editor.save.noname"));
         }else{
-            Map map = world.maps.all().find(m -> m.name().equals(name));
+            Map map = maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
                 handleSaveBuiltin(map);
             }else{
-                world.maps.saveMap(editor.getTags());
+                maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
             }
         }
@@ -670,7 +670,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         int i = 0;
 
         blocksOut.clear();
-        blocksOut.addAll(Vars.content.blocks());
+        blocksOut.addAll(Min.content.blocks());
         blocksOut.sort((b1, b2) -> {
             int core = -Boolean.compare(b1 instanceof CoreBlock, b2 instanceof CoreBlock);
             if(core != 0) return core;

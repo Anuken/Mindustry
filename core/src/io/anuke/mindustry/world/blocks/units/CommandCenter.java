@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.all.length];
@@ -41,7 +41,7 @@ public class CommandCenter extends Block{
     @Override
     public void placed(Tile tile){
         super.placed(tile);
-        ObjectSet<Tile> set = world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
 
         if(set.size > 0){
             CommandCenterEntity entity = tile.entity();
@@ -92,7 +92,7 @@ public class CommandCenter extends Block{
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
         Effects.effect(((CommandCenter)tile.block()).effect, tile);
 
-        for(Tile center : world.indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
+        for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
             if(center.block() instanceof CommandCenter){
                 CommandCenterEntity entity = center.entity();
                 entity.command = command;

@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.blocks.storage.*;
 import java.io.*;
 import java.util.zip.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Reads and writes map files. */
 //TODO does this class even need to exist??? move to Maps?

@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.function.*;
 import io.anuke.mindustry.maps.*;
 
-import static io.anuke.mindustry.Vars.waveTeam;
+import static io.anuke.mindustry.Min.waveTeam;
 
 /** Defines preset rule sets. */
 public enum Gamemode{

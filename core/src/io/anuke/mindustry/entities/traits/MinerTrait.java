@@ -13,7 +13,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public interface MinerTrait extends Entity{
 

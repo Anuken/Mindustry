@@ -25,7 +25,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public abstract class InputHandler implements InputProcessor{
     /** Used for dropping items. */

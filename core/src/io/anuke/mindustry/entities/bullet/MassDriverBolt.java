@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class MassDriverBolt extends BulletType{
 

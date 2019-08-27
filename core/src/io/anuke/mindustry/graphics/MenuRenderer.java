@@ -19,7 +19,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Floor;
 import io.anuke.mindustry.world.blocks.OreBlock;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class MenuRenderer implements Disposable{
     private static final float darkness = 0.3f;

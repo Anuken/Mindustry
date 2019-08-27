@@ -22,8 +22,8 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Min.world;
 
 public class ItemBridge extends Block{
     protected int timerTransport = timers++;

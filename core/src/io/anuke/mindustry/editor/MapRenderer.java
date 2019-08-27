@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Disposable;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BlockPart;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class MapRenderer implements Disposable{
     private static final int chunkSize = 64;

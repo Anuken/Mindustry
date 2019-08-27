@@ -14,7 +14,7 @@ import net.jpountz.lz4.*;
 import java.io.*;
 import java.nio.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 @SuppressWarnings("unchecked")
 public class Net{

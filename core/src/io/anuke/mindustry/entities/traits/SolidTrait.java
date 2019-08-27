@@ -3,7 +3,7 @@ package io.anuke.mindustry.entities.traits;
 
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.math.geom.QuadTree.QuadTreeObject;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 
 public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, Entity, Position{
 
@@ -33,6 +33,6 @@ public interface SolidTrait extends QuadTreeObject, MoveTrait, VelocityTrait, En
     }
 
     default void move(float x, float y){
-        Vars.collisions.move(this, x, y);
+        Min.collisions.move(this, x, y);
     }
 }

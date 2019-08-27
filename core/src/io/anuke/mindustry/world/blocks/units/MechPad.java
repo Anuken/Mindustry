@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.Mechs;
 import io.anuke.mindustry.entities.Effects;
@@ -25,8 +25,8 @@ import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.mobile;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class MechPad extends Block{
     protected Mech mech;
@@ -130,10 +130,10 @@ public class MechPad extends Block{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-            tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+            tile.drawx() + Mathf.sin(entity.time, 6f, Min.tilesize / 3f * size),
             tile.drawy(),
             90,
-            size * Vars.tilesize / 2f + 1f);
+            size * Min.tilesize / 2f + 1f);
 
             Draw.reset();
         }

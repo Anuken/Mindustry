@@ -14,7 +14,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.*;
 
 public abstract class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
@@ -223,7 +223,7 @@ public abstract class GroundUnit extends BaseUnit{
     protected void moveToCore(){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(team, tile);
+        Tile targetTile = pathfinder.getTargetTile(team, tile);
 
         if(tile == targetTile) return;
 
@@ -235,8 +235,8 @@ public abstract class GroundUnit extends BaseUnit{
 
     protected void moveAwayFromCore(){
         Team enemy = null;
-        for(Team team : Vars.state.teams.enemiesOf(team)){
-            if(Vars.state.teams.isActive(team)){
+        for(Team team : Min.state.teams.enemiesOf(team)){
+            if(Min.state.teams.isActive(team)){
                 enemy = team;
                 break;
             }
@@ -246,7 +246,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
+        Tile targetTile = pathfinder.getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || dst(core) < 120f) return;

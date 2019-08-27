@@ -18,7 +18,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class PowerNode extends PowerBlock{
     protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();

@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /**
  * Logic module.
@@ -109,7 +109,7 @@ public class Logic implements ApplicationListener{
     }
 
     public void runWave(){
-        world.spawner.spawnEnemies();
+        spawner.spawnEnemies();
         state.wave++;
         state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
         world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
@@ -234,7 +234,7 @@ public class Logic implements ApplicationListener{
                     collisions.collideGroups(bulletGroup, playerGroup);
                 }
 
-                world.pathfinder.update();
+                pathfinder.update();
             }
 
             if(!Net.client() && !world.isInvalidMap() && !state.isEditor()){

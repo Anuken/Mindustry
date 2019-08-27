@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class OverdriveProjector extends Block{
     private static Color color = Color.valueOf("feb380");

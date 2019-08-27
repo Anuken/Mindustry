@@ -15,7 +15,7 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class MapsDialog extends FloatingDialog{
     private FloatingDialog dialog;
@@ -63,7 +63,7 @@ public class MapsDialog extends FloatingDialog{
         if(!ios){
             buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
                 Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
-                    world.maps.tryCatchMapError(() -> {
+                    maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showError("$editor.errorimage");
                             return;
@@ -73,14 +73,14 @@ public class MapsDialog extends FloatingDialog{
                         if(file.extension().equalsIgnoreCase(mapExtension)){
                             map = MapIO.createMap(file, true);
                         }else{
-                            map = world.maps.makeLegacyMap(file);
+                            map = maps.makeLegacyMap(file);
                         }
 
                         //when you attempt to import a save, it will have no name, so generate one
                         String name = map.tags.getOr("name", () -> {
                             String result = "unknown";
                             int number = 0;
-                            while(world.maps.byName(result + number++) != null) ;
+                            while(maps.byName(result + number++) != null) ;
                             return result + number;
                         });
 
@@ -90,19 +90,19 @@ public class MapsDialog extends FloatingDialog{
                             return;
                         }
 
-                        Map conflict = world.maps.all().find(m -> m.name().equals(name));
+                        Map conflict = maps.all().find(m -> m.name().equals(name));
 
                         if(conflict != null && !conflict.custom){
                             ui.showInfo(Core.bundle.format("editor.import.exists", name));
                         }else if(conflict != null){
                             ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                                world.maps.tryCatchMapError(() -> {
-                                    world.maps.importMap(file);
+                                maps.tryCatchMapError(() -> {
+                                    maps.importMap(file);
                                     setup();
                                 });
                             });
                         }else{
-                            world.maps.importMap(map.file);
+                            maps.importMap(map.file);
                             setup();
                         }
 
@@ -123,7 +123,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = 200f;
 
         int i = 0;
-        for(Map map : world.maps.all()){
+        for(Map map : Min.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
@@ -143,7 +143,7 @@ public class MapsDialog extends FloatingDialog{
             i++;
         }
 
-        if(world.maps.all().size == 0){
+        if(Min.maps.all().size == 0){
             maps.add("$maps.none");
         }
 
@@ -189,7 +189,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton("$editor.openin", "icon-load-map-small", iconsizesmall, () -> {
             try{
-                Vars.ui.editor.beginEditMap(map.file);
+                Min.ui.editor.beginEditMap(map.file);
                 dialog.hide();
                 hide();
             }catch(Exception e){
@@ -200,7 +200,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton("$delete", "icon-trash-16-small", iconsizesmall, () -> {
             ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
-                world.maps.removeMap(map);
+                maps.removeMap(map);
                 dialog.hide();
                 setup();
             });

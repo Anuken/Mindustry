@@ -15,7 +15,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;

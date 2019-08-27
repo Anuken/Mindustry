@@ -10,8 +10,8 @@ import io.anuke.mindustry.type.ItemType;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.data;
+import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Min.data;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{

@@ -7,7 +7,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Item.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class GameOverDialog extends FloatingDialog{
     private Team winner;

@@ -10,7 +10,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Links;
 import io.anuke.mindustry.ui.Links.LinkEntry;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class AboutDialog extends FloatingDialog{
     private Array<String> contributors = new Array<>();

@@ -6,12 +6,11 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class CustomGameDialog extends FloatingDialog{
     private MapPlayDialog dialog = new MapPlayDialog();
@@ -42,7 +41,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         int i = 0;
         maps.defaults().width(170).fillY().top().pad(4f);
-        for(Map map : world.maps.all()){
+        for(Map map : Min.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
@@ -83,7 +82,7 @@ public class CustomGameDialog extends FloatingDialog{
             i++;
         }
 
-        if(world.maps.all().size == 0){
+        if(Min.maps.all().size == 0){
             maps.add("$maps.none").pad(50);
         }
 

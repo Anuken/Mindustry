@@ -17,7 +17,7 @@ import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Drill extends Block{
     protected final static float hardnessDrillMultiplier = 50f;

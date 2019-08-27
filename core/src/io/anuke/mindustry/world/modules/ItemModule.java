@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.ItemStack;
 import java.io.*;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class ItemModule extends BlockModule{
     private int[] items = new int[content.items().size];

@@ -1,7 +1,9 @@
 package io.anuke.mindustry.type;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -15,7 +17,7 @@ import io.anuke.mindustry.world.*;
 
 import java.util.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Zone extends UnlockableContent{
     public final Generator generator;
@@ -39,6 +41,13 @@ public class Zone extends UnlockableContent{
     public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
+
+        if(!headless){
+            FileHandle file = Core.files.internal("zones/" + name + ".png");
+            if(file.exists()){
+                Core.assets.load(new AssetDescriptor<>(file, Texture.class)).loaded = t -> preview = (Texture)t;
+            }
+        }
     }
 
     public Rules getRules(){
@@ -171,13 +180,6 @@ public class Zone extends UnlockableContent{
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;
-        }
-    }
-
-    @Override
-    public void load(){
-        if(Core.files.internal("zones/" + name + ".png").exists() && !headless){
-            preview = new Texture(Core.files.internal("zones/" + name + ".png"));
         }
     }
 

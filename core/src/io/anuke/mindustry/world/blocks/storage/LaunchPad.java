@@ -4,7 +4,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -15,8 +15,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import static io.anuke.mindustry.Vars.data;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.data;
+import static io.anuke.mindustry.Min.world;
 
 public class LaunchPad extends StorageBlock{
     protected final int timerLaunch = timers++;
@@ -72,7 +72,7 @@ public class LaunchPad extends StorageBlock{
         TileEntity entity = tile.entity;
 
         if(entity.cons.valid() && world.isZone() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
-            for(Item item : Vars.content.items()){
+            for(Item item : Min.content.items()){
                 Effects.effect(Fx.padlaunch, tile);
                 data.addItem(item, entity.items.get(item));
                 entity.items.set(item, 0);

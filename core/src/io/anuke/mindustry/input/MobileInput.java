@@ -21,7 +21,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class MobileInput extends InputHandler implements GestureListener{

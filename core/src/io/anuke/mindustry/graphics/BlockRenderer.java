@@ -13,7 +13,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class BlockRenderer implements Disposable{
     private final static int initialRequests = 32 * 32;

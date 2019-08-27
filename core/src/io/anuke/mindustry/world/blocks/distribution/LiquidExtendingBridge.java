@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.world;
 
 public class LiquidExtendingBridge extends ExtendingItemBridge{
 

@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.storage.CoreBlock;
 import org.junit.jupiter.api.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -65,7 +65,7 @@ public class ZoneTests{
                 }
 
                 assertTrue(hasSpawnPoint, "Zone \"" + zone.name + "\" has no spawn points.");
-                assertTrue(world.spawner.countSpawns() > 0 || (state.rules.attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + world.spawner.countSpawns());
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
 
                 for(Item item : resources){
                     assertTrue(Structs.contains(zone.resources, item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");

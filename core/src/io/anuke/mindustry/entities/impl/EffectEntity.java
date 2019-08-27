@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.Entity;
 
-import static io.anuke.mindustry.Vars.effectGroup;
+import static io.anuke.mindustry.Min.effectGroup;
 
 public class EffectEntity extends TimedEntity implements Poolable, DrawTrait{
     public Effect effect;

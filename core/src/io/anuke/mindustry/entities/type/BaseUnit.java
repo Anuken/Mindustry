@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Base class for AI units. */
 public abstract class BaseUnit extends Unit implements ShooterTrait{
@@ -84,12 +84,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public boolean isCommanded(){
-        return world.indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && world.indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
+        return indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
     }
 
     public UnitCommand getCommand(){
         if(isCommanded()){
-            return world.indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }
         return null;
     }
@@ -145,12 +145,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosestAllyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, flag));
+        Tile target = Geometry.findClosest(x, y, indexer.getAllied(team, flag));
         if(target != null) this.target = target.entity;
     }
 
     public void targetClosestEnemyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer.getEnemy(team, flag));
+        Tile target = Geometry.findClosest(x, y, indexer.getEnemy(team, flag));
         if(target != null) this.target = target.entity;
     }
 
@@ -163,8 +163,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public TileEntity getClosestEnemyCore(){
 
-        for(Team enemy : Vars.state.teams.enemiesOf(team)){
-            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
+        for(Team enemy : Min.state.teams.enemiesOf(team)){
+            Tile tile = Geometry.findClosest(x, y, Min.state.teams.get(enemy).cores);
             if(tile != null){
                 return tile.entity;
             }
@@ -183,7 +183,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float getDamageMultipler(){
-        return status.getDamageMultiplier() * Vars.state.rules.unitDamageMultiplier;
+        return status.getDamageMultiplier() * Min.state.rules.unitDamageMultiplier;
     }
 
     @Override
@@ -232,7 +232,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float maxHealth(){
-        return type.health * Vars.state.rules.unitHealthMultiplier;
+        return type.health * Min.state.rules.unitHealthMultiplier;
     }
 
     @Override

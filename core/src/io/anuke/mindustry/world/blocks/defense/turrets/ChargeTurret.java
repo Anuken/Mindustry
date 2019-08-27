@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class ChargeTurret extends PowerTurret{
 

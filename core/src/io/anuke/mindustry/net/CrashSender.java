@@ -50,8 +50,8 @@ public class CrashSender{
             }
 
             try{
-                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
-                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
+                File file = new File(OS.getAppDataDirectoryString(Min.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Min.appName), "crashes"));
                 Files.write(file.toPath(), parseException(exception).getBytes());
 
                 writeListener.accept(file);
@@ -95,8 +95,8 @@ public class CrashSender{
             ex(() -> value.addChild("build", new JsonValue(Version.build)));
             ex(() -> value.addChild("net", new JsonValue(fn)));
             ex(() -> value.addChild("server", new JsonValue(fs)));
-            ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
-            ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
+            ex(() -> value.addChild("players", new JsonValue(Min.playerGroup.size())));
+            ex(() -> value.addChild("state", new JsonValue(Min.state.getState().name())));
             ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
 
@@ -104,7 +104,7 @@ public class CrashSender{
 
             Log.info("Sending crash report.");
             //post to crash report URL
-            httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
+            httpPost(Min.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
                 System.exit(1);

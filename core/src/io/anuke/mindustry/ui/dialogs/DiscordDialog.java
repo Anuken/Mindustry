@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.Dialog;
 import io.anuke.mindustry.graphics.Pal;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class DiscordDialog extends Dialog{
 

@@ -25,7 +25,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public abstract class Turret extends Block{
     protected static final int targetInterval = 20;

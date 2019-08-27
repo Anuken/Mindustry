@@ -12,7 +12,7 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -31,7 +31,7 @@ import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
@@ -731,7 +731,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                         target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                         if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
+                            target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
@@ -859,7 +859,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             byte mechid = stream.readByte();
             int spawner = stream.readInt();
             Tile stile = world.tile(spawner);
-            Player player = headless ? this : Vars.player;
+            Player player = headless ? this : Min.player;
             player.readSaveSuper(stream, version);
             player.mech = content.getByID(ContentType.mech, mechid);
             player.dead = false;

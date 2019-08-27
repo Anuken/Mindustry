@@ -17,8 +17,8 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.ui.GridImage;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Min.mobile;
+import static io.anuke.mindustry.Min.ui;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;

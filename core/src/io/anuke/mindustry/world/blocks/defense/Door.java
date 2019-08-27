@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.*;
 
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();
@@ -40,7 +40,7 @@ public class Door extends Wall{
             entity.open = open;
             Door door = (Door)tile.block();
 
-            world.pathfinder.updateSolid(tile);
+            pathfinder.updateSolid(tile);
             if(!entity.open){
                 Effects.effect(door.openfx, tile.drawx(), tile.drawy());
             }else{

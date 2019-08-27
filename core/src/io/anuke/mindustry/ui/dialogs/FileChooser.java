@@ -16,7 +16,7 @@ import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class FileChooser extends FloatingDialog{
     private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());

@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;

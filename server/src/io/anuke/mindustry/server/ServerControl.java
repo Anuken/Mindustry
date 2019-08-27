@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import static io.anuke.arc.util.Log.*;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
@@ -143,8 +143,8 @@ public class ServerControl implements ApplicationListener{
             info("Game over!");
 
             if(Core.settings.getBool("shuffle")){
-                if(world.maps.all().size > 0){
-                    Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
+                if(maps.all().size > 0){
+                    Array<Map> maps = maps.customMaps().size == 0 ? maps.defaultMaps() : maps.customMaps();
 
                     Map previous = world.getMap();
                     Map map = maps.random(previous);
@@ -208,7 +208,7 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            Map result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
             if(result == null){
                 err("No map with name &y'{0}'&lr found.", arg[0]);
@@ -259,9 +259,9 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("maps", "Display all available maps.", arg -> {
-            if(!world.maps.all().isEmpty()){
+            if(!maps.all().isEmpty()){
                 info("Maps:");
-                for(Map map : world.maps.all()){
+                for(Map map : maps.all()){
                     info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
                 }
             }else{
@@ -271,10 +271,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
-            int beforeMaps = world.maps.all().size;
-            world.maps.reload();
-            if(world.maps.all().size > beforeMaps){
-                info("&lc{0}&ly new map(s) found and reloaded.", world.maps.all().size - beforeMaps);
+            int beforeMaps = maps.all().size;
+            maps.reload();
+            if(maps.all().size > beforeMaps){
+                info("&lc{0}&ly new map(s) found and reloaded.", maps.all().size - beforeMaps);
             }else{
                 info("&lyMaps reloaded.");
             }

@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.blocks.ItemSelection;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class Unloader extends Block{
     protected float speed = 1f;

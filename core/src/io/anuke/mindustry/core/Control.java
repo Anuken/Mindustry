@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -13,8 +14,8 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
@@ -27,7 +28,7 @@ import io.anuke.mindustry.world.blocks.storage.*;
 import java.io.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /**
  * Control module.
@@ -35,10 +36,10 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
-public class Control implements ApplicationListener{
-    public final Saves saves;
-    public final MusicControl music;
-    public final Tutorial tutorial;
+public class Control implements ApplicationListener, Loadable{
+    public Saves saves;
+    public MusicControl music;
+    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -46,36 +47,6 @@ public class Control implements ApplicationListener{
     private boolean wasPaused = false;
 
     public Control(){
-        saves = new Saves();
-        tutorial = new Tutorial();
-        music = new MusicControl();
-
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
-
-        Core.input.setCatch(KeyCode.BACK, true);
-
-        content.initialize(Content::init);
-        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
-        content.initialize(Content::load, true);
-
-        data.load();
-
-        Core.settings.setAppName(appName);
-        Core.settings.defaults(
-            "ip", "localhost",
-            "color-0", Color.rgba8888(playerColors[8]),
-            "color-1", Color.rgba8888(playerColors[11]),
-            "color-2", Color.rgba8888(playerColors[13]),
-            "color-3", Color.rgba8888(playerColors[9]),
-            "name", "",
-            "lastBuild", 0
-        );
-
-        createPlayer();
-
-        saves.load();
-
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, Platform.instance::updateRPC);
@@ -176,9 +147,38 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+    }
 
+    @Override
+    public void loadAsync(){
+        saves = new Saves();
+        tutorial = new Tutorial();
+        music = new MusicControl();
+
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+
+        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
+
+        Core.input.setCatch(KeyCode.BACK, true);
+
+        data.load();
+
+        Core.settings.defaults(
+        "ip", "localhost",
+        "color-0", Color.rgba8888(playerColors[8]),
+        "name", "",
+        "lastBuild", 0
+        );
+
+        createPlayer();
+
+        saves.load();
+    }
+
+    @Override
+    public void loadSync(){
         if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
+            //Sounds.empty.loop(0f, 1f, 0f);
 
             checkClassicData();
         }

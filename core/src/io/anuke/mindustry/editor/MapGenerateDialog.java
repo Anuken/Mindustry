@@ -21,7 +21,7 @@ import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends FloatingDialog{
@@ -72,7 +72,7 @@ public class MapGenerateDialog extends FloatingDialog{
             }).size(160f, 64f);
         }else{
             buttons.addButton("$settings.reset", () -> {
-                filters.set(world.maps.readFilters(""));
+                filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
             }).size(160f, 64f);
@@ -304,7 +304,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         selection.cont.addButton("$filter.defaultores", () -> {
-            world.maps.addDefaultOres(filters);
+            maps.addDefaultOres(filters);
             rebuildFilters();
             update();
             selection.hide();

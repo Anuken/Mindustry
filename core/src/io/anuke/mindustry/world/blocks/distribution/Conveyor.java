@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Conveyor extends Block{
     private static final float itemSpace = 0.4f;

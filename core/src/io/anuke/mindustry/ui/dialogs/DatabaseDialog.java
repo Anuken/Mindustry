@@ -8,7 +8,7 @@ import io.anuke.arc.scene.event.HandCursorListener;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
@@ -33,7 +33,7 @@ public class DatabaseDialog extends FloatingDialog{
         table.margin(20);
         ScrollPane pane = new ScrollPane(table);
 
-        Array<Content>[] allContent = Vars.content.getContentMap();
+        Array<Content>[] allContent = Min.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.values()[j];
@@ -56,16 +56,16 @@ public class DatabaseDialog extends FloatingDialog{
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked", Pal.gray);
-                    list.add(image).size(unlocked(unlock) ? 8*4 : Vars.iconsize).pad(3);
+                    list.add(image).size(unlocked(unlock) ? 8*4 : Min.iconsize).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
-                    if(!Vars.mobile && unlocked(unlock)){
+                    if(!Min.mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
                         image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.LIGHT_GRAY : Color.WHITE, 0.4f * Time.delta()));
                     }
 
                     if(unlocked(unlock)){
-                        image.clicked(() -> Vars.ui.content.show(unlock));
+                        image.clicked(() -> Min.ui.content.show(unlock));
                         image.addListener(new Tooltip(t -> t.background("button").add(unlock.localizedName())));
                     }
 
@@ -81,6 +81,6 @@ public class DatabaseDialog extends FloatingDialog{
     }
 
     boolean unlocked(UnlockableContent content){
-        return (!Vars.world.isZone() && !Vars.state.is(State.menu)) || content.unlocked();
+        return (!Min.world.isZone() && !Min.state.is(State.menu)) || content.unlocked();
     }
 }

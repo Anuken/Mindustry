@@ -1,10 +1,10 @@
 package io.anuke.mindustry.io;
 
 import io.anuke.arc.collection.*;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.maps.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.maps;
 
 public class SaveMeta{
     public int version;
@@ -21,7 +21,7 @@ public class SaveMeta{
         this.build = build;
         this.timestamp = timestamp;
         this.timePlayed = timePlayed;
-        this.map = world.maps.all().find(m -> m.name().equals(map));
+        this.map = maps.all().find(m -> m.name().equals(map));
         this.wave = wave;
         this.rules = rules;
         this.tags = tags;

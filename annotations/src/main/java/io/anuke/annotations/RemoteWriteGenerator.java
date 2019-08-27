@@ -106,7 +106,7 @@ public class RemoteWriteGenerator{
             for(VariableElement var : elem.getParameters()){
                 //special case: calling local-only methods uses the local player
                 if(index == 0 && methodEntry.where == Loc.client){
-                    results.append("io.anuke.mindustry.Vars.player");
+                    results.append("io.anuke.mindustry.Min.player");
                 }else{
                     results.append(var.getSimpleName());
                 }

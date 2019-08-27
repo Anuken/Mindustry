@@ -10,7 +10,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{

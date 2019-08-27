@@ -18,8 +18,8 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Min.control;
 
 public class LiquidSource extends Block{
     private static Liquid lastLiquid;

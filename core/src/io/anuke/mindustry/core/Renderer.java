@@ -25,7 +25,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();

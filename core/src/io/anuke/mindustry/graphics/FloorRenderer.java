@@ -15,8 +15,8 @@ import io.anuke.mindustry.world.blocks.Floor;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Min.world;
 
 public class FloorRenderer implements Disposable{
     private final static int chunksize = 64;

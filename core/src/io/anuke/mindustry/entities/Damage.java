@@ -21,7 +21,7 @@ import io.anuke.mindustry.gen.PropCell;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{

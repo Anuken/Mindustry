@@ -19,7 +19,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.bundle;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
     public SettingsTable graphics;
@@ -192,8 +192,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
-            if(Core.graphics.getFrameId() > 10){
-                Log.info("changed");
+            if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
             return s + "%";

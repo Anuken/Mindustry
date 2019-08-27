@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class DeflectorWall extends Wall{
     public static final float hitTime = 10f;

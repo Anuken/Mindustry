@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class BuildBlock extends Block{
     public static final int maxSize = 9;

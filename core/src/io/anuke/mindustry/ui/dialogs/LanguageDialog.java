@@ -8,8 +8,8 @@ import io.anuke.arc.util.Strings;
 
 import java.util.Locale;
 
-import static io.anuke.mindustry.Vars.locales;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Min.locales;
+import static io.anuke.mindustry.Min.ui;
 
 public class LanguageDialog extends FloatingDialog{
     private Locale lastLocale;

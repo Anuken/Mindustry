@@ -12,7 +12,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.world;
 
 public class Bullets implements ContentList{
     public static BulletType

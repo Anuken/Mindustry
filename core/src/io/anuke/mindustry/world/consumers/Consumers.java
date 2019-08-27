@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.power.ConditionalConsumePower;
@@ -12,8 +12,8 @@ public class Consumers{
     private Consume[] map = new Consume[ConsumeType.values().length];
     private Consume[] results, optionalResults;
 
-    public final boolean[] itemFilters = new boolean[Vars.content.items().size];
-    public final boolean[] liquidfilters = new boolean[Vars.content.liquids().size];
+    public final boolean[] itemFilters = new boolean[Min.content.items().size];
+    public final boolean[] liquidfilters = new boolean[Min.content.liquids().size];
 
     public void init(){
         results = Structs.filter(Consume.class, map, m -> m != null);

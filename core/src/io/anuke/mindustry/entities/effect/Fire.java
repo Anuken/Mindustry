@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
     private static final IntMap<Fire> map = new IntMap<>();

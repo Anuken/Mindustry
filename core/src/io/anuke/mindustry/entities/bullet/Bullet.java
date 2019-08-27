@@ -16,8 +16,8 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.bulletGroup;
+import static io.anuke.mindustry.Min.world;
 
 public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, AbsorbTrait{
     public Interval timer = new Interval(3);

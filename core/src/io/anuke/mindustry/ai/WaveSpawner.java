@@ -17,7 +17,7 @@ import io.anuke.mindustry.game.SpawnGroup;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class WaveSpawner{
     private static final float margin = 40f, coreMargin = tilesize * 3; //how far away from the edge flying units spawn

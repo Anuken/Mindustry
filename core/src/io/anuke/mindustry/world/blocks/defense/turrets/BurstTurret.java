@@ -5,7 +5,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.tilesize;
 
 public class BurstTurret extends ItemTurret{
     protected float burstSpacing = 5;

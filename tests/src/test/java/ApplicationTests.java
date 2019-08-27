@@ -4,16 +4,14 @@ import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
@@ -22,7 +20,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
@@ -43,25 +41,23 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
-                    Vars.init();
+                    Min.init();
 
                     headless = true;
 
-                    BundleLoader.load();
-                    content.load();
+                    load();
+                    content.createContent();
 
                     add(logic = new Logic());
                     add(world = new World());
                     add(netServer = new NetServer());
-
-                    content.initialize(Content::init);
                 }
 
                 @Override
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = world.maps.loadInternalMap("groundZero");
+                    testMap = maps.loadInternalMap("groundZero");
                 }
             };
 
@@ -100,7 +96,7 @@ public class ApplicationTests{
     @Test
     void spawnWaves(){
         world.loadMap(testMap);
-        assertTrue(world.spawner.countSpawns() > 0, "No spawns present.");
+        assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);

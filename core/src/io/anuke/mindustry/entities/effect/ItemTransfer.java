@@ -17,7 +17,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.effectGroup;
+import static io.anuke.mindustry.Min.effectGroup;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 from = new Vector2();

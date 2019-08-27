@@ -5,13 +5,13 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.net.Net;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Min.player;
+import static io.anuke.mindustry.Min.ui;
 
 public class HostDialog extends FloatingDialog{
     float w = 300;
@@ -53,7 +53,7 @@ public class HostDialog extends FloatingDialog{
             ui.loadfrag.show("$hosting");
             Time.runTask(5f, () -> {
                 try{
-                    Net.host(Vars.port);
+                    Net.host(Min.port);
                     player.isAdmin = true;
                 }catch(IOException e){
                     ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));

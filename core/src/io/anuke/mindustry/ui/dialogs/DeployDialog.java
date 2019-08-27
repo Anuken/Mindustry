@@ -26,7 +26,7 @@ import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.TreeLayout.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class DeployDialog extends FloatingDialog{
     private final float nodeSize = UnitScl.dp.scl(230f);

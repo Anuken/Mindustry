@@ -24,7 +24,7 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrait, SyncTrait{
     private static final IntMap<Puddle> map = new IntMap<>();

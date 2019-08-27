@@ -11,12 +11,11 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.io.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
-public class Mindustry extends ApplicationCore{
+public class ClientLauncher extends ApplicationCore{
     private long lastTime;
     private boolean finished = false;
 
@@ -24,7 +23,6 @@ public class Mindustry extends ApplicationCore{
     public void setup(){
         Log.setUseColors(false);
 
-        Bench.begin("load setup");
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
             return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
@@ -34,45 +32,54 @@ public class Mindustry extends ApplicationCore{
         assets = new AssetManager();
         atlas = TextureAtlas.blankAtlas();
 
-        assets.load(new Vars());
+        assets.load(new Min());
+        assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
 
-        Bench.begin("cursors");
         UI.loadSystemCursors();
 
-        Bench.begin("vars");
-        Bench.begin("bundle");
-        BundleLoader.load();
+        Musics.load();
+        Sounds.load();
 
-        Bench.begin("music");
-        Musics.loadBegin();
-        Bench.begin("sound");
-        Sounds.loadBegin();
+        add(logic = new Logic());
+        add(control = new Control());
+        add(renderer = new Renderer());
+        add(ui = new UI());
+        add(netServer = new NetServer());
+        add(netClient = new NetClient());
+
+        assets.loadRun("content::init+load", ContentLoader.class, () -> {
+            content.init();
+            content.load();
+        });
     }
 
     private void post(){
-        Bench.begin("content");
-        content.load();
-        content.loadColors();
+        for(ApplicationListener listener : modules){
+            listener.init();
+        }
+    }
 
-        Bench.begin("logic");
-        add(logic = new Logic());
-        Bench.begin("world");
-        add(world = new World());
-        Bench.begin("control");
-        add(control = new Control());
-        Bench.begin("renderer");
-        add(renderer = new Renderer());
-        Bench.begin("ui");
-        add(ui = new UI());
-        Bench.begin("net");
-        add(netServer = new NetServer());
-        add(netClient = new NetClient());
-        Bench.begin("init");
+    @Override
+    public void add(ApplicationListener module){
+        super.add(module);
+
+        //autoload modules when necessary
+        if(module instanceof Loadable){
+            assets.load((Loadable)module);
+        }
+    }
+
+    @Override
+    public void resize(int width, int height){
+        super.resize(width, height);
+
+        if(!assets.isFinished()){
+            Draw.proj().setOrtho(0, 0, width, height);
+        }
     }
 
     @Override
     public void update(){
-        //
         if(!assets.update()){
             drawLoading();
         }else{
@@ -104,8 +111,14 @@ public class Mindustry extends ApplicationCore{
 
     @Override
     public void init(){
-        super.init();
-        Bench.end();
+        setup();
+    }
+
+    @Override
+    public void resume(){
+        if(finished){
+            super.resume();
+        }
     }
 
     void drawLoading(){

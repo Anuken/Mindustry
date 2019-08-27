@@ -17,8 +17,8 @@ import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Min.tilesize;
 
 /**
  * Power generation block which can use items, liquids or both as input sources for power production.

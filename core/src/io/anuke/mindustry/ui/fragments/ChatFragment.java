@@ -14,15 +14,15 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.input;
 import static io.anuke.arc.Core.scene;
-import static io.anuke.mindustry.Vars.maxTextLength;
-import static io.anuke.mindustry.Vars.mobile;
+import static io.anuke.mindustry.Min.maxTextLength;
+import static io.anuke.mindustry.Min.mobile;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
@@ -104,7 +104,7 @@ public class ChatFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.skin.get(TextField.TextFieldStyle.class)));
-        chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
+        chatfield.setFilter((field, c) -> field.getText().length() < Min.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = scene.skin.getFont("chat");
         chatfield.getStyle().fontColor = Color.WHITE;
@@ -114,7 +114,7 @@ public class ChatFragment extends Table{
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
 
-        if(Vars.mobile){
+        if(Min.mobile){
             marginBottom(105f);
             marginRight(240f);
         }

@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.*;
 
 public abstract class BaseDrone extends FlyingUnit{
     public final UnitState retreat = new UnitState(){
@@ -20,7 +20,7 @@ public abstract class BaseDrone extends FlyingUnit{
                 state.set(getStartState());
             }else if(!targetHasFlag(BlockFlag.repair)){
                 if(retarget()){
-                    Tile repairPoint = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
+                    Tile repairPoint = Geometry.findClosest(x, y, indexer.getAllied(team, BlockFlag.repair));
                     if(repairPoint != null){
                         target = repairPoint;
                     }else{
@@ -49,7 +49,7 @@ public abstract class BaseDrone extends FlyingUnit{
 
     @Override
     public void behavior(){
-        if(health <= maxHealth() * type.retreatPercent && !state.is(retreat) && Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair)) != null){
+        if(health <= maxHealth() * type.retreatPercent && !state.is(retreat) && Geometry.findClosest(x, y, indexer.getAllied(team, BlockFlag.repair)) != null){
             setState(retreat);
         }
     }

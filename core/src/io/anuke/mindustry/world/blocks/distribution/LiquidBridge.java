@@ -8,7 +8,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.BlockGroup;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.world;
 
 public class LiquidBridge extends ItemBridge{
 

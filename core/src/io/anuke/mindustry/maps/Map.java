@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.maps;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
@@ -50,16 +50,20 @@ public class Map implements Comparable<Map>{
     }
 
     public Map(StringMap tags){
-        this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
+        this(Min.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
     public int getHightScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
     }
 
+    public FileHandle previewFile(){
+        return Min.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
+    }
+
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Vars.data.modified();
+        Min.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -80,7 +84,7 @@ public class Map implements Comparable<Map>{
     public Rules rules(Rules base){
         try{
             Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
-            if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
+            if(result.spawns.isEmpty()) result.spawns = Min.defaultWaves.get();
             return result;
         }catch(Exception e){
             //error reading rules. ignore?
@@ -94,7 +98,7 @@ public class Map implements Comparable<Map>{
         if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
             return Array.with();
         }
-        return world.maps.readFilters(tags.get("genfilters", ""));
+        return maps.readFilters(tags.get("genfilters", ""));
     }
 
     public String author(){

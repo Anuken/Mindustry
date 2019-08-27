@@ -18,7 +18,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
 public class CoreBlock extends StorageBlock{
     protected Mech mech = Mechs.starter;
@@ -113,10 +113,10 @@ public class CoreBlock extends StorageBlock{
             Draw.color(Pal.accent);
 
             Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
+                tile.drawx() + Mathf.sin(entity.time, 6f, Min.tilesize / 3f * size),
                 tile.drawy(),
                 90,
-                size * Vars.tilesize / 2f);
+                size * Min.tilesize / 2f);
 
             Draw.reset();
         }

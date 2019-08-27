@@ -5,7 +5,7 @@ import io.anuke.arc.math.geom.*;
 
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Min.world;
 
 public class Edges{
     private static final int maxSize = 11;

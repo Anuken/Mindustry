@@ -6,7 +6,7 @@ import io.anuke.mindustry.type.Item;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class ItemBuffer{
     private final float speed;

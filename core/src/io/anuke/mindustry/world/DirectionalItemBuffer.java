@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.Item;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Min.content;
 
 public class DirectionalItemBuffer{
     public final long[][] buffers;

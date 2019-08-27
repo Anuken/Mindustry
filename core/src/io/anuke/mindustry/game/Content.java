@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.Min;
 import io.anuke.mindustry.type.ContentType;
 
 
@@ -9,8 +9,8 @@ public abstract class Content{
     public final short id;
 
     public Content(){
-        this.id = (short)Vars.content.getBy(getContentType()).size;
-        Vars.content.handleContent(this);
+        this.id = (short)Min.content.getBy(getContentType()).size;
+        Min.content.handleContent(this);
     }
 
     /**
@@ -19,7 +19,7 @@ public abstract class Content{
      */
     public abstract ContentType getContentType();
 
-    /** Called after all content is created. Do not use to load regions or texture data! */
+    /** Called after all content and modules are created. Do not use to load regions or texture data! */
     public void init(){
     }
 

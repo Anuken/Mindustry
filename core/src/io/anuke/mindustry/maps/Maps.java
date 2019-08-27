@@ -1,11 +1,13 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
@@ -16,15 +18,17 @@ import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Min.*;
 
-public class Maps implements Disposable{
+public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
     private Json json = new Json();
+
+    private AsyncExecutor executor = new AsyncExecutor(2);
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -74,7 +78,13 @@ public class Maps implements Disposable{
     }
 
     public void reload(){
-        dispose();
+        for(Map map : maps){
+            if(map.texture != null){
+                map.texture.dispose();
+                map.texture = null;
+            }
+        }
+        maps.clear();
         load();
     }
 
@@ -128,7 +138,10 @@ public class Maps implements Disposable{
                     }
                 }
 
-                map.texture = new Texture(MapIO.generatePreview(world.getTiles()));
+                Pixmap pix = MapIO.generatePreview(world.getTiles());
+                executor.submit(() -> map.previewFile().writePNG(pix));
+
+                map.texture = new Texture(pix);
             }
             maps.add(map);
             maps.sort();
@@ -284,6 +297,31 @@ public class Maps implements Disposable{
         }
     }
 
+    public void loadPreviews(){
+        for(Map map : maps){
+            try{
+                //try to load preview
+                if(map.previewFile().exists()){
+                    try{
+                        Core.assets.load(new AssetDescriptor<>(map.previewFile(), Texture.class)).loaded = t -> map.texture = (Texture)t;
+                        //if it works, keep going
+                        continue;
+                    }catch(Exception e){
+                        Log.err("Found cached preview, but failed to load it!");
+                        e.printStackTrace();
+                    }
+                }
+                //if it's here, then the preview failed to load or doesn't exist, make it
+                //this has to be done synchronously!
+                Pixmap pix = MapIO.generatePreview(map);
+                Core.app.post(() -> map.texture = new Texture(pix));
+                executor.submit(() -> map.previewFile().writePNG(pix));
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
@@ -301,10 +339,6 @@ public class Maps implements Disposable{
             throw new IOException("Map name cannot be empty! File: " + file);
         }
 
-        if(!headless){
-            map.texture = new Texture(MapIO.generatePreview(map));
-        }
-
         maps.add(map);
         //maps.sort();
     }
@@ -320,16 +354,5 @@ public class Maps implements Disposable{
                 Log.err(e);
             }
         }
-    }
-
-    @Override
-    public void dispose(){
-        for(Map map : maps){
-            if(map.texture != null){
-                map.texture.dispose();
-                map.texture = null;
-            }
-        }
-        maps.clear();
     }
 }
