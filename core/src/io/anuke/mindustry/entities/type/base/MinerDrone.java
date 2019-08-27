@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** A drone that only mines.*/
 public class MinerDrone extends BaseDrone implements MinerTrait{

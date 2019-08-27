@@ -14,7 +14,7 @@ import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ArcNetClient implements ClientProvider{
     final Client client;

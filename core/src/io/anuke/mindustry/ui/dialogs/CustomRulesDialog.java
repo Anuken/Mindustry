@@ -12,7 +12,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.type.ItemType;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;

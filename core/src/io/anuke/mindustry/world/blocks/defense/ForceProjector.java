@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ForceProjector extends Block{
     protected int timerUse = timers++;

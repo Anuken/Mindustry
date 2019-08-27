@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Pathfinder{
     private static final long maxUpdate = Time.millisToNanos(4);

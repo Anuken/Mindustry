@@ -36,7 +36,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.zip.DeflaterOutputStream;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     public final static int maxSnapshotSize = 430;

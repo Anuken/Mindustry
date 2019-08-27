@@ -26,7 +26,7 @@ import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
     public static Block
@@ -515,10 +515,10 @@ public class Blocks implements ContentList{
                 Draw.alpha(entity.warmup);
 
                 Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.totalProgress, 6f, Min.tilesize / 3f * size),
+                tile.drawx() + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * size),
                 tile.drawy(),
                 90,
-                size * Min.tilesize / 2f);
+                size * Vars.tilesize / 2f);
 
                 Draw.reset();
 

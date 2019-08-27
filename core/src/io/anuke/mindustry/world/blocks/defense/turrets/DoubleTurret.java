@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class DoubleTurret extends ItemTurret{
     protected float shotWidth = 2f;

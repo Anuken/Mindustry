@@ -7,7 +7,7 @@ import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class BaseDrone extends FlyingUnit{
     public final UnitState retreat = new UnitState(){

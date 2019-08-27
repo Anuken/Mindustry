@@ -6,7 +6,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Loadout extends Content{
     private final Array<Tile> outArray = new Array<>();

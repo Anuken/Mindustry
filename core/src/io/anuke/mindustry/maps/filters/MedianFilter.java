@@ -5,7 +5,7 @@ import io.anuke.arc.math.*;
 import io.anuke.mindustry.maps.filters.FilterOption.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class MedianFilter extends GenerateFilter{
     float radius = 2;

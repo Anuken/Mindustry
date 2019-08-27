@@ -5,7 +5,7 @@ import io.anuke.mindustry.type.Liquid;
 import java.io.*;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
     private float[] liquids = new float[content.liquids().size];

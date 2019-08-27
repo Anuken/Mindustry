@@ -4,7 +4,7 @@ import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.Puddle;
@@ -222,8 +222,8 @@ public abstract class BlockStorage extends UnlockableContent{
 
             if(todump == null){
 
-                for(int ii = 0; ii < Min.content.items().size; ii++){
-                    Item item = Min.content.item(ii);
+                for(int ii = 0; ii < Vars.content.items().size; ii++){
+                    Item item = Vars.content.item(ii);
 
                     if(other.getTeam() == tile.getTeam() && entity.items.has(item) && other.block().acceptItem(item, other, in) && canDump(tile, other, item)){
                         other.block().handleItem(item, other, in);

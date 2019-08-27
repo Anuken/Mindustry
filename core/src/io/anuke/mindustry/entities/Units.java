@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Utility class for unit and team interactions.*/
 public class Units{

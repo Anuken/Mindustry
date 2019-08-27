@@ -12,7 +12,7 @@ import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.Block.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ZoneInfoDialog extends FloatingDialog{
     private LoadoutDialog loadout = new LoadoutDialog();

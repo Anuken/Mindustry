@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities.effect;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.Effects.EffectRenderer;
@@ -27,7 +27,7 @@ public class GroundEffectEntity extends EffectEntity{
             if(!once && time >= lifetime()){
                 once = true;
                 time = 0f;
-                Tile tile = Min.world.tileWorld(x, y);
+                Tile tile = Vars.world.tileWorld(x, y);
                 if(tile != null && tile.floor().isLiquid){
                     remove();
                 }

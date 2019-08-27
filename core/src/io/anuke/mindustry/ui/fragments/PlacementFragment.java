@@ -18,7 +18,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.Block.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;

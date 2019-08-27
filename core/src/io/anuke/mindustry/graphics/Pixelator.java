@@ -10,8 +10,8 @@ import io.anuke.mindustry.entities.type.Player;
 
 import static io.anuke.arc.Core.camera;
 import static io.anuke.arc.Core.graphics;
-import static io.anuke.mindustry.Min.playerGroup;
-import static io.anuke.mindustry.Min.renderer;
+import static io.anuke.mindustry.Vars.playerGroup;
+import static io.anuke.mindustry.Vars.renderer;
 
 public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer(2, 2);

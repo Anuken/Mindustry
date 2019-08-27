@@ -50,7 +50,7 @@ public class JsonIO{
 
             @Override
             public Zone read(Json json, JsonValue jsonData, Class type){
-                return Min.content.getByName(ContentType.zone, jsonData.asString());
+                return Vars.content.getByName(ContentType.zone, jsonData.asString());
             }
         });
 
@@ -63,13 +63,13 @@ public class JsonIO{
             @Override
             public Item read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.asString() == null) return Items.copper;
-                Item i =  Min.content.getByName(ContentType.item, jsonData.asString());
+                Item i =  Vars.content.getByName(ContentType.item, jsonData.asString());
                 return i == null ? Items.copper : i;
             }
         });
 
         //TODO extremely hacky and disgusting
-        for(Block block : Min.content.blocks()){
+        for(Block block : Vars.content.blocks()){
             Class type = block.getClass();
             if(type.isAnonymousClass()) type = type.getSuperclass();
 
@@ -81,7 +81,7 @@ public class JsonIO{
 
                 @Override
                 public Block read(Json json, JsonValue jsonData, Class type){
-                    return Min.content.getByName(ContentType.block, jsonData.asString());
+                    return Vars.content.getByName(ContentType.block, jsonData.asString());
                 }
             });
         }
@@ -94,7 +94,7 @@ public class JsonIO{
 
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
-                return Min.content.getByName(ContentType.block, jsonData.asString());
+                return Vars.content.getByName(ContentType.block, jsonData.asString());
             }
         });
 

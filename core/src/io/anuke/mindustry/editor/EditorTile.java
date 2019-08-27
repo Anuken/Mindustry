@@ -10,8 +10,8 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Min.state;
-import static io.anuke.mindustry.Min.ui;
+import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.ui;
 
 //TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{

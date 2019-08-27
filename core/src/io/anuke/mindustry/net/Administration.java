@@ -4,7 +4,7 @@ import io.anuke.annotations.Annotations.Serialize;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 
-import static io.anuke.mindustry.Min.headless;
+import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
 

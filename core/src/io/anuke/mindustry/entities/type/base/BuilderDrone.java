@@ -6,7 +6,7 @@ import io.anuke.arc.collection.IntIntMap;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class BuilderDrone extends BaseDrone implements BuilderTrait{
     private static final StaticReset reset = new StaticReset();
@@ -189,7 +189,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
             }
 
             if(isRebuild() && !isBuilding()){
-                TeamData data = Min.state.teams.get(team);
+                TeamData data = Vars.state.teams.get(team);
                 if(!data.brokenBlocks.isEmpty()){
                     long block = data.brokenBlocks.removeLast();
 

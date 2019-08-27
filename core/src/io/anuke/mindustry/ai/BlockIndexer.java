@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Class used for indexing special target blocks for AI. */
 @SuppressWarnings("unchecked")

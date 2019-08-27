@@ -11,7 +11,7 @@ import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class CooledTurret extends Turret{
     /** How much reload is lowered by for each unit of liquid of heat capacity. */

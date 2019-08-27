@@ -11,7 +11,7 @@ public class LoopControl{
     private ObjectMap<Sound, SoundData> sounds = new ObjectMap<>();
 
     public void play(Sound sound, Position pos, float volume){
-        if(Min.headless) return;
+        if(Vars.headless) return;
 
         float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
         float vol = baseVol * volume;

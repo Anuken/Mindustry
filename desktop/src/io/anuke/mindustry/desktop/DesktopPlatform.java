@@ -15,7 +15,7 @@ import io.anuke.mindustry.ui.dialogs.*;
 import java.net.*;
 import java.util.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopPlatform extends Platform{

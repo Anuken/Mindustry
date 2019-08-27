@@ -9,9 +9,9 @@ import io.anuke.arc.util.*;
 
 public class Upscaler{
     static Res[] resolutions = {
-        new Res(Min.iconsizesmall, "-small"),
-        new Res(Min.iconsizemed, "-med"),
-        new Res(Min.iconsize, ""),
+        new Res(Vars.iconsizesmall, "-small"),
+        new Res(Vars.iconsizemed, "-med"),
+        new Res(Vars.iconsize, ""),
     };
 
     public static void main(String[] args){

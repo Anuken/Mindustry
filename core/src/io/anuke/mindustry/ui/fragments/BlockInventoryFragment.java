@@ -27,7 +27,7 @@ import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;

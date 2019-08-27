@@ -7,7 +7,7 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
-import static io.anuke.mindustry.Min.ui;
+import static io.anuke.mindustry.Vars.ui;
 
 public class MapSaveDialog extends FloatingDialog{
     private TextField field;
@@ -23,7 +23,7 @@ public class MapSaveDialog extends FloatingDialog{
         shown(() -> {
             cont.clear();
             cont.label(() -> {
-                Map map = Min.maps.byName(field.getText());
+                Map map = Vars.maps.byName(field.getText());
                 if(map != null){
                     if(map.custom){
                         return "$editor.overwrite";
@@ -68,7 +68,7 @@ public class MapSaveDialog extends FloatingDialog{
         if(field.getText().isEmpty()){
             return true;
         }
-        Map map = Min.maps.byName(field.getText());
+        Map map = Vars.maps.byName(field.getText());
         return map != null && !map.custom;
     }
 }

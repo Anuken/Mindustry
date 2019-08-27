@@ -7,7 +7,7 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.world.Block;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class PlaceUtils{
     private static final NormalizeResult result = new NormalizeResult();

@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block{
     private static Item lastItem;

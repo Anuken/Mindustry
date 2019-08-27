@@ -6,7 +6,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.graphics.CacheLayer;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class StaticWall extends Rock{
     TextureRegion large;

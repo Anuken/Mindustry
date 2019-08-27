@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class SaveVersion extends SaveFileReader{
     public final int version;

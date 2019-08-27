@@ -15,7 +15,7 @@ import io.anuke.mindustry.graphics.Drawf;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Fx implements ContentList{
     public static Effect

@@ -4,7 +4,7 @@ import io.anuke.arc.scene.ui.ScrollPane;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.net.Administration.PlayerInfo;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class AdminsDialog extends FloatingDialog{
 

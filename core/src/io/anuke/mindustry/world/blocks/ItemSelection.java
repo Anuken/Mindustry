@@ -10,7 +10,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemSelection{
 

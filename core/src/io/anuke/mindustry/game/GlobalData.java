@@ -7,7 +7,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Stores player unlocks. Clientside only. */
 public class GlobalData{
@@ -106,7 +106,7 @@ public class GlobalData{
     @SuppressWarnings("unchecked")
     public void load(){
         unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
-        for(Item item : Min.content.items()){
+        for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));
         }
 
@@ -118,7 +118,7 @@ public class GlobalData{
 
     public void save(){
         Core.settings.putObject("unlocks", unlocked);
-        for(Item item : Min.content.items()){
+        for(Item item : Vars.content.items()){
             Core.settings.put("item-" + item.name, items.get(item, 0));
         }
         Core.settings.save();

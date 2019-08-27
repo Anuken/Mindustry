@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class CommandCenter extends Block{
     protected TextureRegion[] commandRegions = new TextureRegion[UnitCommand.all.length];

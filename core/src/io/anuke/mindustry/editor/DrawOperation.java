@@ -8,7 +8,7 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.Floor;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class DrawOperation{
     private MapEditor editor;

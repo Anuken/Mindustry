@@ -4,7 +4,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.files.FileHandle;
 import io.anuke.arc.util.io.CounterInputStream;
 import io.anuke.arc.util.io.FastDeflaterOutputStream;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.io.versions.Save1;
 import io.anuke.mindustry.io.versions.Save2;
 import io.anuke.mindustry.world.WorldContext;
@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.zip.InflaterInputStream;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
@@ -108,7 +108,7 @@ public class SaveIO{
     }
 
     public static FileHandle fileFor(int slot){
-        return saveDirectory.child(slot + "." + Min.saveExtension);
+        return saveDirectory.child(slot + "." + Vars.saveExtension);
     }
 
     public static FileHandle backupFileFor(FileHandle file){

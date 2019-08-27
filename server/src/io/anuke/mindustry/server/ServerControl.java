@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import static io.anuke.arc.util.Log.*;
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;

@@ -16,7 +16,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class JoinDialog extends FloatingDialog{
     Array<Server> servers = new Array<>();
@@ -317,7 +317,7 @@ public class JoinDialog extends FloatingDialog{
         Time.runTask(2f, () -> {
             logic.reset();
             Net.reset();
-            Min.netClient.beginConnecting();
+            Vars.netClient.beginConnecting();
             Net.connect(ip, port, () -> {
                 hide();
                 add.hide();
@@ -357,16 +357,16 @@ public class JoinDialog extends FloatingDialog{
                     this.port = Integer.parseInt(ip.substring(idx + 1));
                 }catch(Exception e){
                     this.ip = ip;
-                    this.port = Min.port;
+                    this.port = Vars.port;
                 }
             }else{
                 this.ip = ip;
-                this.port = Min.port;
+                this.port = Vars.port;
             }
         }
 
         String displayIP(){
-            return ip + (port != Min.port ? ":" + port : "");
+            return ip + (port != Vars.port ? ":" + port : "");
         }
 
         public Server(){

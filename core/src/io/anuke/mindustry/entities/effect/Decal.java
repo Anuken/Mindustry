@@ -8,7 +8,7 @@ import io.anuke.mindustry.entities.traits.BelowLiquidTrait;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.graphics.Pal;
 
-import static io.anuke.mindustry.Min.groundEffectGroup;
+import static io.anuke.mindustry.Vars.groundEffectGroup;
 
 /**
  * Class for creating block rubble on the ground.

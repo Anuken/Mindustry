@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.blocks.Floor;
 import java.io.*;
 import java.util.zip.InflaterInputStream;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Map IO for the "old" .mmap format.
  * Differentiate between legacy maps and new maps by checking the extension (or the header).*/

@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class ImpactReactor extends PowerGenerator{
     protected int timerUse = timers++;

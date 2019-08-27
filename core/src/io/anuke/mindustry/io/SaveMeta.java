@@ -4,7 +4,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.*;
 
-import static io.anuke.mindustry.Min.maps;
+import static io.anuke.mindustry.Vars.maps;
 
 public class SaveMeta{
     public int version;

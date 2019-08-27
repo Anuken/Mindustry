@@ -41,7 +41,7 @@ public class CustomGameDialog extends FloatingDialog{
 
         int i = 0;
         maps.defaults().width(170).fillY().top().pad(4f);
-        for(Map map : Min.maps.all()){
+        for(Map map : Vars.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
@@ -82,7 +82,7 @@ public class CustomGameDialog extends FloatingDialog{
             i++;
         }
 
-        if(Min.maps.all().size == 0){
+        if(Vars.maps.all().size == 0){
             maps.add("$maps.none").pad(50);
         }
 

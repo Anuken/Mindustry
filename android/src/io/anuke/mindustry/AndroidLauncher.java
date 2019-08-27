@@ -28,7 +28,7 @@ import io.anuke.mindustry.ui.dialogs.FileChooser;
 import java.io.*;
 import java.util.ArrayList;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;

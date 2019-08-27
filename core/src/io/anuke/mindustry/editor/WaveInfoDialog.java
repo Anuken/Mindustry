@@ -10,7 +10,7 @@ import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.Pal;
@@ -18,7 +18,7 @@ import io.anuke.mindustry.io.JsonIO;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.FloatingDialog;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends FloatingDialog{
@@ -242,7 +242,7 @@ public class WaveInfoDialog extends FloatingDialog{
                 table.add((wave + 1) + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
                 table.row();
 
-                int[] spawned = new int[Min.content.getBy(ContentType.unit).size];
+                int[] spawned = new int[Vars.content.getBy(ContentType.unit).size];
 
                 for(SpawnGroup spawn : groups){
                     spawned[spawn.type.id] += spawn.getUnitsSpawned(wave);

@@ -21,7 +21,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 
-import static io.anuke.mindustry.Min.bulletGroup;
+import static io.anuke.mindustry.Vars.bulletGroup;
 
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;

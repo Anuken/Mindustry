@@ -44,7 +44,7 @@ public class ContentLoader{
 
     public ContentLoader(){
         //hack; allows content to initialize itself by referring to Mins.content, even though it hasn't been fully constructed yet
-        Min.content = this;
+        Vars.content = this;
         createContent();
     }
 

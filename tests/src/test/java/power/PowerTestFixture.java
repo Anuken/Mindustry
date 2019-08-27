@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.world.Block;
@@ -31,8 +31,8 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
-        Min.content = new ContentLoader();
-        Min.content.createContent();
+        Vars.content = new ContentLoader();
+        Vars.content.createContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }

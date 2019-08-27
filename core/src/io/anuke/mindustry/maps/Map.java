@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
 
-import static io.anuke.mindustry.Min.maps;
+import static io.anuke.mindustry.Vars.maps;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
@@ -50,7 +50,7 @@ public class Map implements Comparable<Map>{
     }
 
     public Map(StringMap tags){
-        this(Min.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
+        this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
     public int getHightScore(){
@@ -58,12 +58,12 @@ public class Map implements Comparable<Map>{
     }
 
     public FileHandle previewFile(){
-        return Min.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
+        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
     }
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Min.data.modified();
+        Vars.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -84,7 +84,7 @@ public class Map implements Comparable<Map>{
     public Rules rules(Rules base){
         try{
             Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
-            if(result.spawns.isEmpty()) result.spawns = Min.defaultWaves.get();
+            if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
             return result;
         }catch(Exception e){
             //error reading rules. ignore?

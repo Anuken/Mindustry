@@ -13,7 +13,7 @@ import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Build{
     private static final Rectangle rect = new Rectangle();

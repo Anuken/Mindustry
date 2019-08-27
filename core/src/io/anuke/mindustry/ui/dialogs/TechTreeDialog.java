@@ -22,7 +22,7 @@ import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.TreeLayout.*;
 import io.anuke.mindustry.world.Block.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class TechTreeDialog extends FloatingDialog{
     private final float nodeSize = UnitScl.dp.scl(60f);

@@ -20,7 +20,7 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class MassDriver extends Block{
     protected float range;

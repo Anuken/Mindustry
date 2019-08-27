@@ -16,7 +16,7 @@ import io.anuke.mindustry.net.Net;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class LoadDialog extends FloatingDialog{
     ScrollPane pane;
@@ -95,7 +95,7 @@ public class LoadDialog extends FloatingDialog{
                         }, false, FileChooser.saveFiles);
                     }else{
                         try{
-                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + Min.saveExtension);
+                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
                             slot.exportFile(file);
                             Platform.instance.shareFile(file);
                         }catch(Exception e){

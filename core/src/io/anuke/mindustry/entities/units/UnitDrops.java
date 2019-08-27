@@ -1,7 +1,7 @@
 package io.anuke.mindustry.entities.units;
 
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -13,13 +13,13 @@ public class UnitDrops{
 
     public static void dropItems(BaseUnit unit){
         //items only dropped in waves for enemy team
-        if(unit.getTeam() != Min.waveTeam || !Min.state.rules.unitDrops){
+        if(unit.getTeam() != Vars.waveTeam || !Vars.state.rules.unitDrops){
             return;
         }
 
         TileEntity core = unit.getClosestEnemyCore();
 
-        if(core == null || core.dst(unit) > Min.mineTransferRange){
+        if(core == null || core.dst(unit) > Vars.mineTransferRange){
             return;
         }
 
@@ -30,7 +30,7 @@ public class UnitDrops{
         for(int i = 0; i < 3; i++){
             for(Item item : dropTable){
                 //only drop unlocked items
-                if(!Min.headless && !Min.data.isUnlocked(item)){
+                if(!Vars.headless && !Vars.data.isUnlocked(item)){
                     continue;
                 }
 

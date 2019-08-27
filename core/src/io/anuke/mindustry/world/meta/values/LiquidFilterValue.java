@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.LiquidDisplay;
 import io.anuke.mindustry.world.meta.StatValue;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class LiquidFilterValue implements StatValue{
     private final Predicate<Liquid> filter;

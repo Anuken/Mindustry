@@ -17,7 +17,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{

@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static io.anuke.mindustry.Min.saveExtension;
-import static io.anuke.mindustry.Min.state;
+import static io.anuke.mindustry.Vars.saveExtension;
+import static io.anuke.mindustry.Vars.state;
 
 public class Saves{
     private int nextSlot;

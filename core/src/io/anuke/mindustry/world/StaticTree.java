@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.world.blocks.StaticWall;
 
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class StaticTree extends StaticWall{
 

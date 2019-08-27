@@ -21,7 +21,7 @@ import io.anuke.mindustry.world.blocks.BuildBlock.*;
 import java.io.*;
 import java.util.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.entities.traits.BuilderTrait.BuildDataStatic.*;
 
 /** Interface for units that build things.*/
@@ -228,7 +228,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
         float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
-        float sz = Min.tilesize * tile.block().size / 2f;
+        float sz = Vars.tilesize * tile.block().size / 2f;
         float ang = unit.angleTo(tile);
 
         tmptr[0].set(tile.drawx() - sz, tile.drawy() - sz);

@@ -25,7 +25,7 @@ import java.nio.charset.*;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class Min implements Loadable{
+public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** IO buffer size. */

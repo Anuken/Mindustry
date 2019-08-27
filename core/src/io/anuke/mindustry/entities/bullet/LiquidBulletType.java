@@ -9,7 +9,7 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class LiquidBulletType extends BulletType{
     Liquid liquid;

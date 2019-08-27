@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
 public class IOSLauncher extends IOSApplication.Delegate{

@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class MindustryServer implements ApplicationListener{
     private String[] args;
@@ -17,7 +17,7 @@ public class MindustryServer implements ApplicationListener{
     public void init(){
         Core.settings.setDataDirectory(Core.files.local("config"));
         loadLocales = false;
-        Min.init();
+        Vars.init();
 
         headless = true;
 

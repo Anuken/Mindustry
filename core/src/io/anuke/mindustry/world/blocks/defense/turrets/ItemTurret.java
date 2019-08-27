@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.meta.values.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemTurret extends CooledTurret{
     protected int maxAmmo = 30;
@@ -164,7 +164,7 @@ public class ItemTurret extends CooledTurret{
             super.read(stream, revision);
             byte amount = stream.readByte();
             for(int i = 0; i < amount; i++){
-                Item item = Min.content.item(stream.readByte());
+                Item item = Vars.content.item(stream.readByte());
                 short a = stream.readShort();
                 totalAmmo += a;
                 ammo.add(new ItemEntry(item, a));

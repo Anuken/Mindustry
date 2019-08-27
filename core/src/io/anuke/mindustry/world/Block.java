@@ -35,7 +35,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.util.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;

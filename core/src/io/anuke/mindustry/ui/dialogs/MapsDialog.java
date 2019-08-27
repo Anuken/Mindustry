@@ -15,7 +15,7 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapsDialog extends FloatingDialog{
     private FloatingDialog dialog;
@@ -123,7 +123,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = 200f;
 
         int i = 0;
-        for(Map map : Min.maps.all()){
+        for(Map map : Vars.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
@@ -143,7 +143,7 @@ public class MapsDialog extends FloatingDialog{
             i++;
         }
 
-        if(Min.maps.all().size == 0){
+        if(Vars.maps.all().size == 0){
             maps.add("$maps.none");
         }
 
@@ -189,7 +189,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton("$editor.openin", "icon-load-map-small", iconsizesmall, () -> {
             try{
-                Min.ui.editor.beginEditMap(map.file);
+                Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
                 hide();
             }catch(Exception e){

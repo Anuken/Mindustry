@@ -7,8 +7,8 @@ import io.anuke.mindustry.game.EventType.StateChangeEvent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 
-import static io.anuke.mindustry.Min.unitGroups;
-import static io.anuke.mindustry.Min.waveTeam;
+import static io.anuke.mindustry.Vars.unitGroups;
+import static io.anuke.mindustry.Vars.waveTeam;
 
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */

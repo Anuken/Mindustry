@@ -19,11 +19,11 @@ public class ImagePacker{
     static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
 
     public static void main(String[] args) throws IOException{
-        Min.headless = true;
+        Vars.headless = true;
 
         Log.setLogger(new NoopLogHandler());
-        Min.content = new ContentLoader();
-        Min.content.createContent();
+        Vars.content = new ContentLoader();
+        Vars.content.createContent();
         Log.setLogger(new LogHandler());
 
         Files.walk(Paths.get("../../../assets-raw/sprites_out")).forEach(path -> {

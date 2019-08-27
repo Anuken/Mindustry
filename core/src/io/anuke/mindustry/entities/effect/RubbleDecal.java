@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 
-import static io.anuke.mindustry.Min.headless;
+import static io.anuke.mindustry.Vars.headless;
 
 public class RubbleDecal extends Decal{
     private TextureRegion region;

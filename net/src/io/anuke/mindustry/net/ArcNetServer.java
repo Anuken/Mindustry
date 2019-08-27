@@ -12,7 +12,7 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.concurrent.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ArcNetServer implements ServerProvider{
     final Server server;

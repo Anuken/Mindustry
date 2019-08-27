@@ -16,7 +16,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 
-import static io.anuke.mindustry.Min.world;
+import static io.anuke.mindustry.Vars.world;
 
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};

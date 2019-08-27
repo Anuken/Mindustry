@@ -9,7 +9,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.Player;
@@ -18,7 +18,7 @@ import io.anuke.mindustry.input.InputHandler;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class OverlayRenderer{
     private static final float indicatorLength = 14f;
@@ -38,7 +38,7 @@ public class OverlayRenderer{
 
         if(Core.settings.getBool("indicators")){
             for(Player player : playerGroup.all()){
-                if(Min.player != player && Min.player.getTeam() == player.getTeam()){
+                if(Vars.player != player && Vars.player.getTeam() == player.getTeam()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 

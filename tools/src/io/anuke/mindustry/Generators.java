@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static io.anuke.mindustry.Min.content;
-import static io.anuke.mindustry.Min.tilesize;
+import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class Generators{
 

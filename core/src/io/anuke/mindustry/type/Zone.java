@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.*;
 
 import java.util.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
     public final Generator generator;

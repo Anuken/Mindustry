@@ -19,7 +19,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.graphics.MenuRenderer;
 import io.anuke.mindustry.ui.MobileButton;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
     private Texture logo = new Texture("sprites/logo.png");

@@ -6,7 +6,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.*;
@@ -67,7 +67,7 @@ public class UnitFactory extends Block{
     public void init(){
         super.init();
 
-        capacities = new int[Min.content.items().size];
+        capacities = new int[Vars.content.items().size];
         if(consumes.has(ConsumeType.item)){
             ConsumeItems cons = consumes.get(ConsumeType.item);
             for(ItemStack stack : cons.items){
@@ -137,10 +137,10 @@ public class UnitFactory extends Block{
         Draw.alpha(entity.speedScl);
 
         Lines.lineAngleCenter(
-        tile.drawx() + Mathf.sin(entity.time, 20f, Min.tilesize / 2f * size - 2f),
+        tile.drawx() + Mathf.sin(entity.time, 20f, Vars.tilesize / 2f * size - 2f),
         tile.drawy(),
         90,
-        size * Min.tilesize - 4f);
+        size * Vars.tilesize - 4f);
 
         Draw.reset();
 
@@ -156,8 +156,8 @@ public class UnitFactory extends Block{
         }
 
         if(entity.cons.valid() || tile.isEnemyCheat()){
-            entity.time += entity.delta() * entity.speedScl * Min.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
-            entity.buildTime += entity.delta() * entity.power.satisfaction * Min.state.rules.unitBuildSpeedMultiplier;
+            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
+            entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);

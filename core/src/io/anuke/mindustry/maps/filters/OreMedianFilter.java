@@ -52,6 +52,6 @@ public class OreMedianFilter extends GenerateFilter{
         int index = Math.min((int)(blocks.size * percentile), blocks.size - 1);
         int overlay = blocks.get(index);
 
-        in.ore = Min.content.block(overlay);
+        in.ore = Vars.content.block(overlay);
     }
 }

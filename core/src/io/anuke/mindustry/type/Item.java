@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 public class Item extends UnlockableContent implements Comparable<Item>{
     public final Color color;

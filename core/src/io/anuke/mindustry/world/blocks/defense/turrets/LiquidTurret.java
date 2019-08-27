@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.meta.values.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class LiquidTurret extends Turret{
     protected ObjectMap<Liquid, BulletType> ammo = new ObjectMap<>();

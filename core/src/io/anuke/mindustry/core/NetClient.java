@@ -9,7 +9,7 @@ import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.ReusableByteInStream;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
@@ -33,7 +33,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.zip.InflaterInputStream;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
     private final static float dataTimeout = 60 * 18;
@@ -126,8 +126,8 @@ public class NetClient implements ApplicationListener{
     //called on all clients
     @Remote(called = Loc.server, targets = Loc.server, variants = Variant.both)
     public static void sendMessage(String message, String sender, Player playersender){
-        if(Min.ui != null){
-            Min.ui.chatfrag.addMessage(message, sender);
+        if(Vars.ui != null){
+            Vars.ui.chatfrag.addMessage(message, sender);
         }
 
         if(playersender != null){
@@ -139,8 +139,8 @@ public class NetClient implements ApplicationListener{
     //equivalent to above method but there's no sender and no console log
     @Remote(called = Loc.server, targets = Loc.server)
     public static void sendMessage(String message){
-        if(Min.ui != null){
-            Min.ui.chatfrag.addMessage(message, null);
+        if(Vars.ui != null){
+            Vars.ui.chatfrag.addMessage(message, null);
         }
     }
 

@@ -2,7 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.*;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.world.Tile;
 
 /** Class for various team-based utilities. */
@@ -29,7 +29,7 @@ public class Teams{
     /** Returns whether a team is active, e.g. whether it has any cores remaining. */
     public boolean isActive(Team team){
         //the enemy wave team is always active
-        return team == Min.waveTeam || get(team).cores.size > 0;
+        return team == Vars.waveTeam || get(team).cores.size > 0;
     }
 
     /** Returns a set of all teams that are enemies of this team. */

@@ -28,7 +28,7 @@ import io.anuke.mindustry.world.blocks.storage.*;
 import java.io.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Control module.

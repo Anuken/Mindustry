@@ -34,7 +34,7 @@ import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.ui.fragments.*;
 
 import static io.anuke.arc.scene.actions.Actions.*;
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
     private Skin skin;

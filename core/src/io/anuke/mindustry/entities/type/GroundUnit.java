@@ -14,7 +14,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
@@ -235,8 +235,8 @@ public abstract class GroundUnit extends BaseUnit{
 
     protected void moveAwayFromCore(){
         Team enemy = null;
-        for(Team team : Min.state.teams.enemiesOf(team)){
-            if(Min.state.teams.isActive(team)){
+        for(Team team : Vars.state.teams.enemiesOf(team)){
+            if(Vars.state.teams.isActive(team)){
                 enemy = team;
                 break;
             }

@@ -13,7 +13,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Min.updateEditorOnChange;
+import static io.anuke.mindustry.Vars.updateEditorOnChange;
 
 public abstract class FilterOption{
     public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full));
@@ -81,7 +81,7 @@ public abstract class FilterOption{
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
-                for(Block block : Min.content.blocks()){
+                for(Block block : Vars.content.blocks()){
                     if(!filter.test(block)) continue;
 
                     dialog.cont.addImage(block == Blocks.air ? Core.atlas.find("icon-none-small") : block.icon(Icon.medium)).size(8 * 4).pad(3).get().clicked(() -> {

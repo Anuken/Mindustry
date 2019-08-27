@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.glutils.Shader;
 
 import static io.anuke.arc.Core.camera;
-import static io.anuke.mindustry.Min.renderer;
+import static io.anuke.mindustry.Vars.renderer;
 
 public enum CacheLayer{
     water{

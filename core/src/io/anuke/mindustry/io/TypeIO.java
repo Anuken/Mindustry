@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Class for specifying read/write methods for code generation. */
 @SuppressWarnings("unused")

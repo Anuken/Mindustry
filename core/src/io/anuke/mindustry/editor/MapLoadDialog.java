@@ -8,7 +8,7 @@ import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
-import static io.anuke.mindustry.Min.maps;
+import static io.anuke.mindustry.Vars.maps;
 
 public class MapLoadDialog extends FloatingDialog{
     private Map selected = null;

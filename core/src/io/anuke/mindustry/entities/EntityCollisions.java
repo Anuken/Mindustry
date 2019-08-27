@@ -7,8 +7,8 @@ import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SolidTrait;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.tilesize;
-import static io.anuke.mindustry.Min.world;
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class EntityCollisions{
     //range for tile collision scanning

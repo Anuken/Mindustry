@@ -17,7 +17,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.net.Packets.AdminAction;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class PlayerListFragment extends Fragment{
     private boolean visible = false;

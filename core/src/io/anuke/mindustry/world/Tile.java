@@ -12,7 +12,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Tile implements Position, TargetTrait{
     /** Tile traversal cost. */

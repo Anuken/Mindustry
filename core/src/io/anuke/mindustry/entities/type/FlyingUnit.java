@@ -13,7 +13,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class FlyingUnit extends BaseUnit{
     protected float[] weaponAngles = {0, 0};

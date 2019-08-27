@@ -22,7 +22,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 /** Base class for AI units. */
 public abstract class BaseUnit extends Unit implements ShooterTrait{
@@ -163,8 +163,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public TileEntity getClosestEnemyCore(){
 
-        for(Team enemy : Min.state.teams.enemiesOf(team)){
-            Tile tile = Geometry.findClosest(x, y, Min.state.teams.get(enemy).cores);
+        for(Team enemy : Vars.state.teams.enemiesOf(team)){
+            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
             if(tile != null){
                 return tile.entity;
             }
@@ -183,7 +183,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float getDamageMultipler(){
-        return status.getDamageMultiplier() * Min.state.rules.unitDamageMultiplier;
+        return status.getDamageMultiplier() * Vars.state.rules.unitDamageMultiplier;
     }
 
     @Override
@@ -232,7 +232,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public float maxHealth(){
-        return type.health * Min.state.rules.unitHealthMultiplier;
+        return type.health * Vars.state.rules.unitHealthMultiplier;
     }
 
     @Override

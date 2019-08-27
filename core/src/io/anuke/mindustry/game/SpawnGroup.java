@@ -6,7 +6,7 @@ import io.anuke.arc.util.serialization.JsonValue;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.type.*;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * A spawn group defines spawn information for a specific type of unit, with optional extra information like

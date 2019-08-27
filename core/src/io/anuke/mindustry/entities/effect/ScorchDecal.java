@@ -7,8 +7,8 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.headless;
-import static io.anuke.mindustry.Min.world;
+import static io.anuke.mindustry.Vars.headless;
+import static io.anuke.mindustry.Vars.world;
 
 public class ScorchDecal extends Decal{
     private static final int scorches = 5;

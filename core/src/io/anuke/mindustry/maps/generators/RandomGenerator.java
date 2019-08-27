@@ -6,7 +6,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Min.world;
+import static io.anuke.mindustry.Vars.world;
 
 public abstract class RandomGenerator extends Generator{
     protected Block floor;

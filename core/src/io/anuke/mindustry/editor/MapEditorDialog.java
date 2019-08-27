@@ -30,7 +30,7 @@ import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
     public final MapEditor editor;
@@ -670,7 +670,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         int i = 0;
 
         blocksOut.clear();
-        blocksOut.addAll(Min.content.blocks());
+        blocksOut.addAll(Vars.content.blocks());
         blocksOut.sort((b1, b2) -> {
             int core = -Boolean.compare(b1 instanceof CoreBlock, b2 instanceof CoreBlock);
             if(core != 0) return core;

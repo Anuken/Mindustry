@@ -5,7 +5,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Bresenham2;
 import io.anuke.arc.util.Structs;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.*;
@@ -80,7 +80,7 @@ public enum EditorTool{
             editor.drawCircle(x, y, tile -> {
                 if(mode == -1){
                     //erase block
-                    Min.world.removeBlock(tile);
+                    Vars.world.removeBlock(tile);
                 }else if(mode == 0){
                     //erase ore
                     tile.clearOverlay();

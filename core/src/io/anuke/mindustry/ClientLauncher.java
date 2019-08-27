@@ -13,7 +13,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class ClientLauncher extends ApplicationCore{
     private long lastTime;
@@ -32,7 +32,7 @@ public class ClientLauncher extends ApplicationCore{
         assets = new AssetManager();
         atlas = TextureAtlas.blankAtlas();
 
-        assets.load(new Min());
+        assets.load(new Vars());
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
 
         UI.loadSystemCursors();

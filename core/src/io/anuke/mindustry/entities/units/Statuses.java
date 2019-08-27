@@ -14,7 +14,7 @@ import io.anuke.mindustry.type.StatusEffect;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.content;
+import static io.anuke.mindustry.Vars.content;
 
 /** Class for controlling status effects on an entity. */
 public class Statuses implements Saveable{

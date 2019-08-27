@@ -15,7 +15,7 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();

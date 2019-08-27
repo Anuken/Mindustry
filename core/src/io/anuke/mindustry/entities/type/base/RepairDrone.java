@@ -9,7 +9,7 @@ import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.world;
+import static io.anuke.mindustry.Vars.world;
 
 public class RepairDrone extends BaseDrone{
     public final UnitState repair = new UnitState(){

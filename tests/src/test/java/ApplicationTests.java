@@ -4,7 +4,7 @@ import io.anuke.arc.backends.headless.HeadlessApplication;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Min;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.core.*;
@@ -20,7 +20,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 import org.junit.jupiter.api.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
@@ -41,7 +41,7 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
-                    Min.init();
+                    Vars.init();
 
                     headless = true;
 

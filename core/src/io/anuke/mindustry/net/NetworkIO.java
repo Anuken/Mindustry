@@ -13,7 +13,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class NetworkIO{
 

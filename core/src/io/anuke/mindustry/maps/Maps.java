@@ -12,13 +12,14 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.MapPreviewLoader.*;
 import io.anuke.mindustry.maps.filters.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Min.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
@@ -298,27 +299,29 @@ public class Maps{
     }
 
     public void loadPreviews(){
+        Core.assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
         for(Map map : maps){
-            try{
-                //try to load preview
-                if(map.previewFile().exists()){
-                    try{
-                        Core.assets.load(new AssetDescriptor<>(map.previewFile(), Texture.class)).loaded = t -> map.texture = (Texture)t;
-                        //if it works, keep going
-                        continue;
-                    }catch(Exception e){
-                        Log.err("Found cached preview, but failed to load it!");
-                        e.printStackTrace();
-                    }
-                }
-                //if it's here, then the preview failed to load or doesn't exist, make it
-                //this has to be done synchronously!
-                Pixmap pix = MapIO.generatePreview(map);
-                Core.app.post(() -> map.texture = new Texture(pix));
-                executor.submit(() -> map.previewFile().writePNG(pix));
-            }catch(IOException e){
-                e.printStackTrace();
+            //try to load preview
+            if(map.previewFile().exists()){
+                //this may fail, but calls createNewPreview
+                Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
+            }else{
+                createNewPreview(map);
             }
+        }
+    }
+
+    public void createNewPreview(Map map){
+        try{
+            //if it's here, then the preview failed to load or doesn't exist, make it
+            //this has to be done synchronously!
+            Pixmap pix = MapIO.generatePreview(map);
+            Core.app.post(() -> map.texture = new Texture(pix));
+            executor.submit(() -> map.previewFile().writePNG(pix));
+        }catch(IOException e){
+            Log.err("Failed to generate preview!", e);
+            //TODO create error texture instead?
+            map.texture = new Texture("zones/nomap.png");
         }
     }
 
