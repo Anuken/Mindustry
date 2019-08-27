@@ -16,12 +16,17 @@ import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ClientLauncher extends ApplicationCore{
+    private static final int loadingFPS = 20;
+
+    private float smoothProgress, smoothTime;
     private long lastTime;
+    private long beginTime;
     private boolean finished = false;
 
     @Override
     public void setup(){
         Log.setUseColors(false);
+        beginTime = Time.millis();
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -32,10 +37,13 @@ public class ClientLauncher extends ApplicationCore{
         assets = new AssetManager();
         atlas = TextureAtlas.blankAtlas();
 
+        Time.mark();
+        UI.loadDefaultFont();
+        UI.loadSystemCursors();
+        Log.info("UI init: {0}", Time.elapsed());
+
         assets.load(new Vars());
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
-
-        UI.loadSystemCursors();
 
         Musics.load();
         Sounds.load();
@@ -47,7 +55,7 @@ public class ClientLauncher extends ApplicationCore{
         add(netServer = new NetServer());
         add(netClient = new NetClient());
 
-        assets.loadRun("content::init+load", ContentLoader.class, () -> {
+        assets.loadRun("Content", ContentLoader.class, () -> {
             content.init();
             content.load();
         });
@@ -80,10 +88,11 @@ public class ClientLauncher extends ApplicationCore{
 
     @Override
     public void update(){
-        if(!assets.update()){
+        if(!assets.update(1000 / loadingFPS)){
             drawLoading();
         }else{
             if(!finished){
+                Log.info("Time to load: {0}", Time.timeSinceMillis(beginTime));
                 post();
                 finished = true;
                 Events.fire(new ClientLoadEvent());
@@ -122,14 +131,28 @@ public class ClientLauncher extends ApplicationCore{
     }
 
     void drawLoading(){
+        smoothProgress = Mathf.lerpDelta(smoothProgress, assets.getProgress(), 0.1f);
+        smoothTime += Time.delta();
+
         Core.graphics.clear(Color.BLACK);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
-        float height = UnitScl.dp.scl(100f);
+        float height = UnitScl.dp.scl(50f);
 
         Draw.color(Pal.darkerGray);
         Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, graphics.getWidth(), height);
-        Draw.color(Pal.accent);
-        Fill.crect(0, graphics.getHeight()/2f - height/2f, graphics.getWidth() * assets.getProgress(), height);
+        Draw.color(Pal.accent, Color.WHITE, Mathf.absin(smoothTime, 5f, 1f) * 0.5f);
+        Fill.crect(0, graphics.getHeight()/2f - height/2f, graphics.getWidth() * smoothProgress, height);
+
+        if(assets.isLoaded("outline")){
+            BitmapFont font = assets.get("outline");
+            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f, Align.center);
+
+            if(assets.getCurrentLoading() != null){
+                String name = assets.getCurrentLoading().fileName.toLowerCase();
+                String key = name.contains("msav") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "content";
+                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - 10f, Align.center);
+            }
+        }
         Draw.flush();
     }
 }

@@ -72,9 +72,6 @@ public class UI implements ApplicationListener, Loadable{
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver));
         skin = new Skin();
         setupFonts();
     }
@@ -89,6 +86,7 @@ public class UI implements ApplicationListener, Loadable{
         //TODO type-safe skin files
         skin.addRegions(Core.atlas);
         loadExtraStyle(skin);
+        skin.add("outline", Core.assets.get("outline"));
         skin.getFont("default").getData().markupEnabled = true;
         skin.getFont("default").setOwnsTexture(false);
         skin.load(Core.files.internal("sprites/uiskin.json"));
@@ -132,6 +130,23 @@ public class UI implements ApplicationListener, Loadable{
         Core.graphics.restoreCursor();
     }
 
+    /** Called from a static context for use in the loading screen.*/
+    public static void loadDefaultFont(){
+        FileHandleResolver resolver = new InternalFileHandleResolver();
+        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver));
+
+        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+            size = fontParameter().size;
+            borderColor = Color.DARK_GRAY;
+            borderWidth = UnitScl.dp.scl(2f);
+            spaceX -= borderWidth;
+            incremental = true;
+        }};
+
+        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param));
+    }
+
     void loadExtraStyle(Skin skin){
         AtlasRegion region = Core.atlas.find("flat-down-base");
         int[] splits = region.splits;
@@ -156,27 +171,22 @@ public class UI implements ApplicationListener, Loadable{
         unloadCursor = Core.graphics.newCursor("unload");
     }
 
-    void setupFonts(){
+    public void setupFonts(){
         String fontName = "fonts/font.ttf";
 
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+        FreeTypeFontParameter param = fontParameter();
+
+        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("default", f);
+        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("chat", f);
+    }
+
+    static FreeTypeFontParameter fontParameter(){
+        return new FreeTypeFontParameter(){{
             size = (int)(UnitScl.dp.scl(18f));
             shadowColor = Color.DARK_GRAY;
             shadowOffsetY = 2;
             incremental = true;
         }};
-
-        FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
-            size = param.size;
-            borderColor = Color.DARK_GRAY;
-            borderWidth = UnitScl.dp.scl(2f);
-            spaceX -= borderWidth;
-            incremental = true;
-        }};
-
-        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, outlined)).loaded = f -> skin.add("outline", f);
-        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("default", f);
-        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("chat", f);
     }
 
     @Override
