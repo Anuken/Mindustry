@@ -345,8 +345,7 @@ public class Maps{
             });
         }catch(IOException e){
             Log.err("Failed to generate preview!", e);
-            //TODO create error texture instead?
-            Core.app.post(() -> map.texture = new Texture("zones/nomap.png"));
+            Core.app.post(() -> map.texture = new Texture("sprites/error.png"));
         }
     }
 
