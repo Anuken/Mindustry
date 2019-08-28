@@ -73,12 +73,6 @@ public class ClientLauncher extends ApplicationCore{
         });
     }
 
-    private void post(){
-        for(ApplicationListener listener : modules){
-            listener.init();
-        }
-    }
-
     @Override
     public void add(ApplicationListener module){
         super.add(module);

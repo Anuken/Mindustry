@@ -163,7 +163,7 @@ public class ContentLoader{
                 return null;
             }
             if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
-                return getByID(type, 0); //default value is always ID 0
+                return (T)contentMap[type.ordinal()].get(0); //default value is always ID 0
             }
             return (T)temporaryMapper[type.ordinal()][id];
         }

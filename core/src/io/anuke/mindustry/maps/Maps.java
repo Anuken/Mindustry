@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
@@ -308,6 +309,7 @@ public class Maps{
     }
 
     public void loadPreviews(){
+        Array<Map> createNew = new Array<>();
 
         for(Map map : maps){
             //try to load preview
@@ -315,7 +317,7 @@ public class Maps{
                 //this may fail, but calls createNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
             }else{
-                Core.app.post(() -> createNewPreview(map));
+                createNew.add(map);
             }
 
             try{
@@ -323,6 +325,8 @@ public class Maps{
             }catch(Exception ignored){
             }
         }
+
+        ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = () -> Core.app.post(() -> createNew.each(this::createNewPreview));
     }
 
     public void createNewPreview(Map map){
