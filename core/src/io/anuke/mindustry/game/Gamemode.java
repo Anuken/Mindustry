@@ -20,7 +20,6 @@ public enum Gamemode{
         rules.respawnTime = 0f;
     }),
     attack(rules -> {
-        rules.enemyCheat = true;
         rules.unitDrops = true;
         rules.attackMode = true;
         rules.waves = true;

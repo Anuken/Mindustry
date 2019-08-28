@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -85,7 +86,7 @@ public class Mechs implements ContentList{
                     Effects.shake(1f, 1f, player);
                     Effects.effect(Fx.landShock, player);
                     for(int i = 0; i < 8; i++){
-                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Pal.lancerLaser, 17f, player.x, player.y, Mathf.random(360f), 14));
+                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Pal.lancerLaser, 17f * Vars.state.rules.playerDamageMultiplier, player.x, player.y, Mathf.random(360f), 14));
                     }
                 }
             }
@@ -286,7 +287,7 @@ public class Mechs implements ContentList{
                 float scl = scld(player);
                 if(Mathf.chance(Time.delta() * (0.15 * scl))){
                     Effects.effect(Fx.hitLancer, Pal.lancerLaser, player.x, player.y);
-                    Lightning.create(player.getTeam(), Pal.lancerLaser, 10f,
+                    Lightning.create(player.getTeam(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
                     player.x + player.velocity().x, player.y + player.velocity().y, player.rotation, 14);
                 }
             }
