@@ -175,15 +175,6 @@ public class Control implements ApplicationListener, Loadable{
         saves.load();
     }
 
-    @Override
-    public void loadSync(){
-        if(android){
-            //Sounds.empty.loop(0f, 1f, 0f);
-
-            checkClassicData();
-        }
-    }
-
     //checks for existing 3.5 app data, android only
     public void checkClassicData(){
         try{
@@ -380,6 +371,11 @@ public class Control implements ApplicationListener, Loadable{
 
                 dialog.show();
             }));
+        }
+
+        if(android){
+            Sounds.empty.loop(0f, 1f, 0f);
+            checkClassicData();
         }
     }
 

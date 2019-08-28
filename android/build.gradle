@@ -50,8 +50,8 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '29.0.2'
-    compileSdkVersion 29
+    buildToolsVersion '28.0.3'
+    compileSdkVersion 28
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -70,12 +70,12 @@ android{
     }
 
     defaultConfig{
-        Integer vcode = new Properties().with{p -> p.load(new FileInputStream(file('../core/assets/version.properties'))); return p }['androidBuildCode'].toInteger()
+        Integer vcode = new Properties().with{p -> p.load(new FileInputStream(file('../core/assets/version.properties'))); return p }['androidBuildCode']?.toInteger() ?: 1
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 28
         
         versionName versionNameResult
         versionCode vcode
