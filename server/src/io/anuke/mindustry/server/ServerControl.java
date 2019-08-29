@@ -21,6 +21,8 @@ import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.server.plugin.*;
+import io.anuke.mindustry.server.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -40,6 +42,7 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.files.local("logs/");
+    private final Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
     private boolean inExtraRound;
@@ -107,6 +110,9 @@ public class ServerControl implements ApplicationListener{
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
+        //load plugins
+        plugins.load();
+
         registerCommands();
 
         Core.app.post(() -> {
@@ -118,7 +124,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(String s : commands){
-                Response response = handler.handleMessage(s);
+                CommandResponse response = handler.handleMessage(s);
                 if(response.type != ResponseType.valid){
                     err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
                     err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
@@ -128,6 +134,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
+        pluginDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -165,6 +172,13 @@ public class ServerControl implements ApplicationListener{
                 Net.closeServer();
             }
         });
+
+        //initialize plugins
+        plugins.each(Plugin::init);
+
+        if(!plugins.all().isEmpty()){
+            info("&lc{0} plugins loaded.", plugins.all().size);
+        }
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
         System.out.print("> ");
@@ -303,6 +317,31 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     info("  &lyNo players connected.");
                 }
+            }
+        });
+
+        handler.register("plugins", "Display all loaded plugins.", arg -> {
+            if(!plugins.all().isEmpty()){
+                info("Maps:");
+                for(LoadedPlugin plugin : plugins.all()){
+                    info("  &ly{0} &lcv{1}", plugin.meta.name, plugin.meta.version);
+                }
+            }else{
+                info("No plugins found.");
+            }
+            info("&lyPlugin directory: &lb&fi{0}", pluginDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("plugin", "<name...>", "Display information about a loaded plugin.", arg -> {
+            LoadedPlugin plugin = plugins.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
+            if(plugin != null){
+                info("Name: &ly{0}", plugin.meta.name);
+                info("Version: &ly{0}", plugin.meta.version);
+                info("Author: &ly{0}", plugin.meta.author);
+                info("Path: &ly{0}", plugin.jarFile.path());
+                info("Description: &ly{0}", plugin.meta.description);
+            }else{
+                info("No plugin with name &ly'{0}'&lg found.");
             }
         });
 
@@ -644,12 +683,15 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("gc", "Trigger a grabage collection. Testing onlu.", arg -> {
+        handler.register("gc", "Trigger a grabage collection. Testing only.", arg -> {
             int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             System.gc();
             int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
+
+        plugins.each(p -> p.registerServerCommands(handler));
+        plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -662,7 +704,7 @@ public class ServerControl implements ApplicationListener{
     }
 
     private void handleCommandString(String line){
-        Response response = handler.handleMessage(line);
+        CommandResponse response = handler.handleMessage(line);
 
         if(response.type == ResponseType.unknownCommand){
 

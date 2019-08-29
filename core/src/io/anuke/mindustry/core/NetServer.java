@@ -12,6 +12,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
@@ -47,6 +48,7 @@ public class NetServer implements ApplicationListener{
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
+    public final CommandHandler clientCommands = new CommandHandler("/");
 
     /** Maps connection IDs to players. */
     private IntMap<Player> connections = new IntMap<>();
@@ -191,6 +193,34 @@ public class NetServer implements ApplicationListener{
             Player player = connections.get(id);
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
+        });
+
+        registerCommands();
+    }
+
+    private void registerCommands(){
+        clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
+            if(args.length > 0 && !Strings.canParseInt(args[0])){
+                player.sendMessage("[scarlet]'page' must be a number.");
+                return;
+            }
+            int commandsPerPage = 6;
+            int page = args.length > 0 ? Strings.parseInt(args[0]) : 0;
+            int pages = Mathf.ceil((float)clientCommands.getCommandList().size / commandsPerPage);
+
+            if(page > pages || page < 0){
+                player.sendMessage("[scarlet]'page' must be a number between[orange] 0[] and[orange] " + pages + "[].");
+                return;
+            }
+
+            StringBuilder result = new StringBuilder();
+            result.append(Strings.format("[orange]-- Command Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", page, commandsPerPage));
+
+            for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
+                Command command = clientCommands.getCommandList().get(i);
+                result.append("[orange] ").append(command.text).append("[lightgray] ").append(command.paramText).append("[lightgray] - ").append(command.description).append("\n");
+            }
+            player.sendMessage(result.toString());
         });
     }
 

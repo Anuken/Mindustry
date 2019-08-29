@@ -121,6 +121,8 @@ public class Vars implements Loadable{
     public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
+    /** data subdirectory used for plugins */
+    public static FileHandle pluginDirectory;
     /** old map file extension, for conversion */
     public static final String oldMapExtension = "mmap";
     /** map file extension */
@@ -237,6 +239,7 @@ public class Vars implements Loadable{
         mapPreviewDirectory = dataDirectory.child("previews/");
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
+        pluginDirectory = dataDirectory.child("plugins/");
 
         maps.load();
     }
