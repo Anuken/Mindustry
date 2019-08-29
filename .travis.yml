@@ -9,7 +9,7 @@ script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
 - git tag ${TRAVIS_BUILD}
-- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryBuilds ${TRAVIS_BUILD}
+- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD}
 - cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
 - "./gradlew test"
