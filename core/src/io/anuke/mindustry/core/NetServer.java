@@ -204,16 +204,18 @@ public class NetServer implements ApplicationListener{
                 return;
             }
             int commandsPerPage = 6;
-            int page = args.length > 0 ? Strings.parseInt(args[0]) : 0;
+            int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
             int pages = Mathf.ceil((float)clientCommands.getCommandList().size / commandsPerPage);
 
+            page --;
+
             if(page > pages || page < 0){
-                player.sendMessage("[scarlet]'page' must be a number between[orange] 0[] and[orange] " + pages + "[].");
+                player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
                 return;
             }
 
             StringBuilder result = new StringBuilder();
-            result.append(Strings.format("[orange]-- Command Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", page, commandsPerPage));
+            result.append(Strings.format("[orange]-- Commands Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", (page+1), pages));
 
             for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
                 Command command = clientCommands.getCommandList().get(i);
