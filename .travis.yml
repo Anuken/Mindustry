@@ -13,6 +13,10 @@ script:
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
+- git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
+- cd MindustryBuilds
+- git tag ${TRAVIS_BUILD}
+- git push origin ${TRAVIS_BUILD}
 
 deploy:
   - provider: releases
@@ -31,15 +35,6 @@ deploy:
     on:
       repo: Anuken/Mindustry
       tags: true
-  - provider: script
-    script: 
-    - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
-    - cd MindustryBuilds
-    - git tag ${TRAVIS_BUILD}
-    - git push origin ${TRAVIS_BUILD}
-    on:
-      repo: Anuken/Mindustry
-      tags: false
 
 env:
   global:
