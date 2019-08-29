@@ -8,11 +8,11 @@ android:
 script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
-- echo ${TRAVIS_BUILD} > version.txt
+- echo ${TRAVIS_BUILD_NUMBER} > version.txt
 - git add .
-- git commit -m "Updating to build ${TRAVIS_BUILD}"
-- git tag ${TRAVIS_BUILD}
-- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD}
+- git commit -m "Updating to build ${TRAVIS_BUILD_NUMBER}"
+- git tag ${TRAVIS_BUILD_NUMBER}
+- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}
 - cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
 - "./gradlew test"
