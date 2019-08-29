@@ -40,6 +40,14 @@ After building, the output .JAR file should be in `/desktop/build/libs/Mindustry
 
 ### Downloads
 
-<a href="https://anuke.itch.io/mindustry"><img src="https://static.itch.io/images/badge.svg" width="auto" height="75"></a>
+[<img src="https://static.itch.io/images/badge.svg"
+     alt="Get it on Itch.io"
+     height="60">](https://anuke.itch.io/mindustry)
 
-<a href="https://play.google.com/store/apps/details?id=io.anuke.mindustry&hl=en"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/1280px-Get_it_on_Google_play.svg.png" width="auto" height="75"></a>
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=io.anuke.mindustry)
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
