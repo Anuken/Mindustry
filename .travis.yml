@@ -14,7 +14,7 @@ script:
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
-- cd MindustryBuilds
+- cd ../MindustryBuilds
 - git tag ${TRAVIS_BUILD}
 - git push origin ${TRAVIS_BUILD}
 
