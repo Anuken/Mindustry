@@ -16,6 +16,8 @@ buildscript{
 
 allprojects{
     version = 'release'
+    apply plugin: 'maven'
+    group = 'com.github.Anuken'
 
     ext{
         versionNumber = '4'

@@ -4,14 +4,14 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.ApplicationListener;
 import io.anuke.arc.Events;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.Colors;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
@@ -47,6 +47,7 @@ public class NetServer implements ApplicationListener{
     private final static float correctDist = 16f;
 
     public final Administration admins = new Administration();
+    public final CommandHandler clientCommands = new CommandHandler("/");
 
     /** Maps connection IDs to players. */
     private IntMap<Player> connections = new IntMap<>();
@@ -192,6 +193,132 @@ public class NetServer implements ApplicationListener{
             if(player == null) return;
             RemoteReadServer.readPacket(packet.writeBuffer, packet.type, player);
         });
+
+        registerCommands();
+    }
+
+    private void registerCommands(){
+        clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
+            if(args.length > 0 && !Strings.canParseInt(args[0])){
+                player.sendMessage("[scarlet]'page' must be a number.");
+                return;
+            }
+            int commandsPerPage = 6;
+            int page = args.length > 0 ? Strings.parseInt(args[0]) : 0;
+            int pages = Mathf.ceil((float)clientCommands.getCommandList().size / commandsPerPage);
+
+            if(page > pages || page < 0){
+                player.sendMessage("[scarlet]'page' must be a number between[orange] 0[] and[orange] " + pages + "[].");
+                return;
+            }
+
+            StringBuilder result = new StringBuilder();
+            result.append(Strings.format("[orange]-- Command Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", page, commandsPerPage));
+
+            for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
+                Command command = clientCommands.getCommandList().get(i);
+                result.append("[orange] ").append(command.text).append("[white] ").append(command.paramText).append("[lightgray] - ").append(command.description).append("\n");
+            }
+            player.sendMessage(result.toString());
+        });
+
+        //duration of a a kick in seconds
+        int kickDuration = 10 * 60;
+
+        class VoteSession{
+            Player target;
+            ObjectSet<String> voted = new ObjectSet<>();
+            ObjectMap<Player, VoteSession> map;
+            Timer.Task task;
+            int votes;
+
+            public VoteSession(ObjectMap<Player, VoteSession> map, Player target){
+                this.target = target;
+                this.map = map;
+                this.task = Timer.schedule(() -> {
+                    if(!checkPass()){
+                        Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] {0}[lightgray].", target.name));
+                    }
+                    map.remove(target);
+                    task.cancel();
+                }, 60 * 1.5f);
+            }
+
+            boolean checkPass(){
+                if(votes >= votesRequired() && target.isAdded() && target.con.isConnected()){
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be kicked from the server.", target.name));
+                    admins.getInfo(target.uuid).lastKicked = Time.millis() + kickDuration*1000;
+                    kick(target.con.id, KickReason.vote);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        //cooldown between votes
+        int voteTime = 60 * 10;
+        Timekeeper vtime = new Timekeeper(voteTime);
+        //current kick sessions
+        ObjectMap<Player, VoteSession> currentlyKicking = new ObjectMap<>();
+
+        clientCommands.<Player>register("votekick", "[player]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+            if(playerGroup.size() < 3){
+                player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
+                return;
+            }
+
+            if(currentlyKicking.values().toArray().contains(v -> v.voted.contains(player.uuid) || v.voted.contains(admins.getInfo(player.uuid).lastIP))){
+                player.sendMessage("[scarlet]You've already voted. Sit down.");
+                return;
+            }
+
+            if(args.length == 0){
+                StringBuilder builder = new StringBuilder();
+                builder.append("[orange]Players to kick: \n");
+                for(Player p : playerGroup.all()){
+                    if(p.isAdmin || p.con == null || p == player) continue;
+
+                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.con.id).append(")\n");
+                }
+                player.sendMessage(builder.toString());
+            }else{
+                Player found;
+                if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
+                    int id = Strings.parseInt(args[0].substring(1));
+                    found = playerGroup.find(p -> p.con != null && p.con.id == id);
+                }else{
+                    found = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
+                }
+
+                if(found != null){
+                    if(player == found){
+                        player.sendMessage("[scarlet]If you're interested in kicking yourself, just leave.");
+                    }else if(found.isAdmin){
+                        player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
+                    }else{
+                        if(!currentlyKicking.containsKey(found) && !vtime.get()){
+                            player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
+                            return;
+                        }
+
+                        VoteSession session = currentlyKicking.getOr(found, () -> new VoteSession(currentlyKicking, found));
+                        session.votes ++;
+                        session.voted.addAll(player.uuid, admins.getInfo(player.uuid).lastIP);
+
+                        Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to kick[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /votekick #{4}[] to agree.",
+                            player.name, found.name, session.votes, votesRequired(), found.con.id));
+                        session.checkPass();
+                        vtime.reset();
+                    }
+                }else{
+                    player.sendMessage("[scarlet]No player[orange]'" + args[0] + "'[scarlet] found.");
+                }
+            }
+        });
+    }
+
+    public int votesRequired(){
+        return playerGroup.size() * 2 / 3;
     }
 
     public Team assignTeam(Player current, Iterable<Player> players){
@@ -423,10 +550,10 @@ public class NetServer implements ApplicationListener{
 
         Player player = connections.get(con.id);
 
-        if(player != null && (reason == KickReason.kick || reason == KickReason.banned) && player.uuid != null){
+        if(player != null && (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) && player.uuid != null){
             PlayerInfo info = admins.getInfo(player.uuid);
             info.timesKicked++;
-            info.lastKicked = Time.millis();
+            info.lastKicked = Math.max(Time.millis(), info.lastKicked);
         }
 
         Call.onKick(connection, reason);

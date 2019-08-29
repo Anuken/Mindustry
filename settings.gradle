@@ -7,7 +7,7 @@ def use = { String name ->
 
 def properties = new Properties()
 
-if(new File(settingsDir, 'local.properties').exists()){
+if(new File(settingsDir, 'local.properties').exists() && System.getenv("JITPACK") != "true"){
     properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
 
     if(properties.containsKey("sdk.dir")){

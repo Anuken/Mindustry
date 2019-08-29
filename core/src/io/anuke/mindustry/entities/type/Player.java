@@ -774,6 +774,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     //region utility methods
 
+    public void sendMessage(String text){
+        Call.sendMessage(con.id, text, null, null);
+    }
+
     /** Resets all values of the player. */
     public void reset(){
         resetNoAdd();

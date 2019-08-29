@@ -22,11 +22,10 @@ public class MindustryServer implements ApplicationListener{
         Vars.loadSettings();
         Vars.init();
         content.createContent();
+        content.init();
 
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
-
-        content.init();
     }
 }
