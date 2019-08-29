@@ -1,4 +1,4 @@
-package io.anuke.mindustry.server.plugin;
+package io.anuke.mindustry.plugin;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.files.*;

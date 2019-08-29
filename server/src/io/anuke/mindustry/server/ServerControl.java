@@ -21,8 +21,8 @@ import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.server.plugin.*;
-import io.anuke.mindustry.server.plugin.Plugins.*;
+import io.anuke.mindustry.plugin.Plugins;
+import io.anuke.mindustry.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -42,7 +42,7 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.files.local("logs/");
-    private final Plugins plugins = new Plugins();
+    private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
     private boolean inExtraRound;
@@ -174,7 +174,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         //initialize plugins
-        plugins.each(Plugin::init);
+        plugins.each(io.anuke.mindustry.plugin.Plugin::init);
 
         if(!plugins.all().isEmpty()){
             info("&lc{0} plugins loaded.", plugins.all().size);
