@@ -51,6 +51,7 @@ public class LoadDialog extends FloatingDialog{
         Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
         Array<SaveSlot> array = control.saves.getSaveSlots();
+        array.sort((slot, other) -> -Long.compare(slot.getTimestamp(), other.getTimestamp()));
 
         for(SaveSlot slot : array){
             if(slot.isHidden()) continue;

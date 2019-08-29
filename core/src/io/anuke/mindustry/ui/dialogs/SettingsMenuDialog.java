@@ -139,6 +139,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("crashreport", true);
         }
 
+        game.checkPref("savecreate", true);
+
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){

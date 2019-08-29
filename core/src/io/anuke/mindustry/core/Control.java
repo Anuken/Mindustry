@@ -26,6 +26,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
+import java.time.*;
+import java.time.format.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -230,6 +232,9 @@ public class Control implements ApplicationListener, Loadable{
             world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
+            if(settings.getBool("savecreate")){
+                control.saves.addSave(map.name() + "-" + DateTimeFormatter.ofPattern("MMM dd h:mm").format(LocalDateTime.now()));
+            }
         });
     }
 
