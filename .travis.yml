@@ -6,14 +6,15 @@ android:
   - android-29
   - build-tools-29.0.2
 script:
+- git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
+- cd ../MindustryBuilds
+- git tag ${TRAVIS_BUILD}
+- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryBuilds ${TRAVIS_BUILD}
+- cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
-- git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
-- cd ../MindustryBuilds
-- git tag ${TRAVIS_BUILD}
-- git push https://Anuken:${BUILD_TOKEN}@github.com/MindustryBuilds ${TRAVIS_BUILD}
 deploy:
 - provider: releases
   skip_cleanup: true
