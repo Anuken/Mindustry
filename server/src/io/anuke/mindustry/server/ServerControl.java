@@ -322,7 +322,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("plugins", "Display all loaded plugins.", arg -> {
             if(!plugins.all().isEmpty()){
-                info("Maps:");
+                info("Plugins:");
                 for(LoadedPlugin plugin : plugins.all()){
                     info("  &ly{0} &lcv{1}", plugin.meta.name, plugin.meta.version);
                 }
