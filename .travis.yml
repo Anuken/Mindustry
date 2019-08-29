@@ -16,7 +16,7 @@ script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
 - git tag ${TRAVIS_BUILD}
-- git push origin ${TRAVIS_BUILD}
+- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryBuilds ${TRAVIS_BUILD}
 
 deploy:
   - provider: releases
