@@ -60,17 +60,13 @@ public class MenuFragment extends Fragment{
             }
         });
 
-        //discord icon in top right
-        //parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
-        //.visible(() -> state.is(State.menu)));
-
         //info icon
         if(mobile){
             parent.fill(c -> c.bottom().left().addButton("", "info", ui.about::show).size(84, 45));
             parent.fill(c -> c.bottom().right().addButton("", "discord", ui.discord::show).size(84, 45));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
+        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
             Texture logo = Core.assets.get("sprites/logo.png");

@@ -112,7 +112,7 @@ public class NetServer implements ApplicationListener{
             }
 
             if(packet.versionType == null || ((packet.version == -1 || !packet.versionType.equals(Version.type)) && Version.build != -1 && !admins.allowsCustomClients())){
-                kick(id, KickReason.customClient);
+                kick(id, !Version.type.equals(packet.versionType) ? KickReason.typeMismatch : KickReason.customClient);
                 return;
             }
 
