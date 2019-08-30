@@ -22,12 +22,13 @@ import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
-    public SettingsTable graphics;
-    public SettingsTable game;
-    public SettingsTable sound;
+    private SettingsTable graphics;
+    private SettingsTable game;
+    private SettingsTable sound;
 
     private Table prefs;
     private Table menu;
+    private FloatingDialog dataDialog;
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
@@ -75,6 +76,85 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
+        dataDialog = new FloatingDialog("$settings.data");
+        dataDialog.addCloseButton();
+
+        dataDialog.cont.table("button", t -> {
+            t.defaults().size(240f, 60f).left();
+            String style = "clear";
+
+            t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+                ObjectMap<String, Object> map = new ObjectMap<>();
+                for(String value : Core.settings.keys()){
+                    if(value.contains("usid") || value.contains("uuid")){
+                        map.put(value, Core.settings.getString(value));
+                    }
+                }
+                Core.settings.clear();
+                Core.settings.putAll(map);
+                Core.settings.save();
+
+                for(FileHandle file : dataDirectory.list()){
+                    file.deleteDirectory();
+                }
+
+                Core.app.exit();
+            }));
+
+            t.row();
+
+            if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
+                t.addButton("$classic.export", style, () -> {
+                    control.checkClassicData();
+                });
+            }
+
+            t.row();
+
+            t.addButton("$data.export", style, () -> {
+                if(ios){
+                    FileHandle file = Core.files.local("mindustry-data-export.zip");
+                    try{
+                        data.exportData(file);
+                    }catch(Exception e){
+                        ui.showError(Strings.parseException(e, true));
+                    }
+                    Platform.instance.shareFile(file);
+                }else{
+                    Platform.instance.showFileChooser("$data.export", "Zip Files", file -> {
+                        FileHandle ff = file;
+                        if(!ff.extension().equals("zip")){
+                            ff = ff.sibling(ff.nameWithoutExtension() + ".zip");
+                        }
+                        try{
+                            data.exportData(ff);
+                            ui.showInfo("$data.exported");
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            ui.showError(Strings.parseException(e, true));
+                        }
+                    }, false, f -> false);
+                }
+            });
+
+            t.row();
+
+            //iOS doesn't have a file chooser.
+            if(!ios){
+                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> Platform.instance.showFileChooser("$data.import", "Zip Files", file -> {
+                    try{
+                        data.importData(file);
+                        Core.app.exit();
+                    }catch(IllegalArgumentException e){
+                        ui.showError("$data.invalid");
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        ui.showError(Strings.parseException(e, true));
+                    }
+                }, true, f -> f.equalsIgnoreCase("zip"))));
+            }
+        });
+
         ScrollPane pane = new ScrollPane(prefs);
         pane.addCaptureListener(new InputListener(){
             @Override
@@ -121,6 +201,9 @@ public class SettingsMenuDialog extends SettingsDialog{
             menu.row();
             menu.addButton("$settings.controls", style, ui.controls::show);
         }
+
+        menu.row();
+        menu.addButton("$settings.data", style, () -> dataDialog.show());
     }
 
     void addSettings(){
@@ -144,31 +227,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.addButton("$settings.cleardata", () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
-                    ObjectMap<String, Object> map = new ObjectMap<>();
-                    for(String value : Core.settings.keys()){
-                        if(value.contains("usid") || value.contains("uuid")){
-                            map.put(value, Core.settings.getString(value));
-                        }
-                    }
-                    Core.settings.clear();
-                    Core.settings.putAll(map);
-                    Core.settings.save();
-
-                    for(FileHandle file : dataDirectory.list()){
-                        file.deleteDirectory();
-                    }
-
-                    Core.app.exit();
-                })).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-            }
-        });
-
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
                 table.addButton("$tutorial.retake", () -> {
                     hide();
                     control.playTutorial();
@@ -178,20 +236,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                 hide();
             }
         });
-
-        if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
-            game.pref(new Setting(){
-                @Override
-                public void add(SettingsTable table){
-                    table.addButton("$classic.export", () -> {
-                        control.checkClassicData();
-                    }).size(220f, 60f).pad(6).left();
-                    table.add();
-                    table.row();
-                    hide();
-                }
-            });
-        }
 
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
             if(ui.settings != null){
