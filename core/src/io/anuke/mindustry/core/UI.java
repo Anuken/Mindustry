@@ -3,8 +3,13 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.assets.*;
+import io.anuke.arc.assets.loaders.*;
+import io.anuke.arc.assets.loaders.resolvers.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.freetype.*;
 import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
+import io.anuke.arc.freetype.FreetypeFontLoader.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -31,8 +36,8 @@ import io.anuke.mindustry.ui.fragments.*;
 import static io.anuke.arc.scene.actions.Actions.*;
 import static io.anuke.mindustry.Vars.*;
 
-public class UI implements ApplicationListener{
-    private FreeTypeFontGenerator generator;
+public class UI implements ApplicationListener, Loadable{
+    private Skin skin;
 
     public MenuFragment menufrag;
     public HudFragment hudfrag;
@@ -67,9 +72,23 @@ public class UI implements ApplicationListener{
     public Cursor drillCursor, unloadCursor;
 
     public UI(){
-        Skin skin = new Skin(Core.atlas);
-        generateFonts(skin);
+        skin = new Skin();
+        setupFonts();
+    }
+
+    @Override
+    public void loadAsync(){
+
+    }
+
+    @Override
+    public void loadSync(){
+        //TODO type-safe skin files
+        skin.addRegions(Core.atlas);
         loadExtraStyle(skin);
+        skin.add("outline", Core.assets.get("outline"));
+        skin.getFont("default").getData().markupEnabled = true;
+        skin.getFont("default").setOwnsTexture(false);
         skin.load(Core.files.internal("sprites/uiskin.json"));
 
         for(BitmapFont font : skin.getAll(BitmapFont.class).values()){
@@ -97,6 +116,11 @@ public class UI implements ApplicationListener{
         loadExtraCursors();
     }
 
+    @Override
+    public Array<AssetDescriptor> getDependencies(){
+        return Array.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
+    }
+
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
         SystemCursor.arrow.set(Core.graphics.newCursor("cursor"));
@@ -104,6 +128,23 @@ public class UI implements ApplicationListener{
         SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam"));
 
         Core.graphics.restoreCursor();
+    }
+
+    /** Called from a static context for use in the loading screen.*/
+    public static void loadDefaultFont(){
+        FileHandleResolver resolver = new InternalFileHandleResolver();
+        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver));
+
+        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+            size = fontParameter().size;
+            borderColor = Color.DARK_GRAY;
+            borderWidth = UnitScl.dp.scl(2f);
+            spaceX -= borderWidth;
+            incremental = true;
+        }};
+
+        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param));
     }
 
     void loadExtraStyle(Skin skin){
@@ -130,29 +171,22 @@ public class UI implements ApplicationListener{
         unloadCursor = Core.graphics.newCursor("unload");
     }
 
-    void generateFonts(Skin skin){
-        generator = new FreeTypeFontGenerator(Core.files.internal("fonts/font.ttf"));
+    public void setupFonts(){
+        String fontName = "fonts/font.ttf";
 
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+        FreeTypeFontParameter param = fontParameter();
+
+        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("default", f);
+        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> skin.add("chat", f);
+    }
+
+    static FreeTypeFontParameter fontParameter(){
+        return new FreeTypeFontParameter(){{
             size = (int)(UnitScl.dp.scl(18f));
             shadowColor = Color.DARK_GRAY;
             shadowOffsetY = 2;
             incremental = true;
         }};
-
-        FreeTypeFontParameter outlined = new FreeTypeFontParameter(){{
-            size = param.size;
-            borderColor = Color.DARK_GRAY;
-            borderWidth = UnitScl.dp.scl(2f);
-            spaceX -= borderWidth;
-            incremental = true;
-        }};
-
-        skin.add("outline", generator.generateFont(outlined));
-        skin.add("default", generator.generateFont(param));
-        skin.add("chat", generator.generateFont(param));
-        skin.getFont("default").getData().markupEnabled = true;
-        skin.getFont("default").setOwnsTexture(false);
     }
 
     @Override
@@ -232,7 +266,7 @@ public class UI implements ApplicationListener{
 
     @Override
     public void dispose(){
-        generator.dispose();
+        //generator.dispose();
     }
 
     public void loadAnd(Runnable call){

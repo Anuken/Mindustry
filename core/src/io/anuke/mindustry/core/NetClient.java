@@ -7,6 +7,7 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.ReusableByteInStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
@@ -151,15 +152,38 @@ public class NetClient implements ApplicationListener{
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
-        //server console logging
-        Log.info("&y{0}: &lb{1}", player.name, message);
+        //check if it's a command
+        CommandResponse response = netServer.clientCommands.handleMessage(message, player);
+        if(response.type == ResponseType.noCommand){ //no command to handle
+            //server console logging
+            Log.info("&y{0}: &lb{1}", player.name, message);
 
-        //invoke event for all clients but also locally
-        //this is required so other clients get the correct name even if they don't know who's sending it yet
-        Call.sendMessage(message, colorizeName(player.id, player.name), player);
+            //invoke event for all clients but also locally
+            //this is required so other clients get the correct name even if they don't know who's sending it yet
+            Call.sendMessage(message, colorizeName(player.id, player.name), player);
+        }else{
+            //log command to console but with brackets
+            Log.info("<&y{0}: &lm{1}&lg>", player.name, message);
+
+            //a command was sent, now get the output
+            if(response.type != ResponseType.valid){
+                String text;
+
+                //send usage
+                if(response.type == ResponseType.manyArguments){
+                    text = "[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+                }else if(response.type == ResponseType.fewArguments){
+                    text = "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+                }else{ //unknown command
+                    text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                }
+
+                player.sendMessage(text);
+            }
+        }
     }
 
-    private static String colorizeName(int id, String name){
+    public static String colorizeName(int id, String name){
         Player player = playerGroup.getByID(id);
         if(name == null || player == null) return null;
         return "[#" + player.color.toString().toUpperCase() + "]" + name;

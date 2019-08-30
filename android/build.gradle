@@ -70,7 +70,7 @@ android{
     }
 
     defaultConfig{
-        Integer vcode = new Properties().with{p -> p.load(new FileInputStream(file('../core/assets/version.properties'))); return p }['androidBuildCode'].toInteger()
+        Integer vcode = new Properties().with{p -> p.load(new FileInputStream(file('../core/assets/version.properties'))); return p }['androidBuildCode']?.toInteger() ?: 1
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 
         applicationId "io.anuke.mindustry"

@@ -3,7 +3,6 @@ package io.anuke.mindustry.io;
 import io.anuke.annotations.Annotations.ReadClass;
 import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.Entities;

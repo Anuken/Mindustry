@@ -81,7 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
-        Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
+        Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
             "width", 1,

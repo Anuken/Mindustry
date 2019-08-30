@@ -93,11 +93,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
                 Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
-                    world.maps.tryCatchMapError(() -> {
+                    maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("$editor.errorimage");
                         }else if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                            editor.beginEdit(world.maps.makeLegacyMap(file));
+                            editor.beginEdit(maps.makeLegacyMap(file));
                         }else{
                             editor.beginEdit(MapIO.createMap(file, true));
                         }
@@ -286,11 +286,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
             infoDialog.show();
             Core.app.post(() -> ui.showError("$editor.save.noname"));
         }else{
-            Map map = world.maps.all().find(m -> m.name().equals(name));
+            Map map = maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
                 handleSaveBuiltin(map);
             }else{
-                world.maps.saveMap(editor.getTags());
+                maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
             }
         }

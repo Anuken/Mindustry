@@ -11,9 +11,7 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.ContentType;
@@ -43,25 +41,21 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
-                    Vars.init();
-
                     headless = true;
-
-                    BundleLoader.load();
-                    content.load();
+                    Vars.init();
+                    content.createContent();
 
                     add(logic = new Logic());
-                    add(world = new World());
                     add(netServer = new NetServer());
 
-                    content.initialize(Content::init);
+                    content.init();
                 }
 
                 @Override
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = world.maps.loadInternalMap("groundZero");
+                    testMap = maps.loadInternalMap("groundZero");
                 }
             };
 
@@ -100,7 +94,7 @@ public class ApplicationTests{
     @Test
     void spawnWaves(){
         world.loadMap(testMap);
-        assertTrue(world.spawner.countSpawns() > 0, "No spawns present.");
+        assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);

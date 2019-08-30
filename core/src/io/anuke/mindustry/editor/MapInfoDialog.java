@@ -9,8 +9,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
-import static io.anuke.mindustry.Vars.world;
-
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
@@ -70,7 +68,7 @@ public class MapInfoDialog extends FloatingDialog{
             t.row();
             t.add("$editor.generation").padRight(8).left();
             t.addButton("$edit",
-                () -> generate.show(world.maps.readFilters(editor.getTags().get("genfilters", "")),
+                () -> generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
                 filters -> editor.getTags().put("genfilters", JsonIO.write(filters)))
             ).left().width(200f);
 

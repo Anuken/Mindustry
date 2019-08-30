@@ -257,7 +257,7 @@ public class HudFragment extends Fragment{
             t.table("flat", c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
-            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(world.spawner.playerNear()), 0.1f)).get().color.a = 0f;
+            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
         parent.fill(t -> {
@@ -543,7 +543,7 @@ public class HudFragment extends Fragment{
         return world.isZone() &&
             world.getZone().metCondition() &&
             !Net.client() &&
-            state.wave % world.getZone().launchPeriod == 0 && !world.spawner.isSpawning();
+            state.wave % world.getZone().launchPeriod == 0 && !spawner.isSpawning();
     }
 
     private boolean canLaunch(){
@@ -639,7 +639,7 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !world.spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){

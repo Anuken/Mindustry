@@ -60,8 +60,11 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
 
     void process(String classname, String path, String rtype, String loadMethod) throws Exception{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
-        MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        //MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
 
         HashSet<String> names = new HashSet<>();
         Files.list(Paths.get(path)).forEach(p -> {
@@ -79,8 +82,16 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
                 name = name + "s";
             }
 
-            load.addStatement(name + " = io.anuke.arc.Core.audio."+loadMethod+"(io.anuke.arc.Core.files.internal(io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? $S : $S))",
-                path.substring(path.lastIndexOf("/") + 1) + "/" + fname, (path.substring(path.lastIndexOf("/") + 1) + "/" + fname).replace(".ogg", ".mp3"));
+            String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
+
+            //load.addStatement(name + " = io.anuke.arc.Core.audio."+loadMethod+"(io.anuke.arc.Core.files.internal(io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? $S : $S))",
+            //filepath, filepath.replace(".ogg", ".mp3"));
+
+            loadBegin.addStatement("io.anuke.arc.Core.assets.load(io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? $S : $S, "+rtype+".class, " +
+            "new io.anuke.arc.assets.loaders."+classname.substring(0, classname.length()-1)+"Loader."+classname.substring(0, classname.length()-1)+"Parameter((m, name, type) -> " + name + " = m.get(\"" + filepath + "\")))",
+            filepath, filepath.replace(".ogg", ".mp3"));
+
+
             dispose.addStatement(name + ".dispose()");
             dispose.addStatement(name + " = null");
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
@@ -91,7 +102,8 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         }
 
-        type.addMethod(load.build());
+        //type.addMethod(load.build());
+        type.addMethod(loadBegin.build());
         type.addMethod(dispose.build());
         JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
     }

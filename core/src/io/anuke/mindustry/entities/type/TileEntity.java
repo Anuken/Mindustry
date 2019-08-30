@@ -52,7 +52,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             tile.entity.health = health;
 
             if(tile.entity.damaged()){
-                world.indexer.notifyTileDamaged(tile.entity);
+                indexer.notifyTileDamaged(tile.entity);
             }
         }
     }
@@ -171,7 +171,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
-            world.indexer.notifyTileDamaged(this);
+            indexer.notifyTileDamaged(this);
         }
     }
 

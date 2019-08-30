@@ -13,7 +13,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class FlyingUnit extends BaseUnit{
     protected float[] weaponAngles = {0, 0};
@@ -97,7 +97,7 @@ public abstract class FlyingUnit extends BaseUnit{
             if(retarget()){
                 target = getSpawner();
 
-                Tile repair = Geometry.findClosest(x, y, world.indexer.getAllied(team, BlockFlag.repair));
+                Tile repair = Geometry.findClosest(x, y, indexer.getAllied(team, BlockFlag.repair));
                 if(repair != null && damaged()) FlyingUnit.this.target = repair.entity;
                 if(target == null) target = getClosestCore();
             }

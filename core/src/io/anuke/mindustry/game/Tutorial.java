@@ -161,7 +161,7 @@ public class Tutorial{
             }
         },
         deposit(() -> event("deposit")),
-        waves(() -> state.wave > 2 && state.enemies() <= 0 && !world.spawner.isSpawning()){
+        waves(() -> state.wave > 2 && state.enemies() <= 0 && !spawner.isSpawning()){
             void begin(){
                 state.rules.waveTimer = true;
                 logic.runWave();

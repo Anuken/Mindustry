@@ -52,13 +52,13 @@ public class WaveInfoDialog extends FloatingDialog{
             dialog.cont.defaults().size(210f, 64f);
             dialog.cont.addButton("$waves.copy", () -> {
                 ui.showInfoFade("$waves.copied");
-                Core.app.setClipboardText(world.maps.writeWaves(groups));
+                Core.app.setClipboardText(maps.writeWaves(groups));
                 dialog.hide();
             }).disabled(b -> groups == null);
             dialog.cont.row();
             dialog.cont.addButton("$waves.load", () -> {
                 try{
-                    groups = world.maps.readWaves(Core.app.getClipboardText());
+                    groups = maps.readWaves(Core.app.getClipboardText());
                     buildGroups();
                 }catch(Exception e){
                     ui.showError("$waves.invalid");
