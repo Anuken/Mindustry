@@ -15,6 +15,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
@@ -27,7 +28,8 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopPlatform extends Platform{
-    static boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = false;
+    static boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = true;
+    static SteamCoreNetImpl steamCore;
     final static String applicationId = "610508934456934412";
     String[] args;
 
@@ -50,8 +52,9 @@ public class DesktopPlatform extends Platform{
         }
 
         if(useSteam){
+
             if(showConsole){
-                Events.on(GameLoadEvent.class, event -> {
+                Events.on(ClientLoadEvent.class, event -> {
                     Label[] label = {null};
                     Core.scene.table(t -> {
                         t.touchable(Touchable.disabled);
@@ -79,15 +82,15 @@ public class DesktopPlatform extends Platform{
                 });
             }
 
-            Vars.steam = true;
             try{
                 SteamAPI.loadLibraries();
                 if(!SteamAPI.init()){
                     Log.info("Steam client not running. Make sure Steam is running!");
                 }else{
-
+                    Vars.steam = true;
                     //run steam callbacks
-                    Events.on(GameLoadEvent.class, event -> {
+                    Events.on(ClientLoadEvent.class, event -> {
+                        Core.settings.defaults("name", steamCore.friends.getPersonaName());
                         //update callbacks
                         Core.app.addListener(new ApplicationListener(){
                             @Override

@@ -15,7 +15,7 @@ public class DesktopLauncher{
             Platform.instance = new DesktopPlatform(arg);
 
             if(SteamAPI.isSteamRunning()){
-                SteamNetImpl net = new SteamNetImpl();
+                SteamCoreNetImpl net = DesktopPlatform.steamCore = new SteamCoreNetImpl();
                 Net.setClientProvider(net);
                 Net.setServerProvider(net);
             }else{

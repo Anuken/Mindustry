@@ -57,7 +57,13 @@ public class PausedDialog extends FloatingDialog{
 
                 cont.row();
 
-                cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+                cont.addButton("$hostserver", () -> {
+                    if(steam){
+                        ui.host.runHost();
+                    }else{
+                        ui.host.show();
+                    }
+                }).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
             }
 
             cont.row();

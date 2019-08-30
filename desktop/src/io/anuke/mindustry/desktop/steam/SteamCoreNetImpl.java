@@ -15,7 +15,6 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
@@ -23,16 +22,14 @@ import java.util.concurrent.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, ClientProvider, ServerProvider{
-    final SteamNetworking snet = new SteamNetworking(this);
-    final SteamMatchmaking smat = new SteamMatchmaking(this);
-    final SteamFriends friends = new SteamFriends(this);
+public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, ClientProvider, ServerProvider{
+    public final SteamNetworking snet = new SteamNetworking(this);
+    public final SteamMatchmaking smat = new SteamMatchmaking(this);
+    public final SteamFriends friends = new SteamFriends(this);
 
     final PacketSerializer serializer = new PacketSerializer();
     final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
     final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
-    final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-    final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
@@ -42,8 +39,8 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     Consumer<Host> lobbyCallback;
     Runnable lobbyDoneCallback, joinCallback;
 
-    public SteamNetImpl(){
-        Events.on(GameLoadEvent.class, e -> Core.app.addListener(new ApplicationListener(){
+    public SteamCoreNetImpl(){
+        Events.on(ClientLoadEvent.class, e -> Core.app.addListener(new ApplicationListener(){
             //read packets
             int length;
             SteamID from = new SteamID();
@@ -136,11 +133,6 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
     }
 
     @Override
-    public byte[] decompressSnapshot(byte[] input, int size){
-        return decompressor.decompress(input, size);
-    }
-
-    @Override
     public void discover(Consumer<Host> callback, Runnable done){
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
@@ -169,11 +161,6 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
         }
 
         steamConnections.clear();
-    }
-
-    @Override
-    public byte[] compressSnapshot(byte[] input){
-        return compressor.compress(input);
     }
 
     @Override
@@ -443,13 +430,12 @@ public class SteamNetImpl implements SteamNetworkingCallback, SteamMatchmakingCa
         @Override
         public boolean isConnected(){
             snet.getP2PSessionState(sid, state);
-            return state.isConnectionActive() || state.isConnecting();
+            return state.isConnectionActive();
         }
 
         @Override
         public void close(){
             snet.closeP2PSessionWithUser(sid);
-            //smat.
         }
     }
 }

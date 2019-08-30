@@ -10,8 +10,7 @@ import io.anuke.mindustry.net.Net;
 
 import java.io.IOException;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class HostDialog extends FloatingDialog{
     float w = 300;
@@ -50,23 +49,29 @@ public class HostDialog extends FloatingDialog{
                 return;
             }
 
-            ui.loadfrag.show("$hosting");
-            Time.runTask(5f, () -> {
-                try{
-                    Net.host(Vars.port);
-                    player.isAdmin = true;
-                }catch(IOException e){
-                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
-                }
-                ui.loadfrag.hide();
-                hide();
-            });
+            runHost();
         }).width(w).height(70f);
 
         cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
 
         shown(() -> {
-            Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+            if(!steam){
+                Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+            }
+        });
+    }
+
+    public void runHost(){
+        ui.loadfrag.show("$hosting");
+        Time.runTask(5f, () -> {
+            try{
+                Net.host(Vars.port);
+                player.isAdmin = true;
+            }catch(IOException e){
+                ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
+            }
+            ui.loadfrag.hide();
+            hide();
         });
     }
 }
