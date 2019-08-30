@@ -14,6 +14,7 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
@@ -731,7 +732,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                         target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                         if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
+                            target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
                             if(target != null && dst(target) > getWeapon().bullet.range()){
                                 target = null;
                             }else if(target != null){
@@ -773,6 +774,31 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     //region utility methods
+
+    public void sendMessage(String text){
+        if(isLocal){
+            if(Vars.ui != null){
+                Log.info("add " + text);
+                Vars.ui.chatfrag.addMessage(text, null);
+            }
+        }else{
+            Call.sendMessage(con.id, text, null, null);
+        }
+    }
+
+    public void sendMessage(String text, Player from){
+        sendMessage(text, from, NetClient.colorizeName(from.id, from.name));
+    }
+
+    public void sendMessage(String text, Player from, String fromName){
+        if(isLocal){
+            if(Vars.ui != null){
+                Vars.ui.chatfrag.addMessage(text, fromName);
+            }
+        }else{
+            Call.sendMessage(con.id, text, fromName, from);
+        }
+    }
 
     /** Resets all values of the player. */
     public void reset(){

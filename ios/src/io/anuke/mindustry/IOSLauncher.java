@@ -7,6 +7,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Net;
@@ -65,7 +66,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         };
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new Mindustry(), config);
+        return new IOSApplication(new ClientLauncher(), config);
     }
 
     @Override
@@ -90,17 +91,19 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
-        Core.app.post(() -> Core.app.post(() -> {
-            Core.scene.table("dialogDim", t -> {
-                t.visible(() -> {
-                    if(!forced) return false;
-                    t.toFront();
-                    UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
-                    return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.app.post(() -> Core.app.post(() -> {
+                Core.scene.table("dialogDim", t -> {
+                    t.visible(() -> {
+                        if(!forced) return false;
+                        t.toFront();
+                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+                    });
+                    t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
                 });
-                t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
-            });
-        }));
+            }));
+        });
 
         return b;
     }

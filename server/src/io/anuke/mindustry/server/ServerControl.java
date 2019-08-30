@@ -1,33 +1,35 @@
 package io.anuke.mindustry.server;
 
 import io.anuke.arc.*;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.Array.ArrayIterable;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Array.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.CommandHandler.*;
-import io.anuke.arc.util.Timer.Task;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.arc.util.Timer.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.EventType.GameOverEvent;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.maps.MapException;
-import io.anuke.mindustry.net.Administration.PlayerInfo;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.Packets.KickReason;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.net.Packets.*;
+import io.anuke.mindustry.plugin.Plugins;
+import io.anuke.mindustry.plugin.Plugins.*;
+import io.anuke.mindustry.type.*;
 
 import java.io.*;
 import java.net.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
 import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
@@ -40,6 +42,7 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.files.local("logs/");
+    private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
     private boolean inExtraRound;
@@ -107,6 +110,9 @@ public class ServerControl implements ApplicationListener{
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
+        //load plugins
+        plugins.load();
+
         registerCommands();
 
         Core.app.post(() -> {
@@ -118,7 +124,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(String s : commands){
-                Response response = handler.handleMessage(s);
+                CommandResponse response = handler.handleMessage(s);
                 if(response.type != ResponseType.valid){
                     err("Invalid command argument sent: '{0}': {1}", s, response.type.name());
                     err("Argument usage: &lc<command-1> <command1-args...>,<command-2> <command-2-args2...>");
@@ -128,6 +134,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
+        pluginDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -143,8 +150,8 @@ public class ServerControl implements ApplicationListener{
             info("Game over!");
 
             if(Core.settings.getBool("shuffle")){
-                if(world.maps.all().size > 0){
-                    Array<Map> maps = world.maps.customMaps().size == 0 ? world.maps.defaultMaps() : world.maps.customMaps();
+                if(maps.all().size > 0){
+                    Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
 
                     Map previous = world.getMap();
                     Map map = maps.random(previous);
@@ -165,6 +172,13 @@ public class ServerControl implements ApplicationListener{
                 Net.closeServer();
             }
         });
+
+        //initialize plugins
+        plugins.each(io.anuke.mindustry.plugin.Plugin::init);
+
+        if(!plugins.all().isEmpty()){
+            info("&lc{0} plugins loaded.", plugins.all().size);
+        }
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
         System.out.print("> ");
@@ -208,7 +222,7 @@ public class ServerControl implements ApplicationListener{
 
             if(lastTask != null) lastTask.cancel();
 
-            Map result = world.maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            Map result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
             if(result == null){
                 err("No map with name &y'{0}'&lr found.", arg[0]);
@@ -259,9 +273,9 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("maps", "Display all available maps.", arg -> {
-            if(!world.maps.all().isEmpty()){
+            if(!maps.all().isEmpty()){
                 info("Maps:");
-                for(Map map : world.maps.all()){
+                for(Map map : maps.all()){
                     info("  &ly{0}: &lb&fi{1} / {2}x{3}", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
                 }
             }else{
@@ -271,10 +285,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
-            int beforeMaps = world.maps.all().size;
-            world.maps.reload();
-            if(world.maps.all().size > beforeMaps){
-                info("&lc{0}&ly new map(s) found and reloaded.", world.maps.all().size - beforeMaps);
+            int beforeMaps = maps.all().size;
+            maps.reload();
+            if(maps.all().size > beforeMaps){
+                info("&lc{0}&ly new map(s) found and reloaded.", maps.all().size - beforeMaps);
             }else{
                 info("&lyMaps reloaded.");
             }
@@ -303,6 +317,31 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     info("  &lyNo players connected.");
                 }
+            }
+        });
+
+        handler.register("plugins", "Display all loaded plugins.", arg -> {
+            if(!plugins.all().isEmpty()){
+                info("Plugins:");
+                for(LoadedPlugin plugin : plugins.all()){
+                    info("  &ly{0} &lcv{1}", plugin.meta.name, plugin.meta.version);
+                }
+            }else{
+                info("No plugins found.");
+            }
+            info("&lyPlugin directory: &lb&fi{0}", pluginDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("plugin", "<name...>", "Display information about a loaded plugin.", arg -> {
+            LoadedPlugin plugin = plugins.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
+            if(plugin != null){
+                info("Name: &ly{0}", plugin.meta.name);
+                info("Version: &ly{0}", plugin.meta.version);
+                info("Author: &ly{0}", plugin.meta.author);
+                info("Path: &ly{0}", plugin.jarFile.path());
+                info("Description: &ly{0}", plugin.meta.description);
+            }else{
+                info("No plugin with name &ly'{0}'&lg found.");
             }
         });
 
@@ -643,6 +682,16 @@ public class ServerControl implements ApplicationListener{
                 info("Nobody with that name could be found.");
             }
         });
+
+        handler.register("gc", "Trigger a grabage collection. Testing only.", arg -> {
+            int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            System.gc();
+            int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
+            info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
+        });
+
+        plugins.each(p -> p.registerServerCommands(handler));
+        plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -655,7 +704,7 @@ public class ServerControl implements ApplicationListener{
     }
 
     private void handleCommandString(String line){
-        Response response = handler.handleMessage(line);
+        CommandResponse response = handler.handleMessage(line);
 
         if(response.type == ResponseType.unknownCommand){
 

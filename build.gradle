@@ -16,6 +16,8 @@ buildscript{
 
 allprojects{
     version = 'release'
+    apply plugin: 'maven'
+    group = 'com.github.Anuken'
 
     ext{
         versionNumber = '4'
@@ -120,6 +122,7 @@ allprojects{
                 props.load(new FileInputStream(pfile))
 
                 String buildid = getBuildVersion()
+                println("Compiling with build: '$buildid'")
 
                 props["type"] = versionType
                 props["number"] = versionNumber
@@ -203,6 +206,7 @@ project(":core"){
 
     task preGen{
         generateLocales()
+        writeVersion()
     }
 
     dependencies{
@@ -233,6 +237,7 @@ project(":core"){
 
         compileJava.dependsOn(preGen)
 
+        compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
@@ -298,7 +303,6 @@ project(":net"){
 
     dependencies{
         compile project(":core")
-        compile "org.lz4:lz4-java:1.4.1"
     }
 }
 

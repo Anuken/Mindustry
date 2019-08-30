@@ -19,6 +19,7 @@ logs/
 /tools/build/
 /tests/build/
 /server/build/
+changelog
 saves/
 core/assets/saves/
 /core/assets/saves/
@@ -37,6 +38,7 @@ packr-out/
 config/
 changelog
 *.gif
+/core/assets/saves/
 
 version.properties
 

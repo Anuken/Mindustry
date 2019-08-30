@@ -7,7 +7,6 @@ import io.anuke.arc.collection.*;
 import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
-
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();

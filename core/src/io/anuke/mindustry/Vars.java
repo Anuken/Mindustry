@@ -1,35 +1,36 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.Application.ApplicationType;
-import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.Application.*;
+import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.mindustry.entities.traits.DrawTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.impl.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.Serialization;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Locale;
+import java.nio.charset.*;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class Vars{
+public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
-    /** global charset */
+    /** global charset, since Android doesn't support the Charsets class */
     public static final Charset charset = Charset.forName("UTF-8");
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
@@ -116,10 +117,14 @@ public class Vars{
     public static FileHandle screenshotDirectory;
     /** data subdirectory used for custom mmaps */
     public static FileHandle customMapDirectory;
+    /** data subdirectory used for custom mmaps */
+    public static FileHandle mapPreviewDirectory;
     /** tmp subdirectory for map conversion */
     public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
+    /** data subdirectory used for plugins */
+    public static FileHandle pluginDirectory;
     /** old map file extension, for conversion */
     public static final String oldMapExtension = "mmap";
     /** map file extension */
@@ -137,14 +142,20 @@ public class Vars{
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
 
+    public static World world;
+    public static Maps maps;
+    public static WaveSpawner spawner;
+    public static BlockIndexer indexer;
+    public static Pathfinder pathfinder;
+
     public static Control control;
     public static Logic logic;
     public static Renderer renderer;
     public static UI ui;
-    public static World world;
     public static NetServer netServer;
     public static NetClient netClient;
 
+    public static Entities entities;
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
     public static EntityGroup<Bullet> bulletGroup;
@@ -157,6 +168,12 @@ public class Vars{
 
     /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
+
+    @Override
+    public void loadAsync(){
+        loadSettings();
+        init();
+    }
 
     public static void init(){
         Serialization.init();
@@ -180,29 +197,32 @@ public class Vars{
         Version.init();
 
         content = new ContentLoader();
-        if(!headless){
-            content.setVerbose();
-        }
-
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
+        world = new World();
 
-        playerGroup = Entities.addGroup(Player.class).enableMapping();
-        tileGroup = Entities.addGroup(TileEntity.class, false);
-        bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
-        effectGroup = Entities.addGroup(EffectEntity.class, false);
-        groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
-        puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
-        shieldGroup = Entities.addGroup(ShieldEntity.class, false);
-        fireGroup = Entities.addGroup(Fire.class).enableMapping();
+        maps = new Maps();
+        spawner = new WaveSpawner();
+        indexer = new BlockIndexer();
+        pathfinder = new Pathfinder();
+
+        entities = new Entities();
+        playerGroup = entities.add(Player.class).enableMapping();
+        tileGroup = entities.add(TileEntity.class, false);
+        bulletGroup = entities.add(Bullet.class).enableMapping();
+        effectGroup = entities.add(EffectEntity.class, false);
+        groundEffectGroup = entities.add(DrawTrait.class, false);
+        puddleGroup = entities.add(Puddle.class).enableMapping();
+        shieldGroup = entities.add(ShieldEntity.class, false);
+        fireGroup = entities.add(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
-            unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
+            unitGroups[team.ordinal()] = entities.add(BaseUnit.class).enableMapping();
         }
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
                 if(entity instanceof SyncTrait && Net.client()){
                     netClient.addRemovedEntity((entity).getID());
@@ -217,16 +237,64 @@ public class Vars{
         ios = Core.app.getType() == ApplicationType.iOS;
         android = Core.app.getType() == ApplicationType.Android;
 
+        dataDirectory = Core.settings.getDataDirectory();
+        screenshotDirectory = dataDirectory.child("screenshots/");
+        customMapDirectory = dataDirectory.child("maps/");
+        mapPreviewDirectory = dataDirectory.child("previews/");
+        saveDirectory = dataDirectory.child("saves/");
+        tmpDirectory = dataDirectory.child("tmp/");
+        pluginDirectory = dataDirectory.child("plugins/");
+
+        maps.load();
+    }
+
+    public static void loadSettings(){
         Core.settings.setAppName(appName);
 
         if(steam){
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 
-        dataDirectory = Core.settings.getDataDirectory();
-        screenshotDirectory = dataDirectory.child("screenshots/");
-        customMapDirectory = dataDirectory.child("maps/");
-        saveDirectory = dataDirectory.child("saves/");
-        tmpDirectory = dataDirectory.child("tmp/");
+        Core.settings.defaults("locale", "default");
+        Core.keybinds.setDefaults(Binding.values());
+        Core.settings.load();
+
+        if(!loadLocales) return;
+
+        try{
+            //try loading external bundle
+            FileHandle handle = Core.files.local("bundle");
+
+            Locale locale = Locale.ENGLISH;
+            Core.bundle = I18NBundle.createBundle(handle, locale);
+
+            Log.info("NOTE: external translation bundle has been loaded.");
+            if(!headless){
+                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle."));
+            }
+        }catch(Throwable e){
+            //no external bundle found
+
+            FileHandle handle = Core.files.internal("bundles/bundle");
+
+            Locale locale;
+            String loc = Core.settings.getString("locale");
+            if(loc.equals("default")){
+                locale = Locale.getDefault();
+            }else{
+                Locale lastLocale;
+                if(loc.contains("_")){
+                    String[] split = loc.split("_");
+                    lastLocale = new Locale(split[0], split[1]);
+                }else{
+                    lastLocale = new Locale(loc);
+                }
+
+                locale = lastLocale;
+            }
+
+            Locale.setDefault(locale);
+            Core.bundle = I18NBundle.createBundle(handle, locale);
+        }
     }
 }

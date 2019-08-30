@@ -32,7 +32,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch, commandSend;
 
     @Override
     public void load(){
@@ -51,6 +51,13 @@ public class Fx implements ContentList{
             unit.getIconRegion().getWidth() * Draw.scl * scl, unit.getIconRegion().getWidth() * Draw.scl * scl, 180f);
 
             Draw.reset();
+        });
+
+        commandSend = new Effect(28, e -> {
+            Draw.color(Pal.command);
+            Lines.stroke(e.fout() * 2f);
+            Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
+            Draw.color();
         });
 
         placeBlock = new Effect(16, e -> {

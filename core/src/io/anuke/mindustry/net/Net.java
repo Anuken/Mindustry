@@ -1,19 +1,18 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.BiConsumer;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.net.Streamable.StreamBuilder;
+import io.anuke.mindustry.net.Streamable.*;
+import net.jpountz.lz4.*;
 
-import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
+import java.io.*;
+import java.nio.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,6 +27,8 @@ public class Net{
     private static ClientProvider clientProvider;
     private static ServerProvider serverProvider;
     private static IntMap<StreamBuilder> streams = new IntMap<>();
+    private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+    private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     /** Display a network error. Call on the graphics thread. */
     public static void showError(Throwable e){
@@ -149,11 +150,11 @@ public class Net{
     }
 
     public static byte[] compressSnapshot(byte[] input){
-        return serverProvider.compressSnapshot(input);
+        return compressor.compress(input);
     }
 
     public static byte[] decompressSnapshot(byte[] input, int size){
-        return clientProvider.decompressSnapshot(input, size);
+        return decompressor.decompress(input, size);
     }
 
     /**
@@ -359,9 +360,6 @@ public class Net{
         /** Disconnect from the server. */
         void disconnect();
 
-        /** Decompress an input snapshot byte array. */
-        byte[] decompressSnapshot(byte[] input, int size);
-
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
          * Callback should be run on libGDX main thread.
@@ -434,9 +432,6 @@ public class Net{
 
         /** Close the server connection. */
         void close();
-
-        /** Compress an input snapshot byte array. */
-        byte[] compressSnapshot(byte[] input);
 
         /** Return all connected users. */
         Iterable<? extends NetConnection> getConnections();

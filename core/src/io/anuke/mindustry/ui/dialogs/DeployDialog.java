@@ -14,9 +14,8 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
@@ -33,12 +32,9 @@ public class DeployDialog extends FloatingDialog{
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
-    private Texture nomap = new Texture("zones/nomap.png");
 
     public DeployDialog(){
         super("", "fulldialog");
-
-        Events.on(DisposeEvent.class, e -> nomap.dispose());
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
@@ -90,6 +86,7 @@ public class DeployDialog extends FloatingDialog{
                 Stack sub = new Stack();
 
                 if(control.saves.getZoneSlot().getZone() != null){
+                    sub.add(new Table(f -> f.margin(4f).add(new Image("whiteui")).color(Color.fromGray(0.1f)).grow()));
                     sub.add(new Table(f -> f.margin(4f).add(new Image(control.saves.getZoneSlot().getZone().preview).setScaling(Scaling.fit)).color(Color.DARK_GRAY).grow()));
                 }
 
@@ -195,7 +192,7 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview != null ? node.zone.preview : nomap).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
+                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button("square");

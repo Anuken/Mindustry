@@ -44,8 +44,6 @@ task dist(type: Jar){
     exclude("icons/**")
     exclude("bundles/**")
 
-    writeVersion()
-
     manifest{
         attributes 'Main-Class': project.mainClassName
     }

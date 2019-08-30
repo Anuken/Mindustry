@@ -23,7 +23,7 @@ public class DesktopLauncher{
                 Net.setServerProvider(new ArcNetServer());
             }
 
-            new SdlApplication(new Mindustry(), new SdlConfig(){{
+            new SdlApplication(new ClientLauncher(), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
                 depth = 0;

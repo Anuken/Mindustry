@@ -104,6 +104,10 @@ public class Tile implements Position, TargetTrait{
         return block().offset() + worldy();
     }
 
+    public boolean isDarkened(){
+        return block().solid && !block().synthetic() && block().fillsTile;
+    }
+
     public Floor floor(){
         return floor;
     }

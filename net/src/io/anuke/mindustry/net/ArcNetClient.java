@@ -8,7 +8,6 @@ import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.net.*;
@@ -20,7 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class ArcNetClient implements ClientProvider{
     final Client client;
     final Supplier<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
-    final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
     public ArcNetClient(){
         client = new Client(8192, 4096, new PacketSerializer());
@@ -75,14 +73,6 @@ public class ArcNetClient implements ClientProvider{
         }
     }
 
-
-    @Override
-    public byte[] decompressSnapshot(byte[] input, int size){
-        byte[] result = new byte[size];
-        decompressor.decompress(input, result);
-        return result;
-    }
-
     @Override
     public void connect(String ip, int port, Runnable success){
         Threads.daemon(() -> {
@@ -90,17 +80,15 @@ public class ArcNetClient implements ClientProvider{
                 //just in case
                 client.stop();
 
-                Thread updateThread = new Thread(() -> {
+                Threads.daemon("Net Client", () -> {
                     try{
                         client.run();
                     }catch(Exception e){
                         if(!(e instanceof ClosedSelectorException)) handleException(e);
                     }
-                }, "Net Client");
-                updateThread.setDaemon(true);
-                updateThread.start();
+                });
 
-                client.connect(5000, ip, port);
+                client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
                 handleException(e);
@@ -116,7 +104,11 @@ public class ArcNetClient implements ClientProvider{
     @Override
     public void sendClient(Object object, SendMode mode){
         try{
-            client.sendTCP(object);
+            if(mode == SendMode.tcp){
+                client.sendTCP(object);
+            }else{
+                client.sendUDP(object);
+            }
             //sending things can cause an under/overflow, catch it and disconnect instead of crashing
         }catch(BufferOverflowException | BufferUnderflowException e){
             Net.showError(e);

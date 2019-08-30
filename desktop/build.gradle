@@ -9,6 +9,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
+def enableTemplates = true
 def JDK_DIR = "$System.env.PACKR_DIR"
 def ICON_DIR = new File("core/assets/icons/icon.icns")
 
@@ -75,7 +76,7 @@ PackrConfig.Platform.values().each{ platform ->
                 delete "build/packr/output/"
             }
 
-            if(platform == PackrConfig.Platform.Windows32 || platform == PackrConfig.Platform.Windows64){
+            if(enableTemplates && (platform == PackrConfig.Platform.Windows64)){
                 copy{
                     into "build/packr/output"
                     from "${JDK_DIR}/templates/${platform.toString().toLowerCase()}"
@@ -110,7 +111,7 @@ PackrConfig.Platform.values().each{ platform ->
 
                 new Packr().pack(config)
 
-                if(platform == PackrConfig.Platform.Linux64){
+                if(platform != PackrConfig.Platform.MacOS){
                     copy{
                         into "build/packr/output/jre/"
                         from "build/packr/output/desktop.jar"
@@ -125,13 +126,21 @@ PackrConfig.Platform.values().each{ platform ->
 
                 if(platform == PackrConfig.Platform.MacOS){
                     copy{
-                        into "build/packr/${appName}.app/Contents/"
-                        from "build/packr/Contents/"
+                        into "build/packr/output/${appName}.app/Contents/"
+                        from "build/packr/output/Contents/"
                     }
 
                     delete{
-                        delete "build/packr/Contents/"
+                        delete "build/packr/output/Contents/"
                     }
+                }
+            }
+
+            if((platform == PackrConfig.Platform.Windows64 || platform == PackrConfig.Platform.Windows32)){
+                copy{
+                    from "build/packr/output/jre/bin/msvcr100.dll"
+                    into "build/packr/output/"
+                    rename("msvcr100.dll", "MSVCR100.dll")
                 }
             }
 

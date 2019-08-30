@@ -96,7 +96,7 @@ public class OverlayRenderer{
         Lines.stroke(2f);
         Draw.color(Color.GRAY, Color.LIGHT_GRAY, Mathf.absin(Time.time(), 8f, 1f));
 
-        for(Tile tile : world.spawner.getGroundSpawns()){
+        for(Tile tile : spawner.getGroundSpawns()){
             if(tile.withinDst(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                 Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                 Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
