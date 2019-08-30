@@ -14,7 +14,7 @@ script:
 - git commit -m "Updating to build ${TRAVIS_BUILD_NUMBER}"
 - git tag ${TRAVIS_BUILD_NUMBER}
 - git config --global user.name "Build Uploader"
-- git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}; fi
 - cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
 - "./gradlew test"
