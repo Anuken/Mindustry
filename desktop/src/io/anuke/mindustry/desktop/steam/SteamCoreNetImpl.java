@@ -147,7 +147,13 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public void host(int port) throws IOException{
-        smat.createLobby(LobbyType.values()[Core.settings.getInt("lobbytype", 2)], 32);
+        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 32);
+    }
+
+    public void updateLobby(){
+        if(currentLobby != null && Net.server()){
+            smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
+        }
     }
 
     @Override

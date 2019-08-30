@@ -223,6 +223,10 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
+        game.checkPref("publichost", false, i -> {
+            platform.updateLobby();
+        });
+
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){

@@ -13,6 +13,11 @@ import static io.anuke.mindustry.Vars.mobile;
 
 public interface Platform{
 
+    /**Steam: Update lobby visibility.*/
+    default void updateLobby(){
+
+    }
+
     /** Add a text input dialog that should show up after the field is tapped. */
     default void addDialog(TextField field){
         addDialog(field, 16);
