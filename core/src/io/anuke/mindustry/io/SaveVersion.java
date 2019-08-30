@@ -209,7 +209,7 @@ public abstract class SaveVersion extends SaveFileReader{
         //write entity chunk
         int groups = 0;
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.getAllGroups()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 groups++;
             }
@@ -217,7 +217,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         stream.writeByte(groups);
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.getAllGroups()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){

@@ -589,7 +589,7 @@ public class NetServer implements ApplicationListener{
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
         //check for syncable groups
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.getAllGroups()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
             //make sure mapping is enabled for this group

@@ -153,6 +153,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
+    public static Entities entities;
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
     public static EntityGroup<Bullet> bulletGroup;
@@ -204,21 +205,22 @@ public class Vars implements Loadable{
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
 
-        playerGroup = Entities.addGroup(Player.class).enableMapping();
-        tileGroup = Entities.addGroup(TileEntity.class, false);
-        bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
-        effectGroup = Entities.addGroup(EffectEntity.class, false);
-        groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
-        puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
-        shieldGroup = Entities.addGroup(ShieldEntity.class, false);
-        fireGroup = Entities.addGroup(Fire.class).enableMapping();
+        entities = new Entities();
+        playerGroup = entities.addGroup(Player.class).enableMapping();
+        tileGroup = entities.addGroup(TileEntity.class, false);
+        bulletGroup = entities.addGroup(Bullet.class).enableMapping();
+        effectGroup = entities.addGroup(EffectEntity.class, false);
+        groundEffectGroup = entities.addGroup(DrawTrait.class, false);
+        puddleGroup = entities.addGroup(Puddle.class).enableMapping();
+        shieldGroup = entities.addGroup(ShieldEntity.class, false);
+        fireGroup = entities.addGroup(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
-            unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
+            unitGroups[team.ordinal()] = entities.addGroup(BaseUnit.class).enableMapping();
         }
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.getAllGroups()){
             group.setRemoveListener(entity -> {
                 if(entity instanceof SyncTrait && Net.client()){
                     netClient.addRemovedEntity((entity).getID());

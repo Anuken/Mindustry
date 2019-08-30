@@ -33,7 +33,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //gesture data
     private Vector2 vector = new Vector2();
-    private float lastDistance = -1f, lastZoom;
+    private float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY;
@@ -729,6 +729,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public boolean zoom(float initialDistance, float distance){
         if(Core.settings.getBool("keyboard")) return false;
+        if(lastZoom < 0){
+            lastZoom = renderer.getScale();
+        }
 
         renderer.setScale(distance / initialDistance * lastZoom);
         return true;

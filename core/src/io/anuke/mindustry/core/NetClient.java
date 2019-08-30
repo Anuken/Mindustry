@@ -219,7 +219,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void onWorldDataBegin(){
-        Entities.clear();
+        entities.clear();
         netClient.removed.clear();
         logic.reset();
 
@@ -253,7 +253,7 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(Net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
-            EntityGroup group = Entities.getGroup(groupID);
+            EntityGroup group = entities.getGroup(groupID);
 
             //go through each entity
             for(int j = 0; j < amount; j++){
@@ -370,7 +370,7 @@ public class NetClient implements ApplicationListener{
         quiet = false;
         lastSent = 0;
 
-        Entities.clear();
+        entities.clear();
         ui.chatfrag.clearMessages();
     }
 

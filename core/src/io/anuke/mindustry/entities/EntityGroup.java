@@ -1,16 +1,13 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntMap;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.math.geom.QuadTree;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.mindustry.entities.traits.*;
+
+import static io.anuke.mindustry.Vars.collisions;
 
 public class EntityGroup<T extends Entity>{
-    private static int lastid;
     private final boolean useTree;
     private final int id;
     private final Class<T> type;
@@ -22,13 +19,25 @@ public class EntityGroup<T extends Entity>{
     private Consumer<T> removeListener;
     private Consumer<T> addListener;
 
-    public EntityGroup(Class<T> type, boolean useTree){
+    public EntityGroup(int id, Class<T> type, boolean useTree){
         this.useTree = useTree;
-        this.id = lastid++;
+        this.id = id;
         this.type = type;
 
         if(useTree){
             tree = new QuadTree<>(new Rectangle(0, 0, 0, 0));
+        }
+    }
+
+    public void update(){
+        updateEvents();
+
+        if(useTree()){
+            collisions.updatePhysics(this);
+        }
+
+        for(Entity e : all()){
+            e.update();
         }
     }
 

@@ -259,13 +259,13 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         draw(playerGroup, p -> true, Player::drawBuildRequests);
 
-        if(Entities.countInBounds(shieldGroup) > 0){
+        if(entities.countInBounds(shieldGroup) > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.CLEAR);
-                Entities.draw(shieldGroup);
-                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                entities.draw(shieldGroup);
+                entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
                 Draw.flush();
                 shieldBuffer.end();
                 Draw.shader(Shaders.shield);
@@ -274,7 +274,7 @@ public class Renderer implements ApplicationListener{
                 Draw.color();
                 Draw.shader();
             }else{
-                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+                entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
             }
         }
 
@@ -351,7 +351,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        Entities.draw(group, toDraw, drawer);
+        entities.draw(group, toDraw, drawer);
     }
 
     public void scaleCamera(float amount){

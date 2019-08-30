@@ -101,8 +101,8 @@ public class Logic implements ApplicationListener{
         state.rules = new Rules();
         state.stats = new Stats();
 
+        entities.clear();
         Time.clear();
-        Entities.clear();
         TileEntity.sleepingEntities = 0;
 
         Events.fire(new ResetEvent());
@@ -195,20 +195,20 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(!headless){
-                    Entities.update(effectGroup);
-                    Entities.update(groundEffectGroup);
+                    effectGroup.update();
+                    groundEffectGroup.update();
                 }
 
                 if(!state.isEditor()){
                     for(EntityGroup group : unitGroups){
-                        Entities.update(group);
+                        group.update();
                     }
 
-                    Entities.update(puddleGroup);
-                    Entities.update(shieldGroup);
-                    Entities.update(bulletGroup);
-                    Entities.update(tileGroup);
-                    Entities.update(fireGroup);
+                    puddleGroup.update();
+                    shieldGroup.update();
+                    bulletGroup.update();
+                    tileGroup.update();
+                    fireGroup.update();
                 }else{
                     for(EntityGroup<?> group : unitGroups){
                         group.updateEvents();
@@ -217,11 +217,11 @@ public class Logic implements ApplicationListener{
                 }
 
 
-                Entities.update(playerGroup);
+                playerGroup.update();
 
                 //effect group only contains item transfers in the headless version, update it!
                 if(headless){
-                    Entities.update(effectGroup);
+                    effectGroup.update();
                 }
 
                 if(!state.isEditor()){
