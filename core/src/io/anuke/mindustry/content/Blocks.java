@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.mindustry.world.blocks.distribution.*;
+import io.anuke.mindustry.world.blocks.others.LED;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
@@ -78,7 +79,10 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
+
+    //others
+    led;
 
     @Override
     public void load(){
@@ -979,7 +983,7 @@ public class Blocks implements ContentList{
             health = 45;
         }};
 
-        pulseConduit = new Conduit("pulse-conduit"){{
+            pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 1));
             liquidCapacity = 16f;
             liquidFlowFactor = 4.9f;
@@ -1771,6 +1775,14 @@ public class Blocks implements ContentList{
             mech = Mechs.glaive;
             size = 3;
             consumes.power(1.2f);
+        }};
+
+        led = new LED("led"){{
+
+            requirements(Category.effect, ItemStack.with(Items.copper, 50));
+            consumes.power(1f);
+
+            size = 1;
         }};
 
         //endregion
