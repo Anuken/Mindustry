@@ -1,30 +1,31 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.files.FileHandle;
+import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.EventType.StateChangeEvent;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.io.SaveIO.SaveException;
-import io.anuke.mindustry.io.SaveMeta;
+import io.anuke.arc.util.async.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.type.*;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
-import static io.anuke.mindustry.Vars.saveExtension;
-import static io.anuke.mindustry.Vars.state;
+import static io.anuke.mindustry.Vars.*;
 
 public class Saves{
     private int nextSlot;
     private Array<SaveSlot> saves = new Array<>();
     private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
+    private AsyncExecutor previewExecutor = new AsyncExecutor(2);
     private boolean saving;
     private float time;
 
@@ -32,6 +33,8 @@ public class Saves{
     private long lastTimestamp;
 
     public Saves(){
+        Core.assets.setLoader(Texture.class, ".spreview", new SavePreviewLoader());
+
         Events.on(StateChangeEvent.class, event -> {
             if(event.to == State.menu){
                 totalPlaytime = 0;
@@ -162,6 +165,7 @@ public class Saves{
 
     public class SaveSlot{
         public final int index;
+        boolean requestedPreview;
         SaveMeta meta;
 
         public SaveSlot(int index){
@@ -174,6 +178,7 @@ public class Saves{
                 meta = SaveIO.getMeta(index);
                 current = this;
                 totalPlaytime = meta.timePlayed;
+                savePreview();
             }catch(Exception e){
                 throw new SaveException(e);
             }
@@ -191,6 +196,40 @@ public class Saves{
             }
 
             totalPlaytime = prev;
+            savePreview();
+        }
+
+        private void savePreview(){
+            if(Core.assets.isLoaded(loadPreviewFile().path())){
+                Core.assets.unload(loadPreviewFile().path());
+            }
+            previewExecutor.submit(() -> {
+                try{
+                    previewFile().writePNG(renderer.minimap.getPixmap());
+                }catch(Throwable t){
+                    t.printStackTrace();
+                }
+            });
+        }
+
+        public Texture previewTexture(){
+            if(!previewFile().exists()){
+                return null;
+            }else if(Core.assets.isLoaded(loadPreviewFile().path())){
+                return Core.assets.get(loadPreviewFile().path());
+            }else if(!requestedPreview){
+                Core.assets.load(new AssetDescriptor<>(loadPreviewFile(), Texture.class));
+                requestedPreview = true;
+            }
+            return null;
+        }
+
+        private FileHandle previewFile(){
+            return mapPreviewDirectory.child("save_slot_" + index + ".png");
+        }
+
+        private FileHandle loadPreviewFile(){
+            return previewFile().sibling(previewFile().name() + ".spreview");
         }
 
         public boolean isHidden(){
@@ -214,7 +253,7 @@ public class Saves{
         }
 
         public String getName(){
-            return Core.settings.getString("save-" + index + "-name", "untittled");
+            return Core.settings.getString("save-" + index + "-name", "untitled");
         }
 
         public void setName(String name){
