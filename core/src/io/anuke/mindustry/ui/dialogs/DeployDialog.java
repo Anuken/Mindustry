@@ -86,6 +86,7 @@ public class DeployDialog extends FloatingDialog{
                 Stack sub = new Stack();
 
                 if(control.saves.getZoneSlot().getZone() != null){
+                    sub.add(new Table(f -> f.margin(4f).add(new Image("whiteui")).color(Color.fromGray(0.1f)).grow()));
                     sub.add(new Table(f -> f.margin(4f).add(new Image(control.saves.getZoneSlot().getZone().preview).setScaling(Scaling.fit)).color(Color.DARK_GRAY).grow()));
                 }
 
