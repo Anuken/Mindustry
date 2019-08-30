@@ -206,21 +206,21 @@ public class Vars implements Loadable{
         pathfinder = new Pathfinder();
 
         entities = new Entities();
-        playerGroup = entities.addGroup(Player.class).enableMapping();
-        tileGroup = entities.addGroup(TileEntity.class, false);
-        bulletGroup = entities.addGroup(Bullet.class).enableMapping();
-        effectGroup = entities.addGroup(EffectEntity.class, false);
-        groundEffectGroup = entities.addGroup(DrawTrait.class, false);
-        puddleGroup = entities.addGroup(Puddle.class).enableMapping();
-        shieldGroup = entities.addGroup(ShieldEntity.class, false);
-        fireGroup = entities.addGroup(Fire.class).enableMapping();
+        playerGroup = entities.add(Player.class).enableMapping();
+        tileGroup = entities.add(TileEntity.class, false);
+        bulletGroup = entities.add(Bullet.class).enableMapping();
+        effectGroup = entities.add(EffectEntity.class, false);
+        groundEffectGroup = entities.add(DrawTrait.class, false);
+        puddleGroup = entities.add(Puddle.class).enableMapping();
+        shieldGroup = entities.add(ShieldEntity.class, false);
+        fireGroup = entities.add(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
-            unitGroups[team.ordinal()] = entities.addGroup(BaseUnit.class).enableMapping();
+            unitGroups[team.ordinal()] = entities.add(BaseUnit.class).enableMapping();
         }
 
-        for(EntityGroup<?> group : entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
                 if(entity instanceof SyncTrait && Net.client()){
                     netClient.addRemovedEntity((entity).getID());

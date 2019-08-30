@@ -1,12 +1,15 @@
 package io.anuke.mindustry.entities;
 
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.entities.traits.*;
 
 import static io.anuke.mindustry.Vars.collisions;
 
+@SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entity>{
     private final boolean useTree;
     private final int id;
@@ -18,6 +21,10 @@ public class EntityGroup<T extends Entity>{
     private QuadTree tree;
     private Consumer<T> removeListener;
     private Consumer<T> addListener;
+
+    private final Rectangle viewport = new Rectangle();
+    private final boolean clip = true;
+    private int count = 0;
 
     public EntityGroup(int id, Class<T> type, boolean useTree){
         this.useTree = useTree;
@@ -38,6 +45,34 @@ public class EntityGroup<T extends Entity>{
 
         for(Entity e : all()){
             e.update();
+        }
+    }
+
+    public int countInBounds(){
+        count = 0;
+        draw(e -> true, e -> count++);
+        return count;
+    }
+
+    public void draw(){
+        draw(e -> true);
+    }
+
+    public void draw(Predicate<T> toDraw){
+        draw(toDraw, t -> ((DrawTrait)t).draw());
+    }
+
+    public void draw(Predicate<T> toDraw, Consumer<T> cons){
+        Camera cam = Core.camera;
+        viewport.set(cam.position.x - cam.width / 2, cam.position.y - cam.height / 2, cam.width, cam.height);
+
+        for(Entity e : all()){
+            if(!(e instanceof DrawTrait) || !toDraw.test((T)e) || !e.isAdded()) continue;
+            DrawTrait draw = (DrawTrait)e;
+
+            if(viewport.overlaps(draw.getX() - draw.drawSize()/2f, draw.getY() - draw.drawSize()/2f, draw.drawSize(), draw.drawSize())){
+                cons.accept((T)e);
+            }
         }
     }
 

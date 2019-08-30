@@ -5,7 +5,6 @@ import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
@@ -58,7 +57,7 @@ public class TypeIO{
         byte gid = buffer.get();
         if(gid == -1) return null;
         int id = buffer.getInt();
-        return (Unit)entities.getGroup(gid).getByID(id);
+        return (Unit)entities.get(gid).getByID(id);
     }
 
     @WriteClass(ShooterTrait.class)
@@ -71,7 +70,7 @@ public class TypeIO{
     public static ShooterTrait readShooter(ByteBuffer buffer){
         byte gid = buffer.get();
         int id = buffer.getInt();
-        return (ShooterTrait)entities.getGroup(gid).getByID(id);
+        return (ShooterTrait)entities.get(gid).getByID(id);
     }
 
     @WriteClass(Bullet.class)

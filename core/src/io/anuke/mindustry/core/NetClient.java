@@ -12,7 +12,6 @@ import io.anuke.arc.util.io.ReusableByteInStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
@@ -253,7 +252,7 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(Net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
-            EntityGroup group = entities.getGroup(groupID);
+            EntityGroup group = entities.get(groupID);
 
             //go through each entity
             for(int j = 0; j < amount; j++){

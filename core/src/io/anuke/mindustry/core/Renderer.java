@@ -209,9 +209,9 @@ public class Renderer implements ApplicationListener{
 
         blocks.floor.drawFloor();
 
-        draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
-        draw(puddleGroup);
-        draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+        groundEffectGroup.draw(e -> e instanceof BelowLiquidTrait);
+        puddleGroup.draw();
+        groundEffectGroup.draw(e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
 
@@ -248,8 +248,8 @@ public class Renderer implements ApplicationListener{
             bloom.capture();
         }
 
-        draw(bulletGroup);
-        draw(effectGroup);
+        bulletGroup.draw();
+        effectGroup.draw();
 
         Draw.flush();
         if(bloom != null && !pixelator.enabled()){
@@ -257,15 +257,15 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawBottom();
-        draw(playerGroup, p -> true, Player::drawBuildRequests);
+        playerGroup.draw(p -> true, Player::drawBuildRequests);
 
-        if(entities.countInBounds(shieldGroup) > 0){
+        if(shieldGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.CLEAR);
-                entities.draw(shieldGroup);
-                entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                shieldGroup.draw();
+                shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
                 Draw.flush();
                 shieldBuffer.end();
                 Draw.shader(Shaders.shield);
@@ -274,13 +274,13 @@ public class Renderer implements ApplicationListener{
                 Draw.color();
                 Draw.shader();
             }else{
-                entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+                shieldGroup.draw(shield -> true, ShieldEntity::drawSimple);
             }
         }
 
         overlays.drawTop();
 
-        draw(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+        playerGroup.draw(p -> !p.isDead() && !p.isLocal, Player::drawName);
 
         Draw.color();
         Draw.flush();
@@ -297,12 +297,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                draw(group, unit -> !unit.isDead(), draw::accept);
+                group.draw(unit -> !unit.isDead(), draw::accept);
             }
         }
 
         if(!playerGroup.isEmpty()){
-            draw(playerGroup, unit -> !unit.isDead(), draw::accept);
+            playerGroup.draw(unit -> !unit.isDead(), draw::accept);
         }
 
         Draw.color();
@@ -314,12 +314,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                draw(group, unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+                group.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
             }
         }
 
         if(!playerGroup.isEmpty()){
-            draw(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
+            playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
         Draw.color();
@@ -331,27 +331,15 @@ public class Renderer implements ApplicationListener{
 
             if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
         }
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group){
-        draw(group, t -> true, DrawTrait::draw);
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw){
-        draw(group, toDraw, DrawTrait::draw);
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        entities.draw(group, toDraw, drawer);
     }
 
     public void scaleCamera(float amount){

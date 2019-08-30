@@ -178,7 +178,7 @@ public class World{
             addDarkness(tiles);
         }
 
-        entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
+        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
         generating = false;
         Events.fire(new WorldLoadEvent());

@@ -15,7 +15,6 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.Entity;
@@ -589,7 +588,7 @@ public class NetServer implements ApplicationListener{
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
         //check for syncable groups
-        for(EntityGroup<?> group : entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             if(group.isEmpty() || !(group.all().get(0) instanceof SyncTrait)) continue;
 
             //make sure mapping is enabled for this group
