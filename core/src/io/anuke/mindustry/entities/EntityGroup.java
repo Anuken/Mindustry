@@ -9,21 +9,21 @@ import io.anuke.mindustry.entities.traits.*;
 
 import static io.anuke.mindustry.Vars.collisions;
 
+/** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entity>{
     private final boolean useTree;
     private final int id;
     private final Class<T> type;
-    private final Array<T> entityArray = new Array<>(false, 16);
-    private final Array<T> entitiesToRemove = new Array<>(false, 16);
-    private final Array<T> entitiesToAdd = new Array<>(false, 16);
+    private final Array<T> entityArray = new Array<>(false, 32);
+    private final Array<T> entitiesToRemove = new Array<>(false, 32);
+    private final Array<T> entitiesToAdd = new Array<>(false, 32);
     private IntMap<T> map;
     private QuadTree tree;
     private Consumer<T> removeListener;
     private Consumer<T> addListener;
 
     private final Rectangle viewport = new Rectangle();
-    private final boolean clip = true;
     private int count = 0;
 
     public EntityGroup(int id, Class<T> type, boolean useTree){
