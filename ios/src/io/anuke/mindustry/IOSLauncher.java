@@ -6,7 +6,6 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
@@ -36,7 +35,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
             UnitScl.dp.addition = -0.5f;
         }
 
-        Platform.instance = new Platform(){
+        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        return new IOSApplication(new ClientLauncher(){
 
             @Override
             public void shareFile(FileHandle file){
@@ -63,10 +63,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        };
-
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new ClientLauncher(), config);
+        }, config);
     }
 
     @Override

@@ -12,7 +12,6 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.Align;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.DisposeEvent;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.Version;
@@ -118,7 +117,7 @@ public class MenuFragment extends Fragment{
                 table.add(editor);
                 table.add(tools);
 
-                if(Platform.instance.canDonate()) table.add(donate);
+                if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -136,7 +135,7 @@ public class MenuFragment extends Fragment{
             container.table(table -> {
                 table.defaults().set(container.defaults());
 
-                if(Platform.instance.canDonate()) table.add(donate);
+                if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(2);
         }

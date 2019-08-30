@@ -17,7 +17,7 @@ import io.anuke.mindustry.maps.*;
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
 
-public class ClientLauncher extends ApplicationCore{
+public abstract class ClientLauncher extends ApplicationCore implements Platform{
     private static final int loadingFPS = 20;
 
     private float smoothProgress;
@@ -27,6 +27,7 @@ public class ClientLauncher extends ApplicationCore{
 
     @Override
     public void setup(){
+        Vars.platform = this;
         Log.setUseColors(false);
         beginTime = Time.millis();
 
@@ -48,9 +49,7 @@ public class ClientLauncher extends ApplicationCore{
         assets.load(new Vars());
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
 
-        assets.loadRun("maps", Map.class, () -> {
-            maps.loadPreviews();
-        });
+        assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
         Sounds.load();
@@ -134,6 +133,13 @@ public class ClientLauncher extends ApplicationCore{
     public void resume(){
         if(finished){
             super.resume();
+        }
+    }
+
+    @Override
+    public void pause(){
+        if(finished){
+            super.pause();
         }
     }
 

@@ -19,7 +19,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
@@ -92,7 +91,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 createDialog("$editor.import",
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
-                Platform.instance.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
+                platform.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("$editor.errorimage");
@@ -105,7 +104,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }), true, FileChooser.anyMapFiles),
 
                 "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
-                Platform.instance.showFileChooser("$loadimage", "Image Files", file ->
+                platform.showFileChooser("$loadimage", "Image Files", file ->
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
@@ -121,7 +120,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             Cell cell = t.addImageTextButton("$editor.export", "icon-save-map", isize, () -> {
                 if(!ios){
-                    Platform.instance.showFileChooser("$editor.savemap", "Map Files", file -> {
+                    platform.showFileChooser("$editor.savemap", "Map Files", file -> {
                         file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
                         FileHandle result = file;
                         ui.loadAnd(() -> {
@@ -141,7 +140,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         try{
                             FileHandle result = Core.files.local(editor.getTags().get("name", "unknown") + "." + mapExtension);
                             MapIO.writeMap(result, editor.createMap(result));
-                            Platform.instance.shareFile(result);
+                            platform.shareFile(result);
                         }catch(Exception e){
                             ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
                             Log.err(e);
@@ -210,7 +209,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         shown(() -> {
 
             saved = true;
-            if(!Core.settings.getBool("landscape")) Platform.instance.beginForceLandscape();
+            if(!Core.settings.getBool("landscape")) platform.beginForceLandscape();
             editor.clearOp();
             Core.scene.setScrollFocus(view);
             if(!shownWithMap){
@@ -221,13 +220,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
             shownWithMap = false;
 
-            Time.runTask(10f, Platform.instance::updateRPC);
+            Time.runTask(10f, platform::updateRPC);
         });
 
         hidden(() -> {
             editor.clearOp();
-            Platform.instance.updateRPC();
-            if(!Core.settings.getBool("landscape")) Platform.instance.endForceLandscape();
+            platform.updateRPC();
+            if(!Core.settings.getBool("landscape")) platform.endForceLandscape();
         });
     }
 

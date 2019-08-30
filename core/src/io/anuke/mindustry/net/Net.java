@@ -5,7 +5,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.net.Streamable.*;
@@ -122,7 +121,7 @@ public class Net{
         active = true;
         server = true;
 
-        Time.runTask(60f, Platform.instance::updateRPC);
+        Time.runTask(60f, platform::updateRPC);
     }
 
     /**

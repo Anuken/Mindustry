@@ -9,7 +9,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
@@ -62,7 +61,7 @@ public class MapsDialog extends FloatingDialog{
 
         if(!ios){
             buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
-                Platform.instance.showFileChooser("$editor.importmap", "Map File", file -> {
+                platform.showFileChooser("$editor.importmap", "Map File", file -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showError("$editor.errorimage");

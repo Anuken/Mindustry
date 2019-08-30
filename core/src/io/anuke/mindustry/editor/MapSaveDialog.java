@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
@@ -18,7 +17,7 @@ public class MapSaveDialog extends FloatingDialog{
         field = new TextField();
         listener = cons;
 
-        Platform.instance.addDialog(field);
+        Vars.platform.addDialog(field);
 
         shown(() -> {
             cont.clear();

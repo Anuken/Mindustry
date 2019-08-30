@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -76,9 +75,9 @@ public class MapInfoDialog extends FloatingDialog{
             description.change();
             author.change();
 
-            Platform.instance.addDialog(name, 50);
-            Platform.instance.addDialog(author, 50);
-            Platform.instance.addDialog(description, 1000);
+            Vars.platform.addDialog(name, 50);
+            Vars.platform.addDialog(author, 50);
+            Vars.platform.addDialog(description, 1000);
             t.margin(16f);
         });
     }

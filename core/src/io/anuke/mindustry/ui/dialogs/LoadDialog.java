@@ -8,7 +8,6 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.io.SaveIO.*;
@@ -86,7 +85,7 @@ public class LoadDialog extends FloatingDialog{
 
                 t.addImageButton("icon-save", "empty", iconsize, () -> {
                     if(!ios){
-                        Platform.instance.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
+                        platform.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
                             try{
                                 slot.exportFile(file);
                                 setup();
@@ -98,7 +97,7 @@ public class LoadDialog extends FloatingDialog{
                         try{
                             FileHandle file = Core.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
                             slot.exportFile(file);
-                            Platform.instance.shareFile(file);
+                            platform.shareFile(file);
                         }catch(Exception e){
                             ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                         }
@@ -148,7 +147,7 @@ public class LoadDialog extends FloatingDialog{
         if(ios) return;
 
         slots.addImageTextButton("$save.import", "icon-add", iconsize, () -> {
-            Platform.instance.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
+            platform.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
                         control.saves.importSave(file);

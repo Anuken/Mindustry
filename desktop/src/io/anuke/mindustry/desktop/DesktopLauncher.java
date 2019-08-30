@@ -12,7 +12,6 @@ public class DesktopLauncher{
 
     public static void main(String[] arg){
         try{
-            Platform.instance = new DesktopPlatform(arg);
 
             if(SteamAPI.isSteamRunning()){
                 SteamCoreNetImpl net = DesktopPlatform.steamCore = new SteamCoreNetImpl();
@@ -23,7 +22,7 @@ public class DesktopLauncher{
                 Net.setServerProvider(new ArcNetServer());
             }
 
-            new SdlApplication(new ClientLauncher(), new SdlConfig(){{
+            new SdlApplication(new DesktopPlatform(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
                 depth = 0;

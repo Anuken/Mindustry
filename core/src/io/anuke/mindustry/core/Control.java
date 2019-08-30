@@ -51,7 +51,7 @@ public class Control implements ApplicationListener, Loadable{
     public Control(){
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
-                Time.runTask(5f, Platform.instance::updateRPC);
+                Time.runTask(5f, platform::updateRPC);
             }
         });
 
@@ -184,7 +184,7 @@ public class Control implements ApplicationListener, Loadable{
                 settings.getBoolOnce("classic-backup-check", () -> {
                     app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
                         try{
-                            Platform.instance.requestExternalPerms(() -> {
+                            platform.requestExternalPerms(() -> {
                                 FileHandle external = files.external("MindustryClassic");
                                 if(files.local("mindustry-maps").exists()){
                                     files.local("mindustry-maps").copyTo(external);
@@ -336,7 +336,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void init(){
-        Platform.instance.updateRPC();
+        platform.updateRPC();
 
         //play tutorial on stop
         if(!settings.getBool("playedtutorial", false)){
@@ -426,7 +426,7 @@ public class Control implements ApplicationListener, Loadable{
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
-                Platform.instance.updateRPC();
+                platform.updateRPC();
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
@@ -452,7 +452,7 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
-                Platform.instance.hide();
+                platform.hide();
             }
         }
     }

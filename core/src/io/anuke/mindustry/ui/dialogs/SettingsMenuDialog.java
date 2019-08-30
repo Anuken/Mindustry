@@ -13,7 +13,6 @@ import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
@@ -119,9 +118,9 @@ public class SettingsMenuDialog extends SettingsDialog{
                     }catch(Exception e){
                         ui.showError(Strings.parseException(e, true));
                     }
-                    Platform.instance.shareFile(file);
+                    platform.shareFile(file);
                 }else{
-                    Platform.instance.showFileChooser("$data.export", "Zip Files", file -> {
+                    platform.showFileChooser("$data.export", "Zip Files", file -> {
                         FileHandle ff = file;
                         if(!ff.extension().equals("zip")){
                             ff = ff.sibling(ff.nameWithoutExtension() + ".zip");
@@ -141,7 +140,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             //iOS doesn't have a file chooser.
             if(!ios){
-                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> Platform.instance.showFileChooser("$data.import", "Zip Files", file -> {
+                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser("$data.import", "Zip Files", file -> {
                     try{
                         data.importData(file);
                         Core.app.exit();
@@ -269,14 +268,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         }else{
             graphics.checkPref("landscape", false, b -> {
                 if(b){
-                    Platform.instance.beginForceLandscape();
+                    platform.beginForceLandscape();
                 }else{
-                    Platform.instance.endForceLandscape();
+                    platform.endForceLandscape();
                 }
             });
 
             if(Core.settings.getBool("landscape")){
-                Platform.instance.beginForceLandscape();
+                platform.beginForceLandscape();
             }
         }
 

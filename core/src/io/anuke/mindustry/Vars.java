@@ -141,6 +141,7 @@ public class Vars implements Loadable{
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
+    public static Platform platform;
 
     public static World world;
     public static Maps maps;
