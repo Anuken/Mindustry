@@ -309,6 +309,10 @@ public class Saves{
                 current = null;
             }
 
+            if(Core.assets.isLoaded(loadPreviewFile().path())){
+                Core.assets.unload(loadPreviewFile().path());
+            }
+
             saveSlots();
         }
     }

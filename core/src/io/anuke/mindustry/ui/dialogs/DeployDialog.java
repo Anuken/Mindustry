@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.*;
@@ -78,20 +79,30 @@ public class DeployDialog extends FloatingDialog{
         }}.setScaling(Scaling.fit));
 
         if(control.saves.getZoneSlot() != null){
-            float size = 230f;
+            float size = 250f;
 
             stack.add(new Table(t -> {
                 SaveSlot slot = control.saves.getZoneSlot();
 
                 Stack sub = new Stack();
 
-                if(control.saves.getZoneSlot().getZone() != null){
+                if(slot.getZone() != null){
                     sub.add(new Table(f -> f.margin(4f).add(new Image("whiteui")).color(Color.fromGray(0.1f)).grow()));
-                    sub.add(new Table(f -> f.margin(4f).add(new Image(control.saves.getZoneSlot().getZone().preview).setScaling(Scaling.fit)).color(Color.DARK_GRAY).grow()));
+
+                    sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
+                        TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();
+                        if(draw.getRegion().getTexture().isDisposed()){
+                            draw.setRegion(slot.getZone().preview);
+                        }
+
+                        Texture text = slot.previewTexture();
+                        if(draw.getRegion() == slot.getZone().preview && text != null){
+                            draw.setRegion(new TextureRegion(text));
+                        }
+                    }).color(Color.DARK_GRAY).grow()));
                 }
 
                 TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), "square", () -> {
-
                     hide();
                     ui.loadAnd(() -> {
                         logic.reset();
@@ -128,7 +139,7 @@ public class DeployDialog extends FloatingDialog{
                         slot.delete();
                         setup();
                     });
-                }).width(230f).height(50f).padTop(3);
+                }).width(size).height(50f).padTop(3);
             }));
         }else{
             stack.add(new View());

@@ -87,6 +87,7 @@ public class UI implements ApplicationListener, Loadable{
         skin.addRegions(Core.atlas);
         loadExtraStyle(skin);
         skin.add("outline", Core.assets.get("outline"));
+        skin.getFont("outline").getData().markupEnabled = true;
         skin.getFont("default").getData().markupEnabled = true;
         skin.getFont("default").setOwnsTexture(false);
         skin.load(Core.files.internal("sprites/uiskin.json"));
