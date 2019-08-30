@@ -387,6 +387,8 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void update(){
         saves.update();
+        //update and load any requested assets
+        assets.update();
 
         input.updateController();
 
