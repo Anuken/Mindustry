@@ -83,7 +83,7 @@ public class NetClient implements ApplicationListener{
             c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
             c.usid = getUsid(packet.addressTCP);
-            c.uuid = Platform.instance.getUUID();
+            c.uuid = platform.getUUID();
 
             if(c.uuid == null){
                 ui.showError("$invalidid");
@@ -101,7 +101,7 @@ public class NetClient implements ApplicationListener{
             connecting = false;
             state.set(State.menu);
             logic.reset();
-            Platform.instance.updateRPC();
+            platform.updateRPC();
 
             if(quiet) return;
 
@@ -356,7 +356,7 @@ public class NetClient implements ApplicationListener{
         ui.join.hide();
         Net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
-        Time.runTask(40f, Platform.instance::updateRPC);
+        Time.runTask(40f, platform::updateRPC);
         Core.app.post(() -> ui.loadfrag.hide());
     }
 

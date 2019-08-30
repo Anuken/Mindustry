@@ -184,7 +184,7 @@ public class NetServer implements ApplicationListener{
 
             sendWorldData(player, id);
 
-            Platform.instance.updateRPC();
+            platform.updateRPC();
         });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> {

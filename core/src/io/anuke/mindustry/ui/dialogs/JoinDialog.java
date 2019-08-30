@@ -10,7 +10,6 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
@@ -48,7 +47,7 @@ public class JoinDialog extends FloatingDialog{
             Core.settings.save();
         }).size(320f, 54f).get();
 
-        Platform.instance.addDialog(field, 100);
+        platform.addDialog(field, 100);
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);

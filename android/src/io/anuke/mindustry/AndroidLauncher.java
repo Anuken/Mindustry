@@ -1,32 +1,28 @@
 package io.anuke.mindustry;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings.Secure;
-import android.telephony.TelephonyManager;
-import io.anuke.arc.Core;
-import io.anuke.arc.backends.android.surfaceview.AndroidApplication;
-import io.anuke.arc.backends.android.surfaceview.AndroidApplicationConfiguration;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.scene.ui.layout.UnitScl;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.core.Platform;
-import io.anuke.mindustry.game.Saves.SaveSlot;
-import io.anuke.mindustry.io.SaveIO;
+import android.*;
+import android.content.*;
+import android.content.pm.*;
+import android.net.*;
+import android.os.*;
+import android.provider.Settings.*;
+import android.telephony.*;
+import io.anuke.arc.*;
+import io.anuke.arc.backends.android.surfaceview.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.ui.dialogs.FileChooser;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.lang.System;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -42,7 +38,14 @@ public class AndroidLauncher extends AndroidApplication{
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
         config.depth = 0;
-        Platform.instance = new Platform(){
+        if(doubleScaleTablets && isTablet(this.getContext())){
+            UnitScl.dp.addition = 0.5f;
+        }
+
+        config.hideStatusBar = true;
+        Net.setClientProvider(new ArcNetClient());
+        Net.setServerProvider(new ArcNetServer());
+        initialize(new ClientLauncher(){
 
             @Override
             public void hide(){
@@ -70,7 +73,7 @@ public class AndroidLauncher extends AndroidApplication{
             @Override
             public void requestExternalPerms(Runnable callback){
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
                     callback.run();
                 }else{
                     permCallback = callback;
@@ -93,7 +96,7 @@ public class AndroidLauncher extends AndroidApplication{
             public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
                 chooser = new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons);
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
                     chooser.show();
                     chooser = null;
                 }else{
@@ -122,16 +125,7 @@ public class AndroidLauncher extends AndroidApplication{
             public boolean canDonate(){
                 return true;
             }
-        };
-
-        if(doubleScaleTablets && isTablet(this.getContext())){
-            UnitScl.dp.addition = 0.5f;
-        }
-
-        config.hideStatusBar = true;
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
-        initialize(new ClientLauncher(), config);
+        }, config);
         checkFiles(getIntent());
     }
 

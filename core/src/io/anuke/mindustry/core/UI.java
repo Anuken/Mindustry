@@ -287,7 +287,7 @@ public class UI implements ApplicationListener, Loadable{
             TextField field = cont.addField(def, t -> {
             }).size(170f, 50f).get();
             field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
-            Platform.instance.addDialog(field);
+            platform.addDialog(field);
             buttons.defaults().size(120, 54).pad(4);
             buttons.addButton("$ok", () -> {
                 confirmed.accept(field.getText());
