@@ -219,9 +219,13 @@ public class NetServer implements ApplicationListener{
 
             for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
                 Command command = clientCommands.getCommandList().get(i);
-                result.append("[orange] ").append(command.text).append("[white] ").append(command.paramText).append("[lightgray] - ").append(command.description).append("\n");
+                result.append("[orange] /").append(command.text).append("[white] ").append(command.paramText).append("[lightgray] - ").append(command.description).append("\n");
             }
             player.sendMessage(result.toString());
+        });
+
+        clientCommands.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
+            playerGroup.all().each(p -> p.getTeam() == player.getTeam(), o -> o.sendMessage(args[0], player, "[#" + player.getTeam().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
         });
 
         //duration of a a kick in seconds
@@ -263,7 +267,7 @@ public class NetServer implements ApplicationListener{
         //current kick sessions
         ObjectMap<Player, VoteSession> currentlyKicking = new ObjectMap<>();
 
-        clientCommands.<Player>register("votekick", "[player]", "Vote to kick a player, with a cooldown.", (args, player) -> {
+        clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
             if(playerGroup.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;

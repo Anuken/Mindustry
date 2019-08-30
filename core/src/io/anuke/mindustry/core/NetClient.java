@@ -183,7 +183,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    private static String colorizeName(int id, String name){
+    public static String colorizeName(int id, String name){
         Player player = playerGroup.getByID(id);
         if(name == null || player == null) return null;
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
