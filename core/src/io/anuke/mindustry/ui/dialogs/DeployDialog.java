@@ -9,14 +9,13 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
@@ -33,12 +32,9 @@ public class DeployDialog extends FloatingDialog{
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
-    private Texture nomap = new Texture("zones/nomap.png");
 
     public DeployDialog(){
         super("", "fulldialog");
-
-        Events.on(DisposeEvent.class, e -> nomap.dispose());
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
@@ -56,7 +52,7 @@ public class DeployDialog extends FloatingDialog{
     }
 
     public void setup(){
-        Platform.instance.updateRPC();
+        platform.updateRPC();
 
         cont.clear();
         titleTable.remove();
@@ -82,19 +78,30 @@ public class DeployDialog extends FloatingDialog{
         }}.setScaling(Scaling.fit));
 
         if(control.saves.getZoneSlot() != null){
-            float size = 230f;
+            float size = 250f;
 
             stack.add(new Table(t -> {
                 SaveSlot slot = control.saves.getZoneSlot();
 
                 Stack sub = new Stack();
 
-                if(control.saves.getZoneSlot().getZone() != null){
-                    sub.add(new Table(f -> f.margin(4f).add(new Image(control.saves.getZoneSlot().getZone().preview).setScaling(Scaling.fit)).color(Color.DARK_GRAY).grow()));
+                if(slot.getZone() != null){
+                    sub.add(new Table(f -> f.margin(4f).add(new Image("whiteui")).color(Color.fromGray(0.1f)).grow()));
+
+                    sub.add(new Table(f -> f.margin(4f).add(new Image(slot.getZone().preview).setScaling(Scaling.fit)).update(img -> {
+                        TextureRegionDrawable draw = (TextureRegionDrawable)img.getDrawable();
+                        if(draw.getRegion().getTexture().isDisposed()){
+                            draw.setRegion(slot.getZone().preview);
+                        }
+
+                        Texture text = slot.previewTexture();
+                        if(draw.getRegion() == slot.getZone().preview && text != null){
+                            draw.setRegion(new TextureRegion(text));
+                        }
+                    }).color(Color.DARK_GRAY).grow()));
                 }
 
                 TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), "square", () -> {
-
                     hide();
                     ui.loadAnd(() -> {
                         logic.reset();
@@ -131,7 +138,7 @@ public class DeployDialog extends FloatingDialog{
                         slot.delete();
                         setup();
                     });
-                }).width(230f).height(50f).padTop(3);
+                }).width(size).height(50f).padTop(3);
             }));
         }else{
             stack.add(new View());
@@ -195,7 +202,7 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview != null ? node.zone.preview : nomap).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
+                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button("square");

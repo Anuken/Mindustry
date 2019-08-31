@@ -6,10 +6,8 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
@@ -23,11 +21,7 @@ import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class World implements ApplicationListener{
-    public final Maps maps = new Maps();
-    public final BlockIndexer indexer = new BlockIndexer();
-    public final WaveSpawner spawner = new WaveSpawner();
-    public final Pathfinder pathfinder = new Pathfinder();
+public class World{
     public final Context context = new Context();
 
     private Map currentMap;
@@ -36,17 +30,7 @@ public class World implements ApplicationListener{
     private boolean generating, invalidMap;
 
     public World(){
-        maps.load();
-    }
 
-    @Override
-    public void init(){
-        maps.loadLegacyMaps();
-    }
-
-    @Override
-    public void dispose(){
-        maps.dispose();
     }
 
     public boolean isInvalidMap(){
@@ -190,9 +174,11 @@ public class World implements ApplicationListener{
             }
         }
 
-        addDarkness(tiles);
+        if(!headless){
+            addDarkness(tiles);
+        }
 
-        Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
+        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -354,7 +340,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
+                if(tile.isDarkened()){
                     dark[x][y] = darkIterations;
                 }
             }
@@ -383,8 +369,20 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic()){
+                if(tile.isDarkened()){
                     tiles[x][y].rotation(dark[x][y]);
+                }
+                if(dark[x][y] == 4){
+                    boolean full = true;
+                    for(Point2 p : Geometry.d4){
+                        int px = p.x + x, py = p.y + y;
+                        if(Structs.inBounds(px, py, tiles) && !(tiles[px][py].isDarkened() && dark[px][py] == 4)){
+                            full = false;
+                            break;
+                        }
+                    }
+
+                    if(full) tiles[x][y].rotation(5);
                 }
             }
         }

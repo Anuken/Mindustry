@@ -1,15 +1,22 @@
 package io.anuke.mindustry.maps;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
+import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.async.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.maps.MapPreviewLoader.*;
 import io.anuke.mindustry.maps.filters.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
@@ -18,13 +25,16 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Maps implements Disposable{
+public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Array<Map> maps = new Array<>();
     /** Serializer for meta. */
     private Json json = new Json();
+
+    private AsyncExecutor executor = new AsyncExecutor(2);
+    private ObjectSet<Map> previewList = new ObjectSet<>();
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -43,6 +53,16 @@ public class Maps implements Disposable{
 
     public Map byName(String name){
         return maps.find(m -> m.name().equals(name));
+    }
+
+    public Maps(){
+        Events.on(ClientLoadEvent.class, event -> {
+            maps.sort();
+        });
+
+        if(Core.assets != null){
+            ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
+        }
     }
 
     /**
@@ -74,7 +94,13 @@ public class Maps implements Disposable{
     }
 
     public void reload(){
-        dispose();
+        for(Map map : maps){
+            if(map.texture != null){
+                map.texture.dispose();
+                map.texture = null;
+            }
+        }
+        maps.clear();
         load();
     }
 
@@ -128,7 +154,15 @@ public class Maps implements Disposable{
                     }
                 }
 
-                map.texture = new Texture(MapIO.generatePreview(world.getTiles()));
+                if(Core.assets.isLoaded(map.previewFile().path() + "." + mapExtension)){
+                    Core.assets.unload(map.previewFile().path() + "." + mapExtension);
+                }
+
+                Pixmap pix = MapIO.generatePreview(world.getTiles());
+                executor.submit(() -> map.previewFile().writePNG(pix));
+                writeCache(map);
+
+                map.texture = new Texture(pix);
             }
             maps.add(map);
             maps.sort();
@@ -227,8 +261,8 @@ public class Maps implements Disposable{
         int index = 0;
         for(Block block : new Block[]{Blocks.oreCopper, Blocks.oreLead, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium}){
             OreFilter filter = new OreFilter();
-            filter.threshold += index ++ * 0.019f;
-            filter.scl += index/2f;
+            filter.threshold += index ++ * 0.018f;
+            filter.scl += index/2.1f;
             filter.ore = block;
             filters.add(filter);
         }
@@ -284,6 +318,82 @@ public class Maps implements Disposable{
         }
     }
 
+    public void loadPreviews(){
+
+        for(Map map : maps){
+            //try to load preview
+            if(map.previewFile().exists()){
+                //this may fail, but calls createNewPreview
+                Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
+
+                try{
+                    readCache(map);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    queueNewPreview(map);
+                }
+            }else{
+                queueNewPreview(map);
+            }
+        }
+    }
+
+    private void createAllPreviews(){
+        Core.app.post(() -> {
+            for(Map map : previewList){
+                createNewPreview(map);
+            }
+            previewList.clear();
+        });
+    }
+
+    public void queueNewPreview(Map map){
+        Core.app.post(() -> previewList.add(map));
+    }
+
+    private void createNewPreview(Map map){
+        try{
+            //if it's here, then the preview failed to load or doesn't exist, make it
+            //this has to be done synchronously!
+            Pixmap pix = MapIO.generatePreview(map);
+            Core.app.post(() -> map.texture = new Texture(pix));
+            executor.submit(() -> {
+                try{
+                    map.previewFile().writePNG(pix);
+                    writeCache(map);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            });
+        }catch(IOException e){
+            Log.err("Failed to generate preview!", e);
+            Core.app.post(() -> map.texture = new Texture("sprites/error.png"));
+        }
+    }
+
+    private void writeCache(Map map) throws IOException{
+        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.DEFAULT_BUFFER_SIZE))){
+            stream.write(0);
+            stream.writeInt(map.spawns);
+            stream.write(map.teams.size);
+            IntSetIterator iter = map.teams.iterator();
+            while(iter.hasNext){
+                stream.write(iter.next());
+            }
+        }
+    }
+
+    private void readCache(Map map) throws IOException{
+        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.DEFAULT_BUFFER_SIZE))){
+            stream.read(); //version
+            map.spawns = stream.readInt();
+            int teamsize = stream.readByte();
+            for(int i = 0; i < teamsize; i++){
+                map.teams.add(stream.read());
+            }
+        }
+    }
+
     /** Find a new filename to put a map to. */
     private FileHandle findFile(){
         //find a map name that isn't used.
@@ -301,12 +411,8 @@ public class Maps implements Disposable{
             throw new IOException("Map name cannot be empty! File: " + file);
         }
 
-        if(!headless){
-            map.texture = new Texture(MapIO.generatePreview(map));
-        }
-
         maps.add(map);
-        //maps.sort();
+        maps.sort();
     }
 
     private void loadCustomMaps(){
@@ -320,16 +426,5 @@ public class Maps implements Disposable{
                 Log.err(e);
             }
         }
-    }
-
-    @Override
-    public void dispose(){
-        for(Map map : maps){
-            if(map.texture != null){
-                map.texture.dispose();
-                map.texture = null;
-            }
-        }
-        maps.clear();
     }
 }

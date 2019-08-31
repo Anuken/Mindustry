@@ -1,23 +1,23 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -25,6 +25,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
+import java.text.*;
+import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -35,10 +37,10 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
-public class Control implements ApplicationListener{
-    public final Saves saves;
-    public final MusicControl music;
-    public final Tutorial tutorial;
+public class Control implements ApplicationListener, Loadable{
+    public Saves saves;
+    public MusicControl music;
+    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -46,40 +48,9 @@ public class Control implements ApplicationListener{
     private boolean wasPaused = false;
 
     public Control(){
-        batch = new SpriteBatch();
-        saves = new Saves();
-        tutorial = new Tutorial();
-        music = new MusicControl();
-
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
-
-        Core.input.setCatch(KeyCode.BACK, true);
-
-        content.initialize(Content::init);
-        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
-        content.initialize(Content::load, true);
-
-        data.load();
-
-        Core.settings.setAppName(appName);
-        Core.settings.defaults(
-            "ip", "localhost",
-            "color-0", Color.rgba8888(playerColors[8]),
-            "color-1", Color.rgba8888(playerColors[11]),
-            "color-2", Color.rgba8888(playerColors[13]),
-            "color-3", Color.rgba8888(playerColors[9]),
-            "name", "",
-            "lastBuild", 0
-        );
-
-        createPlayer();
-
-        saves.load();
-
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
-                Time.runTask(5f, Platform.instance::updateRPC);
+                Time.runTask(5f, platform::updateRPC);
             }
         });
 
@@ -95,7 +66,7 @@ public class Control implements ApplicationListener{
             Core.app.post(() -> Core.app.post(() -> {
                 if(Net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.getClosestCore());
+                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
                     //locally, set to player position since respawning occurs immediately
                     Core.camera.position.set(player);
@@ -177,12 +148,30 @@ public class Control implements ApplicationListener{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+    }
 
-        if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
+    @Override
+    public void loadAsync(){
+        saves = new Saves();
+        tutorial = new Tutorial();
+        music = new MusicControl();
 
-            checkClassicData();
-        }
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+
+        Core.input.setCatch(KeyCode.BACK, true);
+
+        data.load();
+
+        Core.settings.defaults(
+        "ip", "localhost",
+        "color-0", Color.rgba8888(playerColors[8]),
+        "name", "",
+        "lastBuild", 0
+        );
+
+        createPlayer();
+
+        saves.load();
     }
 
     //checks for existing 3.5 app data, android only
@@ -192,7 +181,7 @@ public class Control implements ApplicationListener{
                 settings.getBoolOnce("classic-backup-check", () -> {
                     app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
                         try{
-                            Platform.instance.requestExternalPerms(() -> {
+                            platform.requestExternalPerms(() -> {
                                 FileHandle external = files.external("MindustryClassic");
                                 if(files.local("mindustry-maps").exists()){
                                     files.local("mindustry-maps").copyTo(external);
@@ -231,7 +220,9 @@ public class Control implements ApplicationListener{
             player.add();
         }
 
-        Core.input.addProcessor(input);
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.input.addProcessor(input);
+        });
     }
 
     public void playMap(Map map, Rules rules){
@@ -240,6 +231,9 @@ public class Control implements ApplicationListener{
             world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
+            if(settings.getBool("savecreate") && !world.isInvalidMap()){
+                control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
+            }
         });
     }
 
@@ -341,7 +335,7 @@ public class Control implements ApplicationListener{
 
     @Override
     public void init(){
-        Platform.instance.updateRPC();
+        platform.updateRPC();
 
         //play tutorial on stop
         if(!settings.getBool("playedtutorial", false)){
@@ -382,11 +376,18 @@ public class Control implements ApplicationListener{
                 dialog.show();
             }));
         }
+
+        if(android){
+            Sounds.empty.loop(0f, 1f, 0f);
+            checkClassicData();
+        }
     }
 
     @Override
     public void update(){
         saves.update();
+        //update and load any requested assets
+        assets.update();
 
         input.updateController();
 
@@ -395,6 +396,17 @@ public class Control implements ApplicationListener{
 
         music.update();
         loops.update();
+
+        if(Core.input.keyTap(Binding.fullscreen)){
+            boolean full = settings.getBool("fullscreen");
+            if(full){
+                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
+            }else{
+                graphics.setFullscreenMode(graphics.getDisplayMode());
+            }
+            settings.put("fullscreen", !full);
+            settings.save();
+        }
 
         if(!state.is(State.menu)){
             input.update();
@@ -415,7 +427,7 @@ public class Control implements ApplicationListener{
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
-                Platform.instance.updateRPC();
+                platform.updateRPC();
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
@@ -441,7 +453,7 @@ public class Control implements ApplicationListener{
             }
 
             if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
-                Platform.instance.hide();
+                platform.hide();
             }
         }
     }

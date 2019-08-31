@@ -10,6 +10,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class StaticWall extends Rock{
     TextureRegion large;
+    TextureRegion[][] split;
 
     public StaticWall(String name){
         super(name);
@@ -25,9 +26,7 @@ public class StaticWall extends Rock{
         int ry = tile.y / 2 * 2;
 
         if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Pos.get(rx, ry)) < 0.5){
-            if(rx == tile.x && ry == tile.y){
-                Draw.rect(large, tile.worldx() + tilesize / 2f, tile.worldy() + tilesize / 2f);
-            }
+            Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
         }else if(variants > 0){
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
         }else{
@@ -39,6 +38,7 @@ public class StaticWall extends Rock{
     public void load(){
         super.load();
         large = Core.atlas.find(name + "-large");
+        split = large.split(32, 32);
     }
 
     boolean eq(int rx, int ry){

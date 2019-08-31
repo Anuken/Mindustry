@@ -1,14 +1,13 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.ui.ContentDisplay;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -40,6 +39,7 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         this.description = Core.bundle.getOrNull("item." + this.name + ".description");
     }
 
+    @Override
     public void load(){
         regions = new TextureRegion[Icon.values().length];
         for(int i = 0; i < regions.length; i++){

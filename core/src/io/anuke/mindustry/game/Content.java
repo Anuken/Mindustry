@@ -19,7 +19,7 @@ public abstract class Content{
      */
     public abstract ContentType getContentType();
 
-    /** Called after all content is created. Do not use to load regions or texture data! */
+    /** Called after all content and modules are created. Do not use to load regions or texture data! */
     public void init(){
     }
 

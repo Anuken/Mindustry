@@ -11,18 +11,15 @@ import io.anuke.arc.util.serialization.Base64Coder;
 
 import static io.anuke.mindustry.Vars.mobile;
 
-public abstract class Platform{
-    /** Each separate game platform should set this instance to their own implementation. */
-    public static Platform instance = new Platform(){
-    };
+public interface Platform{
 
     /** Add a text input dialog that should show up after the field is tapped. */
-    public void addDialog(TextField field){
+    default void addDialog(TextField field){
         addDialog(field, 16);
     }
 
     /** See addDialog(). */
-    public void addDialog(TextField field, int maxLength){
+    default void addDialog(TextField field, int maxLength){
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
@@ -40,21 +37,21 @@ public abstract class Platform{
     }
 
     /** Request external read/write perms. Run callback when complete.*/
-    public void requestExternalPerms(Runnable callback){
+    default void requestExternalPerms(Runnable callback){
         callback.run();
     }
 
     /** Update discord RPC. */
-    public void updateRPC(){
+    default void updateRPC(){
     }
 
     /** Whether donating is supported. */
-    public boolean canDonate(){
+    default boolean canDonate(){
         return false;
     }
 
     /** Must be a base64 string 8 bytes in length. */
-    public String getUUID(){
+    default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
@@ -68,7 +65,7 @@ public abstract class Platform{
     }
 
     /** Only used for iOS or android: open the share menu for a map or save. */
-    public void shareFile(FileHandle file){
+    default void shareFile(FileHandle file){
     }
 
     /**
@@ -79,18 +76,18 @@ public abstract class Platform{
      * @param open Whether to open or save files
      * @param filetype File extension to filter
      */
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+    default void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
     }
 
     /** Hide the app. Android only. */
-    public void hide(){
+    default void hide(){
     }
 
     /** Forces the app into landscape mode. Currently Android only. */
-    public void beginForceLandscape(){
+    default void beginForceLandscape(){
     }
 
     /** Stops forcing the app into landscape orientation. Currently Android only. */
-    public void endForceLandscape(){
+    default void endForceLandscape(){
     }
 }

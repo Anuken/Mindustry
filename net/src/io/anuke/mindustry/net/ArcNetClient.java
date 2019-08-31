@@ -80,17 +80,15 @@ public class ArcNetClient implements ClientProvider{
                 //just in case
                 client.stop();
 
-                Thread updateThread = new Thread(() -> {
+                Threads.daemon("Net Client", () -> {
                     try{
                         client.run();
                     }catch(Exception e){
                         if(!(e instanceof ClosedSelectorException)) handleException(e);
                     }
-                }, "Net Client");
-                updateThread.setDaemon(true);
-                updateThread.start();
+                });
 
-                client.connect(5000, ip, port);
+                client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
                 handleException(e);
@@ -106,7 +104,11 @@ public class ArcNetClient implements ClientProvider{
     @Override
     public void send(Object object, SendMode mode){
         try{
-            client.sendTCP(object);
+            if(mode == SendMode.tcp){
+                client.sendTCP(object);
+            }else{
+                client.sendUDP(object);
+            }
             //sending things can cause an under/overflow, catch it and disconnect instead of crashing
         }catch(BufferOverflowException | BufferUnderflowException e){
             Net.showError(e);

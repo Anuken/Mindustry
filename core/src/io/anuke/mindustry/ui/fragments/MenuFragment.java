@@ -12,25 +12,25 @@ import io.anuke.arc.scene.event.Touchable;
 import io.anuke.arc.scene.ui.Button;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.Align;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.EventType.DisposeEvent;
 import io.anuke.mindustry.game.EventType.ResizeEvent;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.graphics.MenuRenderer;
 import io.anuke.mindustry.ui.MobileButton;
 
+import static io.anuke.arc.Core.assets;
 import static io.anuke.mindustry.Vars.*;
 
 public class MenuFragment extends Fragment{
-    private Texture logo = new Texture("sprites/logo.png");
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
 
     public MenuFragment(){
+        assets.load("sprites/logo.png", Texture.class);
+        assets.finishLoading();
         Events.on(DisposeEvent.class, event -> {
             renderer.dispose();
-            logo.dispose();
         });
     }
 
@@ -59,19 +59,16 @@ public class MenuFragment extends Fragment{
             }
         });
 
-        //discord icon in top right
-        //parent.fill(c -> c.top().right().addButton("", "discord", ui.discord::show).size(84, 45)
-        //.visible(() -> state.is(State.menu)));
-
         //info icon
         if(mobile){
             parent.fill(c -> c.bottom().left().addButton("", "info", ui.about::show).size(84, 45));
             parent.fill(c -> c.bottom().right().addButton("", "discord", ui.discord::show).size(84, 45));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : Version.modifier + " build " + Version.build);
+        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build);
 
         parent.fill((x, y, w, h) -> {
+            Texture logo = Core.assets.get("sprites/logo.png");
             float logoscl = UnitScl.dp.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
@@ -81,6 +78,7 @@ public class MenuFragment extends Fragment{
 
             Draw.color();
             Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
+
             Core.scene.skin.font().setColor(Color.WHITE);
             Core.scene.skin.font().draw(versionText, fx, fy - logoh/2f, Align.center);
         }).touchable(Touchable.disabled);
@@ -119,7 +117,7 @@ public class MenuFragment extends Fragment{
                 table.add(editor);
                 table.add(tools);
 
-                if(Platform.instance.canDonate()) table.add(donate);
+                if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -137,7 +135,7 @@ public class MenuFragment extends Fragment{
             container.table(table -> {
                 table.defaults().set(container.defaults());
 
-                if(Platform.instance.canDonate()) table.add(donate);
+                if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(2);
         }

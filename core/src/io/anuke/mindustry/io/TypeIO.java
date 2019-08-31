@@ -5,12 +5,12 @@ import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.bullet.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.AdminAction;
@@ -57,7 +57,7 @@ public class TypeIO{
         byte gid = buffer.get();
         if(gid == -1) return null;
         int id = buffer.getInt();
-        return (Unit)Entities.getGroup(gid).getByID(id);
+        return (Unit)entities.get(gid).getByID(id);
     }
 
     @WriteClass(ShooterTrait.class)
@@ -70,7 +70,7 @@ public class TypeIO{
     public static ShooterTrait readShooter(ByteBuffer buffer){
         byte gid = buffer.get();
         int id = buffer.getInt();
-        return (ShooterTrait)Entities.getGroup(gid).getByID(id);
+        return (ShooterTrait)entities.get(gid).getByID(id);
     }
 
     @WriteClass(Bullet.class)
@@ -175,6 +175,16 @@ public class TypeIO{
     @ReadClass(Team.class)
     public static Team readTeam(ByteBuffer buffer){
         return Team.all[buffer.get()];
+    }
+
+    @WriteClass(UnitCommand.class)
+    public static void writeUnitCommand(ByteBuffer buffer, UnitCommand reason){
+        buffer.put((byte)reason.ordinal());
+    }
+
+    @ReadClass(UnitCommand.class)
+    public static UnitCommand readUnitCommand(ByteBuffer buffer){
+        return UnitCommand.all[buffer.get()];
     }
 
     @WriteClass(AdminAction.class)

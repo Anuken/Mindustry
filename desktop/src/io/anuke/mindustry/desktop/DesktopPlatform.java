@@ -1,14 +1,14 @@
 package io.anuke.mindustry.desktop;
 
 import club.minnced.discord.rpc.*;
-import io.anuke.arc.backends.sdl.jni.SDL;
+import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
@@ -18,7 +18,7 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 
-public class DesktopPlatform extends Platform{
+public class DesktopPlatform extends ClientLauncher{
     static boolean useDiscord = OS.is64Bit;
     final static String applicationId = "610508934456934412";
     String[] args;

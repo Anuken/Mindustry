@@ -7,11 +7,11 @@ import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.RandomXS128;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.ReusableByteInStream;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.Entities;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.SyncTrait;
@@ -83,7 +83,7 @@ public class NetClient implements ApplicationListener{
             c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
             c.usid = getUsid(packet.addressTCP);
-            c.uuid = Platform.instance.getUUID();
+            c.uuid = platform.getUUID();
 
             if(c.uuid == null){
                 ui.showError("$invalidid");
@@ -101,7 +101,7 @@ public class NetClient implements ApplicationListener{
             connecting = false;
             state.set(State.menu);
             logic.reset();
-            Platform.instance.updateRPC();
+            platform.updateRPC();
 
             if(quiet) return;
 
@@ -151,15 +151,38 @@ public class NetClient implements ApplicationListener{
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
-        //server console logging
-        Log.info("&y{0}: &lb{1}", player.name, message);
+        //check if it's a command
+        CommandResponse response = netServer.clientCommands.handleMessage(message, player);
+        if(response.type == ResponseType.noCommand){ //no command to handle
+            //server console logging
+            Log.info("&y{0}: &lb{1}", player.name, message);
 
-        //invoke event for all clients but also locally
-        //this is required so other clients get the correct name even if they don't know who's sending it yet
-        Call.sendMessage(message, colorizeName(player.id, player.name), player);
+            //invoke event for all clients but also locally
+            //this is required so other clients get the correct name even if they don't know who's sending it yet
+            Call.sendMessage(message, colorizeName(player.id, player.name), player);
+        }else{
+            //log command to console but with brackets
+            Log.info("<&y{0}: &lm{1}&lg>", player.name, message);
+
+            //a command was sent, now get the output
+            if(response.type != ResponseType.valid){
+                String text;
+
+                //send usage
+                if(response.type == ResponseType.manyArguments){
+                    text = "[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+                }else if(response.type == ResponseType.fewArguments){
+                    text = "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+                }else{ //unknown command
+                    text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                }
+
+                player.sendMessage(text);
+            }
+        }
     }
 
-    private static String colorizeName(int id, String name){
+    public static String colorizeName(int id, String name){
         Player player = playerGroup.getByID(id);
         if(name == null || player == null) return null;
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
@@ -195,7 +218,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void onWorldDataBegin(){
-        Entities.clear();
+        entities.clear();
         netClient.removed.clear();
         logic.reset();
 
@@ -229,7 +252,7 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(Net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
-            EntityGroup group = Entities.getGroup(groupID);
+            EntityGroup group = entities.get(groupID);
 
             //go through each entity
             for(int j = 0; j < amount; j++){
@@ -333,7 +356,7 @@ public class NetClient implements ApplicationListener{
         ui.join.hide();
         Net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
-        Time.runTask(40f, Platform.instance::updateRPC);
+        Time.runTask(40f, platform::updateRPC);
         Core.app.post(() -> ui.loadfrag.hide());
     }
 
@@ -346,7 +369,7 @@ public class NetClient implements ApplicationListener{
         quiet = false;
         lastSent = 0;
 
-        Entities.clear();
+        entities.clear();
         ui.chatfrag.clearMessages();
     }
 

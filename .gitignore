@@ -19,6 +19,7 @@ logs/
 /tools/build/
 /tests/build/
 /server/build/
+changelog
 /test_files/
 /annotations/build/
 /android/assets/mindustry-maps/

@@ -7,6 +7,8 @@ public enum BlockFlag{
     producer(Float.MAX_VALUE),
     /** A turret. */
     turret(Float.MAX_VALUE),
+    /** Only the command center block.*/
+    comandCenter(Float.MAX_VALUE),
     /** Repair point. */
     repair(Float.MAX_VALUE);
 
