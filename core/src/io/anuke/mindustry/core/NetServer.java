@@ -320,6 +320,15 @@ public class NetServer implements ApplicationListener{
                 }
             }
         });
+
+        clientCommands.<Player>register("sync", "Re-synchronize world state.", (args, player) -> {
+            if(player.isLocal){
+                player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
+            }else{
+                Call.onWorldDataBegin(player.con.id);
+                netServer.sendWorldData(player, player.con.id);
+            }
+        });
     }
 
     public int votesRequired(){

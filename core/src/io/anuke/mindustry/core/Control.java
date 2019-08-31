@@ -66,7 +66,7 @@ public class Control implements ApplicationListener, Loadable{
             Core.app.post(() -> Core.app.post(() -> {
                 if(Net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.getClosestCore());
+                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
                     //locally, set to player position since respawning occurs immediately
                     Core.camera.position.set(player);
