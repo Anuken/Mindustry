@@ -60,7 +60,9 @@ public class Maps{
             maps.sort();
         });
 
-        ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
+        if(Core.assets != null){
+            ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
+        }
     }
 
     /**
