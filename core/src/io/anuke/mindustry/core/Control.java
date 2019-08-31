@@ -231,7 +231,7 @@ public class Control implements ApplicationListener, Loadable{
             world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
-            if(settings.getBool("savecreate")){
+            if(settings.getBool("savecreate") && !world.isInvalidMap()){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
         });

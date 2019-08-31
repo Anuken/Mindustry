@@ -21,7 +21,7 @@ public class MapPreviewLoader extends TextureLoader{
         }catch(Exception e){
             e.printStackTrace();
             MapPreviewParameter param = (MapPreviewParameter)parameter;
-            Vars.maps.createNewPreview(param.map);
+            Vars.maps.queueNewPreview(param.map);
         }
     }
 

@@ -34,6 +34,7 @@ public class Maps{
     private Json json = new Json();
 
     private AsyncExecutor executor = new AsyncExecutor(2);
+    private ObjectSet<Map> previewList = new ObjectSet<>();
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -58,6 +59,8 @@ public class Maps{
         Events.on(ClientLoadEvent.class, event -> {
             maps.sort();
         });
+
+        ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
     }
 
     /**
@@ -149,8 +152,13 @@ public class Maps{
                     }
                 }
 
+                if(Core.assets.isLoaded(map.previewFile().path() + "." + mapExtension)){
+                    Core.assets.unload(map.previewFile().path() + "." + mapExtension);
+                }
+
                 Pixmap pix = MapIO.generatePreview(world.getTiles());
                 executor.submit(() -> map.previewFile().writePNG(pix));
+                writeCache(map);
 
                 map.texture = new Texture(pix);
             }
@@ -309,27 +317,39 @@ public class Maps{
     }
 
     public void loadPreviews(){
-        Array<Map> createNew = new Array<>();
 
         for(Map map : maps){
             //try to load preview
             if(map.previewFile().exists()){
                 //this may fail, but calls createNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
-            }else{
-                createNew.add(map);
-            }
 
-            try{
-                readCache(map);
-            }catch(Exception ignored){
+                try{
+                    readCache(map);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    queueNewPreview(map);
+                }
+            }else{
+                queueNewPreview(map);
             }
         }
-
-        ((CustomLoader)Core.assets.getLoader(Content.class)).loaded = () -> Core.app.post(() -> createNew.each(this::createNewPreview));
     }
 
-    public void createNewPreview(Map map){
+    private void createAllPreviews(){
+        Core.app.post(() -> {
+            for(Map map : previewList){
+                createNewPreview(map);
+            }
+            previewList.clear();
+        });
+    }
+
+    public void queueNewPreview(Map map){
+        Core.app.post(() -> previewList.add(map));
+    }
+
+    private void createNewPreview(Map map){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
