@@ -67,7 +67,7 @@ public class LoadDialog extends FloatingDialog{
             button.defaults().left();
 
             button.table(title -> {
-                title.add("[accent]" + slot.getName()).left().growX();
+                title.add("[accent]" + slot.getName()).left().growX().width(230f).wrap();
 
                 title.table(t -> {
                     t.right();
@@ -119,7 +119,7 @@ public class LoadDialog extends FloatingDialog{
             String color = "[lightgray]";
             TextureRegion def = Core.atlas.find("nomap");
 
-            button.add(new BorderImage(def, 4f)).update(i -> {
+            button.left().add(new BorderImage(def, 4f)).update(i -> {
                 TextureRegionDrawable draw = (TextureRegionDrawable)i.getDrawable();
                 if(draw.getRegion().getTexture().isDisposed()){
                     draw.setRegion(def);
@@ -129,23 +129,23 @@ public class LoadDialog extends FloatingDialog{
                 if(draw.getRegion() == def && text != null){
                     draw.setRegion(new TextureRegion(text));
                 }
-            }).size(160f).padRight(5);
+            }).left().size(160f).padRight(5);
 
             button.table(meta -> {
-                meta.left();
-                meta.defaults().padBottom(3).left();
+                meta.left().top();
+                meta.defaults().padBottom(-2).left().width(250f);
                 meta.row();
-                meta.add(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
+                meta.labelWrap(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
                 meta.row();
-                meta.add(Core.bundle.format("save.wave", color + slot.getWave()));
+                meta.labelWrap(Core.bundle.format("save.wave", color + slot.getWave()));
                 meta.row();
-                meta.label(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
+                meta.labelWrap(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
                 meta.row();
-                meta.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
+                meta.labelWrap(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
                 meta.row();
-                meta.add(Core.bundle.format("save.date", color + slot.getDate())).colspan(2).padTop(5).right();
+                meta.labelWrap(Core.bundle.format("save.date", color + slot.getDate()));
                 meta.row();
-            });
+            }).left().growX().width(250f);
 
             modifyButton(button, slot);
 

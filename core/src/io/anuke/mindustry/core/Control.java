@@ -18,7 +18,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -26,8 +26,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
-import java.time.*;
-import java.time.format.*;
+import java.text.*;
+import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -233,7 +233,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules = rules;
             logic.play();
             if(settings.getBool("savecreate")){
-                control.saves.addSave(map.name() + "-" + DateTimeFormatter.ofPattern("MMM dd h:mm").format(LocalDateTime.now()));
+                control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
         });
     }
