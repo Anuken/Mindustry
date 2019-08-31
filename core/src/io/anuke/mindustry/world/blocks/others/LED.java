@@ -34,7 +34,6 @@ public class LED extends Block {
         update = true;
         hasPower = true;
         configurable = true;
-        layer = Layer.overlay;
 
     }
 
