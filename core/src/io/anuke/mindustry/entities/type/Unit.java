@@ -256,7 +256,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         //apply knockback based on spawns
         if(getTeam() != waveTeam){
             float relativeSize = state.rules.dropZoneRadius + getSize()/2f + 1f;
-            for(Tile spawn : world.spawner.getGroundSpawns()){
+            for(Tile spawn : spawner.getGroundSpawns()){
                 if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velocity.add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }

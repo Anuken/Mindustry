@@ -55,7 +55,7 @@ public class Pixelator implements Disposable{
         Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
         Draw.blend();
 
-        renderer.draw(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+        playerGroup.draw(p -> !p.isDead() && !p.isLocal, Player::drawName);
 
         Core.camera.position.set(px, py);
         Core.settings.put("animatedwater", hadWater);

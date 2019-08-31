@@ -13,7 +13,6 @@ import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
@@ -22,12 +21,13 @@ import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
-    public SettingsTable graphics;
-    public SettingsTable game;
-    public SettingsTable sound;
+    private SettingsTable graphics;
+    private SettingsTable game;
+    private SettingsTable sound;
 
     private Table prefs;
     private Table menu;
+    private FloatingDialog dataDialog;
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
@@ -75,6 +75,85 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
+        dataDialog = new FloatingDialog("$settings.data");
+        dataDialog.addCloseButton();
+
+        dataDialog.cont.table("button", t -> {
+            t.defaults().size(240f, 60f).left();
+            String style = "clear";
+
+            t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+                ObjectMap<String, Object> map = new ObjectMap<>();
+                for(String value : Core.settings.keys()){
+                    if(value.contains("usid") || value.contains("uuid")){
+                        map.put(value, Core.settings.getString(value));
+                    }
+                }
+                Core.settings.clear();
+                Core.settings.putAll(map);
+                Core.settings.save();
+
+                for(FileHandle file : dataDirectory.list()){
+                    file.deleteDirectory();
+                }
+
+                Core.app.exit();
+            }));
+
+            t.row();
+
+            if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
+                t.addButton("$classic.export", style, () -> {
+                    control.checkClassicData();
+                });
+            }
+
+            t.row();
+
+            t.addButton("$data.export", style, () -> {
+                if(ios){
+                    FileHandle file = Core.files.local("mindustry-data-export.zip");
+                    try{
+                        data.exportData(file);
+                    }catch(Exception e){
+                        ui.showError(Strings.parseException(e, true));
+                    }
+                    platform.shareFile(file);
+                }else{
+                    platform.showFileChooser("$data.export", "Zip Files", file -> {
+                        FileHandle ff = file;
+                        if(!ff.extension().equals("zip")){
+                            ff = ff.sibling(ff.nameWithoutExtension() + ".zip");
+                        }
+                        try{
+                            data.exportData(ff);
+                            ui.showInfo("$data.exported");
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            ui.showError(Strings.parseException(e, true));
+                        }
+                    }, false, f -> false);
+                }
+            });
+
+            t.row();
+
+            //iOS doesn't have a file chooser.
+            if(!ios){
+                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser("$data.import", "Zip Files", file -> {
+                    try{
+                        data.importData(file);
+                        Core.app.exit();
+                    }catch(IllegalArgumentException e){
+                        ui.showError("$data.invalid");
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        ui.showError(Strings.parseException(e, true));
+                    }
+                }, true, f -> f.equalsIgnoreCase("zip"))));
+            }
+        });
+
         ScrollPane pane = new ScrollPane(prefs);
         pane.addCaptureListener(new InputListener(){
             @Override
@@ -121,6 +200,9 @@ public class SettingsMenuDialog extends SettingsDialog{
             menu.row();
             menu.addButton("$settings.controls", style, ui.controls::show);
         }
+
+        menu.row();
+        menu.addButton("$settings.data", style, () -> dataDialog.show());
     }
 
     void addSettings(){
@@ -139,30 +221,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("crashreport", true);
         }
 
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
-                table.addButton("$settings.cleardata", () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
-                    ObjectMap<String, Object> map = new ObjectMap<>();
-                    for(String value : Core.settings.keys()){
-                        if(value.contains("usid") || value.contains("uuid")){
-                            map.put(value, Core.settings.getString(value));
-                        }
-                    }
-                    Core.settings.clear();
-                    Core.settings.putAll(map);
-                    Core.settings.save();
-
-                    for(FileHandle file : dataDirectory.list()){
-                        file.deleteDirectory();
-                    }
-
-                    Core.app.exit();
-                })).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-            }
-        });
+        game.checkPref("savecreate", true);
 
         game.pref(new Setting(){
             @Override
@@ -177,28 +236,13 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
-            game.pref(new Setting(){
-                @Override
-                public void add(SettingsTable table){
-                    table.addButton("$classic.export", () -> {
-                        control.checkClassicData();
-                    }).size(220f, 60f).pad(6).left();
-                    table.add();
-                    table.row();
-                    hide();
-                }
-            });
-        }
-
         graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
-            if(Core.graphics.getFrameId() > 10){
-                Log.info("changed");
+            if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
             return s + "%";
         });
-        graphics.sliderPref("fpscap", 241, 5, 241, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 5, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
@@ -207,7 +251,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 if(b){
                     Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
-                    Core.graphics.setWindowedMode(600, 480);
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
                 }
             });
 
@@ -224,14 +268,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         }else{
             graphics.checkPref("landscape", false, b -> {
                 if(b){
-                    Platform.instance.beginForceLandscape();
+                    platform.beginForceLandscape();
                 }else{
-                    Platform.instance.endForceLandscape();
+                    platform.endForceLandscape();
                 }
             });
 
             if(Core.settings.getBool("landscape")){
-                Platform.instance.beginForceLandscape();
+                platform.beginForceLandscape();
             }
         }
 

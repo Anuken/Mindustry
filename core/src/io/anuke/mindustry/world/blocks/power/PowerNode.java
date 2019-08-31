@@ -122,7 +122,7 @@ public class PowerNode extends PowerBlock{
     private void getPotentialLinks(Tile tile, Consumer<Tile> others){
         Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
-        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize)
+        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
         && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
 
         tempTiles.clear();
@@ -222,20 +222,7 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> {
-            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
-        });
-
-        /*
-        for(int cx = (int)(x - laserRange - 1); cx <= x + laserRange + 1; cx++){
-            for(int cy = (int)(y - laserRange - 1); cy <= y + laserRange + 1; cy++){
-                Tile link = world.ltile(cx, cy);
-
-                if(link != null && !(link.x == x && link.y == y) && link.block().hasPower && overlaps(x * tilesize + offset(), y *tilesize + offset(), link, laserRange * tilesize)){
-                    Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 2f, link.pos() == lastPlaced ? Pal.place : Pal.accent);
-                }
-            }
-        }*/
+        getPotentialLinks(tile, other -> Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place));
 
         Draw.reset();
     }

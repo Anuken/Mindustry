@@ -12,7 +12,6 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.scene.ui.layout.UnitScl;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.core.Platform;
 
 import java.util.Arrays;
 
@@ -61,7 +60,7 @@ public class FileChooser extends FloatingDialog{
 
         filefield = new TextField();
         filefield.setOnlyFontChars(false);
-        if(!open) Platform.instance.addDialog(filefield);
+        if(!open) platform.addDialog(filefield);
         filefield.setDisabled(open);
 
         ok = new TextButton(open ? "$load" : "$save");

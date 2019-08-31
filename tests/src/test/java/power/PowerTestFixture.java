@@ -1,21 +1,19 @@
 package power;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.core.ContentLoader;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.PowerBlock;
-import io.anuke.mindustry.world.blocks.power.Battery;
-import io.anuke.mindustry.world.blocks.power.PowerGenerator;
+import io.anuke.arc.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.modules.*;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.*;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
+
+import static io.anuke.mindustry.Vars.content;
 
 /**
  * This class provides objects commonly used by power related unit tests.
@@ -24,15 +22,12 @@ import java.lang.reflect.Field;
  * Note: All tests which subclass this will run with a fixed delta of 0.5!
  */
 public class PowerTestFixture{
-    public static final float smallRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR;
-    public static final float mediumRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR * 10;
-    public static final float highRoundingTolerance = Mathf.FLOAT_ROUNDING_ERROR * 100;
 
     @BeforeAll
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
         Vars.content = new ContentLoader();
-        Vars.content.load();
+        content.createContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }

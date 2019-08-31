@@ -5,9 +5,9 @@ def use = { String name ->
     project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
 }
 
-Properties properties = new Properties()
+def properties = new Properties()
 
-if(new File(settingsDir, 'local.properties').exists()){
+if(new File(settingsDir, 'local.properties').exists() && System.getenv("JITPACK") != "true"){
     properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
 
     if(properties.containsKey("sdk.dir")){
@@ -27,7 +27,6 @@ if(!hasProperty("release")){
         use(':Arc:extensions:freetype')
         use(':Arc:extensions:recorder')
         use(':Arc:extensions:arcnet')
-        use(':Arc:extensions:mnet')
         use(':Arc:extensions:packer')
         use(':Arc:backends')
         use(':Arc:backends:backend-sdl')

@@ -15,11 +15,12 @@ import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Door extends Wall{
     protected final Rectangle rect = new Rectangle();
 
+    protected int timerToggle = timers++;
     protected Effect openfx = Fx.dooropen;
     protected Effect closefx = Fx.doorclose;
 
@@ -39,7 +40,7 @@ public class Door extends Wall{
             entity.open = open;
             Door door = (Door)tile.block();
 
-            world.pathfinder.updateSolid(tile);
+            pathfinder.updateSolid(tile);
             if(!entity.open){
                 Effects.effect(door.openfx, tile.drawx(), tile.drawy());
             }else{
@@ -81,7 +82,7 @@ public class Door extends Wall{
     public void tapped(Tile tile, Player player){
         DoorEntity entity = tile.entity();
 
-        if(Units.anyEntities(tile) && entity.open){
+        if((Units.anyEntities(tile) && entity.open) || !tile.entity.timer.get(timerToggle, 30f)){
             return;
         }
 

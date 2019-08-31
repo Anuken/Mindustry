@@ -15,8 +15,8 @@ import io.anuke.mindustry.game.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.*;
-import java.time.*;
-import java.time.format.*;
+import java.text.*;
+import java.util.*;
 
 public class CrashSender{
 
@@ -50,7 +50,7 @@ public class CrashSender{
             }
 
             try{
-                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
                 Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
                 Files.write(file.toPath(), parseException(exception).getBytes());
 
@@ -97,7 +97,7 @@ public class CrashSender{
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
-            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name"))));
+            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
 
             boolean[] sent = {false};

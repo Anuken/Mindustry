@@ -45,7 +45,7 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            Entities.clear();
+            entities.clear();
             int id = stream.readInt();
             player.resetNoAdd();
             player.read(stream);

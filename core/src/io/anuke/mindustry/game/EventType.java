@@ -32,11 +32,6 @@ public class EventType{
 
     }
 
-    /** Called when the core app is first loaded. */
-    public static class AppLoadEvent{
-
-    }
-
     public static class DisposeEvent{
 
     }

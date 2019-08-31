@@ -4,9 +4,9 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.core.Platform;
 import io.anuke.mindustry.game.Rules;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ItemStack;
@@ -102,7 +102,7 @@ public class CustomRulesDialog extends FloatingDialog{
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.WHITE : Color.GRAY));
-            Platform.instance.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
+            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(Strings::canParsePositiveFloat).width(120f).left().get());

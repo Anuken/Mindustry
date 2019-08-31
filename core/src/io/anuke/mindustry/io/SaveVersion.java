@@ -81,7 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
-        Map worldmap = world.maps.byName(map.get("mapname", "\\\\\\"));
+        Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(
             "name", map.get("mapname", "Unknown"),
             "width", 1,
@@ -209,7 +209,7 @@ public abstract class SaveVersion extends SaveFileReader{
         //write entity chunk
         int groups = 0;
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 groups++;
             }
@@ -217,7 +217,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         stream.writeByte(groups);
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             if(!group.isEmpty() && group.all().get(0) instanceof SaveTrait){
                 stream.writeInt(group.size());
                 for(Entity entity : group.all()){

@@ -16,8 +16,7 @@ import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Pathfinder{
     private static final long maxUpdate = Time.millisToNanos(4);
@@ -117,7 +116,7 @@ public class Pathfinder{
             path.lastSearchTime = Time.millis();
 
             //add all targets to the frontier
-            for(Tile other : world.indexer.getEnemy(team, BlockFlag.target)){
+            for(Tile other : indexer.getEnemy(team, BlockFlag.target)){
                 path.weights[other.x][other.y] = 0;
                 path.searches[other.x][other.y] = (short)path.search;
                 path.frontier.addFirst(other.pos());

@@ -105,7 +105,7 @@ public class ArcNetServer implements ServerProvider{
     @Override
     public void host(int port) throws IOException{
         connections.clear();
-        server.bind(port);
+        server.bind(port, port);
 
         serverThread = new Thread(() -> {
             try{
@@ -151,7 +151,11 @@ public class ArcNetServer implements ServerProvider{
         @Override
         public void send(Object object, SendMode mode){
             try{
-                connection.sendTCP(object);
+                if(mode == SendMode.tcp){
+                    connection.sendTCP(object);
+                }else{
+                    connection.sendUDP(object);
+                }
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");

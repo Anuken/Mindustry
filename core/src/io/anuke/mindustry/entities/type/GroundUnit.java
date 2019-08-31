@@ -1,22 +1,20 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.Weapon;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
@@ -63,7 +61,24 @@ public abstract class GroundUnit extends BaseUnit{
                 }
             }
         }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            moveAwayFromCore();
+        }
     };
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+        command == UnitCommand.attack ? attack :
+        command == UnitCommand.patrol ? patrol :
+        null);
+    }
 
     @Override
     public void interpolate(){
@@ -182,9 +197,9 @@ public abstract class GroundUnit extends BaseUnit{
     protected void patrol(){
         vec.trns(baseRotation, type.speed * Time.delta());
         velocity.add(vec.x, vec.y);
-        vec.trns(baseRotation, type.hitsizeTile * 3);
+        vec.trns(baseRotation, type.hitsizeTile * 5);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
-        if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
+        if((tile == null || tile.solid() || tile.floor().drownTime > 0 || tile.floor().isLiquid) || stuckTime > 10f){
             baseRotation += Mathf.sign(id % 2 - 0.5f) * Time.delta() * 3f;
         }
 
@@ -208,7 +223,7 @@ public abstract class GroundUnit extends BaseUnit{
     protected void moveToCore(){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(team, tile);
+        Tile targetTile = pathfinder.getTargetTile(team, tile);
 
         if(tile == targetTile) return;
 
@@ -231,10 +246,10 @@ public abstract class GroundUnit extends BaseUnit{
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
+        Tile targetTile = pathfinder.getTargetTile(enemy, tile);
         TileEntity core = getClosestCore();
 
-        if(tile == targetTile || core == null || dst(core) < 90f) return;
+        if(tile == targetTile || core == null || dst(core) < 120f) return;
 
         velocity.add(vec.trns(angleTo(targetTile), type.speed * Time.delta()));
         rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);

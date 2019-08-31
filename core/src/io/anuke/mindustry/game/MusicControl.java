@@ -14,15 +14,12 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.45f, musicWaveChance = 0.35f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.5f, musicWaveChance = 0.4f;
 
     /** normal, ambient music, plays at any time */
     public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
     /** darker music, used in times of conflict  */
     public final Array<Music> darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
-    /** all music, both dark and ambient */
-    public final Array<Music> allMusic = Array.withArrays(ambientMusic, darkMusic);
-
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
     private @Nullable Music current;
@@ -88,7 +85,7 @@ public class MusicControl{
         }
 
         //dark based on enemies
-        return Mathf.chance(state.enemies() / 70f);
+        return Mathf.chance(state.enemies() / 70f + 0.1f);
     }
 
     /** Plays and fades in a music track. This must be called every frame.

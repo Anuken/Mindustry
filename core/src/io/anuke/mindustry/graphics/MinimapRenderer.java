@@ -36,6 +36,10 @@ public class MinimapRenderer implements Disposable{
         Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
     }
 
+    public Pixmap getPixmap(){
+        return pixmap;
+    }
+
     public Texture getTexture(){
         return texture;
     }
