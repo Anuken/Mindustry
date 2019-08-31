@@ -41,12 +41,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
         atlas = TextureAtlas.blankAtlas();
 
-        UI.loadDefaultFont();
         UI.loadSystemCursors();
 
-        //1. bundles
-        //2. rest of vars
         assets.load(new Vars());
+
+        UI.loadDefaultFont();
+
         assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());

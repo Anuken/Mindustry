@@ -64,7 +64,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     private int prevX, prevY, prevRotation;
 
     public MobileInput(){
-        Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        });
     }
 
     //region utility methods

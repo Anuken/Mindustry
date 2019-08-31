@@ -8,7 +8,6 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -18,7 +17,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -26,8 +25,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
-import java.time.*;
-import java.time.format.*;
+import java.text.*;
+import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -67,7 +66,7 @@ public class Control implements ApplicationListener, Loadable{
             Core.app.post(() -> Core.app.post(() -> {
                 if(Net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.getClosestCore());
+                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
                     //locally, set to player position since respawning occurs immediately
                     Core.camera.position.set(player);
@@ -159,8 +158,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
-
         Core.input.setCatch(KeyCode.BACK, true);
 
         data.load();
@@ -223,7 +220,9 @@ public class Control implements ApplicationListener, Loadable{
             player.add();
         }
 
-        Core.input.addProcessor(input);
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.input.addProcessor(input);
+        });
     }
 
     public void playMap(Map map, Rules rules){
@@ -232,8 +231,8 @@ public class Control implements ApplicationListener, Loadable{
             world.loadMap(map, rules);
             state.rules = rules;
             logic.play();
-            if(settings.getBool("savecreate")){
-                control.saves.addSave(map.name() + "-" + DateTimeFormatter.ofPattern("MMM dd h:mm").format(LocalDateTime.now()));
+            if(settings.getBool("savecreate") && !world.isInvalidMap()){
+                control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
         });
     }
@@ -387,6 +386,8 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void update(){
         saves.update();
+        //update and load any requested assets
+        assets.update();
 
         input.updateController();
 

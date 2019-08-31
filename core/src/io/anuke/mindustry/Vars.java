@@ -5,6 +5,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
@@ -23,6 +24,8 @@ import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;
 import java.util.*;
+
+import static io.anuke.arc.Core.settings;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
@@ -259,6 +262,8 @@ public class Vars implements Loadable{
         Core.settings.defaults("locale", "default");
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
+
+        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         if(!loadLocales) return;
 

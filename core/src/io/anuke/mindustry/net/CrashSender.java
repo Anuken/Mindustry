@@ -15,8 +15,8 @@ import io.anuke.mindustry.game.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.*;
-import java.time.*;
-import java.time.format.*;
+import java.text.*;
+import java.util.*;
 
 public class CrashSender{
 
@@ -50,7 +50,7 @@ public class CrashSender{
             }
 
             try{
-                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss").format(LocalDateTime.now()) + ".txt");
+                File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
                 Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
                 Files.write(file.toPath(), parseException(exception).getBytes());
 
