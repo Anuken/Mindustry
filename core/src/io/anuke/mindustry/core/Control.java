@@ -223,7 +223,9 @@ public class Control implements ApplicationListener, Loadable{
             player.add();
         }
 
-        Core.input.addProcessor(input);
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.input.addProcessor(input);
+        });
     }
 
     public void playMap(Map map, Rules rules){

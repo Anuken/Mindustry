@@ -128,11 +128,11 @@ public class LoadDialog extends FloatingDialog{
                 if(draw.getRegion() == def && text != null){
                     draw.setRegion(new TextureRegion(text));
                 }
-            }).left().size(160f).padRight(5);
+            }).left().size(160f).padRight(6);
 
             button.table(meta -> {
                 meta.left().top();
-                meta.defaults().padBottom(-2).left().width(250f);
+                meta.defaults().padBottom(-2).left().width(290f);
                 meta.row();
                 meta.labelWrap(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
                 meta.row();
