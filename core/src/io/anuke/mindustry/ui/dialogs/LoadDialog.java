@@ -128,6 +128,7 @@ public class LoadDialog extends FloatingDialog{
                 if(draw.getRegion() == def && text != null){
                     draw.setRegion(new TextureRegion(text));
                 }
+                i.setScaling(Scaling.fit);
             }).left().size(160f).padRight(6);
 
             button.table(meta -> {

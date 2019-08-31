@@ -25,7 +25,7 @@ public class Saves{
     private Array<SaveSlot> saves = new Array<>();
     private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
-    private AsyncExecutor previewExecutor = new AsyncExecutor(2);
+    private AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
