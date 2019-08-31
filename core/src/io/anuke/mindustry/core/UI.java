@@ -7,6 +7,7 @@ import io.anuke.arc.assets.*;
 import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.assets.loaders.resolvers.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.freetype.*;
 import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
 import io.anuke.arc.freetype.FreetypeFontLoader.*;
@@ -135,13 +136,20 @@ public class UI implements ApplicationListener, Loadable{
     public static void loadDefaultFont(){
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver));
+        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
+            @Override
+            public BitmapFont loadSync(AssetManager manager, String fileName, FileHandle file, FreeTypeFontLoaderParameter parameter){
+                if(fileName.equals("outline")){
+                    parameter.fontParameters.borderWidth = UnitScl.dp.scl(2f);
+                    parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
+                }
+                parameter.fontParameters.size = fontParameter().size;
+                return super.loadSync(manager, fileName, file, parameter);
+            }
+        });
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            size = fontParameter().size;
             borderColor = Color.DARK_GRAY;
-            borderWidth = UnitScl.dp.scl(2f);
-            spaceX -= borderWidth;
             incremental = true;
         }};
 

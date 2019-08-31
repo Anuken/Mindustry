@@ -8,7 +8,6 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -158,8 +157,6 @@ public class Control implements ApplicationListener, Loadable{
         music = new MusicControl();
 
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
-
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         Core.input.setCatch(KeyCode.BACK, true);
 
