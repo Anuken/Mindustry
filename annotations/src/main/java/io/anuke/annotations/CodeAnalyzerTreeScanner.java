@@ -54,8 +54,20 @@ class CodeAnalyzerTreeScanner extends TreePathScanner<Object, Trees> {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean checkScope (Scope members) {
-		for (Symbol s : members.getElements()) {
+		Iterable<Symbol> it;
+		try{
+			it = (Iterable<Symbol>)members.getClass().getMethod("getElements").invoke(members);
+		}catch(Throwable t){
+			try{
+				it = (Iterable<Symbol>)members.getClass().getMethod("getSymbols").invoke(members);
+			}catch(Exception e){
+				throw new RuntimeException(e);
+			}
+		}
+
+		for (Symbol s : it) {
 			if (s instanceof MethodSymbol) {
 				MethodSymbol ms = (MethodSymbol) s;
 
