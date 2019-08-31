@@ -9,7 +9,6 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Align;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.units.UnitCommand;
-import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -20,6 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,16 +95,16 @@ public class LED extends Block {
     public static class LEDEntity extends TileEntity{
         public Color color = new Color(255, 255, 255);
 
-        /*@Override
+        @Override
         public void write(DataOutput stream) throws IOException {
             super.write(stream);
-            stream.write(Color.RGBtoHSV(color)[0]);
+            stream.writeInt(color.rgba());
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException {
             super.read(stream, revision);
-            color = Color.HSVtoRGB(stream.readInt(), 0, 0);
-        }*/
+            color = new Color(stream.readInt());
+        }
     }
 }
