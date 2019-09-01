@@ -76,7 +76,7 @@ public class NetServer implements ApplicationListener{
         Net.handleServer(Disconnect.class, (id, packet) -> {
             Player player = connections.get(id);
             if(player != null){
-                onDisconnect(player);
+                onDisconnect(player, packet.reason);
             }
             connections.remove(id);
         });
@@ -362,7 +362,7 @@ public class NetServer implements ApplicationListener{
         Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
 
-    public static void onDisconnect(Player player){
+    public static void onDisconnect(Player player, String reason){
         //singleplayer multiplayer wierdness
         if(player.con == null){
             player.remove();
@@ -375,7 +375,7 @@ public class NetServer implements ApplicationListener{
         }
         player.remove();
         netServer.connections.remove(player.con.id);
-        Log.info("&lm[{1}] &lc{0} has disconnected.", player.name, player.uuid);
+        Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
     }
 
     private static float compound(float speed, float drag){
@@ -701,7 +701,7 @@ public class NetServer implements ApplicationListener{
 
                 if(connection == null || !connection.isConnected() || !connections.containsKey(connection.id)){
                     //player disconnected, call d/c event
-                    onDisconnect(player);
+                    onDisconnect(player, "disappeared");
                     return;
                 }
 

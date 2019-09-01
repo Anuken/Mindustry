@@ -47,12 +47,13 @@ public class ArcNetServer implements ServerProvider{
             }
 
             @Override
-            public void disconnected(Connection connection){
+            public void disconnected(Connection connection, DcReason reason){
                 ArcConnection k = getByKryoID(connection.getID());
                 if(k == null) return;
 
                 Disconnect c = new Disconnect();
                 c.id = k.id;
+                c.reason = reason.toString();
 
                 Core.app.post(() -> {
                     Net.handleServerReceived(k.id, c);
@@ -159,7 +160,7 @@ public class ArcNetServer implements ServerProvider{
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
-                connection.close();
+                connection.close(DcReason.error);
 
                 ArcConnection k = getByKryoID(connection.getID());
                 if(k != null) connections.remove(k);
@@ -168,7 +169,7 @@ public class ArcNetServer implements ServerProvider{
 
         @Override
         public void close(){
-            if(connection.isConnected()) connection.close();
+            if(connection.isConnected()) connection.close(DcReason.closed);
         }
     }
 

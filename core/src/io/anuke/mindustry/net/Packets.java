@@ -52,6 +52,7 @@ public class Packets{
 
     public static class Disconnect implements Packet{
         public int id;
+        public String reason;
 
         @Override
         public boolean isImportant(){

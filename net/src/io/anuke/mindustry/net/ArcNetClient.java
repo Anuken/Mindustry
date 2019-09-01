@@ -36,12 +36,13 @@ public class ArcNetClient implements ClientProvider{
             }
 
             @Override
-            public void disconnected(Connection connection){
+            public void disconnected(Connection connection, DcReason reason){
                 if(connection.getLastProtocolError() != null){
                     netClient.setQuiet();
                 }
 
                 Disconnect c = new Disconnect();
+                c.reason = reason.toString();
                 Core.app.post(() -> Net.handleClientReceived(c));
             }
 

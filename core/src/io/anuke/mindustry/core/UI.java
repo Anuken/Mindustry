@@ -360,6 +360,15 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
+    public void showSmall(String titleText, String text){
+        new Dialog(titleText, "dialog"){{
+            cont.margin(10).add(text);
+            titleTable.row();
+            titleTable.addImage("whiteui").color(Pal.accent).height(3f).growX().pad(2f);
+            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+        }}.show();
+    }
+
     public void showConfirm(String title, String text, Runnable confirmed){
         showConfirm(title, text, null, confirmed);
     }
