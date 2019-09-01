@@ -9,6 +9,7 @@ import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
@@ -70,11 +71,18 @@ public class DesktopLauncher extends ClientLauncher{
             if(showConsole){
                 Events.on(ClientLoadEvent.class, event -> {
                     Label[] label = {null};
+                    boolean[] visible = {false};
                     Core.scene.table(t -> {
                         t.touchable(Touchable.disabled);
                         t.top().left();
-                        t.update(t::toFront);
-                        t.table("guideDim", f -> label[0] = f.add("").get());
+                        t.update(() -> {
+                            if(Core.input.keyTap(KeyCode.BACKTICK)){
+                                visible[0] = !visible[0];
+                            }
+
+                            t.toFront();
+                        });
+                        t.table("guideDim", f -> label[0] = f.add("").get()).visible(() -> visible[0]);
                     });
 
                     Log.setLogger(new LogHandler(){
