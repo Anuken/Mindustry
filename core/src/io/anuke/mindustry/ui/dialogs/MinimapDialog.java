@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.layout.*;
 
 import static io.anuke.mindustry.Vars.renderer;
 
@@ -40,7 +41,7 @@ public class MinimapDialog extends FloatingDialog{
                     renderer.minimap.drawEntities(x, y, width, height);
                 }
             }).grow();
-        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f)).padTop(-20f);
+        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / UnitScl.dp.scl(1f)).padTop(-20f);
 
         cont.addListener(new InputListener(){
             @Override
