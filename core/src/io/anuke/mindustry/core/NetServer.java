@@ -261,7 +261,7 @@ public class NetServer implements ApplicationListener{
         }
 
         //cooldown between votes
-        int voteTime = 60 * 10;
+        int voteTime = 60 * 5;
         Timekeeper vtime = new Timekeeper(voteTime);
         //current kick sessions
         ObjectMap<Player, VoteSession> currentlyKicking = new ObjectMap<>();
@@ -332,7 +332,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public int votesRequired(){
-        return playerGroup.size() * 2 / 3;
+        return 2 + (int)(playerGroup.size() * 0.2f);
     }
 
     public Team assignTeam(Player current, Iterable<Player> players){

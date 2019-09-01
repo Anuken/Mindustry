@@ -80,7 +80,7 @@ public class MapsDialog extends FloatingDialog{
                             String name = map.tags.getOr("name", () -> {
                                 String result = "unknown";
                                 int number = 0;
-                                while(maps.byName(result + number++) != null) ;
+                                while(maps.byName(result + number++) != null);
                                 return result + number;
                             });
 
