@@ -127,8 +127,10 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
                 if(randomlyExplode && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
-                    entity.damage(Mathf.random(11f));
-                    Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
+                    Core.app.post(() -> {
+                        entity.damage(Mathf.random(11f));
+                        Effects.effect(explodeEffect, tile.worldx() + Mathf.range(size * tilesize / 2f), tile.worldy() + Mathf.range(size * tilesize / 2f));
+                    });
                 }
             }else{
                 entity.productionEfficiency = 0.0f;
