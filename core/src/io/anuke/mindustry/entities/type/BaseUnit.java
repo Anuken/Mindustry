@@ -58,7 +58,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         //visual only.
         if(Net.client()){
             Tile tile = world.tile(unit.spawner);
-            if(tile != null && !Net.client()){
+            if(tile != null){
                 tile.block().unitRemoved(tile, unit);
             }
 

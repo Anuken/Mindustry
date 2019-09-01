@@ -228,7 +228,7 @@ public class NetServer implements ApplicationListener{
         });
 
         //duration of a a kick in seconds
-        int kickDuration = 10 * 60;
+        int kickDuration = 15 * 60;
 
         class VoteSession{
             Player target;
@@ -243,9 +243,9 @@ public class NetServer implements ApplicationListener{
                 this.task = Timer.schedule(() -> {
                     if(!checkPass()){
                         Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] {0}[lightgray].", target.name));
+                        map.remove(target);
+                        task.cancel();
                     }
-                    map.remove(target);
-                    task.cancel();
                 }, 60 * 1.5f);
             }
 
@@ -254,6 +254,8 @@ public class NetServer implements ApplicationListener{
                     Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be kicked from the server.", target.name));
                     admins.getInfo(target.uuid).lastKicked = Time.millis() + kickDuration*1000;
                     kick(target.con.id, KickReason.vote);
+                    map.remove(target);
+                    task.cancel();
                     return true;
                 }
                 return false;
@@ -269,6 +271,11 @@ public class NetServer implements ApplicationListener{
         clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player, with a cooldown.", (args, player) -> {
             if(playerGroup.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
+                return;
+            }
+
+            if(player.isLocal){
+                player.sendMessage("[scarlet]Just kick them yourself if you're the host.");
                 return;
             }
 
@@ -296,10 +303,10 @@ public class NetServer implements ApplicationListener{
                 }
 
                 if(found != null){
-                    if(player == found){
-                        player.sendMessage("[scarlet]If you're interested in kicking yourself, just leave.");
-                    }else if(found.isAdmin){
+                    if(found.isAdmin){
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
+                    }else if(found.isLocal){
+                        player.sendMessage("[scarlet]Local players cannot be kicked.");
                     }else{
                         if(!currentlyKicking.containsKey(found) && !vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
