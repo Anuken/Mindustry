@@ -328,7 +328,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (args, player) -> {
+        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
