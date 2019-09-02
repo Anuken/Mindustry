@@ -20,7 +20,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.Entity;
 import io.anuke.mindustry.entities.traits.SyncTrait;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.gen.Call;
@@ -74,7 +74,7 @@ public class NetServer implements ApplicationListener{
         });
 
         Net.handleServer(Disconnect.class, (id, packet) -> {
-            Player player = connections.get(id);
+            Player player = connections.get(id);           
             if(player != null){
                 onDisconnect(player, packet.reason);
             }
@@ -185,6 +185,8 @@ public class NetServer implements ApplicationListener{
             sendWorldData(player, id);
 
             platform.updateRPC();
+            
+            Events.fire(new PlayerJoin(player));
         });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> {
@@ -402,8 +404,9 @@ public class NetServer implements ApplicationListener{
         }
 
         if(player.con.hasConnected){
+            Events.fire(new PlayerLeave(player)); 
             Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-            Call.onPlayerDisconnect(player.id);
+            Call.onPlayerDisconnect(player.id);            
         }
         player.remove();
         netServer.connections.remove(player.con.id);
