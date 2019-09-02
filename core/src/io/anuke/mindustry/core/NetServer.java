@@ -404,8 +404,9 @@ public class NetServer implements ApplicationListener{
         }
 
         if(player.con.hasConnected){
+            Events.fire(new PlayerLeave(player)); 
             Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-            Call.onPlayerDisconnect(player.id);
+            Call.onPlayerDisconnect(player.id);            
         }
         player.remove();
         netServer.connections.remove(player.con.id);
