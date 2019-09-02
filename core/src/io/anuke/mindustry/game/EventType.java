@@ -5,7 +5,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.entities.type.player;
+import io.anuke.mindustry.entities.type.Player;
 
 public class EventType{
 
