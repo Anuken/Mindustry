@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.type.Zone;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.entities.type.player;
 
 public class EventType{
 
@@ -184,5 +185,11 @@ public class EventType{
     public static class ResizeEvent{
 
     }
+    
+    public static class PlayerJoin{
+        public final Player player;
+        public PlayerJoin(Player player){
+            this.player = player;
+        }
 }
 
