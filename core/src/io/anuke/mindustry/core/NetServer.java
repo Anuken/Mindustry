@@ -74,8 +74,9 @@ public class NetServer implements ApplicationListener{
         });
 
         Net.handleServer(Disconnect.class, (id, packet) -> {
-            Player player = connections.get(id);
+            Player player = connections.get(id);           
             if(player != null){
+                Events.fire(new PlayerLeave(player)); 
                 onDisconnect(player, packet.reason);
             }
             connections.remove(id);
