@@ -188,8 +188,19 @@ public class EventType{
     
     public static class PlayerJoin{
         public final Player player;
+        
         public PlayerJoin(Player player){
             this.player = player;
         }
+    }
+        
+    public static class PlayerLeave{
+        public final Player player;
+        
+        public PlayerLeave(Player player){
+            this.player = player;
+        }
+    }
+           
 }
 
