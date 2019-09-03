@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.Pools;
@@ -607,7 +608,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode)){
+        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }

@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.mindustry.world.blocks.distribution.*;
+import io.anuke.mindustry.world.blocks.logic.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
@@ -47,7 +48,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid,
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -730,6 +731,9 @@ public class Blocks implements ContentList{
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, () -> state.rules.infiniteResources, ItemStack.with());
             alwaysUnlocked = true;
+        }};
+        message = new MessageBlock("message"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
         }};
 
         //endregion
