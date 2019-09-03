@@ -500,6 +500,7 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
+            itemCapacity = 20;
 
             int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 

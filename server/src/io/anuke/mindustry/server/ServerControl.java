@@ -401,6 +401,26 @@ public class ServerControl implements ApplicationListener{
             info("Server name is now &lc'{0}'.", arg[0]);
         });
 
+        handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
+            if(arg.length == 0){
+                info("Player limit is currently &lc{0}.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
+                return;
+            }
+            if(arg[0].equals("off")){
+                netServer.admins.setPlayerLimit(0);
+                info("Player limit disabled.");
+                return;
+            }
+
+            if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
+                int lim = Strings.parseInt(arg[0]);
+                netServer.admins.setPlayerLimit(lim);
+                info("Player limit is now &lc{0}.", lim);
+            }else{
+                err("Limit must be a number above 0.");
+            }
+        });
+
         handler.register("whitelist", "[on/off...]", "Enable/disable whitelisting.", arg -> {
             if(arg.length == 0){
                 info("Whitelist is currently &lc{0}.", netServer.admins.isWhitelistEnabled() ? "on" : "off");

@@ -48,6 +48,10 @@ public class Control implements ApplicationListener, Loadable{
     private boolean wasPaused = false;
 
     public Control(){
+        saves = new Saves();
+        tutorial = new Tutorial();
+        music = new MusicControl();
+
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
@@ -152,10 +156,6 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void loadAsync(){
-        saves = new Saves();
-        tutorial = new Tutorial();
-        music = new MusicControl();
-
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
         Core.input.setCatch(KeyCode.BACK, true);

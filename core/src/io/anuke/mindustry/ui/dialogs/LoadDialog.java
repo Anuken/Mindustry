@@ -137,13 +137,13 @@ public class LoadDialog extends FloatingDialog{
                 meta.row();
                 meta.labelWrap(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
                 meta.row();
-                meta.labelWrap(Core.bundle.format("save.wave", color + slot.getWave()));
+                meta.labelWrap(slot.mode().toString() + " /" + color + " " + Core.bundle.format("save.wave", color + slot.getWave()));
                 meta.row();
                 meta.labelWrap(() -> Core.bundle.format("save.autosave", color + Core.bundle.get(slot.isAutosave() ? "on" : "off")));
                 meta.row();
                 meta.labelWrap(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
                 meta.row();
-                meta.labelWrap(Core.bundle.format("save.date", color + slot.getDate()));
+                meta.labelWrap(color + slot.getDate());
                 meta.row();
             }).left().growX().width(250f);
 
