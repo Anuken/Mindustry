@@ -1,39 +1,32 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Events;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Colors;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.traits.Entity;
-import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.EventType.WorldLoadEvent;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.gen.RemoteReadServer;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.net.Administration.PlayerInfo;
-import io.anuke.mindustry.net.Administration.TraceInfo;
+import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.zip.DeflaterOutputStream;
+import java.nio.*;
+import java.util.zip.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -107,6 +100,22 @@ public class NetServer implements ApplicationListener{
 
             if(Time.millis() - info.lastKicked < kickDuration){
                 kick(id, KickReason.recentKick);
+                return;
+            }
+
+            if(admins.isIDBanned(uuid)){
+                kick(id, KickReason.banned);
+                return;
+            }
+
+            if(!admins.isWhitelisted(packet.uuid, packet.usid)){
+                info.adminUsid = packet.usid;
+                info.lastName = packet.name;
+                info.id = packet.uuid;
+                admins.save();
+                Call.onInfoMessage(id, "You are not whitelisted here.");
+                Log.info("&lcDo &lywhitelist-add {0}&lc to whitelist the player &lb'{1}'", packet.uuid, packet.name);
+                kick(id, KickReason.whitelist);
                 return;
             }
 

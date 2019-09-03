@@ -41,7 +41,7 @@ public class ServerControl implements ApplicationListener{
     private static final int commandSocketPort = 6859;
 
     private final CommandHandler handler = new CommandHandler("");
-    private final FileHandle logFolder = Core.files.local("logs/");
+    private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
     private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
@@ -399,6 +399,48 @@ public class ServerControl implements ApplicationListener{
             Core.settings.put("servername", arg[0]);
             Core.settings.save();
             info("Server name is now &lc'{0}'.", arg[0]);
+        });
+
+        handler.register("whitelist", "[on/off...]", "Enable/disable whitelisting.", arg -> {
+            if(arg.length == 0){
+                info("Whitelist is currently &lc{0}.", netServer.admins.isWhitelistEnabled() ? "on" : "off");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            netServer.admins.setWhitelist(on);
+            info("Whitelist is now &lc{0}.", on ? "on" : "off");
+        });
+
+        handler.register("whitelisted", "List the entire whitelist.", arg -> {
+            if(netServer.admins.getWhitelisted().isEmpty()){
+                info("&lyNo whitelisted players found.");
+                return;
+            }
+
+            info("&lyWhitelist:");
+            netServer.admins.getWhitelisted().each(p -> Log.info("- &ly{0}", p.lastName));
+        });
+
+        handler.register("whitelist-add", "<ID>", "Add a player to the whitelist by ID.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            if(info == null){
+                err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                return;
+            }
+
+            netServer.admins.whitelist(arg[0]);
+            info("Player &ly'{0}'&lg has been whitelisted.", info.lastName);
+        });
+
+        handler.register("whitelist-remove", "<ID>", "Remove a player to the whitelist by ID.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            if(info == null){
+                err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                return;
+            }
+
+            netServer.admins.unwhitelist(arg[0]);
+            info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
         });
 
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {

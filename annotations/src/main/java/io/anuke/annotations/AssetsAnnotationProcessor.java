@@ -86,10 +86,9 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
 
             //load.addStatement(name + " = io.anuke.arc.Core.audio."+loadMethod+"(io.anuke.arc.Core.files.internal(io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? $S : $S))",
             //filepath, filepath.replace(".ogg", ".mp3"));
+            String filename = "io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3")+"\"";
 
-            loadBegin.addStatement("io.anuke.arc.Core.assets.load(io.anuke.arc.Core.app.getType() != io.anuke.arc.Application.ApplicationType.iOS ? $S : $S, "+rtype+".class, " +
-            "new io.anuke.arc.assets.loaders."+classname.substring(0, classname.length()-1)+"Loader."+classname.substring(0, classname.length()-1)+"Parameter((m, name, type) -> " + name + " = m.get(\"" + filepath + "\")))",
-            filepath, filepath.replace(".ogg", ".mp3"));
+            loadBegin.addStatement("io.anuke.arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
 
 
             dispose.addStatement(name + ".dispose()");
