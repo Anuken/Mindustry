@@ -9,15 +9,18 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.traits.BuilderTrait.*;
-import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.entities.traits.Entity;
+import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.game.EventType.WorldLoadEvent;
+import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.RemoteReadServer;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Administration.*;
@@ -194,6 +197,8 @@ public class NetServer implements ApplicationListener{
             sendWorldData(player, id);
 
             platform.updateRPC();
+
+            Events.fire(new PlayerJoin(player));
         });
 
         Net.handleServer(InvokePacket.class, (id, packet) -> {
@@ -411,6 +416,7 @@ public class NetServer implements ApplicationListener{
         }
 
         if(player.con.hasConnected){
+            Events.fire(new PlayerLeave(player));
             Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
             Call.onPlayerDisconnect(player.id);
         }
