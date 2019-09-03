@@ -201,6 +201,7 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
+        outputs.upToDateWhen{ false } 
         generateLocales()
         writeVersion()
     }
