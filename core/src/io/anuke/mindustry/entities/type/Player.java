@@ -23,6 +23,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
+import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
@@ -798,6 +799,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             }
         }else{
             Call.sendMessage(con.id, text, fromName, from);
+        }
+    }
+
+    public PlayerInfo getInfo(){
+        if(uuid == null){
+            throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
+        }else{
+            return netServer.admins.getInfo(uuid);
         }
     }
 
