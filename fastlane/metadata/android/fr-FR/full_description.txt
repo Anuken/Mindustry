@@ -1,5 +1,6 @@
 Crée des chaînes de ravitaillement pour tes défenses, produit les matériaux de construction pour aggrandir et protéger tes batiments contre des vagues d'ennemis. Joue avec tes amis grâce à des jeux multijoueurs co-op cross-plateforme, ou défie les dans des parties en PvP par équipe.
 
+Caractéristiques:
 - 24 cartes dans le jeu de base
 - Une campagne, complète avec un arbre de recherche et des zones à débloquer
 - 4 puissantes vagues de boss à vaincre
