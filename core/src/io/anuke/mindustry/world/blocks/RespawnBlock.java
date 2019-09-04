@@ -62,7 +62,7 @@ public class RespawnBlock{
         }
         Draw.reset();
 
-        if(Net.server() && player != null){
+        if(Net.active() && player != null){
             tile.block().drawPlaceText(player.name, tile.x, tile.y - (Math.max((tile.block().size-1)/2, 0)), true);
         }
     }
