@@ -251,7 +251,7 @@ public class Block extends BlockStorage{
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
 
-    protected float drawPlaceText(String text, int x, int y, boolean valid){
+    public float drawPlaceText(String text, int x, int y, boolean valid){
         if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
