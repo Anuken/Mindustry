@@ -143,6 +143,11 @@ public class MechPad extends Block{
         float heat;
 
         @Override
+        public boolean hasUnit(Unit unit){
+            return unit == player;
+        }
+
+        @Override
         public void updateSpawning(Player unit){
             if(player == null){
                 progress = 0f;

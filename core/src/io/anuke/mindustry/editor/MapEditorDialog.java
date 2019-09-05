@@ -186,7 +186,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         clearChildren();
         margin(0);
-        shown(this::build);
 
         update(() -> {
             if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
@@ -228,6 +227,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
             platform.updateRPC();
             if(!Core.settings.getBool("landscape")) platform.endForceLandscape();
         });
+
+        shown(this::build);
     }
 
     @Override

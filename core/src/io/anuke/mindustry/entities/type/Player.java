@@ -919,7 +919,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
-        buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
+        buffer.writeInt(spawner == null || !spawner.hasUnit(this) ? noSpawner : spawner.getTile().pos());
         buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);

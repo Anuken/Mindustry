@@ -115,9 +115,7 @@ public class Tutorial{
                 outline("blockinfo");
             }
         },
-        conveyor(
-        line -> Strings.format(line, Math.min(placed(Blocks.conveyor), 2), 2),
-        () -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
+        conveyor(() -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
             void draw(){
                 outline("category-distribution");
                 outline("block-conveyor");

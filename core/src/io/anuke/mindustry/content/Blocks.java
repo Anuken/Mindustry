@@ -983,7 +983,6 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 1));
             liquidCapacity = 16f;
-            liquidFlowFactor = 4.9f;
             health = 90;
         }};
 
@@ -1406,7 +1405,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 35));
+            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 50));
             shootType = Bullets.arc;
             reload = 24f;
             shootCone = 40f;

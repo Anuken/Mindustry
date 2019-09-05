@@ -11,6 +11,8 @@ import io.anuke.mindustry.world.*;
 public class RespawnBlock{
     
     public static void drawRespawn(Tile tile, float heat, float progress, float time, Player player, Mech to){
+        progress = Mathf.clamp(progress);
+
         Draw.color(Pal.darkMetal);
         Lines.stroke(2f * heat);
         Fill.poly(tile.drawx(), tile.drawy(), 4, 10f * heat);

@@ -144,6 +144,11 @@ public class CoreBlock extends StorageBlock{
         float heat;
 
         @Override
+        public boolean hasUnit(Unit unit){
+            return unit == spawnPlayer;
+        }
+
+        @Override
         public void updateSpawning(Player player){
             if(!netServer.isWaitingForPlayers() && spawnPlayer == null){
                 spawnPlayer = player;
