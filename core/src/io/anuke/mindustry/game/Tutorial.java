@@ -188,13 +188,12 @@ public class Tutorial{
 
         protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
         protected final Function<String, String> text;
-        protected final Array<String> sentences;
+        protected Array<String> sentences;
         protected final BooleanProvider done;
 
         TutorialStage(Function<String, String> text, BooleanProvider done){
             this.text = text;
             this.done = done;
-            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         TutorialStage(BooleanProvider done){
@@ -203,6 +202,7 @@ public class Tutorial{
 
         /** displayed tutorial stage text.*/
         public String text(){
+            if(sentences == null) this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
             String line = sentences.get(control.tutorial.sentence);
             return line.contains("{") ? text.get(line) : line;
         }
