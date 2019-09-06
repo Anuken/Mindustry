@@ -311,8 +311,6 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
             return;
         }
 
-        Log.info("callback run ON SERVER");
-        Log.info("Lobby create callback");
         Log.info("Lobby {1} created? {0}", result, steamID.getAccountID());
         if(result == SteamResult.OK){
             currentLobby = steamID;
