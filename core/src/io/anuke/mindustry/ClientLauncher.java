@@ -84,6 +84,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void resize(int width, int height){
+        if(assets == null) return;
+
         if(!assets.isFinished()){
             Draw.proj().setOrtho(0, 0, width, height);
         }else{

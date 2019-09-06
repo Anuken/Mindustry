@@ -266,6 +266,10 @@ public class Saves{
             return meta == null || meta.rules == null ? null : meta.rules.zone;
         }
 
+        public Gamemode mode(){
+            return Gamemode.bestFit(meta.rules);
+        }
+
         public int getBuild(){
             return meta.build;
         }

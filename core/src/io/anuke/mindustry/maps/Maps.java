@@ -184,7 +184,7 @@ public class Maps{
         FileHandle dest = findFile();
         file.copyTo(dest);
 
-        createNewPreview(loadMap(dest, true), true);
+        createNewPreview(loadMap(dest, true));
     }
 
     /** Attempts to run the following code;
@@ -341,7 +341,7 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                createNewPreview(map, false);
+                createNewPreview(map);
             }
             previewList.clear();
         });
@@ -351,16 +351,12 @@ public class Maps{
         Core.app.post(() -> previewList.add(map));
     }
 
-    private void createNewPreview(Map map, boolean immediate){
+    private void createNewPreview(Map map){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
             Pixmap pix = MapIO.generatePreview(map);
-            if(immediate){
-                map.texture = new Texture(pix);
-            }else{
-                Core.app.post(() -> map.texture = new Texture(pix));
-            }
+            map.texture = new Texture(pix);
             executor.submit(() -> {
                 try{
                     map.previewFile().writePNG(pix);

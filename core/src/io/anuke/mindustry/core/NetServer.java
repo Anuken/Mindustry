@@ -108,6 +108,11 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
+                kick(id, KickReason.playerLimit);
+                return;
+            }
+
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
                 info.adminUsid = packet.usid;
                 info.lastName = packet.name;

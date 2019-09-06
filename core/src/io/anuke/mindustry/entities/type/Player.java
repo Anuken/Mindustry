@@ -23,6 +23,7 @@ import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.InputHandler.PlaceDraw;
 import io.anuke.mindustry.io.TypeIO;
+import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.NetConnection;
 import io.anuke.mindustry.type.*;
@@ -801,6 +802,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
     }
 
+    public PlayerInfo getInfo(){
+        if(uuid == null){
+            throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
+        }else{
+            return netServer.admins.getInfo(uuid);
+        }
+    }
+
     /** Resets all values of the player. */
     public void reset(){
         resetNoAdd();
@@ -910,7 +919,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
-        buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
+        buffer.writeInt(spawner == null || !spawner.hasUnit(this) ? noSpawner : spawner.getTile().pos());
         buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);

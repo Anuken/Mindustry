@@ -3,9 +3,7 @@ package io.anuke.mindustry.world.blocks.storage;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
-import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -16,6 +14,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -32,6 +31,7 @@ public class CoreBlock extends StorageBlock{
         flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
+        layer = Layer.overlay;
     }
 
     @Remote(called = Loc.server)
@@ -84,41 +84,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawLayer(Tile tile){
         CoreEntity entity = tile.entity();
 
-        Draw.rect(region, tile.drawx(), tile.drawy());
-
-        if(entity.heat > 0){
-            Draw.color(Pal.darkMetal);
-            Lines.stroke(2f * entity.heat);
-            Lines.poly(tile.drawx(), tile.drawy(), 4, 8f * entity.heat);
-            Draw.reset();
-        }
-
-        if(entity.spawnPlayer != null){
-            Unit player = entity.spawnPlayer;
-
-            TextureRegion region = player.getIconRegion();
-
-            Shaders.build.region = region;
-            Shaders.build.progress = entity.progress;
-            Shaders.build.color.set(Pal.accent);
-            Shaders.build.time = -entity.time / 10f;
-
-            Draw.shader(Shaders.build, true);
-            Draw.rect(region, tile.drawx(), tile.drawy());
-            Draw.shader();
-
-            Draw.color(Pal.accent);
-
-            Lines.lineAngleCenter(
-                tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-                tile.drawy(),
-                90,
-                size * Vars.tilesize / 2f);
-
-            Draw.reset();
+        if(entity.heat > 0.001f){
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.spawnPlayer, mech);
         }
     }
 
@@ -172,6 +142,11 @@ public class CoreBlock extends StorageBlock{
         float progress;
         float time;
         float heat;
+
+        @Override
+        public boolean hasUnit(Unit unit){
+            return unit == spawnPlayer;
+        }
 
         @Override
         public void updateSpawning(Player player){

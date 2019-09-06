@@ -71,6 +71,8 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     public void hide(){
+        if(table == null) return;
+
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
             table.clearChildren();
             table.clearListeners();

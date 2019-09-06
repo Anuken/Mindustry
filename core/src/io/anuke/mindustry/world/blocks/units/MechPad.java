@@ -1,32 +1,24 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.content.Mechs;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.traits.SpawnerTrait;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.type.Mech;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.mobile;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
     protected Mech mech;
@@ -37,6 +29,7 @@ public class MechPad extends Block{
         update = true;
         solid = false;
         hasPower = true;
+        layer = Layer.overlay;
     }
 
     @Override
@@ -110,32 +103,11 @@ public class MechPad extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
+    public void drawLayer(Tile tile){
         MechFactoryEntity entity = tile.entity();
 
-        Draw.rect(Core.atlas.find(name), tile.drawx(), tile.drawy());
-
         if(entity.player != null){
-            TextureRegion region = (!entity.sameMech && entity.player.mech == mech ? Mechs.starter.iconRegion : mech.iconRegion);
-
-            Shaders.build.region = region;
-            Shaders.build.progress = entity.progress;
-            Shaders.build.time = -entity.time / 5f;
-            Shaders.build.color.set(Pal.accent);
-
-            Draw.shader(Shaders.build);
-            Draw.rect(region, tile.drawx(), tile.drawy());
-            Draw.shader();
-
-            Draw.color(Pal.accent);
-
-            Lines.lineAngleCenter(
-            tile.drawx() + Mathf.sin(entity.time, 6f, Vars.tilesize / 3f * size),
-            tile.drawy(),
-            90,
-            size * Vars.tilesize / 2f + 1f);
-
-            Draw.reset();
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech));
         }
     }
 
@@ -169,6 +141,11 @@ public class MechPad extends Block{
         float progress;
         float time;
         float heat;
+
+        @Override
+        public boolean hasUnit(Unit unit){
+            return unit == player;
+        }
 
         @Override
         public void updateSpawning(Player unit){

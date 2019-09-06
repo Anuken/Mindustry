@@ -201,7 +201,7 @@ public abstract class Turret extends Block{
     protected void turnToTarget(Tile tile, float targetRot){
         TurretEntity entity = tile.entity();
 
-        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
+        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta() * baseReloadSpeed(tile));
     }
 
     public boolean shouldTurn(Tile tile){
