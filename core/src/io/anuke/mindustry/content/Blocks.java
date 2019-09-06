@@ -1407,7 +1407,7 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 50));
             shootType = Bullets.arc;
-            reload = 30f;
+            reload = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
             powerUse = 1.5f;

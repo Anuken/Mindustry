@@ -19,7 +19,6 @@ import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
@@ -32,6 +31,7 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 import java.util.*;
 
@@ -476,7 +476,10 @@ public class Block extends BlockStorage{
     public void setStats(){
         stats.add(BlockStat.size, "{0}x{0}", size);
         stats.add(BlockStat.health, health, StatUnit.none);
-        stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
+        if(isBuildable()){
+            stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
+            stats.add(BlockStat.buildCost, new ItemListValue(false, buildRequirements));
+        }
 
         consumes.display(stats);
 
