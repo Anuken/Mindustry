@@ -104,7 +104,7 @@ public class ArcNetServer implements ServerProvider{
     }
 
     @Override
-    public void sendStream(int id, Streamable stream){
+    public void sendServerStream(int id, Streamable stream){
         ArcConnection connection = getByID(id);
         if(connection == null) return;
 
