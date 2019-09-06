@@ -42,7 +42,7 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void load(){
-        preview = Core.atlas.find(name);
+        preview = Core.atlas.find("zone-" + name);
     }
 
     public Rules getRules(){

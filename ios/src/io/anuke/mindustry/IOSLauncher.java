@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.backends.iosrobovm.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -13,6 +14,7 @@ import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
+import org.robovm.objc.block.*;
 
 import java.io.*;
 import java.util.*;
@@ -37,6 +39,51 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
+
+            @Override
+            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController();
+                cont.setAllowsDocumentCreation(false);
+                cont.setDelegate(new UIDocumentBrowserViewControllerDelegate(){
+                    @Override
+                    public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+
+                    }
+
+                    @Override
+                    public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+
+                    }
+
+                    @Override
+                    public void didRequestDocumentCreationWithHandler(UIDocumentBrowserViewController controller, VoidBlock2<NSURL, UIDocumentBrowserImportMode> importHandler){
+
+                    }
+
+                    @Override
+                    public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
+                        cons.accept(Core.files.absolute(destinationURL.getAbsoluteString()));
+                    }
+
+                    @Override
+                    public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
+
+                    }
+
+                    @Override
+                    public NSArray<UIActivity> applicationActivities(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+                        return null;
+                    }
+
+                    @Override
+                    public void willPresentActivityViewController(UIDocumentBrowserViewController controller, UIActivityViewController activityViewController){
+
+                    }
+                });
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
+
+                });
+            }
 
             @Override
             public void shareFile(FileHandle file){

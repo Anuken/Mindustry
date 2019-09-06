@@ -62,49 +62,52 @@ public class MapsDialog extends FloatingDialog{
         if(!ios){
             buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
                 platform.showFileChooser("$editor.importmap", "Map File", file -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showError("$editor.errorimage");
-                            return;
-                        }
+                    ui.loadAnd(() -> {
+                        maps.tryCatchMapError(() -> {
+                            if(MapIO.isImage(file)){
+                                ui.showError("$editor.errorimage");
+                                return;
+                            }
 
-                        Map map;
-                        if(file.extension().equalsIgnoreCase(mapExtension)){
-                            map = MapIO.createMap(file, true);
-                        }else{
-                            map = maps.makeLegacyMap(file);
-                        }
+                            Map map;
+                            if(file.extension().equalsIgnoreCase(mapExtension)){
+                                map = MapIO.createMap(file, true);
+                            }else{
+                                map = maps.makeLegacyMap(file);
+                            }
 
-                        //when you attempt to import a save, it will have no name, so generate one
-                        String name = map.tags.getOr("name", () -> {
-                            String result = "unknown";
-                            int number = 0;
-                            while(maps.byName(result + number++) != null) ;
-                            return result + number;
-                        });
-
-                        //this will never actually get called, but it remains just in case
-                        if(name == null){
-                            ui.showError("$editor.errorname");
-                            return;
-                        }
-
-                        Map conflict = maps.all().find(m -> m.name().equals(name));
-
-                        if(conflict != null && !conflict.custom){
-                            ui.showInfo(Core.bundle.format("editor.import.exists", name));
-                        }else if(conflict != null){
-                            ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                                maps.tryCatchMapError(() -> {
-                                    maps.importMap(file);
-                                    setup();
-                                });
+                            //when you attempt to import a save, it will have no name, so generate one
+                            String name = map.tags.getOr("name", () -> {
+                                String result = "unknown";
+                                int number = 0;
+                                while(maps.byName(result + number++) != null);
+                                return result + number;
                             });
-                        }else{
-                            maps.importMap(map.file);
-                            setup();
-                        }
 
+                            //this will never actually get called, but it remains just in case
+                            if(name == null){
+                                ui.showError("$editor.errorname");
+                                return;
+                            }
+
+                            Map conflict = maps.all().find(m -> m.name().equals(name));
+
+                            if(conflict != null && !conflict.custom){
+                                ui.showInfo(Core.bundle.format("editor.import.exists", name));
+                            }else if(conflict != null){
+                                ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
+                                    maps.tryCatchMapError(() -> {
+                                        maps.removeMap(conflict);
+                                        maps.importMap(map.file);
+                                        setup();
+                                    });
+                                });
+                            }else{
+                                maps.importMap(map.file);
+                                setup();
+                            }
+
+                        });
                     });
                 }, true, FileChooser.anyMapFiles);
             }).size(210f, 64f);

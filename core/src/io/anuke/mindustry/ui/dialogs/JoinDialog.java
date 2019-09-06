@@ -182,10 +182,10 @@ public class JoinDialog extends FloatingDialog{
     void setupServer(Server server, Host host){
         server.lastHost = host;
         server.content.clear();
-        server.content.table(t -> setupHostTable(t, host)).expand().left().bottom().padLeft(12f).padBottom(8);
+        buildServer(host, server.content);
     }
 
-    void setupHostTable(Table content, Host host){
+    void buildServer(Host host, Table content){
         String versionString;
 
         if(host.version == -1){
@@ -202,12 +202,14 @@ public class JoinDialog extends FloatingDialog{
             versionString = Core.bundle.format("server.version", host.version, host.versionType);
         }
 
-        content.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
-        content.row();
-        content.add("[lightgray]" + (host.players != 1 ? Core.bundle.format("players", host.players == 0 ? host.players : "[accent]" + host.players + "[lightgray]") : Core.bundle.format("players.single", "[accent]" + host.players + "[lightgray]"))).left();
-        content.row();
-        content.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + Core.bundle.format("save.wave", host.wave)).width(targetWidth() - 10f).left().get().setEllipsis(true);
 
+        content.table(t -> {
+            t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            t.row();
+            t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
+            t.row();
+            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + host.mode.toString()).width(targetWidth() - 10f).left().get().setEllipsis(true);
+        }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
     void setup(){
@@ -275,6 +277,9 @@ public class JoinDialog extends FloatingDialog{
         local.background((Drawable)null);
         local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
         Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+        for(String host : defaultServers){
+            Net.pingHost(host, port, this::addLocalHost, e -> {});
+        }
     }
 
     void finishLocalHosts(){
@@ -299,11 +304,10 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        local.addButton(b -> {
-            b.margin(5f);
-            b.left();
-            setupHostTable(b, host);
-        }, "clear", () -> connect(host.address, port)).width(w).pad(4f).get();
+        TextButton button = local.addButton("", "clear", () -> connect(host.address, port))
+        .width(w).pad(5f).get();
+        button.clearChildren();
+        buildServer(host, button);
     }
 
     void connect(String ip, int port){

@@ -1,12 +1,11 @@
 package io.anuke.mindustry.plugin;
 
-import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.io.*;
 
-import java.lang.reflect.*;
 import java.net.*;
 
 import static io.anuke.mindustry.Vars.pluginDirectory;
@@ -50,12 +49,9 @@ public class Plugins{
 
         PluginMeta meta = JsonIO.read(PluginMeta.class, metaf.readString());
 
-        URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
-        Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-        method.setAccessible(true);
-        method.invoke(classLoader, jar.file().toURI().toURL());
 
-        Class<?> main = Class.forName(meta.main);
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+        Class<?> main = classLoader.loadClass(meta.main);
         return new LoadedPlugin(jar, zip, (Plugin)main.newInstance(), meta);
     }
 

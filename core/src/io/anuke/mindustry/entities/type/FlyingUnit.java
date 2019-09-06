@@ -125,8 +125,8 @@ public abstract class FlyingUnit extends BaseUnit{
 
         if(!Net.client()){
             updateRotation();
-            wobble();
         }
+        wobble();
     }
 
     @Override

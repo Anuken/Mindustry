@@ -7,12 +7,13 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Bullets implements ContentList{
     public static BulletType
@@ -631,7 +632,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 30);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
             }
         };
 

@@ -28,7 +28,6 @@ public abstract class BlockStorage extends UnlockableContent{
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
-    public float liquidFlowFactor = 4.9f;
 
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();

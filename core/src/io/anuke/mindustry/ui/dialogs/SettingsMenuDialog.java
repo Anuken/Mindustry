@@ -139,7 +139,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.row();
 
             //iOS doesn't have a file chooser.
-            if(!ios){
+            //if(!ios){
                 t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser("$data.import", "Zip Files", file -> {
                     try{
                         data.importData(file);
@@ -151,7 +151,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                         ui.showError(Strings.parseException(e, true));
                     }
                 }, true, f -> f.equalsIgnoreCase("zip"))));
-            }
+            //}
         });
 
         ScrollPane pane = new ScrollPane(prefs);

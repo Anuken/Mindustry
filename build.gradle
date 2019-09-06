@@ -179,7 +179,7 @@ project(":ios"){
         }
 
         props['app.id'] = 'io.anuke.mindustry'
-        props['app.version'] = '4.0'
+        props['app.version'] = '4.2.1'
         props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
         props['app.executable'] = 'IOSLauncher'
         props['app.name'] = 'Mindustry'
@@ -205,6 +205,7 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
+        outputs.upToDateWhen{ false } 
         generateLocales()
         writeVersion()
     }

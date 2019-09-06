@@ -107,7 +107,17 @@ public class NetClient implements ApplicationListener{
 
             Time.runTask(3f, ui.loadfrag::hide);
 
-            ui.showError("$disconnect");
+            if(packet.reason != null){
+                if(packet.reason.equals("closed")){
+                    ui.showSmall("$disconnect", "$disconnect.closed");
+                }else if(packet.reason.equals("timeout")){
+                    ui.showSmall("$disconnect", "$disconnect.timeout");
+                }else if(packet.reason.equals("error")){
+                    ui.showSmall("$disconnect", "$disconnect.error");
+                }
+            }else{
+                ui.showError("$disconnect");
+            }
         });
 
         Net.handleClient(WorldStream.class, data -> {

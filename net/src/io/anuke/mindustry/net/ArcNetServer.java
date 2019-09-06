@@ -47,12 +47,13 @@ public class ArcNetServer implements ServerProvider{
             }
 
             @Override
-            public void disconnected(Connection connection){
+            public void disconnected(Connection connection, DcReason reason){
                 ArcConnection k = getByArcID(connection.getID());
                 if(k == null) return;
 
                 Disconnect c = new Disconnect();
                 c.id = k.id;
+                c.reason = reason.toString();
 
                 Core.app.post(() -> {
                     Net.handleServerReceived(k.id, c);
@@ -100,6 +101,34 @@ public class ArcNetServer implements ServerProvider{
         }
 
         return null;
+    }
+
+    @Override
+    public void sendStream(int id, Streamable stream){
+        ArcConnection connection = getByID(id);
+        if(connection == null) return;
+
+        connection.connection.addListener(new InputStreamSender(stream.stream, 512){
+            int id;
+
+            @Override
+            protected void start(){
+                //send an object so the receiving side knows how to handle the following chunks
+                StreamBegin begin = new StreamBegin();
+                begin.total = stream.stream.available();
+                begin.type = Registrator.getID(stream.getClass());
+                connection.connection.sendTCP(begin);
+                id = begin.id;
+            }
+
+            @Override
+            protected Object next(byte[] bytes){
+                StreamChunk chunk = new StreamChunk();
+                chunk.id = id;
+                chunk.data = bytes;
+                return chunk; //wrap the byte[] with an object so the receiving side knows how to handle it.
+            }
+        });
     }
 
     @Override
@@ -159,7 +188,7 @@ public class ArcNetServer implements ServerProvider{
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
-                connection.close();
+                connection.close(DcReason.error);
 
                 ArcConnection k = getByArcID(connection.getID());
                 if(k != null) connections.remove(k);
@@ -168,7 +197,7 @@ public class ArcNetServer implements ServerProvider{
 
         @Override
         public void close(){
-            if(connection.isConnected()) connection.close();
+            if(connection.isConnected()) connection.close(DcReason.closed);
         }
     }
 

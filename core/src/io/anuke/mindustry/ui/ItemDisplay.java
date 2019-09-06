@@ -13,11 +13,15 @@ public class ItemDisplay extends Table{
         this(item, 0);
     }
 
-    public ItemDisplay(Item item, int amount){
-        add(new ItemImage(new ItemStack(item, amount))).size(8 * 4);
-        add(item.localizedName()).padLeft(4);
+    public ItemDisplay(Item item, int amount, boolean showName){
+        add(new ItemImage(new ItemStack(item, amount))).size(8 * 4).padRight(amount > 99 ? 12 : 0);
+        if(showName) add(item.localizedName()).padLeft(4 + amount > 99 ? 4 : 0);
 
         this.item = item;
         this.amount = amount;
+    }
+
+    public ItemDisplay(Item item, int amount){
+        this(item, amount, true);
     }
 }

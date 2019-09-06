@@ -36,12 +36,13 @@ public class ArcNetClient implements ClientProvider{
             }
 
             @Override
-            public void disconnected(Connection connection){
+            public void disconnected(Connection connection, DcReason reason){
                 if(connection.getLastProtocolError() != null){
                     netClient.setQuiet();
                 }
 
                 Disconnect c = new Disconnect();
+                c.reason = reason.toString();
                 Core.app.post(() -> Net.handleClientReceived(c));
             }
 
@@ -181,6 +182,8 @@ public class ArcNetClient implements ClientProvider{
     private void handleException(Exception e){
         if(e instanceof ArcNetException){
             Core.app.post(() -> Net.showError(new IOException("mismatch")));
+        }else if(e instanceof ClosedChannelException){
+            Core.app.post(() -> Net.showError(new IOException("alreadyconnected")));
         }else{
             Core.app.post(() -> Net.showError(e));
         }

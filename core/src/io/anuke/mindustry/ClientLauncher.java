@@ -84,10 +84,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void resize(int width, int height){
-        super.resize(width, height);
+        if(assets == null) return;
 
         if(!assets.isFinished()){
             Draw.proj().setOrtho(0, 0, width, height);
+        }else{
+            super.resize(width, height);
         }
     }
 
@@ -100,6 +102,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
+                super.resize(graphics.getWidth(), graphics.getHeight());
                 finished = true;
                 Events.fire(new ClientLoadEvent());
             }

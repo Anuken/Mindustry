@@ -1,17 +1,15 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Entities;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.arc.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.io.JsonIO;
-import io.anuke.mindustry.io.SaveIO;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.*;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -71,8 +69,9 @@ public class NetworkIO{
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
-        //TODO additional information:
-        // - gamemode ID/name (just pick the closest one?)
+
+        buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
+        buffer.putInt(netServer.admins.getPlayerLimit());
         return buffer;
     }
 
@@ -83,13 +82,15 @@ public class NetworkIO{
         int wave = buffer.getInt();
         int version = buffer.getInt();
         String vertype = readString(buffer);
+        Gamemode gamemode = Gamemode.all[buffer.get()];
+        int limit = buffer.getInt();
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){
         byte[] bytes = string.getBytes(charset);
-        //truncating this way may lead to wierd encoding errors at the ends of strings...
+        //todo truncating this way may lead to wierd encoding errors at the ends of strings...
         if(bytes.length > maxlen){
             bytes = Arrays.copyOfRange(bytes, 0, maxlen);
         }

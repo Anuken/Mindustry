@@ -14,7 +14,7 @@ public class Packets{
 
     public enum KickReason{
         kick, clientOutdated, serverOutdated, banned, gameover(true), recentKick,
-        nameInUse, idInUse, nameEmpty, customClient, serverClose, vote, typeMismatch;
+        nameInUse, idInUse, nameEmpty, customClient, serverClose, vote, typeMismatch, whitelist, playerLimit;
 
         public final boolean quiet;
 
@@ -52,6 +52,7 @@ public class Packets{
 
     public static class Disconnect implements Packet{
         public int id;
+        public String reason;
 
         @Override
         public boolean isImportant(){
