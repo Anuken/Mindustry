@@ -9,6 +9,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.Net;
@@ -273,19 +274,25 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
         if(lobbyDoneCallback != null){
             for(int i = 0; i < matches; i++){
-                SteamID lobby = smat.getLobbyByIndex(i);
-                Host out = new Host(
-                    smat.getLobbyData(lobby, "name"),
-                    "steam:" + lobby.getAccountID(),
-                    smat.getLobbyData(lobby, "mapname"),
-                    Strings.parseInt(smat.getLobbyData(lobby, "wave"), -1),
-                    smat.getNumLobbyMembers(lobby),
-                    Strings.parseInt(smat.getLobbyData(lobby, "name"), -1),
-                smat.getLobbyData(lobby, "versionType"));
+                try{
+                    SteamID lobby = smat.getLobbyByIndex(i);
+                    Host out = new Host(
+                        smat.getLobbyData(lobby, "name"),
+                        "steam:" + lobby.getAccountID(),
+                        smat.getLobbyData(lobby, "mapname"),
+                        Strings.parseInt(smat.getLobbyData(lobby, "wave"), -1),
+                        smat.getNumLobbyMembers(lobby),
+                        Strings.parseInt(smat.getLobbyData(lobby, "name"), -1),
+                        smat.getLobbyData(lobby, "versionType"),
+                        Gamemode.all[Strings.parseInt(smat.getLobbyData(lobby, "gamemode"))],
+                        smat.getLobbyMemberLimit(lobby)
+                    );
 
-                lobbyIDs.put(lobby.getAccountID() + "", lobby);
-
-                lobbyCallback.accept(out);
+                    lobbyIDs.put(lobby.getAccountID() + "", lobby);
+                    lobbyCallback.accept(out);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
 
             lobbyDoneCallback.run();
@@ -315,6 +322,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
+            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules) + "");
 
             friends.activateGameOverlayInviteDialog(currentLobby);
             Log.info("Activating overlay dialog");
