@@ -184,7 +184,18 @@ public class Maps{
         FileHandle dest = findFile();
         file.copyTo(dest);
 
-        createNewPreview(loadMap(dest, true));
+        Map map = loadMap(dest, true);
+        Exception[] error = {null};
+
+        createNewPreview(map, e -> {
+            maps.remove(map);
+            error[0] = e;
+        });
+
+        if(error[0] != null){
+            throw new IOException(error[0]);
+        }
+
     }
 
     /** Attempts to run the following code;
@@ -313,7 +324,7 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                createNewPreview(map);
+                createNewPreview(map, e -> Core.app.post(() -> map.texture = new Texture("sprites/error.png")));
             }
             previewList.clear();
         });
@@ -323,7 +334,7 @@ public class Maps{
         Core.app.post(() -> previewList.add(map));
     }
 
-    private void createNewPreview(Map map){
+    private void createNewPreview(Map map, Consumer<Exception> failed){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
@@ -337,9 +348,9 @@ public class Maps{
                     e.printStackTrace();
                 }
             });
-        }catch(IOException e){
+        }catch(Exception e){
+            failed.accept(e);
             Log.err("Failed to generate preview!", e);
-            Core.app.post(() -> map.texture = new Texture("sprites/error.png"));
         }
     }
 
