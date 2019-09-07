@@ -780,7 +780,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 Vars.ui.chatfrag.addMessage(text, null);
             }
         }else{
-            Call.sendMessage(con.id, text, null, null);
+            Call.sendMessage(con, text, null, null);
         }
     }
 
@@ -794,7 +794,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 Vars.ui.chatfrag.addMessage(text, fromName);
             }
         }else{
-            Call.sendMessage(con.id, text, fromName, from);
+            Call.sendMessage(con, text, fromName, from);
         }
     }
 

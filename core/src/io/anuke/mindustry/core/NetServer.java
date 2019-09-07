@@ -60,7 +60,7 @@ public class NetServer implements ApplicationListener{
 
         net.handleServer(Disconnect.class, (con, packet) -> {
             if(con.player != null){
-                onDisconnect(player, packet.reason);
+                onDisconnect(con.player, packet.reason);
             }
         });
 
@@ -104,7 +104,7 @@ public class NetServer implements ApplicationListener{
                 info.lastName = packet.name;
                 info.id = packet.uuid;
                 admins.save();
-                Call.onInfoMessage(con.id, "You are not whitelisted here.");
+                Call.onInfoMessage(con, "You are not whitelisted here.");
                 Log.info("&lcDo &lywhitelist-add {0}&lc to whitelist the player &lb'{1}'", packet.uuid, packet.name);
                 con.kick(KickReason.whitelist);
                 return;
@@ -180,7 +180,7 @@ public class NetServer implements ApplicationListener{
                 Log.info("Auto-assigned player {0} to team {1}.", player.name, player.getTeam());
             }
 
-            sendWorldData(player, con.id);
+            sendWorldData(player);
 
             platform.updateRPC();
 
@@ -293,14 +293,14 @@ public class NetServer implements ApplicationListener{
                 for(Player p : playerGroup.all()){
                     if(p.isAdmin || p.con == null || p == player) continue;
 
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.con.id).append(")\n");
+                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id).append(")\n");
                 }
                 player.sendMessage(builder.toString());
             }else{
                 Player found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
                     int id = Strings.parseInt(args[0].substring(1));
-                    found = playerGroup.find(p -> p.con != null && p.con.id == id);
+                    found = playerGroup.find(p -> p.id == id);
                 }else{
                     found = playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
@@ -356,8 +356,8 @@ public class NetServer implements ApplicationListener{
             if(player.isLocal){
                 player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
             }else{
-                Call.onWorldDataBegin(player.con.id);
-                netServer.sendWorldData(player, player.con.id);
+                Call.onWorldDataBegin(player.con);
+                netServer.sendWorldData(player);
             }
         });
     }
@@ -382,13 +382,13 @@ public class NetServer implements ApplicationListener{
         });
     }
 
-    public void sendWorldData(Player player, int clientID){
+    public void sendWorldData(Player player){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
         NetworkIO.writeWorld(player, def);
         WorldStream data = new WorldStream();
         data.stream = new ByteArrayInputStream(stream.toByteArray());
-        net.sendStream(clientID, data);
+        player.con.sendStream(data);
 
         Log.debug("Packed {0} compressed bytes of world data.", stream.size());
     }
@@ -487,7 +487,7 @@ public class NetServer implements ApplicationListener{
             newx = x;
             newy = y;
         }else if(Mathf.dst(x, y, newx, newy) > correctDist){
-            Call.onPositionSet(player.con.id, newx, newy); //teleport and correct position when necessary
+            Call.onPositionSet(player.con, newx, newy); //teleport and correct position when necessary
         }
 
         //reset player to previous synced position so it gets interpolated
@@ -530,7 +530,7 @@ public class NetServer implements ApplicationListener{
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid, other.con.modclient, other.con.mobile);
             if(player.con != null){
-                Call.onTraceInfo(player.con.id, other, info);
+                Call.onTraceInfo(player.con, other, info);
             }else{
                 NetClient.onTraceInfo(other, info);
             }
@@ -599,7 +599,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.onStateSnapshot(player.con.id, state.wavetime, state.wave, state.enemies(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.onStateSnapshot(player.con, state.wavetime, state.wave, state.enemies(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
@@ -630,7 +630,7 @@ public class NetServer implements ApplicationListener{
                 if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
                     byte[] syncBytes = syncStream.toByteArray();
-                    Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+                    Call.onEntitySnapshot(player.con, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
                     sent = 0;
                     syncStream.reset();
                 }
@@ -640,7 +640,7 @@ public class NetServer implements ApplicationListener{
                 dataStream.close();
 
                 byte[] syncBytes = syncStream.toByteArray();
-                Call.onEntitySnapshot(player.con.id, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+                Call.onEntitySnapshot(player.con, (byte)group.getID(), (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
             }
         }
     }

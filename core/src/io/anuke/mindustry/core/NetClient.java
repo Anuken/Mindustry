@@ -201,7 +201,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void onPing(Player player, long time){
-        Call.onPingResponse(player.id, time);
+        Call.onPingResponse(player.con, time);
     }
 
     @Remote(variants = Variant.one)

@@ -816,7 +816,7 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
-                netServer.sendWorldData(p, p.con.id);
+                netServer.sendWorldData(p);
             }
             inExtraRound = false;
         };

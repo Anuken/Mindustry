@@ -174,7 +174,6 @@ public class Vars implements Loadable{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
 
     @Override

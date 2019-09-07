@@ -38,7 +38,6 @@ public class PacketSerializer implements NetSerializer{
         }
     }
 
-
     public static void writeFramework(ByteBuffer buffer, FrameworkMessage message){
         if(message instanceof Ping){
             Ping p = (Ping)message;

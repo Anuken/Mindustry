@@ -85,12 +85,12 @@ public class RemoteWriteGenerator{
 
         //if toAll is false, it's a 'send to one player' variant, so add the player as a parameter
         if(!toAll){
-            method.addParameter(int.class, "playerClientID");
+            method.addParameter(ClassName.bestGuess("io.anuke.mindustry.net.NetConnection"), "playerConnection");
         }
 
         //add sender to ignore
         if(forwarded){
-            method.addParameter(int.class, "exceptSenderID");
+            method.addParameter(ClassName.bestGuess("io.anuke.mindustry.net.NetConnection"), "exceptConnection");
         }
 
         //call local method if applicable, shouldn't happen when forwarding method as that already happens by default
@@ -194,18 +194,18 @@ public class RemoteWriteGenerator{
 
         if(forwarded){ //forward packet
             if(!methodEntry.local.isClient){ //if the client doesn't get it called locally, forward it back after validation
-                sendString = "send(";
+                sendString = "io.anuke.mindustry.Vars.net.send(";
             }else{
-                sendString = "sendExcept(exceptSenderID, ";
+                sendString = "io.anuke.mindustry.Vars.net.sendExcept(exceptConnection, ";
             }
         }else if(toAll){ //send to all players / to server
-            sendString = "send(";
+            sendString = "io.anuke.mindustry.Vars.net.send(";
         }else{ //send to specific client from server
-            sendString = "sendTo(playerClientID, ";
+            sendString = "playerConnection.send(";
         }
 
         //send the actual packet
-        method.addStatement("io.anuke.mindustry.Vars.net." + sendString + "packet, " +
+        method.addStatement(sendString + "packet, " +
         (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp") + ")");
 
 

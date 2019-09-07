@@ -41,7 +41,6 @@ public class Packets{
     }
 
     public static class Connect implements Packet{
-        public int id;
         public String addressTCP;
 
         @Override
@@ -51,7 +50,6 @@ public class Packets{
     }
 
     public static class Disconnect implements Packet{
-        public int id;
         public String reason;
 
         @Override

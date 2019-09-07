@@ -34,7 +34,6 @@ public class ArcNetImpl implements NetProvider{
             public void connected(Connection connection){
                 Connect c = new Connect();
                 c.addressTCP = connection.getRemoteAddressTCP().getAddress().getHostAddress();
-                c.id = connection.getID();
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 Core.app.post(() -> net.handleClientReceived(c));
@@ -83,7 +82,6 @@ public class ArcNetImpl implements NetProvider{
                 ArcConnection kn = new ArcConnection(ip, connection);
 
                 Connect c = new Connect();
-                c.id = kn.id;
                 c.addressTCP = ip;
 
                 Log.debug("&bRecieved connection: {0}", c.addressTCP);
@@ -98,7 +96,6 @@ public class ArcNetImpl implements NetProvider{
                 if(k == null) return;
 
                 Disconnect c = new Disconnect();
-                c.id = k.id;
                 c.reason = reason.toString();
 
                 Core.app.post(() -> {
@@ -228,44 +225,17 @@ public class ArcNetImpl implements NetProvider{
 
     @Override
     public void dispose(){
+        disconnectClient();
+        closeServer();
         try{
             client.dispose();
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(IOException ignored){
         }
     }
 
     @Override
     public Iterable<ArcConnection> getConnections(){
         return connections;
-    }
-
-    @Override
-    public void sendServerStream(int id, Streamable stream){
-        ArcConnection connection = (ArcConnection)getConnection(id);
-        if(connection == null) return;
-
-        connection.connection.addListener(new InputStreamSender(stream.stream, 512){
-            int id;
-
-            @Override
-            protected void start(){
-                //send an object so the receiving side knows how to handle the following chunks
-                StreamBegin begin = new StreamBegin();
-                begin.total = stream.stream.available();
-                begin.type = Registrator.getID(stream.getClass());
-                connection.connection.sendTCP(begin);
-                id = begin.id;
-            }
-
-            @Override
-            protected Object next(byte[] bytes){
-                StreamChunk chunk = new StreamChunk();
-                chunk.id = id;
-                chunk.data = bytes;
-                return chunk; //wrap the byte[] with an object so the receiving side knows how to handle it.
-            }
-        });
     }
 
     @Override
@@ -312,6 +282,31 @@ public class ArcNetImpl implements NetProvider{
         @Override
         public boolean isConnected(){
             return connection.isConnected();
+        }
+
+        @Override
+        public void sendStream(Streamable stream){
+            connection.addListener(new InputStreamSender(stream.stream, 512){
+                int id;
+
+                @Override
+                protected void start(){
+                    //send an object so the receiving side knows how to handle the following chunks
+                    StreamBegin begin = new StreamBegin();
+                    begin.total = stream.stream.available();
+                    begin.type = Registrator.getID(stream.getClass());
+                    connection.sendTCP(begin);
+                    id = begin.id;
+                }
+
+                @Override
+                protected Object next(byte[] bytes){
+                    StreamChunk chunk = new StreamChunk();
+                    chunk.id = id;
+                    chunk.data = bytes;
+                    return chunk; //wrap the byte[] with an object so the receiving side knows how to handle it.
+                }
+            });
         }
 
         @Override

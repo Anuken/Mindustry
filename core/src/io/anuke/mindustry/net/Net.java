@@ -134,7 +134,7 @@ public class Net{
      */
     public void closeServer(){
         for(NetConnection con : getConnections()){
-            Call.onKick(con.id, KickReason.serverClose);
+            Call.onKick(con, KickReason.serverClose);
         }
 
         provider.closeServer();
@@ -176,43 +176,24 @@ public class Net{
         return (Iterable<NetConnection>)provider.getConnections();
     }
 
-    /**
-     * Returns a connection by ID
-     */
-    public NetConnection getConnection(int id){
-        return provider.getConnection(id);
-    }
-
-    /**
-     * Send an object to all connected clients, or to the server if this is a client.
-     */
+    /** Send an object to all connected clients, or to the server if this is a client.*/
     public void send(Object object, SendMode mode){
         if(server){
-            provider.sendServer(object, mode);
+            for(NetConnection con : provider.getConnections()){
+                con.send(object, mode);
+            }
         }else{
             provider.sendClient(object, mode);
         }
     }
 
-    /**
-     * Send an object to a certain client. Server-side only
-     */
-    public void sendTo(int id, Object object, SendMode mode){
-        provider.sendServerTo(id, object, mode);
-    }
-
-    /**
-     * Send an object to everyone EXCEPT certain client. Server-side only
-     */
-    public void sendExcept(int id, Object object, SendMode mode){
-        provider.sendServerExcept(id, object, mode);
-    }
-
-    /**
-     * Send a stream to a specific client. Server-side only.
-     */
-    public void sendStream(int id, Streamable stream){
-        provider.sendServerStream(id, stream);
+    /** Send an object to everyone EXCEPT a certain client. Server-side only.*/
+    public void sendExcept(NetConnection except, Object object, SendMode mode){
+        for(NetConnection con : getConnections()){
+            if(con != except){
+                con.send(object, mode);
+            }
+        }
     }
 
     /**
@@ -329,7 +310,7 @@ public class Net{
 
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
-         * Callback should be run on libGDX main thread.
+         * Callback should be run on the main thread.
          * @param done is the callback that should run after discovery.
          */
         void discoverServers(Consumer<Host> callback, Runnable done);
@@ -339,65 +320,6 @@ public class Net{
 
         /** Host a server at specified port. */
         void hostServer(int port) throws IOException;
-
-        /** Sends a large stream of data to a specific client. */
-        default void sendServerStream(int id, Streamable stream){
-            NetConnection connection = getConnection(id);
-            if(connection == null) return;
-            try{
-                int cid;
-                StreamBegin begin = new StreamBegin();
-                begin.total = stream.stream.available();
-                begin.type = Registrator.getID(stream.getClass());
-                connection.send(begin, SendMode.tcp);
-                cid = begin.id;
-
-                while(stream.stream.available() > 0){
-                    byte[] bytes = new byte[Math.min(512, stream.stream.available())];
-                    stream.stream.read(bytes);
-
-                    StreamChunk chunk = new StreamChunk();
-                    chunk.id = cid;
-                    chunk.data = bytes;
-                    connection.send(chunk, SendMode.tcp);
-                }
-            }catch(IOException e){
-                throw new RuntimeException(e);
-            }
-        }
-
-        default void sendServer(Object object, SendMode mode){
-            for(NetConnection con : getConnections()){
-                con.send(object, mode);
-            }
-        }
-
-        default void sendServerTo(int id, Object object, SendMode mode){
-            NetConnection conn = getConnection(id);
-            if(conn == null){
-                Log.err("Failed to find connection with ID {0}.", id);
-                return;
-            }
-            conn.send(object, mode);
-        }
-
-        default void sendServerExcept(int id, Object object, SendMode mode){
-            for(NetConnection con : getConnections()){
-                if(con.id != id){
-                    con.send(object, mode);
-                }
-            }
-        }
-
-        /** Returns a connection by ID. */
-        default NetConnection getConnection(int id){
-            for(NetConnection con : getConnections()){
-                if(con.id == id){
-                    return con;
-                }
-            }
-            return null;
-        }
 
         /** Return all connected users. */
         Iterable<? extends NetConnection> getConnections();

@@ -34,6 +34,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
     final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
 
     final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
+    final CopyOnWriteArrayList<NetConnection> connectionsOut = new CopyOnWriteArrayList<>();
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
     final ObjectMap<String, SteamID> lobbyIDs = new ObjectMap<>();
 
@@ -149,11 +150,12 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
-        //no
+        provider.pingHost(address, port, valid, failed);
     }
 
     @Override
     public void hostServer(int port) throws IOException{
+        provider.hostServer(port);
         smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 32);
     }
 
@@ -165,6 +167,8 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public void closeServer(){
+        provider.closeServer();
+
         if(currentLobby != null){
             smat.leaveLobby(currentLobby);
             for(SteamConnection con : steamConnections.values()){
@@ -178,7 +182,11 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public Iterable<? extends NetConnection> getConnections(){
-        return connections;
+        //merge provider connections
+        connectionsOut.clear();
+        connectionsOut.addAll(connections);
+        for(NetConnection c : provider.getConnections()) connectionsOut.add(c);
+        return connectionsOut;
     }
 
     void disconnectSteamUser(SteamID steamid){
@@ -351,7 +359,6 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
             if(!steamConnections.containsKey(steamIDRemote.getAccountID())){
                 SteamConnection con = new SteamConnection(steamIDRemote);
                 Connect c = new Connect();
-                c.id = con.id;
                 c.addressTCP = "steam:" + steamIDRemote.getAccountID();
 
                 Log.info("&bRecieved connection: {0}", c.addressTCP);
