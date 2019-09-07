@@ -25,7 +25,6 @@ public abstract class NetConnection{
     public boolean hasConnected, hasBegunConnecting;
     public float viewWidth, viewHeight, viewX, viewY;
 
-    /** Assigns this connection a unique ID. No two connections will ever have the same ID.*/
     public NetConnection(String address){
         this.address = address;
     }

@@ -297,7 +297,7 @@ public class Net{
         tcp, udp
     }
 
-    /** Client implementation. */
+    /** Networking implementation. */
     public interface NetProvider{
         /** Connect to a server. */
         void connectClient(String ip, int port, Runnable success) throws IOException;

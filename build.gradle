@@ -151,7 +151,6 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
 
         if(debugged()) compile project(":debug")
 
@@ -189,7 +188,6 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compileOnly project(":annotations")
 
         compile arcModule("backends:backend-robovm")
@@ -254,7 +252,6 @@ project(":server"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compile arcModule("backends:backend-headless")
     }
 }
@@ -296,14 +293,6 @@ project(":annotations"){
     dependencies{
         compile 'com.squareup:javapoet:1.11.0'
         compile files("${System.getProperty('java.home')}/../lib/tools.jar")
-    }
-}
-
-project(":net"){
-    apply plugin: "java"
-
-    dependencies{
-        compile project(":core")
     }
 }
 

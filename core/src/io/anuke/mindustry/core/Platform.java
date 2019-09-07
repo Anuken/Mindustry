@@ -7,6 +7,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
@@ -15,7 +16,9 @@ import static io.anuke.mindustry.Vars.mobile;
 public interface Platform{
 
     /** Get the networking implementation.*/
-    NetProvider getNet();
+    default NetProvider getNet(){
+        return new ArcNetImpl();
+    }
 
     /** Steam: Update lobby visibility.*/
     default void updateLobby(){

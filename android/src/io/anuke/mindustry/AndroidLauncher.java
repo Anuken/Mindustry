@@ -17,8 +17,6 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -40,11 +38,6 @@ public class AndroidLauncher extends AndroidApplication{
         }
 
         initialize(new ClientLauncher(){
-
-            @Override
-            public NetProvider getNet(){
-                return new ArcNetImpl();
-            }
 
             @Override
             public void hide(){
