@@ -36,11 +36,6 @@ public interface Platform{
         });
     }
 
-    /** Request external read/write perms. Run callback when complete.*/
-    default void requestExternalPerms(Runnable callback){
-        callback.run();
-    }
-
     /** Update discord RPC. */
     default void updateRPC(){
     }
