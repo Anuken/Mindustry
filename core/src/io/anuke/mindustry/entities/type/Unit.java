@@ -78,7 +78,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        if(!Net.client()){
+        if(!net.client()){
             super.damage(calculateDamage(amount));
         }
         hitTime = hitDuration;
@@ -308,7 +308,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f && !Net.client()){
+            if(drownTime >= 0.999f && !net.client()){
                 damage(health + 1);
             }
 
@@ -347,7 +347,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void applyEffect(StatusEffect effect, float duration){
-        if(dead || Net.client()) return; //effects are synced and thus not applied through clients
+        if(dead || net.client()) return; //effects are synced and thus not applied through clients
         status.handleApply(this, effect, duration);
     }
 

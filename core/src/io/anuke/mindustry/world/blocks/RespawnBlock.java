@@ -4,9 +4,10 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+
+import static io.anuke.mindustry.Vars.net;
 
 public class RespawnBlock{
     
@@ -64,7 +65,7 @@ public class RespawnBlock{
         }
         Draw.reset();
 
-        if(Net.active() && player != null){
+        if(net.active() && player != null){
             tile.block().drawPlaceText(player.name, tile.x, tile.y - (Math.max((tile.block().size-1)/2, 0)), true);
         }
     }

@@ -1,28 +1,23 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Input.TextInput;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.Input.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.Label;
-import io.anuke.arc.scene.ui.Label.LabelStyle;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.UnitScl;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.Binding;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.Label.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.input.*;
 
-import static io.anuke.arc.Core.input;
-import static io.anuke.arc.Core.scene;
-import static io.anuke.mindustry.Vars.maxTextLength;
-import static io.anuke.mindustry.Vars.mobile;
+import static io.anuke.arc.Core.*;
+import static io.anuke.mindustry.Vars.net;
+import static io.anuke.mindustry.Vars.*;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
@@ -53,7 +48,7 @@ public class ChatFragment extends Table{
         font = scene.skin.getFont("default");
 
         visible(() -> {
-            if(!Net.active() && messages.size > 0){
+            if(!net.active() && messages.size > 0){
                 clearMessages();
 
                 if(chatOpen){
@@ -61,12 +56,12 @@ public class ChatFragment extends Table{
                 }
             }
 
-            return Net.active();
+            return net.active();
         });
 
         update(() -> {
 
-            if(Net.active() && input.keyTap(Binding.chat)){
+            if(net.active() && input.keyTap(Binding.chat)){
                 toggle();
             }
 

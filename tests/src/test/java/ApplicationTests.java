@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
@@ -42,6 +43,7 @@ public class ApplicationTests{
                 @Override
                 public void setup(){
                     headless = true;
+                    net = new Net(null);
                     Vars.init();
                     content.createContent();
 

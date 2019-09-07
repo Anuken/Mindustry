@@ -29,7 +29,7 @@ public class PlayerListFragment extends Fragment{
         parent.fill(cont -> {
             cont.visible(() -> visible);
             cont.update(() -> {
-                if(!(Net.active() && !state.is(State.menu))){
+                if(!(net.active() && !state.is(State.menu))){
                     visible = false;
                     return;
                 }
@@ -52,8 +52,8 @@ public class PlayerListFragment extends Fragment{
                 pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
 
-                    menu.addButton("$server.bans", ui.bans::show).disabled(b -> Net.client());
-                    menu.addButton("$server.admins", ui.admins::show).disabled(b -> Net.client());
+                    menu.addButton("$server.bans", ui.bans::show).disabled(b -> net.client());
+                    menu.addButton("$server.admins", ui.admins::show).disabled(b -> net.client());
                     menu.addButton("$close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
@@ -72,7 +72,7 @@ public class PlayerListFragment extends Fragment{
         playerGroup.all().each(user -> {
             NetConnection connection = user.con;
 
-            if(connection == null && Net.server() && !user.isLocal) return;
+            if(connection == null && net.server() && !user.isLocal) return;
 
             Table button = new Table();
             button.left();
@@ -96,9 +96,9 @@ public class PlayerListFragment extends Fragment{
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && Net.server())).padRight(5).get().updateVisibility();
+            button.addImage("icon-admin").size(iconsize).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
 
-            if((Net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || Net.server())){
+            if((net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || net.server())){
                 button.add().growY();
 
                 float bs = (h) / 2f;
@@ -114,7 +114,7 @@ public class PlayerListFragment extends Fragment{
                     t.row();
 
                     t.addImageButton("icon-admin-small", "clear-toggle-partial", iconsizesmall, () -> {
-                        if(Net.client()) return;
+                        if(net.client()) return;
 
                         String id = user.uuid;
 
@@ -125,8 +125,8 @@ public class PlayerListFragment extends Fragment{
                         }
                     })
                     .update(b -> b.setChecked(user.isAdmin))
-                    .disabled(b -> Net.client())
-                    .touchable(() -> Net.client() ? Touchable.disabled : Touchable.enabled)
+                    .disabled(b -> net.client())
+                    .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
                     .checked(user.isAdmin);
 
                     t.addImageButton("icon-zoom-small", "clear-partial", iconsizesmall, () -> Call.onAdminRequest(user, AdminAction.trace));

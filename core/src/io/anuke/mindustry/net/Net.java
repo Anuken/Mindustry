@@ -17,20 +17,25 @@ import static io.anuke.mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Net{
-    private static boolean server;
-    private static boolean active;
-    private static boolean clientLoaded;
-    private static Array<Object> packetQueue = new Array<>();
-    private static ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
-    private static ObjectMap<Class<?>, BiConsumer<Integer, Object>> serverListeners = new ObjectMap<>();
-    private static ClientProvider clientProvider;
-    private static ServerProvider serverProvider;
-    private static IntMap<StreamBuilder> streams = new IntMap<>();
-    private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-    private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
+    private boolean server;
+    private boolean active;
+    private boolean clientLoaded;
+
+    private final Array<Object> packetQueue = new Array<>();
+    private final ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
+    private final ObjectMap<Class<?>, BiConsumer<NetConnection, Object>> serverListeners = new ObjectMap<>();
+    private final IntMap<StreamBuilder> streams = new IntMap<>();
+
+    private final NetProvider provider;
+    private final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+    private final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
+
+    public Net(NetProvider provider){
+        this.provider = provider;
+    }
 
     /** Display a network error. Call on the graphics thread. */
-    public static void showError(Throwable e){
+    public void showError(Throwable e){
 
         if(!headless){
 
@@ -67,7 +72,7 @@ public class Net{
             }
             ui.loadfrag.hide();
 
-            if(Net.client()){
+            if(client()){
                 netClient.disconnectQuietly();
             }
         }
@@ -78,7 +83,7 @@ public class Net{
     /**
      * Sets the client loaded status, or whether it will recieve normal packets from the server.
      */
-    public static void setClientLoaded(boolean loaded){
+    public void setClientLoaded(boolean loaded){
         clientLoaded = loaded;
 
         if(loaded){
@@ -91,7 +96,7 @@ public class Net{
         packetQueue.clear();
     }
 
-    public static void setClientConnected(){
+    public void setClientConnected(){
         active = true;
         server = false;
     }
@@ -99,10 +104,10 @@ public class Net{
     /**
      * Connect to an address.
      */
-    public static void connect(String ip, int port, Runnable success){
+    public void connect(String ip, int port, Runnable success){
         try{
             if(!active){
-                clientProvider.connect(ip, port, success);
+                provider.connectClient(ip, port, success);
                 active = true;
                 server = false;
             }else{
@@ -116,8 +121,8 @@ public class Net{
     /**
      * Host a server at an address.
      */
-    public static void host(int port) throws IOException{
-        serverProvider.host(port);
+    public void host(int port) throws IOException{
+        provider.hostServer(port);
         active = true;
         server = true;
 
@@ -127,32 +132,32 @@ public class Net{
     /**
      * Closes the server.
      */
-    public static void closeServer(){
+    public void closeServer(){
         for(NetConnection con : getConnections()){
             Call.onKick(con.id, KickReason.serverClose);
         }
 
-        serverProvider.close();
+        provider.closeServer();
         server = false;
         active = false;
     }
 
-    public static void reset(){
+    public void reset(){
         closeServer();
         netClient.disconnectNoReset();
     }
 
-    public static void disconnect(){
-        clientProvider.disconnect();
+    public void disconnect(){
+        provider.disconnectClient();
         server = false;
         active = false;
     }
 
-    public static byte[] compressSnapshot(byte[] input){
+    public byte[] compressSnapshot(byte[] input){
         return compressor.compress(input);
     }
 
-    public static byte[] decompressSnapshot(byte[] input, int size){
+    public byte[] decompressSnapshot(byte[] input, int size){
         return decompressor.decompress(input, size);
     }
 
@@ -160,88 +165,74 @@ public class Net{
      * Starts discovering servers on a different thread.
      * Callback is run on the main libGDX thread.
      */
-    public static void discoverServers(Consumer<Host> cons, Runnable done){
-        clientProvider.discover(cons, done);
+    public void discoverServers(Consumer<Host> cons, Runnable done){
+        provider.discoverServers(cons, done);
     }
 
     /**
      * Returns a list of all connections IDs.
      */
-    public static Iterable<NetConnection> getConnections(){
-        return (Iterable<NetConnection>)serverProvider.getConnections();
+    public Iterable<NetConnection> getConnections(){
+        return (Iterable<NetConnection>)provider.getConnections();
     }
 
     /**
      * Returns a connection by ID
      */
-    public static NetConnection getConnection(int id){
-        return serverProvider.getByID(id);
+    public NetConnection getConnection(int id){
+        return provider.getConnection(id);
     }
 
     /**
      * Send an object to all connected clients, or to the server if this is a client.
      */
-    public static void send(Object object, SendMode mode){
+    public void send(Object object, SendMode mode){
         if(server){
-            if(serverProvider != null) serverProvider.sendServer(object, mode);
+            provider.sendServer(object, mode);
         }else{
-            if(clientProvider != null) clientProvider.sendClient(object, mode);
+            provider.sendClient(object, mode);
         }
     }
 
     /**
      * Send an object to a certain client. Server-side only
      */
-    public static void sendTo(int id, Object object, SendMode mode){
-        serverProvider.sendServerTo(id, object, mode);
+    public void sendTo(int id, Object object, SendMode mode){
+        provider.sendServerTo(id, object, mode);
     }
 
     /**
      * Send an object to everyone EXCEPT certain client. Server-side only
      */
-    public static void sendExcept(int id, Object object, SendMode mode){
-        serverProvider.sendServerExcept(id, object, mode);
+    public void sendExcept(int id, Object object, SendMode mode){
+        provider.sendServerExcept(id, object, mode);
     }
 
     /**
      * Send a stream to a specific client. Server-side only.
      */
-    public static void sendStream(int id, Streamable stream){
-        serverProvider.sendServerStream(id, stream);
-    }
-
-    /**
-     * Sets the net clientProvider, e.g. what handles sending, recieving and connecting to a server.
-     */
-    public static void setClientProvider(ClientProvider provider){
-        Net.clientProvider = provider;
-    }
-
-    /**
-     * Sets the net serverProvider, e.g. what handles hosting a server.
-     */
-    public static void setServerProvider(ServerProvider provider){
-        Net.serverProvider = provider;
+    public void sendStream(int id, Streamable stream){
+        provider.sendServerStream(id, stream);
     }
 
     /**
      * Registers a client listener for when an object is recieved.
      */
-    public static <T> void handleClient(Class<T> type, Consumer<T> listener){
+    public <T> void handleClient(Class<T> type, Consumer<T> listener){
         clientListeners.put(type, listener);
     }
 
     /**
      * Registers a server listener for when an object is recieved.
      */
-    public static <T> void handleServer(Class<T> type, BiConsumer<Integer, T> listener){
-        serverListeners.put(type, (BiConsumer<Integer, Object>)listener);
+    public <T> void handleServer(Class<T> type, BiConsumer<NetConnection, T> listener){
+        serverListeners.put(type, (BiConsumer<NetConnection, Object>)listener);
     }
 
     /**
      * Call to handle a packet being recieved for the client.
      */
-    public static void handleClientReceived(Object object){
+    public void handleClientReceived(Object object){
 
         if(object instanceof StreamBegin){
             StreamBegin b = (StreamBegin)object;
@@ -276,7 +267,7 @@ public class Net{
     /**
      * Call to handle a packet being recieved for the server.
      */
-    public static void handleServerReceived(int connection, Object object){
+    public void handleServerReceived(NetConnection connection, Object object){
 
         if(serverListeners.get(object.getClass()) != null){
             if(serverListeners.get(object.getClass()) != null)
@@ -290,50 +281,33 @@ public class Net{
     /**
      * Pings a host in an new thread. If an error occured, failed() should be called with the exception.
      */
-    public static void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
-        clientProvider.pingHost(address, port, valid, failed);
-    }
-
-    /**
-     * Update client ping.
-     */
-    public static void updatePing(){
-        clientProvider.updatePing();
-    }
-
-    /**
-     * Get the client ping. Only valid after updatePing().
-     */
-    public static int getPing(){
-        return server() ? 0 : clientProvider.getPing();
+    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
+        provider.pingHost(address, port, valid, failed);
     }
 
     /**
      * Whether the net is active, e.g. whether this is a multiplayer game.
      */
-    public static boolean active(){
+    public boolean active(){
         return active;
     }
 
     /**
      * Whether this is a server or not.
      */
-    public static boolean server(){
+    public boolean server(){
         return server && active;
     }
 
     /**
      * Whether this is a client or not.
      */
-    public static boolean client(){
+    public boolean client(){
         return !server && active;
     }
 
-    public static void dispose(){
-        if(clientProvider != null) clientProvider.dispose();
-        if(serverProvider != null) serverProvider.close();
-        clientProvider = null;
-        serverProvider = null;
+    public void dispose(){
+        provider.dispose();
         server = false;
         active = false;
     }
@@ -343,46 +317,32 @@ public class Net{
     }
 
     /** Client implementation. */
-    public interface ClientProvider{
+    public interface NetProvider{
         /** Connect to a server. */
-        void connect(String ip, int port, Runnable success) throws IOException;
+        void connectClient(String ip, int port, Runnable success) throws IOException;
 
         /** Send an object to the server. */
         void sendClient(Object object, SendMode mode);
 
-        /** Update the ping. Should be done every second or so. */
-        void updatePing();
-
-        /** Get ping in milliseconds. Will only be valid after a call to updatePing. */
-        int getPing();
-
         /** Disconnect from the server. */
-        void disconnect();
+        void disconnectClient();
 
         /**
          * Discover servers. This should run the callback regardless of whether any servers are found. Should not block.
          * Callback should be run on libGDX main thread.
          * @param done is the callback that should run after discovery.
          */
-        void discover(Consumer<Host> callback, Runnable done);
+        void discoverServers(Consumer<Host> callback, Runnable done);
 
         /** Ping a host. If an error occured, failed() should be called with the exception. */
         void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
 
-        /** Close all connections. */
-        default void dispose(){
-            disconnect();
-        }
-    }
-
-    /** Server implementation. */
-    public interface ServerProvider{
         /** Host a server at specified port. */
-        void host(int port) throws IOException;
+        void hostServer(int port) throws IOException;
 
         /** Sends a large stream of data to a specific client. */
         default void sendServerStream(int id, Streamable stream){
-            NetConnection connection = getByID(id);
+            NetConnection connection = getConnection(id);
             if(connection == null) return;
             try{
                 int cid;
@@ -413,7 +373,7 @@ public class Net{
         }
 
         default void sendServerTo(int id, Object object, SendMode mode){
-            NetConnection conn = getByID(id);
+            NetConnection conn = getConnection(id);
             if(conn == null){
                 Log.err("Failed to find connection with ID {0}.", id);
                 return;
@@ -429,13 +389,26 @@ public class Net{
             }
         }
 
-        /** Close the server connection. */
-        void close();
+        /** Returns a connection by ID. */
+        default NetConnection getConnection(int id){
+            for(NetConnection con : getConnections()){
+                if(con.id == id){
+                    return con;
+                }
+            }
+            return null;
+        }
 
         /** Return all connected users. */
         Iterable<? extends NetConnection> getConnections();
 
-        /** Returns a connection by ID. */
-        NetConnection getByID(int id);
+        /** Close the server connection. */
+        void closeServer();
+
+        /** Close all connections. */
+        default void dispose(){
+            disconnectClient();
+            closeServer();
+        }
     }
 }

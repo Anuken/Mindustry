@@ -10,8 +10,8 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -28,8 +28,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     protected IOSApplication createApplication(){
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
             UnitScl.dp.addition = 0.5f;
@@ -39,6 +37,11 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
+
+            @Override
+            public NetProvider getNet(){
+                return new ArcNetImpl();
+            }
 
             @Override
             public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){

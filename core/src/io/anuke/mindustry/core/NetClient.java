@@ -40,6 +40,7 @@ public class NetClient implements ApplicationListener{
     private final static float playerSyncTime = 2;
     public final static float viewScale = 2f;
 
+    private long ping;
     private Interval timer = new Interval(5);
     /** Whether the client is currently connecting. */
     private boolean connecting = false;
@@ -60,7 +61,7 @@ public class NetClient implements ApplicationListener{
 
     public NetClient(){
 
-        Net.handleClient(Connect.class, packet -> {
+        net.handleClient(Connect.class, packet -> {
             Log.info("Connecting to server: {0}", packet.addressTCP);
 
             player.isAdmin = false;
@@ -74,7 +75,7 @@ public class NetClient implements ApplicationListener{
                 ui.loadfrag.hide();
                 connecting = false;
                 quiet = true;
-                Net.disconnect();
+                net.disconnect();
             });
 
             ConnectPacket c = new ConnectPacket();
@@ -92,10 +93,10 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
-            Net.send(c, SendMode.tcp);
+            net.send(c, SendMode.tcp);
         });
 
-        Net.handleClient(Disconnect.class, packet -> {
+        net.handleClient(Disconnect.class, packet -> {
             if(quietReset) return;
 
             connecting = false;
@@ -120,14 +121,14 @@ public class NetClient implements ApplicationListener{
             }
         });
 
-        Net.handleClient(WorldStream.class, data -> {
+        net.handleClient(WorldStream.class, data -> {
             Log.info("Recieved world data: {0} bytes.", data.stream.available());
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
         });
 
-        Net.handleClient(InvokePacket.class, packet -> {
+        net.handleClient(InvokePacket.class, packet -> {
             packet.writeBuffer.position(0);
             RemoteReadClient.readPacket(packet.writeBuffer, packet.type);
         });
@@ -198,6 +199,16 @@ public class NetClient implements ApplicationListener{
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 
+    @Remote(targets = Loc.client)
+    public static void onPing(Player player, long time){
+        Call.onPingResponse(player.id, time);
+    }
+
+    @Remote(variants = Variant.one)
+    public static void onPingResponse(long time){
+        netClient.ping = Time.timeSinceMillis(time);
+    }
+
     @Remote(variants = Variant.one)
     public static void onTraceInfo(Player player, TraceInfo info){
         if(player != null){
@@ -233,7 +244,7 @@ public class NetClient implements ApplicationListener{
         logic.reset();
 
         ui.chatfrag.clearMessages();
-        Net.setClientLoaded(false);
+        net.setClientLoaded(false);
 
         ui.loadfrag.show("$connecting.data");
 
@@ -241,7 +252,7 @@ public class NetClient implements ApplicationListener{
             ui.loadfrag.hide();
             netClient.connecting = false;
             netClient.quiet = true;
-            Net.disconnect();
+            net.disconnect();
         });
     }
 
@@ -259,7 +270,7 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onEntitySnapshot(byte groupID, short amount, short dataLen, byte[] data){
         try{
-            netClient.byteStream.setBytes(Net.decompressSnapshot(data, dataLen));
+            netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
             EntityGroup group = entities.get(groupID);
@@ -315,7 +326,7 @@ public class NetClient implements ApplicationListener{
             state.wave = wave;
             state.enemies = enemies;
 
-            netClient.byteStream.setBytes(Net.decompressSnapshot(coreData, coreDataLen));
+            netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
 
             byte cores = input.readByte();
@@ -337,12 +348,12 @@ public class NetClient implements ApplicationListener{
 
     @Override
     public void update(){
-        if(!Net.client()) return;
+        if(!net.client()) return;
 
         if(!state.is(State.menu)){
             if(!connecting) sync();
         }else if(!connecting){
-            Net.disconnect();
+            net.disconnect();
         }else{ //...must be connecting
             timeoutTime += Time.delta();
             if(timeoutTime > dataTimeout){
@@ -350,7 +361,7 @@ public class NetClient implements ApplicationListener{
                 ui.loadfrag.hide();
                 quiet = true;
                 ui.showError("$disconnect.data");
-                Net.disconnect();
+                net.disconnect();
                 timeoutTime = 0f;
             }
         }
@@ -360,18 +371,22 @@ public class NetClient implements ApplicationListener{
         return connecting;
     }
 
+    public int getPing(){
+        return (int)ping;
+    }
+
     private void finishConnecting(){
         state.set(State.playing);
         connecting = false;
         ui.join.hide();
-        Net.setClientLoaded(true);
+        net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
         Core.app.post(() -> ui.loadfrag.hide());
     }
 
     private void reset(){
-        Net.setClientLoaded(false);
+        net.setClientLoaded(false);
         removed.clear();
         timeoutTime = 0f;
         connecting = true;
@@ -390,13 +405,13 @@ public class NetClient implements ApplicationListener{
     /** Disconnects, resetting state to the menu. */
     public void disconnectQuietly(){
         quiet = true;
-        Net.disconnect();
+        net.disconnect();
     }
 
     /** Disconnects, causing no further changes or reset.*/
     public void disconnectNoReset(){
         quiet = quietReset = true;
-        Net.disconnect();
+        net.disconnect();
     }
 
     /** When set, any disconnects will be ignored and no dialogs will be shown. */
@@ -435,7 +450,7 @@ public class NetClient implements ApplicationListener{
         }
 
         if(timer.get(1, 60)){
-            Net.updatePing();
+            Call.onPing(Time.millis());
         }
     }
 

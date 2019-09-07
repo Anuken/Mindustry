@@ -97,7 +97,7 @@ public class RemoteWriteGenerator{
         if(!forwarded && methodEntry.local != Loc.none){
             //add in local checks
             if(methodEntry.local != Loc.both){
-                method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !io.anuke.mindustry.net.Net.active())");
+                method.beginControlFlow("if(" + getCheckString(methodEntry.local) + " || !io.anuke.mindustry.Vars.net.active())");
             }
 
             //concatenate parameters
@@ -159,7 +159,7 @@ public class RemoteWriteGenerator{
             boolean writePlayerSkipCheck = methodEntry.where == Loc.both && i == 0;
 
             if(writePlayerSkipCheck){ //write begin check
-                method.beginControlFlow("if(io.anuke.mindustry.net.Net.server())");
+                method.beginControlFlow("if(io.anuke.mindustry.Vars.net.server())");
             }
 
             if(Utils.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
@@ -205,7 +205,7 @@ public class RemoteWriteGenerator{
         }
 
         //send the actual packet
-        method.addStatement("io.anuke.mindustry.net.Net." + sendString + "packet, " +
+        method.addStatement("io.anuke.mindustry.Vars.net." + sendString + "packet, " +
         (methodEntry.unreliable ? "io.anuke.mindustry.net.Net.SendMode.udp" : "io.anuke.mindustry.net.Net.SendMode.tcp") + ")");
 
 
@@ -217,8 +217,8 @@ public class RemoteWriteGenerator{
     }
 
     private String getCheckString(Loc loc){
-        return loc.isClient && loc.isServer ? "io.anuke.mindustry.net.Net.server() || io.anuke.mindustry.net.Net.client()" :
-        loc.isClient ? "io.anuke.mindustry.net.Net.client()" :
-        loc.isServer ? "io.anuke.mindustry.net.Net.server()" : "false";
+        return loc.isClient && loc.isServer ? "io.anuke.mindustry.Vars.net.server() || io.anuke.mindustry.Vars.net.client()" :
+        loc.isClient ? "io.anuke.mindustry.Vars.net.client()" :
+        loc.isServer ? "io.anuke.mindustry.Vars.net.server()" : "false";
     }
 }

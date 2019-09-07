@@ -36,7 +36,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         hidden(() -> {
             Sounds.back.play();
             if(!state.is(State.menu)){
-                if(!wasPaused || Net.active())
+                if(!wasPaused || net.active())
                     state.set(State.playing);
             }
         });

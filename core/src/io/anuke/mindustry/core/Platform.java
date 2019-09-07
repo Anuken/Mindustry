@@ -7,13 +7,17 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
 public interface Platform{
 
-    /**Steam: Update lobby visibility.*/
+    /** Get the networking implementation.*/
+    NetProvider getNet();
+
+    /** Steam: Update lobby visibility.*/
     default void updateLobby(){
 
     }
@@ -39,11 +43,6 @@ public interface Platform{
             };
             Core.input.getTextInput(input);
         });
-    }
-
-    /** Request external read/write perms. Run callback when complete.*/
-    default void requestExternalPerms(Runnable callback){
-        callback.run();
     }
 
     /** Update discord RPC. */

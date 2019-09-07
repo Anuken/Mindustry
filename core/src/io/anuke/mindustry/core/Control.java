@@ -17,7 +17,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
@@ -29,6 +28,7 @@ import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.net;
 
 /**
  * Control module.
@@ -67,7 +67,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> Core.app.post(() -> {
-                if(Net.active() && player.getClosestCore() != null){
+                if(net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
                     Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
@@ -99,7 +99,7 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != null && !Net.client()){
+            if(state.rules.zone != null && !net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
@@ -109,9 +109,9 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
-            if(state.rules.pvp && !Net.active()){
+            if(state.rules.pvp && !net.active()){
                 try{
-                    Net.host(port);
+                    net.host(port);
                     player.isAdmin = true;
                 }catch(IOException e){
                     ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
@@ -210,7 +210,7 @@ public class Control implements ApplicationListener, Loadable{
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;
@@ -229,7 +229,7 @@ public class Control implements ApplicationListener, Loadable{
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
 
             world.beginMapLoad();
 
@@ -284,7 +284,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void dispose(){
         content.dispose();
-        Net.dispose();
+        net.dispose();
         Musics.dispose();
         Sounds.dispose();
         ui.editor.dispose();

@@ -100,7 +100,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void placed(Tile tile){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;

@@ -1,12 +1,11 @@
 package io.anuke.mindustry;
 
-import android.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
 import android.net.*;
-import android.os.*;
 import android.os.Build.*;
+import android.os.*;
 import android.provider.Settings.*;
 import android.telephony.*;
 import io.anuke.arc.*;
@@ -18,13 +17,12 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.System;
-import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -41,9 +39,12 @@ public class AndroidLauncher extends AndroidApplication{
             UnitScl.dp.addition = 0.5f;
         }
 
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
         initialize(new ClientLauncher(){
+
+            @Override
+            public NetProvider getNet(){
+                return new ArcNetImpl();
+            }
 
             @Override
             public void hide(){
@@ -65,24 +66,6 @@ public class AndroidLauncher extends AndroidApplication{
                     return result;
                 }catch(Exception e){
                     return super.getUUID();
-                }
-            }
-
-            @Override
-            public void requestExternalPerms(Runnable callback){
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    callback.run();
-                }else{
-                    permCallback = callback;
-                    ArrayList<String> perms = new ArrayList<>();
-                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    }
-                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    }
-                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }
             }
 

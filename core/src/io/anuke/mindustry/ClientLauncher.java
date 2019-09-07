@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -40,6 +41,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
         atlas = TextureAtlas.blankAtlas();
+        Vars.net = new Net(platform.getNet());
 
         UI.loadSystemCursors();
 

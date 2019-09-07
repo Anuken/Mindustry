@@ -9,10 +9,9 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -23,10 +22,12 @@ import java.util.concurrent.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, ClientProvider, ServerProvider{
+public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, NetProvider{
     public final SteamNetworking snet = new SteamNetworking(this);
     public final SteamMatchmaking smat = new SteamMatchmaking(this);
     public final SteamFriends friends = new SteamFriends(this);
+
+    final NetProvider provider;
 
     final PacketSerializer serializer = new PacketSerializer();
     final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
@@ -40,7 +41,9 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
     Consumer<Host> lobbyCallback;
     Runnable lobbyDoneCallback, joinCallback;
 
-    public SteamCoreNetImpl(){
+    public SteamCoreNetImpl(NetProvider provider){
+        this.provider = provider;
+
         Events.on(ClientLoadEvent.class, e -> Core.app.addListener(new ApplicationListener(){
             //read packets
             int length;
@@ -55,15 +58,15 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readBuffer);
 
-                        if(Net.server()){
+                        if(net.server()){
                             SteamConnection con = steamConnections.get(fromID);
                             if(con != null){
-                                Net.handleServerReceived(con.id, output);
+                                net.handleServerReceived(con, output);
                             }else{
                                 Log.err("Unknown user with ID: {0}", fromID);
                             }
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
-                            Net.handleClientReceived(output);
+                            net.handleClientReceived(output);
                         }
                     }catch(SteamException e){
                         e.printStackTrace();
@@ -73,68 +76,71 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
         }));
 
         Events.on(WaveEvent.class, e -> {
-            if(currentLobby != null && Net.server()){
+            if(currentLobby != null && net.server()){
                 smat.setLobbyData(currentLobby, "wave", state.wave + "");
             }
         });
     }
 
+    public boolean isSteamClient(){
+        return currentServer != null;
+    }
+
     @Override
-    public void connect(String ip, int port, Runnable success) throws IOException{
+    public void connectClient(String ip, int port, Runnable success) throws IOException{
         if(ip.startsWith("steam:")){
             String lobbyname = ip.substring("steam:".length());
             SteamID lobby = lobbyIDs.get(lobbyname);
             if(lobby == null) throw new IOException("Lobby not found.");
             joinCallback = success;
             smat.joinLobby(lobby);
+        }else{
+            provider.connectClient(ip, port, success);
         }
-        //else, no
     }
 
     @Override
     public void sendClient(Object object, SendMode mode){
-        if(currentServer == null){
-            Log.info("Not connected, quitting.");
-            return;
+        if(isSteamClient()){
+            if(currentServer == null){
+                Log.info("Not connected, quitting.");
+                return;
+            }
+
+            try{
+                writeBuffer.limit(writeBuffer.capacity());
+                writeBuffer.position(0);
+                serializer.write(writeBuffer, object);
+                writeBuffer.flip();
+
+                snet.sendP2PPacket(currentServer, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+            }catch(Exception e){
+                net.showError(e);
+            }
+            Pools.free(object);
+        }else{
+            provider.sendClient(object, mode);
         }
-
-        try{
-            writeBuffer.limit(writeBuffer.capacity());
-            writeBuffer.position(0);
-            serializer.write(writeBuffer, object);
-            writeBuffer.flip();
-
-            snet.sendP2PPacket(currentServer, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
-        }catch(Exception e){
-            Net.showError(e);
-        }
-        Pools.free(object);
     }
 
-    @Override
-    public void updatePing(){
-        //no
-    }
 
     @Override
-    public int getPing(){
-        //absolutely not
-        return 0;
-    }
-
-    @Override
-    public void disconnect(){
-        if(currentLobby != null){
-            smat.leaveLobby(currentLobby);
-            snet.closeP2PSessionWithUser(currentServer);
-            currentServer = null;
-            currentLobby = null;
-            Net.handleClientReceived(new Disconnect());
+    public void disconnectClient(){
+        if(isSteamClient()){
+            if(currentLobby != null){
+                smat.leaveLobby(currentLobby);
+                snet.closeP2PSessionWithUser(currentServer);
+                currentServer = null;
+                currentLobby = null;
+                net.handleClientReceived(new Disconnect());
+            }
+        }else{
+            provider.disconnectClient();
         }
     }
 
     @Override
-    public void discover(Consumer<Host> callback, Runnable done){
+    public void discoverServers(Consumer<Host> callback, Runnable done){
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
@@ -147,18 +153,18 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
     }
 
     @Override
-    public void host(int port) throws IOException{
+    public void hostServer(int port) throws IOException{
         smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 32);
     }
 
     public void updateLobby(){
-        if(currentLobby != null && Net.server()){
+        if(currentLobby != null && net.server()){
             smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
         }
     }
 
     @Override
-    public void close(){
+    public void closeServer(){
         if(currentLobby != null){
             smat.leaveLobby(currentLobby);
             for(SteamConnection con : steamConnections.values()){
@@ -175,18 +181,6 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
         return connections;
     }
 
-    @Override
-    public NetConnection getByID(int id){
-        for(int i = 0; i < connections.size(); i++){
-            SteamConnection con = connections.get(i);
-            if(con.id == id){
-                return con;
-            }
-        }
-
-        return null;
-    }
-
     void disconnectSteamUser(SteamID steamid){
         //a client left
         int sid = steamid.getAccountID();
@@ -194,7 +188,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
         if(steamConnections.containsKey(sid)){
             SteamConnection con = steamConnections.get(sid);
-            Net.handleServerReceived(con.id, new Disconnect());
+            net.handleServerReceived(con, new Disconnect());
             steamConnections.remove(sid);
             connections.remove(con);
         }
@@ -210,7 +204,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
         Log.info("lobby invite {0} {1} {2}", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
 
         //ignore invites when hosting.
-        if(Net.server()) return;
+        if(net.server()) return;
 
         ui.showConfirm("Someone has invited you to a game.", "But do you accept?", () -> {
             smat.joinLobby(steamIDLobby);
@@ -231,8 +225,8 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
         Connect con = new Connect();
         con.addressTCP = "steam:" + currentServer.getAccountID();
 
-        Net.setClientConnected();
-        Net.handleClientReceived(con);
+        net.setClientConnected();
+        net.handleClientReceived(con);
     }
 
     @Override
@@ -244,11 +238,11 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
         Log.info("lobby {0}: {1} caused {2}'s change: {3}", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
-            if(Net.client()){
+            if(net.client()){
                 Log.info("Current host left.");
                 //host left, leave as well
                 if(who == currentServer){
-                    disconnect();
+                    net.disconnect();
                 }
             }else{
                 //a client left
@@ -306,7 +300,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public void onLobbyCreated(SteamResult result, SteamID steamID){
-        if(!Net.server()){
+        if(!net.server()){
             Log.info("Lobby created on server: {0}, ignoring.", steamID);
             return;
         }
@@ -334,24 +328,24 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
     @Override
     public void onP2PSessionConnectFail(SteamID steamIDRemote, P2PSessionError sessionError){
-        if(Net.server()){
+        if(net.server()){
             Log.info("{0} has disconnected: {1}", steamIDRemote.getAccountID(), sessionError);
             disconnectSteamUser(steamIDRemote);
         }else if(steamIDRemote == currentServer){
             Log.info("Disconnected! {1}: {0}", steamIDRemote.getAccountID(), sessionError);
-            Net.handleClientReceived(new Disconnect());
+            net.handleClientReceived(new Disconnect());
         }
     }
 
     @Override
     public void onP2PSessionRequest(SteamID steamIDRemote){
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
-        if(currentServer != null && !Net.server()){
+        if(currentServer != null && !net.server()){
             Log.info("Am client");
             if(steamIDRemote == currentServer){
                 snet.acceptP2PSessionWithUser(steamIDRemote);
             }
-        }else if(Net.server()){
+        }else if(net.server()){
             Log.info("Am server, accepting request.");
             //accept users on request
             if(!steamConnections.containsKey(steamIDRemote.getAccountID())){
@@ -364,7 +358,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
 
                 steamConnections.put(steamIDRemote.getAccountID(), con);
                 connections.add(con);
-                Net.handleServerReceived(c.id, c);
+                net.handleServerReceived(con, c);
             }
 
             snet.acceptP2PSessionWithUser(steamIDRemote);

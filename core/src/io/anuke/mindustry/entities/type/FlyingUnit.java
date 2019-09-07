@@ -123,7 +123,7 @@ public abstract class FlyingUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        if(!Net.client()){
+        if(!net.client()){
             updateRotation();
         }
         wobble();
@@ -176,7 +176,7 @@ public abstract class FlyingUnit extends BaseUnit{
     }
 
     protected void wobble(){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         x += Mathf.sin(Time.time() + id * 999, 25f, 0.05f) * Time.delta();
         y += Mathf.cos(Time.time() + id * 999, 25f, 0.05f) * Time.delta();

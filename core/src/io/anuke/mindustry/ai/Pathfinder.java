@@ -25,7 +25,7 @@ public class Pathfinder{
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> clear());
         Events.on(TileChangeEvent.class, event -> {
-            if(Net.client()) return;
+            if(net.client()) return;
 
             for(Team team : Team.all){
                 TeamData data = state.teams.get(team);
@@ -43,7 +43,7 @@ public class Pathfinder{
     }
 
     public void update(){
-        if(Net.client() || paths == null) return;
+        if(net.client() || paths == null) return;
 
         for(Team team : Team.all){
             if(state.teams.isActive(team)){

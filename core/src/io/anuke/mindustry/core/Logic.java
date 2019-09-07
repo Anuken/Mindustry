@@ -190,7 +190,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if(!Net.client() && state.wavetime <= 0 && state.rules.waves){
+                if(!net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
 
@@ -237,7 +237,7 @@ public class Logic implements ApplicationListener{
                 pathfinder.update();
             }
 
-            if(!Net.client() && !world.isInvalidMap() && !state.isEditor()){
+            if(!net.client() && !world.isInvalidMap() && !state.isEditor()){
                 checkGameOver();
             }
         }

@@ -40,7 +40,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
 
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
-        if(Net.client() || tile == null) return; //not clientside.
+        if(net.client() || tile == null) return; //not clientside.
 
         Fire fire = map.get(tile.pos());
 
@@ -106,7 +106,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());
         map.put(tile.pos(), this);
 
-        if(Net.client()){
+        if(net.client()){
             return;
         }
 

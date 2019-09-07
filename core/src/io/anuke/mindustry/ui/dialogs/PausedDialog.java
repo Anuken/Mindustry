@@ -52,7 +52,7 @@ public class PausedDialog extends FloatingDialog{
                 if(!world.isZone() && !state.isEditor()){
                     cont.row();
                     cont.addButton("$savegame", save::show);
-                    cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+                    cont.addButton("$loadgame", load::show).disabled(b -> net.active());
                 }
 
                 cont.row();
@@ -63,7 +63,7 @@ public class PausedDialog extends FloatingDialog{
                     }else{
                         ui.host.show();
                     }
-                }).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+                }).disabled(b -> net.active()).colspan(2).width(dw * 2 + 20f);
             }
 
             cont.row();
@@ -82,12 +82,12 @@ public class PausedDialog extends FloatingDialog{
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> net.active());
             }else{
                 cont.row();
             }
 
-            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> net.active());
 
             cont.addRowImageTextButton("$quit", "icon-quit", isize, this::showQuitConfirm);
         }
@@ -99,8 +99,8 @@ public class PausedDialog extends FloatingDialog{
                 Core.settings.put("playedtutorial", true);
                 Core.settings.save();
             }
-            wasClient = Net.client();
-            if(Net.client()) netClient.disconnectQuietly();
+            wasClient = net.client();
+            if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
         });

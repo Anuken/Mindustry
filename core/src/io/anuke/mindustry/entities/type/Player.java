@@ -1,34 +1,30 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Queue;
-import io.anuke.arc.graphics.Color;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
-import io.anuke.mindustry.io.TypeIO;
+import io.anuke.mindustry.input.InputHandler.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
@@ -50,7 +46,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float baseRotation;
     public float pointerX, pointerY;
     public String name = "name";
-    public String uuid, usid;
+    public @Nullable String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -59,13 +55,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
-    public NetConnection con;
+    public @Nullable NetConnection con;
     public boolean isLocal = false;
     public Interval timer = new Interval(6);
     public TargetTrait target;
     public TargetTrait moveTarget;
 
-    public String lastText;
+    public @Nullable String lastText;
     public float textFadeTime;
 
     private float walktime, itemtime;
@@ -229,7 +225,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void damage(float amount){
         hitTime = hitDuration;
-        if(!Net.client()){
+        if(!net.client()){
             health -= calculateDamage(amount);
         }
 
@@ -530,7 +526,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             spawner = null;
         }
 
-        if(isLocal || Net.server()){
+        if(isLocal || net.server()){
             avoidOthers();
         }
 
@@ -561,7 +557,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             status.update(this); //status effect updating also happens with non locals for effect purposes
             updateVelocityStatus(); //velocity too, for visual purposes
 
-            if(Net.server()){
+            if(net.server()){
                 updateShooting(); //server simulates player shooting
             }
             return;
@@ -847,7 +843,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(!Net.client()){
+            if(!net.client()){
                 if(lastSpawner != null && lastSpawner.isValid()){
                     this.spawner = lastSpawner;
                 }else if(getClosestCore() != null){

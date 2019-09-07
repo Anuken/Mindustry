@@ -18,8 +18,8 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net.*;
 
 import java.net.*;
 import java.util.*;
@@ -130,12 +130,7 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(steam){
-            SteamCoreNetImpl net = steamCore = new SteamCoreNetImpl();
-            Net.setClientProvider(net);
-            Net.setServerProvider(net);
-        }else{
-            Net.setClientProvider(new ArcNetClient());
-            Net.setServerProvider(new ArcNetServer());
+            SteamCoreNetImpl net = steamCore = new SteamCoreNetImpl(new ArcNetImpl());
         }
     }
 
@@ -163,6 +158,11 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public NetProvider getNet(){
+        return steam ? steamCore : new ArcNetImpl();
+    }
+
+    @Override
     public void updateLobby(){
         steamCore.updateLobby();
     }
@@ -176,7 +176,7 @@ public class DesktopLauncher extends ClientLauncher{
         if(!state.is(State.menu)){
             String map = world.getMap() == null ? "Unknown Map" : world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
             String mode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            String players =  Net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
+            String players =  net.active() && playerGroup.size() > 1 ? " | " + playerGroup.size() + " Players" : "";
 
             presence.state = mode + players;
 

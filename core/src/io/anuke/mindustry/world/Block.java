@@ -24,7 +24,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -300,7 +299,7 @@ public class Block extends BlockStorage{
     /** Called after the block is placed by anyone. */
     @CallSuper
     public void placed(Tile tile){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
             int range = 10;

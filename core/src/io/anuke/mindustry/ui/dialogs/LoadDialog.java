@@ -13,7 +13,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.io.SaveIO.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 
 import java.io.*;
@@ -193,7 +192,7 @@ public class LoadDialog extends FloatingDialog{
 
         ui.loadAnd(() -> {
             try{
-                Net.reset();
+                net.reset();
                 slot.load();
                 state.set(State.playing);
             }catch(SaveException e){

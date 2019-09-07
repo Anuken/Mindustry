@@ -23,7 +23,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -66,13 +65,13 @@ public class HudFragment extends Fragment{
                     flip = select.addImageButton("icon-arrow-up", style, iconsize, this::toggleMenus).get();
 
                     select.addImageButton("icon-pause", style, iconsize, () -> {
-                        if(Net.active()){
+                        if(net.active()){
                             ui.listfrag.toggle();
                         }else{
                             state.set(state.is(State.paused) ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
-                        if(Net.active()){
+                        if(net.active()){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
                         }else{
                             i.setDisabled(false);
@@ -81,7 +80,7 @@ public class HudFragment extends Fragment{
                     }).get();
 
                     select.addImageButton("icon-settings", style, iconsize, () -> {
-                        if(Net.active() && mobile){
+                        if(net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
                             }else{
@@ -93,7 +92,7 @@ public class HudFragment extends Fragment{
                             ui.database.show();
                         }
                     }).update(i -> {
-                        if(Net.active() && mobile){
+                        if(net.active() && mobile){
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
                         }else{
                             i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
@@ -244,7 +243,7 @@ public class HudFragment extends Fragment{
 
                 info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style("outline");
                 info.row();
-                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left().style("outline");
+                info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style("outline");
             }).top().left();
         });
 
@@ -542,7 +541,7 @@ public class HudFragment extends Fragment{
     private boolean inLaunchWave(){
         return world.isZone() &&
             world.getZone().metCondition() &&
-            !Net.client() &&
+            !net.client() &&
             state.wave % world.getZone().launchPeriod == 0 && !spawner.isSpawning();
     }
 
@@ -639,12 +638,12 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.isAdmin) || !net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
         table.right().addImageButton("icon-play", "right", 30f, () -> {
-            if(Net.client() && player.isAdmin){
+            if(net.client() && player.isAdmin){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);

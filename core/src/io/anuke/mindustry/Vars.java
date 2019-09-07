@@ -141,6 +141,7 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
+    public static Net net;
     public static ContentLoader content;
     public static GameState state;
     public static GlobalData data;
@@ -231,7 +232,7 @@ public class Vars implements Loadable{
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && Net.client()){
+                if(entity instanceof SyncTrait && net.client()){
                     netClient.addRemovedEntity((entity).getID());
                 }
             });

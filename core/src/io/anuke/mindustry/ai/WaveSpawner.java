@@ -116,7 +116,7 @@ public class WaveSpawner{
     }
 
     public boolean isSpawning(){
-        return spawning && !Net.client();
+        return spawning && !net.client();
     }
 
     private void reset(){

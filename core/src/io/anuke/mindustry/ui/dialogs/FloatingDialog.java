@@ -26,7 +26,7 @@ public class FloatingDialog extends Dialog{
 
         hidden(() -> {
             if(shouldPause && !state.is(State.menu)){
-                if(!wasPaused || Net.active()){
+                if(!wasPaused || net.active()){
                     state.set(State.playing);
                 }
             }

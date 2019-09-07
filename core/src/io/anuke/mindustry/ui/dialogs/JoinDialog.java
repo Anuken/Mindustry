@@ -12,7 +12,6 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 
@@ -68,7 +67,7 @@ public class JoinDialog extends FloatingDialog{
                 refreshRemote();
             }
             add.hide();
-        }).disabled(b -> Core.settings.getString("ip").isEmpty() || Net.active());
+        }).disabled(b -> Core.settings.getString("ip").isEmpty() || net.active());
 
         add.shown(() -> {
             add.title.setText(renaming != null ? "$server.edit" : "$server.add");
@@ -173,7 +172,7 @@ public class JoinDialog extends FloatingDialog{
         server.content.clear();
         server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
 
-        Net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
+        net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
             server.content.add("$host.invalid");
         });
@@ -276,9 +275,9 @@ public class JoinDialog extends FloatingDialog{
         local.clear();
         local.background((Drawable)null);
         local.table("button", t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
-        Net.discoverServers(this::addLocalHost, this::finishLocalHosts);
+        net.discoverServers(this::addLocalHost, this::finishLocalHosts);
         for(String host : defaultServers){
-            Net.pingHost(host, port, this::addLocalHost, e -> {});
+            net.pingHost(host, port, this::addLocalHost, e -> {});
         }
     }
 
@@ -325,9 +324,9 @@ public class JoinDialog extends FloatingDialog{
 
         Time.runTask(2f, () -> {
             logic.reset();
-            Net.reset();
+            net.reset();
             Vars.netClient.beginConnecting();
-            Net.connect(ip, port, () -> {
+            net.connect(ip, port, () -> {
                 hide();
                 add.hide();
             });
