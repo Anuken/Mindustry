@@ -9,7 +9,6 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
@@ -91,17 +90,17 @@ public class LoadDialog extends FloatingDialog{
 
                 t.addImageButton("icon-save", "empty", iconsize, () -> {
                     if(!ios){
-                        platform.showFileChooser(Core.bundle.get("save.export"), "Mindustry Save", file -> {
+                        platform.showFileChooser(false, saveExtension, file -> {
                             try{
                                 slot.exportFile(file);
                                 setup();
                             }catch(IOException e){
                                 ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                             }
-                        }, false, FileChooser.saveFiles);
+                        });
                     }else{
                         try{
-                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + Vars.saveExtension);
+                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
                             slot.exportFile(file);
                             platform.shareFile(file);
                         }catch(Exception e){
@@ -172,7 +171,7 @@ public class LoadDialog extends FloatingDialog{
         if(ios) return;
 
         slots.addImageTextButton("$save.import", "icon-add", iconsize, () -> {
-            platform.showFileChooser(Core.bundle.get("save.import"), "Mindustry Save", file -> {
+            platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
                         control.saves.importSave(file);
@@ -184,7 +183,7 @@ public class LoadDialog extends FloatingDialog{
                 }else{
                     ui.showError("$save.import.invalid");
                 }
-            }, true, FileChooser.saveFiles);
+            });
         }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
     }
 

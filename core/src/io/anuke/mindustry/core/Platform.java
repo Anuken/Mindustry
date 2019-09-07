@@ -1,13 +1,13 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Input.TextInput;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.math.RandomXS128;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.util.serialization.Base64Coder;
+import io.anuke.arc.*;
+import io.anuke.arc.Input.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
@@ -70,13 +70,18 @@ public interface Platform{
 
     /**
      * Show a file chooser.
-     * @param text File chooser title text
-     * @param content Description of the type of files to be loaded
      * @param cons Selection listener
      * @param open Whether to open or save files
-     * @param filetype File extension to filter
+     * @param extension File extension to filter
      */
-    default void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+    default void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+        new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
+            if(!open){
+                cons.accept(file.parent().child(file.nameWithoutExtension() + "." + extension));
+            }else{
+                cons.accept(file);
+            }
+        }).show();
     }
 
     /** Hide the app. Android only. */

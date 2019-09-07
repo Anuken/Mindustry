@@ -66,11 +66,6 @@ public class DesktopPlatform extends ClientLauncher{
     }
 
     @Override
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
-        new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons).show();
-    }
-
-    @Override
     public void updateRPC(){
         if(!useDiscord) return;
 

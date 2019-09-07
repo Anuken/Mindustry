@@ -196,7 +196,7 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showError("$editor.errorlegacy");
+                ui.showError("$editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
                 ui.showError("$editor.errorheader");
             }else{
@@ -288,34 +288,6 @@ public class Maps{
 
     public Array<SpawnGroup> readWaves(String str){
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
-    }
-
-    public void loadLegacyMaps(){
-        boolean convertedAny = false;
-        for(FileHandle file : customMapDirectory.list()){
-            if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                try{
-                    convertedAny = true;
-                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
-                    //delete old, converted file; it is no longer useful
-                    file.delete();
-                    Log.info("Converted file {0}", file);
-                }catch(Exception e){
-                    //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
-                    //but don't delete it
-                    file.copyTo(file.sibling(file.name() + "_conversion_failed"));
-                    file.delete();
-                    Log.err(e);
-                }
-            }
-        }
-
-        //free up any potential memory that was used up during conversion
-        if(convertedAny){
-            world.createTiles(1, 1);
-            //reload maps to load the converted ones
-            reload();
-        }
     }
 
     public void loadPreviews(){

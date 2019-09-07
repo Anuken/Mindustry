@@ -61,7 +61,7 @@ public class MapsDialog extends FloatingDialog{
 
         if(!ios){
             buttons.addImageTextButton("$editor.importmap", "icon-load", iconsize, () -> {
-                platform.showFileChooser("$editor.importmap", "Map File", file -> {
+                platform.showFileChooser(true, mapExtension, file -> {
                     ui.loadAnd(() -> {
                         maps.tryCatchMapError(() -> {
                             if(MapIO.isImage(file)){
@@ -69,12 +69,8 @@ public class MapsDialog extends FloatingDialog{
                                 return;
                             }
 
-                            Map map;
-                            if(file.extension().equalsIgnoreCase(mapExtension)){
-                                map = MapIO.createMap(file, true);
-                            }else{
-                                map = maps.makeLegacyMap(file);
-                            }
+                            Map map = MapIO.createMap(file, true);
+
 
                             //when you attempt to import a save, it will have no name, so generate one
                             String name = map.tags.getOr("name", () -> {
@@ -109,7 +105,7 @@ public class MapsDialog extends FloatingDialog{
 
                         });
                     });
-                }, true, FileChooser.anyMapFiles);
+                });
             }).size(210f, 64f);
         }
 
