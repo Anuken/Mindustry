@@ -37,14 +37,10 @@ public class AndroidLauncher extends AndroidApplication{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        config.useImmersiveMode = true;
-        config.depth = 0;
         if(doubleScaleTablets && isTablet(this.getContext())){
             UnitScl.dp.addition = 0.5f;
         }
 
-        config.hideStatusBar = true;
         Net.setClientProvider(new ArcNetClient());
         Net.setServerProvider(new ArcNetServer());
         initialize(new ClientLauncher(){
@@ -145,7 +141,11 @@ public class AndroidLauncher extends AndroidApplication{
             public boolean canDonate(){
                 return true;
             }
-        }, config);
+        }, new AndroidApplicationConfiguration(){{
+            useImmersiveMode = true;
+            depth = 0;
+            hideStatusBar = true;
+        }});
         checkFiles(getIntent());
     }
 
