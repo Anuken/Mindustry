@@ -7,7 +7,6 @@ import io.anuke.arc.Files.*;
 import io.anuke.arc.backends.sdl.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.event.*;
@@ -21,7 +20,6 @@ import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.ui.dialogs.*;
 
 import java.net.*;
 import java.util.*;
@@ -167,11 +165,6 @@ public class DesktopLauncher extends ClientLauncher{
     @Override
     public void updateLobby(){
         steamCore.updateLobby();
-    }
-
-    @Override
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
-        new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons).show();
     }
 
     @Override

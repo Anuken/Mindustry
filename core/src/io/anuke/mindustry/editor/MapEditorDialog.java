@@ -91,20 +91,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 createDialog("$editor.import",
                 "$editor.importmap", "$editor.importmap.description", "icon-load-map", (Runnable)loadDialog::show,
                 "$editor.importfile", "$editor.importfile.description", "icon-file", (Runnable)() ->
-                platform.showFileChooser("$editor.loadmap", "Map Files", file -> ui.loadAnd(() -> {
+                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("$editor.errorimage");
-                        }else if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                            editor.beginEdit(maps.makeLegacyMap(file));
                         }else{
                             editor.beginEdit(MapIO.createMap(file, true));
                         }
                     });
-                }), true, FileChooser.anyMapFiles),
+                })),
 
                 "$editor.importimage", "$editor.importimage.description", "icon-file-image", (Runnable)() ->
-                platform.showFileChooser("$loadimage", "Image Files", file ->
+                platform.showFileChooser(true, "png", file ->
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
@@ -114,27 +112,25 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
                         Log.err(e);
                     }
-                }), true, FileChooser.pngFiles))
+                })))
                 );
             }
 
             Cell cell = t.addImageTextButton("$editor.export", "icon-save-map", isize, () -> {
                 if(!ios){
-                    platform.showFileChooser("$editor.savemap", "Map Files", file -> {
-                        file = file.parent().child(file.nameWithoutExtension() + "." + mapExtension);
-                        FileHandle result = file;
+                    platform.showFileChooser(false, mapExtension, file -> {
                         ui.loadAnd(() -> {
                             try{
                                 if(!editor.getTags().containsKey("name")){
-                                    editor.getTags().put("name", result.nameWithoutExtension());
+                                    editor.getTags().put("name", file.nameWithoutExtension());
                                 }
-                                MapIO.writeMap(result, editor.createMap(result));
+                                MapIO.writeMap(file, editor.createMap(file));
                             }catch(Exception e){
                                 ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
                                 Log.err(e);
                             }
                         });
-                    }, false, FileChooser.mapFiles);
+                    });
                 }else{
                     ui.loadAnd(() -> {
                         try{

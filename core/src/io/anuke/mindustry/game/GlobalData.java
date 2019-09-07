@@ -52,10 +52,12 @@ public class GlobalData{
     }
 
     public void importData(FileHandle file){
-        FileHandle zipped = new ZipFileHandle(file);
+        FileHandle dest = Core.files.local("zipdata.zip");
+        file.copyTo(dest);
+        FileHandle zipped = new ZipFileHandle(dest);
 
         FileHandle base = Core.settings.getDataDirectory();
-        if(!base.child("settings.bin").exists()){
+        if(!zipped.child("settings.bin").exists()){
             throw new IllegalArgumentException("Not valid save data.");
         }
 
@@ -63,12 +65,13 @@ public class GlobalData{
         for(FileHandle f : base.list()){
             if(f.isDirectory()){
                 f.deleteDirectory();
-            }else{
+            }else if(!f.name().equals("zipdata.zip")){
                 f.delete();
             }
         }
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
+        dest.delete();
     }
 
     public void modified(){

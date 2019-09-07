@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
-import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -172,35 +171,6 @@ public class Control implements ApplicationListener, Loadable{
         createPlayer();
 
         saves.load();
-    }
-
-    //checks for existing 3.5 app data, android only
-    public void checkClassicData(){
-        try{
-            if(files.local("mindustry-maps").exists() || files.local("mindustry-saves").exists()){
-                settings.getBoolOnce("classic-backup-check", () -> {
-                    app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
-                        try{
-                            platform.requestExternalPerms(() -> {
-                                FileHandle external = files.external("MindustryClassic");
-                                if(files.local("mindustry-maps").exists()){
-                                    files.local("mindustry-maps").copyTo(external);
-                                }
-
-                                if(files.local("mindustry-saves").exists()){
-                                    files.local("mindustry-saves").copyTo(external);
-                                }
-                            });
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showError(Strings.parseException(e, true));
-                        }
-                    })));
-                });
-            }
-        }catch(Throwable t){
-            t.printStackTrace();
-        }
     }
 
     void createPlayer(){
@@ -379,7 +349,6 @@ public class Control implements ApplicationListener, Loadable{
 
         if(android){
             Sounds.empty.loop(0f, 1f, 0f);
-            checkClassicData();
         }
     }
 

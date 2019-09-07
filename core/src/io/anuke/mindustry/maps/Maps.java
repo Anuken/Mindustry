@@ -184,7 +184,18 @@ public class Maps{
         FileHandle dest = findFile();
         file.copyTo(dest);
 
-        createNewPreview(loadMap(dest, true));
+        Map map = loadMap(dest, true);
+        Exception[] error = {null};
+
+        createNewPreview(map, e -> {
+            maps.remove(map);
+            error[0] = e;
+        });
+
+        if(error[0] != null){
+            throw new IOException(error[0]);
+        }
+
     }
 
     /** Attempts to run the following code;
@@ -196,7 +207,7 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showError("$editor.errorlegacy");
+                ui.showError("$editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
                 ui.showError("$editor.errorheader");
             }else{
@@ -290,34 +301,6 @@ public class Maps{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
-    public void loadLegacyMaps(){
-        boolean convertedAny = false;
-        for(FileHandle file : customMapDirectory.list()){
-            if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                try{
-                    convertedAny = true;
-                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
-                    //delete old, converted file; it is no longer useful
-                    file.delete();
-                    Log.info("Converted file {0}", file);
-                }catch(Exception e){
-                    //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
-                    //but don't delete it
-                    file.copyTo(file.sibling(file.name() + "_conversion_failed"));
-                    file.delete();
-                    Log.err(e);
-                }
-            }
-        }
-
-        //free up any potential memory that was used up during conversion
-        if(convertedAny){
-            world.createTiles(1, 1);
-            //reload maps to load the converted ones
-            reload();
-        }
-    }
-
     public void loadPreviews(){
 
         for(Map map : maps){
@@ -341,7 +324,7 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                createNewPreview(map);
+                createNewPreview(map, e -> Core.app.post(() -> map.texture = new Texture("sprites/error.png")));
             }
             previewList.clear();
         });
@@ -351,7 +334,7 @@ public class Maps{
         Core.app.post(() -> previewList.add(map));
     }
 
-    private void createNewPreview(Map map){
+    private void createNewPreview(Map map, Consumer<Exception> failed){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
@@ -365,9 +348,9 @@ public class Maps{
                     e.printStackTrace();
                 }
             });
-        }catch(IOException e){
+        }catch(Exception e){
+            failed.accept(e);
             Log.err("Failed to generate preview!", e);
-            Core.app.post(() -> map.texture = new Texture("sprites/error.png"));
         }
     }
 

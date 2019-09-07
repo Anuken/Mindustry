@@ -41,7 +41,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
                 UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController(NSArray.fromStrings("public.archive"));
 
                 cont.setAllowsDocumentCreation(false);
