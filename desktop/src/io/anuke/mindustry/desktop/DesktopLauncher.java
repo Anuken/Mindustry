@@ -18,6 +18,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 
@@ -30,7 +31,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     private final static String applicationId = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, useSteam = true, showConsole = true;
+    boolean useDiscord = OS.is64Bit, showConsole = true;
     SteamCoreNetImpl steamCore;
 
     public static void main(String[] arg){
@@ -50,6 +51,8 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     public DesktopLauncher(String[] args){
+        Version.init();
+        boolean useSteam = Version.modifier.equals("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
@@ -105,9 +108,10 @@ public class DesktopLauncher extends ClientLauncher{
             try{
                 SteamAPI.loadLibraries();
                 if(!SteamAPI.init()){
-                    Log.info("Steam client not running. Make sure Steam is running!");
+                    Log.err("Steam client not running.");
                 }else{
                     Vars.steam = true;
+                    steamCore = new SteamCoreNetImpl(new ArcNetImpl());
                     Events.on(ClientLoadEvent.class, event -> {
                         Core.settings.defaults("name", steamCore.friends.getPersonaName());
                         //update callbacks
@@ -127,10 +131,6 @@ public class DesktopLauncher extends ClientLauncher{
                 Log.err("Failed to load Steam native libraries.");
                 e.printStackTrace();
             }
-        }
-
-        if(steam){
-            SteamCoreNetImpl net = steamCore = new SteamCoreNetImpl(new ArcNetImpl());
         }
     }
 
