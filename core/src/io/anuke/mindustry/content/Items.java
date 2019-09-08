@@ -39,7 +39,7 @@ public class Items implements ContentList{
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
-            explosiveness = 0.4f;
+            explosiveness = 0.2f;
             flammability = 1f;
             hardness = 2;
         }};

@@ -61,7 +61,7 @@ public class Router extends Block{
         int counter = tile.rotation();
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
-            if(tile == from) continue;
+            if(other == from) continue;
             if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
             if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;

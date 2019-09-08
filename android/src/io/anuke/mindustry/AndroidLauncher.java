@@ -1,9 +1,10 @@
 package io.anuke.mindustry;
 
-import android.*;
+import android.app.*;
 import android.content.*;
 import android.content.pm.*;
 import android.net.*;
+import android.os.Build.*;
 import android.os.*;
 import android.provider.Settings.*;
 import android.telephony.*;
@@ -22,7 +23,6 @@ import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.System;
-import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -36,13 +36,9 @@ public class AndroidLauncher extends AndroidApplication{
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        config.useImmersiveMode = true;
-        config.depth = 0;
         if(doubleScaleTablets && isTablet(this.getContext())){
             UnitScl.dp.addition = 0.5f;
         }
-
-        config.hideStatusBar = true;
         Net.setClientProvider(new ArcNetClient());
         Net.setServerProvider(new ArcNetServer());
         initialize(new ClientLauncher(){
@@ -71,43 +67,42 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void requestExternalPerms(Runnable callback){
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    callback.run();
-                }else{
-                    permCallback = callback;
-                    ArrayList<String> perms = new ArrayList<>();
-                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    }
-                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    }
-                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
-                }
-            }
-
-            @Override
             public void shareFile(FileHandle file){
             }
 
             @Override
-            public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
-                chooser = new FileChooser(text, file -> filetype.test(file.extension().toLowerCase()), open, cons);
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser.show();
-                    chooser = null;
+            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+                if(VERSION.SDK_INT >= 19){
+                    Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                    addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
+                        if(code == Activity.RESULT_OK && in != null && in.getData() != null){
+                            Uri uri = in.getData();
+
+                            Core.app.post(() -> Core.app.post(() -> cons.accept(new FileHandle(uri.getPath()){
+                                @Override
+                                public InputStream read(){
+                                    try{
+                                        return getContentResolver().openInputStream(uri);
+                                    }catch(IOException e){
+                                        throw new ArcRuntimeException(e);
+                                    }
+                                }
+
+                                @Override
+                                public OutputStream write(boolean append){
+                                    try{
+                                        return getContentResolver().openOutputStream(uri);
+                                    }catch(IOException e){
+                                        throw new ArcRuntimeException(e);
+                                    }
+                                }
+                            })));
+                        }
+                    });
                 }else{
-                    ArrayList<String> perms = new ArrayList<>();
-                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    }
-                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    }
-                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+                    super.showFileChooser(open, extension, cons);
                 }
             }
 
@@ -125,7 +120,11 @@ public class AndroidLauncher extends AndroidApplication{
             public boolean canDonate(){
                 return true;
             }
-        }, config);
+        }, new AndroidApplicationConfiguration(){{
+            config.useImmersiveMode = true;
+            config.depth = 0;
+            config.hideStatusBar = true;
+        }});
         checkFiles(getIntent());
     }
 

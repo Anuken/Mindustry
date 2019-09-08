@@ -297,9 +297,6 @@ public class Saves{
 
         public void exportFile(FileHandle file) throws IOException{
             try{
-                if(!file.extension().equals(saveExtension)){
-                    file = file.parent().child(file.nameWithoutExtension() + "." + saveExtension);
-                }
                 SaveIO.fileFor(index).copyTo(file);
             }catch(Exception e){
                 throw new IOException(e);

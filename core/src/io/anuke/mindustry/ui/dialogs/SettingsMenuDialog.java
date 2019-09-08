@@ -102,14 +102,6 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            if(android && (Core.files.local("mindustry-maps").exists() || Core.files.local("mindustry-saves").exists())){
-                t.addButton("$classic.export", style, () -> {
-                    control.checkClassicData();
-                });
-            }
-
-            t.row();
-
             t.addButton("$data.export", style, () -> {
                 if(ios){
                     FileHandle file = Core.files.local("mindustry-data-export.zip");
@@ -120,19 +112,15 @@ public class SettingsMenuDialog extends SettingsDialog{
                     }
                     platform.shareFile(file);
                 }else{
-                    platform.showFileChooser("$data.export", "Zip Files", file -> {
-                        FileHandle ff = file;
-                        if(!ff.extension().equals("zip")){
-                            ff = ff.sibling(ff.nameWithoutExtension() + ".zip");
-                        }
+                    platform.showFileChooser(false, "zip", file -> {
                         try{
-                            data.exportData(ff);
+                            data.exportData(file);
                             ui.showInfo("$data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
                             ui.showError(Strings.parseException(e, true));
                         }
-                    }, false, f -> false);
+                    });
                 }
             });
 
@@ -140,7 +128,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             //iOS doesn't have a file chooser.
             if(!ios){
-                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser("$data.import", "Zip Files", file -> {
+                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                     try{
                         data.importData(file);
                         Core.app.exit();
@@ -148,9 +136,13 @@ public class SettingsMenuDialog extends SettingsDialog{
                         ui.showError("$data.invalid");
                     }catch(Exception e){
                         e.printStackTrace();
-                        ui.showError(Strings.parseException(e, true));
+                        if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                            ui.showError(Strings.parseException(e, true));
+                        }else{
+                            ui.showError("$data.invalid");
+                        }
                     }
-                }, true, f -> f.equalsIgnoreCase("zip"))));
+                })));
             }
         });
 
