@@ -61,12 +61,12 @@ public class Net{
             }else if(error.equals("alreadyconnected") || error.contains("connection is closed")){
                 error = Core.bundle.get("error.alreadyconnected");
             }else if(!error.isEmpty()){
-                error = Core.bundle.get("error.any") + "\n" + Strings.parseException(e, true);
+                error = Core.bundle.get("error.any");
                 isError = true;
             }
 
             if(isError){
-                ui.showError(Core.bundle.format("connectfail", error));
+                ui.showException("$error.any", e);
             }else{
                 ui.showText("", Core.bundle.format("connectfail", error));
             }

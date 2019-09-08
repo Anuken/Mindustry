@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, NetProvider{
+public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, SteamFriendsCallback, NetProvider{
     public final SteamNetworking snet = new SteamNetworking(this);
     public final SteamMatchmaking smat = new SteamMatchmaking(this);
     public final SteamFriends friends = new SteamFriends(this);
@@ -43,7 +43,7 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
     Consumer<Host> lobbyCallback;
     Runnable lobbyDoneCallback, joinCallback;
 
-    public SteamCoreNetImpl(NetProvider provider){
+    public SNet(NetProvider provider){
         this.provider = provider;
 
         Events.on(ClientLoadEvent.class, e -> Core.app.addListener(new ApplicationListener(){
@@ -324,7 +324,11 @@ public class SteamCoreNetImpl implements SteamNetworkingCallback, SteamMatchmaki
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
             smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules) + "");
+        }
+    }
 
+    public void showFriendInvites(){
+        if(currentLobby != null){
             friends.activateGameOverlayInviteDialog(currentLobby);
             Log.info("Activating overlay dialog");
         }

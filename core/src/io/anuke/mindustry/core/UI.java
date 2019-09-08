@@ -107,7 +107,7 @@ public class UI implements ApplicationListener, Loadable{
 
         Core.settings.setErrorHandler(e -> {
             e.printStackTrace();
-            Core.app.post(() -> showError("Failed to access local storage.\nSettings will not be saved."));
+            Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
@@ -330,19 +330,42 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
-    public void showError(String text){
+    public void showErrorMessage(String text){
         new Dialog("", "dialog"){{
-            setFillParent(true);
+            setFillParent(false);
+            cont.margin(15f);
             cont.add("$error.title");
             cont.row();
-            cont.margin(15).pane(t -> {
-                Label l = t.add(text).pad(14f).get();
-                l.setAlignment(Align.center, Align.left);
-                if(mobile){
-                    t.getCell(l).wrap().width(400f);
-                }
-            });
-            buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
+            cont.addImage("whiteui").fillX().pad(2).height(4f).color(Color.SCARLET);
+            cont.row();
+            cont.add(text).pad(2f);
+            buttons.addButton("$ok", this::hide).size(120, 50).pad(4);
+        }}.show();
+    }
+
+    public void showException(Throwable t){
+        showException("", t);
+    }
+
+    public void showException(String text, Throwable exc){
+        new Dialog("", "dialog"){{
+            String message = Strings.getFinalMesage(exc);
+
+            setFillParent(true);
+            cont.margin(15);
+            cont.add("$error.title").colspan(2);
+            cont.row();
+            cont.addImage("whiteui").fillX().pad(2).colspan(2).height(4f).color(Color.SCARLET);
+            cont.row();
+            cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).center().get().setAlignment(Align.center);
+            cont.row();
+
+            Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.LIGHT_GRAY).left()), true);
+
+            cont.addButton("$details", "toggle", col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+            cont.addButton("$ok", this::hide).size(100, 50).fillX().left();
+            cont.row();
+            cont.add(col).colspan(2).pad(2);
         }}.show();
     }
 

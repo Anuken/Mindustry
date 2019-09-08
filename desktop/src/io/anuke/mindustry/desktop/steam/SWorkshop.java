@@ -4,16 +4,15 @@ import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamRemoteStorage.*;
 import io.anuke.mindustry.maps.*;
 
-public class WorkshopImpl implements SteamUGCCallback{
-    private SteamUGC ugc = new SteamUGC(this);
+public class SWorkshop implements SteamUGCCallback{
+    public final SteamUGC ugc = new SteamUGC(this);
 
     public void publishMap(Map map){
-        ugc.createItem(1127400, WorkshopFileType.GameManagedItem);
+        ugc.createItem(SVars.steamID, WorkshopFileType.GameManagedItem);
     }
 
     @Override
     public void onUGCQueryCompleted(SteamUGCQuery query, int numResultsReturned, int totalMatchingResults, boolean isCachedData, SteamResult result){
-        //ugc.submitItemUpdate()
 
     }
 
@@ -35,6 +34,12 @@ public class WorkshopImpl implements SteamUGCCallback{
     @Override
     public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         //TODO
+        if(result == SteamResult.OK){
+
+        }else{
+            //TODO show "failed to create" dialog
+            //ui.showError("");
+        }
     }
 
     @Override

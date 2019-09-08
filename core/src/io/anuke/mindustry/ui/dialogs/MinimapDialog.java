@@ -23,10 +23,6 @@ public class MinimapDialog extends FloatingDialog{
         onResize(this::setup);
     }
 
-    public void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     void setup(){
         cont.clearChildren();
 

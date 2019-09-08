@@ -19,6 +19,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 
@@ -29,10 +30,9 @@ import static io.anuke.mindustry.Vars.*;
 
 
 public class DesktopLauncher extends ClientLauncher{
-    private final static String applicationId = "610508934456934412";
+    public final static String discordID = "610508934456934412";
 
     boolean useDiscord = OS.is64Bit, showConsole = true;
-    SteamCoreNetImpl steamCore;
 
     public static void main(String[] arg){
         try{
@@ -58,7 +58,7 @@ public class DesktopLauncher extends ClientLauncher{
         if(useDiscord){
             try{
                 DiscordEventHandlers handlers = new DiscordEventHandlers();
-                DiscordRPC.INSTANCE.Discord_Initialize(applicationId, handlers, true, "1127400");
+                DiscordRPC.INSTANCE.Discord_Initialize(discordID, handlers, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
 
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
@@ -111,27 +111,35 @@ public class DesktopLauncher extends ClientLauncher{
                     Log.err("Steam client not running.");
                 }else{
                     Vars.steam = true;
-                    steamCore = new SteamCoreNetImpl(new ArcNetImpl());
-                    Events.on(ClientLoadEvent.class, event -> {
-                        Core.settings.defaults("name", steamCore.friends.getPersonaName());
-                        //update callbacks
-                        Core.app.addListener(new ApplicationListener(){
-                            @Override
-                            public void update(){
-                                if(SteamAPI.isSteamRunning()){
-                                    SteamAPI.runCallbacks();
-                                }
-                            }
-                        });
-                    });
-                    //steam shutdown hook
-                    Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+                    initSteam();
+
                 }
             }catch(Exception e){
                 Log.err("Failed to load Steam native libraries.");
                 e.printStackTrace();
             }
         }
+    }
+
+    void initSteam(){
+        SVars.net = new SNet(new ArcNetImpl());
+        SVars.stats = new SStats();
+        SVars.workshop = new SWorkshop();
+
+        Events.on(ClientLoadEvent.class, event -> {
+            Core.settings.defaults("name", SVars.net.friends.getPersonaName());
+            //update callbacks
+            Core.app.addListener(new ApplicationListener(){
+                @Override
+                public void update(){
+                    if(SteamAPI.isSteamRunning()){
+                        SteamAPI.runCallbacks();
+                    }
+                }
+            });
+        });
+        //steam shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
     }
 
     static void handleCrash(Throwable e){
@@ -159,12 +167,22 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public NetProvider getNet(){
-        return steam ? steamCore : new ArcNetImpl();
+        return steam ? SVars.net : new ArcNetImpl();
+    }
+
+    @Override
+    public void publishMap(Map map){
+        SVars.workshop.publishMap(map);
+    }
+
+    @Override
+    public void inviteFriends(){
+        SVars.net.showFriendInvites();
     }
 
     @Override
     public void updateLobby(){
-        steamCore.updateLobby();
+        SVars.net.updateLobby();
     }
 
     @Override

@@ -43,7 +43,7 @@ public class DiscordDialog extends Dialog{
         });
         buttons.addButton("$openlink", () -> {
             if(!Core.net.openURI(discordURL)){
-                ui.showError("$linkfail");
+                ui.showErrorMessage("$linkfail");
                 Core.app.setClipboardText(discordURL);
             }
         });

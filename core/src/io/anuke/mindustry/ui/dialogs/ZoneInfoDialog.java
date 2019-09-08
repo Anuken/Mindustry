@@ -24,11 +24,6 @@ public class ZoneInfoDialog extends FloatingDialog{
         addCloseButton();
     }
 
-    @Override
-    protected void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     public void show(Zone zone){
         setup(zone);
         show();

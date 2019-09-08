@@ -37,8 +37,8 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.9f;
             effect = Fx.wet;
 
-            trans(() -> shocked, ((unit, time, newTime, result) -> unit.damage(15f)));
-            opposite(() -> burning, () -> shocked);
+            trans(() -> shocked, ((unit, time, newTime, result) -> unit.damage(20f)));
+            opposite(() -> burning);
         }};
 
         melting = new StatusEffect(){{

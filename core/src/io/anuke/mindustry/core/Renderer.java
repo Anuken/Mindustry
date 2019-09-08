@@ -162,7 +162,7 @@ public class Renderer implements ApplicationListener{
             e.printStackTrace();
             settings.put("bloom", false);
             settings.save();
-            ui.showError("$error.bloom");
+            ui.showErrorMessage("$error.bloom");
         }
     }
 

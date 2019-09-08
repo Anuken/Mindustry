@@ -65,7 +65,7 @@ public class MapsDialog extends FloatingDialog{
                     ui.loadAnd(() -> {
                         maps.tryCatchMapError(() -> {
                             if(MapIO.isImage(file)){
-                                ui.showError("$editor.errorimage");
+                                ui.showErrorMessage("$editor.errorimage");
                                 return;
                             }
 
@@ -82,7 +82,7 @@ public class MapsDialog extends FloatingDialog{
 
                             //this will never actually get called, but it remains just in case
                             if(name == null){
-                                ui.showError("$editor.errorname");
+                                ui.showErrorMessage("$editor.errorname");
                                 return;
                             }
 
@@ -192,7 +192,7 @@ public class MapsDialog extends FloatingDialog{
                 hide();
             }catch(Exception e){
                 e.printStackTrace();
-                ui.showError("$error.mapnotfound");
+                ui.showErrorMessage("$error.mapnotfound");
             }
         }).fillX().height(54f).marginLeft(10);
 

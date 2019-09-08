@@ -49,7 +49,6 @@ public class Plugins{
 
         PluginMeta meta = JsonIO.read(PluginMeta.class, metaf.readString());
 
-
         URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
         Class<?> main = classLoader.loadClass(meta.main);
         return new LoadedPlugin(jar, zip, (Plugin)main.newInstance(), meta);

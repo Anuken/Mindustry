@@ -15,7 +15,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
@@ -108,7 +107,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                     try{
                         data.exportData(file);
                     }catch(Exception e){
-                        ui.showError(Strings.parseException(e, true));
+                        ui.showException(e);
                     }
                     platform.shareFile(file);
                 }else{
@@ -118,7 +117,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             ui.showInfo("$data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
-                            ui.showError(Strings.parseException(e, true));
+                            ui.showException(e);
                         }
                     });
                 }
@@ -133,13 +132,13 @@ public class SettingsMenuDialog extends SettingsDialog{
                         data.importData(file);
                         Core.app.exit();
                     }catch(IllegalArgumentException e){
-                        ui.showError("$data.invalid");
+                        ui.showErrorMessage("$data.invalid");
                     }catch(Exception e){
                         e.printStackTrace();
                         if(e.getMessage() == null || !e.getMessage().contains("too short")){
-                            ui.showError(Strings.parseException(e, true));
+                            ui.showException(e);
                         }else{
-                            ui.showError("$data.invalid");
+                            ui.showErrorMessage("$data.invalid");
                         }
                     }
                 })));
@@ -215,9 +214,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
-        game.checkPref("publichost", false, i -> {
-            platform.updateLobby();
-        });
+        if(steam){
+            game.checkPref("publichost", false, i -> {
+                platform.updateLobby();
+            });
+        }
 
         game.pref(new Setting(){
             @Override

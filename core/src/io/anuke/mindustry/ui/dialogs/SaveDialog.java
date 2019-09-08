@@ -53,7 +53,7 @@ public class SaveDialog extends LoadDialog{
             }catch(Throwable e){
                 e.printStackTrace();
 
-                ui.showError("[accent]" + Core.bundle.get("savefail"));
+                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
         });
     }

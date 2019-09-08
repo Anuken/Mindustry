@@ -15156,7 +15156,7 @@ window-empty
   rotate: false
   xy: 1308, 494
   size: 27, 61
-  split: 8, 8, 44, 11
+  split: 2, 2, 2, 2
   orig: 27, 61
   offset: 0, 0
   index: -1

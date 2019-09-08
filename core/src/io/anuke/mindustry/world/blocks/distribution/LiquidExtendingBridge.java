@@ -1,13 +1,10 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.collection.IntSet.IntSetIterator;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Pos;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -52,35 +49,5 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
-    }
-
-    @Override
-    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
-        ItemBridgeEntity entity = tile.entity();
-
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)){
-            int i = tile.absoluteRelativeTo(to.x, to.y);
-
-            IntSetIterator it = entity.incoming.iterator();
-
-            while(it.hasNext){
-                int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        int rel = tile.absoluteRelativeTo(other.x, other.y);
-        int rel2 = tile.relativeTo(to.x, to.y);
-
-        return rel != rel2;
     }
 }

@@ -168,11 +168,6 @@ public class DeployDialog extends FloatingDialog{
         return false;
     }
 
-    @Override
-    protected void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     void buildButton(Zone zone, Button button){
         button.setDisabled(() -> hidden(zone));
         button.clicked(() -> info.show(zone));

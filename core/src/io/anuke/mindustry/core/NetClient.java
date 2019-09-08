@@ -87,7 +87,7 @@ public class NetClient implements ApplicationListener{
             c.uuid = platform.getUUID();
 
             if(c.uuid == null){
-                ui.showError("$invalidid");
+                ui.showErrorMessage("$invalidid");
                 ui.loadfrag.hide();
                 disconnectQuietly();
                 return;
@@ -117,7 +117,7 @@ public class NetClient implements ApplicationListener{
                     ui.showSmall("$disconnect", "$disconnect.error");
                 }
             }else{
-                ui.showError("$disconnect");
+                ui.showErrorMessage("$disconnect");
             }
         });
 
@@ -360,7 +360,7 @@ public class NetClient implements ApplicationListener{
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
                 quiet = true;
-                ui.showError("$disconnect.data");
+                ui.showErrorMessage("$disconnect.data");
                 net.disconnect();
                 timeoutTime = 0f;
             }

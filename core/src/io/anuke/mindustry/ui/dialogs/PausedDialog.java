@@ -1,9 +1,8 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.*;
+import io.anuke.arc.input.*;
+import io.anuke.mindustry.core.GameState.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -123,7 +122,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                ui.showError("[accent]" + Core.bundle.get("savefail"));
+                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
             state.set(State.menu);
             logic.reset();

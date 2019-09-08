@@ -53,11 +53,6 @@ public class TechTreeDialog extends FloatingDialog{
         }).size(210f, 64f);
     }
 
-    @Override
-    protected void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     void treeLayout(){
         TreeLayout layout = new TreeLayout();
         layout.gapBetweenLevels = UnitScl.dp.scl(60f);

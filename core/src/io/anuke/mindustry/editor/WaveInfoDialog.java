@@ -61,7 +61,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     groups = maps.readWaves(Core.app.getClipboardText());
                     buildGroups();
                 }catch(Exception e){
-                    ui.showError("$waves.invalid");
+                    ui.showErrorMessage("$waves.invalid");
                 }
                 dialog.hide();
             }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());

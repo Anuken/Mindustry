@@ -1,19 +1,17 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
+import io.anuke.arc.util.pooling.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,13 +29,9 @@ public class FileChooser extends FloatingDialog{
     private Consumer<FileHandle> selectListener;
     private boolean open;
 
-    public static final Predicate<String> pngFiles = str -> str.equals("png");
-    public static final Predicate<String> anyMapFiles = str -> str.equals(oldMapExtension) || str.equals(mapExtension);
-    public static final Predicate<String> mapFiles = str -> str.equals(mapExtension);
-    public static final Predicate<String> saveFiles = str -> str.equals(saveExtension);
-
     public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
         super(title);
+        setFillParent(true);
         this.open = open;
         this.filter = filter;
         this.selectListener = result;
@@ -88,11 +82,7 @@ public class FileChooser extends FloatingDialog{
         files.marginRight(10);
         files.marginLeft(3);
 
-        pane = new ScrollPane(files){
-            public float getPrefHeight(){
-                return Core.graphics.getHeight();
-            }
-        };
+        pane = new ScrollPane(files);
         pane.setOverscroll(false, false);
         pane.setFadeScrollBars(false);
 
@@ -152,7 +142,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(Core.graphics.isPortrait() ? Core.graphics.getWidth() / UnitScl.dp.scl(1) : Core.graphics.getWidth() / UnitScl.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).colspan(3).grow();
         content.row();
 
         if(!open){
@@ -162,7 +152,7 @@ public class FileChooser extends FloatingDialog{
 
         content.add(buttons).growX();
 
-        cont.add(content);
+        cont.add(content).grow();
     }
 
     private void updateFileFieldStatus(){

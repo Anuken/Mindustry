@@ -94,7 +94,7 @@ public class LoadDialog extends FloatingDialog{
                                 slot.exportFile(file);
                                 setup();
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
+                                ui.showException("save.export.fail", e);
                             }
                         });
                     }else{
@@ -103,7 +103,7 @@ public class LoadDialog extends FloatingDialog{
                             slot.exportFile(file);
                             platform.shareFile(file);
                         }catch(Exception e){
-                            ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
+                            ui.showException("save.export.fail", e);
                         }
                     }
                 }).size(iconsize).right();
@@ -177,10 +177,10 @@ public class LoadDialog extends FloatingDialog{
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                        ui.showException("save.import.fail", e);
                     }
                 }else{
-                    ui.showError("$save.import.invalid");
+                    ui.showErrorMessage("$save.import.invalid");
                 }
             });
         }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
@@ -199,7 +199,7 @@ public class LoadDialog extends FloatingDialog{
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();
-                ui.showError("$save.corrupted");
+                ui.showErrorMessage("$save.corrupted");
             }
         });
     }

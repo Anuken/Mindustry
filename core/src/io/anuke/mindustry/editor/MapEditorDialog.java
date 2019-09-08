@@ -109,7 +109,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){
-                        ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                        ui.showException("$editor.errorload", e);
                         Log.err(e);
                     }
                 })))
@@ -126,7 +126,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 }
                                 MapIO.writeMap(file, editor.createMap(file));
                             }catch(Exception e){
-                                ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
+                                ui.showException("$editor.errorsave", e);
                                 Log.err(e);
                             }
                         });
@@ -138,7 +138,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             MapIO.writeMap(result, editor.createMap(result));
                             platform.shareFile(result);
                         }catch(Exception e){
-                            ui.showError(Core.bundle.format("editor.errorsave", Strings.parseException(e, true)));
+                            ui.showException("$editor.errorsave", e);
                             Log.err(e);
                         }
                     });
@@ -173,7 +173,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             try{
                 editor.beginEdit(map);
             }catch(Exception e){
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                ui.showException("$editor.errorload", e);
                 Log.err(e);
             }
         }));
@@ -227,11 +227,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         shown(this::build);
     }
 
-    @Override
-    protected void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     public void resumeEditing(){
         state.set(State.menu);
         shownWithMap = true;
@@ -280,7 +275,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(name.isEmpty()){
             infoDialog.show();
-            Core.app.post(() -> ui.showError("$editor.save.noname"));
+            Core.app.post(() -> ui.showErrorMessage("$editor.save.noname"));
         }else{
             Map map = maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
@@ -297,7 +292,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     /** Called when a built-in map save is attempted.*/
     protected void handleSaveBuiltin(Map map){
-        ui.showError("$editor.save.overwrite");
+        ui.showErrorMessage("$editor.save.overwrite");
     }
 
     /**
@@ -366,7 +361,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 show();
             }catch(Exception e){
                 Log.err(e);
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                ui.showException("$editor.errorload", e);
             }
         });
     }

@@ -40,7 +40,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
-        if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20)) return;
+        if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20) || !tile.interactable(player.getTeam())) return;
 
         int removed = tile.block().removeStack(tile, item, amount);
 

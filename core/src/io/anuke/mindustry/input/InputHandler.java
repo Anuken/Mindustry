@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -60,11 +59,11 @@ public abstract class InputHandler implements InputProcessor{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(!player.timer.get(Player.timerTransfer, 40)) return;
-        if(net.server() && (player.item().amount <= 0 || player.isTransferring)){
+        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !tile.interactable(player.getTeam()))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        if(player == null || tile.entity == null) return;
+        if(tile.entity == null) return;
 
         player.isTransferring = true;
 

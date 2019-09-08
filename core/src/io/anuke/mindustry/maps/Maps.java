@@ -207,11 +207,11 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showError("$editor.errornot");
+                ui.showErrorMessage("$editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
-                ui.showError("$editor.errorheader");
+                ui.showErrorMessage("$editor.errorheader");
             }else{
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                ui.showException("$editor.errorload", e);
             }
         }
     }

@@ -636,7 +636,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 25){
+        arc = new BulletType(0.001f, 21){
             {
                 lifetime = 1;
                 despawnEffect = Fx.none;
