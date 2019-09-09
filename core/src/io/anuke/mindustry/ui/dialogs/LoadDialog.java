@@ -178,7 +178,7 @@ public class LoadDialog extends FloatingDialog{
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showException("save.import.fail", e);
+                        ui.showException("$save.import.fail", e);
                     }
                 }else{
                     ui.showErrorMessage("$save.import.invalid");
