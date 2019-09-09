@@ -16,6 +16,7 @@ import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -64,7 +65,7 @@ public class CommandCenter extends Block{
         CommandCenterEntity entity = tile.entity();
         super.draw(tile);
 
-        float size = iconsizesmall/4f;
+        float size = IconSize.small.size/4f;
 
         Draw.color(bottomColor);
         Draw.rect(commandRegions[entity.command.ordinal()], tile.drawx(), tile.drawy() - 1, size, size);
@@ -80,12 +81,12 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton("icon-command-" + cmd.name() + "-small", "clear-toggle-trans", iconsizesmall, () -> Call.onCommandCenterSet(player, tile, cmd))
+            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Style.clearToggleTransIbutton, () -> Call.onCommandCenterSet(player, tile, cmd))
             .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
         table.row();
-        table.label(() -> entity.command.localized()).style("outline").center().growX().get().setAlignment(Align.center);
+        table.label(() -> entity.command.localized()).style(Style.outlineLabel).center().growX().get().setAlignment(Align.center);
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)

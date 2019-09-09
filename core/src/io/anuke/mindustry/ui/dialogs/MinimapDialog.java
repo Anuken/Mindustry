@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.renderer;
 
@@ -26,7 +27,7 @@ public class MinimapDialog extends FloatingDialog{
     void setup(){
         cont.clearChildren();
 
-        cont.table("pane", t -> {
+        cont.table(Tex.pane,t -> {
             t.addRect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
                 Draw.color(Color.WHITE);

@@ -17,8 +17,10 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -249,27 +251,27 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Table table){
-        table.addImage("whiteui").color(Pal.gray).height(4f).colspan(4).growX();
+        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton("icon-break-small", "clear-toggle-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.breakSmall, Style.clearTogglePartialIbutton, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.addImageButton("icon-diagonal-small", "clear-toggle-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.diagonalSmall, Style.clearTogglePartialIbutton, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton("icon-arrow-small", "clear-partial", iconsizesmall, () -> rotation = Mathf.mod(rotation + 1, 4))
+        table.addImageButton(Icon.arrowSmall, Style.clearPartialIbutton,() -> rotation = Mathf.mod(rotation + 1, 4))
         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
 
         //confirm button
-        table.addImageButton("icon-check-small", "clear-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.checkSmall, Style.clearPartialIbutton, () -> {
             for(PlaceRequest request : selection){
                 Tile tile = request.tile();
 
@@ -295,7 +297,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         Core.scene.table(t -> {
            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
-           t.addImageTextButton("$cancel", "icon-cancel", 16*2, () -> {
+           t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                player.clearBuilding();
                mode = none;
                block = null;

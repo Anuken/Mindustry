@@ -14,6 +14,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.net;
@@ -45,7 +46,7 @@ public class ChatFragment extends Table{
         super();
 
         setFillParent(true);
-        font = scene.skin.getFont("default");
+        font = Fonts.def;
 
         visible(() -> {
             if(!net.active() && messages.size > 0){
@@ -98,10 +99,10 @@ public class ChatFragment extends Table{
         fieldlabel.getStyle().font = font;
         fieldlabel.setStyle(fieldlabel.getStyle());
 
-        chatfield = new TextField("", new TextField.TextFieldStyle(scene.skin.get(TextField.TextFieldStyle.class)));
+        chatfield = new TextField("", new TextField.TextFieldStyle(scene.getStyle(TextField.TextFieldStyle.class)));
         chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
-        chatfield.getStyle().font = scene.skin.getFont("chat");
+        chatfield.getStyle().font = Fonts.chat;
         chatfield.getStyle().fontColor = Color.WHITE;
         chatfield.setStyle(chatfield.getStyle());
 

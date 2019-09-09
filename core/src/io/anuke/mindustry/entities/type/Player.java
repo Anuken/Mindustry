@@ -24,6 +24,7 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -372,7 +373,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default");
+        BitmapFont font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
@@ -391,9 +392,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(isAdmin){
             float s = 3f;
             Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
             Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){

@@ -19,8 +19,9 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Style;
 import io.anuke.mindustry.ui.TreeLayout.*;
-import io.anuke.mindustry.world.Block.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -47,7 +48,7 @@ public class TechTreeDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addImageTextButton("$database", "icon-database", iconsize, () -> {
+        buttons.addImageTextButton("$database", Icon.database, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -142,7 +143,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.touchable(Touchable.enabled);
 
             for(TechTreeNode node : nodes){
-                ImageButton button = new ImageButton(node.node.block.icon(Icon.medium), "node");
+                ImageButton button = new ImageButton(node.node.block.icon(Block.Icon.medium), Style.nodeIbutton);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(mobile){
@@ -186,9 +187,9 @@ public class TechTreeDialog extends FloatingDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = Core.scene.skin.getDrawable(!locked(node.node) ? "button-over" : !data.hasItems(node.node.requirements) ? "button-red" : "button");
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !data.hasItems(node.node.requirements) ? Tex.buttonRed : Tex.button;
                     ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.block.icon(Icon.medium) : Core.atlas.find("icon-locked"));
+                    .setRegion(node.visible ? node.node.block.icon(Block.Icon.medium) : Core.atlas.find("icon-locked"));
                     button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
                 });
                 addChild(button);
@@ -257,12 +258,12 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
 
             infoTable.left();
-            infoTable.background("button").margin(8f);
+            infoTable.background(Tex.button).margin(8f);
 
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton("icon-info-small", "clear", iconsizesmall, () -> ui.content.show(node.block)).growY().width(50f);
+                b.addImageButton(Icon.infoSmall, Style.clearIbutton, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -289,7 +290,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", "icon-check-small", "node", iconsizesmall, () -> unlock(node))
+                    b.addImageTextButton("$research", Icon.checkSmall, Style.nodeTbutton, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

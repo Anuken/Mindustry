@@ -6,13 +6,14 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Minimap extends Table{
 
     public Minimap(){
-        background("pane");
+        background(Tex.pane);
         float margin = 5f;
         touchable(Touchable.enabled);
 

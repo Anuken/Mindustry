@@ -1,17 +1,18 @@
 package io.anuke.mindustry.world.meta.values;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.ObjectMap;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.type.Item;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.world.meta.StatValue;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -30,7 +31,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             BulletType type = map.get(t);
             table.addImage(icon(t)).size(3 * 8).padRight(4).right().top();
             table.add(t.localizedName()).padRight(10).left().top();
-            table.table("underline", bt -> {
+            table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0){

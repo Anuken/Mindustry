@@ -10,7 +10,6 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -55,7 +54,7 @@ public class ZoneInfoDialog extends FloatingDialog{
 
         cont.pane(cont -> {
             if(zone.locked()){
-                cont.addImage("icon-locked");
+                cont.addImage(Icon.locked);
                 cont.row();
                 cont.add("$locked").padBottom(6);
                 cont.row();
@@ -68,9 +67,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$complete").colspan(2).left();
                             r.row();
                             for(ZoneRequirement other : zone.zoneRequirements){
-                                r.addImage("icon-terrain").padRight(4);
+                                r.addImage(Icon.terrain).padRight(4);
                                 r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.LIGHT_GRAY);
-                                r.addImage(other.zone.bestWave() >= other.wave ? "icon-check-small" : "icon-cancel-small", other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.addImage(other.zone.bestWave() >= other.wave ? Icon.checkSmall : Icon.cancelSmall, other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
                         });
@@ -83,9 +82,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Block block : zone.blockRequirements){
-                                r.addImage(block.icon(Icon.small)).size(8 * 3).padRight(4);
+                                r.addImage(block.icon(Block.Icon.small)).size(8 * 3).padRight(4);
                                 r.add(block.localizedName).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isUnlocked(block) ? "icon-check-small" : "icon-cancel-small", data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
                                 r.row();
                             }
 
@@ -96,7 +95,7 @@ public class ZoneInfoDialog extends FloatingDialog{
             }else{
                 cont.add(zone.localizedName()).color(Pal.accent).growX().center();
                 cont.row();
-                cont.addImage("whiteui").color(Pal.accent).height(3).pad(6).growX();
+                cont.addImage().color(Pal.accent).height(3).pad(6).growX();
                 cont.row();
                 cont.table(desc -> {
                     desc.left().defaults().left().width(Core.graphics.isPortrait() ? 350f : 500f);

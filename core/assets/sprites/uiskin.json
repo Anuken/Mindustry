@@ -279,7 +279,9 @@
   },
   WindowStyle: {
     default: {
+      stageBackground: dialogDim,
       titleFont: default,
+      background: window-empty,
       titleFontColor: accent
     },
     dialog: {

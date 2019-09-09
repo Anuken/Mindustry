@@ -19,9 +19,9 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -400,7 +400,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
 
             if(number){
-                Core.scene.skin.getFont("outline").draw(item.amount + "",
+                Fonts.outline.draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
                     Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center

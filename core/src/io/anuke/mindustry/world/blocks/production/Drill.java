@@ -184,7 +184,7 @@ public class Drill extends Block{
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
 
-                table.addImage(item.name + "1").size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                table.addImage(Core.atlas.find(item.name + "1")).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 table.add(item.localizedName());
                 if(i != list.size - 1){
                     table.add("/").padLeft(5).padRight(5);

@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.Core;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.TraceInfo;
 
 public class TraceDialog extends FloatingDialog{
@@ -17,7 +18,7 @@ public class TraceDialog extends FloatingDialog{
     public void show(Player player, TraceInfo info){
         cont.clear();
 
-        Table table = new Table("clear");
+        Table table = new Table(Tex.clear);
         table.margin(14);
         table.defaults().pad(1);
 

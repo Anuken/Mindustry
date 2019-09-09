@@ -6,7 +6,9 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -44,7 +46,7 @@ public class LoadoutDialog extends FloatingDialog{
             FloatingDialog dialog = new FloatingDialog("");
             dialog.setFillParent(false);
             for(Item item : content.items().select(item -> filter.test(item) && item.type == ItemType.material && supplier.get().find(stack -> stack.item == item) == null)){
-                TextButton button = dialog.cont.addButton("", "clear", () -> {
+                TextButton button = dialog.cont.addButton("", Style.clearTbutton, () -> {
                     dialog.hide();
                     supplier.get().add(new ItemStack(item, 0));
                     updater.run();
@@ -67,7 +69,7 @@ public class LoadoutDialog extends FloatingDialog{
         }).size(210f, 64f);
 
         cont.row();
-        cont.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f, 64f);
+        cont.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
     }
 
     public void show(int capacity, Supplier<Array<ItemStack>> supplier, Runnable reseter, Runnable updater, Runnable hider, Predicate<Item> filter){
@@ -87,17 +89,17 @@ public class LoadoutDialog extends FloatingDialog{
         int step = 50;
 
         for(ItemStack stack : supplier.get()){
-            items.addButton("x", "clear-partial", () -> {
+            items.addButton("x", Style.clearPartialTbutton, () -> {
                 supplier.get().remove(stack);
                 updater.run();
                 setup();
             }).size(bsize);
 
-            items.addButton("-", "clear-partial", () -> {
+            items.addButton("-", Style.clearPartialTbutton, () -> {
                 stack.amount = Math.max(stack.amount - step, 0);
                 updater.run();
             }).size(bsize);
-            items.addButton("+", "clear-partial", () -> {
+            items.addButton("+", Style.clearPartialTbutton, () -> {
                 stack.amount = Math.min(stack.amount + step, capacity);
                 updater.run();
             }).size(bsize);

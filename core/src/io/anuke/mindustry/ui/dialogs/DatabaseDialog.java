@@ -12,6 +12,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ContentType;
 
@@ -43,7 +44,7 @@ public class DatabaseDialog extends FloatingDialog{
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
-            table.addImage("whiteui").growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            table.addImage().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
             table.table(list -> {
                 list.left();
@@ -55,8 +56,8 @@ public class DatabaseDialog extends FloatingDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image("icon-locked", Pal.gray);
-                    list.add(image).size(unlocked(unlock) ? 8*4 : Vars.iconsize).pad(3);
+                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image(Icon.lockedSmall, Pal.gray);
+                    list.add(image).size(8*4).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
                     if(!Vars.mobile && unlocked(unlock)){
@@ -66,7 +67,7 @@ public class DatabaseDialog extends FloatingDialog{
 
                     if(unlocked(unlock)){
                         image.clicked(() -> Vars.ui.content.show(unlock));
-                        image.addListener(new Tooltip(t -> t.background("button").add(unlock.localizedName())));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName())));
                     }
 
                     if((++count) % maxWidth == 0){

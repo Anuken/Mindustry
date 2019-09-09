@@ -6,6 +6,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
 
@@ -55,7 +56,7 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            modes.addButton(mode.toString(), "toggle", () -> {
+            modes.addButton(mode.toString(), Style.toggleTbutton, () -> {
                 selectedGamemode = mode;
                 rules = map.applyRules(mode);
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
@@ -66,7 +67,7 @@ public class MapPlayDialog extends FloatingDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.addImageTextButton("$customize", "icon-tools-small", iconsizesmall, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
+        cont.addImageTextButton("$customize", Icon.toolsSmall, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
         cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
@@ -78,7 +79,7 @@ public class MapPlayDialog extends FloatingDialog{
         buttons.clearChildren();
         addCloseButton();
 
-        buttons.addImageTextButton("$play", "icon-play", iconsize, () -> {
+        buttons.addImageTextButton("$play", Icon.play, () -> {
             control.playMap(map, rules);
             hide();
             ui.custom.hide();

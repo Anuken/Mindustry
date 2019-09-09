@@ -10,10 +10,12 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
 import java.util.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.platform;
 
 public class FileChooser extends FloatingDialog{
     private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
@@ -90,10 +92,7 @@ public class FileChooser extends FloatingDialog{
 
         Table icontable = new Table();
 
-        float isize = iconsize;
-
-        ImageButton up = new ImageButton("icon-folder-parent");
-        up.resizeImage(isize);
+        ImageButton up = new ImageButton(Icon.folderParent);
         up.clicked(() -> {
             directory = directory.parent();
             updateFiles(true);
@@ -104,19 +103,15 @@ public class FileChooser extends FloatingDialog{
             up.setDisabled(true);
         }
 
-        ImageButton back = new ImageButton("icon-arrow-left");
-        back.resizeImage(isize);
-
-        ImageButton forward = new ImageButton("icon-arrow-right");
-        forward.resizeImage(isize);
+        ImageButton back = new ImageButton(Icon.arrowLeft);
+        ImageButton forward = new ImageButton(Icon.arrowRight);
 
         forward.clicked(() -> stack.forward());
         back.clicked(() -> stack.back());
         forward.setDisabled(() -> !stack.canForward());
         back.setDisabled(() -> !stack.canBack());
 
-        ImageButton home = new ImageButton("icon-home");
-        home.resizeImage(isize);
+        ImageButton home = new ImageButton(Icon.home);
         home.clicked(() -> {
             directory = homeDirectory;
             lastDirectory = directory;
@@ -181,7 +176,7 @@ public class FileChooser extends FloatingDialog{
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.scene.skin.getFont("default"), navigation.getText());
+        layout.setText(Fonts.def, navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);
@@ -197,15 +192,15 @@ public class FileChooser extends FloatingDialog{
 
         //macs are confined to the Downloads/ directory
         if(!OS.isMac){
-            Image upimage = new Image("icon-folder-parent-small");
-            TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
+            Image upimage = new Image(Icon.folderParentSmall);
+            TextButton upbutton = new TextButton(".." + directory.toString(), Style.clearToggleTbutton);
             upbutton.clicked(() -> {
                 directory = directory.parent();
                 lastDirectory = directory;
                 updateFiles(true);
             });
 
-            upbutton.left().add(upimage).padRight(4f).size(iconsizesmall).padLeft(4);
+            upbutton.left().add(upimage).padRight(4f).padLeft(4);
             upbutton.getLabel().setAlignment(Align.left);
             upbutton.getCells().reverse();
 
@@ -221,7 +216,7 @@ public class FileChooser extends FloatingDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(shorten(filename), "clear-toggle");
+            TextButton button = new TextButton(shorten(filename), Style.clearToggleTbutton);
             group.add(button);
 
             button.clicked(() -> {
@@ -239,9 +234,9 @@ public class FileChooser extends FloatingDialog{
                 button.setChecked(filename.equals(filefield.getText()));
             });
 
-            Image image = new Image(file.isDirectory() ? "icon-folder-small" : "icon-file-text-small");
+            Image image = new Image(file.isDirectory() ? Icon.folderSmall : Icon.fileTextSmall);
 
-            button.add(image).padRight(4f).padLeft(4).size(iconsizesmall);
+            button.add(image).padRight(4f).padLeft(4);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
             .height(50).pad(2).padTop(0).padBottom(0).colspan(2);

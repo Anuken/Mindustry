@@ -8,6 +8,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
@@ -47,7 +48,7 @@ public class CustomGameDialog extends FloatingDialog{
                 maps.row();
             }
 
-            ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
+            ImageButton image = new ImageButton(new TextureRegion(map.texture), Style.clearIbutton);
             image.margin(5);
             image.top();
 
@@ -59,14 +60,14 @@ public class CustomGameDialog extends FloatingDialog{
                 t.left();
                 for(Gamemode mode : Gamemode.all){
                     if(mode.valid(map) && Core.atlas.has("icon-mode-" + mode.name())){
-                        t.addImage("icon-mode-" + mode.name()).size(16f).pad(4f);
+                        t.addImage(Core.atlas.drawable("icon-mode-" + mode.name())).size(16f).pad(4f);
                     }
                 }
             }).left();
             image.row();
             image.add(map.name()).pad(1f).growX().wrap().left().get().setEllipsis(true);
             image.row();
-            image.addImage("whiteui", Pal.gray).growX().pad(3).height(4f);
+            image.addImage(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
             image.row();
             image.add(img).size(images);
 

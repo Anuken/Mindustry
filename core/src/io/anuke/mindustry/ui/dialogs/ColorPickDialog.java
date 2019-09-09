@@ -1,20 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.ui.Dialog;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.playerColors;
+import static io.anuke.mindustry.Vars.*;
 
 public class ColorPickDialog extends Dialog{
     private Consumer<Color> cons;
 
     public ColorPickDialog(){
-        super("", "dialog");
+        super("");
         build();
     }
 
@@ -25,7 +25,7 @@ public class ColorPickDialog extends Dialog{
         for(int i = 0; i < playerColors.length; i++){
             Color color = playerColors[i];
 
-            ImageButton button = table.addImageButton("whiteui", "clear-toggle", 34, () -> {
+            ImageButton button = table.addImageButton(Tex.whiteui, Style.clearToggleIbutton, 34, () -> {
                 cons.accept(color);
                 hide();
             }).size(48).get();

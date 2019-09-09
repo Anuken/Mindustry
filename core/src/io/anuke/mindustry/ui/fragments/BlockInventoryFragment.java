@@ -22,7 +22,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Tile;
@@ -88,7 +88,7 @@ public class BlockInventoryFragment extends Fragment{
 
         table.clearChildren();
         table.clearActions();
-        table.background("inventory");
+        table.background(Tex.inventory);
         table.touchable(Touchable.enabled);
         table.update(() -> {
 

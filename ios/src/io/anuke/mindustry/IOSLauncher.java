@@ -10,6 +10,7 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -134,7 +135,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
         Events.on(ClientLoadEvent.class, e -> {
             Core.app.post(() -> Core.app.post(() -> {
-                Core.scene.table("dialogDim", t -> {
+                Core.scene.table(Style.dialogDim,t -> {
                     t.visible(() -> {
                         if(!forced) return false;
                         t.toFront();
@@ -172,10 +173,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             ui.load.runLoadSave(slot);
                         }
                     }catch(IOException e){
-                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                        ui.showException("save.import.fail", e);
                     }
                 }else{
-                    ui.showError("save.import.invalid");
+                    ui.showErrorMessage("save.import.invalid");
                 }
 
             }

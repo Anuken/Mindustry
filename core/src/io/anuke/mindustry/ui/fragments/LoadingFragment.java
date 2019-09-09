@@ -7,6 +7,7 @@ import io.anuke.arc.scene.ui.Label;
 import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.ui.*;
 
 public class LoadingFragment extends Fragment{
     private Table table;
@@ -14,16 +15,16 @@ public class LoadingFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        parent.fill("loadDim", t -> {
+        parent.fill(Style.loadDim,t -> {
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(70f).row();
 
-            t.addImage("whiteui").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
             t.add("$loading").name("namelabel").pad(10f);
             t.row();
-            t.addImage("whiteui").growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
 
             button = t.addButton("$cancel", () -> {

@@ -5,6 +5,7 @@ import io.anuke.arc.scene.ui.TextButton;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.game.Saves.SaveSlot;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -22,7 +23,7 @@ public class SaveDialog extends LoadDialog{
 
     public void addSetup(){
         slots.row();
-        slots.addImageTextButton("$save.new", "icon-add", 14 * 3, () ->
+        slots.addImageTextButton("$save.new", Icon.add, () ->
         ui.showTextInput("$save", "$save.newslot", 30, "", text -> {
             ui.loadAnd("$saving", () -> {
                 control.saves.addSave(text);

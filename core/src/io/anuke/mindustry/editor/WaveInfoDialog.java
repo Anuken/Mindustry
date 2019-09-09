@@ -1,22 +1,23 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.Label;
-import io.anuke.arc.scene.ui.TextField.TextFieldFilter;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.TextField.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.io.JsonIO;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.game.SpawnGroup.never;
@@ -79,7 +80,7 @@ public class WaveInfoDialog extends FloatingDialog{
         groups = JsonIO.copy(state.rules.spawns.isEmpty() ? defaultWaves.get() : state.rules.spawns);
 
         cont.clear();
-        cont.stack(new Table("clear", main -> {
+        cont.stack(new Table(Tex.clear, main -> {
             main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
             main.addButton("$add", () -> {
@@ -94,7 +95,7 @@ public class WaveInfoDialog extends FloatingDialog{
             setAlignment(Align.center, Align.center);
         }}).width(390f).growY();
 
-        cont.table("clear", m -> {
+        cont.table(Tex.clear, m -> {
             m.add("$waves.preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.addButton("-", () -> {
@@ -134,7 +135,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         if(groups != null){
             for(SpawnGroup group : groups){
-                table.table("button", t -> {
+                table.table(Tex.button, t -> {
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.addButton(b -> {
                         b.left();
@@ -238,7 +239,7 @@ public class WaveInfoDialog extends FloatingDialog{
 
         for(int i = start; i < displayed + start; i++){
             int wave = i;
-            preview.table("underline", table -> {
+            preview.table(Tex.underline, table -> {
                 table.add((wave + 1) + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
                 table.row();
 

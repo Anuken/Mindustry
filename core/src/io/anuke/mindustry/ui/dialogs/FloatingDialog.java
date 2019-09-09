@@ -8,7 +8,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -16,12 +15,12 @@ public class FloatingDialog extends Dialog{
     private boolean wasPaused;
     protected boolean shouldPause;
 
-    public FloatingDialog(String title, String style){
+    public FloatingDialog(String title, DialogStyle style){
         super(title, style);
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.addImage("whiteui", Pal.accent)
+        titleTable.addImage(Tex.whiteui, Pal.accent)
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
@@ -42,7 +41,7 @@ public class FloatingDialog extends Dialog{
     }
 
     public FloatingDialog(String title){
-        this(title, "dialog");
+        this(title, Core.scene.getStyle(DialogStyle.class));
     }
 
     protected void onResize(Runnable run){
@@ -56,7 +55,7 @@ public class FloatingDialog extends Dialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", "icon-arrow-left", iconsize, this::hide).size(210f, 64f);
+        buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){

@@ -169,10 +169,10 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                                ui.showException("save.import.fail", e);
                             }
                         }else{
-                            ui.showError("$save.import.invalid");
+                            ui.showErrorMessage("$save.import.invalid");
                         }
                     }else if(map){ //open map
                         FileHandle file = Core.files.local("temp-map." + mapExtension);

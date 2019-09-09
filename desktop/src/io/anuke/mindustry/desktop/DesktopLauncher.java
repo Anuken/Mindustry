@@ -22,6 +22,7 @@ import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.ui.*;
 
 import java.net.*;
 import java.util.*;
@@ -83,7 +84,7 @@ public class DesktopLauncher extends ClientLauncher{
 
                             t.toFront();
                         });
-                        t.table("guideDim", f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                        t.table(Style.guideDim,f -> label[0] = f.add("").get()).visible(() -> visible[0]);
                     });
 
                     Log.setLogger(new LogHandler(){
