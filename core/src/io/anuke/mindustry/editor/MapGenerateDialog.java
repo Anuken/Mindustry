@@ -178,7 +178,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     }
                 }
             }, new Stack(){{
-                add(new Image(Style.loadDim));
+                add(new Image(Styles.black8));
                 add(new Image(Icon.refresh, Scaling.none));
                 visible(() -> generating && !updateEditorOnChange);
             }}).grow().padRight(10);
@@ -233,7 +233,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     t.row();
 
                     t.table(b -> {
-                        ImageButtonStyle style = Style.clearIbutton;
+                        ImageButtonStyle style = Styles.cleari;
                         b.defaults().size(50f);
                         b.addImageButton(Icon.refreshSmall, style, () -> {
                             filter.randomize();

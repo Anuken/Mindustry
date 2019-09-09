@@ -99,7 +99,7 @@ public class JoinDialog extends FloatingDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), Style.clearTbutton, () -> {
+            TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), Styles.cleart, () -> {
                 if(!buttons[0].childrenPressed()){
                     if(server.lastHost != null && server.lastHost.version != Version.build && Version.build != -1 && server.lastHost.version != -1){
                         ui.showInfo("[scarlet]" + (server.lastHost.version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
@@ -118,7 +118,7 @@ public class JoinDialog extends FloatingDialog{
 
             inner.add(button.getLabel()).growX();
 
-            inner.addImageButton(Icon.arrowUpSmall, Style.emptyIbutton, () -> {
+            inner.addImageButton(Icon.arrowUpSmall, Styles.emptyi, () -> {
                 int index = servers.indexOf(server);
                 if(index > 0){
                     servers.remove(index);
@@ -137,16 +137,16 @@ public class JoinDialog extends FloatingDialog{
 
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.loadingSmall, Style.emptyIbutton, () -> {
+            inner.addImageButton(Icon.loadingSmall, Styles.emptyi, () -> {
                 refreshServer(server);
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.pencilSmall, Style.emptyIbutton, () -> {
+            inner.addImageButton(Icon.pencilSmall, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).padTop(6f).top().right();
 
-            inner.addImageButton(Icon.trash16Small, Style.emptyIbutton, () -> {
+            inner.addImageButton(Icon.trash16Small, Styles.emptyi, () -> {
                 ui.showConfirm("$confirm", "$server.delete", () -> {
                     servers.removeValue(server, true);
                     saveServers();
@@ -237,7 +237,7 @@ public class JoinDialog extends FloatingDialog{
                 Core.settings.save();
             }).grow().pad(8).get().setMaxLength(maxNameLength);
 
-            ImageButton button = t.addImageButton(Tex.whiteui, Style.clearFullIbutton, 40, () -> {
+            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
@@ -304,7 +304,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("", Style.clearTbutton, () -> connect(host.address, port))
+        TextButton button = local.addButton("", Styles.cleart, () -> connect(host.address, port))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);

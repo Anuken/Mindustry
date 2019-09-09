@@ -7,7 +7,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -27,7 +27,7 @@ public class ItemSelection{
         for(Item item : items){
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
-            ImageButton button = cont.addImageButton(Tex.whiteui, Style.clearToggleTransIbutton, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Item.Icon.medium));
             button.update(() -> button.setChecked(holder.get() == item));

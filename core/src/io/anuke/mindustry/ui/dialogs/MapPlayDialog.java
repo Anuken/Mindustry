@@ -56,7 +56,7 @@ public class MapPlayDialog extends FloatingDialog{
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
 
-            modes.addButton(mode.toString(), Style.toggleTbutton, () -> {
+            modes.addButton(mode.toString(), Styles.togglet, () -> {
                 selectedGamemode = mode;
                 rules = map.applyRules(mode);
             }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));

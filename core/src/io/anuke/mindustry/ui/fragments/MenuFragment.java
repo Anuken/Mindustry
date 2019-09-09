@@ -16,7 +16,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 
 import static io.anuke.arc.Core.assets;
 import static io.anuke.mindustry.Vars.*;
@@ -61,8 +61,8 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().addButton("", Style.infoTbutton, ui.about::show).size(84, 45));
-            parent.fill(c -> c.bottom().right().addButton("", Style.discordTbutton, ui.discord::show).size(84, 45));
+            parent.fill(c -> c.bottom().left().addButton("", Styles.infot, ui.about::show).size(84, 45));
+            parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
         }
 
         String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build);
@@ -146,7 +146,7 @@ public class MenuFragment extends Fragment{
 
 
         float width = 230f;
-        Drawable background = Style.flatTrans;
+        Drawable background = Styles.black6;
 
         container.left();
         container.add().width(Core.graphics.getWidth()/10f);
@@ -198,7 +198,7 @@ public class MenuFragment extends Fragment{
     private void buttons(Table t, Buttoni... buttons){
         for(Buttoni b : buttons){
             Button[] out = {null};
-            out[0] = t.addImageTextButton(b.text, b.icon, Style.clearToggleMenuTbutton, () -> {
+            out[0] = t.addImageTextButton(b.text, b.icon, Styles.clearToggleMenut, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;
                     fadeOutMenu();

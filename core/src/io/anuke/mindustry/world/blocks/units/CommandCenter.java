@@ -81,12 +81,12 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Style.clearToggleTransIbutton, () -> Call.onCommandCenterSet(player, tile, cmd))
+            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> Call.onCommandCenterSet(player, tile, cmd))
             .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
         table.row();
-        table.label(() -> entity.command.localized()).style(Style.outlineLabel).center().growX().get().setAlignment(Align.center);
+        table.label(() -> entity.command.localized()).style(Styles.outlineLabel).center().growX().get().setAlignment(Align.center);
     }
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)

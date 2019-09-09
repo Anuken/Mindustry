@@ -15,7 +15,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 
 import java.io.*;
 
@@ -59,7 +59,7 @@ public class LoadDialog extends FloatingDialog{
         for(SaveSlot slot : array){
             if(slot.isHidden()) continue;
 
-            TextButton button = new TextButton("", Style.clearTbutton);
+            TextButton button = new TextButton("", Styles.cleart);
             button.getLabel().remove();
             button.clearChildren();
 
@@ -71,25 +71,25 @@ public class LoadDialog extends FloatingDialog{
                 title.table(t -> {
                     t.right();
 
-                    t.addImageButton(Icon.floppy, Style.emptytoggleIbutton, () -> {
+                    t.addImageButton(Icon.floppy, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
                     }).checked(slot.isAutosave()).right();
 
-                    t.addImageButton(Icon.trash, Style.emptyIbutton, () -> {
+                    t.addImageButton(Icon.trash, Styles.emptyi, () -> {
                         ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                             slot.delete();
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.pencil, Style.emptyIbutton, () -> {
+                    t.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                         ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
                             setup();
                         });
                     }).right();
 
-                    t.addImageButton(Icon.save, Style.emptyIbutton, () -> {
+                    t.addImageButton(Icon.save, Styles.emptyi, () -> {
                         if(!ios){
                             platform.showFileChooser(false, saveExtension, file -> {
                                 try{

@@ -23,7 +23,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -49,7 +49,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public MapEditorDialog(){
         super("");
 
-        background(Style.dark);
+        background(Styles.black);
 
         editor = new MapEditor();
         view = new MapView(editor);
@@ -398,7 +398,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 Consumer<EditorTool> addTool = tool -> {
 
-                    ImageButton button = new ImageButton(Core.atlas.drawable("icon-" + tool.name() + "-small"), Style.clearToggleIbutton);
+                    ImageButton button = new ImageButton(Core.atlas.drawable("icon-" + tool.name() + "-small"), Styles.clearTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
@@ -424,7 +424,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 lastTable[0].remove();
                             }
 
-                            Table table = new Table(Style.dialogDim);
+                            Table table = new Table(Styles.black9);
                             table.defaults().size(300f, 70f);
 
                             for(int i = 0; i < tool.altModes.length; i++){
@@ -434,7 +434,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 table.addButton(b -> {
                                     b.left();
                                     b.marginLeft(6);
-                                    b.setStyle(Style.clearToggleTbutton);
+                                    b.setStyle(Styles.clearTogglet);
                                     b.add(Core.bundle.get("toolmode." + name)).left();
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.LIGHT_GRAY).left();
@@ -474,16 +474,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.addImageButton(Icon.menuLargeSmall, Style.clearIbutton, menu::show);
+                tools.addImageButton(Icon.menuLargeSmall, Styles.cleari, menu::show);
 
-                ImageButton grid = tools.addImageButton(Icon.gridSmall, Style.clearToggleIbutton, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.addImageButton(Icon.gridSmall, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.accept(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.addImageButton(Icon.undoSmall, Style.clearIbutton, editor::undo).get();
-                ImageButton redo = tools.addImageButton(Icon.redoSmall, Style.clearIbutton, editor::redo).get();
+                ImageButton undo = tools.addImageButton(Icon.undoSmall, Styles.cleari, editor::undo).get();
+                ImageButton redo = tools.addImageButton(Icon.redoSmall, Styles.cleari, editor::redo).get();
 
                 addTool.accept(EditorTool.pick);
 
@@ -505,7 +505,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.accept(EditorTool.fill);
                 addTool.accept(EditorTool.spray);
 
-                ImageButton rotate = tools.addImageButton(Icon.arrow16Small, Style.clearIbutton, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.addImageButton(Icon.arrow16Small, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -523,7 +523,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.all){
-                    ImageButton button = new ImageButton(Tex.whiteui, Style.clearTogglePartialIbutton);
+                    ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglePartiali);
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -675,7 +675,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region)) continue;
 
-            ImageButton button = new ImageButton(Tex.whiteui, Style.clearToggleIbutton);
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

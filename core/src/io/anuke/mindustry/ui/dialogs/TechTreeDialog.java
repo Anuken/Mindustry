@@ -19,7 +19,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.TreeLayout.*;
 import io.anuke.mindustry.world.*;
 
@@ -143,7 +143,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.touchable(Touchable.enabled);
 
             for(TechTreeNode node : nodes){
-                ImageButton button = new ImageButton(node.node.block.icon(Block.Icon.medium), Style.nodeIbutton);
+                ImageButton button = new ImageButton(node.node.block.icon(Block.Icon.medium), Styles.nodei);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(mobile){
@@ -263,7 +263,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.addImageButton(Icon.infoSmall, Style.clearIbutton, () -> ui.content.show(node.block)).growY().width(50f);
+                b.addImageButton(Icon.infoSmall, Styles.cleari, () -> ui.content.show(node.block)).growY().width(50f);
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
@@ -290,7 +290,7 @@ public class TechTreeDialog extends FloatingDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.addImageTextButton("$research", Icon.checkSmall, Style.nodeTbutton, () -> unlock(node))
+                    b.addImageTextButton("$research", Icon.checkSmall, Styles.nodet, () -> unlock(node))
                     .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
                 }
             });

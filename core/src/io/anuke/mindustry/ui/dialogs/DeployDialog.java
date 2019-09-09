@@ -23,7 +23,7 @@ import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -35,7 +35,7 @@ public class DeployDialog extends FloatingDialog{
     private Rectangle bounds = new Rectangle();
 
     public DeployDialog(){
-        super("", Style.fulldialogWindow);
+        super("", Styles.fullDialog);
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
@@ -102,7 +102,7 @@ public class DeployDialog extends FloatingDialog{
                     }).color(Color.DARK_GRAY).grow()));
                 }
 
-                TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), Style.squareTbutton, () -> {
+                TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), Styles.squaret, () -> {
                     hide();
                     ui.loadAnd(() -> {
                         logic.reset();
@@ -175,7 +175,7 @@ public class DeployDialog extends FloatingDialog{
         button.clicked(() -> info.show(zone));
 
         if(zone.unlocked() && !hidden(zone)){
-            button.labelWrap(zone.localizedName()).style(Style.outlineLabel).width(140).growX().get().setAlignment(Align.center);
+            button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
             Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.WHITE).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
             flasher.accept(button.addImage(Icon.locked).get());

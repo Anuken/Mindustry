@@ -79,7 +79,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         dataDialog.cont.table(Tex.button, t -> {
             t.defaults().size(240f, 60f).left();
-            TextButtonStyle style = Style.clearTbutton;
+            TextButtonStyle style = Styles.cleart;
 
             t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
@@ -177,7 +177,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     void rebuildMenu(){
         menu.clearChildren();
 
-        TextButtonStyle style = Style.clearTbutton;
+        TextButtonStyle style = Styles.cleart;
 
         menu.defaults().size(300f, 60f);
         menu.addButton("$settings.game", style, () -> visible(0));

@@ -334,7 +334,7 @@ public class UI implements ApplicationListener, Loadable{
 
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.LIGHT_GRAY).left()), true);
 
-            cont.addButton("$details", Style.toggleTbutton, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+            cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
             cont.addButton("$ok", this::hide).size(100, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);

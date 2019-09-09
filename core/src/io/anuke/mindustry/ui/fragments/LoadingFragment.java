@@ -15,7 +15,7 @@ public class LoadingFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        parent.fill(Style.loadDim,t -> {
+        parent.fill(Styles.black8, t -> {
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(70f).row();

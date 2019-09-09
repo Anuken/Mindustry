@@ -135,7 +135,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
         Events.on(ClientLoadEvent.class, e -> {
             Core.app.post(() -> Core.app.post(() -> {
-                Core.scene.table(Style.dialogDim,t -> {
+                Core.scene.table(Styles.black9, t -> {
                     t.visible(() -> {
                         if(!forced) return false;
                         t.toFront();

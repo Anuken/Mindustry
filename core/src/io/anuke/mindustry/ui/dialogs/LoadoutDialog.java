@@ -46,7 +46,7 @@ public class LoadoutDialog extends FloatingDialog{
             FloatingDialog dialog = new FloatingDialog("");
             dialog.setFillParent(false);
             for(Item item : content.items().select(item -> filter.test(item) && item.type == ItemType.material && supplier.get().find(stack -> stack.item == item) == null)){
-                TextButton button = dialog.cont.addButton("", Style.clearTbutton, () -> {
+                TextButton button = dialog.cont.addButton("", Styles.cleart, () -> {
                     dialog.hide();
                     supplier.get().add(new ItemStack(item, 0));
                     updater.run();
@@ -89,17 +89,17 @@ public class LoadoutDialog extends FloatingDialog{
         int step = 50;
 
         for(ItemStack stack : supplier.get()){
-            items.addButton("x", Style.clearPartialTbutton, () -> {
+            items.addButton("x", Styles.clearPartialt, () -> {
                 supplier.get().remove(stack);
                 updater.run();
                 setup();
             }).size(bsize);
 
-            items.addButton("-", Style.clearPartialTbutton, () -> {
+            items.addButton("-", Styles.clearPartialt, () -> {
                 stack.amount = Math.max(stack.amount - step, 0);
                 updater.run();
             }).size(bsize);
-            items.addButton("+", Style.clearPartialTbutton, () -> {
+            items.addButton("+", Styles.clearPartialt, () -> {
                 stack.amount = Math.min(stack.amount + step, capacity);
                 updater.run();
             }).size(bsize);

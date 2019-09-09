@@ -22,45 +22,32 @@ import io.anuke.mindustry.graphics.*;
 import static io.anuke.mindustry.gen.Tex.*;
 
 @StyleDefaults
-public class Style{
-    public static Drawable 
-    dialogDim = whiteui.tint(0f, 0f, 0f, 0.9f),
-    loadDim = whiteui.tint(0f, 0f, 0f, 0.8f),
-    guideDim = whiteui.tint(0f, 0f, 0f, 0.3f),
-    chatfield = whiteui.tint(0f, 0f, 0f, 0.2f),
-    dark = whiteui.tint(0f, 0f, 0f, 1f),
-    none = whiteui.tint(0f, 0f, 0f, 0.1f),
-    flatTrans = whiteui.tint(0f, 0f, 0f, 0.6f),
-    flat = whiteui.tint(0f, 0f, 0f, 1f),
+public class Styles{
+    public static Drawable
+    black = whiteui.tint(0f, 0f, 0f, 1f),
+    black9 = whiteui.tint(0f, 0f, 0f, 0.9f),
+    black8 = whiteui.tint(0f, 0f, 0f, 0.8f),
+    black6 = whiteui.tint(0f, 0f, 0f, 0.6f),
+    black3 = whiteui.tint(0f, 0f, 0f, 0.3f),
+    none = whiteui.tint(0f, 0f, 0f, 0f),
     flatDown = createFlatDown(),
     flatOver = whiteui.tint(Color.valueOf("454545"));
 
     public static ButtonStyle
-    defaultButton = new ButtonStyle(){{
+    defaultb = new ButtonStyle(){{
         down = buttonDown;
         up = button;
         over = buttonOver;
         disabled = buttonDisabled;
     }},
-    squareButton = new ButtonStyle(){{
-        over = buttonSquareOver;
-        disabled = buttonDisabled;
-        down = buttonSquareDown;
-        up = buttonSquare;
-    }},
-    toggleButton = new ButtonStyle(){{
-        checked = buttonDown;
-        down = buttonDown;
-        up = button;
-    }},
-    waveButton = new ButtonStyle(){{
+    waveb = new ButtonStyle(){{
         up = buttonEdge4;
         over = buttonEdgeOver4;
         disabled = buttonEdge4;
     }};
 
     public static TextButtonStyle
-    defaultTbutton = new TextButtonStyle(){{
+    defaultt = new TextButtonStyle(){{
         over = buttonOver;
         disabled = buttonDisabled;
         font = Fonts.def;
@@ -69,7 +56,7 @@ public class Style{
         down = buttonDown;
         up = button;
     }},
-    squareTbutton = new TextButtonStyle(){{
+    squaret = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         disabledFontColor = Color.GRAY;
@@ -78,7 +65,7 @@ public class Style{
         down = buttonSquareDown;
         up = buttonSquare;
     }},
-    nodeTbutton = new TextButtonStyle(){{
+    nodet = new TextButtonStyle(){{
         disabled = button;
         font = Fonts.def;
         fontColor = Color.WHITE;
@@ -86,39 +73,25 @@ public class Style{
         up = buttonOver;
         over = buttonDown;
     }},
-    rightTbutton = new TextButtonStyle(){{
-        over = buttonRightOver;
-        font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
-        down = buttonRightDown;
-        up = buttonRight;
-    }},
-    waveTbutton = new TextButtonStyle(){{
-        font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
-        up = buttonEdge4;
-    }},
-    clearTbutton = new TextButtonStyle(){{
+    cleart = new TextButtonStyle(){{
         over = flatOver;
         font = Fonts.def;
         fontColor = Color.WHITE;
         disabledFontColor = Color.GRAY;
         down = flatOver;
-        up = flat;
+        up = black;
     }},
-    discordTbutton = new TextButtonStyle(){{
+    discordt = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         up = discordBanner;
     }},
-    infoTbutton = new TextButtonStyle(){{
+    infot = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         up = infoBanner;
     }},
-    clearPartialTbutton = new TextButtonStyle(){{
+    clearPartialt = new TextButtonStyle(){{
         down = whiteui;
         up = pane;
         over = flatDown;
@@ -126,38 +99,27 @@ public class Style{
         fontColor = Color.WHITE;
         disabledFontColor = Color.GRAY;
     }},
-    clearPartial2Tbutton = new TextButtonStyle(){{
-        down = flatOver;
-        up = none;
-        over = flatOver;
-        font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
-    }},
-    emptyTbutton = new TextButtonStyle(){{
-        font = Fonts.def;
-    }},
-    clearToggleTbutton = new TextButtonStyle(){{
+    clearTogglet = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         checked = flatDown;
         down = flatDown;
-        up = flat;
+        up = black;
         over = flatOver;
-        disabled = flat;
+        disabled = black;
         disabledFontColor = Color.GRAY;
     }},
-    clearToggleMenuTbutton = new TextButtonStyle(){{
+    clearToggleMenut = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         checked = flatDown;
         down = flatDown;
         up = clear;
         over = flatOver;
-        disabled = flat;
+        disabled = black;
         disabledFontColor = Color.GRAY;
     }},
-    toggleTbutton = new TextButtonStyle(){{
+    togglet = new TextButtonStyle(){{
         font = Fonts.def;
         fontColor = Color.WHITE;
         checked = buttonDown;
@@ -169,7 +131,7 @@ public class Style{
     }};
 
     public static ImageButtonStyle
-    defaultIbutton = new ImageButtonStyle(){{
+    defaulti = new ImageButtonStyle(){{
         down = buttonDown;
         up = button;
         over = buttonOver;
@@ -177,74 +139,61 @@ public class Style{
         imageUpColor = Color.WHITE;
         disabled = buttonDisabled;
     }},
-    nodeIbutton = new ImageButtonStyle(){{
+    nodei = new ImageButtonStyle(){{
         up = buttonOver;
         over = buttonDown;
     }},
-    rightIbutton = new ImageButtonStyle(){{
+    righti = new ImageButtonStyle(){{
         over = buttonRightOver;
         down = buttonRightDown;
         up = buttonRight;
     }},
-    emptyIbutton = new ImageButtonStyle(){{
+    emptyi = new ImageButtonStyle(){{
         imageDownColor = Pal.accent;
         imageUpColor = Color.WHITE;
     }},
-    emptytoggleIbutton = new ImageButtonStyle(){{
+    emptytogglei = new ImageButtonStyle(){{
         imageCheckedColor = Color.WHITE;
         imageDownColor = Color.WHITE;
         imageUpColor = Color.GRAY;
     }},
-    staticIbutton = new ImageButtonStyle(){{
-        up = button;
-    }},
-    staticDownIbutton = new ImageButtonStyle(){{
-        up = buttonDown;
-    }},
-    toggleIbutton = new ImageButtonStyle(){{
-        checked = buttonDown;
-        down = buttonDown;
-        up = button;
-        imageDisabledColor = Color.GRAY;
-        imageUpColor = Color.WHITE;
-    }},
-    selectIbutton = new ImageButtonStyle(){{
+    selecti = new ImageButtonStyle(){{
         checked = buttonSelect;
         up = none;
     }},
-    clearIbutton = new ImageButtonStyle(){{
+    cleari = new ImageButtonStyle(){{
         down = flatOver;
-        up = flat;
+        up = black;
         over = flatOver;
     }},
-    clearFullIbutton = new ImageButtonStyle(){{
+    clearFulli = new ImageButtonStyle(){{
         down = whiteui;
         up = pane;
         over = flatDown;
     }},
-    clearPartialIbutton = new ImageButtonStyle(){{
+    clearPartiali = new ImageButtonStyle(){{
         down = flatDown;
         up = none;
         over = flatOver;
     }},
-    clearToggleIbutton = new ImageButtonStyle(){{
+    clearTogglei = new ImageButtonStyle(){{
         down = flatDown;
         checked = flatDown;
-        up = flat;
+        up = black;
         over = flatOver;
     }},
-    clearTransIbutton = new ImageButtonStyle(){{
+    clearTransi = new ImageButtonStyle(){{
         down = flatDown;
-        up = flatTrans;
+        up = black6;
         over = flatOver;
     }},
-    clearToggleTransIbutton = new ImageButtonStyle(){{
+    clearToggleTransi = new ImageButtonStyle(){{
         down = flatDown;
         checked = flatDown;
-        up = flatTrans;
+        up = black6;
         over = flatOver;
     }},
-    clearTogglePartialIbutton = new ImageButtonStyle(){{
+    clearTogglePartiali = new ImageButtonStyle(){{
         down = flatDown;
         checked = flatDown;
         up = none;
@@ -271,13 +220,13 @@ public class Style{
     }};
     
     public static SliderStyle
-    defaultHorizontalSlider = new SliderStyle(){{
+    defaultSlider = new SliderStyle(){{
         background = slider;
         knob = sliderKnob;
         knobOver = sliderKnobOver;
         knobDown = sliderKnobDown;
     }},
-    defaultVerticalSlider = new SliderStyle(){{
+    vSlider = new SliderStyle(){{
         background = sliderVertical;
         knob = sliderKnob;
         knobOver = sliderKnobOver;
@@ -307,7 +256,7 @@ public class Style{
         messageFont = Fonts.def;
         messageFontColor = Color.GRAY;
     }},
-    textareaField = new TextFieldStyle(){{
+    areaField = new TextFieldStyle(){{
         font = Fonts.chat;
         fontColor = Color.WHITE;
         disabledFontColor = Color.GRAY;
@@ -330,19 +279,18 @@ public class Style{
         disabledFontColor = Color.GRAY;
     }};
     public static DialogStyle
-    defaultWindow = new DialogStyle(){{
-        stageBackground = dialogDim;
+    defaultDialog = new DialogStyle(){{
+        stageBackground = black9;
         titleFont = Fonts.def;
         background = windowEmpty;
         titleFontColor = Pal.accent;
     }},
-    fulldialogWindow = new DialogStyle(){{
-        stageBackground = dark;
+    fullDialog = new DialogStyle(){{
+        stageBackground = black;
         titleFont = Fonts.def;
         background = windowEmpty;
         titleFontColor = Pal.accent;
     }};
-
 
     private static Drawable createFlatDown(){
         AtlasRegion region = Core.atlas.find("flat-down-base");

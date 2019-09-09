@@ -128,7 +128,7 @@ public class MapsDialog extends FloatingDialog{
                 maps.row();
             }
 
-            TextButton button = maps.addButton("", Style.clearTbutton, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+            TextButton button = maps.addButton("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
             button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
@@ -160,7 +160,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
 
-        table.table(Style.flat, desc -> {
+        table.table(Styles.black, desc -> {
             desc.top();
             Table t = new Table();
             t.margin(6);

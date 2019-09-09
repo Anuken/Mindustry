@@ -48,7 +48,7 @@ public class CustomGameDialog extends FloatingDialog{
                 maps.row();
             }
 
-            ImageButton image = new ImageButton(new TextureRegion(map.texture), Style.clearIbutton);
+            ImageButton image = new ImageButton(new TextureRegion(map.texture), Styles.cleari);
             image.margin(5);
             image.top();
 

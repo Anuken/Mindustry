@@ -89,7 +89,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
                 if(SourceVersion.isKeyword(varname)) varname += "s";
 
                 ttype.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-                tload.addStatement(varname + " = ("+dtype+")io.anuke.arc.Core.atlas.getDrawable($S)", sfilen);
+                tload.addStatement(varname + " = ("+dtype+")io.anuke.arc.Core.atlas.drawable($S)", sfilen);
             }
         });
 
@@ -98,7 +98,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             t.getEnclosedElements().stream().filter(e -> e.getKind() == ElementKind.FIELD).forEach(field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
-                    load.addStatement("io.anuke.arc.Core.scene.addStyle(" + field.asType().toString() + ".class, io.anuke.mindustry.ui.Style." + fname + ")");
+                    load.addStatement("io.anuke.arc.Core.scene.addStyle(" + field.asType().toString() + ".class, io.anuke.mindustry.ui.Styles." + fname + ")");
                 }
             });
         }

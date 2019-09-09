@@ -16,7 +16,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Style;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -138,7 +138,7 @@ public class PlacementFragment extends Fragment{
                             continue;
                         }
 
-                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Style.selectIbutton, () -> {
+                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
@@ -195,7 +195,7 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", Style.clearPartialTbutton, () -> {
+                                    header.addButton("?", Styles.clearPartialt, () -> {
                                         ui.content.show(lastDisplay);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -268,11 +268,11 @@ public class PlacementFragment extends Fragment{
                         if(f++ % 2 == 0) categories.row();
 
                         if(categoryEmpty[cat.ordinal()]){
-                            categories.addImage(Style.flatTrans);
+                            categories.addImage(Styles.black6);
                             continue;
                         }
 
-                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Style.clearToggleTransIbutton, () -> {
+                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());

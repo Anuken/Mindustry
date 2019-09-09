@@ -30,7 +30,7 @@ public class LanguageDialog extends FloatingDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Strings.capitalize(loc.getDisplayName(loc)), Style.clearToggleTbutton);
+            TextButton button = new TextButton(Strings.capitalize(loc.getDisplayName(loc)), Styles.clearTogglet);
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());

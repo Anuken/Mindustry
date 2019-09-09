@@ -84,7 +84,7 @@ public class DesktopLauncher extends ClientLauncher{
 
                             t.toFront();
                         });
-                        t.table(Style.guideDim,f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                        t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
                     });
 
                     Log.setLogger(new LogHandler(){
