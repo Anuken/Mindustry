@@ -69,7 +69,6 @@ public class AndroidLauncher extends AndroidApplication{
             @Override
             public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
                 if(VERSION.SDK_INT >= 19){
-
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");

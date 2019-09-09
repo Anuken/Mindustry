@@ -189,6 +189,11 @@ public class Maps{
 
         createNewPreview(map, e -> {
             maps.remove(map);
+            try{
+                map.file.delete();
+            }catch(Throwable ignored){
+
+            }
             error[0] = e;
         });
 
