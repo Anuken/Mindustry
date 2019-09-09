@@ -327,9 +327,9 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15);
             cont.add("$error.title").colspan(2);
             cont.row();
-            cont.addImage().fillX().pad(2).colspan(2).height(4f).color(Color.SCARLET);
+            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.SCARLET);
             cont.row();
-            cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).center().get().setAlignment(Align.center);
+            cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
 
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.LIGHT_GRAY).left()), true);
