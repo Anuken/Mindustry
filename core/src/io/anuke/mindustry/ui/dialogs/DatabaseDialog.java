@@ -62,7 +62,7 @@ public class DatabaseDialog extends FloatingDialog{
                     image.addListener(listener);
                     if(!Vars.mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.LIGHT_GRAY : Color.WHITE, 0.4f * Time.delta()));
+                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta()));
                     }
 
                     if(unlocked(unlock)){

@@ -26,7 +26,7 @@ import io.anuke.mindustry.world.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class TechTreeDialog extends FloatingDialog{
-    private final float nodeSize = UnitScl.dp.scl(60f);
+    private final float nodeSize = Scl.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private Rectangle bounds = new Rectangle();
@@ -56,8 +56,8 @@ public class TechTreeDialog extends FloatingDialog{
 
     void treeLayout(){
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = UnitScl.dp.scl(60f);
-        layout.gapBetweenNodes = UnitScl.dp.scl(40f);
+        layout.gapBetweenLevels = Scl.scl(60f);
+        layout.gapBetweenNodes = Scl.scl(40f);
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
         bounds.set(layout.getBounds());
@@ -190,7 +190,7 @@ public class TechTreeDialog extends FloatingDialog{
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !data.hasItems(node.node.requirements) ? Tex.buttonRed : Tex.button;
                     ((TextureRegionDrawable)button.getStyle().imageUp)
                     .setRegion(node.visible ? node.node.block.icon(Block.Icon.medium) : Core.atlas.find("icon-locked"));
-                    button.getImage().setColor(!locked(node.node) ? Color.WHITE : Color.GRAY);
+                    button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
                 });
                 addChild(button);
             }
@@ -276,9 +276,9 @@ public class TechTreeDialog extends FloatingDialog{
                                 t.table(list -> {
                                     list.left();
                                     list.addImage(req.item.icon(Item.Icon.medium)).size(8 * 3).padRight(3);
-                                    list.add(req.item.localizedName()).color(Color.LIGHT_GRAY);
+                                    list.add(req.item.localizedName()).color(Color.lightGray);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
-                                    .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.LIGHT_GRAY : Color.SCARLET));
+                                    .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));
                                 }).fillX().left();
                                 t.row();
                             }
@@ -297,7 +297,7 @@ public class TechTreeDialog extends FloatingDialog{
 
             infoTable.row();
             if(node.block.description != null){
-                infoTable.table(t -> t.margin(3f).left().labelWrap(node.block.description).color(Color.LIGHT_GRAY).growX()).fillX();
+                infoTable.table(t -> t.margin(3f).left().labelWrap(node.block.description).color(Color.lightGray).growX()).fillX();
             }
 
 
@@ -316,7 +316,7 @@ public class TechTreeDialog extends FloatingDialog{
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
 
-                    Lines.stroke(UnitScl.dp.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Lines.stroke(Scl.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }

@@ -81,7 +81,7 @@ public class PlayerListFragment extends Fragment{
                     super.draw();
                     Draw.color(Pal.gray);
                     Draw.alpha(parentAlpha);
-                    Lines.stroke(UnitScl.dp.scl(4f));
+                    Lines.stroke(Scl.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }

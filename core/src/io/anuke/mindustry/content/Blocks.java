@@ -590,7 +590,7 @@ public class Blocks implements ContentList{
 
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 50, Items.lead, 25));
-            flameColor = Color.CLEAR;
+            flameColor = Color.clear;
             hasItems = true;
             hasPower = true;
             outputItem = new ItemStack(Items.pyratite, 1);
@@ -661,7 +661,7 @@ public class Blocks implements ContentList{
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.CLEAR, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.color(Color.clear, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -1397,7 +1397,7 @@ public class Blocks implements ContentList{
             smokeEffect = Fx.lancerLaserShootSmoke;
             chargeEffect = Fx.lancerLaserCharge;
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             size = 2;
             health = 280 * size * size;
             targetAir = false;
@@ -1414,7 +1414,7 @@ public class Blocks implements ContentList{
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             recoil = 1f;
             size = 1;
             health = 260;
@@ -1502,7 +1502,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void draw(Bullet b){
                     super.draw(b);
-                    Draw.color(Color.WHITE, Pal.lancerLaser, b.fin());
+                    Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());
                     for(int i = 0; i < 7; i++){
                         Tmp.v1.trns(b.rot(), i * 8f);

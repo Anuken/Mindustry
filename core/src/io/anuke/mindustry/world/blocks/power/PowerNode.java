@@ -12,7 +12,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -286,7 +285,7 @@ public class PowerNode extends PowerBlock{
 
         float fract = 1f-tile.entity.power.graph.getSatisfaction();
 
-        Draw.color(Color.WHITE, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.4f);
         Draw.color();
     }

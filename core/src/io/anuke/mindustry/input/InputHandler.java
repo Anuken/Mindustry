@@ -52,7 +52,7 @@ public abstract class InputHandler implements InputProcessor{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.item().item);
+        Effects.effect(Fx.dropItem, Color.white, player.x, player.y, angle, player.item().item);
         player.clearItem();
     }
 

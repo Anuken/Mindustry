@@ -64,7 +64,7 @@ public class AboutDialog extends FloatingDialog{
             table.table(inset -> {
                 inset.add("[accent]" + Strings.capitalize(link.name.replace("-", " "))).growX().left();
                 inset.row();
-                inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
+                inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);
 
             table.addImageButton(Icon.link, () -> {

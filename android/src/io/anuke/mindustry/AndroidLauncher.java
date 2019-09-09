@@ -34,7 +34,7 @@ public class AndroidLauncher extends AndroidApplication{
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         if(doubleScaleTablets && isTablet(this.getContext())){
-            UnitScl.dp.addition = 0.5f;
+            Scl.setAddition(0.5f);
         }
 
         initialize(new ClientLauncher(){

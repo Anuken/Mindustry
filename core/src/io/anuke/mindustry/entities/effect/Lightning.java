@@ -110,7 +110,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     @Override
     public void draw(){
         Lines.stroke(3f * fout());
-        Draw.color(color, Color.WHITE, fin());
+        Draw.color(color, Color.white, fin());
         Lines.beginLine();
 
         Lines.linePoint(x, y);

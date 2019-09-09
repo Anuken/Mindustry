@@ -17,7 +17,7 @@ public class StatusEffect extends Content{
     public float damageMultiplier = 1f; //damage dealt
     public float armorMultiplier = 1f; //armor points
     public float speedMultiplier = 1f; //speed
-    public Color color = Color.WHITE.cpy(); //tint color
+    public Color color = Color.white.cpy(); //tint color
 
     /** Transition handler map. */
     private ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();

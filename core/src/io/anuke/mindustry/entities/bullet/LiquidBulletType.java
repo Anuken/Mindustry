@@ -50,7 +50,7 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        Draw.color(liquid.color, Color.WHITE, b.fout() / 100f);
+        Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
         Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);
     }

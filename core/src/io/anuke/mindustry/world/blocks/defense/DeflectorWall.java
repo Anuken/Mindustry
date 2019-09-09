@@ -32,7 +32,7 @@ public class DeflectorWall extends Wall{
 
         if(entity.hit < 0.0001f) return;
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Draw.alpha(entity.hit * 0.5f);
         Draw.blend(Blending.additive);
         Fill.rect(tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);

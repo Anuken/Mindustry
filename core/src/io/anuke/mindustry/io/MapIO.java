@@ -73,7 +73,7 @@ public class MapIO{
 
             Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
             Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
-            int black = Color.rgba8888(Color.BLACK);
+            int black = Color.rgba8888(Color.black);
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
             CachedTile tile = new CachedTile(){
                 @Override

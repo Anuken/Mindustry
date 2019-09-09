@@ -9,7 +9,6 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -136,7 +135,7 @@ public abstract class FlyingUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
         Draw.rect(type.region, x, y, rotation - 90);
 
         drawWeapons();
@@ -153,7 +152,7 @@ public abstract class FlyingUnit extends BaseUnit{
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset), y + Angles.trnsy(rotation + 180, type.engineOffset),
         type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset - 1f), y + Angles.trnsy(rotation + 180, type.engineOffset - 1f),
         (type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f)) / 2f);
         Draw.color();

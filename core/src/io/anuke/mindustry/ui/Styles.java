@@ -51,15 +51,15 @@ public class Styles{
         over = buttonOver;
         disabled = buttonDisabled;
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         down = buttonDown;
         up = button;
     }},
     squaret = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         over = buttonSquareOver;
         disabled = buttonDisabled;
         down = buttonSquareDown;
@@ -68,27 +68,27 @@ public class Styles{
     nodet = new TextButtonStyle(){{
         disabled = button;
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         up = buttonOver;
         over = buttonDown;
     }},
     cleart = new TextButtonStyle(){{
         over = flatOver;
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         down = flatOver;
         up = black;
     }},
     discordt = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
         up = discordBanner;
     }},
     infot = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
         up = infoBanner;
     }},
     clearPartialt = new TextButtonStyle(){{
@@ -96,38 +96,38 @@ public class Styles{
         up = pane;
         over = flatDown;
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
     }},
     clearTogglet = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
         checked = flatDown;
         down = flatDown;
         up = black;
         over = flatOver;
         disabled = black;
-        disabledFontColor = Color.GRAY;
+        disabledFontColor = Color.gray;
     }},
     clearToggleMenut = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
         checked = flatDown;
         down = flatDown;
         up = clear;
         over = flatOver;
         disabled = black;
-        disabledFontColor = Color.GRAY;
+        disabledFontColor = Color.gray;
     }},
     togglet = new TextButtonStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
         checked = buttonDown;
         down = buttonDown;
         up = button;
         over = buttonOver;
         disabled = buttonDisabled;
-        disabledFontColor = Color.GRAY;
+        disabledFontColor = Color.gray;
     }};
 
     public static ImageButtonStyle
@@ -135,8 +135,8 @@ public class Styles{
         down = buttonDown;
         up = button;
         over = buttonOver;
-        imageDisabledColor = Color.GRAY;
-        imageUpColor = Color.WHITE;
+        imageDisabledColor = Color.gray;
+        imageUpColor = Color.white;
         disabled = buttonDisabled;
     }},
     nodei = new ImageButtonStyle(){{
@@ -150,12 +150,12 @@ public class Styles{
     }},
     emptyi = new ImageButtonStyle(){{
         imageDownColor = Pal.accent;
-        imageUpColor = Color.WHITE;
+        imageUpColor = Color.white;
     }},
     emptytogglei = new ImageButtonStyle(){{
-        imageCheckedColor = Color.WHITE;
-        imageDownColor = Color.WHITE;
-        imageUpColor = Color.GRAY;
+        imageCheckedColor = Color.white;
+        imageDownColor = Color.white;
+        imageUpColor = Color.gray;
     }},
     selecti = new ImageButtonStyle(){{
         checked = buttonSelect;
@@ -215,8 +215,8 @@ public class Styles{
     public static KeybindDialogStyle
     defaultKeybindDialog = new KeybindDialogStyle(){{
         keyColor = Pal.accent;
-        keyNameColor = Color.WHITE;
-        controllerColor = Color.LIGHT_GRAY;
+        keyNameColor = Color.white;
+        controllerColor = Color.lightGray;
     }};
     
     public static SliderStyle
@@ -236,35 +236,35 @@ public class Styles{
     public static LabelStyle
     defaultLabel = new LabelStyle(){{
         font = Fonts.def;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
     }},
     outlineLabel = new LabelStyle(){{
         font = Fonts.outline;
-        fontColor = Color.WHITE;
+        fontColor = Color.white;
     }};
     
     public static TextFieldStyle
     defaultField = new TextFieldStyle(){{
         font = Fonts.chat;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         disabledBackground = underlineDisabled;
         selection = Tex.selection;
         background = underline;
         invalidBackground = underlineRed;
         cursor = Tex.cursor;
         messageFont = Fonts.def;
-        messageFontColor = Color.GRAY;
+        messageFontColor = Color.gray;
     }},
     areaField = new TextFieldStyle(){{
         font = Fonts.chat;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
         selection = Tex.selection;
         background = underline;
         cursor = Tex.cursor;
         messageFont = Fonts.def;
-        messageFontColor = Color.GRAY;
+        messageFontColor = Color.gray;
     }};
     public static CheckBoxStyle
     defaultCheck = new CheckBoxStyle(){{
@@ -275,8 +275,8 @@ public class Styles{
         checkboxOnDisabled = checkOnDisabled;
         checkboxOffDisabled = checkDisabled;
         font = Fonts.def;
-        fontColor = Color.WHITE;
-        disabledFontColor = Color.GRAY;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
     }};
     public static DialogStyle
     defaultDialog = new DialogStyle(){{

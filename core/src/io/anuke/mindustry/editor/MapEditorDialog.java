@@ -325,7 +325,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.table(t -> {
                 t.add(name).growX().wrap();
                 t.row();
-                t.add(description).color(Color.GRAY).growX().wrap();
+                t.add(description).color(Color.gray).growX().wrap();
             }).growX().pad(10f).padLeft(5);
 
             button.row();
@@ -437,7 +437,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     b.setStyle(Styles.clearTogglet);
                                     b.add(Core.bundle.get("toolmode." + name)).left();
                                     b.row();
-                                    b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.LIGHT_GRAY).left();
+                                    b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
                                 }, () -> {
                                     tool.mode = (tool.mode == mode ? -1 : mode);
                                     table.remove();
@@ -492,8 +492,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 undo.setDisabled(() -> !editor.canUndo());
                 redo.setDisabled(() -> !editor.canRedo());
 
-                undo.update(() -> undo.getImage().setColor(undo.isDisabled() ? Color.GRAY : Color.WHITE));
-                redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.GRAY : Color.WHITE));
+                undo.update(() -> undo.getImage().setColor(undo.isDisabled() ? Color.gray : Color.white));
+                redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.gray : Color.white));
                 grid.update(() -> grid.setChecked(view.isGrid()));
 
                 addTool.accept(EditorTool.line);

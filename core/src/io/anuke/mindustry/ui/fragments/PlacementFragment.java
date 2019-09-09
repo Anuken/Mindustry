@@ -148,7 +148,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -210,7 +210,7 @@ public class PlacementFragment extends Fragment{
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
-                                        line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
+                                        line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";

@@ -29,7 +29,7 @@ import io.anuke.mindustry.ui.TreeLayout.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class DeployDialog extends FloatingDialog{
-    private final float nodeSize = UnitScl.dp.scl(230f);
+    private final float nodeSize = Scl.scl(230f);
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
@@ -40,8 +40,8 @@ public class DeployDialog extends FloatingDialog{
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
         TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = layout.gapBetweenNodes = UnitScl.dp.scl(60f);
-        layout.gapBetweenNodes = UnitScl.dp.scl(120f);
+        layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
+        layout.gapBetweenNodes = Scl.scl(120f);
         layout.layout(root);
         bounds.set(layout.getBounds());
         bounds.y += nodeSize*0.4f;
@@ -99,7 +99,7 @@ public class DeployDialog extends FloatingDialog{
                         if(draw.getRegion() == slot.getZone().preview && text != null){
                             draw.setRegion(new TextureRegion(text));
                         }
-                    }).color(Color.DARK_GRAY).grow()));
+                    }).color(Color.darkGray).grow()));
                 }
 
                 TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), Styles.squaret, () -> {
@@ -177,7 +177,7 @@ public class DeployDialog extends FloatingDialog{
         if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
-            Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.WHITE).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
+            Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
             flasher.accept(button.addImage(Icon.locked).get());
             button.row();
             flasher.accept(button.add("$locked").get());
@@ -198,7 +198,7 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 stack.setSize(Tmp.v1.x, Tmp.v1.y);
-                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.DARK_GRAY : Color.fromGray(0.2f)).grow()));
+                stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.fromGray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
                 Button button = new Button(Tex.buttonSquare);
@@ -233,7 +233,7 @@ public class DeployDialog extends FloatingDialog{
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.allChildren){
-                    Lines.stroke(UnitScl.dp.scl(4f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.gray);
+                    Lines.stroke(Scl.scl(4f), node.zone.locked() || child.zone.locked() ? Pal.gray : Pal.gray);
                     Draw.alpha(parentAlpha);
                     Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                 }

@@ -69,17 +69,17 @@ public class MenuFragment extends Fragment{
 
         parent.fill((x, y, w, h) -> {
             Texture logo = Core.assets.get("sprites/logo.png");
-            float logoscl = UnitScl.dp.scl(1);
-            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - UnitScl.dp.scl(20));
+            float logoscl = Scl.scl(1);
+            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
 
             float fx = (int)(Core.graphics.getWidth() / 2f);
-            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? UnitScl.dp.scl(30f) : 0f);
+            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
 
             Draw.color();
             Draw.rect(Draw.wrap(logo), fx, fy, logow, logoh);
 
-            Fonts.def.setColor(Color.WHITE);
+            Fonts.def.setColor(Color.white);
             Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
         }).touchable(Touchable.disabled);
     }
@@ -208,7 +208,7 @@ public class MenuFragment extends Fragment{
                         submenu.clearChildren();
                         fadeInMenu();
                         //correctly offset the button
-                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / UnitScl.dp.scl(1f));
+                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / Scl.scl(1f));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{

@@ -29,9 +29,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
     protected IOSApplication createApplication(){
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
-            UnitScl.dp.addition = 0.5f;
+            Scl.setAddition(0.5f);
         }else{
-            UnitScl.dp.addition = -0.5f;
+            Scl.setAddition(-0.5f);
         }
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();

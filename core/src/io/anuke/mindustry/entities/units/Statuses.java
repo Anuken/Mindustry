@@ -60,7 +60,7 @@ public class Statuses implements Saveable{
 
     public Color getStatusColor(){
         if(statuses.size == 0){
-            return Tmp.c1.set(Color.WHITE);
+            return Tmp.c1.set(Color.white);
         }
 
         float r = 0f, g = 0f, b = 0f;

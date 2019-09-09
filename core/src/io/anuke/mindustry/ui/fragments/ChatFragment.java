@@ -29,9 +29,9 @@ public class ChatFragment extends Table{
     private Label fieldlabel = new Label(">");
     private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
-    private float offsetx = UnitScl.dp.scl(4), offsety = UnitScl.dp.scl(4), fontoffsetx = UnitScl.dp.scl(2), chatspace = UnitScl.dp.scl(50);
+    private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
-    private float textspacing = UnitScl.dp.scl(10);
+    private float textspacing = Scl.scl(10);
     private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
@@ -103,7 +103,7 @@ public class ChatFragment extends Table{
         chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = Fonts.chat;
-        chatfield.getStyle().fontColor = Color.WHITE;
+        chatfield.getStyle().fontColor = Color.white;
         chatfield.setStyle(chatfield.getStyle());
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(6f);
@@ -119,7 +119,7 @@ public class ChatFragment extends Table{
     @Override
     public void draw(){
         float opacity = Core.settings.getInt("chatopacity") / 100f;
-        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, UnitScl.dp.scl(700f));
+        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, Scl.scl(700f));
 
         Draw.color(shadowColor);
 
@@ -140,7 +140,7 @@ public class ChatFragment extends Table{
         float theight = offsety + spacing + getMarginBottom();
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
 
-            layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
+            layout.setText(font, messages.get(i).formattedMessage, Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
             if(i - scrollPos == 0) theight -= textspacing + 1;
 
@@ -154,7 +154,7 @@ public class ChatFragment extends Table{
                 font.getCache().setAlphas(opacity);
             }
 
-            Fill.crect(offsetx, theight - layout.height - 2, textWidth + UnitScl.dp.scl(4f), layout.height + textspacing);
+            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
             Draw.alpha(opacity * shadowColor.a);
 

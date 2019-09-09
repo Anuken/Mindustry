@@ -31,7 +31,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private static final float maxPanSpeed = 1.3f;
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = UnitScl.dp.scl(60f);
+    private final float edgePan = Scl.scl(60f);
 
     //gesture data
     private Vector2 vector = new Vector2();
@@ -192,7 +192,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             TextureRegion region = placeDraw.region;
 
             Draw.mixcol(Pal.accent, Mathf.clamp((1f - request.scale) / 0.5f + 0.12f + Mathf.absin(Time.time(), 8f, 0.35f)));
-            Draw.tint(Color.WHITE, Pal.breakInvalid, request.redness);
+            Draw.tint(Color.white, Pal.breakInvalid, request.redness);
 
             Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
                 region.getWidth() * request.scale * Draw.scl * placeDraw.scalex,

@@ -36,7 +36,7 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
     private Color clearColor;
-    private float targetscale = UnitScl.dp.scl(4);
+    private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private float shakeIntensity, shaketime;
@@ -100,14 +100,14 @@ public class Renderer implements ApplicationListener{
     @Override
     public void update(){
         //TODO hack, find source of this bug
-        Color.WHITE.set(1f, 1f, 1f, 1f);
+        Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
         if(state.is(State.menu)){
-            graphics.clear(Color.BLACK);
+            graphics.clear(Color.black);
         }else{
             Vector2 position = Tmp.v3.set(player);
 
@@ -263,7 +263,7 @@ public class Renderer implements ApplicationListener{
             if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
-                graphics.clear(Color.CLEAR);
+                graphics.clear(Color.clear);
                 shieldGroup.draw();
                 shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
                 Draw.flush();
@@ -348,7 +348,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = UnitScl.dp.scl(1f);
+        float s = Scl.scl(1f);
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 

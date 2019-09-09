@@ -372,7 +372,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
 
@@ -403,7 +403,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 Fonts.outline.draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
-                    Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center
+                    Pal.accent, 0.25f * itemtime / Scl.scl(1f), false, Align.center
                 );
             }
         }

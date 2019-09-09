@@ -46,7 +46,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                     iteminfo.row();
                 }
                 iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(1);
-                iteminfo.add(stack.amount + "").color(Color.LIGHT_GRAY).padRight(5);
+                iteminfo.add(stack.amount + "").color(Color.lightGray).padRight(5);
             }
         };
 
@@ -68,8 +68,8 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.row();
                             for(ZoneRequirement other : zone.zoneRequirements){
                                 r.addImage(Icon.terrain).padRight(4);
-                                r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.LIGHT_GRAY);
-                                r.addImage(other.zone.bestWave() >= other.wave ? Icon.checkSmall : Icon.cancelSmall, other.zone.bestWave() >= other.wave ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.lightGray);
+                                r.addImage(other.zone.bestWave() >= other.wave ? Icon.checkSmall : Icon.cancelSmall, other.zone.bestWave() >= other.wave ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
                         });
@@ -83,8 +83,8 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.row();
                             for(Block block : zone.blockRequirements){
                                 r.addImage(block.icon(Block.Icon.small)).size(8 * 3).padRight(4);
-                                r.add(block.localizedName).color(Color.LIGHT_GRAY);
-                                r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.LIGHT_GRAY : Color.SCARLET).padLeft(3);
+                                r.add(block.localizedName).color(Color.lightGray);
+                                r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
 

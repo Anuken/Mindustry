@@ -295,11 +295,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.color(Color.WHITE, floor.color, 0.5f);
+                Draw.color(Color.white, floor.color, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -319,9 +319,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, drownTime);
+            Draw.color(Color.white, floor.color, drownTime);
         }else{
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
         }
 
         Draw.rect(mech.region, x, y, rotation - 90);
@@ -344,7 +344,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
@@ -366,7 +366,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
         size + Mathf.absin(Time.time(), 2f, size / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
         (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
@@ -380,7 +380,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / UnitScl.dp.scl(1f));
+        font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
         Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
@@ -403,7 +403,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
 
-            layout.setText(font, text, Color.WHITE, width, Align.bottom, true);
+            layout.setText(font, text, Color.white, width, Align.bottom, true);
 
             Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
             Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
@@ -413,7 +413,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
         Pools.free(layout);
         font.getData().setScale(1f);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.white);
         font.setUseIntegerPositions(ints);
     }
 

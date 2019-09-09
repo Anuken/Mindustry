@@ -93,7 +93,7 @@ public class MassDriverBolt extends BulletType{
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
                 float angle = b.rot() + Mathf.range(100f);
-                Effects.effect(Fx.dropItem, Color.WHITE, b.x, b.y, angle, content.item(i));
+                Effects.effect(Fx.dropItem, Color.white, b.x, b.y, angle, content.item(i));
             }
         }
     }

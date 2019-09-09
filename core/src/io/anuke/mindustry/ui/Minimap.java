@@ -19,12 +19,12 @@ public class Minimap extends Table{
 
         add(new Element(){
             {
-                setSize(UnitScl.dp.scl(140f));
+                setSize(Scl.scl(140f));
             }
 
             @Override
             public void act(float delta){
-                setPosition(UnitScl.dp.scl(margin), UnitScl.dp.scl(margin));
+                setPosition(Scl.scl(margin), Scl.scl(margin));
 
                 super.act(delta);
             }
@@ -53,7 +53,7 @@ public class Minimap extends Table{
 
         addListener(new ClickListener(){
             {
-                tapSquareSize = UnitScl.dp.scl(11f);
+                tapSquareSize = Scl.scl(11f);
             }
 
             @Override

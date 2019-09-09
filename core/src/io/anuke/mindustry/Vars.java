@@ -258,7 +258,7 @@ public class Vars implements Loadable{
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
 
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
+        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         if(!loadLocales) return;
 

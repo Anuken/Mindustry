@@ -103,7 +103,7 @@ public class HudFragment extends Fragment{
 
                     select.addImage().color(Pal.gray).width(4f).fillY();
 
-                    float size = UnitScl.dp.scl(dsize);
+                    float size = Scl.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
@@ -115,7 +115,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(UnitScl.dp.scl(4f), size);
+                                elem.setSize(Scl.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return true;
@@ -154,7 +154,7 @@ public class HudFragment extends Fragment{
                 addPlayButton(btable);
                 wavesMain.add(stack).width(dsize * 4 + 4f);
                 wavesMain.row();
-                wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 wavesMain.row();
             }
@@ -223,7 +223,7 @@ public class HudFragment extends Fragment{
                                 }
                             }
 
-                            Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                            Draw.color(Pal.accent, Color.white, Mathf.absin(Time.time(), 8f, 1f));
                             Lines.poly(position[0], position[1], 4, size[0] / 2f);
                             Draw.reset();
 
@@ -239,7 +239,7 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -UnitScl.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
@@ -256,7 +256,7 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
             t.table(Styles.black, c -> c.add("$nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
@@ -310,7 +310,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity > 0;
             });
             t.table(Tex.button, top -> top.add("$coreattack").pad(2)
-            .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+            .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //tutorial text
@@ -598,7 +598,7 @@ public class HudFragment extends Fragment{
 
             if(inLaunchWave()){
                 builder.append("[#");
-                Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
+                Tmp.c1.set(Color.white).lerp(state.enemies() > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
                 builder.append("]");
 
                 if(!canLaunch()){

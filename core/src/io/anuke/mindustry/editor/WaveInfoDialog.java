@@ -96,7 +96,7 @@ public class WaveInfoDialog extends FloatingDialog{
         }}).width(390f).growY();
 
         cont.table(Tex.clear, m -> {
-            m.add("$waves.preview").color(Color.LIGHT_GRAY).growX().center().get().setAlignment(Align.center, Align.center);
+            m.add("$waves.preview").color(Color.lightGray).growX().center().get().setAlignment(Align.center, Align.center);
             m.row();
             m.addButton("-", () -> {
             }).update(t -> {
@@ -253,7 +253,7 @@ public class WaveInfoDialog extends FloatingDialog{
                     if(spawned[j] > 0){
                         UnitType type = content.getByID(ContentType.unit, j);
                         table.addImage(type.iconRegion).size(30f).padRight(4);
-                        table.add(spawned[j] + "x").color(Color.LIGHT_GRAY).padRight(6);
+                        table.add(spawned[j] + "x").color(Color.lightGray).padRight(6);
                         table.row();
                     }
                 }

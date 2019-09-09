@@ -142,7 +142,7 @@ public class Drill extends Block{
         if(returnItem != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
             float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
-            Draw.mixcol(Color.DARK_GRAY, 1f);
+            Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(returnItem.icon(Item.Icon.large), dx, dy - 1);
             Draw.reset();
             Draw.rect(returnItem.icon(Item.Icon.large), dx, dy);
@@ -161,7 +161,7 @@ public class Drill extends Block{
 
         if(entity.dominantItem != null){
             float dx = tile.drawx() - size * tilesize/2f, dy = tile.drawy() + size * tilesize/2f;
-            Draw.mixcol(Color.DARK_GRAY, 1f);
+            Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(entity.dominantItem.icon(Item.Icon.large), dx, dy);
             Draw.reset();
             Draw.rect(entity.dominantItem.icon(Item.Icon.medium), dx, dy);

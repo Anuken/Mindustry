@@ -125,14 +125,14 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
 
         float ft = Mathf.sin(walkTime * type.speed * 5f, 6f, 2f + type.hitsize / 15f);
 
         Floor floor = getFloorOn();
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, 0.5f);
+            Draw.color(Color.white, floor.color, 0.5f);
         }
 
         for(int i : Mathf.signs){
@@ -143,9 +143,9 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, drownTime * 0.4f);
+            Draw.color(Color.white, floor.color, drownTime * 0.4f);
         }else{
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
         }
 
         Draw.rect(type.baseRegion, x, y, baseRotation - 90);

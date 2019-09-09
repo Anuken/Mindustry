@@ -118,7 +118,7 @@ public class MapsDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / UnitScl.dp.scl(230)), 1, 8);
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Scl.scl(230)), 1, 8);
         float mapsize = 200f;
 
         int i = 0;
@@ -137,7 +137,7 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : "$builtin").color(Color.GRAY).padTop(3);
+            button.add(map.custom ? "$custom" : "$builtin").color(Color.gray).padTop(3);
 
             i++;
         }
@@ -171,15 +171,15 @@ public class MapsDialog extends FloatingDialog{
             t.top();
             t.defaults().padTop(10).left();
 
-            t.add("$editor.name").padRight(10).color(Color.GRAY).padTop(0);
+            t.add("$editor.name").padRight(10).color(Color.gray).padTop(0);
             t.row();
             t.add(map.name()).growX().wrap().padTop(2);
             t.row();
-            t.add("$editor.author").padRight(10).color(Color.GRAY);
+            t.add("$editor.author").padRight(10).color(Color.gray);
             t.row();
             t.add(map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
-            t.add("$editor.description").padRight(10).color(Color.GRAY).top();
+            t.add("$editor.description").padRight(10).color(Color.gray).top();
             t.row();
             t.add(map.description()).growX().wrap().padTop(2);
         }).height(mapsize).width(mapsize);

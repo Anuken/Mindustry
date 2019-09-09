@@ -104,7 +104,7 @@ public class UI implements ApplicationListener, Loadable{
         ClickListener.clicked = () -> Sounds.press.play();
 
         Colors.put("accent", Pal.accent);
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.WHITE, 0.3f));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
         loadExtraCursors();
     }
@@ -131,7 +131,7 @@ public class UI implements ApplicationListener, Loadable{
             @Override
             public BitmapFont loadSync(AssetManager manager, String fileName, FileHandle file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.equals("outline")){
-                    parameter.fontParameters.borderWidth = UnitScl.dp.scl(2f);
+                    parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }
                 parameter.fontParameters.size = fontParameter().size;
@@ -140,7 +140,7 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         FreeTypeFontParameter param = new FreeTypeFontParameter(){{
-            borderColor = Color.DARK_GRAY;
+            borderColor = Color.darkGray;
             incremental = true;
         }};
 
@@ -163,8 +163,8 @@ public class UI implements ApplicationListener, Loadable{
 
     static FreeTypeFontParameter fontParameter(){
         return new FreeTypeFontParameter(){{
-            size = (int)(UnitScl.dp.scl(18f));
-            shadowColor = Color.DARK_GRAY;
+            size = (int)(Scl.scl(18f));
+            shadowColor = Color.darkGray;
             shadowOffsetY = 2;
             incremental = true;
         }};
@@ -308,7 +308,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15f);
             cont.add("$error.title");
             cont.row();
-            cont.addImage().fillX().pad(2).height(4f).color(Color.SCARLET);
+            cont.addImage().fillX().pad(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add(text).pad(2f);
             buttons.addButton("$ok", this::hide).size(120, 50).pad(4);
@@ -327,12 +327,12 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(15);
             cont.add("$error.title").colspan(2);
             cont.row();
-            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.SCARLET);
+            cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
 
-            Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.LIGHT_GRAY).left()), true);
+            Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.lightGray).left()), true);
 
             cont.addButton("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
             cont.addButton("$ok", this::hide).size(100, 50).fillX().left();

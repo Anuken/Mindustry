@@ -217,7 +217,7 @@ public class ItemBridge extends Block{
 
         int i = tile.absoluteRelativeTo(other.x, other.y);
 
-        Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Time.time(), 6f, 0.07f));
+        Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
