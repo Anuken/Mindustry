@@ -201,7 +201,7 @@ public class DeployDialog extends FloatingDialog{
                 stack.add(new Table(t -> t.margin(4f).add(new Image(node.zone.preview).setScaling(Scaling.stretch)).color(node.zone.unlocked() ? Color.darkGray : Color.fromGray(0.2f)).grow()));
                 stack.update(() -> stack.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f, Align.center));
 
-                Button button = new Button(Tex.buttonSquare);
+                Button button = new Button(Styles.squaret);
                 buildButton(node.zone, button);
                 stack.add(button);
                 addChild(stack);

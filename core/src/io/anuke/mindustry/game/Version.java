@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.*;
 import io.anuke.arc.Files.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -26,7 +27,7 @@ public class Version{
         if(!enabled) return;
 
         try{
-            FileHandle file = new FileHandle("version.properties", FileType.Internal);
+            FileHandle file = OS.isAndroid || OS.isIos ? Core.files.internal("version.properties") : new FileHandle("version.properties", FileType.Internal);
 
             ObjectMap<String, String> map = new ObjectMap<>();
             PropertiesUtils.load(map, file.reader());

@@ -6,6 +6,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -99,10 +100,23 @@ public class LoadoutDialog extends FloatingDialog{
                 stack.amount = Math.max(stack.amount - step, 0);
                 updater.run();
             }).size(bsize);
+
             items.addButton("+", Styles.clearPartialt, () -> {
                 stack.amount = Math.min(stack.amount + step, capacity);
                 updater.run();
             }).size(bsize);
+
+            items.addImageButton(Icon.pencilSmaller, Styles.clearPartial2i, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                if(Strings.canParsePostiveInt(str)){
+                    int amount = Strings.parseInt(str);
+                    if(amount >= 0 && amount <= capacity){
+                        stack.amount = amount;
+                        updater.run();
+                        return;
+                    }
+                }
+                ui.showInfo(Core.bundle.format("configure.invalid", capacity));
+            })).size(bsize);
 
             items.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4).padLeft(4);
             items.label(() -> stack.amount + "").left();

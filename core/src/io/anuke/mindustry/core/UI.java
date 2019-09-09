@@ -3,6 +3,7 @@ package io.anuke.mindustry.core;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.Input.*;
 import io.anuke.arc.assets.*;
 import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.assets.loaders.resolvers.*;
@@ -262,28 +263,37 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, TextFieldFilter filter, Consumer<String> confirmed){
-        new Dialog(titleText){{
-            cont.margin(30).add(text).padRight(6f);
-            TextField field = cont.addField(def, t -> {
-            }).size(170f, 50f).get();
-            field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
-            platform.addDialog(field);
-            buttons.defaults().size(120, 54).pad(4);
-            buttons.addButton("$ok", () -> {
-                confirmed.accept(field.getText());
-                hide();
-            }).disabled(b -> field.getText().isEmpty());
-            buttons.addButton("$cancel", this::hide);
-        }}.show();
+    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Consumer<String> confirmed){
+        if(mobile){
+            Core.input.getTextInput(new TextInput(){{
+                this.title = (titleText.startsWith("$") ? Core.bundle.get(titleText.substring(1)) : titleText);
+                this.text = def;
+                this.numeric = inumeric;
+                this.maxLength = textLength;
+                this.accepted = confirmed;
+            }});
+        }else{
+            new Dialog(titleText){{
+                cont.margin(30).add(dtext).padRight(6f);
+                TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
+                TextField field = cont.addField(def, t -> {}).size(170f, 50f).get();
+                field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
+                buttons.defaults().size(120, 54).pad(4);
+                buttons.addButton("$ok", () -> {
+                    confirmed.accept(field.getText());
+                    hide();
+                }).disabled(b -> field.getText().isEmpty());
+                buttons.addButton("$cancel", this::hide);
+            }}.show();
+        }
     }
 
     public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
-        showTextInput(title, text, 12, def, (field, c) -> true, confirmed);
+        showTextInput(title, text, 24, def, confirmed);
     }
 
-    public void showTextInput(String title, String text, int textLength, String def, Consumer<String> confirmed){
-        showTextInput(title, text, textLength < 0 ? 12 : textLength, def, (field, c) -> true, confirmed);
+    public void showTextInput(String titleText, String text, int textLength, String def, Consumer<String> confirmed){
+        showTextInput(titleText, text, textLength, def, false, confirmed);
     }
 
     public void showInfoFade(String info){

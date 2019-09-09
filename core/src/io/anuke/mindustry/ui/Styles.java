@@ -176,6 +176,11 @@ public class Styles{
         up = none;
         over = flatOver;
     }},
+    clearPartial2i = new ImageButtonStyle(){{
+        down = whiteui;
+        up = pane;
+        over = flatDown;
+    }},
     clearTogglei = new ImageButtonStyle(){{
         down = flatDown;
         checked = flatDown;
@@ -266,6 +271,7 @@ public class Styles{
         messageFont = Fonts.def;
         messageFontColor = Color.gray;
     }};
+
     public static CheckBoxStyle
     defaultCheck = new CheckBoxStyle(){{
         checkboxOn = checkOn;
@@ -278,6 +284,7 @@ public class Styles{
         fontColor = Color.white;
         disabledFontColor = Color.gray;
     }};
+
     public static DialogStyle
     defaultDialog = new DialogStyle(){{
         stageBackground = black9;
