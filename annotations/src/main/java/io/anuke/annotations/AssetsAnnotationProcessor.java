@@ -58,7 +58,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         String resources = path + "/assets-raw/sprites/ui";
         Files.walk(Paths.get(resources)).forEach(p -> {
-            if(Files.isDirectory(p)) return;
+            if(Files.isDirectory(p) || p.getFileName().toString().equals(".DS_Store")) return;
 
             String filename = p.getFileName().toString();
             filename = filename.substring(0, filename.indexOf("."));

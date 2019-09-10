@@ -2,12 +2,21 @@ package io.anuke.mindustry.desktop.steam;
 
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamRemoteStorage.*;
+import io.anuke.arc.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
+    private Map lastMap;
+
     public void publishMap(Map map){
+        this.lastMap = map;
         ugc.createItem(SVars.steamID, WorkshopFileType.GameManagedItem);
     }
 
@@ -33,18 +42,43 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
-        //TODO
-        if(result == SteamResult.OK){
-
-        }else{
-            //TODO show "failed to create" dialog
-            //ui.showError("");
+        if(lastMap == null){
+            Log.err("No map to publish?");
+            return;
         }
+
+        Map map = lastMap;
+
+        if(result == SteamResult.OK){
+            SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
+
+            Gamemode mode = Gamemode.attack.valid(map) ? Gamemode.attack : Gamemode.survival;
+            FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("preview.png");
+            lastMap.file.copyTo(mapFile);
+
+            ugc.setItemTitle(h, map.name());
+            ugc.setItemDescription(h, map.description());
+            ugc.setItemTags(h, new String[]{"map", mode.name()});
+            ugc.setItemVisibility(h, PublishedFileVisibility.Public);
+            ugc.setItemPreview(h, map.previewFile().absolutePath());
+            ugc.setItemContent(h, mapFile.parent().absolutePath());
+            ugc.addItemKeyValueTag(h, "mode", mode.name());
+            ugc.submitItemUpdate(h, "Map created");
+        }else{
+            ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
+        }
+
+        lastMap = null;
     }
 
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
-
+        if(result == SteamResult.OK){
+            //redirect user to page for further updates
+            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.toString());
+        }else{
+            ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
+        }
     }
 
     @Override
