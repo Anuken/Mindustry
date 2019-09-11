@@ -22,6 +22,7 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
@@ -38,6 +39,8 @@ public class Renderer implements ApplicationListener{
     private Color clearColor;
     private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
+    private float landscale = 0f, landTime;
+    private float minZoomScl = Scl.scl(0.01f);
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private float shakeIntensity, shaketime;
 
@@ -99,14 +102,21 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void update(){
-        //TODO hack, find source of this bug
         Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+
+        if(landTime > 0){
+            landTime -= Time.delta();
+            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            camerascale = landscale;
+        }
+
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
         if(state.is(State.menu)){
+            landTime = 0f;
             graphics.clear(Color.black);
         }else{
             Vector2 position = Tmp.v3.set(player);
@@ -282,8 +292,35 @@ public class Renderer implements ApplicationListener{
 
         playerGroup.draw(p -> !p.isDead() && !p.isLocal, Player::drawName);
 
+        drawLanding();
+
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawLanding(){
+        if(landTime > 0 && player.getClosestCore() != null){
+            float fract = landTime / Fx.coreLand.lifetime;
+            TileEntity entity = player.getClosestCore();
+
+            TextureRegion reg = entity.block.icon(Block.Icon.full);
+            float scl = Scl.scl(4f) / camerascale;
+            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+
+            Draw.color(Pal.lightTrail);
+            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+
+            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
+                Lines.stroke(scl * fin);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+            });
+
+            Draw.color();
+            Draw.mixcol(Color.white, fract);
+            Draw.rect(reg, entity.x, entity.y, reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+
+            Draw.reset();
+        }
     }
 
     private void drawGroundShadows(){
@@ -359,6 +396,11 @@ public class Renderer implements ApplicationListener{
     public void setScale(float scl){
         targetscale = scl;
         clampScale();
+    }
+
+    public void zoomIn(float duration){
+        landscale = minZoomScl;
+        landTime = duration;
     }
 
     public void takeMapScreenshot(){

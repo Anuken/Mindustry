@@ -520,6 +520,21 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
+    public void showLand(){
+        Image image = new Image();
+        image.getColor().a = 1f;
+        image.touchable(Touchable.disabled);
+        image.setFillParent(true);
+        image.actions(Actions.fadeOut(0.8f), Actions.remove());
+        image.update(() -> {
+            image.toFront();
+            if(state.is(State.menu)){
+                image.remove();
+            }
+        });
+        Core.scene.add(image);
+    }
+
     private void showLaunchConfirm(){
         FloatingDialog dialog = new FloatingDialog("$launch");
         dialog.update(() -> {

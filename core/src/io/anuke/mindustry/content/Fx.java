@@ -1,19 +1,17 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.effect.GroundEffectEntity.GroundEffect;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.game.ContentList;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.graphics.Drawf;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Item.Icon;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.effect.GroundEffectEntity.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.Item.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -32,7 +30,7 @@ public class Fx implements ContentList{
     bigShockwave, nuclearShockwave, explosion, blockExplosion, blockExplosionSmoke, shootSmall, shootHeal, shootSmallSmoke, shootBig, shootBig2, shootBigSmoke,
     shootBigSmoke2, shootSmallFlame, shootPyraFlame, shootLiquid, shellEjectSmall, shellEjectMedium,
     shellEjectBig, lancerLaserShoot, lancerLaserShootSmoke, lancerLaserCharge, lancerLaserChargeBegin, lightningCharge, lightningShoot,
-    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch, commandSend;
+    unitSpawn, spawnShockwave, magmasmoke, impactShockwave, impactcloud, impactsmoke, dynamicExplosion, padlaunch, commandSend, coreLand;
 
     @Override
     public void load(){
@@ -1208,6 +1206,9 @@ public class Fx implements ContentList{
             Lines.stroke(3f * e.fout());
             Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
             Draw.reset();
+        });
+
+        coreLand = new Effect(120f, e -> {
         });
     }
 }

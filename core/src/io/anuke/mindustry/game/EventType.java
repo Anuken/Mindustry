@@ -16,7 +16,8 @@ public class EventType{
         impactPower,
         thoriumReactorOverheat,
         itemLaunch,
-        fireExtinguish
+        fireExtinguish,
+        newGame
     }
 
     public static class WinEvent{}

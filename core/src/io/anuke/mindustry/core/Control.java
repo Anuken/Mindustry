@@ -151,6 +151,20 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+
+        Events.on(Trigger.newGame, () -> {
+            TileEntity core = player.getClosestCore();
+
+            if(core == null) return;
+
+            app.post(() -> ui.hudfrag.showLand());
+            renderer.zoomIn(Fx.coreLand.lifetime);
+            app.post(() -> Effects.effect(Fx.coreLand, core.x, core.y, 0, core.block));
+            Time.run(Fx.coreLand.lifetime, () -> {
+                Effects.effect(Fx.launch, core);
+                Effects.shake(5f, 5f, core);
+            });
+        });
     }
 
     @Override
@@ -204,6 +218,7 @@ public class Control implements ApplicationListener, Loadable{
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -222,6 +237,7 @@ public class Control implements ApplicationListener, Loadable{
             state.set(State.playing);
             control.saves.zoneSave();
             logic.play();
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -274,6 +290,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.waveSpacing = 60f * 30;
             state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
+            Events.fire(Trigger.newGame);
         });
     }
 
