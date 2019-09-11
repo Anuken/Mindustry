@@ -242,10 +242,13 @@ public class HudFragment extends Fragment{
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
+                IntFormat pos = new IntFormat("pos");
 
                 info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel);
                 info.row();
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
+                info.row();
+                info.label(() -> Core.bundle.format("pos", (int)player.getX(), (int)player.getY())).left().style(Styles.outlineLabel);
             }).top().left();
         });
 
