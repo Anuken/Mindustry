@@ -1,6 +1,7 @@
 package io.anuke.mindustry.entities.effect;
 
 import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -10,9 +11,9 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -70,7 +71,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
      */
     public static void extinguish(Tile tile, float intensity){
         if(tile != null && map.containsKey(tile.pos())){
-            map.get(tile.pos()).time += intensity * Time.delta();
+            Fire fire = map.get(tile.pos());
+            fire.time += intensity * Time.delta();
+            if(fire.time >= fire.lifetime()){
+                Events.fire(Trigger.fireExtinguish);
+            }
         }
     }
 

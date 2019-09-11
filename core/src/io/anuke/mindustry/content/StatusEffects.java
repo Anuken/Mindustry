@@ -1,9 +1,13 @@
 package io.anuke.mindustry.content;
 
+import io.anuke.arc.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.StatusEffect;
+
+import static io.anuke.mindustry.Vars.waveTeam;
 
 public class StatusEffects implements ContentList{
     public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, corroded, boss;
@@ -37,7 +41,12 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.9f;
             effect = Fx.wet;
 
-            trans(() -> shocked, ((unit, time, newTime, result) -> unit.damage(20f)));
+            trans(() -> shocked, ((unit, time, newTime, result) -> {
+                unit.damage(20f);
+                if(unit.getTeam() == waveTeam){
+                    Events.fire(Trigger.shock);
+                }
+            }));
             opposite(() -> burning);
         }};
 

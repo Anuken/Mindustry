@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
@@ -10,6 +10,7 @@ import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Damage;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
@@ -111,6 +112,7 @@ public class NuclearReactor extends PowerGenerator{
         entity.heat = Mathf.clamp(entity.heat);
 
         if(entity.heat >= 0.999f){
+            Events.fire(Trigger.thoriumReactorOverheat);
             entity.kill();
         }
     }

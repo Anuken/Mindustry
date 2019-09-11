@@ -35,7 +35,9 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onUnsubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
-
+        ItemInstallInfo info = new ItemInstallInfo();
+        ugc.getItemInstallInfo(publishedFileID, info);
+        Log.info("Item unsubscribed from {0}", info.getFolder());
     }
 
     @Override
@@ -106,7 +108,9 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onDownloadItemResult(int appID, SteamPublishedFileID publishedFileID, SteamResult result){
-
+        ItemInstallInfo info = new ItemInstallInfo();
+        ugc.getItemInstallInfo(publishedFileID, info);
+        Log.info("Item downloaded to {0}", info.getFolder());
     }
 
     @Override
@@ -141,6 +145,8 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onDeleteItem(SteamPublishedFileID publishedFileID, SteamResult result){
-
+        ItemInstallInfo info = new ItemInstallInfo();
+        ugc.getItemInstallInfo(publishedFileID, info);
+        Log.info("Item removed from {0}", info.getFolder());
     }
 }

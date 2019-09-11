@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.Unit;
@@ -8,6 +9,44 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.entities.type.Player;
 
 public class EventType{
+
+    //events that occur very often
+    public enum Trigger{
+        shock,
+        impactPower,
+        thoriumReactorOverheat,
+        itemLaunch,
+        fireExtinguish
+    }
+
+    //TODO
+    public static class WinEvent{}
+
+    //TODO
+    public static class LoseEvent{}
+
+    //TODO
+    public static class LaunchEvent{}
+
+    //TODO
+    public static class PlayerDeathEvent{}
+
+    //TODO
+    public static class MapMakeEvent{}
+
+    //TODO
+    public static class MapPublishEvent{}
+
+    //TODO
+    public static class PlayerChatEvent{
+        public final Player player;
+        public final String message;
+
+        public PlayerChatEvent(Player player, String message){
+            this.player = player;
+            this.message = message;
+        }
+    }
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
@@ -137,11 +176,13 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
+        public final @Nullable Player player;
         public final boolean breaking;
 
-        public BlockBuildEndEvent(Tile tile, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Player player, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
+            this.player = player;
             this.breaking = breaking;
         }
     }
