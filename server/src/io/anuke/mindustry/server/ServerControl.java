@@ -19,9 +19,8 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Administration.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.plugin.Plugins;
+import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
@@ -169,7 +168,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
-                Net.closeServer();
+                net.closeServer();
             }
         });
 
@@ -203,12 +202,12 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
-            Net.dispose();
+            net.dispose();
             Core.app.exit();
         });
 
         handler.register("stop", "Stop hosting the server.", arg -> {
-            Net.closeServer();
+            net.closeServer();
             if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
             info("Stopped server.");
@@ -534,7 +533,7 @@ public class ServerControl implements ApplicationListener{
 
             if(target != null){
                 Call.sendMessage("[scarlet] " + target.name + " has been kicked by the server.");
-                netServer.kick(target.con.id, KickReason.kick);
+                target.con.kick(KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -563,7 +562,7 @@ public class ServerControl implements ApplicationListener{
             for(Player player : playerGroup.all()){
                 if(netServer.admins.isIDBanned(player.uuid)){
                     Call.sendMessage("[scarlet] " + player.name + " has been banned.");
-                    netServer.kick(player.con.id, KickReason.banned);
+                    player.con.kick(KickReason.banned);
                 }
             }
         });
@@ -817,7 +816,7 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
-                netServer.sendWorldData(p, p.con.id);
+                netServer.sendWorldData(p);
             }
             inExtraRound = false;
         };
@@ -830,7 +829,7 @@ public class ServerControl implements ApplicationListener{
                         r.run();
                     }catch(MapException e){
                         Log.err(e.map.name() + ": " + e.getMessage());
-                        Net.closeServer();
+                        net.closeServer();
                     }
                 }
             };
@@ -843,7 +842,7 @@ public class ServerControl implements ApplicationListener{
 
     private void host(){
         try{
-            Net.host(Core.settings.getInt("port"));
+            net.host(Core.settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");

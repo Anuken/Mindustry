@@ -1,34 +1,32 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Queue;
-import io.anuke.arc.graphics.Color;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
-import io.anuke.mindustry.io.TypeIO;
+import io.anuke.mindustry.input.InputHandler.*;
+import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
@@ -50,7 +48,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float baseRotation;
     public float pointerX, pointerY;
     public String name = "name";
-    public String uuid, usid;
+    public @Nullable String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -59,13 +57,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
-    public NetConnection con;
+    public @Nullable NetConnection con;
     public boolean isLocal = false;
     public Interval timer = new Interval(6);
     public TargetTrait target;
     public TargetTrait moveTarget;
 
-    public String lastText;
+    public @Nullable String lastText;
     public float textFadeTime;
 
     private float walktime, itemtime;
@@ -229,7 +227,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void damage(float amount){
         hitTime = hitDuration;
-        if(!Net.client()){
+        if(!net.client()){
             health -= calculateDamage(amount);
         }
 
@@ -298,11 +296,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.color(Color.WHITE, floor.color, 0.5f);
+                Draw.color(Color.white, floor.color, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -322,9 +320,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, drownTime);
+            Draw.color(Color.white, floor.color, drownTime);
         }else{
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
         }
 
         Draw.rect(mech.region, x, y, rotation - 90);
@@ -347,7 +345,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
@@ -369,21 +367,21 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
         size + Mathf.absin(Time.time(), 2f, size / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
         (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default");
+        BitmapFont font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / UnitScl.dp.scl(1f));
+        font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
         Draw.color(0f, 0f, 0f, 0.3f);
         Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
@@ -395,9 +393,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(isAdmin){
             float s = 3f;
             Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
             Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){
@@ -406,7 +404,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
 
-            layout.setText(font, text, Color.WHITE, width, Align.bottom, true);
+            layout.setText(font, text, Color.white, width, Align.bottom, true);
 
             Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
             Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
@@ -416,7 +414,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
         Pools.free(layout);
         font.getData().setScale(1f);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.white);
         font.setUseIntegerPositions(ints);
     }
 
@@ -530,7 +528,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             spawner = null;
         }
 
-        if(isLocal || Net.server()){
+        if(isLocal || net.server()){
             avoidOthers();
         }
 
@@ -561,7 +559,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             status.update(this); //status effect updating also happens with non locals for effect purposes
             updateVelocityStatus(); //velocity too, for visual purposes
 
-            if(Net.server()){
+            if(net.server()){
                 updateShooting(); //server simulates player shooting
             }
             return;
@@ -784,7 +782,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 Vars.ui.chatfrag.addMessage(text, null);
             }
         }else{
-            Call.sendMessage(con.id, text, null, null);
+            Call.sendMessage(con, text, null, null);
         }
     }
 
@@ -798,7 +796,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 Vars.ui.chatfrag.addMessage(text, fromName);
             }
         }else{
-            Call.sendMessage(con.id, text, fromName, from);
+            Call.sendMessage(con, text, fromName, from);
         }
     }
 
@@ -847,7 +845,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(!Net.client()){
+            if(!net.client()){
                 if(lastSpawner != null && lastSpawner.isValid()){
                     this.spawner = lastSpawner;
                 }else if(getClosestCore() != null){

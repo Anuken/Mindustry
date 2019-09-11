@@ -17,8 +17,6 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -35,12 +33,10 @@ public class AndroidLauncher extends AndroidApplication{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         if(doubleScaleTablets && isTablet(this.getContext())){
-            UnitScl.dp.addition = 0.5f;
+            Scl.setAddition(0.5f);
         }
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
+
         initialize(new ClientLauncher(){
 
             @Override
@@ -121,9 +117,9 @@ public class AndroidLauncher extends AndroidApplication{
                 return true;
             }
         }, new AndroidApplicationConfiguration(){{
-            config.useImmersiveMode = true;
-            config.depth = 0;
-            config.hideStatusBar = true;
+            useImmersiveMode = true;
+            depth = 0;
+            hideStatusBar = true;
         }});
         checkFiles(getIntent());
     }
@@ -172,10 +168,10 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                                ui.showException("$save.import.fail", e);
                             }
                         }else{
-                            ui.showError("$save.import.invalid");
+                            ui.showErrorMessage("$save.import.invalid");
                         }
                     }else if(map){ //open map
                         FileHandle file = Core.files.local("temp-map." + mapExtension);

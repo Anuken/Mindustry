@@ -73,6 +73,23 @@
                     <string>io.anuke.mindustry.mapfile</string>
                 </array>
             </dict>
+
+            <array>
+                <dict>
+                    <key>CFBundleTypeIconFiles</key>
+                    <array>
+                        <string>icon-72.png</string>
+                    </array>
+                    <key>CFBundleTypeName</key>
+                    <string>Zip Data File</string>
+                    <key>LSHandlerRank</key>
+                    <string>Alternate</string>
+                    <key>LSItemContentTypes</key>
+                    <array>
+                        <string>public.archive</string>
+                    </array>
+                </dict>
+            </array>
         </array>
 
         <key>UTExportedTypeDeclarations</key>

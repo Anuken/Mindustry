@@ -8,6 +8,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -71,9 +72,15 @@ public class ImpactReactor extends PowerGenerator{
         FusionReactorEntity entity = tile.entity();
 
         if(entity.cons.valid() && entity.power.satisfaction >= 0.99f){
+            boolean prevOut = getPowerProduction(tile) <= consumes.getPower().requestedPower(entity);
+
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, warmupSpeed);
             if(Mathf.isEqual(entity.warmup, 1f, 0.001f)){
                 entity.warmup = 1f;
+            }
+
+            if(!prevOut && (getPowerProduction(tile) <= consumes.getPower().requestedPower(entity))){
+                Events.fire(Trigger.impactPower);
             }
 
             if(entity.timer.get(timerUse, itemDuration / entity.timeScale)){

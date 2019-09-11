@@ -10,12 +10,13 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.SettingsDialog.SettingsTable.*;
+import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
@@ -31,12 +32,10 @@ public class SettingsMenuDialog extends SettingsDialog{
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
-        setStyle(Core.scene.skin.get("dialog", WindowStyle.class));
-
         hidden(() -> {
             Sounds.back.play();
             if(!state.is(State.menu)){
-                if(!wasPaused || Net.active())
+                if(!wasPaused || net.active())
                     state.set(State.playing);
             }
         });
@@ -54,13 +53,13 @@ public class SettingsMenuDialog extends SettingsDialog{
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image("whiteui")).growX().height(3f).pad(4f).get().setColor(Pal.accent);
+        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
         buttons.remove();
 
-        menu = new Table("button");
+        menu = new Table(Tex.button);
 
         game = new SettingsTable();
         graphics = new SettingsTable();
@@ -78,9 +77,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         dataDialog = new FloatingDialog("$settings.data");
         dataDialog.addCloseButton();
 
-        dataDialog.cont.table("button", t -> {
+        dataDialog.cont.table(Tex.button, t -> {
             t.defaults().size(240f, 60f).left();
-            String style = "clear";
+            TextButtonStyle style = Styles.cleart;
 
             t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
@@ -108,7 +107,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                     try{
                         data.exportData(file);
                     }catch(Exception e){
-                        ui.showError(Strings.parseException(e, true));
+                        ui.showException(e);
                     }
                     platform.shareFile(file);
                 }else{
@@ -118,7 +117,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             ui.showInfo("$data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
-                            ui.showError(Strings.parseException(e, true));
+                            ui.showException(e);
                         }
                     });
                 }
@@ -127,23 +126,23 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.row();
 
             //iOS doesn't have a file chooser.
-            if(!ios){
+            //if(!ios){
                 t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                     try{
                         data.importData(file);
                         Core.app.exit();
                     }catch(IllegalArgumentException e){
-                        ui.showError("$data.invalid");
+                        ui.showErrorMessage("$data.invalid");
                     }catch(Exception e){
                         e.printStackTrace();
                         if(e.getMessage() == null || !e.getMessage().contains("too short")){
-                            ui.showError(Strings.parseException(e, true));
+                            ui.showException(e);
                         }else{
-                            ui.showError("$data.invalid");
+                            ui.showErrorMessage("$data.invalid");
                         }
                     }
                 })));
-            }
+            //}
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -178,7 +177,7 @@ public class SettingsMenuDialog extends SettingsDialog{
     void rebuildMenu(){
         menu.clearChildren();
 
-        String style = "clear";
+        TextButtonStyle style = Styles.cleart;
 
         menu.defaults().size(300f, 60f);
         menu.addButton("$settings.game", style, () -> visible(0));
@@ -214,6 +213,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         game.checkPref("savecreate", true);
+
+        if(steam){
+            game.checkPref("publichost", false, i -> {
+                platform.updateLobby();
+            });
+        }
 
         game.pref(new Setting(){
             @Override
@@ -312,7 +317,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", "icon-arrow-left", 30f, () -> {
+        buttons.addImageTextButton("$back", Icon.arrowLeftSmaller, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{

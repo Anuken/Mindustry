@@ -19,9 +19,9 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -78,7 +78,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        if(!Net.client()){
+        if(!net.client()){
             super.damage(calculateDamage(amount));
         }
         hitTime = hitDuration;
@@ -308,7 +308,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f && !Net.client()){
+            if(drownTime >= 0.999f && !net.client()){
                 damage(health + 1);
             }
 
@@ -347,7 +347,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void applyEffect(StatusEffect effect, float duration){
-        if(dead || Net.client()) return; //effects are synced and thus not applied through clients
+        if(dead || net.client()) return; //effects are synced and thus not applied through clients
         status.handleApply(this, effect, duration);
     }
 
@@ -372,7 +372,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
 
@@ -400,10 +400,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
 
             if(number){
-                Core.scene.skin.getFont("outline").draw(item.amount + "",
+                Fonts.outline.draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
-                    Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center
+                    Pal.accent, 0.25f * itemtime / Scl.scl(1f), false, Align.center
                 );
             }
         }

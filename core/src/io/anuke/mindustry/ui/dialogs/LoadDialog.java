@@ -11,10 +11,11 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.io.SaveIO.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Styles;
 
 import java.io.*;
 
@@ -58,7 +59,7 @@ public class LoadDialog extends FloatingDialog{
         for(SaveSlot slot : array){
             if(slot.isHidden()) continue;
 
-            TextButton button = new TextButton("", "clear");
+            TextButton button = new TextButton("", Styles.cleart);
             button.getLabel().remove();
             button.clearChildren();
 
@@ -70,45 +71,44 @@ public class LoadDialog extends FloatingDialog{
                 title.table(t -> {
                     t.right();
 
-                    t.addImageButton("icon-floppy", "emptytoggle", iconsize, () -> {
+                    t.addImageButton(Icon.floppy, Styles.emptytogglei, () -> {
                         slot.setAutosave(!slot.isAutosave());
                     }).checked(slot.isAutosave()).right();
 
-                    t.addImageButton("icon-trash", "empty", iconsize, () -> {
+                    t.addImageButton(Icon.trash, Styles.emptyi, () -> {
                         ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
                             slot.delete();
                             setup();
                         });
-                    }).size(iconsize).right();
+                    }).right();
 
-                    t.addImageButton("icon-pencil", "empty", iconsize, () -> {
+                    t.addImageButton(Icon.pencil, Styles.emptyi, () -> {
                         ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
                             setup();
                         });
-                    }).size(iconsize).right();
+                    }).right();
 
-                t.addImageButton("icon-save", "empty", iconsize, () -> {
-                    if(!ios){
-                        platform.showFileChooser(false, saveExtension, file -> {
+                    t.addImageButton(Icon.save, Styles.emptyi, () -> {
+                        if(!ios){
+                            platform.showFileChooser(false, saveExtension, file -> {
+                                try{
+                                    slot.exportFile(file);
+                                    setup();
+                                }catch(IOException e){
+                                    ui.showException("save.export.fail", e);
+                                }
+                            });
+                        }else{
                             try{
+                                FileHandle file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
                                 slot.exportFile(file);
-                                setup();
-                            }catch(IOException e){
-                                ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
+                                platform.shareFile(file);
+                            }catch(Exception e){
+                                ui.showException("save.export.fail", e);
                             }
-                        });
-                    }else{
-                        try{
-                            FileHandle file = Core.files.local("save-" + slot.getName() + "." + saveExtension);
-                            slot.exportFile(file);
-                            platform.shareFile(file);
-                        }catch(Exception e){
-                            ui.showError(Core.bundle.format("save.export.fail", Strings.parseException(e, true)));
                         }
-                    }
-                }).size(iconsize).right();
-
+                    }).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);
@@ -170,7 +170,7 @@ public class LoadDialog extends FloatingDialog{
 
         if(ios) return;
 
-        slots.addImageTextButton("$save.import", "icon-add", iconsize, () -> {
+        slots.addImageTextButton("$save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -178,10 +178,10 @@ public class LoadDialog extends FloatingDialog{
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                        ui.showException("$save.import.fail", e);
                     }
                 }else{
-                    ui.showError("$save.import.invalid");
+                    ui.showErrorMessage("$save.import.invalid");
                 }
             });
         }).fillX().margin(10f).minWidth(300f).height(70f).pad(4f).padRight(-4);
@@ -193,14 +193,14 @@ public class LoadDialog extends FloatingDialog{
 
         ui.loadAnd(() -> {
             try{
-                Net.reset();
+                net.reset();
                 slot.load();
                 state.set(State.playing);
             }catch(SaveException e){
                 Log.err(e);
                 state.set(State.menu);
                 logic.reset();
-                ui.showError("$save.corrupted");
+                ui.showErrorMessage("$save.corrupted");
             }
         });
     }

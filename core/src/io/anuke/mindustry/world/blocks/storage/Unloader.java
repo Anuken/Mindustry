@@ -77,7 +77,7 @@ public class Unloader extends Block{
 
         SortedUnloaderEntity entity = tile.entity();
 
-        Draw.color(entity.sortItem == null ? Color.CLEAR : entity.sortItem.color);
+        Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
         Fill.square(tile.worldx(), tile.worldy(), 1f);
         Draw.color();
     }

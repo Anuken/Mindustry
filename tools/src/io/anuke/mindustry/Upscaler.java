@@ -6,14 +6,9 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.ui.*;
 
 public class Upscaler{
-    static Res[] resolutions = {
-        new Res(Vars.iconsizesmall, "-small"),
-        new Res(Vars.iconsizemed, "-med"),
-        new Res(Vars.iconsize, ""),
-    };
-
     public static void main(String[] args){
         new SdlApplication(new ApplicationListener(){
             @Override
@@ -35,12 +30,13 @@ public class Upscaler{
         Time.mark();
         FileHandle[] list = file.list();
 
-        for(Res res : resolutions){
-            SquareMarcher marcher = new SquareMarcher(res.size);
+        for(IconSize size : IconSize.values()){
+            String suffix = size == IconSize.def ? "" : "-" + size.name();
+            SquareMarcher marcher = new SquareMarcher(size.size);
 
             for(FileHandle img : list){
                 if(img.extension().equals("png")){
-                    marcher.render(new Pixmap(img), img.sibling(img.nameWithoutExtension() + res.suffix + ".png"));
+                    marcher.render(new Pixmap(img), img.sibling(img.nameWithoutExtension() + suffix + ".png"));
                 }
             }
         }

@@ -53,7 +53,7 @@ public class IndexedRenderer implements Disposable{
     private Matrix3 projMatrix = new Matrix3();
     private Matrix3 transMatrix = new Matrix3();
     private Matrix3 combined = new Matrix3();
-    private float color = Color.WHITE.toFloatBits();
+    private float color = Color.white.toFloatBits();
 
     public IndexedRenderer(int sprites){
         resize(sprites);

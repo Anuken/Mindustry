@@ -108,7 +108,7 @@ public class Maps{
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public void saveMap(ObjectMap<String, String> baseTags){
+    public Map saveMap(ObjectMap<String, String> baseTags){
 
         try{
             StringMap tags = new StringMap(baseTags);
@@ -166,6 +166,9 @@ public class Maps{
             }
             maps.add(map);
             maps.sort();
+
+            return map;
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -189,6 +192,11 @@ public class Maps{
 
         createNewPreview(map, e -> {
             maps.remove(map);
+            try{
+                map.file.delete();
+            }catch(Throwable ignored){
+
+            }
             error[0] = e;
         });
 
@@ -207,11 +215,11 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showError("$editor.errornot");
+                ui.showErrorMessage("$editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
-                ui.showError("$editor.errorheader");
+                ui.showErrorMessage("$editor.errorheader");
             }else{
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                ui.showException("$editor.errorload", e);
             }
         }
     }

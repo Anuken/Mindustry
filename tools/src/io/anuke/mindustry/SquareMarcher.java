@@ -36,8 +36,8 @@ public class SquareMarcher{
         Draw.proj().setOrtho(-xscl / 2f, -yscl / 2f, resolution, resolution);
 
         buffer.begin();
-        Core.graphics.clear(Color.CLEAR);
-        Draw.color(Color.WHITE);
+        Core.graphics.clear(Color.clear);
+        Draw.color(Color.white);
 
         for(int x = -1; x < pixmap.getWidth(); x++){
             for(int y = -1; y < pixmap.getHeight(); y++){

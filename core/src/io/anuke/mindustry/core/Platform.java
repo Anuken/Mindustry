@@ -7,11 +7,31 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
 public interface Platform{
+
+    /** Steam: Update lobby visibility.*/
+    default void updateLobby(){}
+
+    /** Steam: Show multiplayer friend invite dialog.*/
+    default void inviteFriends(){}
+
+    /** Steam: Share a map on the workshop.*/
+    default void publishMap(Map map){}
+
+    /** Steam: Open workshop for maps.*/
+    default void openWorkshop(){}
+
+    /** Get the networking implementation.*/
+    default NetProvider getNet(){
+        return new ArcNetImpl();
+    }
 
     /** Add a text input dialog that should show up after the field is tapped. */
     default void addDialog(TextField field){
@@ -83,11 +103,11 @@ public interface Platform{
     default void hide(){
     }
 
-    /** Forces the app into landscape mode. Currently Android only. */
+    /** Forces the app into landscape mode.*/
     default void beginForceLandscape(){
     }
 
-    /** Stops forcing the app into landscape orientation. Currently Android only. */
+    /** Stops forcing the app into landscape orientation.*/
     default void endForceLandscape(){
     }
 }

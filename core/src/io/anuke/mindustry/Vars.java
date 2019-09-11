@@ -62,14 +62,6 @@ public class Vars implements Loadable{
     public static final float itemSize = 5f;
     /** extra padding around the world; units outside this bound will begin to self-destruct. */
     public static final float worldBounds = 100f;
-    /** default size of UI icons.*/
-    public static final int iconsize = 48;
-    /** size of UI icons (small)*/
-    public static final int iconsizesmall = 32;
-    /** size of UI icons (medium)*/
-    public static final int iconsizemed = 30;
-    /** size of UI icons (medium)*/
-    public static final int iconsizetiny = 16;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */
@@ -115,6 +107,8 @@ public class Vars implements Loadable{
     public static boolean android;
     /** whether the game is running on a headless server */
     public static boolean headless;
+    /** whether steam is enabled for this game */
+    public static boolean steam;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
     public static FileHandle dataDirectory;
     /** data subdirectory used for screenshots */
@@ -139,6 +133,7 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
+    public static Net net;
     public static ContentLoader content;
     public static GameState state;
     public static GlobalData data;
@@ -171,7 +166,6 @@ public class Vars implements Loadable{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
 
     @Override
@@ -229,7 +223,7 @@ public class Vars implements Loadable{
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && Net.client()){
+                if(entity instanceof SyncTrait && net.client()){
                     netClient.addRemovedEntity((entity).getID());
                 }
             });
@@ -255,11 +249,16 @@ public class Vars implements Loadable{
 
     public static void loadSettings(){
         Core.settings.setAppName(appName);
+
+        if(steam){
+            Core.settings.setDataDirectory(Core.files.local("saves/"));
+        }
+
         Core.settings.defaults("locale", "default");
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
 
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
+        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         if(!loadLocales) return;
 

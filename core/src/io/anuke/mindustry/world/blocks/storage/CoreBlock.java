@@ -94,7 +94,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void handleItem(Item item, Tile tile, Tile source){
-        if(Net.server() || !Net.active()){
+        if(net.server() || !net.active()){
             super.handleItem(item, tile, source);
             if(state.rules.tutorial){
                 Events.fire(new CoreItemDeliverEvent());

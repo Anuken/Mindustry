@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -49,22 +48,22 @@ public abstract class InputHandler implements InputProcessor{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
-        if(Net.server() && player.item().amount <= 0){
+        if(net.server() && player.item().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.item().item);
+        Effects.effect(Fx.dropItem, Color.white, player.x, player.y, angle, player.item().item);
         player.clearItem();
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(!player.timer.get(Player.timerTransfer, 40)) return;
-        if(Net.server() && (player.item().amount <= 0 || player.isTransferring)){
+        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !tile.interactable(player.getTeam()))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        if(player == null || tile.entity == null) return;
+        if(tile.entity == null) return;
 
         player.isTransferring = true;
 
@@ -298,7 +297,7 @@ public abstract class InputHandler implements InputProcessor{
 
         ItemStack stack = player.item();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems && player.item().amount > 0 && !player.isTransferring && tile.interactable(player.getTeam())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));

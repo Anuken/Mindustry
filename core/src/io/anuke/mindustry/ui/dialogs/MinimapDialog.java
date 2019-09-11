@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.renderer;
 
@@ -23,17 +24,13 @@ public class MinimapDialog extends FloatingDialog{
         onResize(this::setup);
     }
 
-    public void drawBackground(float x, float y){
-        drawDefaultBackground(x, y);
-    }
-
     void setup(){
         cont.clearChildren();
 
-        cont.table("pane", t -> {
+        cont.table(Tex.pane,t -> {
             t.addRect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
-                Draw.color(Color.WHITE);
+                Draw.color(Color.white);
                 Draw.alpha(parentAlpha);
                 Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
@@ -41,7 +38,7 @@ public class MinimapDialog extends FloatingDialog{
                     renderer.minimap.drawEntities(x, y, width, height);
                 }
             }).grow();
-        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / UnitScl.dp.scl(1f)).padTop(-20f);
+        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / Scl.scl(1f)).padTop(-20f);
 
         cont.addListener(new InputListener(){
             @Override

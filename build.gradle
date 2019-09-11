@@ -21,11 +21,12 @@ allprojects{
 
     ext{
         versionNumber = '4'
-        versionModifier = 'release'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.7'
+        steamworksVersion = '1.8.0'
         arcHash = null
 
         debugged = {
@@ -150,12 +151,14 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
 
         if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+        compile "com.code-disaster.steamworks4j:steamworks4j:$steamworksVersion"
+        compile "com.code-disaster.steamworks4j:steamworks4j-server:$steamworksVersion"
 
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
@@ -185,7 +188,6 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compileOnly project(":annotations")
 
         compile arcModule("backends:backend-robovm")
@@ -250,7 +252,6 @@ project(":server"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compile arcModule("backends:backend-headless")
     }
 }
@@ -292,14 +293,6 @@ project(":annotations"){
     dependencies{
         compile 'com.squareup:javapoet:1.11.0'
         compile files("${System.getProperty('java.home')}/../lib/tools.jar")
-    }
-}
-
-project(":net"){
-    apply plugin: "java"
-
-    dependencies{
-        compile project(":core")
     }
 }
 

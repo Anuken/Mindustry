@@ -247,7 +247,7 @@ public class ForceProjector extends Block{
         public void drawOver(){
             if(entity.hit <= 0f) return;
 
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
             Draw.alpha(entity.hit);
             Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();

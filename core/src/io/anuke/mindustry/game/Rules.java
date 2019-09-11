@@ -74,4 +74,9 @@ public class Rules{
     public Rules copy(){
         return JsonIO.copy(this);
     }
+
+    /** Returns the gamemode that best fits these rules.*/
+    public Gamemode mode(){
+        return Gamemode.bestFit(this);
+    }
 }

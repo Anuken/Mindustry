@@ -13,6 +13,7 @@ import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -23,10 +24,10 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -60,28 +61,28 @@ public class HudFragment extends Fragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    String style = "clear-trans";
+                    ImageButtonStyle style = Styles.clearTransi;
 
-                    select.addImageButton("icon-menu-large", style, iconsize, ui.paused::show);
-                    flip = select.addImageButton("icon-arrow-up", style, iconsize, this::toggleMenus).get();
+                    select.addImageButton(Icon.menuLarge, style, ui.paused::show);
+                    flip = select.addImageButton(Icon.arrowUp, style, this::toggleMenus).get();
 
-                    select.addImageButton("icon-pause", style, iconsize, () -> {
-                        if(Net.active()){
+                    select.addImageButton(Icon.pause, style, () -> {
+                        if(net.active()){
                             ui.listfrag.toggle();
                         }else{
                             state.set(state.is(State.paused) ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
-                        if(Net.active()){
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-players");
+                        if(net.active()){
+                            i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable(state.is(State.paused) ? "icon-play" : "icon-pause");
+                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
                         }
                     }).get();
 
-                    select.addImageButton("icon-settings", style, iconsize, () -> {
-                        if(Net.active() && mobile){
+                    select.addImageButton(Icon.settings, style,() -> {
+                        if(net.active() && mobile){
                             if(ui.chatfrag.chatOpen()){
                                 ui.chatfrag.hide();
                             }else{
@@ -93,16 +94,16 @@ public class HudFragment extends Fragment{
                             ui.database.show();
                         }
                     }).update(i -> {
-                        if(Net.active() && mobile){
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-chat");
+                        if(net.active() && mobile){
+                            i.getStyle().imageUp = Icon.chat;
                         }else{
-                            i.getStyle().imageUp = Core.scene.skin.getDrawable("icon-database");
+                            i.getStyle().imageUp = Icon.database;
                         }
                     }).get();
 
-                    select.addImage("whiteui").color(Pal.gray).width(4f).fillY();
+                    select.addImage().color(Pal.gray).width(4f).fillY();
 
-                    float size = UnitScl.dp.scl(dsize);
+                    float size = Scl.scl(dsize);
                     Array<Element> children = new Array<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
@@ -114,7 +115,7 @@ public class HudFragment extends Fragment{
                             if(fi < 4){
                                 elem.setSize(size);
                             }else{
-                                elem.setSize(UnitScl.dp.scl(4f), size);
+                                elem.setSize(Scl.scl(4f), size);
                             }
                             elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
                             return true;
@@ -125,7 +126,7 @@ public class HudFragment extends Fragment{
                 }
 
                 cont.row();
-                cont.addImage("whiteui").height(4f).color(Pal.gray).fillX();
+                cont.addImage().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
 
@@ -143,7 +144,7 @@ public class HudFragment extends Fragment{
                 wavesMain.visible(() -> shown && !state.isEditor());
                 wavesMain.top().left();
                 Stack stack = new Stack();
-                Button waves = new Button("wave");
+                Button waves = new Button(Styles.waveb);
                 Table btable = new Table().margin(0);
 
                 stack.add(waves);
@@ -153,13 +154,13 @@ public class HudFragment extends Fragment{
                 addPlayButton(btable);
                 wavesMain.add(stack).width(dsize * 4 + 4f);
                 wavesMain.row();
-                wavesMain.table("button", t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.WHITE))
+                wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
                 .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
                 wavesMain.row();
             }
 
             {
-                editorMain.table("button-edge-4", t -> {
+                editorMain.table(Tex.buttonEdge4, t -> {
                     //t.margin(0f);
                     t.add("$editor.teams").growX().left();
                     t.row();
@@ -167,7 +168,7 @@ public class HudFragment extends Fragment{
                         teams.left();
                         int i = 0;
                         for(Team team : Team.all){
-                            ImageButton button = teams.addImageButton("white", "clear-toggle-partial", 40f, () -> Call.setPlayerTeamEditor(player, team))
+                            ImageButton button = teams.addImageButton(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
                                 .size(50f).margin(6f).get();
                             button.getImageCell().grow();
                             button.getStyle().imageUpColor = team.color;
@@ -182,11 +183,11 @@ public class HudFragment extends Fragment{
                     if(enableUnitEditing){
 
                         t.row();
-                        t.addImageTextButton("$editor.spawn", "icon-add", iconsize, () -> {
+                        t.addImageTextButton("$editor.spawn", Icon.add, () -> {
                             FloatingDialog dialog = new FloatingDialog("$editor.spawn");
                             int i = 0;
                             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                                dialog.cont.addImageButton("white", 48, () -> {
+                                dialog.cont.addImageButton(Tex.whiteui, 48, () -> {
                                     Call.spawnUnitEditor(player, type);
                                     dialog.hide();
                                 }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
@@ -201,7 +202,7 @@ public class HudFragment extends Fragment{
                         float[] position = {0, 0};
 
                         t.row();
-                        t.addImageTextButton("$editor.removeunit", "icon-quit", "toggle", iconsize, () -> {}).fillX().update(b -> {
+                        t.addImageTextButton("$editor.removeunit", Icon.quit, Styles.togglet, () -> {}).fillX().update(b -> {
                             boolean[] found = {false};
                             if(b.isChecked()){
                                 Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -222,7 +223,7 @@ public class HudFragment extends Fragment{
                                 }
                             }
 
-                            Draw.color(Pal.accent, Color.WHITE, Mathf.absin(Time.time(), 8f, 1f));
+                            Draw.color(Pal.accent, Color.white, Mathf.absin(Time.time(), 8f, 1f));
                             Lines.poly(position[0], position[1], 4, size[0] / 2f);
                             Draw.reset();
 
@@ -238,13 +239,13 @@ public class HudFragment extends Fragment{
             //fps display
             cont.table(info -> {
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps"));
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -UnitScl.dp.scl(dsize * 4 + 3), 0));
+                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
-                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style("outline");
+                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel);
                 info.row();
-                info.label(() -> ping.get(Net.getPing())).visible(Net::client).left().style("outline");
+                info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
 
@@ -254,15 +255,15 @@ public class HudFragment extends Fragment{
         //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
-            t.table("flat", c -> c.add("$nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.WHITE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 10f, 1f))))
+            t.table(Styles.black, c -> c.add("$nearpoint")
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers());
-            t.table("button", c -> c.add("$waiting.players"));
+            t.table(Tex.button, c -> c.add("$waiting.players"));
         });
 
         //'core is under attack' table
@@ -308,8 +309,8 @@ public class HudFragment extends Fragment{
 
                 return coreAttackOpacity > 0;
             });
-            t.table("button", top -> top.add("$coreattack").pad(2)
-            .update(label -> label.getColor().set(Color.ORANGE).lerp(Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+            t.table(Tex.button, top -> top.add("$coreattack").pad(2)
+            .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //tutorial text
@@ -317,14 +318,14 @@ public class HudFragment extends Fragment{
             Runnable resize = () -> {
                 t.clearChildren();
                 t.top().right().visible(() -> state.rules.tutorial);
-                t.stack(new Button("default"){{
+                t.stack(new Button(){{
                     marginLeft(48f);
                     labelWrap(() -> control.tutorial.stage.text() + (control.tutorial.canNext() ? "\n\n" + Core.bundle.get("tutorial.next") : "")).width(!Core.graphics.isPortrait() ? 400f : 160f).pad(2f);
                     clicked(() -> control.tutorial.nextSentence());
                     setDisabled(() -> !control.tutorial.canNext());
                 }},
                 new Table(f -> {
-                    f.left().addImageButton("icon-arrow-left-small", "empty", iconsizesmall, () -> {
+                    f.left().addImageButton(Icon.arrowLeftSmall, Styles.emptyi, () -> {
                         control.tutorial.prevSentence();
                     }).width(44f).growY().visible(() -> control.tutorial.canPrev());
                 }));
@@ -337,13 +338,13 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.isPaused()).touchable(Touchable.disabled);
-            t.table("button-trans", top -> top.add("$paused").pad(5f));
+            t.table(Tex.buttonTrans, top -> top.add("$paused").pad(5f));
         });
 
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saveload").style("outline");
+            t.add("$saveload").style(Styles.outlineLabel);
         });
 
         blockfrag.build(parent);
@@ -391,14 +392,14 @@ public class HudFragment extends Fragment{
         scheduleToast(() -> {
             Sounds.message.play();
 
-            Table table = new Table("button");
+            Table table = new Table(Tex.button);
             table.update(() -> {
                 if(state.is(State.menu)){
                     table.remove();
                 }
             });
             table.margin(12);
-            table.addImage("icon-check").size(iconsize).pad(3);
+            table.addImage(Icon.check).pad(3);
             table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
             table.pack();
 
@@ -427,7 +428,7 @@ public class HudFragment extends Fragment{
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
             scheduleToast(() -> {
-                Table table = new Table("button");
+                Table table = new Table(Tex.button);
                 table.update(() -> {
                     if(state.is(State.menu)){
                         table.remove();
@@ -499,7 +500,7 @@ public class HudFragment extends Fragment{
 
                 lastUnlockLayout.add(image);
             }else{ //else, add a specific icon to denote no more space
-                lastUnlockLayout.addImage("icon-add");
+                lastUnlockLayout.addImage(Icon.add);
             }
 
             lastUnlockLayout.pack();
@@ -507,7 +508,7 @@ public class HudFragment extends Fragment{
     }
 
     public void showLaunch(){
-        Image image = new Image("whiteui");
+        Image image = new Image();
         image.getColor().a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));
@@ -542,7 +543,7 @@ public class HudFragment extends Fragment{
     private boolean inLaunchWave(){
         return world.isZone() &&
             world.getZone().metCondition() &&
-            !Net.client() &&
+            !net.client() &&
             state.wave % world.getZone().launchPeriod == 0 && !spawner.isSpawning();
     }
 
@@ -552,7 +553,7 @@ public class HudFragment extends Fragment{
 
     private void toggleMenus(){
         if(flip != null){
-            flip.getStyle().imageUp = Core.scene.skin.getDrawable(shown ? "icon-arrow-down" : "icon-arrow-up");
+            flip.getStyle().imageUp = shown ? Icon.arrowDown : Icon.arrowUp;
         }
 
         shown = !shown;
@@ -597,7 +598,7 @@ public class HudFragment extends Fragment{
 
             if(inLaunchWave()){
                 builder.append("[#");
-                Tmp.c1.set(Color.WHITE).lerp(state.enemies() > 0 ? Color.WHITE : Color.SCARLET, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
+                Tmp.c1.set(Color.white).lerp(state.enemies() > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
                 builder.append("]");
 
                 if(!canLaunch()){
@@ -639,12 +640,12 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((Net.server() || player.isAdmin) || !Net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.isAdmin) || !net.active()) && state.enemies() == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
-        table.right().addImageButton("icon-play", "right", 30f, () -> {
-            if(Net.client() && player.isAdmin){
+        table.right().addImageButton(Icon.playSmaller, Styles.righti, 30f, () -> {
+            if(net.client() && player.isAdmin){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);

@@ -48,7 +48,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public static void onUnitDeath(BaseUnit unit){
         if(unit == null) return;
 
-        if(Net.server() || !Net.active()){
+        if(net.server() || !net.active()){
             UnitDrops.dropItems(unit);
         }
 
@@ -56,7 +56,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         unit.type.deathSound.at(unit);
 
         //visual only.
-        if(Net.client()){
+        if(net.client()){
             Tile tile = world.tile(unit.spawner);
             if(tile != null){
                 tile.block().unitRemoved(tile, unit);
@@ -255,7 +255,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         hitTime -= Time.delta();
 
-        if(Net.client()){
+        if(net.client()){
             interpolate();
             status.update(this);
             return;
@@ -297,7 +297,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
-        if(tile != null && !Net.client()){
+        if(tile != null && !net.client()){
             tile.block().unitRemoved(tile, this);
         }
 

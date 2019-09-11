@@ -8,10 +8,12 @@ import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
@@ -84,7 +86,7 @@ public class MapGenerateDialog extends FloatingDialog{
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", "icon-add", iconsize, this::showAdd).height(64f).width(140f);
+        buttons.addImageTextButton("$add", Icon.add, this::showAdd).height(64f).width(140f);
 
         if(!applied){
             hidden(this::apply);
@@ -176,10 +178,8 @@ public class MapGenerateDialog extends FloatingDialog{
                     }
                 }
             }, new Stack(){{
-                add(new Image("loadDim"));
-                add(new Image("icon-refresh"){{
-                    setScaling(Scaling.none);
-                }});
+                add(new Image(Styles.black8));
+                add(new Image(Icon.refresh, Scaling.none));
                 visible(() -> generating && !updateEditorOnChange);
             }}).grow().padRight(10);
             t.pane(p -> filterTable = p.marginRight(6)).update(pane -> {
@@ -216,7 +216,7 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / UnitScl.dp.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -224,7 +224,7 @@ public class MapGenerateDialog extends FloatingDialog{
         for(GenerateFilter filter : filters){
 
             //main container
-            filterTable.table("button", c -> {
+            filterTable.table(Tex.button, c -> {
                 //icons to perform actions
                 c.table(t -> {
                     t.top();
@@ -233,26 +233,26 @@ public class MapGenerateDialog extends FloatingDialog{
                     t.row();
 
                     t.table(b -> {
-                        String style = "clear";
+                        ImageButtonStyle style = Styles.cleari;
                         b.defaults().size(50f);
-                        b.addImageButton("icon-refresh-small", style, iconsizesmall, () -> {
+                        b.addImageButton(Icon.refreshSmall, style, () -> {
                             filter.randomize();
                             update();
                         });
 
-                        b.addImageButton("icon-arrow-up-small", style, iconsizesmall, () -> {
+                        b.addImageButton(Icon.arrowUpSmall, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.max(0, idx - 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton("icon-arrow-down-small",style,  iconsizesmall, () -> {
+                        b.addImageButton(Icon.arrowDownSmall, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton("icon-trash-small", style, iconsizesmall, () -> {
+                        b.addImageButton(Icon.trashSmall, style, () -> {
                             filters.remove(filter);
                             rebuildFilters();
                             update();

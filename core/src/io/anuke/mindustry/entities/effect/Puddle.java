@@ -83,7 +83,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
 
         Puddle p = map.get(tile.pos());
         if(p == null){
-            if(Net.client()) return; //not clientside.
+            if(net.client()) return; //not clientside.
 
             Puddle puddle = Pools.obtain(Puddle.class, Puddle::new);
             puddle.tile = tile;
@@ -168,7 +168,7 @@ public class Puddle extends SolidEntity implements SaveTrait, Poolable, DrawTrai
     public void update(){
 
         //no updating happens clientside
-        if(Net.client()){
+        if(net.client()){
             amount = Mathf.lerpDelta(amount, targetAmount, 0.15f);
         }else{
             //update code

@@ -24,7 +24,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -255,11 +254,11 @@ public class Block extends BlockStorage{
         if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Core.scene.skin.getFont("outline");
+        BitmapFont font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / 4f / UnitScl.dp.scl(1f));
+        font.getData().setScale(1f / 4f / Scl.scl(1f));
         layout.setText(font, text);
 
         float width = layout.width;
@@ -268,13 +267,13 @@ public class Block extends BlockStorage{
         float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
-        Lines.stroke(2f, Color.DARK_GRAY);
+        Lines.stroke(2f, Color.darkGray);
         Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
         Lines.stroke(1f, color);
         Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 
         font.setUseIntegerPositions(ints);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.white);
         font.getData().setScale(1f);
         Draw.reset();
         Pools.free(layout);
@@ -300,7 +299,7 @@ public class Block extends BlockStorage{
     /** Called after the block is placed by anyone. */
     @CallSuper
     public void placed(Tile tile){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         if((consumesPower && !outputsPower) || (!consumesPower && outputsPower)){
             int range = 10;
@@ -489,7 +488,7 @@ public class Block extends BlockStorage{
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.WHITE));
+        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
             Function<TileEntity, Liquid> current;

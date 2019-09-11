@@ -1,20 +1,21 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.ScrollPane;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.ui.Links;
-import io.anuke.mindustry.ui.Links.LinkEntry;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Links.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class AboutDialog extends FloatingDialog{
     private Array<String> contributors = new Array<>();
-    private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "trello");
+    private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds");
 
     public AboutDialog(){
         super("$about.button");
@@ -39,32 +40,32 @@ public class AboutDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(in);
 
         for(LinkEntry link : Links.getLinks()){
-            if((ios || OS.isMac) && bannedItems.contains(link.name)){ //because Apple doesn't like me mentioning things
+            if((ios || OS.isMac || steam) && bannedItems.contains(link.name)){
                 continue;
             }
 
-            Table table = new Table("underline");
+            Table table = new Table(Tex.underline);
             table.margin(0);
             table.table(img -> {
-                img.addImage("whiteui").height(h - 5).width(40f).color(link.color);
+                img.addImage().height(h - 5).width(40f).color(link.color);
                 img.row();
-                img.addImage("whiteui").height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.addImage().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
             table.table(i -> {
-                i.background("button-edge-3");
-                i.addImage("icon-" + link.name).size(iconsize);
+                i.background(Tex.buttonEdge3);
+                i.addImage(Core.atlas.drawable("icon-" + link.name));
             }).size(h - 5, h);
 
             table.table(inset -> {
                 inset.add("[accent]" + Strings.capitalize(link.name.replace("-", " "))).growX().left();
                 inset.row();
-                inset.labelWrap(link.description).width(w - 100f).color(Color.LIGHT_GRAY).growX();
+                inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);
 
-            table.addImageButton("icon-link", iconsize, () -> {
+            table.addImageButton(Icon.link, () -> {
                 if(!Core.net.openURI(link.link)){
-                    ui.showError("$linkfail");
+                    ui.showErrorMessage("$linkfail");
                     Core.app.setClipboardText(link.link);
                 }
             }).size(h - 5, h);
@@ -94,7 +95,7 @@ public class AboutDialog extends FloatingDialog{
         dialog.cont.add("$credits.text");
         dialog.cont.row();
         if(!contributors.isEmpty()){
-            dialog.cont.addImage("whiteui").color(Pal.accent).fillX().height(3f).pad(3f);
+            dialog.cont.addImage().color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
             dialog.cont.add("$contributors");
             dialog.cont.row();

@@ -26,7 +26,6 @@ repositories{
 
 dependencies{
     implementation project(":core")
-    implementation project(":net")
 
     implementation arcModule("backends:backend-android")
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"

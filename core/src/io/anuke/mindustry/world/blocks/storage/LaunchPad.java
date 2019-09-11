@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
@@ -8,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -73,6 +75,7 @@ public class LaunchPad extends StorageBlock{
 
         if(entity.cons.valid() && world.isZone() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
+                Events.fire(Trigger.itemLaunch);
                 Effects.effect(Fx.padlaunch, tile);
                 data.addItem(item, entity.items.get(item));
                 entity.items.set(item, 0);
