@@ -6,6 +6,7 @@ import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.*;
 
@@ -101,6 +102,7 @@ public class SWorkshop implements SteamUGCCallback{
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
+            Events.fire(new MapPublishEvent());
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }

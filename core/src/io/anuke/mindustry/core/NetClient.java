@@ -1,37 +1,33 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.RandomXS128;
-import io.anuke.arc.util.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.CommandHandler.*;
-import io.anuke.arc.util.io.ReusableByteInStream;
-import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
-import io.anuke.mindustry.entities.traits.SyncTrait;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.TypeID;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.gen.RemoteReadClient;
-import io.anuke.mindustry.net.Administration.TraceInfo;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.net.Administration.*;
+import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
-import io.anuke.mindustry.net.Net.SendMode;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.modules.ItemModule;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.modules.*;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.zip.InflaterInputStream;
+import java.io.*;
+import java.util.zip.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -191,6 +187,8 @@ public class NetClient implements ApplicationListener{
                 player.sendMessage(text);
             }
         }
+
+        Events.fire(new PlayerChatEvent(player, message));
     }
 
     public static String colorizeName(int id, String name){

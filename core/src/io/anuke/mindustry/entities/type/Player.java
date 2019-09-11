@@ -15,6 +15,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;

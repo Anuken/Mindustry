@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Stats.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
@@ -21,6 +22,11 @@ public class GameOverDialog extends FloatingDialog{
     public void show(Team winner){
         this.winner = winner;
         show();
+        if(winner == player.getTeam()){
+            Events.fire(new WinEvent());
+        }else{
+            Events.fire(new LoseEvent());
+        }
     }
 
     void rebuild(){

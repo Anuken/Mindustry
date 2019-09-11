@@ -9,6 +9,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
@@ -56,6 +57,7 @@ public class MapsDialog extends FloatingDialog{
                     hide();
                     ui.editor.show();
                     ui.editor.editor.getTags().put("name", text);
+                    Events.fire(new MapMakeEvent());
                 });
             });
         }).size(210f, 64f);

@@ -19,25 +19,16 @@ public class EventType{
         fireExtinguish
     }
 
-    //TODO
     public static class WinEvent{}
 
-    //TODO
     public static class LoseEvent{}
 
-    //TODO
     public static class LaunchEvent{}
 
-    //TODO
-    public static class PlayerDeathEvent{}
-
-    //TODO
     public static class MapMakeEvent{}
 
-    //TODO
     public static class MapPublishEvent{}
 
-    //TODO
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
