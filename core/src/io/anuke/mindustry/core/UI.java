@@ -67,7 +67,6 @@ public class UI implements ApplicationListener, Loadable{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
-    public BrowseMapsDialog browse;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -218,7 +217,6 @@ public class UI implements ApplicationListener, Loadable{
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
-        browse = new BrowseMapsDialog();
 
         Group group = Core.scene.root;
 

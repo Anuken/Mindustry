@@ -172,6 +172,11 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public void openWorkshop(){
+        SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/app/1127400/workshop/");
+    }
+
+    @Override
     public void publishMap(Map map){
         SVars.workshop.publishMap(map);
     }

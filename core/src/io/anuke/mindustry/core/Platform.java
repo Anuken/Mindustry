@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Input.*;
-import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
@@ -26,8 +25,8 @@ public interface Platform{
     /** Steam: Share a map on the workshop.*/
     default void publishMap(Map map){}
 
-    /** Steam: Find workshop maps.*/
-    default void findMaps(String query, Consumer<Array<PostedMap>> result){}
+    /** Steam: Open workshop for maps.*/
+    default void openWorkshop(){}
 
     /** Get the networking implementation.*/
     default NetProvider getNet(){
@@ -110,17 +109,5 @@ public interface Platform{
 
     /** Stops forcing the app into landscape orientation.*/
     default void endForceLandscape(){
-    }
-
-    /** Specifies a map posted in the steam workshop.*/
-    interface PostedMap{
-        String name();
-        String author();
-        String description();
-        String gamemode();
-        void openPage();
-        void subscribe();
-        boolean subscribed();
-        void preview(Consumer<FileHandle> file);
     }
 }

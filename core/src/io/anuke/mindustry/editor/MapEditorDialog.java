@@ -582,7 +582,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(Core.input.ctrl()){
             //alt mode select
-            //TODO these keycode are unusable, tweak later
             for(int i = 0; i < view.getTool().altModes.length + 1; i++){
                 if(Core.input.keyTap(KeyCode.valueOf("NUM_" + (i + 1)))){
                     view.getTool().mode = i - 1;

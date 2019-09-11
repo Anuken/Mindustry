@@ -153,7 +153,6 @@ public class MenuFragment extends Fragment{
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
 
-            //todo buttons should be small
             buttons(t,
                 new Buttoni("$play", Icon.play2Small,
                     new Buttoni("$campaign", Icon.play2Small, ui.deploy::show),
@@ -162,7 +161,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$loadgame", Icon.loadSmall, ui.load::show),
                     new Buttoni("$tutorial", Icon.infoSmall, control::playTutorial)
                 ),
-                steam ? new Buttoni("$maps.browse", Icon.saveSmall, ui.browse::show) : null,
+                steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
                 new Buttoni("$editor", Icon.editorSmall, ui.maps::show),
                 new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
                 new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
