@@ -2,6 +2,7 @@ package io.anuke.mindustry.desktop.steam;
 
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamRemoteStorage.*;
+import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
@@ -18,6 +19,8 @@ public class SWorkshop implements SteamUGCCallback{
     public void publishMap(Map map){
         this.lastMap = map;
         ugc.createItem(SVars.steamID, WorkshopFileType.GameManagedItem);
+        ui.loadfrag.show("$map.publishing");
+        Log.info("Publish map " + map.name());
     }
 
     @Override
@@ -47,14 +50,20 @@ public class SWorkshop implements SteamUGCCallback{
             return;
         }
 
+        //SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.toString());
+
         Map map = lastMap;
+        Log.info("Create item {0} result {1} {2}", SteamNativeHandle.getNativeHandle(publishedFileID), result, needsToAcceptWLA);
 
         if(result == SteamResult.OK){
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
 
             Gamemode mode = Gamemode.attack.valid(map) ? Gamemode.attack : Gamemode.survival;
-            FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("preview.png");
+            FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("map.msav");
             lastMap.file.copyTo(mapFile);
+
+            Log.info(mapFile.parent().absolutePath());
+            Log.info(map.previewFile().absolutePath());
 
             ugc.setItemTitle(h, map.name());
             ugc.setItemDescription(h, map.description());
@@ -64,6 +73,18 @@ public class SWorkshop implements SteamUGCCallback{
             ugc.setItemContent(h, mapFile.parent().absolutePath());
             ugc.addItemKeyValueTag(h, "mode", mode.name());
             ugc.submitItemUpdate(h, "Map created");
+
+            ItemUpdateInfo info = new ItemUpdateInfo();
+
+            ui.loadfrag.setProgress(() -> {
+                ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
+                ui.loadfrag.setText("$" + status.name().toLowerCase());
+                if(status == ItemUpdateStatus.Invalid){
+                    ui.loadfrag.setText("$done");
+                    return 1f;
+                }
+                return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;
+            });
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }
@@ -73,9 +94,11 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
+        ui.loadfrag.hide();
+        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID, needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
-            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.toString());
+            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }

@@ -383,7 +383,7 @@ public class Control implements ApplicationListener, Loadable{
             if(world.isZone()){
                 for(Tile tile : state.teams.get(player.getTeam()).cores){
                     for(Item item : content.items()){
-                        if(tile.entity.items.has(item)){
+                        if(tile.entity != null && tile.entity.items.has(item)){
                             data.unlockContent(item);
                         }
                     }

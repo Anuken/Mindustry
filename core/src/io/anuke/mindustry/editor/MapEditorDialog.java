@@ -152,7 +152,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.row();
 
         if(steam){
-            menu.cont.addImageTextButton("$editor.publish.workshop", Icon.arrowSmall, () -> {
+            menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
                 Map map = save();
                 if(map != null){
                     platform.publishMap(map);
@@ -162,7 +162,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        menu.cont.addImageTextButton("$editor.ingame", Icon.arrowSmall, this::playtest).padTop(-3).size(swidth * 2f + 10, 60f);
+        menu.cont.addImageTextButton("$editor.ingame", Icon.arrowSmall, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
 
         menu.cont.row();
 
@@ -293,9 +293,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(map != null && !map.custom){
                 handleSaveBuiltin(map);
             }else{
-                maps.saveMap(editor.getTags());
+                returned = maps.saveMap(editor.getTags());
                 ui.showInfoFade("$editor.saved");
-                returned = map;
             }
         }
 

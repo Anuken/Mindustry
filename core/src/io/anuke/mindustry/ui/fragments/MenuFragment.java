@@ -162,6 +162,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$loadgame", Icon.loadSmall, ui.load::show),
                     new Buttoni("$tutorial", Icon.infoSmall, control::playTutorial)
                 ),
+                steam ? new Buttoni("$maps.browse", Icon.saveSmall, ui.browse::show) : null,
                 new Buttoni("$editor", Icon.editorSmall, ui.maps::show),
                 new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
                 new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
@@ -197,6 +198,7 @@ public class MenuFragment extends Fragment{
 
     private void buttons(Table t, Buttoni... buttons){
         for(Buttoni b : buttons){
+            if(b == null) continue;
             Button[] out = {null};
             out[0] = t.addImageTextButton(b.text, b.icon, Styles.clearToggleMenut, () -> {
                 if(currentMenu == out[0]){

@@ -108,7 +108,7 @@ public class Maps{
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public void saveMap(ObjectMap<String, String> baseTags){
+    public Map saveMap(ObjectMap<String, String> baseTags){
 
         try{
             StringMap tags = new StringMap(baseTags);
@@ -166,6 +166,9 @@ public class Maps{
             }
             maps.add(map);
             maps.sort();
+
+            return map;
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }

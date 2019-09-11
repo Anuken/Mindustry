@@ -1,5 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
+import io.anuke.arc.function.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.Touchable;
@@ -12,6 +13,7 @@ import io.anuke.mindustry.ui.*;
 public class LoadingFragment extends Fragment{
     private Table table;
     private TextButton button;
+    private Bar bar;
 
     @Override
     public void build(Group parent){
@@ -27,10 +29,16 @@ public class LoadingFragment extends Fragment{
             t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
 
-            button = t.addButton("$cancel", () -> {
-            }).pad(20).size(250f, 70f).visible(false).get();
+            bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
+            t.row();
+            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
+    }
+
+    public void setProgress(FloatProvider progress){
+        bar.visible(true);
+        bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
     }
 
     public void setButton(Runnable listener){
@@ -39,11 +47,17 @@ public class LoadingFragment extends Fragment{
         button.clicked(listener);
     }
 
+    public void setText(String text){
+        table.<Label>find("namelabel").setText(text);
+        table.<Label>find("namelabel").setColor(Pal.accent);
+    }
+
     public void show(){
         show("$loading");
     }
 
     public void show(String text){
+        bar.visible(false);
         table.clearActions();
         table.touchable(Touchable.enabled);
         table.<Label>find("namelabel").setText(text);

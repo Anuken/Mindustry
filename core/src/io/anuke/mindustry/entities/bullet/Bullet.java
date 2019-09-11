@@ -25,7 +25,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     private float lifeScl;
     private Team team;
     private Object data;
-    private boolean supressCollision, supressOnce, initialized;
+    private boolean supressCollision, supressOnce, initialized, deflected;
 
     protected BulletType type;
     protected Entity owner;
@@ -100,9 +100,14 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         return type.collidesTiles;
     }
 
-    public void supress(){
+    public void deflect(){
         supressCollision = true;
         supressOnce = true;
+        deflected = true;
+    }
+
+    public boolean isDeflected(){
+        return deflected;
     }
 
     public BulletType getBulletType(){
@@ -239,6 +244,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         data = null;
         supressCollision = false;
         supressOnce = false;
+        deflected = false;
         initialized = false;
     }
 

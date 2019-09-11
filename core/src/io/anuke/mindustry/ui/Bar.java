@@ -37,6 +37,18 @@ public class Bar extends Element{
         });
     }
 
+    public Bar(){
+
+    }
+
+    public void set(Supplier<String> name, FloatProvider fraction, Color color){
+        this.fraction = fraction;
+        this.lastValue = fraction.get();
+        this.blinkColor.set(color);
+        setColor(color);
+        update(() -> this.name = name.get());
+    }
+
     public Bar blink(Color color){
         blinkColor.set(color);
         return this;
@@ -44,6 +56,8 @@ public class Bar extends Element{
 
     @Override
     public void draw(){
+        if(fraction == null) return;
+
         float computed = Mathf.clamp(fraction.get());
         if(!Mathf.isEqual(lastValue, computed)){
             blink = 1f;
@@ -73,7 +87,7 @@ public class Bar extends Element{
 
         Draw.color();
 
-        BitmapFont font = Fonts.def;
+        BitmapFont font = Fonts.outline;
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
