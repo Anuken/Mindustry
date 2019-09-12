@@ -1,6 +1,7 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.Core;
 import io.anuke.arc.backends.headless.HeadlessApplication;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -221,6 +222,37 @@ public class ApplicationTests{
         //just tests if the map was loaded properly and didn't crash, no validity checks currently
         assertEquals(276, world.width());
         assertEquals(10, world.height());
+    }
+
+    @Test
+    void arrayIterators(){
+        Array<String> arr = Array.with("a", "b" , "c", "d", "e", "f");
+        Array<String> results = new Array<>();
+
+        for(String s : arr);
+        for(String s : results);
+
+        Array.iteratorsAllocated = 0;
+
+        //simulate non-enhanced for loops, which should be correct
+
+        for(int i = 0; i < arr.size; i++){
+            for(int j = 0; j < arr.size; j++){
+                results.add(arr.get(i) + arr.get(j));
+            }
+        }
+
+        int index = 0;
+
+        //test nested for loops
+        for(String s : arr){
+            for(String s2 : arr){
+                assertEquals(results.get(index++), s + s2);
+            }
+        }
+
+        assertEquals(results.size, index);
+        assertEquals(0, Array.iteratorsAllocated, "No new iterators must have been allocated.");
     }
 
     @Test
