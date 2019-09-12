@@ -20,7 +20,7 @@ public class LoadingFragment extends Fragment{
         parent.fill(Styles.black8, t -> {
             t.visible(false);
             t.touchable(Touchable.enabled);
-            t.add().height(70f).row();
+            t.add().height(133f).row();
 
             t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
