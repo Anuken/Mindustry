@@ -10,6 +10,8 @@ script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
 - echo ${TRAVIS_BUILD_NUMBER} > version.txt
+- TEST_TAG=v9999
+- echo versionName=4-fdroid-${TEST_TAG}$'\n'versionCode=${TEST_TAG:1} > version_fdroid.txt
 - git add .
 - git commit -m "Updating to build ${TRAVIS_BUILD_NUMBER}"
 - git tag ${TRAVIS_BUILD_NUMBER}

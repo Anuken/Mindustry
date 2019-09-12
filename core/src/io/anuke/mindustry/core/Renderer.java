@@ -267,7 +267,7 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawBottom();
-        playerGroup.draw(p -> true, Player::drawBuildRequests);
+        playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
 
         if(shieldGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){

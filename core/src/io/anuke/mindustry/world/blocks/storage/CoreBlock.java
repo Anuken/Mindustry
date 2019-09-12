@@ -11,7 +11,6 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -138,10 +137,10 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{
-        public Player spawnPlayer;
-        float progress;
-        float time;
-        float heat;
+        protected Player spawnPlayer;
+        protected float progress;
+        protected float time;
+        protected float heat;
 
         @Override
         public boolean hasUnit(Unit unit){
