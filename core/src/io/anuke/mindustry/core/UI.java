@@ -91,6 +91,8 @@ public class UI implements ApplicationListener, Loadable{
 
         Tex.load();
         Icon.load();
+        Styles.load();
+        Tex.loadStyles();
 
         Dialog.setShowAction(() -> sequence(alpha(0f), fadeIn(0.1f)));
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));

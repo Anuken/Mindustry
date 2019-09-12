@@ -55,6 +55,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         TypeSpec.Builder type = TypeSpec.classBuilder("Tex").addModifiers(Modifier.PUBLIC);
         TypeSpec.Builder ictype = TypeSpec.classBuilder("Icon").addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         String resources = path + "/assets-raw/sprites/ui";
         Files.walk(Paths.get(resources)).forEach(p -> {
@@ -98,7 +99,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             t.getEnclosedElements().stream().filter(e -> e.getKind() == ElementKind.FIELD).forEach(field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
-                    load.addStatement("io.anuke.arc.Core.scene.addStyle(" + field.asType().toString() + ".class, io.anuke.mindustry.ui.Styles." + fname + ")");
+                    loadStyles.addStatement("io.anuke.arc.Core.scene.addStyle(" + field.asType().toString() + ".class, io.anuke.mindustry.ui.Styles." + fname + ")");
                 }
             });
         }
@@ -107,6 +108,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         JavaFile.builder(packageName, ictype.build()).build().writeTo(Utils.filer);
 
         type.addMethod(load.build());
+        type.addMethod(loadStyles.build());
         JavaFile.builder(packageName, type.build()).build().writeTo(Utils.filer);
     }
 
