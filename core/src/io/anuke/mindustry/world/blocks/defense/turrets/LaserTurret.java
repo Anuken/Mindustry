@@ -74,7 +74,7 @@ public class LaserTurret extends PowerTurret{
             Liquid liquid = entity.liquids.current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta());
+            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()));
             entity.reload += used;
             entity.liquids.remove(liquid, used);
 
