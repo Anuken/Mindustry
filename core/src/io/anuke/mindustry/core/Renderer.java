@@ -141,6 +141,10 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public float landScale(){
+        return landTime > 0 ? landscale : 1f;
+    }
+
     @Override
     public void dispose(){
         minimap.dispose();

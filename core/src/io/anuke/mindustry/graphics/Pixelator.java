@@ -37,8 +37,8 @@ public class Pixelator implements Disposable{
         float px = Core.camera.position.x, py = Core.camera.position.y;
         Core.camera.position.set((int)px + ((int)(camera.width) % 2 == 0 ? 0 : 0.5f), (int)py + ((int)(camera.height) % 2 == 0 ? 0 : 0.5f));
 
-        int w = (int)(Core.camera.width);
-        int h = (int)(Core.camera.height);
+        int w = (int)(Core.camera.width * renderer.landScale());
+        int h = (int)(Core.camera.height * renderer.landScale());
 
         if(!graphics.isHidden() && (buffer.getWidth() != w || buffer.getHeight() != h)){
             buffer.resize(w, h);
