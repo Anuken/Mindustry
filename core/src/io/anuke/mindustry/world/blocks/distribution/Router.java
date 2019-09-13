@@ -17,6 +17,7 @@ public class Router extends Block{
         hasItems = true;
         itemCapacity = 1;
         group = BlockGroup.transportation;
+        unloadable = false;
     }
 
     @Override

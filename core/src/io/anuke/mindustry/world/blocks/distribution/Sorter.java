@@ -26,6 +26,7 @@ public class Sorter extends Block{
         instantTransfer = true;
         group = BlockGroup.transportation;
         configurable = true;
+        unloadable = false;
     }
 
     @Override

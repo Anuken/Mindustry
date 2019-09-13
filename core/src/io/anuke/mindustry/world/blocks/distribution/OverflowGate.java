@@ -18,6 +18,7 @@ public class OverflowGate extends Block{
         solid = true;
         update = true;
         group = BlockGroup.transportation;
+        unloadable = false;
     }
 
     @Override

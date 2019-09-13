@@ -45,6 +45,8 @@ public class Block extends BlockStorage{
     public boolean update;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
+    /** whether unloaders work on this block*/
+    public boolean unloadable = true;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
