@@ -16,7 +16,7 @@ script:
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds; fi
 - cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
-- if [ -n "$TRAVIS_TAG" ]; cd ../Arc; git tag ${TRAVIS_TAG}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/Arc ${TRAVIS_TAG}; cd ../Mindustry; fi
+- if [ -n "$TRAVIS_TAG" ]; then cd ../Arc; git tag ${TRAVIS_TAG}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/Arc ${TRAVIS_TAG}; cd ../Mindustry; fi
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
