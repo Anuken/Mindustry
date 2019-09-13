@@ -38,7 +38,7 @@ allprojects{
         }
 
         getArcHash = {
-            return new Properties().with{ p -> p.load(new File(projectDir, 'gradle.properties')) }["archash"]
+            return new Properties().with{ p -> p.load(new File((File)projectDir, 'gradle.properties').newReader()); return p }["archash"]
         }
 
         arcModule = { String name ->
