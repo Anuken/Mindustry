@@ -38,16 +38,7 @@ allprojects{
         }
 
         getArcHash = {
-            //get latest commit hash from github since JITPack's '-snapshot' version doesn't work correctly
-            if(arcHash == null){
-                try{
-                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
-                }catch(e){
-                    e.printStackTrace()
-                    arcHash = "-SNAPSHOT"
-                }
-            }
-            return arcHash
+            return new Properties().with{ p -> p.load(new File(projectDir, 'gradle.properties'))}["archash"]
         }
 
         arcModule = { String name ->
