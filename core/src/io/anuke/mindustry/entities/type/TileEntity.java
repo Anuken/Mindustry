@@ -207,14 +207,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             if(other == null) continue;
             if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
 
-            other.block().onProximityUpdate(other);
-
-            tmpTiles.add(other);
-
             //add this tile to proximity of nearby tiles
             if(!other.entity.proximity.contains(tile, true)){
                 other.entity.proximity.add(tile);
             }
+
+            tmpTiles.add(other);
         }
 
         //using a set to prevent duplicates
@@ -224,6 +222,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         block.onProximityAdded(tile);
         block.onProximityUpdate(tile);
+
+        for(Tile other : tmpTiles){
+            other.block().onProximityUpdate(other);
+        }
     }
 
     public Array<Tile> proximity(){
