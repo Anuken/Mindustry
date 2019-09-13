@@ -34,11 +34,11 @@ allprojects{
         }
 
         localArc = {
-            return (!project.hasProperty("release")) && new File(projectDir.parent, '../Arc').exists()
+            return !project.hasProperty("release") && new File(projectDir.parent, '../Arc').exists()
         }
 
         getArcHash = {
-            return new Properties().with{ p -> p.load(new File(projectDir, 'gradle.properties'))}["archash"]
+            return new Properties().with{ p -> p.load(new File(projectDir, 'gradle.properties')) }["archash"]
         }
 
         arcModule = { String name ->
