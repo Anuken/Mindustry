@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -64,6 +65,8 @@ public class AboutDialog extends FloatingDialog{
             }).padLeft(8);
 
             table.addImageButton(Icon.link, () -> {
+                if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
+
                 if(!Core.net.openURI(link.link)){
                     ui.showErrorMessage("$linkfail");
                     Core.app.setClipboardText(link.link);

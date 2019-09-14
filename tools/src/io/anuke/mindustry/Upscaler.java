@@ -44,14 +44,4 @@ public class Upscaler{
         Log.info("Done upscaling icons in &lm{0}&lgs.", Time.elapsed()/1000f);
         Core.app.exit();
     }
-
-    static class Res{
-        final int size;
-        final String suffix;
-
-        public Res(int size, String suffix){
-            this.size = size;
-            this.suffix = suffix;
-        }
-    }
 }

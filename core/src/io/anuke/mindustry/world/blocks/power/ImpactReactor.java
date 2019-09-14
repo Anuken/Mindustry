@@ -79,7 +79,7 @@ public class ImpactReactor extends PowerGenerator{
                 entity.warmup = 1f;
             }
 
-            if(!prevOut && (getPowerProduction(tile) <= consumes.getPower().requestedPower(entity))){
+            if(!prevOut && (getPowerProduction(tile) > consumes.getPower().requestedPower(entity))){
                 Events.fire(Trigger.impactPower);
             }
 

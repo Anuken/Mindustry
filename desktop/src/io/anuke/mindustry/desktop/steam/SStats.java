@@ -20,9 +20,9 @@ import static io.anuke.mindustry.desktop.steam.SAchievement.*;
 public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
-    //todo store stats periodically
     private boolean updated = false;
     private ObjectSet<String> mechs = new ObjectSet<>();
+    private int statSavePeriod = 4; //in minutes
 
     public SStats(){
         stats.requestCurrentStats();
@@ -32,6 +32,7 @@ public class SStats implements SteamUserStatsCallback{
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
+
                 @Override
                 public void update(){
                     if(i.get(60f / 4f)){
@@ -39,6 +40,12 @@ public class SStats implements SteamUserStatsCallback{
                     }
                 }
             });
+
+            Timer.schedule(() -> {
+                if(updated){
+                    stats.storeStats();
+                }
+            }, statSavePeriod * 60, statSavePeriod * 60);
         });
     }
 
@@ -71,7 +78,7 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
                 if(e.unit.getTeam() != Vars.player.getTeam()){
-                    SStat.enemiesDestroyed.add();
+                    SStat.unitsDestroyed.add();
 
                     if(e.unit instanceof BaseUnit && ((BaseUnit)e.unit).isBoss()){
                         SStat.bossesDefeated.add();
@@ -94,7 +101,7 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(CommandIssueEvent.class, e -> {
             if(campaign() && e.command == UnitCommand.attack){
-                issueAttackcommand.achieved();
+                issueAttackCommand.achieved();
             }
         });
 
@@ -139,7 +146,13 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.achieved();
             if(e.content == Items.titanium) obtainTitanium.achieved();
+
+            if(!content.zones().contains(Zone::locked)){
+                unlockAllZones.achieved();
+            }
         });
+
+        Events.on(Trigger.openWiki, openWiki::achieved);
 
         Events.on(Trigger.exclusionDeath, dieExclusion::achieved);
 
@@ -207,7 +220,6 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(ResearchEvent.class, e -> {
             if(e.content == Blocks.router) researchRouter.achieved();
-            if(e.content == Blocks.launchPad) researchLaunchPad.achieved();
 
             if(!TechTree.all.contains(t -> t.block.locked())){
                 researchAll.achieved();
@@ -255,16 +267,22 @@ public class SStats implements SteamUserStatsCallback{
 
     @Override
     public void onUserStatsReceived(long gameID, SteamID steamID, SteamResult result){
-        if(result == SteamResult.OK){
-            registerEvents();
-        }else{
+        registerEvents();
+
+        if(result != SteamResult.OK){
             Log.err("Failed to recieve steam stats: {0}", result);
+        }else{
+            Log.err("Recieved steam stats.");
         }
     }
 
     @Override
-    public void onUserStatsStored(long l, SteamResult steamResult){
+    public void onUserStatsStored(long gameID, SteamResult result){
+        Log.info("Stored stats: {0}", result);
 
+        if(result == SteamResult.OK){
+            updated = true;
+        }
     }
 
     @Override

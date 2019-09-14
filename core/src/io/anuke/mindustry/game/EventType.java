@@ -25,7 +25,8 @@ public class EventType{
         enablePixelation,
         drown,
         exclusionDeath,
-        suicideBomb
+        suicideBomb,
+        openWiki
     }
 
     public static class WinEvent{}
