@@ -17,11 +17,15 @@ public class Plugins{
     public void load(){
         for(FileHandle file : pluginDirectory.list()){
             if(!file.extension().equals("jar")) continue;
-
+            
+            String pluginPath = pluginDirectory.absolutePath() + "/" + file.nameWithoutExtension();
+            FileHandle pluginDirectory = new FileHandle(pluginPath);
+            if(!pluginDirectory.exists()) {
+            	pluginDirectory.mkdirs();
+            	new FileHandle(pluginPath + "/config.yml").write(true);
+            }
+            
             try{
-            	String pluginPath = pluginDirectory.absolutePath() + "/" + file.nameWithoutExtension();
-            	new FileHandle(pluginPath).mkdirs();
-            	new FileHandle(pluginPath + "/config.yml");
                 loaded.add(loadPlugin(file));
             }catch(IllegalArgumentException ignored){
             }catch(Exception e){
