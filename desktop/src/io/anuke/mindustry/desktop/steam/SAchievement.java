@@ -69,7 +69,7 @@ public enum SAchievement{
     }
 
     public void complete(){
-        if(!achieved()){
+        if(!isAchieved()){
             SVars.stats.stats.setAchievement(name());
             SVars.stats.stats.storeStats();
         }
@@ -79,7 +79,7 @@ public enum SAchievement{
         //TODO
     }
 
-    public boolean achieved(){
+    public boolean isAchieved(){
         return SVars.stats.stats.isAchieved(name(), false);
     }
 }

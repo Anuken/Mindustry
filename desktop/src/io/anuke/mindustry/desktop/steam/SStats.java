@@ -58,16 +58,16 @@ public class SStats implements SteamUserStatsCallback{
             SStat.maxUnitActive.max(unitGroups[player.getTeam().ordinal()].size());
 
             if(unitGroups[player.getTeam().ordinal()].count(u -> u.getType() == UnitTypes.phantom) >= 10){
-                active10Phantoms.achieved();
+                active10Phantoms.complete();
             }
 
             if(unitGroups[player.getTeam().ordinal()].count(u -> u.getType() == UnitTypes.crawler) >= 50){
-                active50Crawlers.achieved();
+                active50Crawlers.complete();
             }
 
             for(Tile tile : state.teams.get(player.getTeam()).cores){
                 if(!content.items().contains(i -> i.type == ItemType.material && tile.entity.items.get(i) < tile.block().itemCapacity)){
-                    fillCoreAllCampaign.achieved();
+                    fillCoreAllCampaign.complete();
                     break;
                 }
             }
@@ -89,19 +89,19 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             if(!content.zones().contains(z -> !z.canConfigure())){
-                configAllZones.achieved();
+                configAllZones.complete();
             }
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.getClosestCore() != null && player.getClosestCore().items.total() >= 10 * 1000){
-                drop10kitems.achieved();
+                drop10kitems.complete();
             }
         }));
 
         Events.on(CommandIssueEvent.class, e -> {
             if(campaign() && e.command == UnitCommand.attack){
-                issueAttackCommand.achieved();
+                issueAttackCommand.complete();
             }
         });
 
@@ -110,11 +110,11 @@ public class SStats implements SteamUserStatsCallback{
                 SStat.blocksBuilt.add();
 
                 if(e.tile.block() == Blocks.router && e.tile.entity.proximity().contains(t -> t.block() == Blocks.router)){
-                    chainRouters.achieved();
+                    chainRouters.complete();
                 }
 
                 if(e.tile.block() == Blocks.daggerFactory){
-                    buildDaggerFactory.achieved();
+                    buildDaggerFactory.complete();
                 }
 
                 if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
@@ -127,7 +127,7 @@ public class SStats implements SteamUserStatsCallback{
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
-                        buildMeltdownSpectre.achieved();
+                        buildMeltdownSpectre.complete();
                     }
                 }
             }
@@ -144,39 +144,39 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(MapPublishEvent.class, e -> SStat.mapsPublished.add());
 
         Events.on(UnlockEvent.class, e -> {
-            if(e.content == Items.thorium) obtainThorium.achieved();
-            if(e.content == Items.titanium) obtainTitanium.achieved();
+            if(e.content == Items.thorium) obtainThorium.complete();
+            if(e.content == Items.titanium) obtainTitanium.complete();
 
             if(!content.zones().contains(Zone::locked)){
-                unlockAllZones.achieved();
+                unlockAllZones.complete();
             }
         });
 
-        Events.on(Trigger.openWiki, openWiki::achieved);
+        Events.on(Trigger.openWiki, openWiki::complete);
 
-        Events.on(Trigger.exclusionDeath, dieExclusion::achieved);
+        Events.on(Trigger.exclusionDeath, dieExclusion::complete);
 
-        Events.on(Trigger.drown, drown::achieved);
+        Events.on(Trigger.drown, drown::complete);
 
-        Events.on(Trigger.impactPower, powerupImpactReactor::achieved);
+        Events.on(Trigger.impactPower, powerupImpactReactor::complete);
 
-        Events.on(Trigger.flameAmmo, useFlameAmmo::achieved);
+        Events.on(Trigger.flameAmmo, useFlameAmmo::complete);
 
-        Events.on(Trigger.turretCool, coolTurret::achieved);
+        Events.on(Trigger.turretCool, coolTurret::complete);
 
-        Events.on(Trigger.enablePixelation, enablePixelation::achieved);
+        Events.on(Trigger.enablePixelation, enablePixelation::complete);
 
-        Events.on(Trigger.suicideBomb, suicideBomb::achieved);
+        Events.on(Trigger.suicideBomb, suicideBomb::complete);
 
         Events.on(Trigger.thoriumReactorOverheat, SStat.reactorsOverheated::add);
 
-        Events.on(Trigger.tutorialComplete, completeTutorial::achieved);
+        Events.on(Trigger.tutorialComplete, completeTutorial::complete);
 
-        Events.on(Trigger.shock, shockWetEnemy::achieved);
+        Events.on(Trigger.shock, shockWetEnemy::complete);
 
-        Events.on(Trigger.phaseDeflectHit, killEnemyPhaseWall::achieved);
+        Events.on(Trigger.phaseDeflectHit, killEnemyPhaseWall::complete);
 
-        Events.on(Trigger.itemLaunch, launchItemPad::achieved);
+        Events.on(Trigger.itemLaunch, launchItemPad::complete);
 
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign() && e.unit.getTeam() == player.getTeam()){
@@ -187,7 +187,7 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(LoseEvent.class, e -> {
             if(campaign()){
                 if(world.getZone().metCondition() && (state.wave - world.getZone().conditionWave) / world.getZone().launchPeriod >= 1){
-                    skipLaunching2Death.achieved();
+                    skipLaunching2Death.complete();
                 }
             }
         });
@@ -207,7 +207,7 @@ public class SStats implements SteamUserStatsCallback{
                 SStat.maxWavesSurvived.max(Vars.state.wave);
 
                 if(state.stats.buildingsBuilt == 0 && state.wave >= 10){
-                    survive10WavesNoBlocks.achieved();
+                    survive10WavesNoBlocks.complete();
                 }
             }
         });
@@ -219,17 +219,17 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(ResearchEvent.class, e -> {
-            if(e.content == Blocks.router) researchRouter.achieved();
+            if(e.content == Blocks.router) researchRouter.complete();
 
             if(!TechTree.all.contains(t -> t.block.locked())){
-                researchAll.achieved();
+                researchAll.complete();
             }
         });
 
         Events.on(WinEvent.class, e -> {
             if(campaign()){
                 if(Vars.state.wave <= 5){
-                    defeatAttack5Waves.achieved();
+                    defeatAttack5Waves.complete();
                 }
 
                 if(Vars.state.rules.attackMode){
@@ -237,8 +237,8 @@ public class SStats implements SteamUserStatsCallback{
                 }
 
                 RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
-                if(result.rank == Rank.S) earnSRank.achieved();
-                if(result.rank == Rank.SS) earnSSRank.achieved();
+                if(result.rank == Rank.S) earnSRank.complete();
+                if(result.rank == Rank.SS) earnSSRank.complete();
             }
 
             if(state.rules.pvp){
