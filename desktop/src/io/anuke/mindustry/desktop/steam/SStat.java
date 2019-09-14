@@ -5,6 +5,7 @@ public enum SStat{
     attacksWon,
     pvpsWon,
     gamesWon,
+    timesLaunched,
     maxWavesSurvived,
     zoneMechsUsed,
     enemiesDestroyed,
@@ -24,6 +25,12 @@ public enum SStat{
 
     public int get(){
         return SVars.stats.stats.getStatI(name(), 0);
+    }
+
+    public void max(int amount){
+        if(amount > get()){
+            add(amount - get());
+        }
     }
 
     public void add(int amount){

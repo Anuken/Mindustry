@@ -31,7 +31,7 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onSubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
-
+        SAchievement.downloadMapWorkshop.achieved();
     }
 
     @Override
@@ -110,6 +110,7 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onDownloadItemResult(int appID, SteamPublishedFileID publishedFileID, SteamResult result){
+        SAchievement.downloadMapWorkshop.achieved();
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
         Log.info("Item downloaded to {0}", info.getFolder());

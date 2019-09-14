@@ -1,7 +1,7 @@
 package io.anuke.mindustry.io.versions;
 
 import io.anuke.arc.function.Supplier;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.base.*;

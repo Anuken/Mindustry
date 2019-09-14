@@ -15,6 +15,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -235,6 +236,7 @@ public class TechTreeDialog extends FloatingDialog{
             rebuild();
             Core.scene.act();
             Sounds.unlock.play();
+            Events.fire(new ResearchEvent(node.block));
         }
 
         void rebuild(){

@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
@@ -10,6 +10,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
@@ -60,6 +61,7 @@ public class UnitFactory extends Block{
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.velocity().y = factory.launchVelocity;
+            Events.fire(new UnitCreateEvent(unit));
         }
     }
 

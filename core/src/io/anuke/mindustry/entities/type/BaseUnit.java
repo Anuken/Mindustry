@@ -11,11 +11,12 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
 import io.anuke.mindustry.world.meta.*;
@@ -77,6 +78,17 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public TypeID getTypeID(){
         return type.typeID;
+    }
+
+    @Override
+    public void onHit(SolidTrait entity){
+        if(entity instanceof Bullet && ((Bullet)entity).getOwner() instanceof DeflectorEntity && player != null && getTeam() != player.getTeam()){
+            Core.app.post(() -> {
+                if(isDead()){
+                    Events.fire(Trigger.phaseDeflectHit);
+                }
+            });
+        }
     }
 
     public @Nullable Tile getSpawner(){

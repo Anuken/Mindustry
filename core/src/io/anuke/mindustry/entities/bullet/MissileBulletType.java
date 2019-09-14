@@ -5,6 +5,7 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 

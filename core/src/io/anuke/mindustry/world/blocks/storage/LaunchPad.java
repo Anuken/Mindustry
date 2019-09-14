@@ -48,7 +48,7 @@ public class LaunchPad extends StorageBlock{
     public void draw(Tile tile){
         super.draw(tile);
 
-        float progress = Mathf.clamp((tile.entity.items.total() / (float)itemCapacity) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
+        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items.total() / (float)itemCapacity)) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
         float scale = size / 3f;
 
         Lines.stroke(2f);
@@ -59,7 +59,7 @@ public class LaunchPad extends StorageBlock{
 
         if(tile.entity.cons.valid()){
             for(int i = 0; i < 3; i++){
-                float f = (Time.time() / 100f + i * 0.5f) % 1f;
+                float f = (Time.time() / 200f + i * 0.5f) % 1f;
 
                 Lines.stroke(((2f * (2f - Math.abs(0.5f - f) * 2f)) - 2f + 0.2f));
                 Lines.poly(tile.drawx(), tile.drawy(), 4, (1f - f) * 10f * scale);

@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.entities.traits.ScaleTrait;
 
 public class Effects{

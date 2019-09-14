@@ -8,6 +8,7 @@ import io.anuke.mindustry.world.blocks.storage.*;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO this class is a disappointment
 public class Loadout extends Content{
     private final Array<Tile> outArray = new Array<>();
     private final IntMap<BlockEntry> entries = new IntMap<BlockEntry>(){{

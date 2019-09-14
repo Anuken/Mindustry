@@ -184,7 +184,7 @@ public class NetServer implements ApplicationListener{
 
             platform.updateRPC();
 
-            Events.fire(new PlayerJoin(player));
+            Events.fire(new PlayerConnect(player));
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
@@ -546,6 +546,8 @@ public class NetServer implements ApplicationListener{
         player.con.hasConnected = true;
         Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
         Log.info("&lm[{1}] &y{0} has connected. ", player.name, player.uuid);
+
+        Events.fire(new PlayerJoin(player));
     }
 
     public boolean isWaitingForPlayers(){

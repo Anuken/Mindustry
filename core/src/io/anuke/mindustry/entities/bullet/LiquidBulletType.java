@@ -6,6 +6,7 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -35,7 +36,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(io.anuke.mindustry.entities.type.Bullet b){
         super.update(b);
 
         if(liquid.canExtinguish()){
@@ -49,7 +50,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(io.anuke.mindustry.entities.type.Bullet b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
         Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);

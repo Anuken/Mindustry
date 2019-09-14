@@ -8,6 +8,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -1493,7 +1494,7 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(Bullet b){
+                public void init(io.anuke.mindustry.entities.type.Bullet b){
                     for(int i = 0; i < rays; i++){
                         Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
