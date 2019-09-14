@@ -1,6 +1,5 @@
 package io.anuke.mindustry.plugin;
 
-import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
