@@ -1,5 +1,6 @@
 package io.anuke.mindustry.plugin;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
@@ -19,6 +20,9 @@ public class Plugins{
             if(!file.extension().equals("jar")) continue;
 
             try{
+            	String pluginPath = pluginDirectory.absolutePath() + "/" + file.nameWithoutExtension();
+            	new FileHandle(pluginPath).mkdirs();
+            	new FileHandle(pluginPath + "/config.yml");
                 loaded.add(loadPlugin(file));
             }catch(IllegalArgumentException ignored){
             }catch(Exception e){
