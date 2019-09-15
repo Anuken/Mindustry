@@ -133,7 +133,7 @@ public class MusicControl{
     }
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
-    private void playOnce(@NonNull Music music){
+    private void playOnce(Music music){
         if(current != null || music == null) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
