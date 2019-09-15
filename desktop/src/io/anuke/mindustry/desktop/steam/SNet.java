@@ -260,7 +260,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
-                if(who == currentServer || who == currentLobby){
+                if(who.equals(currentServer) || who.equals(currentLobby)){
                     net.disconnect();
                     Log.info("Current host left.");
                 }
@@ -353,7 +353,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(net.server()){
             Log.info("{0} has disconnected: {1}", steamIDRemote.getAccountID(), sessionError);
             disconnectSteamUser(steamIDRemote);
-        }else if(steamIDRemote == currentServer){
+        }else if(steamIDRemote.equals(currentServer)){
             Log.info("Disconnected! {1}: {0}", steamIDRemote.getAccountID(), sessionError);
             net.handleClientReceived(new Disconnect());
         }
@@ -364,7 +364,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
         if(currentServer != null && !net.server()){
             Log.info("Am client, accepting request");
-            if(steamIDRemote == currentServer){
+            if(steamIDRemote.equals(currentServer)){
                 snet.acceptP2PSessionWithUser(steamIDRemote);
             }
         }else if(net.server()){
