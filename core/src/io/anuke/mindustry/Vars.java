@@ -270,6 +270,7 @@ public class Vars implements Loadable{
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
+
             if(!headless){
                 Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }
