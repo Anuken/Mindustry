@@ -442,7 +442,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         @Override
         public boolean isConnected(){
             snet.getP2PSessionState(sid, state);
-            return state.isConnectionActive();
+            return true;//state.isConnectionActive();
         }
 
         @Override

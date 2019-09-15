@@ -231,11 +231,15 @@ public class JoinDialog extends FloatingDialog{
         cont.clear();
         cont.table(t -> {
             t.add("$name").padRight(10);
-            t.addField(Core.settings.getString("name"), text -> {
-                player.name = text;
-                Core.settings.put("name", text);
-                Core.settings.save();
-            }).grow().pad(8).get().setMaxLength(maxNameLength);
+            if(!steam){
+                t.addField(Core.settings.getString("name"), text -> {
+                    player.name = text;
+                    Core.settings.put("name", text);
+                    Core.settings.save();
+                }).grow().pad(8).get().setMaxLength(maxNameLength);
+            }else{
+                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+            }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new ColorPickDialog().show(color -> {
