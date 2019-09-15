@@ -76,7 +76,9 @@ public enum SAchievement{
     }
 
     public void checkCompletion(){
-        //TODO
+        if(!isAchieved() && stat != null && stat.get() >= statGoal){
+            complete();
+        }
     }
 
     public boolean isAchieved(){
