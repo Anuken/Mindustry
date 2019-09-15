@@ -37,7 +37,6 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
     final CopyOnWriteArrayList<NetConnection> connectionsOut = new CopyOnWriteArrayList<>();
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
-    final ObjectMap<String, SteamID> lobbyIDs = new ObjectMap<>();
 
     SteamID currentLobby, currentServer;
     Consumer<Host> lobbyCallback;
@@ -92,10 +91,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     public void connectClient(String ip, int port, Runnable success) throws IOException{
         if(ip.startsWith("steam:")){
             String lobbyname = ip.substring("steam:".length());
-            SteamID lobby = lobbyIDs.get(lobbyname);
-            if(lobby == null) throw new IOException("Lobby not found.");
-            joinCallback = success;
-            smat.joinLobby(lobby);
+            try{
+                SteamID lobby = SteamID.createFromNativeHandle(Long.parseLong(lobbyname));
+                joinCallback = success;
+                smat.joinLobby(lobby);
+            }catch(NumberFormatException e){
+                throw new IOException("Invalid Steam ID: " + lobbyname);
+            }
         }else{
             provider.connectClient(ip, port, success);
         }
@@ -251,7 +253,6 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 disconnectSteamUser(who);
             }
         }
-
     }
 
     @Override
@@ -284,7 +285,6 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getLobbyMemberLimit(lobby)
                     );
 
-                    lobbyIDs.put(lobby.getAccountID() + "", lobby);
                     lobbyCallback.accept(out);
                 }catch(Exception e){
                     e.printStackTrace();
@@ -447,7 +447,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
         @Override
         public void close(){
-            snet.closeP2PSessionWithUser(sid);
+            disconnectSteamUser(sid);
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.anuke.mindustry.net;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
@@ -20,6 +21,7 @@ public class Net{
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
+    private @Nullable StreamBuilder currentStream;
 
     private final Array<Object> packetQueue = new Array<>();
     private final ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
@@ -196,6 +198,10 @@ public class Net{
         }
     }
 
+    public @Nullable StreamBuilder getCurrentStream(){
+        return currentStream;
+    }
+
     /**
      * Registers a client listener for when an object is recieved.
      */
@@ -217,7 +223,8 @@ public class Net{
 
         if(object instanceof StreamBegin){
             StreamBegin b = (StreamBegin)object;
-            streams.put(b.id, new StreamBuilder(b));
+            streams.put(b.id, currentStream = new StreamBuilder(b));
+
         }else if(object instanceof StreamChunk){
             StreamChunk c = (StreamChunk)object;
             StreamBuilder builder = streams.get(c.id);
@@ -228,6 +235,7 @@ public class Net{
             if(builder.isDone()){
                 streams.remove(builder.id);
                 handleClientReceived(builder.build());
+                currentStream = null;
             }
         }else if(clientListeners.get(object.getClass()) != null){
 

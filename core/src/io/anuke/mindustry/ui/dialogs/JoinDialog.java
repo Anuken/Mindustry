@@ -310,8 +310,8 @@ public class JoinDialog extends FloatingDialog{
         buildServer(host, button);
     }
 
-    void connect(String ip, int port){
-        if(Core.settings.getString("name").trim().isEmpty()){
+    public void connect(String ip, int port){
+        if(player.name.trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }
