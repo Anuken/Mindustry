@@ -267,7 +267,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyMatchList(int matches){
-        Log.info("found {0} matches", matches);
+        Log.info("found {0} matches {1}", matches, lobbyDoneCallback);
 
         if(lobbyDoneCallback != null){
             for(int i = 0; i < matches; i++){
@@ -281,13 +281,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getNumLobbyMembers(lobby),
                         Strings.parseInt(smat.getLobbyData(lobby, "name"), -1),
                         smat.getLobbyData(lobby, "versionType"),
-                        Gamemode.all[Strings.parseInt(smat.getLobbyData(lobby, "gamemode"))],
+                        Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby)
                     );
 
                     lobbyCallback.accept(out);
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err(e);
                 }
             }
 
@@ -316,7 +316,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
-            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules) + "");
+            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules).name() + "");
         }
     }
 
