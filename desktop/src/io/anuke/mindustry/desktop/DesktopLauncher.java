@@ -132,6 +132,8 @@ public class DesktopLauncher extends ClientLauncher{
         Events.on(ClientLoadEvent.class, event -> {
             player.name = SVars.net.friends.getPersonaName();
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
+            Core.settings.put("name", player.name);
+            Core.settings.save();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override
