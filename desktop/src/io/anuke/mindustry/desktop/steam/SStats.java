@@ -170,8 +170,6 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(Trigger.thoriumReactorOverheat, SStat.reactorsOverheated::add);
 
-        Events.on(Trigger.tutorialComplete, completeTutorial::complete);
-
         Events.on(Trigger.shock, shockWetEnemy::complete);
 
         Events.on(Trigger.phaseDeflectHit, killEnemyPhaseWall::complete);
@@ -196,6 +194,10 @@ public class SStats implements SteamUserStatsCallback{
             int total = 0;
             for(Item item : Vars.content.items()){
                 total += Vars.state.stats.itemsDelivered.get(item, 0);
+            }
+
+            if(state.rules.tutorial){
+                completeTutorial.complete();
             }
 
             SStat.timesLaunched.add();
@@ -228,7 +230,7 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(WinEvent.class, e -> {
             if(campaign()){
-                if(Vars.state.wave <= 5){
+                if(Vars.state.wave <= 5 && state.rules.attackMode){
                     defeatAttack5Waves.complete();
                 }
 
