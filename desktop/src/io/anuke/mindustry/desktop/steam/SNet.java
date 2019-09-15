@@ -210,14 +210,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyInvite(SteamID steamIDUser, SteamID steamIDLobby, long gameID){
-        Log.info("lobby invite {0} {1} {2}", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
-
-        //ignore invites when hosting.
-        if(net.server()) return;
-
-        ui.showConfirm("Someone has invited you to a game.", "But do you accept?", () -> {
-            smat.joinLobby(steamIDLobby);
-        });
+        Log.info("onLobbyInvite {0} {1} {2}", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
     }
 
     @Override
@@ -393,8 +386,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     }
 
     @Override
-    public void onGameLobbyJoinRequested(SteamID steamID, SteamID steamID1){
-
+    public void onGameLobbyJoinRequested(SteamID steamID, SteamID steamIDFriend){
+        Log.info("onGameLobbyJoinRequested {0} {1}", steamID, steamIDFriend);
     }
 
     @Override
@@ -408,12 +401,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     }
 
     @Override
-    public void onGameRichPresenceJoinRequested(SteamID steamID, String s){
-
+    public void onGameRichPresenceJoinRequested(SteamID steamID, String connect){
+        Log.info("onGameRichPresenceJoinRequested {0} {1}", steamID, connect);
     }
 
     @Override
-    public void onGameServerChangeRequested(String s, String s1){
+    public void onGameServerChangeRequested(String server, String password){
 
     }
 

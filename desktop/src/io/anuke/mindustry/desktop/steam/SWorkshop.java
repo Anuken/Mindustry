@@ -71,7 +71,7 @@ public class SWorkshop implements SteamUGCCallback{
             ugc.setItemTitle(h, map.name());
             ugc.setItemDescription(h, map.description());
             ugc.setItemTags(h, new String[]{"map", mode.name()});
-            ugc.setItemVisibility(h, PublishedFileVisibility.Public);
+            ugc.setItemVisibility(h, PublishedFileVisibility.Private);
             ugc.setItemPreview(h, map.previewFile().absolutePath());
             ugc.setItemContent(h, mapFile.parent().absolutePath());
             ugc.addItemKeyValueTag(h, "mode", mode.name());
@@ -102,6 +102,9 @@ public class SWorkshop implements SteamUGCCallback{
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
+            if(needsToAcceptWLA){
+                SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+            }
             Events.fire(new MapPublishEvent());
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
