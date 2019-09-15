@@ -86,21 +86,22 @@ public class CoreBlock extends StorageBlock{
         }
         state.teams.get(tile.getTeam()).cores.add(tile);
 
-        entity.storageCapacity = entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
+        entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
             t.entity.items = entity.items;
             t.<StorageBlockEntity>entity().linkedCore = tile;
         });
 
-        for(Tile other :  state.teams.get(tile.getTeam()).cores){
-            entity.storageCapacity += other.block().itemCapacity;
+        for(Tile other : state.teams.get(tile.getTeam()).cores){
+            if(other == tile) continue;
+            entity.storageCapacity += other.block().itemCapacity + other.entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
         for(Item item : content.items()){
             entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
         }
 
-        for(Tile other :  state.teams.get(tile.getTeam()).cores){
+        for(Tile other : state.teams.get(tile.getTeam()).cores){
             CoreEntity oe = other.entity();
             oe.storageCapacity = entity.storageCapacity;
         }
