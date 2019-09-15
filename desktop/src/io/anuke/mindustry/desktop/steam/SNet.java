@@ -61,11 +61,20 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
                         if(net.server()){
                             SteamConnection con = steamConnections.get(fromID);
-                            if(con != null){
-                                net.handleServerReceived(con, output);
-                            }else{
-                                Log.err("Unknown user with ID: {0}", fromID);
+                            //accept users on request
+                            if(con == null){
+                                con = new SteamConnection(from);
+                                Connect c = new Connect();
+                                c.addressTCP = "steam:" + from.getAccountID();
+
+                                Log.info("&bRecieved connection: {0}", c.addressTCP);
+
+                                steamConnections.put(from.getAccountID(), con);
+                                connections.add(con);
+                                net.handleServerReceived(con, c);
                             }
+
+                            net.handleServerReceived(con, output);
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
                             net.handleClientReceived(output);
                         }
@@ -250,10 +259,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Log.info("lobby {0}: {1} caused {2}'s change: {3}", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
-                Log.info("Current host left.");
                 //host left, leave as well
-                if(who == currentServer){
+                if(who == currentServer || who == currentLobby){
                     net.disconnect();
+                    Log.info("Current host left.");
                 }
             }else{
                 //a client left
@@ -354,25 +363,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     public void onP2PSessionRequest(SteamID steamIDRemote){
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
         if(currentServer != null && !net.server()){
-            Log.info("Am client");
+            Log.info("Am client, accepting request");
             if(steamIDRemote == currentServer){
                 snet.acceptP2PSessionWithUser(steamIDRemote);
             }
         }else if(net.server()){
-            Log.info("Am server, accepting request.");
-            //accept users on request
-            if(!steamConnections.containsKey(steamIDRemote.getAccountID())){
-                SteamConnection con = new SteamConnection(steamIDRemote);
-                Connect c = new Connect();
-                c.addressTCP = "steam:" + steamIDRemote.getAccountID();
-
-                Log.info("&bRecieved connection: {0}", c.addressTCP);
-
-                steamConnections.put(steamIDRemote.getAccountID(), con);
-                connections.add(con);
-                net.handleServerReceived(con, c);
-            }
-
+            Log.info("Am server, accepting request from " + steamIDRemote.getAccountID());
             snet.acceptP2PSessionWithUser(steamIDRemote);
         }
     }
