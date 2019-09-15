@@ -8,7 +8,9 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -18,10 +20,22 @@ public class SWorkshop implements SteamUGCCallback{
     private Map lastMap;
 
     public void publishMap(Map map){
-        this.lastMap = map;
-        ugc.createItem(SVars.steamID, WorkshopFileType.GameManagedItem);
-        ui.loadfrag.show("$map.publishing");
-        Log.info("Publish map " + map.name());
+        FloatingDialog dialog = new FloatingDialog("$confirm");
+        dialog.setFillParent(false);
+        dialog.cont.add("$map.publish.confirm").width(600f).wrap();
+        dialog.addCloseButton();
+        dialog.buttons.addImageTextButton("$eula", Icon.linkSmall, () -> {
+            SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+        }).size(210f, 64f);
+
+        dialog.buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
+            this.lastMap = map;
+            ugc.createItem(SVars.steamID, WorkshopFileType.Community);
+            ui.loadfrag.show("$map.publishing");
+            Log.info("Publish map " + map.name());
+            dialog.hide();
+        }).size(170f, 64f);
+        dialog.show();
     }
 
     @Override
@@ -109,6 +123,7 @@ public class SWorkshop implements SteamUGCCallback{
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }
+
     }
 
     @Override

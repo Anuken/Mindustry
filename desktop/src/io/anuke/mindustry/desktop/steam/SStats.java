@@ -168,7 +168,11 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(Trigger.suicideBomb, suicideBomb::complete);
 
-        Events.on(Trigger.thoriumReactorOverheat, SStat.reactorsOverheated::add);
+        Events.on(Trigger.thoriumReactorOverheat, () -> {
+            if(campaign()){
+                SStat.reactorsOverheated.add();
+            }
+        });
 
         Events.on(Trigger.shock, shockWetEnemy::complete);
 

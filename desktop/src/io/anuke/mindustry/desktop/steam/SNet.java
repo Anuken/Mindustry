@@ -386,8 +386,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     }
 
     @Override
-    public void onGameLobbyJoinRequested(SteamID steamID, SteamID steamIDFriend){
-        Log.info("onGameLobbyJoinRequested {0} {1}", steamID, steamIDFriend);
+    public void onGameLobbyJoinRequested(SteamID lobby, SteamID steamIDFriend){
+        Log.info("onGameLobbyJoinRequested {0} {1}", lobby, steamIDFriend);
+        smat.joinLobby(lobby);
     }
 
     @Override
