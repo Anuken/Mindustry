@@ -6,7 +6,7 @@ import io.anuke.mindustry.*;
 
 public abstract class Plugin{
 
-    /** @return the config file for this plugin.*/
+    /** @return the config file for this plugin, as the file 'plugins/[plugin-name]/config.json'.*/
     public FileHandle getConfig(){
         return Vars.plugins.getConfig(this);
     }
