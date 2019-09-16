@@ -28,12 +28,13 @@ public class Statuses implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(io.anuke.mindustry.entities.type.Unit unit, StatusEffect effect, float duration){
+    public void handleApply(Unit unit, StatusEffect effect, float duration){
         if(effect == StatusEffects.none || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){
             //check for opposite effects
             for(StatusEntry entry : statuses){
+                if(entry.effect == null) continue;
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
