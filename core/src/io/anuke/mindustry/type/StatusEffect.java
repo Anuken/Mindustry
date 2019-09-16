@@ -60,8 +60,8 @@ public class StatusEffect extends Content{
         transInit.add(new Object[]{effect, handler});
     }
 
-    @SafeVarargs
-    protected final void opposite(Supplier<StatusEffect>... effect){
+    @SuppressWarnings("unchecked")
+    protected void opposite(Supplier<StatusEffect>... effect){
         for(Supplier<StatusEffect> sup : effect){
             trans(sup, (unit, time, newTime, result) -> {
                 time -= newTime * 0.5f;

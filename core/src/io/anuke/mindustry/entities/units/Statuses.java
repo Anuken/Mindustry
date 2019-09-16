@@ -124,7 +124,7 @@ public class Statuses implements Saveable{
 
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
-        statuses.forEach(Pools::free);
+        statuses.each(Pools::free);
         statuses.clear();
 
         byte amount = stream.readByte();
@@ -140,8 +140,7 @@ public class Statuses implements Saveable{
      * @param effect    the status effect
      * @param time      the effect duration
      */
-    private void addStatus(StatusEffect effect, float time)
-    {
+    private void addStatus(StatusEffect effect, float time){
         StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
         statuses.add(entry.set(effect, time));
     }
