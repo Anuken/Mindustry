@@ -1,8 +1,15 @@
 package io.anuke.mindustry.plugin;
 
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 
 public abstract class Plugin{
+
+    /** @return the config file for this plugin.*/
+    public FileHandle getConfig(){
+        return Vars.plugins.getConfig(this);
+    }
 
     /** Called after all plugins have been created and commands have been registered.*/
     public void init(){

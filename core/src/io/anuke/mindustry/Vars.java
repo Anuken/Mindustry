@@ -14,13 +14,12 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.Bullet;
-import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;
@@ -141,6 +140,7 @@ public class Vars implements Loadable{
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
     public static Platform platform;
+    public static Plugins plugins;
 
     public static World world;
     public static Maps maps;

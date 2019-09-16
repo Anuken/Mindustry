@@ -41,7 +41,6 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
-    private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
     private boolean inExtraRound;
@@ -52,6 +51,8 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
+        plugins = new Plugins();
+
         Core.settings.defaults(
             "shufflemode", "normal",
             "bans", "",
