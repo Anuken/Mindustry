@@ -26,6 +26,7 @@ public class MinimapDialog extends FloatingDialog{
 
     void setup(){
         cont.clearChildren();
+        cont.clearListeners();
 
         cont.table(Tex.pane,t -> {
             t.addRect((x, y, width, height) -> {
