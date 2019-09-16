@@ -373,7 +373,9 @@ public class Control implements ApplicationListener, Loadable{
     public void update(){
         saves.update();
         //update and load any requested assets
-        assets.update();
+        if(assets != null){
+            assets.update();
+        }
 
         input.updateController();
 
