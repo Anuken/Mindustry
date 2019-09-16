@@ -17,8 +17,10 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -29,7 +31,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private static final float maxPanSpeed = 1.3f;
     private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = UnitScl.dp.scl(60f);
+    private final float edgePan = Scl.scl(60f);
 
     //gesture data
     private Vector2 vector = new Vector2();
@@ -65,7 +67,33 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     public MobileInput(){
         Events.on(ClientLoadEvent.class, e -> {
-            Core.input.addProcessor(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+            GestureDetector dec = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this){
+                boolean clearMouse = false;
+
+                @Override
+                public boolean touchDown(int x, int y, int pointer, KeyCode button){
+                    if(Core.scene.hasMouse(x, y)){
+                        clearMouse = true;
+                        return false;
+                    }
+                    return super.touchDown(x, y, pointer, button);
+                }
+
+                @Override
+                public boolean touchDragged(int x, int y, int pointer){
+                    if(!clearMouse){
+                        return super.touchDragged(x, y, pointer);
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean touchUp(int x, int y, int pointer, KeyCode button){
+                    clearMouse = false;
+                    return super.touchUp(x, y, pointer, button);
+                }
+            };
+            Core.input.getInputProcessors().insert(0, dec);
         });
     }
 
@@ -190,7 +218,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             TextureRegion region = placeDraw.region;
 
             Draw.mixcol(Pal.accent, Mathf.clamp((1f - request.scale) / 0.5f + 0.12f + Mathf.absin(Time.time(), 8f, 0.35f)));
-            Draw.tint(Color.WHITE, Pal.breakInvalid, request.redness);
+            Draw.tint(Color.white, Pal.breakInvalid, request.redness);
 
             Draw.rect(region, tile.worldx() + offset, tile.worldy() + offset,
                 region.getWidth() * request.scale * Draw.scl * placeDraw.scalex,
@@ -249,27 +277,27 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Table table){
-        table.addImage("whiteui").color(Pal.gray).height(4f).colspan(4).growX();
+        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton("icon-break-small", "clear-toggle-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.breakSmall, Styles.clearTogglePartiali, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.addImageButton("icon-diagonal-small", "clear-toggle-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.diagonalSmall, Styles.clearTogglePartiali, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
             Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton("icon-arrow-small", "clear-partial", iconsizesmall, () -> rotation = Mathf.mod(rotation + 1, 4))
+        table.addImageButton(Icon.arrowSmall, Styles.clearPartiali,() -> rotation = Mathf.mod(rotation + 1, 4))
         .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
 
         //confirm button
-        table.addImageButton("icon-check-small", "clear-partial", iconsizesmall, () -> {
+        table.addImageButton(Icon.checkSmall, Styles.clearPartiali, () -> {
             for(PlaceRequest request : selection){
                 Tile tile = request.tile();
 
@@ -295,7 +323,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         Core.scene.table(t -> {
            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
-           t.addImageTextButton("$cancel", "icon-cancel", 16*2, () -> {
+           t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                player.clearBuilding();
                mode = none;
                block = null;

@@ -11,11 +11,12 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
 import io.anuke.mindustry.world.meta.*;
@@ -48,7 +49,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public static void onUnitDeath(BaseUnit unit){
         if(unit == null) return;
 
-        if(Net.server() || !Net.active()){
+        if(net.server() || !net.active()){
             UnitDrops.dropItems(unit);
         }
 
@@ -56,9 +57,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         unit.type.deathSound.at(unit);
 
         //visual only.
-        if(Net.client()){
+        if(net.client()){
             Tile tile = world.tile(unit.spawner);
-            if(tile != null && !Net.client()){
+            if(tile != null){
                 tile.block().unitRemoved(tile, unit);
             }
 
@@ -77,6 +78,17 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public TypeID getTypeID(){
         return type.typeID;
+    }
+
+    @Override
+    public void onHit(SolidTrait entity){
+        if(entity instanceof Bullet && ((Bullet)entity).getOwner() instanceof DeflectorEntity && player != null && getTeam() != player.getTeam()){
+            Core.app.post(() -> {
+                if(isDead()){
+                    Events.fire(Trigger.phaseDeflectHit);
+                }
+            });
+        }
     }
 
     public @Nullable Tile getSpawner(){
@@ -255,7 +267,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         hitTime -= Time.delta();
 
-        if(Net.client()){
+        if(net.client()){
             interpolate();
             status.update(this);
             return;
@@ -297,7 +309,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
-        if(tile != null && !Net.client()){
+        if(tile != null && !net.client()){
             tile.block().unitRemoved(tile, this);
         }
 

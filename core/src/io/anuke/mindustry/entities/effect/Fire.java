@@ -1,18 +1,19 @@
 package io.anuke.mindustry.entities.effect;
 
 import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.TimedEntity;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -40,7 +41,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
 
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
-        if(Net.client() || tile == null) return; //not clientside.
+        if(net.client() || tile == null) return; //not clientside.
 
         Fire fire = map.get(tile.pos());
 
@@ -70,7 +71,11 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
      */
     public static void extinguish(Tile tile, float intensity){
         if(tile != null && map.containsKey(tile.pos())){
-            map.get(tile.pos()).time += intensity * Time.delta();
+            Fire fire = map.get(tile.pos());
+            fire.time += intensity * Time.delta();
+            if(fire.time >= fire.lifetime()){
+                Events.fire(Trigger.fireExtinguish);
+            }
         }
     }
 
@@ -106,7 +111,7 @@ public class Fire extends TimedEntity implements SaveTrait, SyncTrait{
         time = Mathf.clamp(time + Time.delta(), 0, lifetime());
         map.put(tile.pos(), this);
 
-        if(Net.client()){
+        if(net.client()){
             return;
         }
 

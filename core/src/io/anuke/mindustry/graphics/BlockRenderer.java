@@ -44,7 +44,7 @@ public class BlockRenderer implements Disposable{
             shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
             shadows.resize(world.width(), world.height());
             shadows.begin();
-            Core.graphics.clear(Color.WHITE);
+            Core.graphics.clear(Color.white);
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
             Draw.color(shadowColor);
@@ -65,7 +65,7 @@ public class BlockRenderer implements Disposable{
             fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
             fog.resize(world.width(), world.height());
             fog.begin();
-            Core.graphics.clear(Color.WHITE);
+            Core.graphics.clear(Color.white);
             Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
 
             for(int x = 0; x < world.width(); x++){
@@ -129,10 +129,10 @@ public class BlockRenderer implements Disposable{
 
             for(Tile tile : shadowEvents){
                 //clear it first
-                Draw.color(Color.WHITE);
+                Draw.color(Color.white);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 //then draw the shadow
-                Draw.color(!tile.block().hasShadow ? Color.WHITE : shadowColor);
+                Draw.color(!tile.block().hasShadow ? Color.white : shadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 

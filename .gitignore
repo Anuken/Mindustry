@@ -20,6 +20,10 @@ logs/
 /tests/build/
 /server/build/
 changelog
+saves/
+core/assets/saves/
+/core/assets/saves/
+steam_appid.txt
 /test_files/
 /annotations/build/
 /android/assets/mindustry-maps/

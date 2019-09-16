@@ -8,9 +8,9 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.BaseEntity;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
@@ -247,7 +247,7 @@ public class ForceProjector extends Block{
         public void drawOver(){
             if(entity.hit <= 0f) return;
 
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
             Draw.alpha(entity.hit);
             Fill.poly(x, y, 6, realRadius(entity));
             Draw.color();

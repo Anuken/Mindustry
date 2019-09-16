@@ -15,7 +15,7 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -201,7 +201,7 @@ public abstract class Turret extends Block{
     protected void turnToTarget(Tile tile, float targetRot){
         TurretEntity entity = tile.entity();
 
-        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta());
+        entity.rotation = Angles.moveToward(entity.rotation, targetRot, rotatespeed * entity.delta() * baseReloadSpeed(tile));
     }
 
     public boolean shouldTurn(Tile tile){

@@ -16,8 +16,7 @@ public class Links{
             new LinkEntry("itch.io", "https://anuke.itch.io/mindustry", Color.valueOf("fa5c5c")),
             new LinkEntry("google-play", "https://play.google.com/store/apps/details?id=io.anuke.mindustry", Color.valueOf("689f38")),
             new LinkEntry("github", "https://github.com/Anuken/Mindustry/", Color.valueOf("24292e")),
-            new LinkEntry("dev-builds", "https://jenkins.hellomouse.net/job/mindustry/", Color.valueOf("fafbfc"))
-
+            new LinkEntry("dev-builds", "https://github.com/Anuken/MindustryBuilds", Color.valueOf("fafbfc"))
         };
     }
 

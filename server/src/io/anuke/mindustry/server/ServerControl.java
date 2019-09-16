@@ -19,9 +19,8 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Administration.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.plugin.Plugins;
+import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
@@ -41,7 +40,7 @@ public class ServerControl implements ApplicationListener{
     private static final int commandSocketPort = 6859;
 
     private final CommandHandler handler = new CommandHandler("");
-    private final FileHandle logFolder = Core.files.local("logs/");
+    private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
     private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
@@ -169,7 +168,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
-                Net.closeServer();
+                net.closeServer();
             }
         });
 
@@ -203,12 +202,12 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
-            Net.dispose();
+            net.dispose();
             Core.app.exit();
         });
 
         handler.register("stop", "Stop hosting the server.", arg -> {
-            Net.closeServer();
+            net.closeServer();
             if(lastTask != null) lastTask.cancel();
             state.set(State.menu);
             info("Stopped server.");
@@ -401,6 +400,68 @@ public class ServerControl implements ApplicationListener{
             info("Server name is now &lc'{0}'.", arg[0]);
         });
 
+        handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
+            if(arg.length == 0){
+                info("Player limit is currently &lc{0}.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
+                return;
+            }
+            if(arg[0].equals("off")){
+                netServer.admins.setPlayerLimit(0);
+                info("Player limit disabled.");
+                return;
+            }
+
+            if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
+                int lim = Strings.parseInt(arg[0]);
+                netServer.admins.setPlayerLimit(lim);
+                info("Player limit is now &lc{0}.", lim);
+            }else{
+                err("Limit must be a number above 0.");
+            }
+        });
+
+        handler.register("whitelist", "[on/off...]", "Enable/disable whitelisting.", arg -> {
+            if(arg.length == 0){
+                info("Whitelist is currently &lc{0}.", netServer.admins.isWhitelistEnabled() ? "on" : "off");
+                return;
+            }
+            boolean on = arg[0].equalsIgnoreCase("on");
+            netServer.admins.setWhitelist(on);
+            info("Whitelist is now &lc{0}.", on ? "on" : "off");
+        });
+
+        handler.register("whitelisted", "List the entire whitelist.", arg -> {
+            if(netServer.admins.getWhitelisted().isEmpty()){
+                info("&lyNo whitelisted players found.");
+                return;
+            }
+
+            info("&lyWhitelist:");
+            netServer.admins.getWhitelisted().each(p -> Log.info("- &ly{0}", p.lastName));
+        });
+
+        handler.register("whitelist-add", "<ID>", "Add a player to the whitelist by ID.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            if(info == null){
+                err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                return;
+            }
+
+            netServer.admins.whitelist(arg[0]);
+            info("Player &ly'{0}'&lg has been whitelisted.", info.lastName);
+        });
+
+        handler.register("whitelist-remove", "<ID>", "Remove a player to the whitelist by ID.", arg -> {
+            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
+            if(info == null){
+                err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                return;
+            }
+
+            netServer.admins.unwhitelist(arg[0]);
+            info("Player &ly'{0}'&lg has been un-whitelisted.", info.lastName);
+        });
+
         handler.register("crashreport", "<on/off>", "Disables or enables automatic crash reporting", arg -> {
             boolean value = arg[0].equalsIgnoreCase("on");
             Core.settings.put("crashreport", value);
@@ -471,8 +532,8 @@ public class ServerControl implements ApplicationListener{
             Player target = playerGroup.find(p -> p.name.equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name + " has been kicked by the server.");
-                netServer.kick(target.con.id, KickReason.kick);
+                Call.sendMessage("[scarlet] " + target.name + "[scarlet] has been kicked by the server.");
+                target.con.kick(KickReason.kick);
                 info("It is done.");
             }else{
                 info("Nobody with that name could be found...");
@@ -501,7 +562,7 @@ public class ServerControl implements ApplicationListener{
             for(Player player : playerGroup.all()){
                 if(netServer.admins.isIDBanned(player.uuid)){
                     Call.sendMessage("[scarlet] " + player.name + " has been banned.");
-                    netServer.kick(player.con.id, KickReason.banned);
+                    player.con.kick(KickReason.banned);
                 }
             }
         });
@@ -755,7 +816,7 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
-                netServer.sendWorldData(p, p.con.id);
+                netServer.sendWorldData(p);
             }
             inExtraRound = false;
         };
@@ -768,7 +829,7 @@ public class ServerControl implements ApplicationListener{
                         r.run();
                     }catch(MapException e){
                         Log.err(e.map.name() + ": " + e.getMessage());
-                        Net.closeServer();
+                        net.closeServer();
                     }
                 }
             };
@@ -781,7 +842,7 @@ public class ServerControl implements ApplicationListener{
 
     private void host(){
         try{
-            Net.host(Core.settings.getInt("port"));
+            net.host(Core.settings.getInt("port"));
             info("&lcOpened a server on port {0}.", Core.settings.getInt("port"));
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");

@@ -118,7 +118,7 @@ public class RemoteReadGenerator{
             if(entry.forward && entry.where.isServer && needsPlayer){
                 //call forwarded method
                 readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
-                "__forward(player.con.id" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
+                "__forward(player.con" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");

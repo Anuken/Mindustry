@@ -11,8 +11,9 @@ import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -83,7 +84,7 @@ public class LiquidSource extends Block{
 
         for(int i = 0; i < items.size; i++){
             final int f = i;
-            ImageButton button = cont.addImageButton("clear", "clear-toggle-trans", 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
+            ImageButton button = cont.addImageButton(Tex.clear, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
             button.changed(() -> {
                 Call.setLiquidSourceLiquid(null, tile, button.isChecked() ? items.get(f) : null);
                 control.input.frag.config.hideConfig();

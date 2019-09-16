@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.*;
 import java.text.*;
 import java.util.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class CrashSender{
 
@@ -78,9 +79,9 @@ public class CrashSender{
 
             //attempt to close connections, if applicable
             try{
-                netActive = Net.active();
-                netServer = Net.server();
-                Net.dispose();
+                netActive = net.active();
+                netServer = net.server();
+                net.dispose();
             }catch(Throwable ignored){
             }
 

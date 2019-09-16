@@ -5,7 +5,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.graphics.glutils.Shader;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.Scl;
 import io.anuke.arc.util.Time;
 
 public class Shaders{
@@ -48,7 +48,7 @@ public class Shaders{
             setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
             setUniformi("u_time", (int)(time += Core.graphics.getDeltaTime() * 60f));
             setUniformf("u_uv", Core.atlas.white().getU(), Core.atlas.white().getV());
-            setUniformf("u_scl", UnitScl.dp.scl(1f));
+            setUniformf("u_scl", Scl.scl(1f));
             setUniformf("u_uv2", Core.atlas.white().getU2(), Core.atlas.white().getV2());
         }
     }
@@ -124,8 +124,8 @@ public class Shaders{
 
         @Override
         public void apply(){
-            setUniformf("u_dp", UnitScl.dp.scl(1f));
-            setUniformf("u_time", Time.time() / UnitScl.dp.scl(1f));
+            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_time", Time.time() / Scl.scl(1f));
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.*;
+import io.anuke.arc.input.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -52,12 +52,22 @@ public class PausedDialog extends FloatingDialog{
                 if(!world.isZone() && !state.isEditor()){
                     cont.row();
                     cont.addButton("$savegame", save::show);
-                    cont.addButton("$loadgame", load::show).disabled(b -> Net.active());
+                    cont.addButton("$loadgame", load::show).disabled(b -> net.active());
                 }
 
                 cont.row();
 
-                cont.addButton("$hostserver", ui.host::show).disabled(b -> Net.active()).colspan(2).width(dw * 2 + 20f);
+                cont.addButton("$hostserver", () -> {
+                    if(net.active() && steam){
+                        platform.inviteFriends();
+                    }else{
+                        if(steam){
+                            ui.host.runHost();
+                        }else{
+                            ui.host.show();
+                        }
+                    }
+                }).disabled(b -> net.active() && !steam).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.active() && steam ? "$invitefriends" : "$hostserver"));
             }
 
             cont.row();
@@ -66,24 +76,22 @@ public class PausedDialog extends FloatingDialog{
 
         }else{
             cont.defaults().size(120f).pad(5);
-            float isize = iconsize;
-
-            cont.addRowImageTextButton("$back", "icon-play-2", isize, this::hide);
-            cont.addRowImageTextButton("$settings", "icon-tools", isize, ui.settings::show);
+            cont.addRowImageTextButton("$back", Icon.play2, this::hide);
+            cont.addRowImageTextButton("$settings", Icon.tools, ui.settings::show);
 
             if(!world.isZone() && !state.isEditor()){
-                cont.addRowImageTextButton("$save", "icon-save", isize, save::show);
+                cont.addRowImageTextButton("$save", Icon.save, save::show);
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", "icon-load", isize, load::show).disabled(b -> Net.active());
+                cont.addRowImageTextButton("$load", Icon.load, load::show).disabled(b -> net.active());
             }else{
                 cont.row();
             }
 
-            cont.addRowImageTextButton("$hostserver.mobile", "icon-host", isize, ui.host::show).disabled(b -> Net.active());
+            cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", "icon-quit", isize, this::showQuitConfirm);
+            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm);
         }
     }
 
@@ -93,8 +101,8 @@ public class PausedDialog extends FloatingDialog{
                 Core.settings.put("playedtutorial", true);
                 Core.settings.save();
             }
-            wasClient = Net.client();
-            if(Net.client()) netClient.disconnectQuietly();
+            wasClient = net.client();
+            if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
         });
@@ -117,7 +125,7 @@ public class PausedDialog extends FloatingDialog{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
-                ui.showError("[accent]" + Core.bundle.get("savefail"));
+                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
             state.set(State.menu);
             logic.reset();

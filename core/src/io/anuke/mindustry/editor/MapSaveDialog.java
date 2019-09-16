@@ -55,7 +55,7 @@ public class MapSaveDialog extends FloatingDialog{
         if(!invalid()){
             listener.accept(field.getText());
         }else{
-            ui.showError("$editor.failoverwrite");
+            ui.showErrorMessage("$editor.failoverwrite");
         }
     }
 

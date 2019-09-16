@@ -22,7 +22,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Tile;
@@ -40,7 +40,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20) || !tile.interactable(player.getTeam())) return;
 
         int removed = tile.block().removeStack(tile, item, amount);
 
@@ -71,6 +71,8 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     public void hide(){
+        if(table == null) return;
+
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
             table.clearChildren();
             table.clearListeners();
@@ -86,7 +88,7 @@ public class BlockInventoryFragment extends Fragment{
 
         table.clearChildren();
         table.clearActions();
-        table.background("inventory");
+        table.background(Tex.inventory);
         table.touchable(Touchable.enabled);
         table.update(() -> {
 

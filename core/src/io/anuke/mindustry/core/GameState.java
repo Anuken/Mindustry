@@ -1,14 +1,12 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.Events;
-import io.anuke.mindustry.entities.type.BaseUnit;
-import io.anuke.mindustry.entities.type.base.BaseDrone;
-import io.anuke.mindustry.game.EventType.StateChangeEvent;
+import io.anuke.arc.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.base.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.net.Net;
 
-import static io.anuke.mindustry.Vars.unitGroups;
-import static io.anuke.mindustry.Vars.waveTeam;
+import static io.anuke.mindustry.Vars.*;
 
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */
@@ -29,7 +27,7 @@ public class GameState{
     private State state = State.menu;
 
     public int enemies(){
-        return Net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));
+        return net.client() ? enemies : unitGroups[waveTeam.ordinal()].count(b -> !(b instanceof BaseDrone));
     }
 
     public BaseUnit boss(){
@@ -46,7 +44,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !Net.active()) || (gameOver && !Net.active());
+        return (is(State.paused) && !net.active()) || (gameOver && !net.active());
     }
 
     public boolean is(State astate){

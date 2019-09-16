@@ -1,28 +1,24 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Input.TextInput;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.Input.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.ui.Label;
-import io.anuke.arc.scene.ui.Label.LabelStyle;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.UnitScl;
-import io.anuke.arc.util.Align;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.input.Binding;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.Label.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.ui.*;
 
-import static io.anuke.arc.Core.input;
-import static io.anuke.arc.Core.scene;
-import static io.anuke.mindustry.Vars.maxTextLength;
-import static io.anuke.mindustry.Vars.mobile;
+import static io.anuke.arc.Core.*;
+import static io.anuke.mindustry.Vars.net;
+import static io.anuke.mindustry.Vars.*;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
@@ -33,9 +29,9 @@ public class ChatFragment extends Table{
     private Label fieldlabel = new Label(">");
     private BitmapFont font;
     private GlyphLayout layout = new GlyphLayout();
-    private float offsetx = UnitScl.dp.scl(4), offsety = UnitScl.dp.scl(4), fontoffsetx = UnitScl.dp.scl(2), chatspace = UnitScl.dp.scl(50);
+    private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
-    private float textspacing = UnitScl.dp.scl(10);
+    private float textspacing = Scl.scl(10);
     private Array<String> history = new Array<>();
     private int historyPos = 0;
     private int scrollPos = 0;
@@ -50,10 +46,10 @@ public class ChatFragment extends Table{
         super();
 
         setFillParent(true);
-        font = scene.skin.getFont("default");
+        font = Fonts.def;
 
         visible(() -> {
-            if(!Net.active() && messages.size > 0){
+            if(!net.active() && messages.size > 0){
                 clearMessages();
 
                 if(chatOpen){
@@ -61,12 +57,12 @@ public class ChatFragment extends Table{
                 }
             }
 
-            return Net.active();
+            return net.active();
         });
 
         update(() -> {
 
-            if(Net.active() && input.keyTap(Binding.chat)){
+            if(net.active() && input.keyTap(Binding.chat)){
                 toggle();
             }
 
@@ -103,11 +99,11 @@ public class ChatFragment extends Table{
         fieldlabel.getStyle().font = font;
         fieldlabel.setStyle(fieldlabel.getStyle());
 
-        chatfield = new TextField("", new TextField.TextFieldStyle(scene.skin.get(TextField.TextFieldStyle.class)));
+        chatfield = new TextField("", new TextField.TextFieldStyle(scene.getStyle(TextField.TextFieldStyle.class)));
         chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
         chatfield.getStyle().background = null;
-        chatfield.getStyle().font = scene.skin.getFont("chat");
-        chatfield.getStyle().fontColor = Color.WHITE;
+        chatfield.getStyle().font = Fonts.chat;
+        chatfield.getStyle().fontColor = Color.white;
         chatfield.setStyle(chatfield.getStyle());
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(6f);
@@ -123,7 +119,7 @@ public class ChatFragment extends Table{
     @Override
     public void draw(){
         float opacity = Core.settings.getInt("chatopacity") / 100f;
-        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, UnitScl.dp.scl(700f));
+        float textWidth = Math.min(Core.graphics.getWidth()/1.5f, Scl.scl(700f));
 
         Draw.color(shadowColor);
 
@@ -144,7 +140,7 @@ public class ChatFragment extends Table{
         float theight = offsety + spacing + getMarginBottom();
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || chatOpen); i++){
 
-            layout.setText(font, messages.get(i).formattedMessage, Color.WHITE, textWidth, Align.bottomLeft, true);
+            layout.setText(font, messages.get(i).formattedMessage, Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
             if(i - scrollPos == 0) theight -= textspacing + 1;
 
@@ -158,7 +154,7 @@ public class ChatFragment extends Table{
                 font.getCache().setAlphas(opacity);
             }
 
-            Fill.crect(offsetx, theight - layout.height - 2, textWidth + UnitScl.dp.scl(4f), layout.height + textspacing);
+            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
             Draw.alpha(opacity * shadowColor.a);
 

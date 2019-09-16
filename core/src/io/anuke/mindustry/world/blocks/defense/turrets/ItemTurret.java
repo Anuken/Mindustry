@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -110,6 +111,10 @@ public class ItemTurret extends CooledTurret{
     public void handleItem(Item item, Tile tile, Tile source){
         TurretEntity entity = tile.entity();
         if(entity == null) return;
+
+        if(item == Items.pyratite){
+            Events.fire(Trigger.flameAmmo);
+        }
 
         BulletType type = ammo.get(item);
         entity.totalAmmo += type.ammoMultiplier;

@@ -1,17 +1,16 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.util.Strings;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Net;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class HostDialog extends FloatingDialog{
     float w = 300;
@@ -30,7 +29,7 @@ public class HostDialog extends FloatingDialog{
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.addImageButton("whiteui", "clear-full", 40, () -> {
+            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
@@ -50,23 +49,29 @@ public class HostDialog extends FloatingDialog{
                 return;
             }
 
-            ui.loadfrag.show("$hosting");
-            Time.runTask(5f, () -> {
-                try{
-                    Net.host(Vars.port);
-                    player.isAdmin = true;
-                }catch(IOException e){
-                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
-                }
-                ui.loadfrag.hide();
-                hide();
-            });
+            runHost();
         }).width(w).height(70f);
 
         cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
 
         shown(() -> {
-            Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+            if(!steam){
+                Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+            }
+        });
+    }
+
+    public void runHost(){
+        ui.loadfrag.show("$hosting");
+        Time.runTask(5f, () -> {
+            try{
+                net.host(Vars.port);
+                player.isAdmin = true;
+            }catch(IOException e){
+                ui.showException("$server.error", e);
+            }
+            ui.loadfrag.hide();
+            hide();
         });
     }
 }

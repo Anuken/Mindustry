@@ -1,4 +1,4 @@
-include 'desktop', 'core', 'net', 'server', 'ios', 'annotations', 'tools', 'tests'
+include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def use = { String name ->
     include(name)

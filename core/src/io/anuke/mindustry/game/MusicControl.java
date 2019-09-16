@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.5f, musicWaveChance = 0.4f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
 
     /** normal, ambient music, plays at any time */
     public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
@@ -133,8 +133,8 @@ public class MusicControl{
     }
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
-    private void playOnce(@NonNull Music music){
-        if(current != null) return; //do not interrupt already-playing tracks
+    private void playOnce(Music music){
+        if(current != null || music == null) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
         lastRandomPlayed = music;

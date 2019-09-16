@@ -8,6 +8,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -500,6 +501,7 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
+            itemCapacity = 20;
 
             int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 
@@ -589,7 +591,7 @@ public class Blocks implements ContentList{
 
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 50, Items.lead, 25));
-            flameColor = Color.CLEAR;
+            flameColor = Color.clear;
             hasItems = true;
             hasPower = true;
             outputItem = new ItemStack(Items.pyratite, 1);
@@ -660,7 +662,7 @@ public class Blocks implements ContentList{
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.CLEAR, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.color(Color.clear, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -982,7 +984,6 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 1));
             liquidCapacity = 16f;
-            liquidFlowFactor = 4.9f;
             health = 90;
         }};
 
@@ -1397,7 +1398,7 @@ public class Blocks implements ContentList{
             smokeEffect = Fx.lancerLaserShootSmoke;
             chargeEffect = Fx.lancerLaserCharge;
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             size = 2;
             health = 280 * size * size;
             targetAir = false;
@@ -1405,16 +1406,16 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 35));
+            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 50));
             shootType = Bullets.arc;
-            reload = 24f;
+            reload = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 0.9f;
+            powerUse = 1.5f;
             targetAir = false;
-            range = 95f;
+            range = 90f;
             shootEffect = Fx.lightningShoot;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             recoil = 1f;
             size = 1;
             health = 260;
@@ -1493,7 +1494,7 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(Bullet b){
+                public void init(io.anuke.mindustry.entities.type.Bullet b){
                     for(int i = 0; i < rays; i++){
                         Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
@@ -1502,7 +1503,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void draw(Bullet b){
                     super.draw(b);
-                    Draw.color(Color.WHITE, Pal.lancerLaser, b.fin());
+                    Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());
                     for(int i = 0; i < 7; i++){
                         Tmp.v1.trns(b.rot(), i * 8f);

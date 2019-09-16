@@ -1,20 +1,22 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.annotations.Annotations.Struct;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.GridBits;
 import io.anuke.arc.collection.IntQueue;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.effect.Fire;
 import io.anuke.mindustry.entities.effect.Lightning;
 import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.gen.PropCell;
@@ -187,6 +189,10 @@ public class Damage{
             //TODO better velocity displacement
             float dst = tr.set(entity.x - x, entity.y - y).len();
             entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+
+            if(complete && damage >= 9999999f && entity == player){
+                Events.fire(Trigger.exclusionDeath);
+            }
         };
 
         rect.setSize(radius * 2).setCenter(x, y);

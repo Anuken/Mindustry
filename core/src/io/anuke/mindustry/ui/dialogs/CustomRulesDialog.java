@@ -101,7 +101,7 @@ public class CustomRulesDialog extends FloatingDialog{
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
-            .update(a -> a.setColor(condition.get() ? Color.WHITE : Color.GRAY));
+            .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
             Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))

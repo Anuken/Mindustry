@@ -11,8 +11,8 @@ import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -82,8 +82,8 @@ public class MassDriver extends Block{
 
         //switch states
         if(entity.state == DriverState.idle){
-            //start accepting when idle
-            if(!entity.waitingShooters.isEmpty()){
+            //start accepting when idle and there's space
+            if(!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute)){
                 entity.state = DriverState.accepting;
             }else if(hasLink){ //switch to shooting if there's a valid link.
                 entity.state = DriverState.shooting;
@@ -101,8 +101,8 @@ public class MassDriver extends Block{
         }
 
         if(entity.state == DriverState.accepting){
-            //if there's nothing shooting at this, bail
-            if(entity.currentShooter() == null){
+            //if there's nothing shooting at this, bail - OR, items full
+            if(entity.currentShooter() == null || (itemCapacity - entity.items.total() < minDistribute)){
                 entity.state = DriverState.idle;
                 return;
             }
@@ -111,7 +111,7 @@ public class MassDriver extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.power.satisfaction);
         }else if(entity.state == DriverState.shooting){
             //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
-            if(!hasLink || !entity.waitingShooters.isEmpty()){
+            if(!hasLink || (!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute))){
                 entity.state = DriverState.idle;
                 return;
             }

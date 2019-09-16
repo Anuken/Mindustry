@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -40,6 +41,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
         atlas = TextureAtlas.blankAtlas();
+        Vars.net = new Net(platform.getNet());
 
         UI.loadSystemCursors();
 
@@ -47,7 +49,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         UI.loadDefaultFont();
 
-        assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
+        assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
+            atlas = (TextureAtlas)t;
+        };
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
@@ -84,10 +88,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void resize(int width, int height){
-        super.resize(width, height);
+        if(assets == null) return;
 
         if(!assets.isFinished()){
             Draw.proj().setOrtho(0, 0, width, height);
+        }else{
+            super.resize(width, height);
         }
     }
 
@@ -100,6 +106,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
+                super.resize(graphics.getWidth(), graphics.getHeight());
                 finished = true;
                 Events.fire(new ClientLoadEvent());
             }
@@ -149,15 +156,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Core.graphics.clear(Pal.darkerGray);
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-        float height = UnitScl.dp.scl(50f);
+        float height = Scl.scl(50f);
 
-        Draw.color(Color.BLACK);
+        Draw.color(Color.black);
         Fill.poly(graphics.getWidth()/2f, graphics.getHeight()/2f, 6, Mathf.dst(graphics.getWidth()/2f, graphics.getHeight()/2f) * smoothProgress);
         Draw.reset();
 
         float w = graphics.getWidth()*0.6f;
 
-        Draw.color(Color.BLACK);
+        Draw.color(Color.black);
         Fill.rect(graphics.getWidth()/2f, graphics.getHeight()/2f, w, height);
 
         Draw.color(Pal.accent);
@@ -169,13 +176,13 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         if(assets.isLoaded("outline")){
             BitmapFont font = assets.get("outline");
-            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f + UnitScl.dp.scl(10f), Align.center);
-            font.draw(bundle.get("loading", "").replace("[accent]", ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f + height / 2f + UnitScl.dp.scl(20), Align.center);
+            font.draw((int)(assets.getProgress() * 100) + "%", graphics.getWidth() / 2f, graphics.getHeight() / 2f + Scl.scl(10f), Align.center);
+            font.draw(bundle.get("loading", "").replace("[accent]", ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f + height / 2f + Scl.scl(20), Align.center);
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
                 String key = name.contains("content") ? "content" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
-                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - UnitScl.dp.scl(10f), Align.center);
+                font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - Scl.scl(10f), Align.center);
             }
         }
         Draw.flush();

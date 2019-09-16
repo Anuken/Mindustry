@@ -242,14 +242,13 @@ public class BlockIndexer{
         int quadrantY = tile.y / quadrantSize;
         itemSet.clear();
 
-        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
-        Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
+        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1), Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
 
         //find all items that this quadrant contains
-        for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
-            for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
+        for(int x = Math.max(0, rounded.x - quadrantSize / 2); x < rounded.x + quadrantSize / 2 && x < world.width(); x++){
+            for(int y = Math.max(0, rounded.y - quadrantSize / 2); y < rounded.y + quadrantSize / 2 && y < world.height(); y++){
                 Tile result = world.tile(x, y);
-                if(result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
+                if(result == null || result.drop() == null || !scanOres.contains(result.drop()) || result.block() != Blocks.air) continue;
 
                 itemSet.add(result.drop());
             }

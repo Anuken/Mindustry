@@ -12,11 +12,12 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -137,17 +138,17 @@ public class PlacementFragment extends Fragment{
                             continue;
                         }
 
-                        ImageButton button = blockTable.addImageButton("icon-locked", "select", 8 * 4, () -> {
+                        ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 input.block = input.block == block ? null : block;
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Icon.medium));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Block.Icon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.WHITE : Color.GRAY;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(input.block == block);
                         });
@@ -169,7 +170,7 @@ public class PlacementFragment extends Fragment{
                 };
 
                 //top table with hover info
-                frame.table("button-edge-2", top -> {
+                frame.table(Tex.buttonEdge2,top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
                         //don't refresh unnecessarily
@@ -189,12 +190,12 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new Image(lastDisplay.icon(Icon.medium))).size(8 * 4);
+                                header.add(new Image(lastDisplay.icon(Block.Icon.medium))).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
-                                    header.addButton("?", "clear-partial", () -> {
+                                    header.addButton("?", Styles.clearPartialt, () -> {
                                         ui.content.show(lastDisplay);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -209,7 +210,7 @@ public class PlacementFragment extends Fragment{
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
-                                        line.add(stack.item.localizedName()).color(Color.LIGHT_GRAY).padLeft(2).left();
+                                        line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
@@ -243,9 +244,9 @@ public class PlacementFragment extends Fragment{
                     });
                 }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
                 frame.row();
-                frame.addImage("whiteui").color(Pal.gray).colspan(3).height(4).growX();
+                frame.addImage().color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
-                frame.table("pane-2", blocksSelect -> {
+                frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
@@ -267,11 +268,11 @@ public class PlacementFragment extends Fragment{
                         if(f++ % 2 == 0) categories.row();
 
                         if(categoryEmpty[cat.ordinal()]){
-                            categories.addImage("flat-trans");
+                            categories.addImage(Styles.black6);
                             continue;
                         }
 
-                        categories.addImageButton("icon-" + cat.name() + "-med", "clear-toggle-trans", iconsizemed, () -> {
+                        categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());

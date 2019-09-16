@@ -88,7 +88,7 @@ public interface MinerTrait extends Entity{
         float ex = tile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = tile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.color(Color.LIGHT_GRAY, Color.WHITE, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
+        Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
         Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
 

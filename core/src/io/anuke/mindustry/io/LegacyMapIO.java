@@ -207,7 +207,7 @@ public class LegacyMapIO{
                 if(block.ore != null) tile.setOverlay(block.ore);
 
                 //place core
-                if(color == Color.rgba8888(Color.GREEN)){
+                if(color == Color.rgba8888(Color.green)){
                     for(int dx = 0; dx < 3; dx++){
                         for(int dy = 0; dy < 3; dy++){
                             int worldx = dx - 1 + x;

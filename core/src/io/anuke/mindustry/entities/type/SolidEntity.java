@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.impl;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.traits.SolidTrait;

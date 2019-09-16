@@ -22,7 +22,6 @@ public enum Gamemode{
     attack(rules -> {
         rules.unitDrops = true;
         rules.attackMode = true;
-        rules.waves = true;
     }, map -> map.teams.contains(waveTeam.ordinal())),
     pvp(rules -> {
         rules.pvp = true;
@@ -67,6 +66,20 @@ public enum Gamemode{
         this.rules = rules;
         this.hidden = hidden;
         this.validator = validator;
+    }
+
+    public static Gamemode bestFit(Rules rules){
+        if(rules.pvp){
+            return pvp;
+        }else if(rules.editor){
+            return editor;
+        }else if(rules.attackMode){
+            return attack;
+        }else if(rules.infiniteResources){
+            return sandbox;
+        }else{
+            return survival;
+        }
     }
 
     /** Applies this preset to this ruleset. */

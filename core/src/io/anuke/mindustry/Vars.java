@@ -3,6 +3,7 @@ package io.anuke.mindustry;
 import io.anuke.arc.Application.*;
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -10,11 +11,11 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
@@ -43,6 +44,8 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
+    /** list of built-in servers.*/
+    public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */
@@ -59,14 +62,6 @@ public class Vars implements Loadable{
     public static final float itemSize = 5f;
     /** extra padding around the world; units outside this bound will begin to self-destruct. */
     public static final float worldBounds = 100f;
-    /** default size of UI icons.*/
-    public static final int iconsize = 48;
-    /** size of UI icons (small)*/
-    public static final int iconsizesmall = 32;
-    /** size of UI icons (medium)*/
-    public static final int iconsizemed = 30;
-    /** size of UI icons (medium)*/
-    public static final int iconsizetiny = 16;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */
@@ -112,6 +107,8 @@ public class Vars implements Loadable{
     public static boolean android;
     /** whether the game is running on a headless server */
     public static boolean headless;
+    /** whether steam is enabled for this game */
+    public static boolean steam;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
     public static FileHandle dataDirectory;
     /** data subdirectory used for screenshots */
@@ -136,6 +133,7 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
+    public static Net net;
     public static ContentLoader content;
     public static GameState state;
     public static GlobalData data;
@@ -168,7 +166,6 @@ public class Vars implements Loadable{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
 
     @Override
@@ -226,7 +223,7 @@ public class Vars implements Loadable{
 
         for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && Net.client()){
+                if(entity instanceof SyncTrait && net.client()){
                     netClient.addRemovedEntity((entity).getID());
                 }
             });
@@ -252,11 +249,16 @@ public class Vars implements Loadable{
 
     public static void loadSettings(){
         Core.settings.setAppName(appName);
+
+        if(steam){
+            Core.settings.setDataDirectory(Core.files.local("saves/"));
+        }
+
         Core.settings.defaults("locale", "default");
         Core.keybinds.setDefaults(Binding.values());
         Core.settings.load();
 
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
+        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
 
         if(!loadLocales) return;
 
@@ -268,6 +270,7 @@ public class Vars implements Loadable{
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
+
             if(!headless){
                 Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle."));
             }

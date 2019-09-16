@@ -12,8 +12,8 @@ import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.content.Bullets;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.type.Bullet;
+import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.traits.TimeTrait;
 import io.anuke.mindustry.entities.type.Unit;
@@ -110,7 +110,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     @Override
     public void draw(){
         Lines.stroke(3f * fout());
-        Draw.color(color, Color.WHITE, fin());
+        Draw.color(color, Color.white, fin());
         Lines.beginLine();
 
         Lines.linePoint(x, y);

@@ -6,6 +6,7 @@ import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
@@ -23,7 +24,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(io.anuke.mindustry.entities.type.Bullet b){
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
@@ -36,7 +37,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void update(Bullet b){
+    public void update(io.anuke.mindustry.entities.type.Bullet b){
         //data MUST be an instance of DriverBulletData
         if(!(b.getData() instanceof DriverBulletData)){
             hit(b);
@@ -82,7 +83,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void despawned(Bullet b){
+    public void despawned(io.anuke.mindustry.entities.type.Bullet b){
         super.despawned(b);
 
         if(!(b.getData() instanceof DriverBulletData)) return;
@@ -93,7 +94,7 @@ public class MassDriverBolt extends BulletType{
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
                 float angle = b.rot() + Mathf.range(100f);
-                Effects.effect(Fx.dropItem, Color.WHITE, b.x, b.y, angle, content.item(i));
+                Effects.effect(Fx.dropItem, Color.white, b.x, b.y, angle, content.item(i));
             }
         }
     }
