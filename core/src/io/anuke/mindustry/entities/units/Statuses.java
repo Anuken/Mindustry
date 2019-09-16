@@ -11,13 +11,14 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
+import java.util.Iterator;
 
+import static io.anuke.mindustry.Validate.notNull;
 import static io.anuke.mindustry.Vars.content;
 
 /** Class for controlling status effects on an entity. */
 public class Statuses implements Saveable{
     private static final StatusEntry globalResult = new StatusEntry();
-    private static final Array<StatusEntry> removals = new Array<>();
 
     private Array<StatusEntry> statuses = new Array<>();
     private Bits applied = new Bits(content.getBy(ContentType.status).size);
@@ -29,10 +30,9 @@ public class Statuses implements Saveable{
     public void handleApply(Unit unit, StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
-        if(statuses.size > 0){
+        if(!statuses.isEmpty()){
             //check for opposite effects
             for(StatusEntry entry : statuses){
-                if(entry.effect == null) continue;
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
@@ -52,13 +52,11 @@ public class Statuses implements Saveable{
         }
 
         //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-        entry.set(effect, duration);
-        statuses.add(entry);
+        addStatus(effect, duration);
     }
 
     public Color getStatusColor(){
-        if(statuses.size == 0){
+        if(statuses.isEmpty()){
             return Tmp.c1.set(Color.white);
         }
 
@@ -79,31 +77,23 @@ public class Statuses implements Saveable{
         applied.clear();
         speedMultiplier = damageMultiplier = armorMultiplier = 1f;
 
-        if(statuses.size == 0) return;
+        if(statuses.isEmpty()) return;
 
-        removals.clear();
-
-        for(StatusEntry entry : statuses){
-            if(entry.effect == null){
-                removals.add(entry);
-                continue;
-            }
+        Iterator<StatusEntry> i = statuses.iterator();
+        while(i.hasNext()){
+            StatusEntry entry = i.next();
             entry.time = Math.max(entry.time - Time.delta(), 0);
             applied.set(entry.effect.id);
 
             if(entry.time <= 0){
+                i.remove();
                 Pools.free(entry);
-                removals.add(entry);
             }else{
                 speedMultiplier *= entry.effect.speedMultiplier;
                 armorMultiplier *= entry.effect.armorMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 entry.effect.update(unit, entry.time);
             }
-        }
-
-        if(removals.size > 0){
-            statuses.removeAll(removals, true);
         }
     }
 
@@ -134,20 +124,26 @@ public class Statuses implements Saveable{
 
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
-        for(StatusEntry effect : statuses){
-            Pools.free(effect);
-        }
-
+        statuses.forEach(Pools::free);
         statuses.clear();
 
         byte amount = stream.readByte();
         for(int i = 0; i < amount; i++){
             byte id = stream.readByte();
             float time = stream.readFloat();
-            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-            entry.set(content.getByID(ContentType.status, id), time);
-            statuses.add(entry);
+            addStatus(content.getByID(ContentType.status, id), time);
         }
+    }
+
+    /**
+     * Creates a StatusEntry from {@code effect} and {@code time} and adds it to {@code statuses}
+     * @param effect    the status effect
+     * @param time      the effect duration
+     */
+    private void addStatus(StatusEffect effect, float time)
+    {
+        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+        statuses.add(entry.set(effect, time));
     }
 
     public static class StatusEntry{
@@ -155,7 +151,7 @@ public class Statuses implements Saveable{
         public float time;
 
         public StatusEntry set(StatusEffect effect, float time){
-            this.effect = effect;
+            this.effect = notNull(effect, "effect");
             this.time = time;
             return this;
         }
