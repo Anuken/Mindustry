@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.graphics.Pal;
 
 /** An extended BulletType for most ammo-based bullets shot from turrets and units. */

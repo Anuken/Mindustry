@@ -4,6 +4,7 @@ import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.type.Bullet;
 
 public abstract class FlakBulletType extends BasicBulletType{
     protected static Rectangle rect = new Rectangle();

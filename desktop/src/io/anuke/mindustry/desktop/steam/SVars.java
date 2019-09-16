@@ -6,4 +6,5 @@ public class SVars{
     public static SNet net;
     public static SStats stats;
     public static SWorkshop workshop;
+    public static SUser user;
 }

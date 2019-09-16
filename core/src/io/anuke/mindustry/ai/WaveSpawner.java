@@ -14,7 +14,6 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.game.EventType.WorldLoadEvent;
 import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;

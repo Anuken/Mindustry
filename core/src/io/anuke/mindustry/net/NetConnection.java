@@ -30,7 +30,7 @@ public abstract class NetConnection{
     }
 
     public void kick(KickReason reason){
-        Log.info("Kicking connection {0}; Reason: {2}", address, reason.name());
+        Log.info("Kicking connection {0}; Reason: {1}", address, reason.name());
 
         if(player != null && (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);

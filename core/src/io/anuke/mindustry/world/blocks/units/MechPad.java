@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -9,6 +10,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -68,10 +70,14 @@ public class MechPad extends Block{
         boolean resetSpawner = !entity.sameMech && entity.player.mech == mech;
         entity.player.mech = !entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech;
 
+        Player player = entity.player;
+
         entity.progress = 0;
         entity.player.onRespawn(tile);
         if(resetSpawner) entity.player.lastSpawner = null;
         entity.player = null;
+
+        Events.fire(new MechChangeEvent(player, player.mech));
     }
 
     protected static boolean checkValidTap(Tile tile, Player player){

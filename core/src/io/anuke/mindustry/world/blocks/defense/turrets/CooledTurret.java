@@ -1,15 +1,16 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -33,6 +34,15 @@ public class CooledTurret extends Turret{
         float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
         stats.add(BlockStat.boostEffect, 1f + maxUsed * coolantMultiplier, StatUnit.timesSpeed);
+    }
+
+    @Override
+    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        if(tile.entity.liquids.currentAmount() <= 0.001f){
+            Events.fire(Trigger.turretCool);
+        }
+
+        super.handleLiquid(tile, source, liquid, amount);
     }
 
     @Override

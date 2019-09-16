@@ -10,7 +10,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;

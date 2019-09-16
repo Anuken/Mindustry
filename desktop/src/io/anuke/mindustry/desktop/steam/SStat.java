@@ -4,26 +4,29 @@ public enum SStat{
     unitsDestroyed,
     attacksWon,
     pvpsWon,
-    gamesWon,
-    maxWavesSurvived,
+    timesLaunched,
     zoneMechsUsed,
-    enemiesDestroyed,
     blocksDestroyed,
-    playerDestroyed,
-    routersBuilt,
-    blocksBuilt,
     itemsLaunched,
     reactorsOverheated,
-    firesExtinguished,
     maxUnitActive,
     unitsBuilt,
     bossesDefeated,
     maxPlayersServer,
     mapsMade,
-    mapsPublished;
+    mapsPublished,
+    maxWavesSurvived,
+    blocksBuilt,
+    ;
 
     public int get(){
         return SVars.stats.stats.getStatI(name(), 0);
+    }
+
+    public void max(int amount){
+        if(amount > get()){
+            add(amount - get());
+        }
     }
 
     public void add(int amount){

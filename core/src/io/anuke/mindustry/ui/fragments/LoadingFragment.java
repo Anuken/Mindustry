@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.Touchable;
@@ -57,6 +58,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        table.<Label>find("namelabel").setColor(Color.white);
         bar.visible(false);
         table.clearActions();
         table.touchable(Touchable.enabled);

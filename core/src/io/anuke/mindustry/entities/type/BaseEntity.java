@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.impl;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.Entity;

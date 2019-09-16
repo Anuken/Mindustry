@@ -14,6 +14,7 @@ import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -105,6 +106,8 @@ public class CommandCenter extends Block{
         for(BaseUnit unit : unitGroups[team.ordinal()].all()){
             unit.onCommand(command);
         }
+
+        Events.fire(new CommandIssueEvent(tile, command));
     }
 
     @Override

@@ -206,7 +206,7 @@ public class JoinDialog extends FloatingDialog{
         content.table(t -> {
             t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);
             t.row();
-            t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
+            t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + host.mode.toString()).width(targetWidth() - 10f).left().get().setEllipsis(true);
         }).expand().left().bottom().padLeft(12f).padBottom(8);
@@ -231,11 +231,15 @@ public class JoinDialog extends FloatingDialog{
         cont.clear();
         cont.table(t -> {
             t.add("$name").padRight(10);
-            t.addField(Core.settings.getString("name"), text -> {
-                player.name = text;
-                Core.settings.put("name", text);
-                Core.settings.save();
-            }).grow().pad(8).get().setMaxLength(maxNameLength);
+            if(!steam){
+                t.addField(Core.settings.getString("name"), text -> {
+                    player.name = text;
+                    Core.settings.put("name", text);
+                    Core.settings.save();
+                }).grow().pad(8).get().setMaxLength(maxNameLength);
+            }else{
+                t.add(player.name).update(l -> l.setColor(player.color)).grow().pad(8);
+            }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new ColorPickDialog().show(color -> {
@@ -310,8 +314,8 @@ public class JoinDialog extends FloatingDialog{
         buildServer(host, button);
     }
 
-    void connect(String ip, int port){
-        if(Core.settings.getString("name").trim().isEmpty()){
+    public void connect(String ip, int port){
+        if(player.name.trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }

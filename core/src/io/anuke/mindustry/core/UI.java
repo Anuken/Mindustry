@@ -14,6 +14,7 @@ import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
 import io.anuke.arc.freetype.FreetypeFontLoader.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
@@ -137,6 +138,8 @@ public class UI implements ApplicationListener, Loadable{
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }
+                parameter.fontParameters.magFilter = TextureFilter.Linear;
+                parameter.fontParameters.minFilter = TextureFilter.Linear;
                 parameter.fontParameters.size = fontParameter().size;
                 return super.loadSync(manager, fileName, file, parameter);
             }

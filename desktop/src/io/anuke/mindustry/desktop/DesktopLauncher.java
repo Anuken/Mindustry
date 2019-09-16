@@ -9,6 +9,7 @@ import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
@@ -112,7 +113,7 @@ public class DesktopLauncher extends ClientLauncher{
                     Log.err("Steam client not running.");
                 }else{
                     Vars.steam = true;
-                    initSteam();
+                    initSteam(args);
 
                 }
             }catch(Exception e){
@@ -122,19 +123,35 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
-    void initSteam(){
+    void initSteam(String[] args){
         SVars.net = new SNet(new ArcNetImpl());
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
+        SVars.user = new SUser();
 
         Events.on(ClientLoadEvent.class, event -> {
+            player.name = SVars.net.friends.getPersonaName();
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
+            Core.settings.put("name", player.name);
+            Core.settings.save();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override
                 public void update(){
                     if(SteamAPI.isSteamRunning()){
                         SteamAPI.runCallbacks();
+                    }
+                }
+            });
+
+            Core.app.post(() -> {
+                if(args.length >= 2 && args[0].equals("+connect_lobby")){
+                    try{
+                        long id = Long.parseLong(args[1]);
+                        ui.join.connect("steam:" + id, port);
+                    }catch(Exception e){
+                        Log.err("Failed to parse steam lobby ID: {0}", e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             });
@@ -227,6 +244,16 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public String getUUID(){
+        if(steam){
+            try{
+                byte[] result = new byte[8];
+                new RandomXS128(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
+                return new String(Base64Coder.encode(result));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
         try{
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             NetworkInterface out;

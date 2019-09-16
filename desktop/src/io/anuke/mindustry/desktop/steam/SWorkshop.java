@@ -8,7 +8,9 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -18,10 +20,22 @@ public class SWorkshop implements SteamUGCCallback{
     private Map lastMap;
 
     public void publishMap(Map map){
-        this.lastMap = map;
-        ugc.createItem(SVars.steamID, WorkshopFileType.GameManagedItem);
-        ui.loadfrag.show("$map.publishing");
-        Log.info("Publish map " + map.name());
+        FloatingDialog dialog = new FloatingDialog("$confirm");
+        dialog.setFillParent(false);
+        dialog.cont.add("$map.publish.confirm").width(600f).wrap();
+        dialog.addCloseButton();
+        dialog.buttons.addImageTextButton("$eula", Icon.linkSmall, () -> {
+            SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+        }).size(210f, 64f);
+
+        dialog.buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
+            this.lastMap = map;
+            ugc.createItem(SVars.steamID, WorkshopFileType.Community);
+            ui.loadfrag.show("$map.publishing");
+            Log.info("Publish map " + map.name());
+            dialog.hide();
+        }).size(170f, 64f);
+        dialog.show();
     }
 
     @Override
@@ -31,7 +45,10 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onSubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
-
+        ItemInstallInfo info = new ItemInstallInfo();
+        ugc.getItemInstallInfo(publishedFileID, info);
+        Log.info("Item subscribed from {0}", info.getFolder());
+        SAchievement.downloadMapWorkshop.complete();
     }
 
     @Override
@@ -71,7 +88,7 @@ public class SWorkshop implements SteamUGCCallback{
             ugc.setItemTitle(h, map.name());
             ugc.setItemDescription(h, map.description());
             ugc.setItemTags(h, new String[]{"map", mode.name()});
-            ugc.setItemVisibility(h, PublishedFileVisibility.Public);
+            ugc.setItemVisibility(h, PublishedFileVisibility.Private);
             ugc.setItemPreview(h, map.previewFile().absolutePath());
             ugc.setItemContent(h, mapFile.parent().absolutePath());
             ugc.addItemKeyValueTag(h, "mode", mode.name());
@@ -102,14 +119,19 @@ public class SWorkshop implements SteamUGCCallback{
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
+            if(needsToAcceptWLA){
+                SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+            }
             Events.fire(new MapPublishEvent());
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }
+
     }
 
     @Override
     public void onDownloadItemResult(int appID, SteamPublishedFileID publishedFileID, SteamResult result){
+        SAchievement.downloadMapWorkshop.complete();
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
         Log.info("Item downloaded to {0}", info.getFolder());

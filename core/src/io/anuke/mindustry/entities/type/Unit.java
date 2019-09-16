@@ -11,7 +11,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -110,6 +109,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         drownTime = 0f;
         status.clear();
         Events.fire(new UnitDestroyEvent(this));
+
+        if(explosiveness > 7f && this == player){
+            Events.fire(Trigger.suicideBomb);
+        }
     }
 
     @Override
@@ -310,6 +313,9 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             if(drownTime >= 0.999f && !net.client()){
                 damage(health + 1);
+                if(this == player){
+                    Events.fire(Trigger.drown);
+                }
             }
 
             float px = x, py = y;

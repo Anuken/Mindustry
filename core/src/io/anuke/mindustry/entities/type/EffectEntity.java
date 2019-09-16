@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.impl;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.pooling.Pool.Poolable;
