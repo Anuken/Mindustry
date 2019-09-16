@@ -319,13 +319,13 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showErrorMessage(String text){
         new Dialog(""){{
-            setFillParent(false);
+            setFillParent(true);
             cont.margin(15f);
             cont.add("$error.title");
             cont.row();
-            cont.addImage().fillX().pad(2).height(4f).color(Color.scarlet);
+            cont.addImage().width(300f).pad(2).height(4f).color(Color.scarlet);
             cont.row();
-            cont.add(text).pad(2f);
+            cont.add(text).pad(2f).growX().wrap();
             buttons.addButton("$ok", this::hide).size(120, 50).pad(4);
         }}.show();
     }

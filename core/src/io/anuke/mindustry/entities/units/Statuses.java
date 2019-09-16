@@ -1,16 +1,14 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Bits;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.traits.Saveable;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
 
 import java.io.*;
 
@@ -28,12 +26,13 @@ public class Statuses implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(io.anuke.mindustry.entities.type.Unit unit, StatusEffect effect, float duration){
-        if(effect == StatusEffects.none || unit.isImmune(effect)) return; //don't apply empty or immune effects
+    public void handleApply(Unit unit, StatusEffect effect, float duration){
+        if(effect == StatusEffects.none || effect == null || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){
             //check for opposite effects
             for(StatusEntry entry : statuses){
+                if(entry.effect == null) continue;
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
@@ -85,6 +84,10 @@ public class Statuses implements Saveable{
         removals.clear();
 
         for(StatusEntry entry : statuses){
+            if(entry.effect == null){
+                removals.add(entry);
+                continue;
+            }
             entry.time = Math.max(entry.time - Time.delta(), 0);
             applied.set(entry.effect.id);
 
