@@ -2,6 +2,7 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Input.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
@@ -24,6 +25,11 @@ public interface Platform{
 
     /** Steam: Share a map on the workshop.*/
     default void publishMap(Map map){}
+
+    /** Steam: Return external workshop maps to be loaded.*/
+    default Array<FileHandle> getExternalMaps(){
+        return Array.with();
+    }
 
     /** Steam: Open workshop for maps.*/
     default void openWorkshop(){}
