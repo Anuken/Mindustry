@@ -41,7 +41,7 @@ public class Statuses implements Saveable{
                     entry.effect.getTransition(unit, effect, entry.time, duration, globalResult);
                     entry.time = globalResult.time;
 
-                    if(globalResult.effect != entry.effect){
+                    if(globalResult.effect != entry.effect && globalResult.effect != null){
                         entry.effect = globalResult.effect;
                     }
 
@@ -127,6 +127,7 @@ public class Statuses implements Saveable{
     public void writeSave(DataOutput stream) throws IOException{
         stream.writeByte(statuses.size);
         for(StatusEntry entry : statuses){
+
             stream.writeByte(entry.effect.id);
             stream.writeFloat(entry.time);
         }
