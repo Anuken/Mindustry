@@ -19,6 +19,18 @@ public class SWorkshop implements SteamUGCCallback{
 
     private Map lastMap;
 
+    public SWorkshop(){
+        int items = ugc.getNumSubscribedItems();
+        SteamPublishedFileID[] ids = new SteamPublishedFileID[items];
+        ugc.getSubscribedItems(ids);
+        for(int i = 0; i < items; i++){
+            SteamPublishedFileID id = ids[i];
+            ItemInstallInfo info = new ItemInstallInfo();
+            ugc.getItemInstallInfo(id, info);
+
+        }
+    }
+
     public void publishMap(Map map){
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
