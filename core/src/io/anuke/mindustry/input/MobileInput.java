@@ -67,33 +67,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     public MobileInput(){
         Events.on(ClientLoadEvent.class, e -> {
-            GestureDetector dec = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this){
-                boolean clearMouse = false;
-
-                @Override
-                public boolean touchDown(int x, int y, int pointer, KeyCode button){
-                    if(Core.scene.hasMouse(x, y)){
-                        clearMouse = true;
-                        return false;
-                    }
-                    return super.touchDown(x, y, pointer, button);
-                }
-
-                @Override
-                public boolean touchDragged(int x, int y, int pointer){
-                    if(!clearMouse){
-                        return super.touchDragged(x, y, pointer);
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean touchUp(int x, int y, int pointer, KeyCode button){
-                    clearMouse = false;
-                    return super.touchUp(x, y, pointer, button);
-                }
-            };
-            Core.input.getInputProcessors().insert(0, dec);
+            Core.input.getInputProcessors().add(new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
         });
     }
 
