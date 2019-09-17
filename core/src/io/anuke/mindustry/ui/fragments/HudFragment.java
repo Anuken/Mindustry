@@ -572,9 +572,6 @@ public class HudFragment extends Fragment{
         }
 
         shown = !shown;
-        if(flip != null){
-            flip.getParent().act(Core.graphics.getDeltaTime());
-        }
     }
 
     private void addWaveTable(Button table){
