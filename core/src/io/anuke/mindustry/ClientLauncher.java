@@ -40,6 +40,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
+        assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
 

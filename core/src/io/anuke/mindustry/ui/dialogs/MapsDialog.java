@@ -143,9 +143,9 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.addImage().growX().pad(4).color(Pal.gray);
             button.row();
-            button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
+            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : "$builtin").color(Color.gray).padTop(3);
+            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : "$builtin").color(Color.gray).padTop(3);
 
             i++;
         }
@@ -166,7 +166,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
         Table table = dialog.cont;
 
-        table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
+        table.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize);
 
         table.table(Styles.black, desc -> {
             desc.top();

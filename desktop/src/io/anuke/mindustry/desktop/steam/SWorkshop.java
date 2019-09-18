@@ -4,6 +4,7 @@ import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamRemoteStorage.*;
 import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -18,17 +19,23 @@ public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
     private Map lastMap;
+    private Array<FileHandle> mapFiles;
 
     public SWorkshop(){
         int items = ugc.getNumSubscribedItems();
         SteamPublishedFileID[] ids = new SteamPublishedFileID[items];
+        ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
-        for(int i = 0; i < items; i++){
-            SteamPublishedFileID id = ids[i];
-            ItemInstallInfo info = new ItemInstallInfo();
-            ugc.getItemInstallInfo(id, info);
+        mapFiles = Array.with(ids).map(f -> {
+            ugc.getItemInstallInfo(f, info);
+            return new FileHandle(info.getFolder());
+        }).select(f -> f.list().length > 0).map(f -> f.list()[0]);
 
-        }
+        Log.info("Fetching {0} subscribed maps.", items);
+    }
+
+    public Array<FileHandle> getMapFiles(){
+        return mapFiles;
     }
 
     public void publishMap(Map map){

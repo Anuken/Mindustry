@@ -20,6 +20,8 @@ public class Map implements Comparable<Map>{
     public final FileHandle file;
     /** Format version. */
     public final int version;
+    /** Whether this map is managed, e.g. downloaded from the Steam workshop.*/
+    public boolean workshop;
     /** Map width/height, shorts. */
     public int width, height;
     /** Preview texture. */
@@ -55,6 +57,10 @@ public class Map implements Comparable<Map>{
 
     public int getHightScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
+    }
+
+    public Texture safeTexture(){
+        return texture == null ? Core.assets.get("sprites/error.png") : texture;
     }
 
     public FileHandle previewFile(){
