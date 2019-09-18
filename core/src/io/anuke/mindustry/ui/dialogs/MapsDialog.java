@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -205,13 +204,17 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$delete", Icon.trash16Small, () -> {
-            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
-                maps.removeMap(map);
-                dialog.hide();
-                setup();
-            });
-        }).fillX().height(54f).marginLeft(10).disabled(!map.custom).touchable(map.custom ? Touchable.enabled : Touchable.disabled);
+        table.addImageTextButton(map.workshop ? "$view.workshop" : "$delete", map.workshop ? Icon.linkSmall : Icon.trash16Small, () -> {
+            if(map.workshop){
+                platform.viewMapListing(map);
+            }else{
+                ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
+                    maps.removeMap(map);
+                    dialog.hide();
+                    setup();
+                });
+            }
+        }).fillX().height(54f).marginLeft(10).disabled(!map.workshop && !map.custom);
 
         dialog.show();
     }

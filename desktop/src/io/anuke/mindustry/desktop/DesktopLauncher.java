@@ -203,6 +203,11 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public void viewMapListing(Map map){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.file.parent().name());
+    }
+
+    @Override
     public NetProvider getNet(){
         return steam ? SVars.net : new ArcNetImpl();
     }

@@ -139,7 +139,7 @@ public class Vars implements Loadable{
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
-    public static Platform platform;
+    public static Platform platform = new Platform(){};
     public static Plugins plugins;
 
     public static World world;

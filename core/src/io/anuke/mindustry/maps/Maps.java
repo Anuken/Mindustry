@@ -324,10 +324,8 @@ public class Maps{
     public void loadPreviews(){
 
         for(Map map : maps){
-            Log.info("Generating preview for {0}", map.name());
             //try to load preview
             if(map.previewFile().exists()){
-                Log.info("> exists");
                 //this may fail, but calls queueNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
 
@@ -338,7 +336,6 @@ public class Maps{
                     queueNewPreview(map);
                 }
             }else{
-                Log.info("> doesn't exist, queuing");
                 queueNewPreview(map);
             }
         }
@@ -347,7 +344,6 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                Log.info("> > GEN NEW preview for {0}", map.name());
                 createNewPreview(map, e -> Core.app.post(() -> map.texture = Core.assets.get("sprites/error.png")));
             }
             previewList.clear();

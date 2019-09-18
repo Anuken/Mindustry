@@ -39,6 +39,15 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     public void publishMap(Map map){
+        if(map.tags.containsKey("steamid")){
+            Log.info("Map already published, redirecting to ID.");
+            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.tags.get("steamid"));
+            return;
+        }
+
+        //update author name when publishing
+        map.tags.put("author", SVars.net.friends.getPersonaName());
+
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
         dialog.cont.add("$map.publish.confirm").width(600f).wrap();
@@ -140,6 +149,12 @@ public class SWorkshop implements SteamUGCCallback{
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
             if(needsToAcceptWLA){
                 SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
+            }
+            ui.editor.editor.getTags().put("steamid", SteamNativeHandle.getNativeHandle(publishedFileID) + "");
+            try{
+                ui.editor.save();
+            }catch(Exception e){
+                Log.err(e);
             }
             Events.fire(new MapPublishEvent());
         }else{

@@ -6,6 +6,7 @@ import io.anuke.arc.assets.loaders.resolvers.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
 
@@ -20,7 +21,7 @@ public class MapPreviewLoader extends TextureLoader{
         try{
             super.loadAsync(manager, fileName, file.sibling(file.nameWithoutExtension()), parameter);
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
             MapPreviewParameter param = (MapPreviewParameter)parameter;
             Vars.maps.queueNewPreview(param.map);
         }
@@ -31,11 +32,11 @@ public class MapPreviewLoader extends TextureLoader{
         try{
             return super.loadSync(manager, fileName, file, parameter);
         }catch(Throwable e){
-            e.printStackTrace();
+            Log.err(e);
             try{
                 return new Texture(file);
             }catch(Throwable e2){
-                e2.printStackTrace();
+                Log.err(e2);
                 return new Texture("sprites/error.png");
             }
         }

@@ -64,7 +64,7 @@ public class Map implements Comparable<Map>{
     }
 
     public FileHandle previewFile(){
-        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
     }
 
     public FileHandle cacheFile(){
@@ -133,6 +133,8 @@ public class Map implements Comparable<Map>{
 
     @Override
     public int compareTo(Map map){
+        int work = -Boolean.compare(workshop, map.workshop);
+        if(work != 0) return work;
         int type = -Boolean.compare(custom, map.custom);
         if(type != 0) return type;
         int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));
