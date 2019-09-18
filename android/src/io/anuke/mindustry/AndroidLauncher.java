@@ -76,6 +76,8 @@ public class AndroidLauncher extends AndroidApplication{
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
 
+                            if(uri.getPath().contains("(invalid)")) return;
+
                             Core.app.post(() -> Core.app.post(() -> cons.accept(new FileHandle(uri.getPath()){
                                 @Override
                                 public InputStream read(){
