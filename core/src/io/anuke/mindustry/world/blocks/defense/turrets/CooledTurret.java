@@ -55,7 +55,7 @@ public class CooledTurret extends Turret{
         Liquid liquid = entity.liquids.current();
 
         float used = Math.min(Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reload - entity.reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed(tile);
-        entity.reload += (used * liquid.heatCapacity) / liquid.heatCapacity;
+        entity.reload += used * liquid.heatCapacity * coolantMultiplier;
         entity.liquids.remove(liquid, used);
 
         if(Mathf.chance(0.06 * used)){

@@ -122,8 +122,6 @@ public class Vars implements Loadable{
     public static FileHandle saveDirectory;
     /** data subdirectory used for plugins */
     public static FileHandle pluginDirectory;
-    /** old map file extension, for conversion */
-    public static final String oldMapExtension = "mmap";
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
