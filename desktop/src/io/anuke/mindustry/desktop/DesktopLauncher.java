@@ -7,6 +7,7 @@ import io.anuke.arc.Files.*;
 import io.anuke.arc.backends.sdl.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
@@ -48,11 +49,12 @@ public class DesktopLauncher extends ClientLauncher{
                 setWindowIcon(FileType.Internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
-            DesktopLauncher.handleCrash(e);
+            handleCrash(e);
         }
     }
 
     public DesktopLauncher(String[] args){
+        Log.setUseColors(false);
         Version.init();
         boolean useSteam = Version.modifier.equals("steam");
         testMobile = Array.with(args).contains("-testMobile");
@@ -72,6 +74,16 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useSteam){
             if(showConsole){
+                StringBuilder base = new StringBuilder();
+                Log.setLogger(new LogHandler(){
+                      @Override
+                      public void print(String text, Object... args){
+                          String out = Log.format(text, false, args);
+
+                          base.append(out).append("\n");
+                      }
+                });
+
                 Events.on(ClientLoadEvent.class, event -> {
                     Label[] label = {null};
                     boolean[] visible = {false};
@@ -86,6 +98,7 @@ public class DesktopLauncher extends ClientLauncher{
                             t.toFront();
                         });
                         t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                        label[0].getText().append(base);
                     });
 
                     Log.setLogger(new LogHandler(){
@@ -177,10 +190,21 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
+            Throwable cause = Strings.getFinalCause(e);
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + (e.getMessage() == null ? "" : "\n" + e.getMessage())));
+                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
         });
+    }
+
+    @Override
+    public Array<FileHandle> getExternalMaps(){
+        return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
+    }
+
+    @Override
+    public void viewMapListing(Map map){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.file.parent().name());
     }
 
     @Override

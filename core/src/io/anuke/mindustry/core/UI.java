@@ -325,8 +325,9 @@ public class UI implements ApplicationListener, Loadable{
             cont.row();
             cont.addImage().width(300f).pad(2).height(4f).color(Color.scarlet);
             cont.row();
-            cont.add(text).pad(2f).growX().wrap();
-            buttons.addButton("$ok", this::hide).size(120, 50).pad(4);
+            cont.add(text).pad(2f).growX().wrap().get().setAlignment(Align.center);
+            cont.row();
+            cont.addButton("$ok", this::hide).size(120, 50).pad(4);
         }}.show();
     }
 

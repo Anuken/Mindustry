@@ -154,10 +154,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
                 Map map = save();
-                if(map != null){
-                    platform.publishMap(map);
+
+                if(map == null) return;
+
+                if(map.tags.get("description", "").length() < 4){
+                    ui.showErrorMessage("$editor.nodescription");
+                    return;
                 }
-            }).padTop(-3).size(swidth * 2f + 10, 60f);
+
+                if(!Gamemode.survival.valid(map)){
+                    ui.showErrorMessage("$map.nospawn");
+                    return;
+                }
+
+                platform.publishMap(map);
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -276,7 +287,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
-    private Map save(){
+    public Map save(){
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");

@@ -81,6 +81,7 @@ public class Maps{
 
     /** Load all maps. Should be called at application start. */
     public void load(){
+        //defaults; must work
         try{
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
@@ -90,7 +91,27 @@ public class Maps{
             throw new RuntimeException(e);
         }
 
-        loadCustomMaps();
+        //custom
+        for(FileHandle file : customMapDirectory.list()){
+            try{
+                if(file.extension().equalsIgnoreCase(mapExtension)){
+                    loadMap(file, true);
+                }
+            }catch(Exception e){
+                Log.err("Failed to load custom map file '{0}'!", file);
+                Log.err(e);
+            }
+        }
+
+        //workshop
+        for(FileHandle file : platform.getExternalMaps()){
+            try{
+                loadMap(file, false).workshop = true;
+            }catch(Exception e){
+                Log.err("Failed to load workshop map file '{0}'!", file);
+                Log.err(e);
+            }
+        }
     }
 
     public void reload(){
@@ -174,14 +195,6 @@ public class Maps{
         }
     }
 
-    /** Creates a legacy map by converting it to a non-legacy map and pasting it in a temp directory.
-     * Should be followed up by {@link #importMap(FileHandle)} .*/
-    public Map makeLegacyMap(FileHandle file) throws IOException{
-        FileHandle dst = tmpDirectory.child("conversion_map." + mapExtension);
-        LegacyMapIO.convertMap(file, dst);
-        return MapIO.createMap(dst, true);
-    }
-
     /** Import a map, then save it. This updates all values and stored data necessary. */
     public void importMap(FileHandle file) throws IOException{
         FileHandle dest = findFile();
@@ -203,7 +216,6 @@ public class Maps{
         if(error[0] != null){
             throw new IOException(error[0]);
         }
-
     }
 
     /** Attempts to run the following code;
@@ -314,7 +326,7 @@ public class Maps{
         for(Map map : maps){
             //try to load preview
             if(map.previewFile().exists()){
-                //this may fail, but calls createNewPreview
+                //this may fail, but calls queueNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
 
                 try{
@@ -332,7 +344,7 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                createNewPreview(map, e -> Core.app.post(() -> map.texture = new Texture("sprites/error.png")));
+                createNewPreview(map, e -> Core.app.post(() -> map.texture = Core.assets.get("sprites/error.png")));
             }
             previewList.clear();
         });
@@ -407,16 +419,4 @@ public class Maps{
         return map;
     }
 
-    private void loadCustomMaps(){
-        for(FileHandle file : customMapDirectory.list()){
-            try{
-                if(file.extension().equalsIgnoreCase(mapExtension)){
-                    loadMap(file, true);
-                }
-            }catch(Exception e){
-                Log.err("Failed to load custom map file '{0}'!", file);
-                Log.err(e);
-            }
-        }
-    }
 }

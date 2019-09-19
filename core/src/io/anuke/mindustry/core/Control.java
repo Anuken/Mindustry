@@ -371,11 +371,13 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
+        //TODO find out why this happens on Android
+        if(assets == null) return;
+
         saves.update();
+
         //update and load any requested assets
-        if(assets != null){
-            assets.update();
-        }
+        assets.update();
 
         input.updateController();
 

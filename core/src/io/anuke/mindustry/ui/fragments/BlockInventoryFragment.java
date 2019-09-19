@@ -32,7 +32,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;
 
-    private Table table;
+    private Table table = new Table();
     private Tile tile;
     private float holdTime = 0f;
     private boolean holding;
@@ -52,7 +52,6 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table = new Table();
         table.setName("inventory");
         table.setTransform(true);
         parent.setTransform(true);

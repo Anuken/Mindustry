@@ -32,12 +32,12 @@ public class Statuses implements Saveable{
         if(statuses.size > 0){
             //check for opposite effects
             for(StatusEntry entry : statuses){
-                if(entry.effect == null) continue;
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
                     return;
                 }else if(entry.effect.reactsWith(effect)){ //find opposite
+                    globalResult.effect = entry.effect;
                     entry.effect.getTransition(unit, effect, entry.time, duration, globalResult);
                     entry.time = globalResult.time;
 
@@ -84,10 +84,6 @@ public class Statuses implements Saveable{
         removals.clear();
 
         for(StatusEntry entry : statuses){
-            if(entry.effect == null){
-                removals.add(entry);
-                continue;
-            }
             entry.time = Math.max(entry.time - Time.delta(), 0);
             applied.set(entry.effect.id);
 
