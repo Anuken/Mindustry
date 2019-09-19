@@ -85,7 +85,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            if(!ios){
+            //if(!ios){
                 t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
                 createDialog("$editor.import",
                 "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
@@ -113,7 +113,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     }
                 })))
                 );
-            }
+            //}
 
             Cell cell = t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
                 if(!ios){
