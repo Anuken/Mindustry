@@ -67,7 +67,7 @@ public class PausedDialog extends FloatingDialog{
                             ui.host.show();
                         }
                     }
-                }).disabled(b -> net.active() && !steam).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.active() && steam ? "$invitefriends" : "$hostserver"));
+                }).disabled(b -> net.active() && !steam).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.active() && steam && net.server() ? "$invitefriends" : "$hostserver"));
             }
 
             cont.row();

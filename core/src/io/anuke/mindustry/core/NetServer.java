@@ -704,15 +704,9 @@ public class NetServer implements ApplicationListener{
             //iterate through each player
             for(int i = 0; i < playerGroup.size(); i++){
                 Player player = playerGroup.all().get(i);
-                if(player.isLocal) continue;
+                if(player.isLocal || player.con == null) continue;
 
                 NetConnection connection = player.con;
-
-                if(connection == null || !connection.isConnected()){
-                    //player disconnected, call d/c event
-                    onDisconnect(player, "disappeared");
-                    return;
-                }
 
                 if(!player.timer.get(Player.timerSync, serverSyncTime) || !connection.hasConnected) continue;
 
