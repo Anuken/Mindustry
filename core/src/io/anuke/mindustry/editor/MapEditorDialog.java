@@ -162,7 +162,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
 
                 platform.publishMap(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f);
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }

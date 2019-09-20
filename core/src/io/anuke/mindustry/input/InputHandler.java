@@ -58,7 +58,7 @@ public abstract class InputHandler implements InputProcessor{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(!player.timer.get(Player.timerTransfer, 40)) return;
+        if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
         if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !tile.interactable(player.getTeam()))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
