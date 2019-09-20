@@ -85,37 +85,35 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            if(!ios){
-                t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
-                createDialog("$editor.import",
-                "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
-                "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showInfo("$editor.errorimage");
-                        }else{
-                            editor.beginEdit(MapIO.createMap(file, true));
-                        }
-                    });
-                })),
-
-                "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
-                platform.showFileChooser(true, "png", file ->
-                ui.loadAnd(() -> {
-                    try{
-                        Pixmap pixmap = new Pixmap(file);
-                        editor.beginEdit(pixmap);
-                        pixmap.dispose();
-                    }catch(Exception e){
-                        ui.showException("$editor.errorload", e);
-                        Log.err(e);
+            t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
+            createDialog("$editor.import",
+            "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
+            "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
+            platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showInfo("$editor.errorimage");
+                    }else{
+                        editor.beginEdit(MapIO.createMap(file, true));
                     }
-                })))
-                );
-            }
+                });
+            })),
 
-            Cell cell = t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
+            "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
+            platform.showFileChooser(true, "png", file ->
+            ui.loadAnd(() -> {
+                try{
+                    Pixmap pixmap = new Pixmap(file);
+                    editor.beginEdit(pixmap);
+                    pixmap.dispose();
+                }catch(Exception e){
+                    ui.showException("$editor.errorload", e);
+                    Log.err(e);
+                }
+            })))
+            );
+
+            t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
                 if(!ios){
                     platform.showFileChooser(false, mapExtension, file -> {
                         ui.loadAnd(() -> {
@@ -143,10 +141,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     });
                 }
             });
-
-            if(ios){
-                cell.size(swidth * 2f + 10, 60f).colspan(2);
-            }
         });
 
         menu.cont.row();

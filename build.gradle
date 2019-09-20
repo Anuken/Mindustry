@@ -38,7 +38,7 @@ allprojects{
         }
 
         getArcHash = {
-            return new Properties().with{ p -> p.load(new File((File)projectDir, 'gradle.properties').newReader()); return p }["archash"]
+            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
         }
 
         arcModule = { String name ->
@@ -200,7 +200,7 @@ project(":core"){
     }
 
     dependencies{
-        if(System.properties["user.name"] == "anuke"){
+        if(System.properties["user.name"] == "anuke2"){
             task cleanGen{
                 doFirst{
                     delete{
