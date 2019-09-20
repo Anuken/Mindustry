@@ -126,24 +126,21 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            //iOS doesn't have a file chooser.
-            //if(!ios){
-                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
-                    try{
-                        data.importData(file);
-                        Core.app.exit();
-                    }catch(IllegalArgumentException e){
+            t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+                try{
+                    data.importData(file);
+                    Core.app.exit();
+                }catch(IllegalArgumentException e){
+                    ui.showErrorMessage("$data.invalid");
+                }catch(Exception e){
+                    e.printStackTrace();
+                    if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                        ui.showException(e);
+                    }else{
                         ui.showErrorMessage("$data.invalid");
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        if(e.getMessage() == null || !e.getMessage().contains("too short")){
-                            ui.showException(e);
-                        }else{
-                            ui.showErrorMessage("$data.invalid");
-                        }
                     }
-                })));
-            //}
+                }
+            })));
         });
 
         ScrollPane pane = new ScrollPane(prefs);
