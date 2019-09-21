@@ -236,6 +236,17 @@ public class DesktopInput extends InputHandler{
             selectY = tileY(Core.input.mouseY());
         }
 
+        if (mode == placing && block != null){
+            if (!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY)){
+                if ((int) Core.input.axisTap(Binding.rotate) != 0){
+                    rotation = ((int)((Angles.angle(selectX, selectY, cursorX, cursorY) + 45) / 90f)) % 4;
+                    overrideLineRotation = true;
+                }
+            }
+        }else{
+            overrideLineRotation = false;
+        }
+
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
