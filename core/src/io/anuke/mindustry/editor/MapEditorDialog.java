@@ -283,6 +283,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public Map save(){
+        boolean isEditor = state.rules.editor;
+        state.rules.editor = false;
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
@@ -306,6 +308,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.hide();
         saved = true;
+        state.rules.editor = isEditor;
         return returned;
     }
 
