@@ -7,7 +7,6 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
-import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
@@ -39,6 +38,7 @@ public class Pathfinder implements Runnable{
         Events.on(WorldLoadEvent.class, event -> {
             stop();
 
+            //reset and update internal tile array
             tiles = new int[world.width()][world.height()];
             pathMap = new PathData[Team.all.length][PathTarget.all.length];
             created = new GridBits(Team.all.length, PathTarget.all.length);
@@ -50,8 +50,13 @@ public class Pathfinder implements Runnable{
                 }
             }
 
+            //special preset which may help speed things up; this is optional
+            preloadPath(waveTeam, PathTarget.enemyCores);
+
             start();
         });
+
+        Events.on(ResetEvent.class, event -> stop());
 
         Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
     }
@@ -84,12 +89,13 @@ public class Pathfinder implements Runnable{
         int x = tile.x, y = tile.y;
         tiles[x][y] = packed;
 
+        //can't iterate through array so use the map, which should not lead to problems
         for(PathData[] arr : pathMap){
             for(PathData path : arr){
                 if(path != null){
                     synchronized(path.targets){
                         path.targets.clear();
-                        path.target.getTargets(tile.getTeam(), path.targets);
+                        path.target.getTargets(path.team, path.targets);
                     }
                 }
             }
@@ -97,7 +103,7 @@ public class Pathfinder implements Runnable{
 
         queue.post(() -> {
             for(PathData data : list){
-                updateTargets(data, x, y, packed);
+                updateTargets(data, x, y);
             }
         });
     }
@@ -106,7 +112,7 @@ public class Pathfinder implements Runnable{
     @Override
     public void run(){
         while(true){
-            if(net.client() || state.is(State.menu)) return;
+            if(net.client()) return;
 
             queue.run();
 
@@ -126,7 +132,7 @@ public class Pathfinder implements Runnable{
 
     /** Gets next tile to travel to. Main thread only. */
     public Tile getTargetTile(Tile tile, Team team, PathTarget target){
-        if(tile == null) return tile;
+        if(tile == null) return null;
 
         PathData data = pathMap[team.ordinal()][target.ordinal()];
 
@@ -136,7 +142,7 @@ public class Pathfinder implements Runnable{
                 created.set(team.ordinal(), target.ordinal());
                 //grab targets since this is run on main thread
                 IntArray targets = target.getTargets(team, new IntArray());
-                queue.post(() -> createFor(team, target, targets));
+                queue.post(() -> createPath(team, target, targets));
             }
             return tile;
         }
@@ -174,7 +180,7 @@ public class Pathfinder implements Runnable{
      * Clears the frontier, increments the search and sets up all flow sources.
      * This only occurs for active teams.
      */
-    private void updateTargets(PathData path, int x, int y, int tile){
+    private void updateTargets(PathData path, int x, int y){
         if(!Structs.inBounds(x, y, path.weights)) return;
 
         if(path.weights[x][y] == 0){
@@ -207,9 +213,13 @@ public class Pathfinder implements Runnable{
         }
     }
 
+    private void preloadPath(Team team, PathTarget target){
+        updateFrontier(createPath(team, target, target.getTargets(team, new IntArray())), -1);
+    }
+
     /** Created a new flowfield that aims to get to a certain target for a certain team.
      * Pathfinding thread only. */
-    private void createFor(Team team, PathTarget target, IntArray targets){
+    private PathData createPath(Team team, PathTarget target, IntArray targets){
         PathData path = new PathData(team, target, world.width(), world.height());
 
         list.add(path);
@@ -234,6 +244,8 @@ public class Pathfinder implements Runnable{
             path.weights[Pos.x(pos)][Pos.y(pos)] = 0;
             path.frontier.addFirst(pos);
         }
+
+        return path;
     }
 
     /** Update the frontier for a path. Pathfinding thread only. */
@@ -273,6 +285,13 @@ public class Pathfinder implements Runnable{
         enemyCores((team, out) -> {
             for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.pos());
+            }
+
+            //spawn points are also enemies.
+            if(state.rules.waves && team == defaultTeam){
+                for(Tile other : spawner.getGroundSpawns()){
+                    out.add(other.pos());
+                }
             }
         }),
         rallyPoints((team, out) -> {
