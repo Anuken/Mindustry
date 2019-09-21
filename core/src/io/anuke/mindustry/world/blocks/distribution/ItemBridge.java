@@ -1,35 +1,29 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.collection.IntSet.IntSetIterator;
-import io.anuke.arc.graphics.Color;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.IntSet.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.graphics.Layer;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.Item;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemBridge extends Block{
     protected int timerTransport = timers++;
     protected int range;
     protected float transportTime = 2f;
-    protected IntArray removals = new IntArray();
     protected TextureRegion endRegion, bridgeRegion, arrowRegion;
 
     private static int lastPlaced = Pos.invalid;
@@ -44,6 +38,7 @@ public class ItemBridge extends Block{
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
+        unloadable = false;
         group = BlockGroup.transportation;
     }
 
@@ -166,20 +161,14 @@ public class ItemBridge extends Block{
         entity.time += entity.cycleSpeed * entity.delta();
         entity.time2 += (entity.cycleSpeed - 1f) * entity.delta();
 
-        removals.clear();
-
         IntSetIterator it = entity.incoming.iterator();
-
         while(it.hasNext){
             int i = it.next();
             Tile other = world.tile(i);
             if(!linkValid(tile, other, false)){
-                removals.add(i);
+                it.remove();
             }
         }
-
-        for(int j = 0; j < removals.size; j++)
-            entity.incoming.remove(removals.get(j));
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
@@ -188,7 +177,7 @@ public class ItemBridge extends Block{
             entity.uptime = 0f;
         }else{
 
-            if(entity.cons.valid()){
+            if(entity.cons.valid() && (!hasPower || Mathf.isZero(1f - entity.power.satisfaction))){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -222,7 +211,7 @@ public class ItemBridge extends Block{
 
         int i = tile.absoluteRelativeTo(other.x, other.y);
 
-        Draw.color(Color.WHITE, Color.BLACK, Mathf.absin(Time.time(), 6f, 0.07f));
+        Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
         Draw.alpha(Math.max(entity.uptime, 0.25f));
 
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
@@ -268,6 +257,52 @@ public class ItemBridge extends Block{
         }
 
         return tile.entity.items.total() < itemCapacity;
+    }
+
+
+    @Override
+    public boolean canDumpLiquid(Tile tile, Tile to, Liquid liquid){
+        ItemBridgeEntity entity = tile.entity();
+
+        Tile other = world.tile(entity.link);
+        if(!linkValid(tile, other)){
+            Tile edge = Edges.getFacingEdge(to, tile);
+            int i = tile.absoluteRelativeTo(edge.x, edge.y);
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == i){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        int rel = tile.absoluteRelativeTo(other.x, other.y);
+        int rel2 = tile.relativeTo(to.x, to.y);
+
+        return rel != rel2;
+    }
+
+    @Override
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+        if(tile.getTeam() != source.getTeam()) return false;
+
+        ItemBridgeEntity entity = tile.entity();
+        Tile other = world.tile(entity.link);
+
+        if(linkValid(tile, other)){
+            int rel = tile.absoluteRelativeTo(other.x, other.y);
+            int rel2 = tile.relativeTo(source.x, source.y);
+
+            if(rel == rel2) return false;
+        }else if(!(source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos())){
+            return false;
+        }
+
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
     }
 
     @Override

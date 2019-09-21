@@ -16,12 +16,14 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
@@ -36,8 +38,10 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
     private Color clearColor;
-    private float targetscale = UnitScl.dp.scl(4);
+    private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
+    private float landscale = 0f, landTime;
+    private float minZoomScl = Scl.scl(0.01f);
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private float shakeIntensity, shaketime;
 
@@ -99,15 +103,22 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void update(){
-        //TODO hack, find source of this bug
-        Color.WHITE.set(1f, 1f, 1f, 1f);
+        Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+
+        if(landTime > 0){
+            landTime -= Time.delta();
+            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            camerascale = landscale;
+        }
+
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
         if(state.is(State.menu)){
-            graphics.clear(Color.BLACK);
+            landTime = 0f;
+            graphics.clear(Color.black);
         }else{
             Vector2 position = Tmp.v3.set(player);
 
@@ -118,7 +129,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile || settings.getBool("keyboard")){
+            }else if(control.input instanceof DesktopInput){
                 camera.position.lerpDelta(position, 0.08f);
             }
 
@@ -129,6 +140,10 @@ public class Renderer implements ApplicationListener{
                 draw();
             }
         }
+    }
+
+    public float landScale(){
+        return landTime > 0 ? landscale : 1f;
     }
 
     @Override
@@ -162,7 +177,7 @@ public class Renderer implements ApplicationListener{
             e.printStackTrace();
             settings.put("bloom", false);
             settings.save();
-            ui.showError("$error.bloom");
+            ui.showErrorMessage("$error.bloom");
         }
     }
 
@@ -257,13 +272,13 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawBottom();
-        playerGroup.draw(p -> true, Player::drawBuildRequests);
+        playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
 
         if(shieldGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
-                graphics.clear(Color.CLEAR);
+                graphics.clear(Color.clear);
                 shieldGroup.draw();
                 shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
                 Draw.flush();
@@ -282,8 +297,35 @@ public class Renderer implements ApplicationListener{
 
         playerGroup.draw(p -> !p.isDead() && !p.isLocal, Player::drawName);
 
+        drawLanding();
+
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawLanding(){
+        if(landTime > 0 && player.getClosestCore() != null){
+            float fract = landTime / Fx.coreLand.lifetime;
+            TileEntity entity = player.getClosestCore();
+
+            TextureRegion reg = entity.block.icon(Block.Icon.full);
+            float scl = Scl.scl(4f) / camerascale;
+            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+
+            Draw.color(Pal.lightTrail);
+            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+
+            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
+                Lines.stroke(scl * fin);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+            });
+
+            Draw.color();
+            Draw.mixcol(Color.white, fract);
+            Draw.rect(reg, entity.x, entity.y, reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+
+            Draw.reset();
+        }
     }
 
     private void drawGroundShadows(){
@@ -348,7 +390,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = UnitScl.dp.scl(1f);
+        float s = Scl.scl(1f);
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
@@ -359,6 +401,11 @@ public class Renderer implements ApplicationListener{
     public void setScale(float scl){
         targetscale = scl;
         clampScale();
+    }
+
+    public void zoomIn(float duration){
+        landscale = minZoomScl;
+        landTime = duration;
     }
 
     public void takeMapScreenshot(){

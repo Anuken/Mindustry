@@ -8,10 +8,13 @@ import io.anuke.mindustry.world.Block;
 import static io.anuke.mindustry.content.Blocks.*;
 
 public class TechTree implements ContentList{
+    public static Array<TechNode> all;
     public static TechNode root;
 
     @Override
     public void load(){
+        all = new Array<>();
+
         root = node(coreShard, () -> {
 
             node(conveyor, () -> {
@@ -326,6 +329,7 @@ public class TechTree implements ContentList{
             context = this;
             children.run();
             context = last;
+            all.add(this);
         }
     }
 }

@@ -5,11 +5,11 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -36,13 +36,15 @@ public abstract class FlyingUnit extends BaseUnit{
 
                 if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                 if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
-
-                if(target == null){
-                    setState(patrol);
-                }
             }
 
-            if(target != null){
+            if(target == null){
+                target = getSpawner();
+            }
+
+            if(target == getSpawner() && getSpawner() != null){
+                circle(80f + Mathf.randomSeed(id) * 120);
+            }else if(target != null){
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation
@@ -65,26 +67,28 @@ public abstract class FlyingUnit extends BaseUnit{
                         getWeapon().update(FlyingUnit.this, to.x, to.y);
                     }
                 }
+            }else{
+                target = getClosestSpawner();
+                moveTo(Vars.state.rules.dropZoneRadius + 120f);
             }
         }
     },
-    patrol = new UnitState(){
+    rally = new UnitState(){
         public void update(){
             if(retarget()){
+                targetClosestAllyFlag(BlockFlag.rally);
                 targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
 
                 if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
                     return;
                 }
 
-                target = getSpawner();
-                if(target == null) target = getClosestCore();
+                if(target == null) target = getSpawner();
             }
 
             if(target != null){
-                circle(80f + Mathf.randomSeed(id) * 120);
+                circle(65f + Mathf.randomSeed(id) * 100);
             }
         }
     },
@@ -110,7 +114,7 @@ public abstract class FlyingUnit extends BaseUnit{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
         command == UnitCommand.attack ? attack :
-        command == UnitCommand.patrol ? patrol :
+        command == UnitCommand.rally ? rally :
         null);
     }
 
@@ -123,10 +127,10 @@ public abstract class FlyingUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        if(!Net.client()){
+        if(!net.client()){
             updateRotation();
-            wobble();
         }
+        wobble();
     }
 
     @Override
@@ -136,7 +140,7 @@ public abstract class FlyingUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
         Draw.rect(type.region, x, y, rotation - 90);
 
         drawWeapons();
@@ -153,7 +157,7 @@ public abstract class FlyingUnit extends BaseUnit{
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset), y + Angles.trnsy(rotation + 180, type.engineOffset),
         type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset - 1f), y + Angles.trnsy(rotation + 180, type.engineOffset - 1f),
         (type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f)) / 2f);
         Draw.color();
@@ -176,7 +180,7 @@ public abstract class FlyingUnit extends BaseUnit{
     }
 
     protected void wobble(){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         x += Mathf.sin(Time.time() + id * 999, 25f, 0.05f) * Time.delta();
         y += Mathf.cos(Time.time() + id * 999, 25f, 0.05f) * Time.delta();

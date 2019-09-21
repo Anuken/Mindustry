@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
-import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -18,7 +17,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
@@ -30,6 +28,7 @@ import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.net;
 
 /**
  * Control module.
@@ -48,6 +47,10 @@ public class Control implements ApplicationListener, Loadable{
     private boolean wasPaused = false;
 
     public Control(){
+        saves = new Saves();
+        tutorial = new Tutorial();
+        music = new MusicControl();
+
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
@@ -64,7 +67,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> Core.app.post(() -> {
-                if(Net.active() && player.getClosestCore() != null){
+                if(net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
                     Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
@@ -96,7 +99,7 @@ public class Control implements ApplicationListener, Loadable{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != null && !Net.client()){
+            if(state.rules.zone != null && !net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
@@ -106,12 +109,12 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
-            if(state.rules.pvp && !Net.active()){
+            if(state.rules.pvp && !net.active()){
                 try{
-                    Net.host(port);
+                    net.host(port);
                     player.isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
+                    ui.showException("$server.error", e);
                     Core.app.post(() -> state.set(State.menu));
                 }
             }
@@ -148,14 +151,24 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
+
+        Events.on(Trigger.newGame, () -> {
+            TileEntity core = player.getClosestCore();
+
+            if(core == null) return;
+
+            app.post(() -> ui.hudfrag.showLand());
+            renderer.zoomIn(Fx.coreLand.lifetime);
+            app.post(() -> Effects.effect(Fx.coreLand, core.x, core.y, 0, core.block));
+            Time.run(Fx.coreLand.lifetime, () -> {
+                Effects.effect(Fx.launch, core);
+                Effects.shake(5f, 5f, core);
+            });
+        });
     }
 
     @Override
     public void loadAsync(){
-        saves = new Saves();
-        tutorial = new Tutorial();
-        music = new MusicControl();
-
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
         Core.input.setCatch(KeyCode.BACK, true);
@@ -172,35 +185,6 @@ public class Control implements ApplicationListener, Loadable{
         createPlayer();
 
         saves.load();
-    }
-
-    //checks for existing 3.5 app data, android only
-    public void checkClassicData(){
-        try{
-            if(files.local("mindustry-maps").exists() || files.local("mindustry-saves").exists()){
-                settings.getBoolOnce("classic-backup-check", () -> {
-                    app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
-                        try{
-                            platform.requestExternalPerms(() -> {
-                                FileHandle external = files.external("MindustryClassic");
-                                if(files.local("mindustry-maps").exists()){
-                                    files.local("mindustry-maps").copyTo(external);
-                                }
-
-                                if(files.local("mindustry-saves").exists()){
-                                    files.local("mindustry-saves").copyTo(external);
-                                }
-                            });
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showError(Strings.parseException(e, true));
-                        }
-                    })));
-                });
-            }
-        }catch(Throwable t){
-            t.printStackTrace();
-        }
     }
 
     void createPlayer(){
@@ -220,9 +204,18 @@ public class Control implements ApplicationListener, Loadable{
             player.add();
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.input.addProcessor(input);
-        });
+        Events.on(ClientLoadEvent.class, e -> input.add());
+    }
+
+    public void setInput(InputHandler newInput){
+        Block block = input.block;
+        boolean added = Core.input.getInputProcessors().contains(input);
+        input.remove();
+        this.input = newInput;
+        newInput.block = block;
+        if(added){
+            newInput.add();
+        }
     }
 
     public void playMap(Map map, Rules rules){
@@ -230,17 +223,20 @@ public class Control implements ApplicationListener, Loadable{
             logic.reset();
             world.loadMap(map, rules);
             state.rules = rules;
+            state.rules.zone = null;
+            state.rules.editor = false;
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
+            Events.fire(Trigger.newGame);
         });
     }
 
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;
@@ -252,6 +248,7 @@ public class Control implements ApplicationListener, Loadable{
             state.set(State.playing);
             control.saves.zoneSave();
             logic.play();
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -259,7 +256,7 @@ public class Control implements ApplicationListener, Loadable{
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
 
             world.beginMapLoad();
 
@@ -304,6 +301,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.waveSpacing = 60f * 30;
             state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -314,7 +312,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void dispose(){
         content.dispose();
-        Net.dispose();
+        net.dispose();
         Musics.dispose();
         Sounds.dispose();
         ui.editor.dispose();
@@ -379,17 +377,20 @@ public class Control implements ApplicationListener, Loadable{
 
         if(android){
             Sounds.empty.loop(0f, 1f, 0f);
-            checkClassicData();
         }
     }
 
     @Override
     public void update(){
+        //TODO find out why this happens on Android
+        if(assets == null) return;
+
         saves.update();
+
         //update and load any requested assets
         assets.update();
 
-        input.updateController();
+        input.updateState();
 
         //autosave global data if it's modified
         data.checkSave();
@@ -414,7 +415,7 @@ public class Control implements ApplicationListener, Loadable{
             if(world.isZone()){
                 for(Tile tile : state.teams.get(player.getTeam()).cores){
                     for(Item item : content.items()){
-                        if(tile.entity.items.has(item)){
+                        if(tile.entity != null && tile.entity.items.has(item)){
                             data.unlockContent(item);
                         }
                     }

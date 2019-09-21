@@ -42,6 +42,7 @@ public class Conveyor extends Block{
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
+        unloadable = false;
     }
 
     private static int compareItems(long a, long b){

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.impl;
+package io.anuke.mindustry.entities.type;
 
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.util.pooling.Pool.Poolable;
@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.effectGroup;
 
 public class EffectEntity extends TimedEntity implements Poolable, DrawTrait{
     public Effect effect;
-    public Color color = new Color(Color.WHITE);
+    public Color color = new Color(Color.white);
     public Object data;
     public float rotation = 0f;
 
@@ -63,7 +63,7 @@ public class EffectEntity extends TimedEntity implements Poolable, DrawTrait{
     @Override
     public void reset(){
         effect = null;
-        color.set(Color.WHITE);
+        color.set(Color.white);
         rotation = time = poffsetx = poffsety = 0f;
         parent = null;
         data = null;

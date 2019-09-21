@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.Scl;
 import io.anuke.mindustry.graphics.Pal;
 
 public class BorderImage extends Image{
@@ -42,7 +42,7 @@ public class BorderImage extends Image{
 
         Draw.color(borderColor);
         Draw.alpha(parentAlpha);
-        Lines.stroke(UnitScl.dp.scl(thickness));
+        Lines.stroke(Scl.scl(thickness));
         Lines.rect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
         Draw.reset();
     }

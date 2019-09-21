@@ -6,7 +6,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.Effects.EffectRenderer;
-import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.world.Tile;
 
 /**

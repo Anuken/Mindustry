@@ -1,14 +1,13 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Supplier;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Item.Icon;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.scene.style.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Styles;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -28,9 +27,9 @@ public class ItemSelection{
         for(Item item : items){
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
-            ImageButton button = cont.addImageButton("whiteui", "clear-toggle-trans", 24, () -> control.input.frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
-            button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Icon.medium));
+            button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Item.Icon.medium));
             button.update(() -> button.setChecked(holder.get() == item));
 
             if(i++ % 4 == 3){

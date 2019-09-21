@@ -6,6 +6,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 public class MapInfoDialog extends FloatingDialog{
@@ -42,7 +43,7 @@ public class MapInfoDialog extends FloatingDialog{
             t.row();
             t.add("$editor.description").padRight(8).left();
 
-            TextArea description = t.addArea(tags.get("description", ""), "textarea", text -> {
+            TextArea description = t.addArea(tags.get("description", ""), Styles.areaField, text -> {
                 tags.put("description", text);
             }).size(400f, 140f).get();
 

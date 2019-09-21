@@ -21,9 +21,16 @@ public class Administration{
         load();
     }
 
+    public int getPlayerLimit(){
+        return Core.settings.getInt("playerlimit", 0);
+    }
+
+    public void setPlayerLimit(int limit){
+        Core.settings.putSave("playerlimit", limit);
+    }
+
     public void setStrict(boolean on){
-        Core.settings.put("strict", on);
-        Core.settings.save();
+        Core.settings.putSave("strict", on);
     }
 
     public boolean getStrict(){

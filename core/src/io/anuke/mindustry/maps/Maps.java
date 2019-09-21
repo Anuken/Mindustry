@@ -81,6 +81,7 @@ public class Maps{
 
     /** Load all maps. Should be called at application start. */
     public void load(){
+        //defaults; must work
         try{
             for(String name : defaultMapNames){
                 FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
@@ -90,7 +91,27 @@ public class Maps{
             throw new RuntimeException(e);
         }
 
-        loadCustomMaps();
+        //custom
+        for(FileHandle file : customMapDirectory.list()){
+            try{
+                if(file.extension().equalsIgnoreCase(mapExtension)){
+                    loadMap(file, true);
+                }
+            }catch(Exception e){
+                Log.err("Failed to load custom map file '{0}'!", file);
+                Log.err(e);
+            }
+        }
+
+        //workshop
+        for(FileHandle file : platform.getExternalMaps()){
+            try{
+                loadMap(file, false).workshop = true;
+            }catch(Exception e){
+                Log.err("Failed to load workshop map file '{0}'!", file);
+                Log.err(e);
+            }
+        }
     }
 
     public void reload(){
@@ -108,7 +129,7 @@ public class Maps{
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public void saveMap(ObjectMap<String, String> baseTags){
+    public Map saveMap(ObjectMap<String, String> baseTags){
 
         try{
             StringMap tags = new StringMap(baseTags);
@@ -166,17 +187,12 @@ public class Maps{
             }
             maps.add(map);
             maps.sort();
+
+            return map;
+
         }catch(IOException e){
             throw new RuntimeException(e);
         }
-    }
-
-    /** Creates a legacy map by converting it to a non-legacy map and pasting it in a temp directory.
-     * Should be followed up by {@link #importMap(FileHandle)} .*/
-    public Map makeLegacyMap(FileHandle file) throws IOException{
-        FileHandle dst = tmpDirectory.child("conversion_map." + mapExtension);
-        LegacyMapIO.convertMap(file, dst);
-        return MapIO.createMap(dst, true);
     }
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
@@ -184,7 +200,22 @@ public class Maps{
         FileHandle dest = findFile();
         file.copyTo(dest);
 
-        createNewPreview(loadMap(dest, true), true);
+        Map map = loadMap(dest, true);
+        Exception[] error = {null};
+
+        createNewPreview(map, e -> {
+            maps.remove(map);
+            try{
+                map.file.delete();
+            }catch(Throwable ignored){
+
+            }
+            error[0] = e;
+        });
+
+        if(error[0] != null){
+            throw new IOException(error[0]);
+        }
     }
 
     /** Attempts to run the following code;
@@ -196,11 +227,11 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showError("$editor.errorlegacy");
+                ui.showErrorMessage("$editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
-                ui.showError("$editor.errorheader");
+                ui.showErrorMessage("$editor.errorheader");
             }else{
-                ui.showError(Core.bundle.format("editor.errorload", Strings.parseException(e, true)));
+                ui.showException("$editor.errorload", e);
             }
         }
     }
@@ -290,40 +321,12 @@ public class Maps{
         return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
     }
 
-    public void loadLegacyMaps(){
-        boolean convertedAny = false;
-        for(FileHandle file : customMapDirectory.list()){
-            if(file.extension().equalsIgnoreCase(oldMapExtension)){
-                try{
-                    convertedAny = true;
-                    LegacyMapIO.convertMap(file, file.sibling(file.nameWithoutExtension() + "." + mapExtension));
-                    //delete old, converted file; it is no longer useful
-                    file.delete();
-                    Log.info("Converted file {0}", file);
-                }catch(Exception e){
-                    //rename the file to a 'mmap_conversion_failed' extension to keep it there just in case
-                    //but don't delete it
-                    file.copyTo(file.sibling(file.name() + "_conversion_failed"));
-                    file.delete();
-                    Log.err(e);
-                }
-            }
-        }
-
-        //free up any potential memory that was used up during conversion
-        if(convertedAny){
-            world.createTiles(1, 1);
-            //reload maps to load the converted ones
-            reload();
-        }
-    }
-
     public void loadPreviews(){
 
         for(Map map : maps){
             //try to load preview
             if(map.previewFile().exists()){
-                //this may fail, but calls createNewPreview
+                //this may fail, but calls queueNewPreview
                 Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
 
                 try{
@@ -341,7 +344,7 @@ public class Maps{
     private void createAllPreviews(){
         Core.app.post(() -> {
             for(Map map : previewList){
-                createNewPreview(map, false);
+                createNewPreview(map, e -> Core.app.post(() -> map.texture = Core.assets.get("sprites/error.png")));
             }
             previewList.clear();
         });
@@ -351,16 +354,12 @@ public class Maps{
         Core.app.post(() -> previewList.add(map));
     }
 
-    private void createNewPreview(Map map, boolean immediate){
+    private void createNewPreview(Map map, Consumer<Exception> failed){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
             Pixmap pix = MapIO.generatePreview(map);
-            if(immediate){
-                map.texture = new Texture(pix);
-            }else{
-                Core.app.post(() -> map.texture = new Texture(pix));
-            }
+            map.texture = new Texture(pix);
             executor.submit(() -> {
                 try{
                     map.previewFile().writePNG(pix);
@@ -369,9 +368,9 @@ public class Maps{
                     e.printStackTrace();
                 }
             });
-        }catch(IOException e){
+        }catch(Exception e){
+            failed.accept(e);
             Log.err("Failed to generate preview!", e);
-            Core.app.post(() -> map.texture = new Texture("sprites/error.png"));
         }
     }
 
@@ -420,16 +419,4 @@ public class Maps{
         return map;
     }
 
-    private void loadCustomMaps(){
-        for(FileHandle file : customMapDirectory.list()){
-            try{
-                if(file.extension().equalsIgnoreCase(mapExtension)){
-                    loadMap(file, true);
-                }
-            }catch(Exception e){
-                Log.err("Failed to load custom map file '{0}'!", file);
-                Log.err(e);
-            }
-        }
-    }
 }

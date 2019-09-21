@@ -215,7 +215,7 @@ public class World{
         }catch(Exception e){
             Log.err(e);
             if(!headless){
-                ui.showError("$map.invalid");
+                ui.showErrorMessage("$map.invalid");
                 Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
@@ -229,7 +229,7 @@ public class World{
 
         if(!headless){
             if(state.teams.get(defaultTeam).cores.size == 0 && !checkRules.pvp){
-                ui.showError("$map.nospawn");
+                ui.showErrorMessage("$map.nospawn");
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 int teams = 0;
@@ -240,12 +240,12 @@ public class World{
                 }
                 if(teams < 2){
                     invalidMap = true;
-                    ui.showError("$map.nospawn.pvp");
+                    ui.showErrorMessage("$map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
-                    ui.showError("$map.nospawn.attack");
+                    ui.showErrorMessage("$map.nospawn.attack");
                 }
             }
         }else{

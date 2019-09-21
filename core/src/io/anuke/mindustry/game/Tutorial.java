@@ -115,9 +115,7 @@ public class Tutorial{
                 outline("blockinfo");
             }
         },
-        conveyor(
-        line -> Strings.format(line, Math.min(placed(Blocks.conveyor), 2), 2),
-        () -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
+        conveyor(() -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
             void draw(){
                 outline("category-distribution");
                 outline("block-conveyor");
@@ -179,6 +177,7 @@ public class Tutorial{
                 state.wave = 5;
 
                 //end tutorial, never show it again
+                Events.fire(Trigger.tutorialComplete);
                 Core.settings.put("playedtutorial", true);
                 Core.settings.save();
             }
@@ -188,15 +187,14 @@ public class Tutorial{
             }
         },;
 
-        protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
+        protected String line = "";
         protected final Function<String, String> text;
-        protected final Array<String> sentences;
+        protected Array<String> sentences;
         protected final BooleanProvider done;
 
         TutorialStage(Function<String, String> text, BooleanProvider done){
             this.text = text;
             this.done = done;
-            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         TutorialStage(BooleanProvider done){
@@ -205,6 +203,10 @@ public class Tutorial{
 
         /** displayed tutorial stage text.*/
         public String text(){
+            if(sentences == null){
+               this.line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
+               this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
+            }
             String line = sentences.get(control.tutorial.sentence);
             return line.contains("{") ? text.get(line) : line;
         }
@@ -273,20 +275,20 @@ public class Tutorial{
             Element element = Core.scene.findVisible(name);
             if(element != null && !toggled(name)){
                 element.localToStageCoordinates(Tmp.v1.setZero());
-                float sin = Mathf.sin(11f, UnitScl.dp.scl(4f));
-                Lines.stroke(UnitScl.dp.scl(7f), Pal.place);
+                float sin = Mathf.sin(11f, Scl.scl(4f));
+                Lines.stroke(Scl.scl(7f), Pal.place);
                 Lines.rect(Tmp.v1.x - sin, Tmp.v1.y - sin, element.getWidth() + sin*2, element.getHeight() + sin*2);
 
-                float size = Math.max(element.getWidth(), element.getHeight()) + Mathf.absin(11f/2f, UnitScl.dp.scl(18f));
+                float size = Math.max(element.getWidth(), element.getHeight()) + Mathf.absin(11f/2f, Scl.scl(18f));
                 float angle = Angles.angle(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Tmp.v1.x + element.getWidth()/2f, Tmp.v1.y + element.getHeight()/2f);
                 Tmp.v2.trns(angle + 180f, size*1.4f);
-                float fs = UnitScl.dp.scl(40f);
-                float fs2 = UnitScl.dp.scl(56f);
+                float fs = Scl.scl(40f);
+                float fs2 = Scl.scl(56f);
 
                 Draw.color(Pal.gray);
                 Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs2, fs2, angle);
                 Draw.color(Pal.place);
-                Tmp.v2.setLength(Tmp.v2.len() - UnitScl.dp.scl(4));
+                Tmp.v2.setLength(Tmp.v2.len() - Scl.scl(4));
                 Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs, fs, angle);
                 Draw.reset();
             }

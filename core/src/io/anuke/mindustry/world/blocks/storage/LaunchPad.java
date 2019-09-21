@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
@@ -8,6 +9,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
@@ -46,7 +48,7 @@ public class LaunchPad extends StorageBlock{
     public void draw(Tile tile){
         super.draw(tile);
 
-        float progress = Mathf.clamp((tile.entity.items.total() / (float)itemCapacity) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
+        float progress = Mathf.clamp(Mathf.clamp((tile.entity.items.total() / (float)itemCapacity)) * ((tile.entity.timer.getTime(timerLaunch) / (launchTime / tile.entity.timeScale))));
         float scale = size / 3f;
 
         Lines.stroke(2f);
@@ -57,7 +59,7 @@ public class LaunchPad extends StorageBlock{
 
         if(tile.entity.cons.valid()){
             for(int i = 0; i < 3; i++){
-                float f = (Time.time() / 100f + i * 0.5f) % 1f;
+                float f = (Time.time() / 200f + i * 0.5f) % 1f;
 
                 Lines.stroke(((2f * (2f - Math.abs(0.5f - f) * 2f)) - 2f + 0.2f));
                 Lines.poly(tile.drawx(), tile.drawy(), 4, (1f - f) * 10f * scale);
@@ -71,11 +73,13 @@ public class LaunchPad extends StorageBlock{
     public void update(Tile tile){
         TileEntity entity = tile.entity;
 
-        if(entity.cons.valid() && world.isZone() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
+        if(world.isZone() && entity.cons.valid() && world.isZone() && entity.items.total() >= itemCapacity && entity.timer.get(timerLaunch, launchTime / entity.timeScale)){
             for(Item item : Vars.content.items()){
+                Events.fire(Trigger.itemLaunch);
                 Effects.effect(Fx.padlaunch, tile);
-                data.addItem(item, entity.items.get(item));
-                entity.items.set(item, 0);
+                int used = Math.min(entity.items.get(item), itemCapacity);
+                data.addItem(item, used);
+                entity.items.remove(item, used);
             }
         }
     }

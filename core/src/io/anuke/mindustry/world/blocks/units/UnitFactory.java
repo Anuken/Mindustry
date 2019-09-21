@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
@@ -10,10 +10,10 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.graphics.Shaders;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Block;
@@ -23,6 +23,7 @@ import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
+import static io.anuke.mindustry.Vars.*;
 
 public class UnitFactory extends Block{
     protected UnitType type;
@@ -54,12 +55,13 @@ public class UnitFactory extends Block{
         Effects.shake(2f, 3f, entity);
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
-        if(!Net.client()){
+        if(!net.client()){
             BaseUnit unit = factory.type.create(tile.getTeam());
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
             unit.velocity().y = factory.launchVelocity;
+            Events.fire(new UnitCreateEvent(unit));
         }
     }
 

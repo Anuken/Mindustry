@@ -3,6 +3,7 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.collection.ObjectIntMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.type.ItemType;
@@ -26,7 +27,7 @@ public class ItemsDisplay extends Table{
         top().left();
         margin(0);
 
-        table("button", t -> {
+        table(Tex.button,t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
             t.add("$launcheditems").colspan(3).left().padBottom(5);
             t.row();
@@ -35,7 +36,7 @@ public class ItemsDisplay extends Table{
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     t.label(() -> format.format(items.get(item, 0))).left();
                     t.addImage(item.icon(Icon.medium)).size(8 * 3).padLeft(4).padRight(4);
-                    t.add(item.localizedName()).color(Color.LIGHT_GRAY).left();
+                    t.add(item.localizedName()).color(Color.lightGray).left();
                     t.row();
                 }
             }

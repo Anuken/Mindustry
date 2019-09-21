@@ -155,7 +155,7 @@ public class MapRenderer implements Disposable{
         }
 
         mesh.draw(idxDecal, region, wx * tilesize + offsetX, wy * tilesize + offsetY, width, height);
-        mesh.setColor(Color.WHITE);
+        mesh.setColor(Color.white);
     }
 
     @Override

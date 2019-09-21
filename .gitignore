@@ -4,6 +4,7 @@ logs/
 /core/assets/bundles/output/
 /core/assets/.gifimages/
 /deploy/
+/out/
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/
@@ -20,6 +21,10 @@ logs/
 /tests/build/
 /server/build/
 changelog
+saves/
+core/assets/saves/
+/core/assets/saves/
+steam_appid.txt
 /test_files/
 /annotations/build/
 /android/assets/mindustry-maps/

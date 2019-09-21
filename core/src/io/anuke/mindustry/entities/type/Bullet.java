@@ -1,23 +1,19 @@
-package io.anuke.mindustry.entities.bullet;
+package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Rectangle;
-import io.anuke.arc.math.geom.Vector2;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pool.Poolable;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.impl.SolidEntity;
+import io.anuke.arc.util.pooling.Pool.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Poolable, DrawTrait, VelocityTrait, TimeTrait, TeamTrait, AbsorbTrait{
     public Interval timer = new Interval(3);
@@ -25,7 +21,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     private float lifeScl;
     private Team team;
     private Object data;
-    private boolean supressCollision, supressOnce, initialized;
+    private boolean supressCollision, supressOnce, initialized, deflected;
 
     protected BulletType type;
     protected Entity owner;
@@ -100,9 +96,14 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         return type.collidesTiles;
     }
 
-    public void supress(){
+    public void deflect(){
         supressCollision = true;
         supressOnce = true;
+        deflected = true;
+    }
+
+    public boolean isDeflected(){
+        return deflected;
     }
 
     public BulletType getBulletType(){
@@ -239,6 +240,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
         data = null;
         supressCollision = false;
         supressOnce = false;
+        deflected = false;
         initialized = false;
     }
 

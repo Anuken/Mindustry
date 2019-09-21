@@ -1,5 +1,6 @@
 package io.anuke.mindustry.plugin;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
@@ -12,6 +13,20 @@ import static io.anuke.mindustry.Vars.pluginDirectory;
 
 public class Plugins{
     private Array<LoadedPlugin> loaded = new Array<>();
+    private ObjectMap<Class<?>, PluginMeta> metas = new ObjectMap<>();
+
+    /** Returns a file named 'config.json' in a special folder for the specified plugin.
+     * Call this in init(). */
+    public FileHandle getConfig(Plugin plugin){
+        PluginMeta load = metas.get(plugin.getClass());
+        if(load == null) throw new IllegalArgumentException("Plugin is not loaded yet (or missing)!");
+        return pluginDirectory.child(load.name).child("config.json");
+    }
+
+    /** @return the loaded plugin found by class, or null if not found. */
+    public @Nullable LoadedPlugin getPlugin(Class<? extends Plugin> type){
+        return loaded.find(l -> l.plugin.getClass() == type);
+    }
 
     /** Loads all plugins from the folder, but does call any methods on them.*/
     public void load(){
@@ -49,10 +64,10 @@ public class Plugins{
 
         PluginMeta meta = JsonIO.read(PluginMeta.class, metaf.readString());
 
-
         URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
         Class<?> main = classLoader.loadClass(meta.main);
-        return new LoadedPlugin(jar, zip, (Plugin)main.newInstance(), meta);
+        metas.put(main, meta);
+        return new LoadedPlugin(jar, zip, (Plugin)main.getDeclaredConstructor().newInstance(), meta);
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/

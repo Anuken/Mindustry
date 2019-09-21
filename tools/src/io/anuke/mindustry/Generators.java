@@ -36,7 +36,7 @@ public class Generators{
                         for(int y = 0; y < dim; y++){
                             float dst = Mathf.dst((float)x/dim, (float)y/dim, 0.5f, 0.5f) * 2f;
                             if(dst < 1.2f && r.getValue(x, y, 1f / 40f) - dst*(1f-fract) > 0.16f){
-                                image.draw(x, y, Color.WHITE);
+                                image.draw(x, y, Color.white);
                             }
                         }
                     }
@@ -59,7 +59,7 @@ public class Generators{
                                     }
                                 }
                             }
-                            output.draw(x, y, whites >= clears ? Color.WHITE : Color.CLEAR);
+                            output.draw(x, y, whites >= clears ? Color.white : Color.clear);
                         }
                     }
 

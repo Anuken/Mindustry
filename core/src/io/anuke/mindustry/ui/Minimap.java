@@ -6,24 +6,25 @@ import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.scene.Element;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class Minimap extends Table{
 
     public Minimap(){
-        background("pane");
+        background(Tex.pane);
         float margin = 5f;
         touchable(Touchable.enabled);
 
         add(new Element(){
             {
-                setSize(UnitScl.dp.scl(140f));
+                setSize(Scl.scl(140f));
             }
 
             @Override
             public void act(float delta){
-                setPosition(UnitScl.dp.scl(margin), UnitScl.dp.scl(margin));
+                setPosition(Scl.scl(margin), Scl.scl(margin));
 
                 super.act(delta);
             }
@@ -52,7 +53,7 @@ public class Minimap extends Table{
 
         addListener(new ClickListener(){
             {
-                tapSquareSize = UnitScl.dp.scl(11f);
+                tapSquareSize = Scl.scl(11f);
             }
 
             @Override

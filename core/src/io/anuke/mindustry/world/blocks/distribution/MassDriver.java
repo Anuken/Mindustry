@@ -11,7 +11,6 @@ import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -82,8 +81,8 @@ public class MassDriver extends Block{
 
         //switch states
         if(entity.state == DriverState.idle){
-            //start accepting when idle
-            if(!entity.waitingShooters.isEmpty()){
+            //start accepting when idle and there's space
+            if(!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute)){
                 entity.state = DriverState.accepting;
             }else if(hasLink){ //switch to shooting if there's a valid link.
                 entity.state = DriverState.shooting;
@@ -101,8 +100,8 @@ public class MassDriver extends Block{
         }
 
         if(entity.state == DriverState.accepting){
-            //if there's nothing shooting at this, bail
-            if(entity.currentShooter() == null){
+            //if there's nothing shooting at this, bail - OR, items full
+            if(entity.currentShooter() == null || (itemCapacity - entity.items.total() < minDistribute)){
                 entity.state = DriverState.idle;
                 return;
             }
@@ -111,7 +110,7 @@ public class MassDriver extends Block{
             entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.power.satisfaction);
         }else if(entity.state == DriverState.shooting){
             //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
-            if(!hasLink || !entity.waitingShooters.isEmpty()){
+            if(!hasLink || (!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute))){
                 entity.state = DriverState.idle;
                 return;
             }
@@ -120,26 +119,28 @@ public class MassDriver extends Block{
 
             if(
                 tile.entity.items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.entity.items.total() >= minDistribute && //must have minimum amount of space
-                entity.reload <= 0.0001f //must have reloaded
+                link.block().itemCapacity - link.entity.items.total() >= minDistribute //must have minimum amount of space
             ){
                 MassDriverEntity other = link.entity();
                 other.waitingShooters.add(tile);
 
-                //align to target location
-                entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
+                if(entity.reload <= 0.0001f){
 
-                //fire when it's the first in the queue and angles are ready.
-                if(other.currentShooter() == tile &&
+                    //align to target location
+                    entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
+
+                    //fire when it's the first in the queue and angles are ready.
+                    if(other.currentShooter() == tile &&
                     other.state == DriverState.accepting &&
                     Angles.near(entity.rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
-                    //actually fire
-                    fire(tile, link);
-                    //remove waiting shooters, it's done firing
-                    other.waitingShooters.remove(tile);
-                    //set both states to idle
-                    entity.state = DriverState.idle;
-                    other.state = DriverState.idle;
+                        //actually fire
+                        fire(tile, link);
+                        //remove waiting shooters, it's done firing
+                        other.waitingShooters.remove(tile);
+                        //set both states to idle
+                        entity.state = DriverState.idle;
+                        other.state = DriverState.idle;
+                    }
                 }
             }
         }

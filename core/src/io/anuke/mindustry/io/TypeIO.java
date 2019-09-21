@@ -5,7 +5,7 @@ import io.anuke.annotations.Annotations.WriteClass;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.ShooterTrait;

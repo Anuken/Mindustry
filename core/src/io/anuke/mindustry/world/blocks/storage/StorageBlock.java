@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -14,12 +15,21 @@ public abstract class StorageBlock extends Block{
 
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        StorageBlockEntity entity = tile.entity();
+        return entity.linkedCore != null ? entity.linkedCore.block().acceptItem(item, entity.linkedCore, source) : tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     @Override
     public int getMaximumAccepted(Tile tile, Item item){
         return itemCapacity;
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        StorageBlockEntity entity = tile.entity();
+        if(entity.linkedCore != null){
+            entity.linkedCore.block().drawSelect(entity.linkedCore);
+        }
     }
 
     @Override
@@ -57,5 +67,14 @@ public abstract class StorageBlock extends Block{
         }else{
             return entity.items.has(item);
         }
+    }
+
+    @Override
+    public TileEntity newEntity(){
+        return new StorageBlockEntity();
+    }
+
+    public class StorageBlockEntity extends TileEntity{
+        protected @Nullable Tile linkedCore;
     }
 }

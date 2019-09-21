@@ -10,7 +10,7 @@ project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true
-def JDK_DIR = "$System.env.PACKR_DIR"
+def JDK_DIR = "$System.env.JDK_DIR"
 def ICON_DIR = new File("core/assets/icons/icon.icns")
 
 task run(dependsOn: classes, type: JavaExec){
@@ -47,10 +47,22 @@ task dist(type: Jar, dependsOn: classes){
     }
 }
 
+task steamtest(dependsOn: dist){
+    doLast{
+        copy{
+            from "build/libs/Mindustry.jar"
+            if(System.properties["os.name"].contains("Mac")){
+                into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources"
+            }else{
+                into "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"
+            }
+            rename("Mindustry.jar", "desktop.jar")
+        }
+    }
+}
 
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
-
         dependsOn dist
 
         doLast{
@@ -131,6 +143,11 @@ PackrConfig.Platform.values().each{ platform ->
                     rename("msvcr100.dll", "MSVCR100.dll")
                 }
             }
+
+            copy{
+                from "build/packr/output"
+                into "../deploy/${platform.toString()}"
+            }
         }
 
         task "zip${platform.toString()}"(type: Zip){
@@ -146,5 +163,6 @@ PackrConfig.Platform.values().each{ platform ->
         }
 
         finalizedBy "zip${platform.toString()}"
+
     }
 }
