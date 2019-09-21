@@ -291,6 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selection.isEmpty()).name("confirmplace");
 
         Core.scene.table(t -> {
+           t.setName("cancelMobile");
            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
            t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                player.clearBuilding();
@@ -442,8 +443,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void add(){
-        super.add();
         Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        super.add();
     }
 
     @Override
@@ -451,6 +452,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         super.remove();
         if(detector != null){
             Core.input.removeProcessor(detector);
+        }
+
+        if(Core.scene != null && Core.scene.find("cancelMobile") != null){
+            Core.scene.find("cancelMobile").remove();
         }
     }
 

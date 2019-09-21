@@ -208,9 +208,11 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void setInput(InputHandler newInput){
+        Block block = input.block;
         boolean added = Core.input.getInputProcessors().contains(input);
         input.remove();
         this.input = newInput;
+        newInput.block = block;
         if(added){
             newInput.add();
         }

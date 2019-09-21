@@ -273,10 +273,23 @@ public abstract class InputHandler implements InputProcessor{
     public void remove(){
         Core.input.removeProcessor(this);
         frag.remove();
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+            }
+        }
     }
 
     public void add(){
         Core.input.addProcessor(this);
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+                buildUI(table);
+            }
+        }
     }
 
     public boolean canShoot(){

@@ -116,7 +116,6 @@ public class PlacementFragment extends Fragment{
             full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
-                InputHandler input = control.input;
 
                 //rebuilds the category table with the correct recipes
                 Runnable rebuildCategory = () -> {
@@ -140,7 +139,7 @@ public class PlacementFragment extends Fragment{
 
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
-                                input.block = input.block == block ? null : block;
+                                control.input.block = control.input.block == block ? null : block;
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
@@ -150,7 +149,7 @@ public class PlacementFragment extends Fragment{
                             TileEntity core = player.getClosestCore();
                             Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
-                            button.setChecked(input.block == block);
+                            button.setChecked(control.input.block == block);
                         });
 
                         button.hovered(() -> hovered = block);
@@ -250,7 +249,7 @@ public class PlacementFragment extends Fragment{
                     blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
-                    blocksSelect.table(input::buildUI).growX();
+                    blocksSelect.table(control.input::buildUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
                 frame.table(categories -> {
                     categories.defaults().size(50f);
@@ -281,7 +280,7 @@ public class PlacementFragment extends Fragment{
 
                 rebuildCategory.run();
                 frame.update(() -> {
-                    if(gridUpdate(input)) rebuildCategory.run();
+                    if(gridUpdate(control.input)) rebuildCategory.run();
                 });
             });
         });
