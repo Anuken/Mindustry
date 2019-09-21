@@ -80,7 +80,9 @@ android{
         versionName versionNameResult
         versionCode vcode
 
-        props['androidBuildCode'] = (vcode + 1).toString()
+        if(project.hasProperty("release")){
+            props['androidBuildCode'] = (vcode + 1).toString()
+        }
         props.store(file('../core/assets/version.properties').newWriter(), null)
     }
 
