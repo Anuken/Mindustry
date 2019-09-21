@@ -156,7 +156,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     return;
                 }
 
-                if(!Gamemode.survival.valid(map)){
+                if(!Structs.contains(Gamemode.all, g -> g.valid(map))){
                     ui.showErrorMessage("$map.nospawn");
                     return;
                 }
@@ -260,6 +260,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
+            state.rules.zone = null;
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),

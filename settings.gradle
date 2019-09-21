@@ -36,8 +36,9 @@ if(!hasProperty("release")){
         use(':Arc:backends:backend-headless')
     }
     
-    if(new File(settingsDir, '../debug').exists()){
-        use(':debug')
+    if(new File(settingsDir, '../Mindustry-Debug').exists()){
+        include(":debug")
+        project(":debug").projectDir = new File(settingsDir, "../Mindustry-Debug")
     }
 }else{
     println("Not including local repositories.")

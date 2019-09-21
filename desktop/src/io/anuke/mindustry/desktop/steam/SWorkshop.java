@@ -31,6 +31,10 @@ public class SWorkshop implements SteamUGCCallback{
             return new FileHandle(info.getFolder());
         }).select(f -> f.list().length > 0).map(f -> f.list()[0]);
 
+        if(items > 0){
+            SAchievement.downloadMapWorkshop.complete();
+        }
+
         Log.info("Fetching {0} subscribed maps.", items);
     }
 
