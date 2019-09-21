@@ -76,7 +76,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    commandCenter, rallyPoint, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
+    commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -1650,13 +1650,6 @@ public class Blocks implements ContentList{
             flags = EnumSet.of(BlockFlag.rally, BlockFlag.comandCenter);
             size = 2;
             health = size * size * 55;
-        }};
-
-        //TODO unused, but may be useful later
-        rallyPoint = new RallyPoint("rally-point"){{
-            //requirements(Category.units, ItemStack.with(Items.lead, 100, Items.silicon, 100, Items.graphite, 50));
-            size = 2;
-            health = size * size * 85;
         }};
 
         wraithFactory = new UnitFactory("wraith-factory"){{
