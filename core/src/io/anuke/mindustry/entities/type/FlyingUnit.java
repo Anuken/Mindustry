@@ -69,7 +69,7 @@ public abstract class FlyingUnit extends BaseUnit{
                 }
             }else{
                 target = getClosestSpawner();
-                moveTo(Vars.state.rules.dropZoneRadius + 80f);
+                moveTo(Vars.state.rules.dropZoneRadius + 120f);
             }
         }
     },
@@ -88,7 +88,7 @@ public abstract class FlyingUnit extends BaseUnit{
             }
 
             if(target != null){
-                circle(80f + Mathf.randomSeed(id) * 120);
+                circle(65f + Mathf.randomSeed(id) * 100);
             }
         }
     },

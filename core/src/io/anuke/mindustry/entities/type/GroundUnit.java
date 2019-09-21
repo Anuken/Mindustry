@@ -37,7 +37,7 @@ public abstract class GroundUnit extends BaseUnit{
 
             if(core == null){
                 Tile closestSpawn = getClosestSpawner();
-                if(closestSpawn == null || !withinDst(closestSpawn, Vars.state.rules.dropZoneRadius + 75f)){
+                if(closestSpawn == null || !withinDst(closestSpawn, Vars.state.rules.dropZoneRadius + 85f)){
                     moveToCore(PathTarget.enemyCores);
                 }
             }else{
@@ -58,7 +58,7 @@ public abstract class GroundUnit extends BaseUnit{
         public void update(){
             Tile target = getClosest(BlockFlag.rally);
 
-            if(target != null && dst(target) > 100f){
+            if(target != null && dst(target) > 80f){
                 moveToCore(PathTarget.rallyPoints);
             }
         }
@@ -243,11 +243,18 @@ public abstract class GroundUnit extends BaseUnit{
             }
         }
 
+        if(enemy == null){
+            for(Team team : Vars.state.teams.enemiesOf(team)){
+                enemy = team;
+                break;
+            }
+        }
+
         if(enemy == null) return;
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, team, PathTarget.enemyCores);
+        Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || dst(core) < 120f) return;

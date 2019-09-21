@@ -100,7 +100,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
     }
 
-    public UnitCommand getCommand(){
+    public @Nullable UnitCommand getCommand(){
         if(isCommanded()){
             return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }

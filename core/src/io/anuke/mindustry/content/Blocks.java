@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -1646,12 +1647,14 @@ public class Blocks implements ContentList{
 
         commandCenter = new CommandCenter("command-center"){{
             requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            flags = EnumSet.of(BlockFlag.rally, BlockFlag.comandCenter);
             size = 2;
             health = size * size * 55;
         }};
 
+        //TODO unused, but may be useful later
         rallyPoint = new RallyPoint("rally-point"){{
-            requirements(Category.units, ItemStack.with(Items.lead, 100, Items.silicon, 100, Items.graphite, 50));
+            //requirements(Category.units, ItemStack.with(Items.lead, 100, Items.silicon, 100, Items.graphite, 50));
             size = 2;
             health = size * size * 85;
         }};
