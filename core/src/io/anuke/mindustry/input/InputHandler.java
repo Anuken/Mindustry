@@ -38,6 +38,7 @@ public abstract class InputHandler implements InputProcessor{
     public final OverlayFragment frag = new OverlayFragment();
 
     public Block block;
+    public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
 
@@ -380,7 +381,10 @@ public abstract class InputHandler implements InputProcessor{
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);
-        int baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        int baseRotation = rotation;
+        if (!overrideLineRotation || diagonal){
+                baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        }
 
         Tmp.r3.set(-1, -1, 0, 0);
 
@@ -394,7 +398,11 @@ public abstract class InputHandler implements InputProcessor{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            if (!overrideLineRotation || diagonal){
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            }else{
+                line.rotation = rotation;
+            }
             line.last = next == null;
             cons.accept(line);
 
