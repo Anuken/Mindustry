@@ -200,7 +200,7 @@ project(":core"){
     }
 
     dependencies{
-        if(System.properties["user.name"] == "anuke2"){
+        if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{
                     delete{
@@ -270,7 +270,6 @@ project(":tools"){
     dependencies{
         compile project(":core")
 
-        //for render tests
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 

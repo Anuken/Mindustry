@@ -22,6 +22,7 @@ import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
@@ -128,7 +129,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile || settings.getBool("keyboard")){
+            }else if(control.input instanceof DesktopInput){
                 camera.position.lerpDelta(position, 0.08f);
             }
 

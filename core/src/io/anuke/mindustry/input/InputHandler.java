@@ -132,7 +132,7 @@ public abstract class InputHandler implements InputProcessor{
 
     }
 
-    public void updateController(){
+    public void updateState(){
 
     }
 
@@ -273,6 +273,10 @@ public abstract class InputHandler implements InputProcessor{
     public void remove(){
         Core.input.removeProcessor(this);
         frag.remove();
+    }
+
+    public void add(){
+        Core.input.addProcessor(this);
     }
 
     public boolean canShoot(){

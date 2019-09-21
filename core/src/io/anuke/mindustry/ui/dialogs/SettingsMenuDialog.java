@@ -17,6 +17,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.bundle;
@@ -202,8 +203,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false);
+            game.checkPref("keyboard", false, val -> control.setInput(val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("keyboard")){
+                control.setInput(new DesktopInput());
+            }
         }
+        //the issue with touchscreen support on desktop is that:
+        //1) I can't test it
+        //2) the SDL backend doesn't support multitouch
+        /*else{
+            game.checkPref("touchscreen", false, val -> control.setInput(!val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("touchscreen")){
+                control.setInput(new MobileInput());
+            }
+        }*/
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){

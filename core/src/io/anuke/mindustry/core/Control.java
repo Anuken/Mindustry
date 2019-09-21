@@ -204,9 +204,16 @@ public class Control implements ApplicationListener, Loadable{
             player.add();
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.input.addProcessor(input);
-        });
+        Events.on(ClientLoadEvent.class, e -> input.add());
+    }
+
+    public void setInput(InputHandler newInput){
+        boolean added = Core.input.getInputProcessors().contains(input);
+        input.remove();
+        this.input = newInput;
+        if(added){
+            newInput.add();
+        }
     }
 
     public void playMap(Map map, Rules rules){
@@ -379,7 +386,7 @@ public class Control implements ApplicationListener, Loadable{
         //update and load any requested assets
         assets.update();
 
-        input.updateController();
+        input.updateState();
 
         //autosave global data if it's modified
         data.checkSave();

@@ -567,7 +567,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             data.unlockContent(mech);
         }
 
-        if(mobile && !Core.settings.getBool("keyboard")){
+        if(control.input instanceof MobileInput){
             updateTouch();
         }else{
             updateKeyboard();
@@ -723,50 +723,41 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         //update shooting if not building, not mining and there's ammo left
         if(!isBuilding() && getMineTile() == null){
 
-            //autofire: mobile only!
-            if(mobile){
-                if(target == null){
-                    isShooting = false;
-                    if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
+            //autofire
+            if(target == null){
+                isShooting = false;
+                if(Core.settings.getBool("autotarget")){
+                    target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
-                        if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
-                            if(target != null && dst(target) > getWeapon().bullet.range()){
-                                target = null;
-                            }else if(target != null){
-                                target = ((Tile)target).entity;
-                            }
-                        }
-
-                        if(target != null){
-                            setMineTile(null);
+                    if(mech.canHeal && target == null){
+                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
+                        if(target != null && dst(target) > getWeapon().bullet.range()){
+                            target = null;
+                        }else if(target != null){
+                            target = ((Tile)target).entity;
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
-                mech.canHeal && dst(target) < getWeapon().bullet.range())){
-                    //rotate toward and shoot the target
-                    if(mech.turnCursor){
-                        rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+
+                    if(target != null){
+                        setMineTile(null);
                     }
-
-                    Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
-
-                    pointerX = intercept.x;
-                    pointerY = intercept.y;
-
-                    updateShooting();
-                    isShooting = true;
+                }
+            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
+            mech.canHeal && dst(target) < getWeapon().bullet.range())){
+                //rotate toward and shoot the target
+                if(mech.turnCursor){
+                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                 }
 
-            }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(),
-                control.input.getMouseY());
-                pointerX = vec.x;
-                pointerY = vec.y;
+                Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+
+                pointerX = intercept.x;
+                pointerY = intercept.y;
 
                 updateShooting();
+                isShooting = true;
             }
+
         }
     }
 

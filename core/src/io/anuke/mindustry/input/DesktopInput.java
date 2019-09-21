@@ -280,7 +280,7 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public void updateController(){
+    public void updateState(){
         if(state.is(State.menu)){
             droppingItem = false;
             mode = none;
