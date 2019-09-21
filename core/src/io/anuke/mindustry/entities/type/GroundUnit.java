@@ -6,6 +6,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ai.Pathfinder.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.units.*;
@@ -223,7 +224,7 @@ public abstract class GroundUnit extends BaseUnit{
     protected void moveToCore(){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(team, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, team, PathTarget.enemyCores);
 
         if(tile == targetTile) return;
 
@@ -246,7 +247,7 @@ public abstract class GroundUnit extends BaseUnit{
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(enemy, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, team, PathTarget.enemyCores);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || dst(core) < 120f) return;

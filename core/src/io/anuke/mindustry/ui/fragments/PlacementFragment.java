@@ -26,7 +26,7 @@ public class PlacementFragment extends Fragment{
 
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
-    boolean[] categoryEmpty = new boolean[Category.values().length];
+    boolean[] categoryEmpty = new boolean[Category.all.length];
     Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
     Tile lastHover;
@@ -91,7 +91,7 @@ public class PlacementFragment extends Fragment{
             int i = 0;
             for(KeyCode key : inputCatGrid){
                 if(Core.input.keyDown(key)){
-                    input.block = getByCategory(Category.values()[i]).first();
+                    input.block = getByCategory(Category.all[i]).first();
                     currentCategory = input.block.buildCategory;
                 }
                 i++;
@@ -258,7 +258,7 @@ public class PlacementFragment extends Fragment{
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
                     //update category empty values
-                    for(Category cat : Category.values()){
+                    for(Category cat : Category.all){
                         Array<Block> blocks = getByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !unlocked(blocks.first());
                     }
@@ -289,7 +289,7 @@ public class PlacementFragment extends Fragment{
 
     Array<Category> getCategories(){
         returnCatArray.clear();
-        returnCatArray.addAll(Category.values());
+        returnCatArray.addAll(Category.all);
         returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
         return returnCatArray;
     }

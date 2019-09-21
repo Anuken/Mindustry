@@ -71,7 +71,7 @@ public abstract class FlyingUnit extends BaseUnit{
         public void update(){
             if(retarget()){
                 targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
+                targetClosestEnemyFlag(BlockFlag.core);
 
                 if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
