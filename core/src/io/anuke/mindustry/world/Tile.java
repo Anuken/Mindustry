@@ -50,6 +50,10 @@ public class Tile implements Position, TargetTrait{
         return Pos.get(x, y);
     }
 
+    public byte relativeTo(Tile tile){
+        return relativeTo(tile.x, tile.y);
+    }
+
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
     public byte relativeTo(int cx, int cy){
         if(x == cx && y == cy - 1) return 1;
