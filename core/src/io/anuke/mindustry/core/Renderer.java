@@ -295,7 +295,7 @@ public class Renderer implements ApplicationListener{
 
         overlays.drawTop();
 
-        playerGroup.draw(p -> !p.isDead() && !p.isLocal, Player::drawName);
+        playerGroup.draw(p -> !p.isDead(), Player::drawName);
 
         drawLanding();
 

@@ -383,12 +383,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
-        Draw.color(0f, 0f, 0f, 0.3f);
-        Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
-        Draw.color();
-        font.setColor(color);
 
-        font.draw(name, x, y + nameHeight, 0, Align.center, false);
+        if(!isLocal){
+            Draw.color(0f, 0f, 0f, 0.3f);
+            Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
+            Draw.color();
+            font.setColor(color);
+            font.draw(name, x, y + nameHeight, 0, Align.center, false);
+        }
 
         if(isAdmin){
             float s = 3f;

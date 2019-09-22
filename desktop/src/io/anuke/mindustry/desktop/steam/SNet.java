@@ -7,6 +7,7 @@ import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -35,7 +36,6 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
 
     final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
-    final CopyOnWriteArrayList<NetConnection> connectionsOut = new CopyOnWriteArrayList<>();
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
 
     SteamID currentLobby, currentServer;
@@ -64,11 +64,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                             try{
                                 //accept users on request
                                 if(con == null){
-                                    con = new SteamConnection(from);
+                                    con = new SteamConnection(SteamID.createFromNativeHandle(SteamNativeHandle.getNativeHandle(from)));
                                     Connect c = new Connect();
                                     c.addressTCP = "steam:" + from.getAccountID();
 
-                                    Log.info("&bRecieved connection: {0}", c.addressTCP);
+                                    Log.info("&bRecieved STEAM connection: {0}", c.addressTCP);
 
                                     steamConnections.put(from.getAccountID(), con);
                                     connections.add(con);
@@ -208,8 +208,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public Iterable<? extends NetConnection> getConnections(){
         //merge provider connections
-        connectionsOut.clear();
-        connectionsOut.addAll(connections);
+        CopyOnWriteArrayList<NetConnection> connectionsOut = new CopyOnWriteArrayList<>(connections);
         for(NetConnection c : provider.getConnections()) connectionsOut.add(c);
         return connectionsOut;
     }
