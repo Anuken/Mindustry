@@ -143,7 +143,7 @@ public class DesktopLauncher extends ClientLauncher{
         SVars.user = new SUser();
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name = "ffmpeg";//SVars.net.friends.getPersonaName();
+            player.name = SVars.net.friends.getPersonaName();
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
             Core.settings.put("name", player.name);
             Core.settings.save();

@@ -58,7 +58,7 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
 
                 cont.addButton("$hostserver", () -> {
-                    if(net.active() && steam){
+                    if(net.server() && steam){
                         platform.inviteFriends();
                     }else{
                         if(steam){
@@ -67,7 +67,7 @@ public class PausedDialog extends FloatingDialog{
                             ui.host.show();
                         }
                     }
-                }).disabled(b -> net.active() && !steam).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.active() && steam && net.server() ? "$invitefriends" : "$hostserver"));
+                }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "$invitefriends" : "$hostserver"));
             }
 
             cont.row();

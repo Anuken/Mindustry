@@ -61,20 +61,31 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
                         if(net.server()){
                             SteamConnection con = steamConnections.get(fromID);
-                            //accept users on request
-                            if(con == null){
-                                con = new SteamConnection(from);
-                                Connect c = new Connect();
-                                c.addressTCP = "steam:" + from.getAccountID();
+                            try{
+                                //accept users on request
+                                if(con == null){
+                                    con = new SteamConnection(from);
+                                    Connect c = new Connect();
+                                    c.addressTCP = "steam:" + from.getAccountID();
 
-                                Log.info("&bRecieved connection: {0}", c.addressTCP);
+                                    Log.info("&bRecieved connection: {0}", c.addressTCP);
 
-                                steamConnections.put(from.getAccountID(), con);
-                                connections.add(con);
-                                net.handleServerReceived(con, c);
+                                    steamConnections.put(from.getAccountID(), con);
+                                    connections.add(con);
+                                    net.handleServerReceived(con, c);
+                                }
+
+                                net.handleServerReceived(con, output);
+                            }catch(RuntimeException e){
+                                if(e.getCause() instanceof ValidateException){
+                                    ValidateException v = (ValidateException)e.getCause();
+                                    Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
+                                }else{
+                                    Log.err(e);
+                                }
+                            }catch(Exception e){
+                                Log.err(e);
                             }
-
-                            net.handleServerReceived(con, output);
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
                             net.handleClientReceived(output);
                         }
@@ -169,6 +180,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     public void hostServer(int port) throws IOException{
         provider.hostServer(port);
         smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, 16);
+
+        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
     }
 
     public void updateLobby(){
@@ -237,6 +250,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);
 
+        Log.info("Connect to {0}");
+
         if(joinCallback != null){
             joinCallback.run();
             joinCallback = null;
@@ -247,6 +262,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
         net.setClientConnected();
         net.handleClientReceived(con);
+
+        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
     }
 
     @Override
@@ -421,6 +438,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         public SteamConnection(SteamID sid){
             super(sid.getAccountID() + "");
             this.sid = sid;
+            Log.info("Create STEAM client {0}", sid.getAccountID());
         }
 
         @Override
