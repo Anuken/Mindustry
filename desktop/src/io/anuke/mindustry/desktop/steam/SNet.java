@@ -250,7 +250,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);
 
-        Log.info("Connect to {0}");
+        Log.info("Connect to owner {0}: {1}", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
 
         if(joinCallback != null){
             joinCallback.run();
@@ -379,12 +379,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void onP2PSessionRequest(SteamID steamIDRemote){
         Log.info("Connection request: {0}", steamIDRemote.getAccountID());
-        if(currentServer != null && !net.server()){
-            Log.info("Am client, accepting request");
-            if(steamIDRemote.equals(currentServer)){
-                snet.acceptP2PSessionWithUser(steamIDRemote);
-            }
-        }else if(net.server()){
+        if(net.server()){
             Log.info("Am server, accepting request from " + steamIDRemote.getAccountID());
             snet.acceptP2PSessionWithUser(steamIDRemote);
         }
