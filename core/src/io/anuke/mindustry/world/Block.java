@@ -440,9 +440,15 @@ public class Block extends BlockStorage{
 
     /**
      * Called when this block is tapped to build a UI on the table.
-     * {@link #configurable} able} must return true for this to be called.
+     * {@link #configurable} must return true for this to be called.
      */
     public void buildTable(Tile tile, Table table){
+    }
+
+    /** Update table alignment after configuring.*/
+    public void updateTableAlign(Tile tile, Table table){
+        Vector2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() - tile.block().size * tilesize / 2f - 1);
+        table.setPosition(pos.x, pos.y, Align.top);
     }
 
     /**

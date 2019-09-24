@@ -29,10 +29,28 @@ public abstract class NetConnection{
         this.address = address;
     }
 
+    /** Kick with a special, localized reason. Use this if possible. */
     public void kick(KickReason reason){
         Log.info("Kicking connection {0}; Reason: {1}", address, reason.name());
 
         if(player != null && (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) && player.uuid != null){
+            PlayerInfo info = netServer.admins.getInfo(player.uuid);
+            info.timesKicked++;
+            info.lastKicked = Math.max(Time.millis(), info.lastKicked);
+        }
+
+        Call.onKick(this, reason);
+
+        Time.runTask(2f, this::close);
+
+        netServer.admins.save();
+    }
+
+    /** Kick with an arbitrary reason. */
+    public void kick(String reason){
+        Log.info("Kicking connection {0}; Reason: {1}", address, reason);
+
+        if(player != null  && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);
             info.timesKicked++;
             info.lastKicked = Math.max(Time.millis(), info.lastKicked);

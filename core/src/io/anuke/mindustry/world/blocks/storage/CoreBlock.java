@@ -33,7 +33,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;

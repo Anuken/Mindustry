@@ -204,9 +204,18 @@ public class Control implements ApplicationListener, Loadable{
             player.add();
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.input.addProcessor(input);
-        });
+        Events.on(ClientLoadEvent.class, e -> input.add());
+    }
+
+    public void setInput(InputHandler newInput){
+        Block block = input.block;
+        boolean added = Core.input.getInputProcessors().contains(input);
+        input.remove();
+        this.input = newInput;
+        newInput.block = block;
+        if(added){
+            newInput.add();
+        }
     }
 
     public void playMap(Map map, Rules rules){
@@ -214,6 +223,8 @@ public class Control implements ApplicationListener, Loadable{
             logic.reset();
             world.loadMap(map, rules);
             state.rules = rules;
+            state.rules.zone = null;
+            state.rules.editor = false;
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
@@ -379,7 +390,7 @@ public class Control implements ApplicationListener, Loadable{
         //update and load any requested assets
         assets.update();
 
-        input.updateController();
+        input.updateState();
 
         //autosave global data if it's modified
         data.checkSave();

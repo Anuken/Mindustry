@@ -688,6 +688,7 @@ public class ServerControl implements ApplicationListener{
             Core.app.post(() -> {
                 try{
                     SaveIO.loadFromSlot(slot);
+                    state.rules.zone = null;
                 }catch(Throwable t){
                     err("Failed to load save. Outdated or corrupt file.");
                 }

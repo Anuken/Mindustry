@@ -359,7 +359,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showText(String titleText, String text){
         new Dialog(titleText){{
-            cont.margin(15).add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            cont.row();
+            cont.addImage().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
+            cont.row();
+            cont.add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            cont.row();
             buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
     }
