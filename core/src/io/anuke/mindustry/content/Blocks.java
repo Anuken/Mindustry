@@ -915,7 +915,7 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             speed = 26;
-            capacity = 15;
+            capacity = 12;
             health = 30;
         }};
 
@@ -923,7 +923,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
             range = 4;
             speed = 70f;
-            bufferCapacity = 15;
+            bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
