@@ -149,7 +149,7 @@ public class BlockInventoryFragment extends Fragment{
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || !tile.entity.items.has(item)) return false;
+                        if(!canPick.get() || tile == null || tile.entity == null || tile.entity.items == null || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);

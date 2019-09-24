@@ -258,7 +258,7 @@ public class NetServer implements ApplicationListener{
 
             boolean checkPass(){
                 if(votes >= votesRequired() && target.isAdded() && target.con.isConnected()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (int)(kickDuration/60)));
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60)));
                     target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
                     playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.kick(KickReason.vote));
                     map[0] = null;
@@ -330,7 +330,8 @@ public class NetServer implements ApplicationListener{
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
-                if(currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP)){
+                //hosts can vote all they want
+                if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");
                     return;
                 }
