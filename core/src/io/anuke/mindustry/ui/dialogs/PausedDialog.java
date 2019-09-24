@@ -72,7 +72,7 @@ public class PausedDialog extends FloatingDialog{
 
             cont.row();
 
-            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null ? "$save.quit" : "$quit"));
+            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
 
         }else{
             cont.defaults().size(120f).pad(5);
@@ -91,7 +91,7 @@ public class PausedDialog extends FloatingDialog{
 
             cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null ? "$save.quit" : "$quit"));
+            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
         }
     }
 
