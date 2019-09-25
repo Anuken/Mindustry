@@ -50,8 +50,11 @@ public class Pathfinder implements Runnable{
                 }
             }
 
-            //special preset which may help speed things up; this is optional
-            preloadPath(waveTeam, PathTarget.enemyCores);
+            //run next frame to try and prevent a crash
+            Core.app.post(() -> {
+                //special preset which may help speed things up; this is optional
+                preloadPath(waveTeam, PathTarget.enemyCores);
+            });
 
             start();
         });
