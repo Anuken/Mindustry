@@ -1,604 +1,295 @@
 package io.anuke.mindustry.game;
 
-import com.badlogic.gdx.math.GridPoint2;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.resource.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.*;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.builders.button;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.TextButton;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Mathf;
-import io.anuke.ucore.util.Tmp;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
+/** Handles tutorial state. */
 public class Tutorial{
-	private Stage stage;
-	private Label info;
-	private TextButton next, prev;
-	
-	public Tutorial(){
-		reset();
-	}
-	
-	public boolean active(){
-		return world.getMap() != null && world.getMap().name.equals("tutorial") && !state.is(State.menu);
-	}
-	
-	public void buildUI(table table){
+    private static final int mineCopper = 18;
+    private static final int blocksToBreak = 3, blockOffset = -6;
 
-		table.atop();
-		
-		new table("pane"){{
-			atop();
-			margin(12);
-			
-			info = new label(()->stage.text).pad(10f).padBottom(5f).width(340f).colspan(2).get();
-			info.setWrap(true);
-			
-			row();
-			
-			prev = new button("$text.tutorial.back", ()->{
-				if(!prev.isDisabled())
-					move(false);
-			}).left().get();
-			
-			next = new button("$text.tutorial.next", ()->{
-				if(!next.isDisabled())
-					move(true);
-			}).right().get();
-			
-			
-		}}.end();
-		
-		prev.margin(16);
-		next.margin(16);
-		
-		prev.setDisabled(()->!canMove(false) || !stage.canBack);
-		next.setDisabled(()->!stage.canForward);
-	}
-	
-	public void update(){
-		stage.update(this);
-		//info.setText(stage.text);
-		
-		if(stage.showBlock){
-			Tile tile = world.tile(world.getCore().x + stage.blockPlaceX, world.getCore().y + stage.blockPlaceY);
-			
-			if(tile.block() == stage.targetBlock && (tile.getRotation() == stage.blockRotation || stage.blockRotation == -1)){
-				move(true);
-			}
-		}
-	}
-	
-	public void reset(){
-		stage = Stage.values()[0];
-		stage.onSwitch();
-	}
-	
-	public void complete(){
-		//new TextDialog("Congratulations!", "You have completed the tutorial!").padText(Unit.dp.inPixels(10f)).show();
-		state.set(State.menu);
-		reset();
-	}
-	
-	void move(boolean forward){
-		
-		if(forward && !canMove(forward)){
-			complete();
-		}else{
-			int current = stage.ordinal();
-			
-			while(true){
-				current += Mathf.sign(forward);
-				
-				if(current < 0 || current >= Stage.values().length){
-					break;
-				}else if(mobile == Stage.values()[current].androidOnly || mobile != Stage.values()[current].desktopOnly){
-					stage = Stage.values()[current];
-					stage.onSwitch();
-					break;
-				}
-			}
-		}
-	}
-	
-	boolean canMove(boolean forward){
-		int current = stage.ordinal();
-		
-		while(true){
-			current += Mathf.sign(forward);
-			
-			if(current < 0 || current >= Stage.values().length){
-				return false;
-			}else if(mobile == Stage.values()[current].androidOnly || mobile != Stage.values()[current].desktopOnly){
-				return true;
-			}
-		}
-		
-	}
-	
-	public boolean showTarget(){
-		return stage == Stage.shoot;
-	}
-	
-	public boolean canPlace(){
-		return stage.canPlace;
-	}
-	
-	public boolean showBlock(){
-		return stage.showBlock;
-	}
-	
-	public Block getPlaceBlock(){
-		return stage.targetBlock;
-	}
-	
-	public GridPoint2 getPlacePoint(){
-		return Tmp.g1.set(stage.blockPlaceX, stage.blockPlaceY);
-	}
-	
-	public int getPlaceRotation(){
-		return stage.blockRotation;
-	}
-	
-	public void setDefaultBlocks(int corex, int corey){
-		world.tile(corex, corey - 2).setBlock(Blocks.air);
-		world.tile(corex, corey - 3).setBlock(Blocks.air);
-		world.tile(corex, corey - 3).setFloor(Blocks.stone);
-		
-		world.tile(corex + 1, corey - 8).setFloor(Blocks.iron);
-		world.tile(corex - 1, corey - 8).setFloor(Blocks.coal);
-		
-		int r = 10;
-		
-		for(int x = -r; x <= r; x ++){
-			for(int y = -r; y <= r; y ++){
-				if(world.tile(corex + x, corey + y).block() == Blocks.rock){
-					world.tile(corex + x, corey + y).setBlock(Blocks.air);
-				}
-			}
-		}
-	}
-	
-	public enum Stage{
-		intro{
-			{
-			}
-		},
-		moveDesktop{
-			{
-				desktopOnly = true;
-			}
-		},
-		shoot{
-			{
-				desktopOnly = true;
-			}
-		},
-		moveAndroid{
-			{
-				androidOnly = true;
-			}
-		},
-		placeSelect{
-			{
-				canBack = false;
-				canPlace = true;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-			}
-		},
-		placeConveyorDesktop{
-			{
-				desktopOnly = true;
-				canPlace = true;
-				showBlock = true;
-				canForward = false;
-				blockRotation = 1;
-				blockPlaceX = 0;
-				blockPlaceY = -2;
-				targetBlock = DistributionBlocks.conveyor;
-			}
-		},
-		placeConveyorAndroid{
-			{
-				androidOnly = true;
-				canPlace = true;
-				showBlock = true;
-				canForward = false;
-				blockRotation = 1;
-				blockPlaceX = 0;
-				blockPlaceY = -2;
-				targetBlock = DistributionBlocks.conveyor;
-			}
-		},
-		placeConveyorAndroidInfo{
-			{
-				androidOnly = true;
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				//player.recipe = null;
-			}
-		},
-		placeDrill{
-			{
-				canPlace = true;
-				canBack = false;
-				showBlock = true;
-				canForward = false;
-				blockPlaceX = 0;
-				blockPlaceY = -3;
-				targetBlock = ProductionBlocks.stonedrill;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttonproduction").fireClick();
-			}
-		},
-		blockInfo{
-			{
-				canBack = true;
-			}
-		},
-		deselectDesktop{
-			{
-				desktopOnly = true;
-				canBack = false;
-			}
-		},
-		deselectAndroid{
-			{
-				androidOnly = true;
-				canBack = false;
-			}
-		},
-		drillPlaced{
-			{
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				control.input().recipe = null;
-			}
-		},
-		drillInfo{
-			{
-			}
-		},
-		drillPlaced2{
-			{
-			}
-		},
-		moreDrills{
-			{
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				for(int flip : new int[]{1, -1}){
-					world.tile(world.getCore().x + flip, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(world.getCore().x + flip*2, world.getCore().y - 2).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(world.getCore().x + flip*2, world.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 2 * flip);
-					world.tile(world.getCore().x + flip*2, world.getCore().y - 3).setBlock(DistributionBlocks.conveyor, 1);
-					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setFloor(Blocks.stone);
-					world.tile(world.getCore().x + flip*2, world.getCore().y - 4).setBlock(ProductionBlocks.stonedrill);
-					
-				}
-			}
-		},
-		deleteBlock{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				targetBlock = Blocks.air;
-				blockPlaceX = 2;
-				blockPlaceY = -2;
-				desktopOnly = true;
-			}
-		},
-		deleteBlockAndroid{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				targetBlock = Blocks.air;
-				blockPlaceX = 2;
-				blockPlaceY = -2;
-				androidOnly = true;
-			}
-		},
-		placeTurret{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = WeaponBlocks.turret;
-				blockPlaceX = 2;
-				blockPlaceY = 2;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttonweapon").fireClick();
-			}
-		},
-		placedTurretAmmo{
-			{
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				for(int i = 0; i < 4; i ++){
-					world.tile(world.getCore().x + 2, world.getCore().y - 2 + i).setBlock(DistributionBlocks.conveyor, 1);
-				}
+    private ObjectSet<String> events = new ObjectSet<>();
+    private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
+    private int sentence;
+    public TutorialStage stage = TutorialStage.values()[0];
 
-				control.input().recipe = null;
-			}
-		},
-		turretExplanation{
-			{
-				canBack = false;
-			}
-		},
-		waves{
-			{
-			}
-		},
-		coreDestruction{
-			{
-			}
-		},
-		pausingDesktop{
-			{
-				desktopOnly = true;
-			}
-		},
-		pausingAndroid{
-			{
-				androidOnly = true;
-			}
-		},
-		//TODO re-add tutorial on weapons
+    public Tutorial(){
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(!event.breaking){
+                blocksPlaced.getAndIncrement(event.tile.block(), 0, 1);
+            }
+        });
 
-		spawnWave{
-			float warmup = 0f;
-			{
-				canBack = false;
-				canForward = false;
-			}
-			
-			void update(Tutorial t){
-				warmup += Timers.delta();
-				if(state.enemies == 0 && warmup > 60f){
-					t.move(true);
-				}
-			}
-			
-			void onSwitch(){
-				warmup = 0f;
-				logic.runWave();
-			}
-		},
-		pumpDesc{
-			{
-				canBack = false;
-			}
-		}, 
-		pumpPlace{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = ProductionBlocks.pump;
-				blockPlaceX = 6;
-				blockPlaceY = -2;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttonproduction").fireClick();
-				state.inventory.addItem(Item.steel, 60);
-				state.inventory.addItem(Item.iron, 60);
-			}
-		},
-		conduitUse{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
-				blockPlaceX = 5;
-				blockPlaceY = -2;
-				blockRotation = 2;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttondistribution").fireClick();
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
-			}
-		},
-		conduitUse2{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
-				blockPlaceX = 4;
-				blockPlaceY = -2;
-				blockRotation = 1;
-			}
-			
-			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
-			}
-		},
-		conduitUse3{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = DistributionBlocks.conduit;
-				blockPlaceX = 4;
-				blockPlaceY = -1;
-				blockRotation = 1;
-			}
-			
-			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
-			}
-		},
-		generator{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				targetBlock = ProductionBlocks.combustiongenerator;
-				blockPlaceX = 4;
-				blockPlaceY = 0;
-			}
-			
-			void onSwitch(){
-				world.tile(blockPlaceX + world.getCore().x, blockPlaceY + world.getCore().y).setBlock(Blocks.air);
-				ui.<ImageButton>find("sectionbuttonpower").fireClick();
-				state.inventory.addItem(Item.steel, 60);
-				state.inventory.addItem(Item.iron, 60);
-			}
-		},
-		generatorExplain{
-			{
-				canBack = false;
-			}
-		},
-		lasers{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				blockPlaceX = 4;
-				blockPlaceY = 4;
-				blockRotation = 2;
-				targetBlock = DistributionBlocks.powerlaser;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttonpower").fireClick();
-			}
-		},
-		laserExplain{
-			{
-				canBack = false;
-			}
-		},
-		laserMore{
-			{
-				canBack = false;
-			}
-		},
-		healingTurret{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				canBack = false;
-				blockPlaceX = 1;
-				blockPlaceY = 4;
-				targetBlock = DefenseBlocks.repairturret;
-			}
-			
-			void onSwitch(){
-				ui.<ImageButton>find("sectionbuttonpower").fireClick();
-			}
-		},
-		healingTurretExplain{
-			{
-				canBack = false;
-			}
-		},
-		smeltery{
-			{
-				canBack = false;
-				canForward = false;
-				showBlock = true;
-				canPlace = true;
-				canBack = false;
-				blockPlaceX = 0;
-				blockPlaceY = -7;
-				targetBlock = ProductionBlocks.smelter;
-			}
-			
-			void onSwitch(){
-				state.inventory.addItem(Item.stone, 40);
-				state.inventory.addItem(Item.iron, 40);
-				ui.<ImageButton>find("sectionbuttoncrafting").fireClick();
-				
-			}
-		},
-		smelterySetup{
-			{
-				canBack = false;
-			}
-			
-			void onSwitch(){
-				for(int i = 0; i < 5; i ++){
-					world.tile(world.getCore().x, world.getCore().y - 6 + i).setBlock(DistributionBlocks.conveyor, 1);
-				}
+        Events.on(LineConfirmEvent.class, event -> events.add("lineconfirm"));
+        Events.on(TurretAmmoDeliverEvent.class, event -> events.add("ammo"));
+        Events.on(CoreItemDeliverEvent.class, event -> events.add("coreitem"));
+        Events.on(BlockInfoEvent.class, event -> events.add("blockinfo"));
+        Events.on(DepositEvent.class, event -> events.add("deposit"));
+        Events.on(WithdrawEvent.class, event -> events.add("withdraw"));
+    }
 
-				world.tile(world.getCore().x, world.getCore().y - 6 + 1).setBlock(DistributionBlocks.tunnel, 3);
-				world.tile(world.getCore().x, world.getCore().y - 6 + 2).setBlock(DefenseBlocks.stonewall, 0);
-				world.tile(world.getCore().x, world.getCore().y - 6 + 3).setBlock(DistributionBlocks.tunnel, 1);
+    /** update tutorial state, transition if needed */
+    public void update(){
+        if(stage.done.get() && !canNext()){
+            next();
+        }else{
+            stage.update();
+        }
+    }
 
-				world.tile(world.getCore().x+1, world.getCore().y - 8).setBlock(ProductionBlocks.irondrill);
-				world.tile(world.getCore().x-1, world.getCore().y - 8).setBlock(ProductionBlocks.coaldrill);
-				
-				world.tile(world.getCore().x+1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 2);
-				world.tile(world.getCore().x-1, world.getCore().y - 7).setBlock(DistributionBlocks.conveyor, 0);
-			}
-		},
-		tunnelExplain{
-			{
-				canBack = false;
-			}
-		},
-		end{
-			{
-				canBack = false;
-			}
-		};
-		public final String text = Bundles.getNotNull("tutorial."+name()+".text");
-		
-		boolean androidOnly;
-		boolean desktopOnly;
-		
-		boolean canBack = true;
-		boolean canForward = true;
-		boolean canPlace = false;
-		boolean showBlock = false;
-		
-		int blockPlaceX = 0;
-		int blockPlaceY = 0;
-		int blockRotation = -1;
-		Block targetBlock = null;
-		
-		void update(Tutorial t){};
-		void onSwitch(){}
-	}
+    /** draw UI overlay */
+    public void draw(){
+        if(!Core.scene.hasDialog()){
+            stage.draw();
+        }
+    }
+
+    /** Resets tutorial state. */
+    public void reset(){
+        stage = TutorialStage.values()[0];
+        stage.begin();
+        blocksPlaced.clear();
+        events.clear();
+        sentence = 0;
+    }
+
+    /** Goes on to the next tutorial step. */
+    public void next(){
+        stage = TutorialStage.values()[Mathf.clamp(stage.ordinal() + 1, 0, TutorialStage.values().length)];
+        stage.begin();
+        blocksPlaced.clear();
+        events.clear();
+        sentence = 0;
+    }
+
+    public boolean canNext(){
+        return sentence + 1 < stage.sentences.size;
+    }
+
+    public void nextSentence(){
+        if(canNext()){
+            sentence ++;
+        }
+    }
+
+    public boolean canPrev(){
+        return sentence > 0;
+    }
+
+    public void prevSentence(){
+        if(canPrev()){
+            sentence --;
+        }
+    }
+
+    public enum TutorialStage{
+        intro(
+        line -> Strings.format(line, item(Items.copper), mineCopper),
+        () -> item(Items.copper) >= mineCopper
+        ),
+        drill(() -> placed(Blocks.mechanicalDrill, 1)){
+            void draw(){
+                outline("category-production");
+                outline("block-mechanical-drill");
+                outline("confirmplace");
+            }
+        },
+        blockinfo(() -> event("blockinfo")){
+            void draw(){
+                outline("category-production");
+                outline("block-mechanical-drill");
+                outline("blockinfo");
+            }
+        },
+        conveyor(() -> placed(Blocks.conveyor, 2) && event("lineconfirm") && event("coreitem")){
+            void draw(){
+                outline("category-distribution");
+                outline("block-conveyor");
+            }
+        },
+        turret(() -> placed(Blocks.duo, 1)){
+            void draw(){
+                outline("category-turret");
+                outline("block-duo");
+            }
+        },
+        drillturret(() -> event("ammo")),
+        pause(() -> state.isPaused()){
+            void draw(){
+                if(mobile){
+                    outline("pause");
+                }
+            }
+        },
+        unpause(() -> !state.isPaused()){
+            void draw(){
+                if(mobile){
+                    outline("pause");
+                }
+            }
+        },
+        breaking(TutorialStage::blocksBroken){
+            void begin(){
+                placeBlocks();
+            }
+
+            void draw(){
+                if(mobile){
+                    outline("breakmode");
+                }
+            }
+        },
+        withdraw(() -> event("withdraw")){
+            void begin(){
+                state.teams.get(defaultTeam).cores.first().entity.items.add(Items.copper, 10);
+            }
+        },
+        deposit(() -> event("deposit")),
+        waves(() -> state.wave > 2 && state.enemies() <= 0 && !spawner.isSpawning()){
+            void begin(){
+                state.rules.waveTimer = true;
+                logic.runWave();
+            }
+
+            void update(){
+                if(state.wave > 2){
+                    state.rules.waveTimer = false;
+                }
+            }
+        },
+        launch(() -> false){
+            void begin(){
+                state.rules.waveTimer = false;
+                state.wave = 5;
+
+                //end tutorial, never show it again
+                Events.fire(Trigger.tutorialComplete);
+                Core.settings.put("playedtutorial", true);
+                Core.settings.save();
+            }
+
+            void draw(){
+                outline("waves");
+            }
+        },;
+
+        protected final String line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
+        protected final Function<String, String> text;
+        protected Array<String> sentences;
+        protected final BooleanProvider done;
+
+        TutorialStage(Function<String, String> text, BooleanProvider done){
+            this.text = text;
+            this.done = done;
+        }
+
+        TutorialStage(BooleanProvider done){
+            this(line -> line, done);
+        }
+
+        /** displayed tutorial stage text.*/
+        public String text(){
+            if(sentences == null) this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
+            String line = sentences.get(control.tutorial.sentence);
+            return line.contains("{") ? text.get(line) : line;
+        }
+
+        /** called every frame when this stage is active.*/
+        void update(){
+
+        }
+
+        /** called when a stage begins.*/
+        void begin(){
+
+        }
+
+        /** called when a stage needs to draw itself, usually over highlighted UI elements. */
+        void draw(){
+
+        }
+
+        //utility
+
+        static void placeBlocks(){
+            Tile core = state.teams.get(defaultTeam).cores.first();
+            for(int i = 0; i < blocksToBreak; i++){
+                world.removeBlock(world.ltile(core.x + blockOffset, core.y + i));
+                world.tile(core.x + blockOffset, core.y + i).setBlock(Blocks.scrapWall, defaultTeam);
+            }
+        }
+
+        static boolean blocksBroken(){
+            Tile core = state.teams.get(defaultTeam).cores.first();
+
+            for(int i = 0; i < blocksToBreak; i++){
+                if(world.tile(core.x + blockOffset, core.y + i).block() == Blocks.scrapWall){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        static boolean event(String name){
+            return control.tutorial.events.contains(name);
+        }
+
+        static boolean placed(Block block, int amount){
+            return placed(block) >= amount;
+        }
+
+        static int placed(Block block){
+            return control.tutorial.blocksPlaced.get(block, 0);
+        }
+
+        static int item(Item item){
+            return state.teams.get(defaultTeam).cores.isEmpty() ? 0 : state.teams.get(defaultTeam).cores.first().entity.items.get(item);
+        }
+
+        static boolean toggled(String name){
+            Element element = Core.scene.findVisible(name);
+            if(element instanceof Button){
+                return ((Button)element).isChecked();
+            }
+            return false;
+        }
+
+        static void outline(String name){
+            Element element = Core.scene.findVisible(name);
+            if(element != null && !toggled(name)){
+                element.localToStageCoordinates(Tmp.v1.setZero());
+                float sin = Mathf.sin(11f, Scl.scl(4f));
+                Lines.stroke(Scl.scl(7f), Pal.place);
+                Lines.rect(Tmp.v1.x - sin, Tmp.v1.y - sin, element.getWidth() + sin*2, element.getHeight() + sin*2);
+
+                float size = Math.max(element.getWidth(), element.getHeight()) + Mathf.absin(11f/2f, Scl.scl(18f));
+                float angle = Angles.angle(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Tmp.v1.x + element.getWidth()/2f, Tmp.v1.y + element.getHeight()/2f);
+                Tmp.v2.trns(angle + 180f, size*1.4f);
+                float fs = Scl.scl(40f);
+                float fs2 = Scl.scl(56f);
+
+                Draw.color(Pal.gray);
+                Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs2, fs2, angle);
+                Draw.color(Pal.place);
+                Tmp.v2.setLength(Tmp.v2.len() - Scl.scl(4));
+                Drawf.tri(Tmp.v1.x + element.getWidth()/2f + Tmp.v2.x, Tmp.v1.y + element.getHeight()/2f + Tmp.v2.y, fs, fs, angle);
+                Draw.reset();
+            }
+        }
+    }
+
 }

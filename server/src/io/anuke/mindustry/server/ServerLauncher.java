@@ -1,28 +1,22 @@
 package io.anuke.mindustry.server;
 
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import io.anuke.kryonet.KryoClient;
-import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.net.Net;
+
+import io.anuke.arc.backends.headless.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.net.*;
+
+import static io.anuke.mindustry.Vars.platform;
 
 public class ServerLauncher{
 
     public static void main(String[] args){
-
-        Net.setClientProvider(new KryoClient());
-        Net.setServerProvider(new KryoServer());
-
-        new HeadlessApplication(new MindustryServer(args));
-
-        //find and handle uncaught exceptions in libGDX thread
-        for(Thread thread : Thread.getAllStackTraces().keySet()){
-            if(thread.getName().equals("HeadlessApplication")){
-                thread.setUncaughtExceptionHandler((t, throwable) ->{
-                    throwable.printStackTrace();
-                    System.exit(-1);
-                });
-                break;
-            }
+        try{
+            Vars.platform = new Platform(){};
+            Vars.net = new Net(platform.getNet());
+            new HeadlessApplication(new MindustryServer(args), null, throwable -> CrashSender.send(throwable, f -> {}));
+        }catch(Throwable t){
+            CrashSender.send(t, f -> {});
         }
     }
 }

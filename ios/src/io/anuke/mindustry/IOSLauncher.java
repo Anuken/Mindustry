@@ -1,71 +1,189 @@
 package io.anuke.mindustry;
 
-import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
-import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import io.anuke.kryonet.DefaultThreadImpl;
-import io.anuke.kryonet.KryoClient;
-import io.anuke.kryonet.KryoServer;
-import io.anuke.mindustry.core.ThreadHandler;
-import io.anuke.mindustry.io.Platform;
-import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.scene.ui.TextField;
-import io.anuke.ucore.scene.ui.layout.Unit;
-import org.robovm.apple.foundation.NSAutoreleasePool;
-import org.robovm.apple.uikit.UIApplication;
+import com.badlogic.gdx.backends.iosrobovm.*;
+import io.anuke.arc.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Saves.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
+import org.robovm.apple.foundation.*;
+import org.robovm.apple.uikit.*;
+import org.robovm.objc.block.*;
 
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.io.*;
+import java.util.*;
+import java.util.zip.*;
 
-public class IOSLauncher extends IOSApplication.Delegate {
+import static io.anuke.mindustry.Vars.*;
+import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
+
+public class IOSLauncher extends IOSApplication.Delegate{
+    private boolean forced;
+
     @Override
-    protected IOSApplication createApplication() {
-        Net.setClientProvider(new KryoClient());
-        Net.setServerProvider(new KryoServer());
+    protected IOSApplication createApplication(){
 
-        Unit.dp.addition -= 0.2f;
-
-        Platform.instance = new Platform() {
-            DateFormat format = SimpleDateFormat.getDateTimeInstance();
-
-            @Override
-            public String format(Date date) {
-                return format.format(date);
-            }
-
-            @Override
-            public String format(int number) {
-                return NumberFormat.getIntegerInstance().format(number);
-            }
-
-            @Override
-            public void addDialog(TextField field) {
-                TextFieldDialogListener.add(field, 16);
-            }
-
-            @Override
-            public void addDialog(TextField field, int maxLength) {
-                TextFieldDialogListener.add(field, maxLength);
-            }
-
-            @Override
-            public String getLocaleName(Locale locale) {
-                return locale.getDisplayName(locale);
-            }
-
-            @Override
-            public ThreadHandler.ThreadProvider getThreadProvider() {
-                return new DefaultThreadImpl();
-            }
-        };
+        if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
+            Scl.setAddition(0.5f);
+        }else{
+            Scl.setAddition(-0.5f);
+        }
 
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new Mindustry(), config);
+        return new IOSApplication(new ClientLauncher(){
+
+            @Override
+            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController(NSArray.fromStrings("public.archive"));
+
+                cont.setAllowsDocumentCreation(false);
+                cont.setDelegate(new UIDocumentBrowserViewControllerDelegate(){
+                    @Override
+                    public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+
+                    }
+
+                    @Override
+                    public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+
+                    }
+
+                    @Override
+                    public void didRequestDocumentCreationWithHandler(UIDocumentBrowserViewController controller, VoidBlock2<NSURL, UIDocumentBrowserImportMode> importHandler){
+
+                    }
+
+                    @Override
+                    public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
+                        cons.accept(Core.files.absolute(destinationURL.getAbsoluteString()));
+                    }
+
+                    @Override
+                    public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
+
+                    }
+
+                    @Override
+                    public NSArray<UIActivity> applicationActivities(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+                        return null;
+                    }
+
+                    @Override
+                    public void willPresentActivityViewController(UIDocumentBrowserViewController controller, UIActivityViewController activityViewController){
+
+                    }
+                });
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
+
+                });
+            }
+
+            @Override
+            public void shareFile(FileHandle file){
+                Log.info("Attempting to share file " + file);
+                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                file.copyTo(to);
+
+                NSURL url = new NSURL(to.file());
+                UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
+
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
+                .presentViewController(p, true, () -> io.anuke.arc.util.Log.info("Success! Presented {0}", to));
+            }
+
+            @Override
+            public void beginForceLandscape(){
+                forced = true;
+                UINavigationController.attemptRotationToDeviceOrientation();
+            }
+
+            @Override
+            public void endForceLandscape(){
+                forced = false;
+                UINavigationController.attemptRotationToDeviceOrientation();
+            }
+        }, config);
     }
 
-    public static void main(String[] argv) {
+    @Override
+    public UIInterfaceOrientationMask getSupportedInterfaceOrientations(UIApplication application, UIWindow window){
+        return forced ? UIInterfaceOrientationMask.Landscape : UIInterfaceOrientationMask.All;
+    }
+
+
+    @Override
+    public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
+        System.out.println("Opened URL: " + url.getPath());
+        openURL(url);
+        return false;
+    }
+
+    @Override
+    public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options){
+        boolean b = super.didFinishLaunching(application, options);
+
+        if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
+            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getPath());
+            openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
+        }
+
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.app.post(() -> Core.app.post(() -> {
+                Core.scene.table(Styles.black9, t -> {
+                    t.visible(() -> {
+                        if(!forced) return false;
+                        t.toFront();
+                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+                    });
+                    t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
+                });
+            }));
+        });
+
+        return b;
+    }
+
+    void openURL(NSURL url){
+
+        Core.app.post(() -> Core.app.post(() -> {
+            FileHandle file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
+            Core.files.absolute(url.getPath()).copyTo(file);
+
+            if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+
+                if(SaveIO.isSaveValid(file)){
+                    try{
+                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.DEFAULT_BUFFER_SIZE))));
+                        if(meta.tags.containsKey("name")){
+                            //is map
+                            if(!ui.editor.isShown()){
+                                ui.editor.show();
+                            }
+
+                            ui.editor.beginEditMap(file);
+                        }else{
+                            SaveSlot slot = control.saves.importSave(file);
+                            ui.load.runLoadSave(slot);
+                        }
+                    }catch(IOException e){
+                        ui.showException("$save.import.fail", e);
+                    }
+                }else{
+                    ui.showErrorMessage("$save.import.invalid");
+                }
+
+            }
+        }));
+    }
+
+    public static void main(String[] argv){
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
         pool.close();

@@ -1,22 +1,54 @@
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-ext {
-	mainClassName = "io.anuke.mindustry.IOSLauncher"
+ext{
+    mainClassName = "io.anuke.mindustry.IOSLauncher"
 }
+
+task copyAssets(){
+    doLast{
+        delete{
+            delete "assets/"
+        }
+    
+        copy{
+            from "../core/assets"
+            into "assets/"
+        }
+        
+        exec{
+            ignoreExitValue true
+            commandLine "sh", "./convert_audio.sh", "assets/sounds"
+        }
+    
+        exec{
+            ignoreExitValue true
+            commandLine "sh", "./convert_audio.sh", "assets/music"
+        }
+    
+        delete{
+            delete fileTree('assets') {
+                include '**/*.ogg'
+            }
+        }
+    }
+}
+
+task deploy{
+    dependsOn copyAssets
+    dependsOn createIPA
+}
+
+
+build.dependsOn copyAssets
 
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
-robovm {
-	archs = "thumbv7:arm64"
-}
-
-eclipse.project {
-    name = appName + "-ios"
-    natures 'org.robovm.eclipse.RoboVMNature'
+robovm{
+    archs = "thumbv7:arm64"
 }

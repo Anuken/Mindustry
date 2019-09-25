@@ -1,45 +1,77 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.graphics.Colors;
-import io.anuke.ucore.scene.builders.label;
-import io.anuke.ucore.scene.builders.table;
-import io.anuke.ucore.scene.event.Touchable;
-import io.anuke.ucore.scene.ui.Label;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.Group;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.scene.ui.Label;
+import io.anuke.arc.scene.ui.TextButton;
+import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.ui.*;
 
-public class LoadingFragment implements Fragment {
+public class LoadingFragment extends Fragment{
     private Table table;
+    private TextButton button;
+    private Bar bar;
 
     @Override
-    public void build() {
+    public void build(Group parent){
+        parent.fill(Styles.black8, t -> {
+            t.visible(false);
+            t.touchable(Touchable.enabled);
+            t.add().height(133f).row();
 
-       table = new table("loadDim"){{
-            touchable(Touchable.enabled);
-            get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
-            row();
-            new label("$text.loading"){{
-                get().setName("namelabel");
-            }}.pad(10);
-            row();
-            get().addImage("white").growX()
-                    .height(3f).pad(4f).growX().get().setColor(Colors.get("accent"));
-        }}.end().get();
+            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.row();
+            t.add("$loading").name("namelabel").pad(10f);
+            t.row();
+            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.row();
 
-        table.setVisible(false);
+            bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
+            t.row();
+            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            table = t;
+        });
+    }
+
+    public void setProgress(FloatProvider progress){
+        bar.visible(true);
+        bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
+    }
+
+    public void setButton(Runnable listener){
+        button.visible(true);
+        button.getListeners().remove(button.getListeners().size - 1);
+        button.clicked(listener);
+    }
+
+    public void setText(String text){
+        table.<Label>find("namelabel").setText(text);
+        table.<Label>find("namelabel").setColor(Pal.accent);
     }
 
     public void show(){
-        show("$text.loading");
+        show("$loading");
     }
 
     public void show(String text){
+        table.<Label>find("namelabel").setColor(Color.white);
+        bar.visible(false);
+        table.clearActions();
+        table.touchable(Touchable.enabled);
         table.<Label>find("namelabel").setText(text);
-        table.setVisible(true);
+        table.visible(true);
+        table.getColor().a = 1f;
         table.toFront();
     }
 
     public void hide(){
-        table.setVisible(false);
+        table.clearActions();
+        table.toFront();
+        table.touchable(Touchable.disabled);
+        table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
     }
 }

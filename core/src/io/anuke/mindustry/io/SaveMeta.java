@@ -1,27 +1,29 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.mindustry.game.Difficulty;
-import io.anuke.mindustry.game.GameMode;
-import io.anuke.mindustry.world.Map;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.maps.*;
 
-import java.util.Date;
+import static io.anuke.mindustry.Vars.maps;
 
-import static io.anuke.mindustry.Vars.world;
-
-public class SaveMeta {
+public class SaveMeta{
     public int version;
-    public String date;
-    public GameMode mode;
+    public int build;
+    public long timestamp;
+    public long timePlayed;
     public Map map;
     public int wave;
-    public Difficulty difficulty;
+    public Rules rules;
+    public StringMap tags;
 
-    public SaveMeta(int version, long date, int mode, int map, int wave, Difficulty difficulty){
+    public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules, StringMap tags){
         this.version = version;
-        this.date = Platform.instance.format(new Date(date));
-        this.mode = GameMode.values()[mode];
-        this.map = world.maps().getMap(map);
+        this.build = build;
+        this.timestamp = timestamp;
+        this.timePlayed = timePlayed;
+        this.map = maps.all().find(m -> m.name().equals(map));
         this.wave = wave;
-        this.difficulty = difficulty;
+        this.rules = rules;
+        this.tags = tags;
     }
 }

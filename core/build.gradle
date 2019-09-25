@@ -2,26 +2,3 @@ apply plugin: "java"
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 sourceSets.main.java.srcDirs = ["src/"]
-
-import com.badlogic.gdx.tools.texturepacker.TexturePacker
-
-task packSprites(){
-	doLast {
-		TexturePacker.process("core/assets-raw/sprites/", "core/assets/sprites/", "sprites.atlas")
-	}
-}
-
-task packUI(){
-	doLast {
-		TexturePacker.process("core/assets-raw/ui/", "core/assets/ui/", "uiskin.atlas")
-	}
-}
-
-task pack(){
-	dependsOn 'packSprites'
-	dependsOn 'packUI'
-}
-
-eclipse.project {
-    name = appName + "-core"
-}
