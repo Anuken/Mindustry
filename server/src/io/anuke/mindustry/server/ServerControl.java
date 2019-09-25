@@ -804,8 +804,6 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.setDead(true);
             }
-
-            Log.info("Group contents:\n{0}\n{1}\n\n", players, playerGroup.all());
             
             logic.reset();
 
@@ -813,8 +811,6 @@ public class ServerControl implements ApplicationListener{
             run.run();
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
-
-            Log.info("Group contents post:\n{0}\n{1}\n\n", players, playerGroup.all());
 
             for(Player p : players){
                 p.reset();
