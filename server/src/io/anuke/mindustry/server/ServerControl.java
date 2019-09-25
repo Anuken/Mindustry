@@ -801,6 +801,7 @@ public class ServerControl implements ApplicationListener{
         Runnable r = () -> {
 
             Array<Player> players = new Array<>();
+            Log.info("Players: " + playerGroup.all());
             for(Player p : playerGroup.all()){
                 players.add(p);
                 p.setDead(true);
@@ -814,6 +815,8 @@ public class ServerControl implements ApplicationListener{
             state.rules = world.getMap().applyRules(lastMode);
 
             for(Player p : players){
+
+                Log.info("Iterate: " + p.name);
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
