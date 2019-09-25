@@ -814,6 +814,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         item.amount = 0;
         placeQueue.clear();
         dead = true;
+        lastText = null;
+        textFadeTime = 0f;
         target = null;
         moveTarget = null;
         spawner = lastSpawner = null;
