@@ -72,6 +72,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Vector2 movement = new Vector2();
     private boolean moved;
 
+    {
+        RuntimeException e = new RuntimeException("player " + name);
+        Core.app.post(e::printStackTrace);
+    }
+
     //endregion
 
     //region unit and event overrides, utility methods
@@ -254,7 +259,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}";
+        return "Player{" + name + ", mech=" + mech.name + ", id=" + id + ", local=" + isLocal + ", " + x + ", " + y + "}";
     }
 
     @Override

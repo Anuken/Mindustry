@@ -799,13 +799,13 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-
             Array<Player> players = new Array<>();
-            Log.info("Players: " + playerGroup.all());
             for(Player p : playerGroup.all()){
                 players.add(p);
                 p.setDead(true);
             }
+
+            Log.info("Group contents:\n{0}\n{1}\n\n", players, playerGroup.all());
             
             logic.reset();
 
@@ -814,11 +814,9 @@ public class ServerControl implements ApplicationListener{
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
 
-            Log.info("Player array: " + players);
+            Log.info("Group contents post:\n{0}\n{1}\n\n", players, playerGroup.all());
 
             for(Player p : players){
-
-                Log.info("Iterate thorugh: " + p);
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
