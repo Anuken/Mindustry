@@ -405,13 +405,18 @@ public class NetServer implements ApplicationListener{
             return;
         }
 
-        if(player.con.hasConnected){
-            Events.fire(new PlayerLeave(player));
-            Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-            Call.onPlayerDisconnect(player.id);
+        if(!player.con.hasDisconnected){
+            if(player.con.hasConnected){
+                Events.fire(new PlayerLeave(player));
+                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                Call.onPlayerDisconnect(player.id);
+            }
+
+            Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
         }
+
         player.remove();
-        Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
+        player.con.hasDisconnected = true;
     }
 
     private static float compound(float speed, float drag){
@@ -709,7 +714,12 @@ public class NetServer implements ApplicationListener{
             //iterate through each player
             for(int i = 0; i < playerGroup.size(); i++){
                 Player player = playerGroup.all().get(i);
-                if(player.isLocal || player.con == null) continue;
+                if(player.isLocal) continue;
+
+                if(player.con == null || !player.con.isConnected()){
+                    onDisconnect(player, "disappeared");
+                    continue;
+                }
 
                 NetConnection connection = player.con;
 
