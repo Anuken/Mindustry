@@ -390,14 +390,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             Draw.color();
             font.setColor(color);
             font.draw(name, x, y + nameHeight, 0, Align.center, false);
-        }
 
-        if(isAdmin){
-            float s = 3f;
-            Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
-            Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            if(isAdmin){
+                float s = 3f;
+                Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+                Draw.color(color);
+                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            }
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){
