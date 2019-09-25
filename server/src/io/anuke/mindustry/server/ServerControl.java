@@ -814,9 +814,11 @@ public class ServerControl implements ApplicationListener{
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
 
+            Log.info("Player array: " + players);
+
             for(Player p : players){
 
-                Log.info("Iterate: " + p.name);
+                Log.info("Iterate thorugh: " + p);
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
