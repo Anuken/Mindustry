@@ -85,37 +85,35 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            if(!ios){
-                t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
-                createDialog("$editor.import",
-                "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
-                "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showInfo("$editor.errorimage");
-                        }else{
-                            editor.beginEdit(MapIO.createMap(file, true));
-                        }
-                    });
-                })),
-
-                "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
-                platform.showFileChooser(true, "png", file ->
-                ui.loadAnd(() -> {
-                    try{
-                        Pixmap pixmap = new Pixmap(file);
-                        editor.beginEdit(pixmap);
-                        pixmap.dispose();
-                    }catch(Exception e){
-                        ui.showException("$editor.errorload", e);
-                        Log.err(e);
+            t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
+            createDialog("$editor.import",
+            "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
+            "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
+            platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showInfo("$editor.errorimage");
+                    }else{
+                        editor.beginEdit(MapIO.createMap(file, true));
                     }
-                })))
-                );
-            }
+                });
+            })),
 
-            Cell cell = t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
+            "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
+            platform.showFileChooser(true, "png", file ->
+            ui.loadAnd(() -> {
+                try{
+                    Pixmap pixmap = new Pixmap(file);
+                    editor.beginEdit(pixmap);
+                    pixmap.dispose();
+                }catch(Exception e){
+                    ui.showException("$editor.errorload", e);
+                    Log.err(e);
+                }
+            })))
+            );
+
+            t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
                 if(!ios){
                     platform.showFileChooser(false, mapExtension, file -> {
                         ui.loadAnd(() -> {
@@ -143,10 +141,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     });
                 }
             });
-
-            if(ios){
-                cell.size(swidth * 2f + 10, 60f).colspan(2);
-            }
         });
 
         menu.cont.row();
@@ -154,10 +148,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
                 Map map = save();
-                if(map != null){
-                    platform.publishMap(map);
+
+                if(map == null) return;
+
+                if(map.tags.get("description", "").length() < 4){
+                    ui.showErrorMessage("$editor.nodescription");
+                    return;
                 }
-            }).padTop(-3).size(swidth * 2f + 10, 60f);
+
+                if(!Structs.contains(Gamemode.all, g -> g.valid(map))){
+                    ui.showErrorMessage("$map.nospawn");
+                    return;
+                }
+
+                platform.publishMap(map);
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -255,6 +260,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
+            state.rules.zone = null;
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),
@@ -276,7 +282,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
-    private Map save(){
+    public Map save(){
+        boolean isEditor = state.rules.editor;
+        state.rules.editor = false;
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
@@ -300,6 +308,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.hide();
         saved = true;
+        state.rules.editor = isEditor;
         return returned;
     }
 

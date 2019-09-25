@@ -24,7 +24,6 @@ public class ItemBridge extends Block{
     protected int timerTransport = timers++;
     protected int range;
     protected float transportTime = 2f;
-    protected IntArray removals = new IntArray();
     protected TextureRegion endRegion, bridgeRegion, arrowRegion;
 
     private static int lastPlaced = Pos.invalid;
@@ -162,20 +161,14 @@ public class ItemBridge extends Block{
         entity.time += entity.cycleSpeed * entity.delta();
         entity.time2 += (entity.cycleSpeed - 1f) * entity.delta();
 
-        removals.clear();
-
         IntSetIterator it = entity.incoming.iterator();
-
         while(it.hasNext){
             int i = it.next();
             Tile other = world.tile(i);
             if(!linkValid(tile, other, false)){
-                removals.add(i);
+                it.remove();
             }
         }
-
-        for(int j = 0; j < removals.size; j++)
-            entity.incoming.remove(removals.get(j));
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
@@ -184,7 +177,7 @@ public class ItemBridge extends Block{
             entity.uptime = 0f;
         }else{
 
-            if(entity.cons.valid()){
+            if(entity.cons.valid() && (!hasPower || Mathf.isZero(1f - entity.power.satisfaction))){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -259,6 +252,16 @@ public class ItemBridge extends Block{
             int rel2 = tile.relativeTo(source.x, source.y);
 
             if(rel == rel2) return false;
+
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == rel2){
+                    return false;
+                }
+            }
         }else{
             return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos() && tile.entity.items.total() < itemCapacity;
         }

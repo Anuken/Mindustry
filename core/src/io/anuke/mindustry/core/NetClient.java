@@ -230,6 +230,15 @@ public class NetClient implements ApplicationListener{
         ui.loadfrag.hide();
     }
 
+    @Remote(variants = Variant.one, priority = PacketPriority.high)
+    public static void onKick(String reason){
+        netClient.disconnectQuietly();
+        state.set(State.menu);
+        logic.reset();
+        ui.showText("$disconnect", reason);
+        ui.loadfrag.hide();
+    }
+
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
         ui.showText("", message);

@@ -17,6 +17,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.bundle;
@@ -126,24 +127,21 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            //iOS doesn't have a file chooser.
-            //if(!ios){
-                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
-                    try{
-                        data.importData(file);
-                        Core.app.exit();
-                    }catch(IllegalArgumentException e){
+            t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+                try{
+                    data.importData(file);
+                    Core.app.exit();
+                }catch(IllegalArgumentException e){
+                    ui.showErrorMessage("$data.invalid");
+                }catch(Exception e){
+                    e.printStackTrace();
+                    if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                        ui.showException(e);
+                    }else{
                         ui.showErrorMessage("$data.invalid");
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        if(e.getMessage() == null || !e.getMessage().contains("too short")){
-                            ui.showException(e);
-                        }else{
-                            ui.showErrorMessage("$data.invalid");
-                        }
                     }
-                })));
-            //}
+                }
+            })));
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -205,8 +203,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false);
+            game.checkPref("keyboard", false, val -> control.setInput(val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("keyboard")){
+                control.setInput(new DesktopInput());
+            }
         }
+        //the issue with touchscreen support on desktop is that:
+        //1) I can't test it
+        //2) the SDL backend doesn't support multitouch
+        /*else{
+            game.checkPref("touchscreen", false, val -> control.setInput(!val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("touchscreen")){
+                control.setInput(new MobileInput());
+            }
+        }*/
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
@@ -294,7 +304,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.checkPref("linear", false, b -> {
+        graphics.checkPref("linear", !mobile, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
                 tex.setFilter(filter, filter);

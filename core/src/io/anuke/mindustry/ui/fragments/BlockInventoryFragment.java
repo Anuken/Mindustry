@@ -32,7 +32,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;
 
-    private Table table;
+    private Table table = new Table();
     private Tile tile;
     private float holdTime = 0f;
     private boolean holding;
@@ -52,7 +52,6 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table = new Table();
         table.setName("inventory");
         table.setTransform(true);
         parent.setTransform(true);
@@ -150,7 +149,7 @@ public class BlockInventoryFragment extends Fragment{
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || !tile.entity.items.has(item)) return false;
+                        if(!canPick.get() || tile == null || tile.entity == null || tile.entity.items == null || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);

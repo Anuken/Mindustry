@@ -45,6 +45,10 @@ public class TechTree implements ContentList{
 
                                 });
                             });
+
+                            node(armoredConveyor, () -> {
+
+                            });
                         });
                     });
                 });

@@ -100,7 +100,7 @@ public class ChatFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.getStyle(TextField.TextFieldStyle.class)));
-        chatfield.setFilter((field, c) -> field.getText().length() < Vars.maxTextLength);
+        chatfield.setMaxLength(Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = Fonts.chat;
         chatfield.getStyle().fontColor = Color.white;

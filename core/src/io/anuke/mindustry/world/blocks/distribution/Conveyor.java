@@ -127,12 +127,12 @@ public class Conveyor extends Block{
         draw.region = regions[blendbits][0];
     }
 
-    private boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
+    protected boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
         Point2 left = Geometry.d4(rotation - offset);
         return left.equals(prevX, prevY) && prevRotation == Mathf.mod(rotation + offset, 4);
     }
 
-    private boolean blends(Tile tile, int direction){
+    protected boolean blends(Tile tile, int direction){
         Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
         if(other != null) other = other.link();
 

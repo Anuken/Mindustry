@@ -40,7 +40,7 @@ public class Door extends Wall{
             entity.open = open;
             Door door = (Door)tile.block();
 
-            pathfinder.updateSolid(tile);
+            pathfinder.updateTile(tile);
             if(!entity.open){
                 Effects.effect(door.openfx, tile.drawx(), tile.drawy());
             }else{

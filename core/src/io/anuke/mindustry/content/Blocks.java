@@ -1,6 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -18,6 +19,7 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.mindustry.world.blocks.distribution.*;
+import io.anuke.mindustry.world.blocks.logic.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
@@ -48,7 +50,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid,
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -56,7 +58,7 @@ public class Blocks implements ContentList{
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
-    conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -733,6 +735,9 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, () -> state.rules.infiniteResources, ItemStack.with());
             alwaysUnlocked = true;
         }};
+        message = new MessageBlock("message"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
+        }};
 
         //endregion
         //region defense
@@ -901,10 +906,16 @@ public class Blocks implements ContentList{
             speed = 0.08f;
         }};
 
+        armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(Items.metaglass, 1, Items.thorium, 1));
+            health = 180;
+            speed = 0.08f;
+        }};
+
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             speed = 26;
-            capacity = 15;
+            capacity = 12;
             health = 30;
         }};
 
@@ -912,7 +923,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
             range = 4;
             speed = 70f;
-            bufferCapacity = 15;
+            bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -1646,6 +1657,7 @@ public class Blocks implements ContentList{
 
         commandCenter = new CommandCenter("command-center"){{
             requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            flags = EnumSet.of(BlockFlag.rally, BlockFlag.comandCenter);
             size = 2;
             health = size * size * 55;
         }};

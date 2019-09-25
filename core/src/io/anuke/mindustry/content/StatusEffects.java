@@ -46,6 +46,7 @@ public class StatusEffects implements ContentList{
                 if(unit.getTeam() == waveTeam){
                     Events.fire(Trigger.shock);
                 }
+                result.set(this, time);
             }));
             opposite(() -> burning);
         }};

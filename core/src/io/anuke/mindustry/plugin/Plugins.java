@@ -67,7 +67,7 @@ public class Plugins{
         URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
         Class<?> main = classLoader.loadClass(meta.main);
         metas.put(main, meta);
-        return new LoadedPlugin(jar, zip, (Plugin)main.newInstance(), meta);
+        return new LoadedPlugin(jar, zip, (Plugin)main.getDeclaredConstructor().newInstance(), meta);
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/

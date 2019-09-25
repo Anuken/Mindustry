@@ -1,5 +1,6 @@
 package io.anuke.mindustry;
 
+import android.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
@@ -21,6 +22,7 @@ import io.anuke.mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.System;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -68,13 +70,15 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
-                if(VERSION.SDK_INT >= 19){
+                if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
+                    intent.setType(extension.equals("zip") ? "application/zip" : "*/*");
                     addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
+
+                            if(uri.getPath().contains("(invalid)")) return;
 
                             Core.app.post(() -> Core.app.post(() -> cons.accept(new FileHandle(uri.getPath()){
                                 @Override
@@ -97,6 +101,24 @@ public class AndroidLauncher extends AndroidApplication{
                             })));
                         }
                     });
+                }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    chooser = new FileChooser(open ? "$open" : "$save", file -> file.extension().equalsIgnoreCase(extension), open, file -> {
+                        if(!open){
+                            cons.accept(file.parent().child(file.nameWithoutExtension() + "." + extension));
+                        }else{
+                            cons.accept(file);
+                        }
+                    });
+
+                    ArrayList<String> perms = new ArrayList<>();
+                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }else{
                     super.showFileChooser(open, extension, cons);
                 }

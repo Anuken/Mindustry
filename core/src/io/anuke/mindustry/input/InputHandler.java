@@ -38,6 +38,7 @@ public abstract class InputHandler implements InputProcessor{
     public final OverlayFragment frag = new OverlayFragment();
 
     public Block block;
+    public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
 
@@ -58,7 +59,7 @@ public abstract class InputHandler implements InputProcessor{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(!player.timer.get(Player.timerTransfer, 40)) return;
+        if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
         if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !tile.interactable(player.getTeam()))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
@@ -132,7 +133,7 @@ public abstract class InputHandler implements InputProcessor{
 
     }
 
-    public void updateController(){
+    public void updateState(){
 
     }
 
@@ -273,6 +274,23 @@ public abstract class InputHandler implements InputProcessor{
     public void remove(){
         Core.input.removeProcessor(this);
         frag.remove();
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+            }
+        }
+    }
+
+    public void add(){
+        Core.input.addProcessor(this);
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+                buildUI(table);
+            }
+        }
     }
 
     public boolean canShoot(){
@@ -363,7 +381,10 @@ public abstract class InputHandler implements InputProcessor{
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);
-        int baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        int baseRotation = rotation;
+        if (!overrideLineRotation || diagonal){
+                baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        }
 
         Tmp.r3.set(-1, -1, 0, 0);
 
@@ -377,7 +398,11 @@ public abstract class InputHandler implements InputProcessor{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            if (!overrideLineRotation || diagonal){
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            }else{
+                line.rotation = rotation;
+            }
             line.last = next == null;
             cons.accept(line);
 

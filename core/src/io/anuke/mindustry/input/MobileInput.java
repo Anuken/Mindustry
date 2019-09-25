@@ -36,6 +36,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     //gesture data
     private Vector2 vector = new Vector2();
     private float lastZoom = -1;
+    private GestureDetector detector;
 
     /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY;
@@ -64,38 +65,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     private PlaceRequest lastPlaced;
 
     private int prevX, prevY, prevRotation;
-
-    public MobileInput(){
-        Events.on(ClientLoadEvent.class, e -> {
-            GestureDetector dec = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this){
-                boolean clearMouse = false;
-
-                @Override
-                public boolean touchDown(int x, int y, int pointer, KeyCode button){
-                    if(Core.scene.hasMouse(x, y)){
-                        clearMouse = true;
-                        return false;
-                    }
-                    return super.touchDown(x, y, pointer, button);
-                }
-
-                @Override
-                public boolean touchDragged(int x, int y, int pointer){
-                    if(!clearMouse){
-                        return super.touchDragged(x, y, pointer);
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean touchUp(int x, int y, int pointer, KeyCode button){
-                    clearMouse = false;
-                    return super.touchUp(x, y, pointer, button);
-                }
-            };
-            Core.input.getInputProcessors().insert(0, dec);
-        });
-    }
 
     //region utility methods
 
@@ -322,6 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selection.isEmpty()).name("confirmplace");
 
         Core.scene.table(t -> {
+           t.setName("cancelMobile");
            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
            t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                player.clearBuilding();
@@ -470,6 +440,24 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //endregion
     //region input events
+
+    @Override
+    public void add(){
+        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
+        super.add();
+    }
+
+    @Override
+    public void remove(){
+        super.remove();
+        if(detector != null){
+            Core.input.removeProcessor(detector);
+        }
+
+        if(Core.scene != null && Core.scene.find("cancelMobile") != null){
+            Core.scene.find("cancelMobile").remove();
+        }
+    }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
