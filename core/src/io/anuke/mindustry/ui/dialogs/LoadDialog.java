@@ -195,6 +195,8 @@ public class LoadDialog extends FloatingDialog{
             try{
                 net.reset();
                 slot.load();
+                state.rules.editor = false;
+                state.rules.zone = null;
                 state.set(State.playing);
             }catch(SaveException e){
                 Log.err(e);

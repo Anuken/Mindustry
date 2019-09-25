@@ -17,9 +17,9 @@ public class MusicControl{
     private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
 
     /** normal, ambient music, plays at any time */
-    public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+    public Array<Music> ambientMusic = Array.with();
     /** darker music, used in times of conflict  */
-    public final Array<Music> darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
+    public Array<Music> darkMusic = Array.with();
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
     private @Nullable Music current;
@@ -27,6 +27,11 @@ public class MusicControl{
     private boolean silenced;
 
     public MusicControl(){
+        Events.on(ClientLoadEvent.class, e -> {
+            ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+            darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
+        });
+
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
             if(Mathf.chance(musicWaveChance)){

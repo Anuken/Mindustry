@@ -95,6 +95,12 @@ public class PowerNode extends PowerBlock{
         ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance() * 60, 1))),
         () -> Pal.powerBar,
         () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
+
+        bars.add("batteries", entity -> new Bar(() ->
+        Core.bundle.format("bar.powerstored",
+        (ui.formatAmount((int)entity.power.graph.getBatteryStored())), ui.formatAmount((int)entity.power.graph.getTotalBatteryCapacity())),
+        () -> Pal.powerBar,
+        () -> Mathf.clamp(entity.power.graph.getBatteryStored() / entity.power.graph.getTotalBatteryCapacity())));
     }
 
     @Override

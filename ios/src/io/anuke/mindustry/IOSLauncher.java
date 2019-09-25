@@ -13,6 +13,7 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
+import org.robovm.apple.uikit.UIBarButtonItem.*;
 import org.robovm.objc.block.*;
 
 import java.io.*;
@@ -39,10 +40,15 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController(NSArray.fromStrings("public.archive"));
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
 
-                cont.setAllowsDocumentCreation(false);
-                cont.setDelegate(new UIDocumentBrowserViewControllerDelegate(){
+                NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
+                    uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
+
+                cont.setAllowsDocumentCreation(!open);
+                cont.setAdditionalLeadingNavigationBarButtonItems(arr);
+
+                class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
                     @Override
                     public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
 
@@ -50,7 +56,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+                        if(documentURLs.size() < 1) return;
 
+                        cont.dismissViewController(true, () -> {});
+                        cons.accept(Core.files.absolute(documentURLs.get(0).getPath()));
                     }
 
                     @Override
@@ -77,7 +86,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     public void willPresentActivityViewController(UIDocumentBrowserViewController controller, UIActivityViewController activityViewController){
 
                     }
-                });
+                }
+
+                cont.setDelegate(new ChooserDelegate());
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
 
                 });

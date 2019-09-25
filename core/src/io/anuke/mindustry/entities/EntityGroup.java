@@ -18,6 +18,8 @@ public class EntityGroup<T extends Entity>{
     private final Array<T> entityArray = new Array<>(false, 32);
     private final Array<T> entitiesToRemove = new Array<>(false, 32);
     private final Array<T> entitiesToAdd = new Array<>(false, 32);
+    private final Array<T> intersectArray = new Array<>();
+    private final Rectangle intersectRect = new Rectangle();
     private IntMap<T> map;
     private QuadTree tree;
     private Consumer<T> removeListener;
@@ -159,6 +161,15 @@ public class EntityGroup<T extends Entity>{
         //don't waste time for empty groups
         if(isEmpty()) return;
         tree().getIntersect(out, x, y, width, height);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Array<T> intersect(float x, float y, float width, float height){
+        intersectArray.clear();
+        //don't waste time for empty groups
+        if(isEmpty()) return intersectArray;
+        tree().getIntersect(intersectArray, intersectRect.set(x, y, width, height));
+        return intersectArray;
     }
 
     public QuadTree tree(){

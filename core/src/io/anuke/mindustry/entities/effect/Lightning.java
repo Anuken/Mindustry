@@ -47,7 +47,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     }
 
     /** Do not invoke! */
-    @Remote(called = Loc.server)
+    @Remote(called = Loc.server, unreliable = true)
     public static void createLighting(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
 
         Lightning l = Pools.obtain(Lightning.class, Lightning::new);

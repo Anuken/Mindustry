@@ -12,7 +12,6 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -120,26 +119,28 @@ public class MassDriver extends Block{
 
             if(
                 tile.entity.items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.entity.items.total() >= minDistribute && //must have minimum amount of space
-                entity.reload <= 0.0001f //must have reloaded
+                link.block().itemCapacity - link.entity.items.total() >= minDistribute //must have minimum amount of space
             ){
                 MassDriverEntity other = link.entity();
                 other.waitingShooters.add(tile);
 
-                //align to target location
-                entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
+                if(entity.reload <= 0.0001f){
 
-                //fire when it's the first in the queue and angles are ready.
-                if(other.currentShooter() == tile &&
+                    //align to target location
+                    entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
+
+                    //fire when it's the first in the queue and angles are ready.
+                    if(other.currentShooter() == tile &&
                     other.state == DriverState.accepting &&
                     Angles.near(entity.rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
-                    //actually fire
-                    fire(tile, link);
-                    //remove waiting shooters, it's done firing
-                    other.waitingShooters.remove(tile);
-                    //set both states to idle
-                    entity.state = DriverState.idle;
-                    other.state = DriverState.idle;
+                        //actually fire
+                        fire(tile, link);
+                        //remove waiting shooters, it's done firing
+                        other.waitingShooters.remove(tile);
+                        //set both states to idle
+                        entity.state = DriverState.idle;
+                        other.state = DriverState.idle;
+                    }
                 }
             }
         }

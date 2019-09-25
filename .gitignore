@@ -4,6 +4,7 @@ logs/
 /core/assets/bundles/output/
 /core/assets/.gifimages/
 /deploy/
+/out/
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/

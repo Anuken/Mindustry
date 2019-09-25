@@ -129,6 +129,11 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton(Icon.zoomSmall, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
+            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3){ //votekick
+                button.add().growY();
+
+                button.addImageButton(Icon.banSmall, Styles.clearPartiali,
+                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);

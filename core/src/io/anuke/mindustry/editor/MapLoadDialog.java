@@ -54,7 +54,7 @@ public class MapLoadDialog extends FloatingDialog{
         for(Map map : maps.all()){
 
             TextButton button = new TextButton(map.name(), Styles.togglet);
-            button.add(new BorderImage(map.texture, 2f).setScaling(Scaling.fit)).size(16 * 4f);
+            button.add(new BorderImage(map.safeTexture(), 2f).setScaling(Scaling.fit)).size(16 * 4f);
             button.getCells().reverse();
             button.clicked(() -> selected = map);
             button.getLabelCell().grow().left().padLeft(5f);
