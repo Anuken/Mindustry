@@ -58,7 +58,7 @@ public class PausedDialog extends FloatingDialog{
                 cont.row();
 
                 cont.addButton("$hostserver", () -> {
-                    if(net.active() && steam){
+                    if(net.server() && steam){
                         platform.inviteFriends();
                     }else{
                         if(steam){
@@ -67,12 +67,12 @@ public class PausedDialog extends FloatingDialog{
                             ui.host.show();
                         }
                     }
-                }).disabled(b -> net.active() && !steam).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.active() && steam ? "$invitefriends" : "$hostserver"));
+                }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "$invitefriends" : "$hostserver"));
             }
 
             cont.row();
 
-            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f);
+            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
 
         }else{
             cont.defaults().size(120f).pad(5);
@@ -91,7 +91,7 @@ public class PausedDialog extends FloatingDialog{
 
             cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm);
+            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
         }
     }
 

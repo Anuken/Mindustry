@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -53,12 +52,18 @@ public class MapsDialog extends FloatingDialog{
 
         buttons.addImageTextButton("$editor.newmap", Icon.add, () -> {
             ui.showTextInput("$editor.newmap", "$name", "", text -> {
-                ui.loadAnd(() -> {
+                Runnable show = () -> ui.loadAnd(() -> {
                     hide();
                     ui.editor.show();
                     ui.editor.editor.getTags().put("name", text);
                     Events.fire(new MapMakeEvent());
                 });
+
+                if(maps.byName(text) != null){
+                    ui.showErrorMessage("$editor.exists");
+                }else{
+                    show.run();
+                }
             });
         }).size(210f, 64f);
 
@@ -137,9 +142,9 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.addImage().growX().pad(4).color(Pal.gray);
             button.row();
-            button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
+            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : "$builtin").color(Color.gray).padTop(3);
+            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : "$builtin").color(Color.gray).padTop(3);
 
             i++;
         }
@@ -160,7 +165,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
         Table table = dialog.cont;
 
-        table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
+        table.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize);
 
         table.table(Styles.black, desc -> {
             desc.top();
@@ -199,13 +204,17 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$delete", Icon.trash16Small, () -> {
-            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
-                maps.removeMap(map);
-                dialog.hide();
-                setup();
-            });
-        }).fillX().height(54f).marginLeft(10).disabled(!map.custom).touchable(map.custom ? Touchable.enabled : Touchable.disabled);
+        table.addImageTextButton(map.workshop ? "$view.workshop" : "$delete", map.workshop ? Icon.linkSmall : Icon.trash16Small, () -> {
+            if(map.workshop){
+                platform.viewMapListing(map);
+            }else{
+                ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
+                    maps.removeMap(map);
+                    dialog.hide();
+                    setup();
+                });
+            }
+        }).fillX().height(54f).marginLeft(10).disabled(!map.workshop && !map.custom);
 
         dialog.show();
     }

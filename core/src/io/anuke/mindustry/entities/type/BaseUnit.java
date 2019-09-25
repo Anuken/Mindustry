@@ -16,6 +16,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
@@ -99,7 +100,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
     }
 
-    public UnitCommand getCommand(){
+    public @Nullable UnitCommand getCommand(){
         if(isCommanded()){
             return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }
@@ -173,8 +174,15 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public TileEntity getClosestEnemyCore(){
+    public Tile getClosest(BlockFlag flag){
+        return Geometry.findClosest(x, y, indexer.getAllied(team, flag));
+    }
 
+    public Tile getClosestSpawner(){
+        return Geometry.findClosest(x, y, Vars.spawner.getGroundSpawns());
+    }
+
+    public TileEntity getClosestEnemyCore(){
         for(Team enemy : Vars.state.teams.enemiesOf(team)){
             Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
             if(tile != null){
@@ -273,7 +281,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             return;
         }
 
-        if(!isFlying() && (world.tileWorld(x, y) != null && world.tileWorld(x, y).solid())){
+        if(!isFlying() && (world.tileWorld(x, y) != null && !(world.tileWorld(x, y).block() instanceof BuildBlock) && world.tileWorld(x, y).solid())){
             kill();
         }
 

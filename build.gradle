@@ -30,7 +30,7 @@ allprojects{
         arcHash = null
 
         debugged = {
-            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
+            return new File(projectDir.parent, '../Mindustry-Debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
         }
 
         localArc = {
@@ -38,7 +38,7 @@ allprojects{
         }
 
         getArcHash = {
-            return new Properties().with{ p -> p.load(new File((File)projectDir, 'gradle.properties').newReader()); return p }["archash"]
+            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
         }
 
         arcModule = { String name ->
@@ -270,7 +270,6 @@ project(":tools"){
     dependencies{
         compile project(":core")
 
-        //for render tests
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 

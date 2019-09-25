@@ -33,7 +33,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
@@ -97,8 +97,10 @@ public class CoreBlock extends StorageBlock{
             entity.storageCapacity += other.block().itemCapacity + other.entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
-        for(Item item : content.items()){
-            entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
+        if(!world.isGenerating()){
+            for(Item item : content.items()){
+                entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
+            }
         }
 
         for(Tile other : state.teams.get(tile.getTeam()).cores){

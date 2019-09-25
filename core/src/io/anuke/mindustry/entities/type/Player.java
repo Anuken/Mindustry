@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
@@ -382,12 +383,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
-        Draw.color(0f, 0f, 0f, 0.3f);
-        Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
-        Draw.color();
-        font.setColor(color);
 
-        font.draw(name, x, y + nameHeight, 0, Align.center, false);
+        if(!isLocal){
+            Draw.color(0f, 0f, 0f, 0.3f);
+            Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
+            Draw.color();
+            font.setColor(color);
+            font.draw(name, x, y + nameHeight, 0, Align.center, false);
+        }
 
         if(isAdmin){
             float s = 3f;
@@ -567,7 +570,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             data.unlockContent(mech);
         }
 
-        if(mobile && !Core.settings.getBool("keyboard")){
+        if(control.input instanceof MobileInput){
             updateTouch();
         }else{
             updateKeyboard();
@@ -604,7 +607,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode)){
+        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -723,50 +726,41 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         //update shooting if not building, not mining and there's ammo left
         if(!isBuilding() && getMineTile() == null){
 
-            //autofire: mobile only!
-            if(mobile){
-                if(target == null){
-                    isShooting = false;
-                    if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
+            //autofire
+            if(target == null){
+                isShooting = false;
+                if(Core.settings.getBool("autotarget")){
+                    target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
-                        if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
-                            if(target != null && dst(target) > getWeapon().bullet.range()){
-                                target = null;
-                            }else if(target != null){
-                                target = ((Tile)target).entity;
-                            }
-                        }
-
-                        if(target != null){
-                            setMineTile(null);
+                    if(mech.canHeal && target == null){
+                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
+                        if(target != null && dst(target) > getWeapon().bullet.range()){
+                            target = null;
+                        }else if(target != null){
+                            target = ((Tile)target).entity;
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
-                mech.canHeal && dst(target) < getWeapon().bullet.range())){
-                    //rotate toward and shoot the target
-                    if(mech.turnCursor){
-                        rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+
+                    if(target != null){
+                        setMineTile(null);
                     }
-
-                    Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
-
-                    pointerX = intercept.x;
-                    pointerY = intercept.y;
-
-                    updateShooting();
-                    isShooting = true;
+                }
+            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
+            mech.canHeal && dst(target) < getWeapon().bullet.range())){
+                //rotate toward and shoot the target
+                if(mech.turnCursor){
+                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                 }
 
-            }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(),
-                control.input.getMouseY());
-                pointerX = vec.x;
-                pointerY = vec.y;
+                Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+
+                pointerX = intercept.x;
+                pointerY = intercept.y;
 
                 updateShooting();
+                isShooting = true;
             }
+
         }
     }
 
@@ -832,7 +826,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public boolean isShooting(){
-        return isShooting && (!isBoosting || mech.flying) && mining == null;
+        return isShooting && (boostHeat < 0.1f || mech.flying) && mining == null;
     }
 
     public void updateRespawning(){

@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.units.*;
@@ -35,13 +36,15 @@ public abstract class FlyingUnit extends BaseUnit{
 
                 if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                 if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
-
-                if(target == null){
-                    setState(patrol);
-                }
             }
 
-            if(target != null){
+            if(target == null){
+                target = getSpawner();
+            }
+
+            if(target == getSpawner() && getSpawner() != null){
+                circle(80f + Mathf.randomSeed(id) * 120);
+            }else if(target != null){
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation
@@ -64,26 +67,28 @@ public abstract class FlyingUnit extends BaseUnit{
                         getWeapon().update(FlyingUnit.this, to.x, to.y);
                     }
                 }
+            }else{
+                target = getClosestSpawner();
+                moveTo(Vars.state.rules.dropZoneRadius + 120f);
             }
         }
     },
-    patrol = new UnitState(){
+    rally = new UnitState(){
         public void update(){
             if(retarget()){
+                targetClosestAllyFlag(BlockFlag.rally);
                 targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
 
                 if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
                     return;
                 }
 
-                target = getSpawner();
-                if(target == null) target = getClosestCore();
+                if(target == null) target = getSpawner();
             }
 
             if(target != null){
-                circle(80f + Mathf.randomSeed(id) * 120);
+                circle(65f + Mathf.randomSeed(id) * 100);
             }
         }
     },
@@ -109,7 +114,7 @@ public abstract class FlyingUnit extends BaseUnit{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
         command == UnitCommand.attack ? attack :
-        command == UnitCommand.patrol ? patrol :
+        command == UnitCommand.rally ? rally :
         null);
     }
 

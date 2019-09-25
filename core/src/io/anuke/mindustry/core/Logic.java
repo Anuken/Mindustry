@@ -227,8 +227,6 @@ public class Logic implements ApplicationListener{
 
                     collisions.collideGroups(bulletGroup, playerGroup);
                 }
-
-                pathfinder.update();
             }
 
             if(!net.client() && !world.isInvalidMap() && !state.isEditor()){
