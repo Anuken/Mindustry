@@ -79,6 +79,11 @@ public class NetServer implements ApplicationListener{
             con.hasBegunConnecting = true;
             con.mobile = packet.mobile;
 
+            if(packet.uuid == null || packet.usid == null){
+                con.kick(KickReason.idInUse);
+                return;
+            }
+
             if(admins.isIDBanned(uuid)){
                 con.kick(KickReason.banned);
                 return;
@@ -124,7 +129,7 @@ public class NetServer implements ApplicationListener{
                         return;
                     }
 
-                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
+                    if(player.uuid != null && player.usid != null && (player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid))){
                         con.kick(KickReason.idInUse);
                         return;
                     }
