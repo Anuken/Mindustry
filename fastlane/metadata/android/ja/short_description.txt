@@ -1,1 +1,1 @@
-A factory-based sandbox tower defense game.
+工場ベースのサンドボックスタワーディフェンスゲーム。
