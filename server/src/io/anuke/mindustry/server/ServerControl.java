@@ -155,7 +155,7 @@ public class ServerControl implements ApplicationListener{
                     maps.shuffle();
 
                     Map previous = world.getMap();
-                    Map map = maps.find(m -> lastMode.valid(m) && m != previous);
+                    Map map = maps.find(m -> m != previous);
 
                     if(map != null){
 
