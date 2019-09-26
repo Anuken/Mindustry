@@ -44,6 +44,7 @@ public class ItemBridge extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void linkItemBridge(Player player, Tile tile, Tile other){
+        if(!tile.interactable(player.getTeam())) return;
         ItemBridgeEntity entity = tile.entity();
         ItemBridgeEntity oe = other.entity();
         entity.link = other.pos();
@@ -52,6 +53,7 @@ public class ItemBridge extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkItemBridge(Player player, Tile tile, Tile other){
+        if(!tile.interactable(player.getTeam())) return;
         ItemBridgeEntity entity = tile.entity();
         entity.link = -1;
         if(other != null){
@@ -252,6 +254,16 @@ public class ItemBridge extends Block{
             int rel2 = tile.relativeTo(source.x, source.y);
 
             if(rel == rel2) return false;
+
+
+            IntSetIterator it = entity.incoming.iterator();
+
+            while(it.hasNext){
+                int v = it.next();
+                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == rel2){
+                    return false;
+                }
+            }
         }else{
             return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos() && tile.entity.items.total() < itemCapacity;
         }

@@ -24,8 +24,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    protected static int maxTextLength = 220;
-    protected static int maxNewlines = 24;
+    protected static int maxTextLength = 170;
+    protected static int maxNewlines = 5;
 
     public MessageBlock(String name){
         super(name);
@@ -36,6 +36,7 @@ public class MessageBlock extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setMessageBlockText(Player player, Tile tile, String text){
+        if(!tile.interactable(player.getTeam())) return;
         if(net.server() && text.length() > maxTextLength){
             throw new ValidateException(player, "Player has gone above text limit.");
         }

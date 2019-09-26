@@ -106,9 +106,7 @@ public class Maps{
         //workshop
         for(FileHandle file : platform.getExternalMaps()){
             try{
-                Map map = loadMap(file, false);
-                map.workshop = true;
-                map.tags.put("steamid", file.parent().name());
+                loadMap(file, false).workshop = true;
             }catch(Exception e){
                 Log.err("Failed to load workshop map file '{0}'!", file);
                 Log.err(e);

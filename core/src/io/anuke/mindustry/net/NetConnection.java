@@ -22,7 +22,7 @@ public abstract class NetConnection{
     /** Timestamp of last recieved snapshot. */
     public long lastRecievedClientTime;
 
-    public boolean hasConnected, hasBegunConnecting, hasDisconnected;
+    public boolean hasConnected, hasBegunConnecting;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){

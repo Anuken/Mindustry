@@ -204,8 +204,8 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.linkSmall : Icon.trash16Small, () -> {
-            if(map.workshop && steam){
+        table.addImageTextButton(map.workshop ? "$view.workshop" : "$delete", map.workshop ? Icon.linkSmall : Icon.trash16Small, () -> {
+            if(map.workshop){
                 platform.viewMapListing(map);
             }else{
                 ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {

@@ -47,6 +47,7 @@ public class MassDriver extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkMassDriver(Player player, Tile tile, int position){
+        if(!tile.interactable(player.getTeam())) return;
         MassDriverEntity entity = tile.entity();
         entity.link = position;
     }

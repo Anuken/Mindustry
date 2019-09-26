@@ -23,8 +23,8 @@ public class UnitTypes implements ContentList{
             speed = 0.3f;
             maxVelocity = 1.2f;
             range = 50f;
-            health = 80;
-            minePower = 0.9f;
+            health = 60;
+            minePower = 0.5f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
             weapon = new Weapon("you have incurred my wrath. prepare to die."){{

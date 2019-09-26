@@ -147,11 +147,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
-                if(editor.getTags().containsKey("steamid")){
-                    platform.viewMapListing(editor.getTags().get("steamid"));
-                    return;
-                }
-
                 Map map = save();
 
                 if(map == null) return;

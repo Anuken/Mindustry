@@ -79,11 +79,6 @@ public class NetServer implements ApplicationListener{
             con.hasBegunConnecting = true;
             con.mobile = packet.mobile;
 
-            if(packet.uuid == null || packet.usid == null){
-                con.kick(KickReason.idInUse);
-                return;
-            }
-
             if(admins.isIDBanned(uuid)){
                 con.kick(KickReason.banned);
                 return;
@@ -129,7 +124,7 @@ public class NetServer implements ApplicationListener{
                         return;
                     }
 
-                    if(player.uuid != null && player.usid != null && (player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid))){
+                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
                         con.kick(KickReason.idInUse);
                         return;
                     }
@@ -405,18 +400,22 @@ public class NetServer implements ApplicationListener{
             return;
         }
 
-        if(!player.con.hasDisconnected){
-            if(player.con.hasConnected){
-                Events.fire(new PlayerLeave(player));
-                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-                Call.onPlayerDisconnect(player.id);
-            }
-
-            Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
+        if(player.con.hasConnected){
+            Events.fire(new PlayerLeave(player));
+            Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+            Call.onPlayerDisconnect(player.id);
         }
-
         player.remove();
-        player.con.hasDisconnected = true;
+        Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
+    }
+
+    private static float compound(float speed, float drag){
+        float total = 0f;
+        for(int i = 0; i < 50; i++){
+            total *= (1f - drag);
+            total += speed;
+        }
+        return total;
     }
 
     @Remote(targets = Loc.client, unreliable = true)
@@ -446,8 +445,8 @@ public class NetServer implements ApplicationListener{
 
         long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
-        float maxSpeed = boosting && !player.mech.flying ? player.mech.compoundSpeedBoost : player.mech.compoundSpeed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(maxSpeed, player.mech.maxSpeed) * 1.1f;
+        float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
+        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.2f);
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;
@@ -705,12 +704,7 @@ public class NetServer implements ApplicationListener{
             //iterate through each player
             for(int i = 0; i < playerGroup.size(); i++){
                 Player player = playerGroup.all().get(i);
-                if(player.isLocal) continue;
-
-                if(player.con == null || !player.con.isConnected()){
-                    onDisconnect(player, "disappeared");
-                    continue;
-                }
+                if(player.isLocal || player.con == null) continue;
 
                 NetConnection connection = player.con;
 

@@ -35,7 +35,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
-    protected boolean loaded;
     protected UnitType type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
@@ -339,9 +338,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void added(){
         state.set(getStartState());
 
-        if(!loaded){
-            health(maxHealth());
-        }
+        health(maxHealth());
 
         if(isCommanded()){
             onCommand(getCommand());
@@ -378,7 +375,6 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
         super.readSave(stream, version);
-        loaded = true;
         byte type = stream.readByte();
         this.spawner = stream.readInt();
 
