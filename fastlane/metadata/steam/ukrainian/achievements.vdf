@@ -60,11 +60,11 @@
 		"NEW_ACHIEVEMENT_21_0_NAME"	"Камікадзе"
 		"NEW_ACHIEVEMENT_21_0_DESC"	"Заповніть свого меха вибуховими матеріалами і помріть, створивши вибух."
 		"NEW_ACHIEVEMENT_21_1_NAME"	"Це починається"
-		"NEW_ACHIEVEMENT_21_1_DESC"	"Побудуйте  Завод мехів «Кинджал»."
+		"NEW_ACHIEVEMENT_21_1_DESC"	"Побудуйте завод мехів «Кинджал»."
 		"NEW_ACHIEVEMENT_21_2_NAME"	"Прямий наступ"
 		"NEW_ACHIEVEMENT_21_2_DESC"	"Видайте команду «Атакувати» за допомогою командного центру."
 		"NEW_ACHIEVEMENT_21_3_NAME"	"Рій"
-		"NEW_ACHIEVEMENT_21_3_DESC"	"Have 100 units active at once."
+		"NEW_ACHIEVEMENT_21_3_DESC"	"100 бовойих одиниць повинні бути активними одночасно."
 		"NEW_ACHIEVEMENT_21_4_NAME"	"Зграя"
 		"NEW_ACHIEVEMENT_21_4_DESC"	"10 фантомних дронів повинні бути активними одночасно."
 		"NEW_ACHIEVEMENT_21_5_NAME"	"Летуча армія"
@@ -104,6 +104,6 @@
 		"NEW_ACHIEVEMENT_21_22_NAME"	"Впевнений початок"
 		"NEW_ACHIEVEMENT_21_22_DESC"	"Вивантажіть в зону 10 000 або більше предметів."
 		"NEW_ACHIEVEMENT_21_23_NAME"	"Запалювання"
-		"NEW_ACHIEVEMENT_21_23_DESC"	"Підвищте потужність Імпульсного реактора."
+		"NEW_ACHIEVEMENT_21_23_DESC"	"Підвищте потужність імпульсного реактора."
 	}
 }
