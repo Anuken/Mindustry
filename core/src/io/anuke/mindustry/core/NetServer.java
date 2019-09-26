@@ -456,7 +456,7 @@ public class NetServer implements ApplicationListener{
         long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
         float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.2f);
+        float maxMove = elapsed / 1000f * 60f * compound(maxSpeed, player.mech.drag) * 1.1f;
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;
