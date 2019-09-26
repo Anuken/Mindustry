@@ -5,6 +5,7 @@ import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.gen.Call;
@@ -32,7 +33,7 @@ public class ItemSource extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setItemSourceItem(Player player, Tile tile, Item item){
-        if(!tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
         ItemSourceEntity entity = tile.entity();
         if(entity != null){
             entity.outputItem = item;

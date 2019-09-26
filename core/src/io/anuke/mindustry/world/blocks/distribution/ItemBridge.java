@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -44,7 +45,7 @@ public class ItemBridge extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void linkItemBridge(Player player, Tile tile, Tile other){
-        if(!tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
         ItemBridgeEntity entity = tile.entity();
         ItemBridgeEntity oe = other.entity();
         entity.link = other.pos();
@@ -53,7 +54,7 @@ public class ItemBridge extends Block{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkItemBridge(Player player, Tile tile, Tile other){
-        if(!tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
         ItemBridgeEntity entity = tile.entity();
         entity.link = -1;
         if(other != null){

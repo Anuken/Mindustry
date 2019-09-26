@@ -5,6 +5,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
@@ -41,7 +42,7 @@ public class Sorter extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
-        if(!tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
         SorterEntity entity = tile.entity();
         if(entity != null){
             entity.sortItem = item;

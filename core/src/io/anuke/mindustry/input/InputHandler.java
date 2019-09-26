@@ -60,7 +60,7 @@ public abstract class InputHandler implements InputProcessor{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
-        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !tile.interactable(player.getTeam()))){
+        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
@@ -110,7 +110,7 @@ public abstract class InputHandler implements InputProcessor{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
-        if(!tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
     }
 
