@@ -28,6 +28,7 @@ public class Mech extends UnlockableContent{
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;
+    public float compoundSpeed, compoundSpeedBoost;
 
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public Weapon weapon;
@@ -67,6 +68,21 @@ public class Mech extends UnlockableContent{
     }
 
     public void onLand(Player player){
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        for(int i = 0; i < 500; i++){
+            compoundSpeed += speed;
+            compoundSpeed *= (1f - drag);
+        }
+
+        for(int i = 0; i < 500; i++){
+            compoundSpeedBoost += boostSpeed;
+            compoundSpeedBoost *= (1f - drag);
+        }
     }
 
     @Override
