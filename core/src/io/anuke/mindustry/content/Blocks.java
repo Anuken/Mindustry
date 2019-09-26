@@ -1630,7 +1630,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
-            maxSpawn = 2;
+            maxSpawn = 1;
             consumes.power(1.1f);
             consumes.items();
         }};
