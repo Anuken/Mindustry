@@ -199,6 +199,9 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public Array<FileHandle> getExternalMaps(){
+        if(steam && SVars.workshop == null){
+            SVars.workshop = new SWorkshop();
+        }
         return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
     }
 
