@@ -41,6 +41,7 @@ public class Sorter extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
+        if(!tile.interactable(player.getTeam())) return;
         SorterEntity entity = tile.entity();
         if(entity != null){
             entity.sortItem = item;

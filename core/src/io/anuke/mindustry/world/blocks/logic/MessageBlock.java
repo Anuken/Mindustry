@@ -36,6 +36,7 @@ public class MessageBlock extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setMessageBlockText(Player player, Tile tile, String text){
+        if(!tile.interactable(player.getTeam())) return;
         if(net.server() && text.length() > maxTextLength){
             throw new ValidateException(player, "Player has gone above text limit.");
         }

@@ -48,6 +48,7 @@ public class Unloader extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
+        if(!tile.interactable(player.getTeam())) return;
         SortedUnloaderEntity entity = tile.entity();
         entity.items.clear();
         entity.sortItem = item;

@@ -110,6 +110,7 @@ public abstract class InputHandler implements InputProcessor{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
+        if(!tile.interactable(player.getTeam())) return;
         tile.block().tapped(tile, player);
     }
 

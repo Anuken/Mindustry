@@ -108,6 +108,7 @@ public class LiquidSource extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
+        if(!tile.interactable(player.getTeam())) return;
         LiquidSourceEntity entity = tile.entity();
         if(entity != null) entity.source = liquid;
     }

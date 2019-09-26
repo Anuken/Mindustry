@@ -32,6 +32,7 @@ public class ItemSource extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setItemSourceItem(Player player, Tile tile, Item item){
+        if(!tile.interactable(player.getTeam())) return;
         ItemSourceEntity entity = tile.entity();
         if(entity != null){
             entity.outputItem = item;
