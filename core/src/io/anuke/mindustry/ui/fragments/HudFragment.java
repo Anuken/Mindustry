@@ -258,7 +258,6 @@ public class HudFragment extends Fragment{
         map_table.label(() -> String.format("%.0f,%.0f", Vars.player.getX(), Vars.player.getY())).visible(
             () -> Core.settings.getBool("position") && !state.rules.tutorial);
         
-        //parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
         parent.fill(t -> t.top().right().add(map_table));
 
         //spawner warning
