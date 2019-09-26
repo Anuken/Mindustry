@@ -16,7 +16,7 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public abstract class FlyingUnit extends BaseUnit{
-    protected float[] weaponAngles = {0, 0};
+    protected float[] weaponAngles = {0,0};
 
     protected final UnitState
 
