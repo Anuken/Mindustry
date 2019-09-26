@@ -47,7 +47,7 @@ Twórz skomplikowane linie transportowe przy u¿yciu przenoœników by zaopatrzyæ wi
 [h2]Edytor Map[/h2]
 
 [list]
-[*] Twórz teren przy u¿yciu UI edytora
+[*] Twórz teren przy u¿yciu interfejsu edytora
 [*] Edytuj i testuj w grze
 [*] Konfigurowalne tryby narzêdzi: Zmieniaj to jak dzia³a ka¿de narzêdzie
 [*] Potê¿ny system generacji mapy, z wieloma ró¿nymi typami filtrów do proceduralnej manipulacji terenem
