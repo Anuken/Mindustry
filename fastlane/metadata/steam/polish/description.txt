@@ -1,60 +1,60 @@
-Twórz skomplikowane linie transportowe przy u¿yciu przenoœników by zaopatrzyæ wie¿yczki w amunicjê, produkowaæ materia³y u¿ywane do budowy, oraz broñ swoje struktury przed falami wrogów. Graj ze swoimi przyjació³mi w miêdzyplatformowych rozgrywkach wieloosobwych typu co-op, lub rzuæ im wyzwanie w dru¿ynowych rozgrywkach PvP.
+TwÃ³rz skomplikowane linie transportowe przy uÅ¼yciu przenoÅ›nikÃ³w by zaopatrzyÄ‡ wieÅ¼yczki w amunicjÄ™, produkowaÄ‡ materiaÅ‚y uÅ¼ywane do budowy, oraz broÅ„ swoje struktury przed falami wrogÃ³w. Graj ze swoimi przyjaciÃ³Å‚mi w miÄ™dzyplatformowych rozgrywkach wieloosobwych typu co-op, lub rzuÄ‡ im wyzwanie w druÅ¼ynowych rozgrywkach PvP.
 
 [img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
 
 [h2]Rozgrywka[/h2]
 
 [list]
-[*] Twórz wiert³a oraz przenoœniki by przenieœæ surowce do twojego Rdzenia. 
-[*] U¿ywaj bloków produkcyjnych do tworzenia zaawansowanych materia³ów.
-[*] Buduj drony do automatycznego wydobycia surowców, pomocy przy budowie i obrony twojej bazy.
-[*] Rozprowadzaj p³yny i walcz z nag³ymi po¿arami.
-[*] Przyœpiesz produkcje poprzez opcjonalne zaopatrzenie swoich linii obronnych i bloków produkcyjnych w ch³odziwo.
+[*] TwÃ³rz wiertÅ‚a oraz przenoÅ›niki by przenieÅ›Ä‡ surowce do twojego Rdzenia. 
+[*] UÅ¼ywaj blokÃ³w produkcyjnych do tworzenia zaawansowanych materiaÅ‚Ã³w.
+[*] Buduj drony do automatycznego wydobycia surowcÃ³w, pomocy przy budowie i obrony twojej bazy.
+[*] Rozprowadzaj pÅ‚yny i walcz z nagÅ‚ymi poÅ¼arami.
+[*] PrzyÅ›piesz produkcje poprzez opcjonalne zaopatrzenie swoich linii obronnych i blokÃ³w produkcyjnych w chÅ‚odziwo.
 [/list]
 
 [h2]Kampania[/h2]
 
 [list]
-[*] PrzejdŸ przez 12 powtarzalnych wbudowanych stref z losowymi punktami startu
+[*] PrzejdÅº przez 12 powtarzalnych wbudowanych stref z losowymi punktami startu
 [*] Zbieraj i wystrzeliwuj surowce
-[*] Badaj nowe bloki by zwiêkszyæ postêp
-[*] Konfiguruj ³adunek by przenieœæ surowce do ka¿dej strefy
-[*] Ró¿norodnoœæ celów misji
-[*] Zapraszaj znajomych by razem wykonywaæ misje
+[*] Badaj nowe bloki by zwiÄ™kszyÄ‡ postÄ™p
+[*] Konfiguruj Å‚adunek by przenieÅ›Ä‡ surowce do kaÅ¼dej strefy
+[*] RÃ³Å¼norodnoÅ›Ä‡ celÃ³w misji
+[*] Zapraszaj znajomych by razem wykonywaÄ‡ misje
 [*] 120+ technologii do zbadania
-[*] 19 ró¿nych typów dronów, mechów oraz statków
-[*] 50+ osi¹gniêæ do ukoñczenia
+[*] 19 rÃ³Å¼nych typÃ³w dronÃ³w, mechÃ³w oraz statkÃ³w
+[*] 50+ osiÄ…gniÄ™Ä‡ do ukoÅ„czenia
 [/list]
 
 [h2][h2]Tryby Gry[/h2][/h2]
 
-[*] [b]Przetrwanie[/b]: Buduj wie¿yczki by obroniæ siê przed wrogami w opartej na gatunku tower-defense rozgrywce. Przetrwaj tak d³ugo jak to mo¿liwe, opcjonalnie wystrzel swój rdzeñ by u¿yæ zebrane surowce do badañ. Przygotuj swoj¹ bazê na sporadyczne ataki powietrznych bossów.
-[*] [b]Atak[/b]: Buduj fabryki jednostek by zniszczyæ rdzenie wroga, jednoczeœnie broni¹c swoj¹ bazê przed falami jednostek wroga. Twórz rozmaite jednostki typu wsparcia i ofensywy które pomog¹ ci osi¹gn¹æ twoje cele.
-[*] [b]PvP[/b]: Rywalizuj z innymi graczami z maksymalnie 4 dru¿yn gdzie celem jest zniszczenie wrogich rdzeni. Twórz jednostki, lub atakuj cudze bazy bezpoœrednio przy u¿yciu swoich mechów.
-[*] [b]Sandbox[/b]: Graj z nieskoñczon¹ iloœci¹ surowców i bez ¿adnego zagro¿enia ze strony wroga. U¿ywaj przeznaczonych dla tego trybu specjalnych bloków które s¹ Ÿród³ami przedmiotów i p³ynów by przetestowaæ ró¿ne projekty, oraz tworzyæ wrogów na ¿¹danie.
+[*] [b]Przetrwanie[/b]: Buduj wieÅ¼yczki by obroniÄ‡ siÄ™ przed wrogami w opartej na gatunku tower-defense rozgrywce. Przetrwaj tak dÅ‚ugo jak to moÅ¼liwe, opcjonalnie wystrzel swÃ³j rdzeÅ„ by uÅ¼yÄ‡ zebrane surowce do badaÅ„. Przygotuj swojÄ… bazÄ™ na sporadyczne ataki powietrznych bossÃ³w.
+[*] [b]Atak[/b]: Buduj fabryki jednostek by zniszczyÄ‡ rdzenie wroga, jednoczeÅ›nie broniÄ…c swojÄ… bazÄ™ przed falami jednostek wroga. TwÃ³rz rozmaite jednostki typu wsparcia i ofensywy ktÃ³re pomogÄ… ci osiÄ…gnÄ…Ä‡ twoje cele.
+[*] [b]PvP[/b]: Rywalizuj z innymi graczami z maksymalnie 4 druÅ¼yn gdzie celem jest zniszczenie wrogich rdzeni. TwÃ³rz jednostki, lub atakuj cudze bazy bezpoÅ›rednio przy uÅ¼yciu swoich mechÃ³w.
+[*] [b]Sandbox[/b]: Graj z nieskoÅ„czonÄ… iloÅ›ciÄ… surowcÃ³w i bez Å¼adnego zagroÅ¼enia ze strony wroga. UÅ¼ywaj przeznaczonych dla tego trybu specjalnych blokÃ³w ktÃ³re sÄ… ÅºrÃ³dÅ‚ami przedmiotÃ³w i pÅ‚ynÃ³w by przetestowaÄ‡ rÃ³Å¼ne projekty, oraz tworzyÄ‡ wrogÃ³w na Å¼Ä…danie.
 [/list]
 
-[h2]Gra Niestandardowa & Miêdzyplatformowa Gra Wieloosobowa[/h2]
+[h2]Gra Niestandardowa & MiÄ™dzyplatformowa Gra Wieloosobowa[/h2]
 
 [list]
-[*] 12 wbudowanych map do gier niestandardowych, oprócz kampanii
+[*] 12 wbudowanych map do gier niestandardowych, oprÃ³cz kampanii
 [*] Graj w trybie Co-op, PvP lub sandbox
-[*] Do³¹cz do publicznych serwerów dedykowanych, lub zaproœ przyjació³ do twoich w³asnych prywatnych rozgrywek
-[*] Konfigurowalne zasady gry: Zmieñ koszt budowy, statystyki wrogów, przedmioty pocz¹tkowe, odstêp fal i wiêcej
-[*] Mo¿liwoœæ mieszania trybów gry: Po³¹cz ze sob¹ tyby PvP oraz PvE
+[*] DoÅ‚Ä…cz do publicznych serwerÃ³w dedykowanych, lub zaproÅ› przyjaciÃ³Å‚ do twoich wÅ‚asnych prywatnych rozgrywek
+[*] Konfigurowalne zasady gry: ZmieÅ„ koszt budowy, statystyki wrogÃ³w, przedmioty poczÄ…tkowe, odstÄ™p fal i wiÄ™cej
+[*] MoÅ¼liwoÅ›Ä‡ mieszania trybÃ³w gry: PoÅ‚Ä…cz ze sobÄ… tyby PvP oraz PvE
 [/list]
 
 [h2]Edytor Map[/h2]
 
 [list]
-[*] Twórz teren przy u¿yciu interfejsu edytora
+[*] TwÃ³rz teren przy uÅ¼yciu UI edytora
 [*] Edytuj i testuj w grze
-[*] Konfigurowalne tryby narzêdzi: Zmieniaj to jak dzia³a ka¿de narzêdzie
-[*] Potê¿ny system generacji mapy, z wieloma ró¿nymi typami filtrów do proceduralnej manipulacji terenem
-[*] Zastosuj szumy, zniekszta³cenia, wyg³adzenie, erozje, symetrie, generacje rud oraz losowy teren do twoich map
-[*] Randomizuj i konfiguruj generacje rud, jak równie¿ po³o¿enie rzek i kratek rud
-[*] Konfiguruj uk³ad fal wroga
+[*] Konfigurowalne tryby narzÄ™dzi: Zmieniaj to jak dziaÅ‚a kaÅ¼de narzÄ™dzie
+[*] PotÄ™Å¼ny system generacji mapy, z wieloma rÃ³Å¼nymi typami filtrÃ³w do proceduralnej manipulacji terenem
+[*] Zastosuj szumy, znieksztaÅ‚cenia, wygÅ‚adzenie, erozje, symetrie, generacje rud oraz losowy teren do twoich map
+[*] Randomizuj i konfiguruj generacje rud, jak rÃ³wnieÅ¼ poÅ‚oÅ¼enie rzek i kratek rud
+[*] Konfiguruj ukÅ‚ad fal wroga
 [*] Publikuj eksportowane mapy na Warsztacie Steam
 [*] Dostosuj standardowy zasady mapy
-[*] U¿yj 75+ róznych bloków terenu
+[*] UÅ¼yj 75+ rÃ³znych blokÃ³w terenu
 [/list]

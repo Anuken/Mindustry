@@ -50,11 +50,8 @@ public class Pathfinder implements Runnable{
                 }
             }
 
-            //run next frame to try and prevent a crash
-            Core.app.post(() -> {
-                //special preset which may help speed things up; this is optional
-                preloadPath(waveTeam, PathTarget.enemyCores);
-            });
+            //special preset which may help speed things up; this is optional
+            preloadPath(waveTeam, PathTarget.enemyCores);
 
             start();
         });
@@ -121,19 +118,23 @@ public class Pathfinder implements Runnable{
     public void run(){
         while(true){
             if(net.client()) return;
-
-            queue.run();
-
-            //total update time no longer than maxUpdate
-            for(PathData data : list){
-                updateFrontier(data, maxUpdate / list.size);
-            }
-
             try{
-                Thread.sleep(updateInterval);
-            }catch(InterruptedException e){
-                //stop looping when interrupted externally
-                return;
+
+                queue.run();
+
+                //total update time no longer than maxUpdate
+                for(PathData data : list){
+                    updateFrontier(data, maxUpdate / list.size);
+                }
+
+                try{
+                    Thread.sleep(updateInterval);
+                }catch(InterruptedException e){
+                    //stop looping when interrupted externally
+                    return;
+                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
         }
     }

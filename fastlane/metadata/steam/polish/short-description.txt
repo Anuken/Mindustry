@@ -1,1 +1,2 @@
-Otwarta gra z gatunku tower-defense skupiona na zarządzaniu surowcami.
+Otwarta gra typu tower-defense skupiona na zarządzaniu surowcami.
+

@@ -38,11 +38,8 @@ public abstract class FlyingUnit extends BaseUnit{
                 if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
             }
 
-            if(target == null){
+            if(getClosestSpawner() == null && getSpawner() != null){
                 target = getSpawner();
-            }
-
-            if(target == getSpawner() && getSpawner() != null){
                 circle(80f + Mathf.randomSeed(id) * 120);
             }else if(target != null){
                 attack(type.attackLength);
