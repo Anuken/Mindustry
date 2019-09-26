@@ -75,13 +75,13 @@ public class Mech extends UnlockableContent{
         super.init();
 
         for(int i = 0; i < 500; i++){
-            compoundSpeed += speed;
             compoundSpeed *= (1f - drag);
+            compoundSpeed += speed;
         }
 
         for(int i = 0; i < 500; i++){
-            compoundSpeedBoost += boostSpeed;
             compoundSpeedBoost *= (1f - drag);
+            compoundSpeedBoost += boostSpeed;
         }
     }
 
