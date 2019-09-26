@@ -53,6 +53,19 @@ public class CommandCenter extends Block{
     }
 
     @Override
+    public void removed(Tile tile){
+        super.removed(tile);
+
+        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+
+        if(set.size == 1){
+            for(BaseUnit unit : unitGroups[tile.getTeam().ordinal()].all()){
+                unit.onCommand(UnitCommand.all[0]);
+            }
+        }
+    }
+
+    @Override
     public void load(){
         super.load();
 

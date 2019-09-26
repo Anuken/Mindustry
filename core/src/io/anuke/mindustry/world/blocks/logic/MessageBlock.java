@@ -24,8 +24,8 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    protected static int maxTextLength = 170;
-    protected static int maxNewlines = 5;
+    protected static int maxTextLength = 220;
+    protected static int maxNewlines = 24;
 
     public MessageBlock(String name){
         super(name);

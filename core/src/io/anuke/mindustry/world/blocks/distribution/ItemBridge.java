@@ -254,16 +254,6 @@ public class ItemBridge extends Block{
             int rel2 = tile.relativeTo(source.x, source.y);
 
             if(rel == rel2) return false;
-
-
-            IntSetIterator it = entity.incoming.iterator();
-
-            while(it.hasNext){
-                int v = it.next();
-                if(tile.absoluteRelativeTo(Pos.x(v), Pos.y(v)) == rel2){
-                    return false;
-                }
-            }
         }else{
             return source.block() instanceof ItemBridge && source.<ItemBridgeEntity>entity().link == tile.pos() && tile.entity.items.total() < itemCapacity;
         }

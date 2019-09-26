@@ -63,7 +63,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, tile.getTeamID(), (byte)0, (!tile.solid() || tile.breakable()) && tile.floor().drownTime <= 0f);
+        return PathTile.get(tile.cost, tile.getTeamID(), (byte)0, !tile.solid() && tile.floor().drownTime <= 0f);
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -81,13 +81,18 @@ public class Pathfinder implements Runnable{
         queue.clear();
     }
 
-    /** Update a tile in the internal pathfinding grid. Causes a completely pathfinding reclaculation. */
+    public int debugValue(Team team, int x, int y){
+        if(pathMap[team.ordinal()][PathTarget.enemyCores.ordinal()] == null) return 0;
+        return pathMap[team.ordinal()][PathTarget.enemyCores.ordinal()].weights[x][y];
+    }
+
+    /** Update a tile in the internal pathfinding grid. Causes a complete pathfinding reclaculation. */
     public void updateTile(Tile tile){
         if(net.client()) return;
 
-        int packed = packTile(tile);
         int x = tile.x, y = tile.y;
-        tiles[x][y] = packed;
+
+        tile.getLinkedTiles(t -> tiles[t.x][t.y] = packTile(t));
 
         //can't iterate through array so use the map, which should not lead to problems
         for(PathData[] arr : pathMap){
@@ -113,19 +118,23 @@ public class Pathfinder implements Runnable{
     public void run(){
         while(true){
             if(net.client()) return;
-
-            queue.run();
-
-            //total update time no longer than maxUpdate
-            for(PathData data : list){
-                updateFrontier(data, maxUpdate / list.size);
-            }
-
             try{
-                Thread.sleep(updateInterval);
-            }catch(InterruptedException e){
-                //stop looping when interrupted externally
-                return;
+
+                queue.run();
+
+                //total update time no longer than maxUpdate
+                for(PathData data : list){
+                    updateFrontier(data, maxUpdate / list.size);
+                }
+
+                try{
+                    Thread.sleep(updateInterval);
+                }catch(InterruptedException e){
+                    //stop looping when interrupted externally
+                    return;
+                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
         }
     }

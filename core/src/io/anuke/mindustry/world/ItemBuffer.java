@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world;
 
-import io.anuke.arc.util.Pack;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.type.Item;
 
 import java.io.*;
@@ -78,5 +77,6 @@ public class ItemBuffer{
                 buffer[i] = l;
             }
         }
+        index = Math.min(index, length - 1);
     }
 }
