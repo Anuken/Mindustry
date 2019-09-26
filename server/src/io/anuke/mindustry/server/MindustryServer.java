@@ -1,16 +1,13 @@
 package io.anuke.mindustry.server;
 
-import io.anuke.mindustry.core.Logic;
-import io.anuke.mindustry.core.NetCommon;
-import io.anuke.mindustry.core.NetServer;
-import io.anuke.mindustry.core.World;
-import io.anuke.mindustry.io.BlockLoader;
-import io.anuke.mindustry.io.BundleLoader;
-import io.anuke.ucore.modules.ModuleCore;
+import io.anuke.arc.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class MindustryServer extends ModuleCore {
+public class MindustryServer implements ApplicationListener{
     private String[] args;
 
     public MindustryServer(String[] args){
@@ -19,15 +16,17 @@ public class MindustryServer extends ModuleCore {
 
     @Override
     public void init(){
+        Core.settings.setDataDirectory(Core.files.local("config"));
+        loadLocales = false;
         headless = true;
 
-        BundleLoader.load();
-        BlockLoader.load();
+        Vars.loadSettings();
+        Vars.init();
+        content.createContent();
+        content.init();
 
-        module(logic = new Logic());
-        module(world = new World());
-        module(netServer = new NetServer());
-        module(netCommon = new NetCommon());
-        module(new ServerControl(args));
+        Core.app.addListener(logic = new Logic());
+        Core.app.addListener(netServer = new NetServer());
+        Core.app.addListener(new ServerControl(args));
     }
 }

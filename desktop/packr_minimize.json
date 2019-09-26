@@ -1,0 +1,127 @@
+{
+  "reduce": [
+    {
+      "archive": "jre/lib/rt.jar",
+      "paths": [
+        "javax/transaction",
+        "javax/tools",
+        "javax/swing",
+        "javax/sql",
+        "javax/smartcardio",
+        "javax/rmi",
+        "javax/print",
+        "javax/naming",
+        "javax/management",
+        "javax/lang",
+        "javax/jws",
+        "javax/swing",
+        "javax/imageio",
+        "javax/annotation",
+        "javax/activity",
+        "javax/activation",
+        "javax/accessibility",
+        "com/sun/corba",
+        "com/sun/jmx",
+        "com/sun/org",
+        "com/sun/imageio",
+        "com/sun/jndi",
+        "com/sun/xml",
+        "com/sun/script",
+        "sun/awt",
+        "sun/java2d",
+        "sun/font",
+        "sun/rmi",
+        "sun/swing",
+        "java/util/stream",
+        "com/sun/media",
+        "sun/print",
+        "sun/awt",
+        "sun/instrument",
+        "sun/security/tools",
+        "sun/security/smartcardio",
+        "sun/audio",
+        "javax/xml",
+        "javax/sound",
+        "javax/script",
+        "java/beans",
+        "java/applet",
+        "java/rmi",
+        "com/sun/naming",
+        "java/awt",
+        "com/sun/org/apache/xpath",
+        "com/sun/rowset",
+        "com/sun/script",
+        "sun/applet",
+        "sun/corba",
+        "sun/management"
+      ]
+    },
+    {
+      "archive": "jre/lib/charsets.jar",
+      "paths": [
+      ]
+    },
+    {
+      "archive": "jre/lib/jsse.jar",
+      "paths": [
+      ]
+    },
+    {
+      "archive": "jre/lib/resources.jar",
+      "paths": [
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "platform": "*",
+      "paths": [
+        "jre/lib/rhino.jar"
+      ]
+    },
+    {
+      "platform": "linux",
+      "paths": [
+        "jre/lib/amd64/libawt.so",
+        "jre/lib/amd64/libawt_xawt.so",
+        "jre/lib/amd64/libjawt.so",
+        "jre/lib/amd64/libhprof.so",
+        "jre/lib/amd64/libdt_socket.so",
+        "jre/lib/amd64/libsplashscreen.so",
+        "jre/lib/amd64/libunpack.so",
+        "jre/lib/amd64/liblcms.so",
+        "jre/lib/amd64/libnpt.so",
+        "jre/lib/amd64/libmlib_image.so",
+        "jre/lib/amd64/libjsig.so",
+        "jre/lib/amd64/libinstrument.so",
+        "jre/lib/amd64/libjaas_unix.so",
+        "jre/lib/amd64/libj2pcsc.so",
+        "jre/lib/amd64/libsaproc.so",
+        "jre/lib/amd64/libsunec.so",
+        "jre/lib/amd64/libj2pkcs11.so",
+        "jre/lib/amd64/libjsdt.so",
+        "jre/lib/amd64/libjdwp.so",
+        "jre/lib/amd64/libjava_crw_demo.so",
+        "jre/lib/amd64/libfreetype.so",
+        "jre/lib/amd64/libmanagement.so",
+        "jre/lib/amd64/libsctp.so",
+        "jre/lib/amd64/libj2gss.so",
+        "jre/lib/amd64/libjpeg.so",
+        "jre/lib/amd64/libfreetype.so.6",
+        "jre/lib/amd64/libjsoundalsa.so",
+        "jre/lib/amd64/libjsound.so",
+        "jre/lib/amd64/libattach.so",
+        "jre/lib/amd64/libawt_headless.so",
+        "jre/lib/amd64/libfontmanager.so"
+      ]
+    },
+    {
+      "platform": "windows",
+      "paths": [
+        "jre/bin/*.exe",
+        "jre/bin/client",
+        "jre/bin/awt.dll"
+      ]
+    }
+  ]
+}

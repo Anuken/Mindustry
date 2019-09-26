@@ -1,0 +1,11 @@
+apply plugin: "java"
+
+sourceCompatibility = 1.8
+
+sourceSets{
+    test{
+        resources{
+            srcDir "src/test/resources"
+        }
+    }
+}

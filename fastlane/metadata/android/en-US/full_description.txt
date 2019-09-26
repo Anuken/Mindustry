@@ -1,0 +1,14 @@
+Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
+
+Feature include:
+- 24 built-in maps
+- A campaign, complete with a tech tree and unlockable areas
+- 4 powerful wave bosses to defeat
+- Energy, liquid and item transportation systems
+- 19 different types of drones, mechs and ships
+- 120+ technology blocks to master
+- 75+ different environmental blocks
+- Cross-platform multiplayer via local networks or dedicated servers
+- Custom game rules: Change block costs, enemy stats, starting items, wave timing and more
+- A powerful editor, with tools to randomly generate ores, terrain, decoration and apply symmetry to maps
+- Customizable map wave layouts

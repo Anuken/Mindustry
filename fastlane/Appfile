@@ -1,0 +1,2 @@
+json_key_file(ENV["FASTLANE_KEY_FILE"])
+package_name("io.anuke.mindustry")

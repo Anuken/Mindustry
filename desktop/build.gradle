@@ -1,3 +1,6 @@
+import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.PackrConfig
+
 apply plugin: "java"
 
 sourceCompatibility = 1.8
@@ -6,165 +9,160 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "io.anuke.mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
-def PACKR_DIR = "$System.env.PACKR_DIR"
-def ICON_DIR = new File("core/assets/sprites/icon.icns")
+def enableTemplates = true
+def JDK_DIR = "$System.env.JDK_DIR"
+def ICON_DIR = new File("core/assets/icons/icon.icns")
 
-ext.getPlatform = {
-    if (project.hasProperty("platform")) {
-        def lc = platform.toLowerCase()
-        if (lc == "windows64") {
-            return "windows64"
-        } else if (lc == "windows32") {
-            return "windows32"
-        } else if (lc == "linux") {
-            return "linux64"
-        } else if (lc == "mac") {
-            return "mac"
-        } else {
-            throw new InvalidUserDataException("Invalid platform. Set platform with -Pplatform=windows/linux/mac")
-        }
-    } else {
-        throw new InvalidUserDataException("No platform defined. Set platform with -Pplatform=windows/linux/mac")
-    }
-}
-
-task run(dependsOn: classes, type: JavaExec) {
+task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
+    ignoreExitValue = true
+
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
-        jvmArgs "-XstartOnFirstThread"
+        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
-    ignoreExitValue = true
-    if (project.hasProperty("appArgs")) {
-        args Eval.me(appArgs)
+
+    if(project.hasProperty("args")){
+        args Eval.me(project.getProperties()["args"])
+    }
+
+    if(args.contains("debug")){
+        main = "io.anuke.mindustry.DebugLauncher"
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
-    debug = true
-}
 
-task dist(type: Jar) {
-    dependsOn classes
-    
-    writeVersion()
-
+task dist(type: Jar, dependsOn: classes){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
     from files(project.assetsDir)
 
-    manifest {
+    archiveName = "${appName}.jar"
+
+    manifest{
         attributes 'Main-Class': project.mainClassName
     }
 }
 
-task clearOut(type: Delete){
-    doLast {
-        delete "packr-out/"
-    }
-}
-
-//note: call desktop:dist beforehand
-task packrCmd() {
-
-    doLast {
-
-        copy {
-            into PACKR_DIR
-            from "build/libs/desktop-release.jar"
-        }
-
-        exec {
-
-            commandLine("java", "-jar", PACKR_DIR + "packr.jar",
-                    "--verbose",
-                    "--bundle", getPackage() + ".mac",
-                    "--platform", getPlatform(),
-                    "--executable", appName,
-                    "--output", "packr-out/",
-                    "--mainclass", project.ext.mainClassName,
-                    "--jdk", PACKR_DIR + "jdk-" + getPlatform() + ".zip",
-                    "--icon", ICON_DIR.getAbsolutePath(),
-                    "--vmargs", (getPlatform().equals("mac") ? "XstartOnFirstThread" : "Xms256m"),
-                    "--classpath", "--", PACKR_DIR + "config.json")
-        }
-    }
-}
-
-task fixMac (type: Copy){
-    dependsOn "packrCmd"
-
-    into "packr-out/" + appName + ".app/Contents/"
-    from "packr-out/Contents/"
-
-    doLast{
-        delete{
-            delete "packr-out/Contents/"
-        }
-    }
-}
-
-task fixWindows32 (type: Copy){
-    dependsOn "packrCmd"
-
-    into "packr-out/jre/bin/"
-    from PACKR_DIR + "zip.dll"
-    rename ("zip.dll", "ojdkbuild_zlib.dll")
-
+task steamtest(dependsOn: dist){
     doLast{
         copy{
-            into "packr-out/jre/bin/"
-            from PACKR_DIR + "zip.dll"
+            from "build/libs/Mindustry.jar"
+            if(System.properties["os.name"].contains("Mac")){
+                into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources"
+            }else{
+                into "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"
+            }
+            rename("Mindustry.jar", "desktop.jar")
         }
     }
 }
 
-task packrZip() {
-    dependsOn "packrCmd"
-    finalizedBy "clearOut"
+PackrConfig.Platform.values().each{ platform ->
+    task "packr${platform.toString()}"{
+        dependsOn dist
 
-    if(project.hasProperty("platform")) {
+        doLast{
+            copy{
+                into "build/packr/"
+                rename("${appName}.jar", "desktop.jar")
+                from "build/libs/${appName}.jar"
+            }
 
-        if (getPlatform() == "mac") {
-            dependsOn "fixMac"
+            delete{
+                delete "build/packr/output/"
+            }
+
+            if(enableTemplates && (platform == PackrConfig.Platform.Windows64)){
+                copy{
+                    into "build/packr/output"
+                    from "${JDK_DIR}/templates/${platform.toString().toLowerCase()}"
+                }
+
+                copy{
+                    into "build/packr/output/jre"
+                    rename("${appName}.jar", "desktop.jar")
+                    from "build/libs/${appName}.jar"
+                }
+            }else{
+                def config = new PackrConfig()
+                config.with{
+                    config.executable = appName
+                    config.platform = platform
+                    verbose = true
+                    bundleIdentifier = getPackage() + ".mac"
+                    iconResource = ICON_DIR
+                    outDir = file("build/packr/output")
+                    mainClass = project.ext.mainClassName
+                    classpath = ["desktop/build/packr/desktop.jar"]
+                    removePlatformLibs = ["desktop/build/packr/desktop.jar"]
+
+                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
+                    minimizeJre = "desktop/packr_minimize.json"
+                    jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
+
+                    if(platform == PackrConfig.Platform.MacOS){
+                        vmArgs += "XstartOnFirstThread"
+                    }
+                }
+
+                new Packr().pack(config)
+
+                if(platform != PackrConfig.Platform.MacOS){
+                    copy{
+                        into "build/packr/output/jre/"
+                        from "build/packr/output/desktop.jar"
+                    }
+
+                    delete{
+                        delete "build/packr/output/desktop.jar"
+                    }
+
+                    file("build/packr/output/config.json").text = file("build/packr/output/config.json").text.replace("desktop.jar", "jre/desktop.jar")
+                }
+
+                if(platform == PackrConfig.Platform.MacOS){
+                    copy{
+                        into "build/packr/output/${appName}.app/Contents/"
+                        from "build/packr/output/Contents/"
+                    }
+
+                    delete{
+                        delete "build/packr/output/Contents/"
+                    }
+                }
+            }
+
+            if((platform == PackrConfig.Platform.Windows64 || platform == PackrConfig.Platform.Windows32)){
+                copy{
+                    from "build/packr/output/jre/bin/msvcr100.dll"
+                    into "build/packr/output/"
+                    rename("msvcr100.dll", "MSVCR100.dll")
+                }
+            }
+
+            copy{
+                from "build/packr/output"
+                into "../deploy/${platform.toString()}"
+            }
         }
 
-        if (getPlatform() == "windows32") {
-            dependsOn "fixWindows32"
+        task "zip${platform.toString()}"(type: Zip){
+            from "build/packr/output"
+            archiveName "${generateDeployName(platform.toString())}.zip"
+            destinationDir(file("../deploy"))
+
+            doLast{
+                delete{
+                    delete "build/packr/"
+                }
+            }
         }
 
-        task zip (type: Zip){
-            from "packr-out/"
-            archiveName "$appName-${getPlatform()}-${getVersionString()}.zip"
-            destinationDir(file("packr-export"))
-        }
+        finalizedBy "zip${platform.toString()}"
 
-        finalizedBy 'zip'
     }
-}
-
-eclipse {
-    project {
-        name = appName + "-desktop"
-        linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/core/assets'
-    }
-}
-
-task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
-  doLast {
-    def classpath = new XmlParser().parse(file(".classpath"))
-    new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ])
-    def writer = new FileWriter(file(".classpath"))
-    def printer = new XmlNodePrinter(new PrintWriter(writer))
-    printer.setPreserveWhitespace(true)
-    printer.print(classpath)
-  }
 }

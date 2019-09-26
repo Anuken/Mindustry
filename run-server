@@ -5,4 +5,4 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 ./gradlew server:dist -Pbuildversion=$1
-java -jar server/build/libs/server-release.jar
+java -jar -XX:+HeapDumpOnOutOfMemoryError server/build/libs/server-release.jar

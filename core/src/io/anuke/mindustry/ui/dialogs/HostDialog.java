@@ -1,65 +1,77 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import com.badlogic.gdx.graphics.Color;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.net.Net;
-import io.anuke.ucore.core.Settings;
-import io.anuke.ucore.core.Timers;
-import io.anuke.ucore.scene.ui.ImageButton;
-import io.anuke.ucore.util.Bundles;
-import io.anuke.ucore.util.Strings;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import static io.anuke.mindustry.Vars.player;
-import static io.anuke.mindustry.Vars.ui;
+import static io.anuke.mindustry.Vars.*;
 
 public class HostDialog extends FloatingDialog{
     float w = 300;
 
     public HostDialog(){
-        super("$text.hostserver");
+        super("$hostserver");
 
         addCloseButton();
 
-        content().table(t -> {
-            t.add("$text.name").padRight(10);
-            t.addField(Settings.getString("name"), text -> {
-                if(text.isEmpty()) return;
-                Vars.player.name = text;
-                Settings.put("name", text);
-                Settings.save();
+        cont.table(t -> {
+            t.add("$name").padRight(10);
+            t.addField(Core.settings.getString("name"), text -> {
+                player.name = text;
+                Core.settings.put("name", text);
+                Core.settings.save();
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.addImageButton("white", 40, () -> {
+            ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new ColorPickDialog().show(color -> {
                     player.color.set(color);
-                    Settings.putInt("color", Color.rgba8888(color));
-                    Settings.save();
+                    Core.settings.put("color-0", Color.rgba8888(color));
+                    Core.settings.save();
                 });
-            }).size(50f, 54f).get();
-            button.update(() -> button.getStyle().imageUpColor = player.getColor());
+            }).size(54f).get();
+            button.update(() -> button.getStyle().imageUpColor = player.color);
         }).width(w).height(70f).pad(4).colspan(3);
 
-        content().row();
+        cont.row();
 
-        content().add().width(65f);
+        cont.add().width(65f);
 
-        content().addButton("$text.host", () -> {
-            ui.loadfrag.show("$text.hosting");
-            Timers.runTask(5f, () -> {
-                try{
-                    Net.host(Vars.port);
-                    player.isAdmin = true;
-                }catch (IOException e){
-                    ui.showError(Bundles.format("text.server.error", Strings.parseException(e, false)));
-                }
-                ui.loadfrag.hide();
-                hide();
-            });
+        cont.addButton("$host", () -> {
+            if(Core.settings.getString("name").trim().isEmpty()){
+                ui.showInfo("$noname");
+                return;
+            }
+
+            runHost();
         }).width(w).height(70f);
 
-        content().addButton("?", () -> ui.showInfo("$text.host.info")).size(65f, 70f).padLeft(6f);
+        cont.addButton("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+
+        shown(() -> {
+            if(!steam){
+                Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+            }
+        });
+    }
+
+    public void runHost(){
+        ui.loadfrag.show("$hosting");
+        Time.runTask(5f, () -> {
+            try{
+                net.host(Vars.port);
+                player.isAdmin = true;
+            }catch(IOException e){
+                ui.showException("$server.error", e);
+            }
+            ui.loadfrag.hide();
+            hide();
+        });
     }
 }

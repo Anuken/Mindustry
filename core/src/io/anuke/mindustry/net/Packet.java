@@ -1,11 +1,24 @@
 package io.anuke.mindustry.net;
 
+import io.anuke.arc.util.pooling.Pool.Poolable;
+
 import java.nio.ByteBuffer;
 
-public interface Packet {
-    void read(ByteBuffer buffer);
-    void write(ByteBuffer buffer);
+public interface Packet extends Poolable{
+    default void read(ByteBuffer buffer){
+    }
 
-    interface ImportantPacket{}
-    interface UnimportantPacket{}
+    default void write(ByteBuffer buffer){
+    }
+
+    default void reset(){
+    }
+
+    default boolean isImportant(){
+        return false;
+    }
+
+    default boolean isUnimportant(){
+        return false;
+    }
 }

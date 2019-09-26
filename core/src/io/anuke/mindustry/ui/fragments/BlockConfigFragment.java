@@ -1,25 +1,39 @@
 package io.anuke.mindustry.ui.fragments;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Blocks;
-import io.anuke.ucore.core.Core;
-import io.anuke.ucore.core.Graphics;
-import io.anuke.ucore.scene.Element;
-import io.anuke.ucore.scene.actions.Actions;
-import io.anuke.ucore.scene.ui.layout.Table;
+import io.anuke.arc.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.actions.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.world.*;
 
-public class BlockConfigFragment implements  Fragment {
-    private Table table;
+import static io.anuke.mindustry.Vars.*;
+
+public class BlockConfigFragment extends Fragment{
+    private Table table = new Table();
     private Tile configTile;
+    private Block configBlock;
 
     @Override
-    public void build() {
-        table = new Table();
-        Core.scene.add(table);
+    public void build(Group parent){
+        table.visible(false);
+        parent.addChild(table);
+
+        //hacky way to hide block config when in menu
+        //TODO remove?
+        Core.scene.add(new Element(){
+            @Override
+            public void act(float delta){
+                super.act(delta);
+                if(state.is(State.menu)){
+                    table.visible(false);
+                    configTile = null;
+                }
+            }
+        });
     }
 
     public boolean isShown(){
@@ -32,30 +46,38 @@ public class BlockConfigFragment implements  Fragment {
 
     public void showConfig(Tile tile){
         configTile = tile;
+        configBlock = tile.block();
 
+        table.visible(true);
         table.clear();
         tile.block().buildTable(tile, table);
         table.pack();
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+        Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
 
-        table.update(()->{
-            table.setOrigin(Align.center);
-            Vector2 pos = Graphics.screen(tile.drawx(), tile.drawy());
-            table.setPosition(pos.x, pos.y, Align.center);
-            if(configTile == null || configTile.block() == Blocks.air){
+        table.update(() -> {
+            if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
                 hideConfig();
+                return;
+            }
+
+            table.setOrigin(Align.center);
+            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
+                hideConfig();
+            }else{
+                configTile.block().updateTableAlign(tile, table);
             }
         });
     }
 
     public boolean hasConfigMouse(){
-        Element e = Core.scene.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), true);
+        Element e = Core.scene.hit(Core.input.mouseX(), Core.graphics.getHeight() - Core.input.mouseY(), true);
         return e != null && (e == table || e.isDescendantOf(table));
     }
 
     public void hideConfig(){
+        configTile = null;
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
     }
 }

@@ -1,0 +1,2 @@
+The first release of version 4.0; an update that has been in the works for over a year.
+Extensive changes, including new gamemodes, customizable rules, a new editor, new graphics, new enemies, unit production, new progression, a campaign, and more. See the in-game changelog link for specific details of what has been added and removed over the past year.

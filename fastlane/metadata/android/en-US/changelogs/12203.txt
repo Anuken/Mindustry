@@ -1,0 +1,3 @@
+- Fixed incorrect attribution in credits; music was made by "A Drop A Day"
+- Removed unneeded 3.5 upgrade dialog that sometimes showed up in main menu
+- Added information dialog regarding v4 beta
