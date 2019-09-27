@@ -35,7 +35,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = true;
+    boolean useDiscord = OS.is64Bit, showConsole = false;
 
     public static void main(String[] arg){
         try{
@@ -217,6 +217,7 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public NetProvider getNet(){
+        if(steam && SVars.net == null) SVars.net = new SNet(new ArcNetImpl());
         return steam ? SVars.net : new ArcNetImpl();
     }
 
