@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -40,6 +41,7 @@ public class PowerNode extends PowerBlock{
     public static void linkPowerNodes(Player player, Tile tile, Tile other){
         if(tile.entity == null || other == null || tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)
         || tile.entity.power.links.size >= ((PowerNode)tile.block()).maxNodes) return;
+        if(!Units.canInteract(player, tile)) return;
 
         TileEntity entity = tile.entity();
 
@@ -60,6 +62,7 @@ public class PowerNode extends PowerBlock{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
         if(tile.entity.power == null || other.entity == null || other.entity.power == null) return;
+        if(!Units.canInteract(player, tile)) return;
 
         TileEntity entity = tile.entity();
 

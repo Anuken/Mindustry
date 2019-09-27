@@ -11,6 +11,7 @@ import io.anuke.arc.scene.ui.TextField.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Net;
@@ -36,6 +37,7 @@ public class MessageBlock extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setMessageBlockText(Player player, Tile tile, String text){
+        if(!Units.canInteract(player, tile)) return;
         if(net.server() && text.length() > maxTextLength){
             throw new ValidateException(player, "Player has gone above text limit.");
         }
