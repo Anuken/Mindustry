@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;

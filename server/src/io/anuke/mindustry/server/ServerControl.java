@@ -18,6 +18,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.plugin.*;
@@ -51,7 +52,6 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
-        plugins = new Plugins();
 
         Core.settings.defaults(
             "shufflemode", "normal",
@@ -134,7 +134,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
-        pluginDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -178,10 +177,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         //initialize plugins
-        plugins.each(io.anuke.mindustry.plugin.Plugin::init);
+        plugins.each(Plugin::init);
 
-        if(!plugins.all().isEmpty()){
-            info("&lc{0} plugins loaded.", plugins.all().size);
+        if(!mods.all().isEmpty()){
+            info("&lc{0} plugins loaded.", mods.all().size);
         }
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
@@ -324,28 +323,28 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("plugins", "Display all loaded plugins.", arg -> {
-            if(!plugins.all().isEmpty()){
-                info("Plugins:");
-                for(LoadedPlugin plugin : plugins.all()){
-                    info("  &ly{0} &lcv{1}", plugin.meta.name, plugin.meta.version);
+        handler.register("mods", "Display all loaded mods.", arg -> {
+            if(!mods.all().isEmpty()){
+                info("Mods:");
+                for(LoadedMod mod : mods.all()){
+                    info("  &ly{0} &lcv{1}", mod.meta.name, mod.meta.version);
                 }
             }else{
-                info("No plugins found.");
+                info("No mods found.");
             }
-            info("&lyPlugin directory: &lb&fi{0}", pluginDirectory.file().getAbsoluteFile().toString());
+            info("&lyMod directory: &lb&fi{0}", modDirectory.file().getAbsoluteFile().toString());
         });
 
-        handler.register("plugin", "<name...>", "Display information about a loaded plugin.", arg -> {
-            LoadedPlugin plugin = plugins.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
-            if(plugin != null){
-                info("Name: &ly{0}", plugin.meta.name);
-                info("Version: &ly{0}", plugin.meta.version);
-                info("Author: &ly{0}", plugin.meta.author);
-                info("Path: &ly{0}", plugin.jarFile.path());
-                info("Description: &ly{0}", plugin.meta.description);
+        handler.register("mod", "<name...>", "Display information about a loaded plugin.", arg -> {
+            LoadedMod mod = mods.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
+            if(mod != null){
+                info("Name: &ly{0}", mod.meta.name);
+                info("Version: &ly{0}", mod.meta.version);
+                info("Author: &ly{0}", mod.meta.author);
+                info("Path: &ly{0}", mod.jarFile.path());
+                info("Description: &ly{0}", mod.meta.description);
             }else{
-                info("No plugin with name &ly'{0}'&lg found.");
+                info("No mod with name &ly'{0}'&lg found.");
             }
         });
 
@@ -757,8 +756,9 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
 
-        plugins.each(p -> p.registerServerCommands(handler));
-        plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
+        mods.each(p -> p.registerServerCommands(handler));
+        //TODO
+        //plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){

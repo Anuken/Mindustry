@@ -18,8 +18,8 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;
@@ -120,8 +120,8 @@ public class Vars implements Loadable{
     public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
-    /** data subdirectory used for plugins */
-    public static FileHandle pluginDirectory;
+    /** data subdirectory used for mods */
+    public static FileHandle modDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -138,7 +138,7 @@ public class Vars implements Loadable{
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
     public static Platform platform = new Platform(){};
-    public static Plugins plugins;
+    public static Mods mods;
 
     public static World world;
     public static Maps maps;
@@ -193,6 +193,7 @@ public class Vars implements Loadable{
 
         Version.init();
 
+        mods = new Mods();
         content = new ContentLoader();
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();
@@ -240,7 +241,9 @@ public class Vars implements Loadable{
         mapPreviewDirectory = dataDirectory.child("previews/");
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
-        pluginDirectory = dataDirectory.child("plugins/");
+        modDirectory = dataDirectory.child("mods/");
+
+        modDirectory.mkdirs();
 
         maps.load();
     }
