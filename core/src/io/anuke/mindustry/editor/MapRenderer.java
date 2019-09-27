@@ -68,6 +68,11 @@ public class MapRenderer implements Disposable{
         updates.addAll(delayedUpdates);
         delayedUpdates.clear();
 
+        //????
+        if(chunks == null){
+            return;
+        }
+
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
                 IndexedRenderer mesh = chunks[x][y];

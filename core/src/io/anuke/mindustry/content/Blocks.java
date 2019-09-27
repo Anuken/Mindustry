@@ -1194,7 +1194,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(0.90f);
+            consumes.power(1f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -1630,7 +1630,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
-            maxSpawn = 2;
+            maxSpawn = 1;
             consumes.power(1.1f);
             consumes.items();
         }};

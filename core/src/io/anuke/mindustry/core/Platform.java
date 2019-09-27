@@ -34,6 +34,9 @@ public interface Platform{
     /** Steam: View a map listing on the workshop.*/
     default void viewMapListing(Map map){}
 
+    /** Steam: View a map listing on the workshop.*/
+    default void viewMapListing(String mapid){}
+
     /** Steam: Open workshop for maps.*/
     default void openWorkshop(){}
 

@@ -35,7 +35,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = true;
+    boolean useDiscord = OS.is64Bit, showConsole = false;
 
     public static void main(String[] arg){
         try{
@@ -199,16 +199,25 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public Array<FileHandle> getExternalMaps(){
+        if(steam && SVars.workshop == null){
+            SVars.workshop = new SWorkshop();
+        }
         return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
     }
 
     @Override
     public void viewMapListing(Map map){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.file.parent().name());
+        viewMapListing(map.file.parent().name());
+    }
+
+    @Override
+    public void viewMapListing(String mapid){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
     }
 
     @Override
     public NetProvider getNet(){
+        if(steam && SVars.net == null) SVars.net = new SNet(new ArcNetImpl());
         return steam ? SVars.net : new ArcNetImpl();
     }
 
