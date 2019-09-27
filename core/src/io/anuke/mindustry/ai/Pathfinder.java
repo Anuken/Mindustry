@@ -118,19 +118,23 @@ public class Pathfinder implements Runnable{
     public void run(){
         while(true){
             if(net.client()) return;
-
-            queue.run();
-
-            //total update time no longer than maxUpdate
-            for(PathData data : list){
-                updateFrontier(data, maxUpdate / list.size);
-            }
-
             try{
-                Thread.sleep(updateInterval);
-            }catch(InterruptedException e){
-                //stop looping when interrupted externally
-                return;
+
+                queue.run();
+
+                //total update time no longer than maxUpdate
+                for(PathData data : list){
+                    updateFrontier(data, maxUpdate / list.size);
+                }
+
+                try{
+                    Thread.sleep(updateInterval);
+                }catch(InterruptedException e){
+                    //stop looping when interrupted externally
+                    return;
+                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
         }
     }
