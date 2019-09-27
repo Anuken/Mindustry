@@ -155,7 +155,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 hide();
                 control.playZone(zone);
             }
-        }).minWidth(150f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
+        }).minWidth(200f).margin(13f).padTop(5).disabled(b -> zone.locked() ? !zone.canUnlock() : !data.hasItems(zone.getLaunchCost())).uniformY().get();
 
         button.row();
         button.add(iteminfo);
