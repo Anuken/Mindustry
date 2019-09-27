@@ -53,6 +53,19 @@ public class CommandCenter extends Block{
     }
 
     @Override
+    public void removed(Tile tile){
+        super.removed(tile);
+
+        ObjectSet<Tile> set = indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter);
+
+        if(set.size == 1){
+            for(BaseUnit unit : unitGroups[tile.getTeam().ordinal()].all()){
+                unit.onCommand(UnitCommand.all[0]);
+            }
+        }
+    }
+
+    @Override
     public void load(){
         super.load();
 
@@ -92,6 +105,8 @@ public class CommandCenter extends Block{
 
     @Remote(called = Loc.server, forward = true, targets = Loc.both)
     public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
+        if(player == null || tile == null || !Units.canInteract(player, tile)) return;
+
         Effects.effect(((CommandCenter)tile.block()).effect, tile);
 
         for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){

@@ -178,7 +178,7 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
-        if(disableUI) return;
+        if(disableUI || Core.scene == null) return;
 
         Core.scene.act();
         Core.scene.draw();

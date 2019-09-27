@@ -20,6 +20,7 @@ import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
@@ -41,6 +42,7 @@ public class BlockInventoryFragment extends Fragment{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
         if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20) || !tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
 
         int removed = tile.block().removeStack(tile, item, amount);
 

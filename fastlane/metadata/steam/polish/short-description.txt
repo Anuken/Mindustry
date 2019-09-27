@@ -1,0 +1,1 @@
+Otwarta gra typu tower-defense skupiona na zarządzaniu surowcami.

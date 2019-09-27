@@ -143,8 +143,11 @@ public class BlockIndexer{
         returnArray.clear();
         for(Team enemy : state.teams.enemiesOf(team)){
             if(state.teams.isActive(enemy)){
-                for(Tile tile : getFlagged(enemy)[type.ordinal()]){
-                    returnArray.add(tile);
+                ObjectSet<Tile> set = getFlagged(enemy)[type.ordinal()];
+                if(set != null){
+                    for(Tile tile : set){
+                        returnArray.add(tile);
+                    }
                 }
             }
         }

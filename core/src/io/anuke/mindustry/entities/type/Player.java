@@ -47,7 +47,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public float baseRotation;
     public float pointerX, pointerY;
-    public String name = "name";
+    public String name = "noname";
     public @Nullable String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
@@ -254,7 +254,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}";
+        return "Player{" + name + ", mech=" + mech.name + ", id=" + id + ", local=" + isLocal + ", " + x + ", " + y + "}";
     }
 
     @Override
@@ -814,6 +814,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         item.amount = 0;
         placeQueue.clear();
         dead = true;
+        lastText = null;
+        textFadeTime = 0f;
         target = null;
         moveTarget = null;
         spawner = lastSpawner = null;

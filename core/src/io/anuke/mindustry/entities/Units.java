@@ -20,6 +20,10 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
 
+    public static boolean canInteract(Player player, Tile tile){
+        return player == null || tile == null || tile.interactable(player.getTeam());
+    }
+
     /**
      * Validates a target.
      * @param target The target to validate

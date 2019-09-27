@@ -151,20 +151,24 @@ public class ServerControl implements ApplicationListener{
 
             if(Core.settings.getBool("shuffle")){
                 if(maps.all().size > 0){
-                    Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
+                    Array<Map> maps = Array.with(Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
+                    maps.shuffle();
 
                     Map previous = world.getMap();
-                    Map map = maps.random(previous);
+                    Map map = maps.find(m -> m != previous);
 
-                    Call.onInfoMessage((state.rules.pvp
-                    ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                    + "\nNext selected map:[accent] " + map.name() + "[]"
-                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
+                    if(map != null){
 
-                    info("Selected next map to be {0}.", map.name());
+                        Call.onInfoMessage((state.rules.pvp
+                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                        + "\nNext selected map:[accent] " + map.name() + "[]"
+                        + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
+                        "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                    play(true, () -> world.loadMap(map,  map.applyRules(lastMode)));
+                        info("Selected next map to be {0}.", map.name());
+
+                        play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                    }
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -799,7 +803,6 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-
             Array<Player> players = new Array<>();
             for(Player p : playerGroup.all()){
                 players.add(p);
@@ -814,6 +817,8 @@ public class ServerControl implements ApplicationListener{
             state.rules = world.getMap().applyRules(lastMode);
 
             for(Player p : players){
+                if(p.con == null) continue;
+
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));

@@ -311,7 +311,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getLobbyData(lobby, "mapname"),
                         Strings.parseInt(smat.getLobbyData(lobby, "wave"), -1),
                         smat.getNumLobbyMembers(lobby),
-                        Strings.parseInt(smat.getLobbyData(lobby, "name"), -1),
+                        Strings.parseInt(smat.getLobbyData(lobby, "version"), -1),
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby)
