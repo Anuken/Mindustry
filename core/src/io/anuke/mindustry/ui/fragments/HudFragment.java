@@ -249,16 +249,16 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-
-        Table map_table = new Table();
-        //minimap
-        map_table.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
-        map_table.row();
-        //position
-        map_table.label(() -> String.format("%.0f,%.0f", Vars.player.getX(), Vars.player.getY())).visible(
-            () -> Core.settings.getBool("position") && !state.rules.tutorial);
         
-        parent.fill(t -> t.top().right().add(map_table));
+        parent.fill(t -> {
+            //minimap
+            t.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+            t.row();
+            //position
+            t.label(() -> (int)player.x + "," + (int)player.y).visible(
+                () -> Core.settings.getBool("position") && !state.rules.tutorial);
+            t.top().right();
+        });
 
         //spawner warning
         parent.fill(t -> {
