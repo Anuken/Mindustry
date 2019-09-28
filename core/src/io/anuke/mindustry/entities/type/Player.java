@@ -341,6 +341,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         Draw.reset();
+
+        renderer.lights.add(x, y, 100f, Pal.powerLight, 0.6f);
     }
 
     @Override

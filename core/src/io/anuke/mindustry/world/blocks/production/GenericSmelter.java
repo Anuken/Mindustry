@@ -7,6 +7,8 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.mindustry.Vars.renderer;
+
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
     protected Color flameColor = Color.valueOf("ffc999");
@@ -43,6 +45,8 @@ public class GenericSmelter extends GenericCrafter{
             Fill.circle(tile.drawx(), tile.drawy(), 1.9f + Mathf.absin(Time.time(), 5f, 1f) + cr);
 
             Draw.color();
+
+            renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.warmup * size, flameColor, 0.65f);
         }
     }
 }
