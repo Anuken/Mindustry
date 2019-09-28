@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.defense.turrets;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.bullet.Bullet;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.world.Tile;
 

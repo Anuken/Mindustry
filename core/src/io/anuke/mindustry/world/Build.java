@@ -86,7 +86,6 @@ public class Build{
             }
         }
 
-
         Tile tile = world.tile(x, y);
 
         if(tile == null) return false;

@@ -1,16 +1,16 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.arc.Core;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 
 import static io.anuke.mindustry.Vars.headless;
 
 public class Administration{
-
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private Array<String> bannedIPs = new Array<>();
+    private Array<String> whitelist = new Array<>();
 
     public Administration(){
         Core.settings.defaults(
@@ -21,9 +21,16 @@ public class Administration{
         load();
     }
 
+    public int getPlayerLimit(){
+        return Core.settings.getInt("playerlimit", 0);
+    }
+
+    public void setPlayerLimit(int limit){
+        Core.settings.putSave("playerlimit", limit);
+    }
+
     public void setStrict(boolean on){
-        Core.settings.put("strict", on);
-        Core.settings.save();
+        Core.settings.putSave("strict", on);
     }
 
     public boolean getStrict(){
@@ -187,6 +194,36 @@ public class Administration{
         return true;
     }
 
+    public boolean isWhitelistEnabled(){
+        return Core.settings.getBool("whitelist", false);
+    }
+
+    public void setWhitelist(boolean enabled){
+        Core.settings.putSave("whitelist", enabled);
+    }
+
+    public boolean isWhitelisted(String id, String usid){
+        return !isWhitelistEnabled() || whitelist.contains(usid + id);
+    }
+
+    public boolean whitelist(String id){
+        PlayerInfo info = getCreateInfo(id);
+        if(whitelist.contains(info.adminUsid + id)) return false;
+        whitelist.add(info.adminUsid + id);
+        save();
+        return true;
+    }
+
+    public boolean unwhitelist(String id){
+        PlayerInfo info = getCreateInfo(id);
+        if(whitelist.contains(info.adminUsid + id)){
+            whitelist.remove(info.adminUsid + id);
+            save();
+            return true;
+        }
+        return false;
+    }
+
     public boolean isIPBanned(String ip){
         return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned);
     }
@@ -243,6 +280,10 @@ public class Administration{
         return null;
     }
 
+    public Array<PlayerInfo> getWhitelisted(){
+        return playerInfo.values().toArray().select(p -> isWhitelisted(p.id, p.adminUsid));
+    }
+
     private PlayerInfo getCreateInfo(String id){
         if(playerInfo.containsKey(id)){
             return playerInfo.get(id);
@@ -257,6 +298,7 @@ public class Administration{
     public void save(){
         Core.settings.putObject("player-info", playerInfo);
         Core.settings.putObject("banned-ips", bannedIPs);
+        Core.settings.putObject("whitelisted", whitelist);
         Core.settings.save();
     }
 
@@ -264,6 +306,7 @@ public class Administration{
     private void load(){
         playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
+        whitelist = Core.settings.getObject("whitelisted", Array.class, Array::new);
     }
 
     @Serialize

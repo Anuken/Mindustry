@@ -9,15 +9,15 @@ import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.impl.TimedEntity;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.effectGroup;
+import static io.anuke.mindustry.Vars.*;
 
 public class ItemTransfer extends TimedEntity implements DrawTrait{
     private Vector2 from = new Vector2();
@@ -47,6 +47,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     @Remote(called = Loc.server)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
         if(tile == null || tile.entity == null || tile.entity.items == null) return;
+        if(!Units.canInteract(player, tile)) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> create(item, x, y, tile, () -> {
             }));

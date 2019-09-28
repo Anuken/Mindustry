@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.FrameBuffer;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.Scl;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
@@ -168,8 +168,8 @@ public class MenuRenderer implements Disposable{
 
         //draw shadows
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
-        shadows.beginDraw(Color.CLEAR);
-        Draw.color(Color.BLACK);
+        shadows.beginDraw(Color.clear);
+        Draw.color(Color.black);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 if(world.rawTile(x, y).block() != Blocks.air){
@@ -220,7 +220,7 @@ public class MenuRenderer implements Disposable{
 
     public void render(){
         time += Time.delta();
-        float scaling = Math.max(UnitScl.dp.scl(4f), Math.max(Core.graphics.getWidth() / ((width - 1f) * tilesize), Core.graphics.getHeight() / ((height - 1f) * tilesize)));
+        float scaling = Math.max(Scl.scl(4f), Math.max(Core.graphics.getWidth() / ((width - 1f) * tilesize), Core.graphics.getHeight() / ((height - 1f) * tilesize)));
         camera.position.set(width * tilesize / 2f, height * tilesize / 2f);
         camera.resize(Core.graphics.getWidth() / scaling,
         Core.graphics.getHeight() / scaling);
@@ -270,7 +270,7 @@ public class MenuRenderer implements Disposable{
             Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset), y + Angles.trnsy(rotation + 180, engineOffset),
             engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f));
 
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
             Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset - 1f), y + Angles.trnsy(rotation + 180, engineOffset - 1f),
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f);
             Draw.color();

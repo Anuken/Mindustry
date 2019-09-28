@@ -1,0 +1,14 @@
+Crée des chaînes de ravitaillement pour tes défenses, produit les matériaux de construction pour aggrandir et protéger tes batiments contre des vagues d'ennemis. Joue avec tes amis grâce à des jeux multijoueurs co-op cross-plateforme, ou défie les dans des parties en PvP par équipe.
+
+Caractéristiques:
+- 24 cartes dans le jeu de base
+- Une campagne, complète avec un arbre de recherche et des zones à débloquer
+- 4 puissantes vagues de boss à vaincre
+- Systèmes de transport d'énergie, liquides et objets
+- 19 différent types de drones, méchas et vaisseaux
+- 120+ blocs technologiques à maîtriser
+- 75+ différents blocs environnementaux
+- Multijoueur cross-plateforme via réseau local or serveurs dédiés
+- Règles de jeu personnalisables: Changez le coût des structures, les stats des ennemis, les ressources de départ, fréquence des vagues et plus
+- Un éditeur puissant dotés d'outils pour générer aléatoirement des minéraux, le terrain, des décorations et appliquer une symétrie de terrain.
+- Personnaliser les vagues d'ennemis

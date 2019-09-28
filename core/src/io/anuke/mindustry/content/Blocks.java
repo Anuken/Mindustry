@@ -1,16 +1,16 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Damage;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.Bullet;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -19,21 +19,19 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.mindustry.world.blocks.distribution.*;
+import io.anuke.mindustry.world.blocks.logic.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.blocks.sandbox.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 import io.anuke.mindustry.world.blocks.units.*;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.Attribute;
-import io.anuke.mindustry.world.modules.LiquidModule;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.modules.*;
 
-import static io.anuke.mindustry.Vars.state;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
-    public static final BooleanProvider padVisible = () -> state.rules.attackMode || state.rules.pvp || state.isEditor();
-
     public static Block
 
     //environment
@@ -52,7 +50,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid,
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -60,7 +58,7 @@ public class Blocks implements ContentList{
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
-    conveyor, titaniumConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -79,7 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
+    commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -505,6 +503,7 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
+            itemCapacity = 20;
 
             int bottomRegion = reg("-bottom"), weaveRegion = reg("-weave");
 
@@ -594,7 +593,7 @@ public class Blocks implements ContentList{
 
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 50, Items.lead, 25));
-            flameColor = Color.CLEAR;
+            flameColor = Color.clear;
             hasItems = true;
             hasPower = true;
             outputItem = new ItemStack(Items.pyratite, 1);
@@ -665,7 +664,7 @@ public class Blocks implements ContentList{
 
                 Draw.rect(region, tile.drawx(), tile.drawy());
                 Draw.rect(reg(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), tile.drawx(), tile.drawy());
-                Draw.color(Color.CLEAR, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
+                Draw.color(Color.clear, tile.entity.liquids.current().color, tile.entity.liquids.total() / liquidCapacity);
                 Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
                 Draw.color();
                 Draw.rect(reg(topRegion), tile.drawx(), tile.drawy());
@@ -735,6 +734,9 @@ public class Blocks implements ContentList{
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, () -> state.rules.infiniteResources, ItemStack.with());
             alwaysUnlocked = true;
+        }};
+        message = new MessageBlock("message"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
         }};
 
         //endregion
@@ -904,10 +906,16 @@ public class Blocks implements ContentList{
             speed = 0.08f;
         }};
 
+        armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(Items.metaglass, 1, Items.thorium, 1));
+            health = 180;
+            speed = 0.08f;
+        }};
+
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             speed = 26;
-            capacity = 15;
+            capacity = 12;
             health = 30;
         }};
 
@@ -915,7 +923,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
             range = 4;
             speed = 70f;
-            bufferCapacity = 15;
+            bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -987,7 +995,6 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 1));
             liquidCapacity = 16f;
-            liquidFlowFactor = 4.9f;
             health = 90;
         }};
 
@@ -1402,7 +1409,7 @@ public class Blocks implements ContentList{
             smokeEffect = Fx.lancerLaserShootSmoke;
             chargeEffect = Fx.lancerLaserCharge;
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             size = 2;
             health = 280 * size * size;
             targetAir = false;
@@ -1410,16 +1417,16 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 35));
+            requirements(Category.turret, ItemStack.with(Items.copper, 35, Items.lead, 50));
             shootType = Bullets.arc;
-            reload = 24f;
+            reload = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 0.9f;
+            powerUse = 1.5f;
             targetAir = false;
-            range = 95f;
+            range = 90f;
             shootEffect = Fx.lightningShoot;
-            heatColor = Color.RED;
+            heatColor = Color.red;
             recoil = 1f;
             size = 1;
             health = 260;
@@ -1498,7 +1505,7 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(Bullet b){
+                public void init(io.anuke.mindustry.entities.type.Bullet b){
                     for(int i = 0; i < rays; i++){
                         Damage.collideLine(b, b.getTeam(), hitEffect, b.x, b.y, b.rot(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
@@ -1507,7 +1514,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void draw(Bullet b){
                     super.draw(b);
-                    Draw.color(Color.WHITE, Pal.lancerLaser, b.fin());
+                    Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());
                     for(int i = 0; i < 7; i++){
                         Tmp.v1.trns(b.rot(), i * 8f);
@@ -1623,7 +1630,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
-            maxSpawn = 2;
+            maxSpawn = 1;
             consumes.power(1.1f);
             consumes.items();
         }};
@@ -1648,17 +1655,24 @@ public class Blocks implements ContentList{
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 10));
         }};
 
-        wraithFactory = new UnitFactory("wraith-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
-            type = UnitTypes.wraith;
-            produceTime = 750;
+        commandCenter = new CommandCenter("command-center"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            flags = EnumSet.of(BlockFlag.rally, BlockFlag.comandCenter);
             size = 2;
-            consumes.power(0.6f);
+            health = size * size * 55;
+        }};
+
+        wraithFactory = new UnitFactory("wraith-factory"){{
+            requirements(Category.units, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
+            type = UnitTypes.wraith;
+            produceTime = 700;
+            size = 2;
+            consumes.power(0.5f);
             consumes.items(new ItemStack(Items.silicon, 10), new ItemStack(Items.titanium, 5));
         }};
 
         ghoulFactory = new UnitFactory("ghoul-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
+            requirements(Category.units, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
             type = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
@@ -1667,7 +1681,7 @@ public class Blocks implements ContentList{
         }};
 
         revenantFactory = new UnitFactory("revenant-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
+            requirements(Category.units, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
             type = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
@@ -1676,7 +1690,7 @@ public class Blocks implements ContentList{
         }};
 
         daggerFactory = new UnitFactory("dagger-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 55, Items.silicon, 35));
+            requirements(Category.units, ItemStack.with(Items.lead, 55, Items.silicon, 35));
             type = UnitTypes.dagger;
             produceTime = 850;
             size = 2;
@@ -1685,17 +1699,17 @@ public class Blocks implements ContentList{
         }};
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.lead, 25, Items.silicon, 30));
+            requirements(Category.units, ItemStack.with(Items.lead, 45, Items.silicon, 30));
             type = UnitTypes.crawler;
-            produceTime = 250;
+            produceTime = 300;
             size = 2;
-            maxSpawn = 8;
-            consumes.power(0.4f);
-            consumes.items(new ItemStack(Items.coal, 5));
+            maxSpawn = 6;
+            consumes.power(0.5f);
+            consumes.items(new ItemStack(Items.coal, 10));
         }};
 
         titanFactory = new UnitFactory("titan-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
+            requirements(Category.units, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
             type = UnitTypes.titan;
             produceTime = 1050;
             size = 3;
@@ -1704,7 +1718,7 @@ public class Blocks implements ContentList{
         }};
 
         fortressFactory = new UnitFactory("fortress-factory"){{
-            requirements(Category.units, padVisible, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
+            requirements(Category.units, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
             type = UnitTypes.fortress;
             produceTime = 2000;
             size = 3;

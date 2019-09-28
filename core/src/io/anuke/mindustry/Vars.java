@@ -1,35 +1,39 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.Application.ApplicationType;
-import io.anuke.arc.Core;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Structs;
+import io.anuke.arc.Application.*;
+import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.Puddle;
-import io.anuke.mindustry.entities.impl.EffectEntity;
-import io.anuke.mindustry.entities.traits.DrawTrait;
-import io.anuke.mindustry.entities.traits.SyncTrait;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.Serialization;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.blocks.defense.ForceProjector.ShieldEntity;
+import io.anuke.mindustry.plugin.*;
+import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Locale;
+import java.nio.charset.*;
+import java.util.*;
+
+import static io.anuke.arc.Core.settings;
 
 @SuppressWarnings("unchecked")
-public class Vars{
+public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
-    /** global charset */
+    /** global charset, since Android doesn't support the Charsets class */
     public static final Charset charset = Charset.forName("UTF-8");
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
@@ -39,6 +43,8 @@ public class Vars{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
+    /** list of built-in servers.*/
+    public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */
@@ -55,14 +61,6 @@ public class Vars{
     public static final float itemSize = 5f;
     /** extra padding around the world; units outside this bound will begin to self-destruct. */
     public static final float worldBounds = 100f;
-    /** default size of UI icons.*/
-    public static final int iconsize = 48;
-    /** size of UI icons (small)*/
-    public static final int iconsizesmall = 32;
-    /** size of UI icons (medium)*/
-    public static final int iconsizemed = 30;
-    /** size of UI icons (medium)*/
-    public static final int iconsizetiny = 16;
     /** units outside of this bound will simply die instantly */
     public static final float finalWorldBounds = worldBounds + 500;
     /** ticks spent out of bound until self destruct. */
@@ -108,18 +106,22 @@ public class Vars{
     public static boolean android;
     /** whether the game is running on a headless server */
     public static boolean headless;
+    /** whether steam is enabled for this game */
+    public static boolean steam;
     /** application data directory, equivalent to {@link io.anuke.arc.Settings#getDataDirectory()} */
     public static FileHandle dataDirectory;
     /** data subdirectory used for screenshots */
     public static FileHandle screenshotDirectory;
     /** data subdirectory used for custom mmaps */
     public static FileHandle customMapDirectory;
+    /** data subdirectory used for custom mmaps */
+    public static FileHandle mapPreviewDirectory;
     /** tmp subdirectory for map conversion */
     public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
-    /** old map file extension, for conversion */
-    public static final String oldMapExtension = "mmap";
+    /** data subdirectory used for plugins */
+    public static FileHandle pluginDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -128,21 +130,30 @@ public class Vars{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
+    public static Net net;
     public static ContentLoader content;
     public static GameState state;
     public static GlobalData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
+    public static Platform platform = new Platform(){};
+    public static Plugins plugins;
+
+    public static World world;
+    public static Maps maps;
+    public static WaveSpawner spawner;
+    public static BlockIndexer indexer;
+    public static Pathfinder pathfinder;
 
     public static Control control;
     public static Logic logic;
     public static Renderer renderer;
     public static UI ui;
-    public static World world;
     public static NetServer netServer;
     public static NetClient netClient;
 
+    public static Entities entities;
     public static EntityGroup<Player> playerGroup;
     public static EntityGroup<TileEntity> tileGroup;
     public static EntityGroup<Bullet> bulletGroup;
@@ -153,8 +164,13 @@ public class Vars{
     public static EntityGroup<Fire> fireGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
-    /** all local players, currently only has one player. may be used for local co-op in the future */
     public static Player player;
+
+    @Override
+    public void loadAsync(){
+        loadSettings();
+        init();
+    }
 
     public static void init(){
         Serialization.init();
@@ -178,31 +194,34 @@ public class Vars{
         Version.init();
 
         content = new ContentLoader();
-        if(!headless){
-            content.setVerbose();
-        }
-
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();
         collisions = new EntityCollisions();
+        world = new World();
 
-        playerGroup = Entities.addGroup(Player.class).enableMapping();
-        tileGroup = Entities.addGroup(TileEntity.class, false);
-        bulletGroup = Entities.addGroup(Bullet.class).enableMapping();
-        effectGroup = Entities.addGroup(EffectEntity.class, false);
-        groundEffectGroup = Entities.addGroup(DrawTrait.class, false);
-        puddleGroup = Entities.addGroup(Puddle.class).enableMapping();
-        shieldGroup = Entities.addGroup(ShieldEntity.class, false);
-        fireGroup = Entities.addGroup(Fire.class).enableMapping();
+        maps = new Maps();
+        spawner = new WaveSpawner();
+        indexer = new BlockIndexer();
+        pathfinder = new Pathfinder();
+
+        entities = new Entities();
+        playerGroup = entities.add(Player.class).enableMapping();
+        tileGroup = entities.add(TileEntity.class, false);
+        bulletGroup = entities.add(Bullet.class).enableMapping();
+        effectGroup = entities.add(EffectEntity.class, false);
+        groundEffectGroup = entities.add(DrawTrait.class, false);
+        puddleGroup = entities.add(Puddle.class).enableMapping();
+        shieldGroup = entities.add(ShieldEntity.class, false);
+        fireGroup = entities.add(Fire.class).enableMapping();
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){
-            unitGroups[team.ordinal()] = Entities.addGroup(BaseUnit.class).enableMapping();
+            unitGroups[team.ordinal()] = entities.add(BaseUnit.class).enableMapping();
         }
 
-        for(EntityGroup<?> group : Entities.getAllGroups()){
+        for(EntityGroup<?> group : entities.all()){
             group.setRemoveListener(entity -> {
-                if(entity instanceof SyncTrait && Net.client()){
+                if(entity instanceof SyncTrait && net.client()){
                     netClient.addRemovedEntity((entity).getID());
                 }
             });
@@ -215,12 +234,67 @@ public class Vars{
         ios = Core.app.getType() == ApplicationType.iOS;
         android = Core.app.getType() == ApplicationType.Android;
 
-        Core.settings.setAppName(appName);
-
         dataDirectory = Core.settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
+        mapPreviewDirectory = dataDirectory.child("previews/");
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
+        pluginDirectory = dataDirectory.child("plugins/");
+
+        maps.load();
+    }
+
+    public static void loadSettings(){
+        Core.settings.setAppName(appName);
+
+        if(steam){
+            Core.settings.setDataDirectory(Core.files.local("saves/"));
+        }
+
+        Core.settings.defaults("locale", "default");
+        Core.keybinds.setDefaults(Binding.values());
+        Core.settings.load();
+
+        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
+
+        if(!loadLocales) return;
+
+        try{
+            //try loading external bundle
+            FileHandle handle = Core.files.local("bundle");
+
+            Locale locale = Locale.ENGLISH;
+            Core.bundle = I18NBundle.createBundle(handle, locale);
+
+            Log.info("NOTE: external translation bundle has been loaded.");
+
+            if(!headless){
+                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle."));
+            }
+        }catch(Throwable e){
+            //no external bundle found
+
+            FileHandle handle = Core.files.internal("bundles/bundle");
+
+            Locale locale;
+            String loc = Core.settings.getString("locale");
+            if(loc.equals("default")){
+                locale = Locale.getDefault();
+            }else{
+                Locale lastLocale;
+                if(loc.contains("_")){
+                    String[] split = loc.split("_");
+                    lastLocale = new Locale(split[0], split[1]);
+                }else{
+                    lastLocale = new Locale(loc);
+                }
+
+                locale = lastLocale;
+            }
+
+            Locale.setDefault(locale);
+            Core.bundle = I18NBundle.createBundle(handle, locale);
+        }
     }
 }

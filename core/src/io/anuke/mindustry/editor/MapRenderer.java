@@ -8,7 +8,7 @@ import io.anuke.arc.graphics.Texture;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Disposable;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
@@ -67,6 +67,11 @@ public class MapRenderer implements Disposable{
 
         updates.addAll(delayedUpdates);
         delayedUpdates.clear();
+
+        //????
+        if(chunks == null){
+            return;
+        }
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
@@ -155,7 +160,7 @@ public class MapRenderer implements Disposable{
         }
 
         mesh.draw(idxDecal, region, wx * tilesize + offsetX, wy * tilesize + offsetY, width, height);
-        mesh.setColor(Color.WHITE);
+        mesh.setColor(Color.white);
     }
 
     @Override

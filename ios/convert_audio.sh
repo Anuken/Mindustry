@@ -1,7 +1,15 @@
 #!/usr/bin/bash
 
-#convert ogg to .caf files for iOS
-for i in $1/*.ogg; do
+cd $1
+
+#convert ogg to .mp3 files for iOS
+for i in *.ogg; do
   echo $i
-  ffmpeg -i "$i" "${i%.*}.caf"
+  ffmpeg -i "$i" "OUT_${i%.*}.mp3"
 done
+
+find . -type f ! -name "OUT_*" -delete
+
+for file in OUT_*; do mv "$file" "${file#OUT_}"; done;
+
+cd ../../

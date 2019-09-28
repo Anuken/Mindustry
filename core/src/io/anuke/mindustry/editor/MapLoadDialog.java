@@ -1,14 +1,14 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Scaling;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.ui.BorderImage;
-import io.anuke.mindustry.ui.dialogs.FloatingDialog;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.maps;
 
 public class MapLoadDialog extends FloatingDialog{
     private Map selected = null;
@@ -17,7 +17,6 @@ public class MapLoadDialog extends FloatingDialog{
         super("$editor.loadmap");
 
         shown(this::rebuild);
-        rebuild();
 
         TextButton button = new TextButton("$load");
         button.setDisabled(() -> selected == null);
@@ -35,8 +34,8 @@ public class MapLoadDialog extends FloatingDialog{
 
     public void rebuild(){
         cont.clear();
-        if(world.maps.all().size > 0){
-            selected = world.maps.all().first();
+        if(maps.all().size > 0){
+            selected = maps.all().first();
         }
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
@@ -49,13 +48,13 @@ public class MapLoadDialog extends FloatingDialog{
         table.defaults().size(200f, 90f).pad(4f);
         table.margin(10f);
 
-        ScrollPane pane = new ScrollPane(table, "horizontal");
+        ScrollPane pane = new ScrollPane(table, Styles.horizontalPane);
         pane.setFadeScrollBars(false);
 
-        for(Map map : world.maps.all()){
+        for(Map map : maps.all()){
 
-            TextButton button = new TextButton(map.name(), "toggle");
-            button.add(new BorderImage(map.texture, 2f).setScaling(Scaling.fit)).size(16 * 4f);
+            TextButton button = new TextButton(map.name(), Styles.togglet);
+            button.add(new BorderImage(map.safeTexture(), 2f).setScaling(Scaling.fit)).size(16 * 4f);
             button.getCells().reverse();
             button.clicked(() -> selected = map);
             button.getLabelCell().grow().left().padLeft(5f);
@@ -64,7 +63,7 @@ public class MapLoadDialog extends FloatingDialog{
             if(++i % maxcol == 0) table.row();
         }
 
-        if(world.maps.all().size == 0){
+        if(maps.all().size == 0){
             table.add("$maps.none").center();
         }else{
             cont.add("$editor.loadmap");

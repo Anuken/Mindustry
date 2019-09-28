@@ -7,7 +7,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.impl.EffectEntity;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.entities.traits.ScaleTrait;
 
 public class Effects{
@@ -49,7 +49,7 @@ public class Effects{
     }
 
     public static void effect(Effect effect, float x, float y, float rotation){
-        provider.createEffect(effect, Color.WHITE, x, y, rotation, null);
+        provider.createEffect(effect, Color.white, x, y, rotation, null);
     }
 
     public static void effect(Effect effect, float x, float y){
@@ -61,7 +61,7 @@ public class Effects{
     }
 
     public static void effect(Effect effect, Position loc){
-        provider.createEffect(effect, Color.WHITE, loc.getX(), loc.getY(), 0f, null);
+        provider.createEffect(effect, Color.white, loc.getX(), loc.getY(), 0f, null);
     }
 
     public static void effect(Effect effect, Color color, float x, float y, float rotation){
@@ -73,7 +73,7 @@ public class Effects{
     }
 
     public static void effect(Effect effect, float x, float y, float rotation, Object data){
-        provider.createEffect(effect, Color.WHITE, x, y, rotation, data);
+        provider.createEffect(effect, Color.white, x, y, rotation, data);
     }
 
     /** Default value is 1000. Higher numbers mean more powerful shake (less falloff). */

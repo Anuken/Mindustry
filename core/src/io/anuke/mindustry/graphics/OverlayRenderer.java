@@ -84,7 +84,7 @@ public class OverlayRenderer{
                 for(Tile core : state.teams.get(enemy).cores){
                     float dst = Mathf.dst(player.x, player.y, core.drawx(), core.drawy());
                     if(dst < state.rules.enemyCoreBuildRadius * 1.5f){
-                        Draw.color(Color.DARK_GRAY);
+                        Draw.color(Color.darkGray);
                         Lines.circle(core.drawx(), core.drawy() - 2, state.rules.enemyCoreBuildRadius);
                         Draw.color(Pal.accent, enemy.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
                         Lines.circle(core.drawx(), core.drawy(), state.rules.enemyCoreBuildRadius);
@@ -94,9 +94,9 @@ public class OverlayRenderer{
         }
 
         Lines.stroke(2f);
-        Draw.color(Color.GRAY, Color.LIGHT_GRAY, Mathf.absin(Time.time(), 8f, 1f));
+        Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
-        for(Tile tile : world.spawner.getGroundSpawns()){
+        for(Tile tile : spawner.getGroundSpawns()){
             if(tile.withinDst(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                 Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                 Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);

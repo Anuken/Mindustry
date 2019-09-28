@@ -16,35 +16,29 @@ buildscript{
 
 allprojects{
     version = 'release'
+    apply plugin: 'maven'
+    group = 'com.github.Anuken'
 
     ext{
         versionNumber = '4'
-        versionModifier = 'release'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.7'
+        steamworksVersion = '1.8.0'
         arcHash = null
 
         debugged = {
-            return new File(projectDir.parent, '../debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
+            return new File(projectDir.parent, '../Mindustry-Debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
         }
 
         localArc = {
-            return (!project.hasProperty("release")) && new File(projectDir.parent, '../Arc').exists()
+            return !project.hasProperty("release") && new File(projectDir.parent, '../Arc').exists()
         }
 
         getArcHash = {
-            //get latest commit hash from github since JITPack's '-snapshot' version doesn't work correctly
-            if(arcHash == null){
-                try{
-                    arcHash = 'git ls-remote https://github.com/Anuken/Arc.git'.execute().text.split("\t")[0]
-                }catch(e){
-                    e.printStackTrace()
-                    arcHash = "-SNAPSHOT"
-                }
-            }
-            return arcHash
+            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
         }
 
         arcModule = { String name ->
@@ -67,7 +61,7 @@ allprojects{
                 platform = "${platform.substring(0, platform.length() - 2)}-${platform.substring(platform.length() - 2)}bit"
             }
 
-            return "[${platform}]${getModifierString()}[${getNeatVersionString()}]${appName}.zip"
+            return "[${platform}]${getModifierString()}[${getNeatVersionString()}]${appName}"
         }
 
         getVersionString = {
@@ -119,6 +113,7 @@ allprojects{
                 props.load(new FileInputStream(pfile))
 
                 String buildid = getBuildVersion()
+                println("Compiling with build: '$buildid'")
 
                 props["type"] = versionType
                 props["number"] = versionNumber
@@ -147,29 +142,14 @@ project(":desktop"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
 
         if(debugged()) compile project(":debug")
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
-        compile arcModule("backends:backend-lwjgl3")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
-    }
-}
-
-project(":desktop-sdl"){
-    apply plugin: "java"
-
-    dependencies{
-        compile project(":core")
-        compile project(":net")
-
-        if(debugged()) compile project(":debug")
-
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "com.code-disaster.steamworks4j:steamworks4j:$steamworksVersion"
+        compile "com.code-disaster.steamworks4j:steamworks4j-server:$steamworksVersion"
 
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
@@ -189,7 +169,7 @@ project(":ios"){
         }
 
         props['app.id'] = 'io.anuke.mindustry'
-        props['app.version'] = '4.0'
+        props['app.version'] = '4.2.1'
         props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
         props['app.executable'] = 'IOSLauncher'
         props['app.name'] = 'Mindustry'
@@ -199,7 +179,6 @@ project(":ios"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compileOnly project(":annotations")
 
         compile arcModule("backends:backend-robovm")
@@ -215,7 +194,9 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
+        outputs.upToDateWhen{ false } 
         generateLocales()
+        writeVersion()
     }
 
     dependencies{
@@ -246,6 +227,7 @@ project(":core"){
 
         compileJava.dependsOn(preGen)
 
+        compile "org.lz4:lz4-java:1.4.1"
         compile arcModule("arc-core")
         compile arcModule("extensions:freetype")
         compile arcModule("extensions:arcnet")
@@ -261,7 +243,6 @@ project(":server"){
 
     dependencies{
         compile project(":core")
-        compile project(":net")
         compile arcModule("backends:backend-headless")
     }
 }
@@ -289,7 +270,6 @@ project(":tools"){
     dependencies{
         compile project(":core")
 
-        //for render tests
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
@@ -306,12 +286,23 @@ project(":annotations"){
     }
 }
 
-project(":net"){
-    apply plugin: "java"
+task deployAll{
+    task cleanDeployOutput{
+        doFirst{
+            if("${getBuildVersion()}" == "custom build" || "${getBuildVersion()}" == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
+            if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
 
-    dependencies{
-        compile project(":core")
-        compile "org.lz4:lz4-java:1.4.1"
-        compile 'com.github.Anuken:WaifUPnP:05eb46bc577fd7674596946ba288c96c0cedd893'
+            delete{
+                delete "deploy/"
+            }
+        }
     }
+
+    dependsOn cleanDeployOutput
+    dependsOn "desktop:packrLinux64"
+    dependsOn "desktop:packrWindows64"
+    dependsOn "desktop:packrWindows32"
+    dependsOn "desktop:packrMacOS"
+    dependsOn "server:deploy"
+    dependsOn "android:deploy"
 }

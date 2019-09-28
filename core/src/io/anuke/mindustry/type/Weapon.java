@@ -13,9 +13,10 @@ import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.gen.Sounds;
-import io.anuke.mindustry.net.Net;
+
+import static io.anuke.mindustry.Vars.net;
 
 public class Weapon{
     public final String name;
@@ -73,7 +74,7 @@ public class Weapon{
         if(player == null) return;
         //clients do not see their own shoot events: they are simulated completely clientside to prevent laggy visuals
         //messing with the firerate or any other stats does not affect the server (take that, script kiddies!)
-        if(Net.client() && player == Vars.player){
+        if(net.client() && player == Vars.player){
             return;
         }
 
@@ -154,7 +155,7 @@ public class Weapon{
     }
 
     public void shoot(ShooterTrait p, float x, float y, float angle, boolean left){
-        if(Net.client()){
+        if(net.client()){
             //call it directly, don't invoke on server
             shootDirect(p, x, y, angle, left);
         }else{

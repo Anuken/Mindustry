@@ -2,10 +2,15 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
+
+import java.io.*;
+import java.util.zip.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -27,6 +32,46 @@ public class GlobalData{
             int amount = stream.readInt();
             return new ItemStack(content.getByName(ContentType.item, name), amount);
         });
+    }
+
+    public void exportData(FileHandle file) throws IOException{
+        Array<FileHandle> files = new Array<>();
+        files.add(Core.settings.getSettingsFile());
+        files.addAll(customMapDirectory.list());
+        files.addAll(saveDirectory.list());
+        String base = Core.settings.getDataDirectory().path();
+
+        try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
+            for(FileHandle add : files){
+                zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
+                Streams.copyStream(add.read(), zos);
+                zos.closeEntry();
+            }
+
+        }
+    }
+
+    public void importData(FileHandle file){
+        FileHandle dest = Core.files.local("zipdata.zip");
+        file.copyTo(dest);
+        FileHandle zipped = new ZipFileHandle(dest);
+
+        FileHandle base = Core.settings.getDataDirectory();
+        if(!zipped.child("settings.bin").exists()){
+            throw new IllegalArgumentException("Not valid save data.");
+        }
+
+        //purge existing data
+        for(FileHandle f : base.list()){
+            if(f.isDirectory()){
+                f.deleteDirectory();
+            }else if(!f.name().equals("zipdata.zip")){
+                f.delete();
+            }
+        }
+
+        zipped.walk(f -> f.copyTo(base.child(f.path())));
+        dest.delete();
     }
 
     public void modified(){

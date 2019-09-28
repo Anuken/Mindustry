@@ -1,6 +1,7 @@
 import io.anuke.arc.ApplicationCore;
 import io.anuke.arc.Core;
 import io.anuke.arc.backends.headless.HeadlessApplication;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
@@ -11,11 +12,10 @@ import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.Content;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.BundleLoader;
 import io.anuke.mindustry.io.SaveIO;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.ContentType;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
@@ -43,25 +43,22 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
-                    Vars.init();
-
                     headless = true;
-
-                    BundleLoader.load();
-                    content.load();
+                    net = new Net(null);
+                    Vars.init();
+                    content.createContent();
 
                     add(logic = new Logic());
-                    add(world = new World());
                     add(netServer = new NetServer());
 
-                    content.initialize(Content::init);
+                    content.init();
                 }
 
                 @Override
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = world.maps.loadInternalMap("groundZero");
+                    testMap = maps.loadInternalMap("groundZero");
                 }
             };
 
@@ -100,7 +97,7 @@ public class ApplicationTests{
     @Test
     void spawnWaves(){
         world.loadMap(testMap);
-        assertTrue(world.spawner.countSpawns() > 0, "No spawns present.");
+        assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
@@ -225,6 +222,37 @@ public class ApplicationTests{
         //just tests if the map was loaded properly and didn't crash, no validity checks currently
         assertEquals(276, world.width());
         assertEquals(10, world.height());
+    }
+
+    @Test
+    void arrayIterators(){
+        Array<String> arr = Array.with("a", "b" , "c", "d", "e", "f");
+        Array<String> results = new Array<>();
+
+        for(String s : arr);
+        for(String s : results);
+
+        Array.iteratorsAllocated = 0;
+
+        //simulate non-enhanced for loops, which should be correct
+
+        for(int i = 0; i < arr.size; i++){
+            for(int j = 0; j < arr.size; j++){
+                results.add(arr.get(i) + arr.get(j));
+            }
+        }
+
+        int index = 0;
+
+        //test nested for loops
+        for(String s : arr){
+            for(String s2 : arr){
+                assertEquals(results.get(index++), s + s2);
+            }
+        }
+
+        assertEquals(results.size, index);
+        assertEquals(0, Array.iteratorsAllocated, "No new iterators must have been allocated.");
     }
 
     @Test

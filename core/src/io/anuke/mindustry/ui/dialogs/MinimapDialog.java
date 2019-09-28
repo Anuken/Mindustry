@@ -1,35 +1,36 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.scene.event.InputEvent;
-import io.anuke.arc.scene.event.InputListener;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.gen.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.renderer;
 
 public class MinimapDialog extends FloatingDialog{
 
     public MinimapDialog(){
         super("$minimap");
-        setFillParent(false);
+        setFillParent(true);
 
         shown(this::setup);
 
         addCloseButton();
         shouldPause = true;
+        titleTable.remove();
+        onResize(this::setup);
     }
 
     void setup(){
         cont.clear();
-        float size = Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) / UnitScl.dp.scl(1f) / 1.3f;
 
-        cont.table("pane", t -> {
+        cont.table(Tex.pane,t -> {
             t.addRect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
-                Draw.color(Color.WHITE);
+                Draw.color(Color.white);
                 Draw.alpha(parentAlpha);
                 Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
@@ -37,7 +38,7 @@ public class MinimapDialog extends FloatingDialog{
                     renderer.minimap.drawEntities(x, y, width, height);
                 }
             }).grow();
-        }).size(size);
+        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / Scl.scl(1f)).padTop(-20f);
 
         cont.addListener(new InputListener(){
             @Override
@@ -45,18 +46,22 @@ public class MinimapDialog extends FloatingDialog{
                 renderer.minimap.zoomBy(amounty);
                 return true;
             }
+        });
+
+        cont.addListener(new ElementGestureListener(){
+            float lzoom = -1f;
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                return true;
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                lzoom = renderer.minimap.getZoom();
             }
 
             @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer){
-                if(mobile){
-                    float max = Math.min(world.width(), world.height()) / 16f / 2f;
-                    renderer.minimap.setZoom(1f + y / cont.getHeight() * (max - 1f));
+            public void zoom(InputEvent event, float initialDistance, float distance){
+                if(lzoom < 0){
+                    lzoom = renderer.minimap.getZoom();
                 }
+                renderer.minimap.setZoom(initialDistance / distance * lzoom);
             }
         });
 

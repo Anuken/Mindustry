@@ -39,10 +39,10 @@ task dist(type: Jar){
     exclude("music/**")
     exclude("sounds/**")
     exclude("fonts/**")
+    exclude("zones/**")
     exclude("com/badlogic/gdx/**")
+    exclude("icons/**")
     exclude("bundles/**")
-
-    writeVersion()
 
     manifest{
         attributes 'Main-Class': project.mainClassName

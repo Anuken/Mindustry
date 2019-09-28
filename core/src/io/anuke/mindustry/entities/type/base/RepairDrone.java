@@ -5,6 +5,7 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -21,6 +22,10 @@ public class RepairDrone extends BaseDrone{
 
             if(retarget()){
                 target = Units.findDamagedTile(team, x, y);
+            }
+
+            if(target instanceof TileEntity && ((TileEntity)target).block instanceof BuildBlock){
+                target = null;
             }
 
             if(target != null){

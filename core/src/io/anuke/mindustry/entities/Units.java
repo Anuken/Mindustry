@@ -20,6 +20,10 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
 
+    public static boolean canInteract(Player player, Tile tile){
+        return player == null || tile == null || tile.interactable(player.getTeam());
+    }
+
     /**
      * Validates a target.
      * @param target The target to validate
@@ -68,13 +72,13 @@ public class Units{
 
     /** Returns the neareset damaged tile. */
     public static TileEntity findDamagedTile(Team team, float x, float y){
-        Tile tile = Geometry.findClosest(x, y, world.indexer.getDamaged(team));
+        Tile tile = Geometry.findClosest(x, y, indexer.getDamaged(team));
         return tile == null ? null : tile.entity;
     }
 
     /** Returns the neareset ally tile in a range. */
     public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
-        return world.indexer.findTile(team, x, y, range, pred);
+        return indexer.findTile(team, x, y, range, pred);
     }
 
     /** Returns the neareset enemy tile in a range. */
@@ -82,7 +86,7 @@ public class Units{
         if(team == Team.derelict) return null;
 
         for(Team enemy : state.teams.enemiesOf(team)){
-            TileEntity entity = world.indexer.findTile(enemy, x, y, range, pred);
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred);
             if(entity != null){
                 return entity;
             }

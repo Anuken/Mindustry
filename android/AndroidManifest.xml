@@ -32,31 +32,8 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="application/octet-stream"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.mmap"/>
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/octet-stream" />
                 <data android:scheme="file" android:host="*" android:pathPattern=".*\\.msav"/>
-            </intent-filter>
-
-
-            <intent-filter android:icon="@mipmap/ic_launcher"
-                           android:label="Mindustry Map"
-                           android:priority="1">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.mmap" android:mimeType="*/*"/>
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.msav" android:mimeType="*/*"/>
             </intent-filter>
         </activity>
 

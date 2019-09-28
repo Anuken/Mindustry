@@ -36,6 +36,12 @@ task copyAssets(){
     }
 }
 
+task deploy{
+    dependsOn copyAssets
+    dependsOn createIPA
+}
+
+
 build.dependsOn copyAssets
 
 launchIPhoneSimulator.dependsOn build

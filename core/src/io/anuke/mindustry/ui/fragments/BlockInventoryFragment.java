@@ -20,9 +20,10 @@ import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.Call;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Item.Icon;
 import io.anuke.mindustry.world.Tile;
@@ -32,7 +33,7 @@ import static io.anuke.mindustry.Vars.*;
 public class BlockInventoryFragment extends Fragment{
     private final static float holdWithdraw = 20f;
 
-    private Table table;
+    private Table table = new Table();
     private Tile tile;
     private float holdTime = 0f;
     private boolean holding;
@@ -40,7 +41,8 @@ public class BlockInventoryFragment extends Fragment{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Tile tile, Item item, int amount){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20) || !tile.interactable(player.getTeam())) return;
+        if(!Units.canInteract(player, tile)) return;
 
         int removed = tile.block().removeStack(tile, item, amount);
 
@@ -52,7 +54,6 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table = new Table();
         table.setName("inventory");
         table.setTransform(true);
         parent.setTransform(true);
@@ -71,6 +72,8 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     public void hide(){
+        if(table == null) return;
+
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
             table.clearChildren();
             table.clearListeners();
@@ -86,7 +89,7 @@ public class BlockInventoryFragment extends Fragment{
 
         table.clearChildren();
         table.clearActions();
-        table.background("inventory");
+        table.background(Tex.inventory);
         table.touchable(Touchable.enabled);
         table.update(() -> {
 
@@ -148,7 +151,7 @@ public class BlockInventoryFragment extends Fragment{
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || !tile.entity.items.has(item)) return false;
+                        if(!canPick.get() || tile == null || tile.entity == null || tile.entity.items == null || !tile.entity.items.has(item)) return false;
                         int amount = Math.min(1, player.maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);

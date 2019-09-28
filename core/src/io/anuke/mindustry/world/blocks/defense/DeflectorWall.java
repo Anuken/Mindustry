@@ -1,15 +1,13 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import io.anuke.arc.graphics.Blending;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -32,7 +30,7 @@ public class DeflectorWall extends Wall{
 
         if(entity.hit < 0.0001f) return;
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Draw.alpha(entity.hit * 0.5f);
         Draw.blend(Blending.additive);
         Fill.rect(tile.drawx(), tile.drawy(), tilesize * size, tilesize * size);
@@ -47,14 +45,14 @@ public class DeflectorWall extends Wall{
         super.handleBulletHit(entity, bullet);
 
         //doesn't reflect powerful bullets
-        if(bullet.damage() > maxDamageDeflect) return;
+        if(bullet.damage() > maxDamageDeflect || bullet.isDeflected()) return;
 
         float penX = Math.abs(entity.x - bullet.x), penY = Math.abs(entity.y - bullet.y);
 
         bullet.hitbox(rect2);
 
-        Vector2 position = Geometry.raycastRect(bullet.x, bullet.y, bullet.x + bullet.velocity().x, bullet.y + bullet.velocity().y,
-        rect.setCenter(entity.x, entity.y).setSize(size * tilesize + rect2.width + rect2.height));
+        Vector2 position = Geometry.raycastRect(bullet.x - bullet.velocity().x*Time.delta(), bullet.y - bullet.velocity().y*Time.delta(), bullet.x + bullet.velocity().x*Time.delta(), bullet.y + bullet.velocity().y*Time.delta(),
+        rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(entity.x, entity.y));
 
         if(position != null){
             bullet.set(position.x, position.y);
@@ -66,10 +64,10 @@ public class DeflectorWall extends Wall{
             bullet.velocity().y *= -1;
         }
 
-        bullet.updateVelocity();
-        bullet.resetOwner(entity, Team.derelict);
+        //bullet.updateVelocity();
+        bullet.resetOwner(entity, entity.getTeam());
         bullet.scaleTime(1f);
-        bullet.supress();
+        bullet.deflect();
 
         ((DeflectorEntity)entity).hit = 1f;
     }

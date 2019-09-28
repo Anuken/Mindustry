@@ -128,6 +128,13 @@ public class GenericCrafter extends Block{
     }
 
     @Override
+    public boolean outputsItems(){
+        return outputItem != null;
+    }
+
+
+
+    @Override
     public boolean canProduce(Tile tile){
         if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){
             return false;

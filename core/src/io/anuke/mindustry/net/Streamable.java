@@ -16,13 +16,16 @@ public class Streamable implements Packet{
         public final int id;
         public final byte type;
         public final int total;
-        public final ByteArrayOutputStream stream;
+        public final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         public StreamBuilder(StreamBegin begin){
             id = begin.id;
             type = begin.type;
             total = begin.total;
-            stream = new ByteArrayOutputStream();
+        }
+
+        public float progress(){
+            return (float)stream.size() / total;
         }
 
         public void add(byte[] bytes){

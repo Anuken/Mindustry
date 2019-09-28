@@ -1,22 +1,22 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.type.Weapon;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.Floor;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.ai.Pathfinder.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
@@ -36,34 +36,50 @@ public abstract class GroundUnit extends BaseUnit{
             TileEntity core = getClosestEnemyCore();
 
             if(core == null){
-                setState(patrol);
-                return;
-            }
+                Tile closestSpawn = getClosestSpawner();
+                if(closestSpawn == null || !withinDst(closestSpawn, Vars.state.rules.dropZoneRadius + 85f)){
+                    moveToCore(PathTarget.enemyCores);
+                }
+            }else{
 
-            float dst = dst(core);
+                float dst = dst(core);
 
-            if(dst < getWeapon().bullet.range() / 1.1f){
-                target = core;
-            }
+                if(dst < getWeapon().bullet.range() / 1.1f){
+                    target = core;
+                }
 
-            if(dst > getWeapon().bullet.range() * 0.5f){
-                moveToCore();
-            }
-        }
-    },
-    patrol = new UnitState(){
-        public void update(){
-            TileEntity target = getClosestCore();
-
-            if(target != null){
-                if(dst(target) > 400f){
-                    moveAwayFromCore();
-                }else if(!(!Units.invalidateTarget(GroundUnit.this.target, GroundUnit.this) && dst(GroundUnit.this.target) < getWeapon().bullet.range())){
-                    patrol();
+                if(dst > getWeapon().bullet.range() * 0.5f){
+                    moveToCore(PathTarget.enemyCores);
                 }
             }
         }
+    },
+    rally = new UnitState(){
+        public void update(){
+            Tile target = getClosest(BlockFlag.rally);
+
+            if(target != null && dst(target) > 80f){
+                moveToCore(PathTarget.rallyPoints);
+            }
+        }
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            moveAwayFromCore();
+        }
     };
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+        command == UnitCommand.attack ? attack :
+        command == UnitCommand.rally ? rally :
+        null);
+    }
 
     @Override
     public void interpolate(){
@@ -110,14 +126,14 @@ public abstract class GroundUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
 
         float ft = Mathf.sin(walkTime * type.speed * 5f, 6f, 2f + type.hitsize / 15f);
 
         Floor floor = getFloorOn();
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, 0.5f);
+            Draw.color(Color.white, floor.color, 0.5f);
         }
 
         for(int i : Mathf.signs){
@@ -128,9 +144,9 @@ public abstract class GroundUnit extends BaseUnit{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, drownTime * 0.4f);
+            Draw.color(Color.white, floor.color, drownTime * 0.4f);
         }else{
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
         }
 
         Draw.rect(type.baseRegion, x, y, baseRotation - 90);
@@ -182,9 +198,9 @@ public abstract class GroundUnit extends BaseUnit{
     protected void patrol(){
         vec.trns(baseRotation, type.speed * Time.delta());
         velocity.add(vec.x, vec.y);
-        vec.trns(baseRotation, type.hitsizeTile * 3);
+        vec.trns(baseRotation, type.hitsizeTile * 5);
         Tile tile = world.tileWorld(x + vec.x, y + vec.y);
-        if((tile == null || tile.solid() || tile.floor().drownTime > 0) || stuckTime > 10f){
+        if((tile == null || tile.solid() || tile.floor().drownTime > 0 || tile.floor().isLiquid) || stuckTime > 10f){
             baseRotation += Mathf.sign(id % 2 - 0.5f) * Time.delta() * 3f;
         }
 
@@ -205,10 +221,10 @@ public abstract class GroundUnit extends BaseUnit{
         velocity.add(vec);
     }
 
-    protected void moveToCore(){
+    protected void moveToCore(PathTarget path){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(team, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, team, path);
 
         if(tile == targetTile) return;
 
@@ -227,14 +243,21 @@ public abstract class GroundUnit extends BaseUnit{
             }
         }
 
+        if(enemy == null){
+            for(Team team : Vars.state.teams.enemiesOf(team)){
+                enemy = team;
+                break;
+            }
+        }
+
         if(enemy == null) return;
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = world.pathfinder.getTargetTile(enemy, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
         TileEntity core = getClosestCore();
 
-        if(tile == targetTile || core == null || dst(core) < 90f) return;
+        if(tile == targetTile || core == null || dst(core) < 120f) return;
 
         velocity.add(vec.trns(angleTo(targetTile), type.speed * Time.delta()));
         rotation = Mathf.slerpDelta(rotation, baseRotation, type.rotatespeed);

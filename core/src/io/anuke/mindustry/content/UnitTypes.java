@@ -3,6 +3,7 @@ package io.anuke.mindustry.content;
 import io.anuke.arc.collection.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
@@ -22,8 +23,8 @@ public class UnitTypes implements ContentList{
             speed = 0.3f;
             maxVelocity = 1.2f;
             range = 50f;
-            health = 60;
-            minePower = 0.5f;
+            health = 80;
+            minePower = 0.9f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
             weapon = new Weapon("you have incurred my wrath. prepare to die."){{
@@ -330,9 +331,9 @@ public class UnitTypes implements ContentList{
             baseRotateSpeed = 0.04f;
             weapon = new Weapon("lich-missiles"){{
                 length = 4f;
-                reload = 180f;
+                reload = 160f;
                 width = 22f;
-                shots = 22;
+                shots = 16;
                 shootCone = 100f;
                 shotDelay = 2;
                 inaccuracy = 10f;
@@ -341,7 +342,7 @@ public class UnitTypes implements ContentList{
                 velocityRnd = 0.2f;
                 spacing = 1f;
                 bullet = Bullets.missileRevenant;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.artillery;
             }};
         }};
 
@@ -371,7 +372,18 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 roundrobin = true;
                 ejectEffect = Fx.none;
-                bullet = Bullets.standardDenseBig;
+                bullet = new BasicBulletType(7f, 42, "bullet"){
+                    {
+                        bulletWidth = 15f;
+                        bulletHeight = 21f;
+                        shootEffect = Fx.shootBig;
+                    }
+
+                    @Override
+                    public float range(){
+                        return 165f;
+                    }
+                };
                 shootSound = Sounds.shootBig;
             }};
         }};

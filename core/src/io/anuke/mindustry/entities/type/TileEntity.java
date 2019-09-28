@@ -8,8 +8,6 @@ import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.bullet.Bullet;
-import io.anuke.mindustry.entities.impl.BaseEntity;
 import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.*;
@@ -52,7 +50,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             tile.entity.health = health;
 
             if(tile.entity.damaged()){
-                world.indexer.notifyTileDamaged(tile.entity);
+                indexer.notifyTileDamaged(tile.entity);
             }
         }
     }
@@ -171,12 +169,8 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         if(preHealth >= maxHealth() - 0.00001f && health < maxHealth() && world != null){ //when just damaged
-            world.indexer.notifyTileDamaged(this);
+            indexer.notifyTileDamaged(this);
         }
-    }
-
-    public boolean damaged(){
-        return health < maxHealth() - 0.00001f;
     }
 
     public Tile getTile(){
@@ -211,14 +205,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             if(other == null) continue;
             if(other.entity == null || !(other.interactable(tile.getTeam()))) continue;
 
-            other.block().onProximityUpdate(other);
-
-            tmpTiles.add(other);
-
             //add this tile to proximity of nearby tiles
             if(!other.entity.proximity.contains(tile, true)){
                 other.entity.proximity.add(tile);
             }
+
+            tmpTiles.add(other);
         }
 
         //using a set to prevent duplicates
@@ -228,6 +220,10 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
         block.onProximityAdded(tile);
         block.onProximityUpdate(tile);
+
+        for(Tile other : tmpTiles){
+            other.block().onProximityUpdate(other);
+        }
     }
 
     public Array<Tile> proximity(){

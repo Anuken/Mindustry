@@ -6,10 +6,8 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
@@ -23,11 +21,7 @@ import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class World implements ApplicationListener{
-    public final Maps maps = new Maps();
-    public final BlockIndexer indexer = new BlockIndexer();
-    public final WaveSpawner spawner = new WaveSpawner();
-    public final Pathfinder pathfinder = new Pathfinder();
+public class World{
     public final Context context = new Context();
 
     private Map currentMap;
@@ -36,17 +30,7 @@ public class World implements ApplicationListener{
     private boolean generating, invalidMap;
 
     public World(){
-        maps.load();
-    }
 
-    @Override
-    public void init(){
-        maps.loadLegacyMaps();
-    }
-
-    @Override
-    public void dispose(){
-        maps.dispose();
     }
 
     public boolean isInvalidMap(){
@@ -190,9 +174,11 @@ public class World implements ApplicationListener{
             }
         }
 
-        addDarkness(tiles);
+        if(!headless){
+            addDarkness(tiles);
+        }
 
-        Entities.getAllGroups().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
+        entities.all().each(group -> group.resize(-finalWorldBounds, -finalWorldBounds, tiles.length * tilesize + finalWorldBounds * 2, tiles[0].length * tilesize + finalWorldBounds * 2));
 
         generating = false;
         Events.fire(new WorldLoadEvent());
@@ -220,12 +206,16 @@ public class World implements ApplicationListener{
     }
 
     public void loadMap(Map map){
+        loadMap(map, new Rules());
+    }
+
+    public void loadMap(Map map, Rules checkRules){
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Exception e){
             Log.err(e);
             if(!headless){
-                ui.showError("$map.invalid");
+                ui.showErrorMessage("$map.invalid");
                 Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
@@ -238,23 +228,24 @@ public class World implements ApplicationListener{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.get(defaultTeam).cores.size == 0){
-                ui.showError("$map.nospawn");
+            if(state.teams.get(defaultTeam).cores.size == 0 && !checkRules.pvp){
+                ui.showErrorMessage("$map.nospawn");
                 invalidMap = true;
-            }else if(state.rules.pvp){ //pvp maps need two cores to be valid
-                invalidMap = true;
+            }else if(checkRules.pvp){ //pvp maps need two cores to be valid
+                int teams = 0;
                 for(Team team : Team.all){
-                    if(state.teams.get(team).cores.size != 0 && team != defaultTeam){
-                        invalidMap = false;
+                    if(state.teams.get(team).cores.size != 0){
+                        teams ++;
                     }
                 }
-                if(invalidMap){
-                    ui.showError("$map.nospawn.pvp");
+                if(teams < 2){
+                    invalidMap = true;
+                    ui.showErrorMessage("$map.nospawn.pvp");
                 }
-            }else if(state.rules.attackMode){ //pvp maps need two cores to be valid
+            }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.teams.get(waveTeam).cores.isEmpty();
                 if(invalidMap){
-                    ui.showError("$map.nospawn.attack");
+                    ui.showErrorMessage("$map.nospawn.attack");
                 }
             }
         }else{
@@ -349,7 +340,7 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic() && tile.block().fillsTile){
+                if(tile.isDarkened()){
                     dark[x][y] = darkIterations;
                 }
             }
@@ -378,8 +369,20 @@ public class World implements ApplicationListener{
         for(int x = 0; x < tiles.length; x++){
             for(int y = 0; y < tiles[0].length; y++){
                 Tile tile = tiles[x][y];
-                if(tile.block().solid && !tile.block().synthetic()){
+                if(tile.isDarkened()){
                     tiles[x][y].rotation(dark[x][y]);
+                }
+                if(dark[x][y] == 4){
+                    boolean full = true;
+                    for(Point2 p : Geometry.d4){
+                        int px = p.x + x, py = p.y + y;
+                        if(Structs.inBounds(px, py, tiles) && !(tiles[px][py].isDarkened() && dark[px][py] == 4)){
+                            full = false;
+                            break;
+                        }
+                    }
+
+                    if(full) tiles[x][y].rotation(5);
                 }
             }
         }

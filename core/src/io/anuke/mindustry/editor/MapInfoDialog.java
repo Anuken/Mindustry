@@ -4,12 +4,10 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class MapInfoDialog extends FloatingDialog{
     private final MapEditor editor;
@@ -45,7 +43,7 @@ public class MapInfoDialog extends FloatingDialog{
             t.row();
             t.add("$editor.description").padRight(8).left();
 
-            TextArea description = t.addArea(tags.get("description", ""), "textarea", text -> {
+            TextArea description = t.addArea(tags.get("description", ""), Styles.areaField, text -> {
                 tags.put("description", text);
             }).size(400f, 140f).get();
 
@@ -70,7 +68,7 @@ public class MapInfoDialog extends FloatingDialog{
             t.row();
             t.add("$editor.generation").padRight(8).left();
             t.addButton("$edit",
-                () -> generate.show(world.maps.readFilters(editor.getTags().get("genfilters", "")),
+                () -> generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
                 filters -> editor.getTags().put("genfilters", JsonIO.write(filters)))
             ).left().width(200f);
 
@@ -78,9 +76,9 @@ public class MapInfoDialog extends FloatingDialog{
             description.change();
             author.change();
 
-            Platform.instance.addDialog(name, 50);
-            Platform.instance.addDialog(author, 50);
-            Platform.instance.addDialog(description, 1000);
+            Vars.platform.addDialog(name, 50);
+            Vars.platform.addDialog(author, 50);
+            Vars.platform.addDialog(description, 1000);
             t.margin(16f);
         });
     }

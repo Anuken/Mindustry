@@ -1,14 +1,15 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 
 public class Interpolator{
     //used for movement
     public Vector2 target = new Vector2();
     public Vector2 last = new Vector2();
     public float[] targets = {};
+    public float[] lasts = {};
     public long lastUpdated, updateSpacing;
 
     //current state
@@ -21,6 +22,12 @@ public class Interpolator{
         lastUpdated = Time.millis();
 
         targets = target1ds;
+        if(lasts.length != values.length){
+            lasts = new float[values.length];
+        }
+        for(int i = 0; i < values.length; i++){
+            lasts[i] = values[i];
+        }
         last.set(cx, cy);
         target.set(x, y);
     }
@@ -46,8 +53,12 @@ public class Interpolator{
                 values = new float[targets.length];
             }
 
+            if(lasts.length != targets.length){
+                lasts = new float[targets.length];
+            }
+
             for(int i = 0; i < values.length; i++){
-                values[i] = Mathf.slerp(values[i], targets[i], alpha);
+                values[i] = Mathf.slerp(lasts[i], targets[i], alpha);
             }
         }else{
             pos.set(target);

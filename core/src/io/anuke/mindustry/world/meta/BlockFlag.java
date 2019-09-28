@@ -1,20 +1,19 @@
 package io.anuke.mindustry.world.meta;
 
+/** Stores special flags of blocks for easy querying. */
 public enum BlockFlag{
-    /** General important target for all types of units. */
-    target(0),
+    /** Enemy core; primary target for all units. */
+    core,
+    /** Rally point for units.*/
+    rally,
     /** Producer of important goods. */
-    producer(Float.MAX_VALUE),
+    producer,
     /** A turret. */
-    turret(Float.MAX_VALUE),
+    turret,
+    /** Only the command center block.*/
+    comandCenter,
     /** Repair point. */
-    repair(Float.MAX_VALUE);
+    repair;
 
     public final static BlockFlag[] all = values();
-    public final float cost;
-
-    BlockFlag(float cost){
-        if(cost < 0) throw new RuntimeException("Block flag costs cannot be < 0!");
-        this.cost = cost;
-    }
 }

@@ -29,6 +29,13 @@ _Building:_ `./gradlew desktop:dist`
 
 Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server', e.g. `gradlew server:dist`.
 
+#### Android
+
+1. Install the Android SDK [here.](https://developer.android.com/studio#downloads) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
+2. Create a file named `local.properties` inside the Mindustry directory, with its contents looking like this: `sdk.dir=<Path to Android SDK you just downloaded, without these bracket>`. For example, if you're on Windows and installed the tools to C:\\tools, your local.properties would contain `sdk.dir=C:\\tools` (*note the double backslashes are required instead of single ones!*).
+3. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
+4. (Optional) To debug the application on a connected phone, do `gradlew android:installDebug android:run`. It is **highly recommended** to use IntelliJ for this instead, however.
+
 ##### Troubleshooting
 
 If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. *This is a one-time procedure.*
@@ -36,10 +43,18 @@ If the terminal returns `Permission denied` or `Command not found` on Mac/Linux,
 ---
 
 Gradle may take up to several minutes to download files. Be patient. <br>
-After building, the output .JAR file should be in `/desktop/build/libs/desktop-release.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
+After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
 
 ### Downloads
 
-<a href="https://anuke.itch.io/mindustry"><img src="https://static.itch.io/images/badge.svg" width="auto" height="75"></a>
+[<img src="https://static.itch.io/images/badge.svg"
+     alt="Get it on Itch.io"
+     height="60">](https://anuke.itch.io/mindustry)
 
-<a href="https://play.google.com/store/apps/details?id=io.anuke.mindustry&hl=en"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/1280px-Get_it_on_Google_play.svg.png" width="auto" height="75"></a>
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=io.anuke.mindustry)
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.anuke.mindustry/)

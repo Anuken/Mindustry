@@ -1,23 +1,22 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Fill;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.mindustry.entities.Predict;
-import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.*;
 
 public abstract class FlyingUnit extends BaseUnit{
-    protected float[] weaponAngles = {0, 0};
+    protected float[] weaponAngles = {0,0};
 
     protected final UnitState
 
@@ -37,13 +36,12 @@ public abstract class FlyingUnit extends BaseUnit{
 
                 if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                 if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
-
-                if(target == null){
-                    setState(patrol);
-                }
             }
 
-            if(target != null){
+            if(getClosestSpawner() == null && getSpawner() != null && target == null){
+                target = getSpawner();
+                circle(80f + Mathf.randomSeed(id) * 120);
+            }else if(target != null){
                 attack(type.attackLength);
 
                 if((Angles.near(angleTo(target), rotation, type.shootCone) || getWeapon().ignoreRotation) //bombers and such don't care about rotation
@@ -66,28 +64,56 @@ public abstract class FlyingUnit extends BaseUnit{
                         getWeapon().update(FlyingUnit.this, to.x, to.y);
                     }
                 }
+            }else{
+                target = getClosestSpawner();
+                moveTo(Vars.state.rules.dropZoneRadius + 120f);
             }
         }
     },
-    patrol = new UnitState(){
+    rally = new UnitState(){
         public void update(){
             if(retarget()){
+                targetClosestAllyFlag(BlockFlag.rally);
                 targetClosest();
-                targetClosestEnemyFlag(BlockFlag.target);
 
                 if(target != null && !Units.invalidateTarget(target, team, x, y)){
                     setState(attack);
                     return;
                 }
 
-                target = getClosestCore();
-            };
+                if(target == null) target = getSpawner();
+            }
 
             if(target != null){
-                circle(60f + Mathf.absin(Time.time() + Mathf.randomSeed(id) * 1200f, 70f, 1200f));
+                circle(65f + Mathf.randomSeed(id) * 100);
             }
         }
-    };
+    },
+    retreat = new UnitState(){
+        public void entered(){
+            target = null;
+        }
+
+        public void update(){
+            if(retarget()){
+                target = getSpawner();
+
+                Tile repair = Geometry.findClosest(x, y, indexer.getAllied(team, BlockFlag.repair));
+                if(repair != null && damaged()) FlyingUnit.this.target = repair.entity;
+                if(target == null) target = getClosestCore();
+            }
+
+            circle(targetHasFlag(BlockFlag.repair) ? 20f : 60f + Mathf.randomSeed(id) * 50, 0.65f * type.speed);
+        }
+    };;
+
+    @Override
+    public void onCommand(UnitCommand command){
+        state.set(command == UnitCommand.retreat ? retreat :
+        command == UnitCommand.attack ? attack :
+        command == UnitCommand.rally ? rally :
+        null);
+    }
 
     @Override
     public void move(float x, float y){
@@ -98,10 +124,10 @@ public abstract class FlyingUnit extends BaseUnit{
     public void update(){
         super.update();
 
-        if(!Net.client()){
+        if(!net.client()){
             updateRotation();
-            wobble();
         }
+        wobble();
     }
 
     @Override
@@ -111,7 +137,7 @@ public abstract class FlyingUnit extends BaseUnit{
 
     @Override
     public void draw(){
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
         Draw.rect(type.region, x, y, rotation - 90);
 
         drawWeapons();
@@ -128,7 +154,7 @@ public abstract class FlyingUnit extends BaseUnit{
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset), y + Angles.trnsy(rotation + 180, type.engineOffset),
         type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, type.engineOffset - 1f), y + Angles.trnsy(rotation + 180, type.engineOffset - 1f),
         (type.engineSize + Mathf.absin(Time.time(), 2f, type.engineSize / 4f)) / 2f);
         Draw.color();
@@ -151,7 +177,7 @@ public abstract class FlyingUnit extends BaseUnit{
     }
 
     protected void wobble(){
-        if(Net.client()) return;
+        if(net.client()) return;
 
         x += Mathf.sin(Time.time() + id * 999, 25f, 0.05f) * Time.delta();
         y += Mathf.cos(Time.time() + id * 999, 25f, 0.05f) * Time.delta();

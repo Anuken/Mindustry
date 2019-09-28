@@ -1,16 +1,14 @@
 package io.anuke.mindustry.entities.units;
 
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.Bits;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.util.Time;
-import io.anuke.arc.util.Tmp;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.entities.traits.Saveable;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.type.StatusEffect;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.traits.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
 
 import java.io.*;
 
@@ -28,8 +26,8 @@ public class Statuses implements Saveable{
     private float damageMultiplier;
     private float armorMultiplier;
 
-    public void handleApply(io.anuke.mindustry.entities.type.Unit unit, StatusEffect effect, float duration){
-        if(effect == StatusEffects.none || unit.isImmune(effect)) return; //don't apply empty or immune effects
+    public void handleApply(Unit unit, StatusEffect effect, float duration){
+        if(effect == StatusEffects.none || effect == null || unit.isImmune(effect)) return; //don't apply empty or immune effects
 
         if(statuses.size > 0){
             //check for opposite effects
@@ -39,6 +37,7 @@ public class Statuses implements Saveable{
                     entry.time = Math.max(entry.time, duration);
                     return;
                 }else if(entry.effect.reactsWith(effect)){ //find opposite
+                    globalResult.effect = entry.effect;
                     entry.effect.getTransition(unit, effect, entry.time, duration, globalResult);
                     entry.time = globalResult.time;
 
@@ -60,7 +59,7 @@ public class Statuses implements Saveable{
 
     public Color getStatusColor(){
         if(statuses.size == 0){
-            return Tmp.c1.set(Color.WHITE);
+            return Tmp.c1.set(Color.white);
         }
 
         float r = 0f, g = 0f, b = 0f;

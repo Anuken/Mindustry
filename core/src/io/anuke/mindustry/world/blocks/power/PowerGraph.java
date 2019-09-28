@@ -100,6 +100,16 @@ public class PowerGraph{
         return totalCapacity;
     }
 
+    public float getTotalBatteryCapacity(){
+        float totalCapacity = 0f;
+        for(Tile battery : batteries){
+            if(battery.block().consumes.hasPower()){
+                totalCapacity += battery.block().consumes.getPower().capacity;
+            }
+        }
+        return totalCapacity;
+    }
+
     public float useBatteries(float needed){
         float stored = getBatteryStored();
         if(Mathf.isEqual(stored, 0f)) return 0f;
@@ -109,10 +119,7 @@ public class PowerGraph{
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
-                ConsumePower consumePower = consumes.getPower();
-                if(consumePower.capacity > 0f){
-                    battery.entity.power.satisfaction = Math.max(0.0f, battery.entity.power.satisfaction - consumedPowerPercentage);
-                }
+                battery.entity.power.satisfaction *= (1f-consumedPowerPercentage);
             }
         }
         return used;

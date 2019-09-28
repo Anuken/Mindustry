@@ -5,6 +5,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
@@ -48,6 +49,7 @@ public class Unloader extends Block{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
+        if(!Units.canInteract(player, tile)) return;
         SortedUnloaderEntity entity = tile.entity();
         entity.items.clear();
         entity.sortItem = item;
@@ -59,9 +61,9 @@ public class Unloader extends Block{
 
         if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
-                if(other.interactable(tile.getTeam()) && other.block() instanceof StorageBlock && entity.items.total() == 0 &&
-                ((entity.sortItem == null && other.entity.items.total() > 0) || ((StorageBlock)other.block()).hasItem(other, entity.sortItem))){
-                    offloadNear(tile, ((StorageBlock)other.block()).removeItem(other, entity.sortItem));
+                if(other.interactable(tile.getTeam()) && other.block().unloadable && other.block().hasItems && entity.items.total() == 0 &&
+                ((entity.sortItem == null && other.entity.items.total() > 0) || hasItem(other, entity.sortItem))){
+                    offloadNear(tile, removeItem(other, entity.sortItem));
                 }
             }
         }
@@ -71,13 +73,45 @@ public class Unloader extends Block{
         }
     }
 
+    /**
+     * Removes an item and returns it. If item is not null, it should return the item.
+     * Returns null if no items are there.
+     */
+    private Item removeItem(Tile tile, Item item){
+        TileEntity entity = tile.entity;
+
+        if(item == null){
+            return entity.items.take();
+        }else{
+            if(entity.items.has(item)){
+                entity.items.remove(item, 1);
+                return item;
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Returns whether this storage block has the specified item.
+     * If the item is null, it should return whether it has ANY items.
+     */
+    private boolean hasItem(Tile tile, Item item){
+        TileEntity entity = tile.entity;
+        if(item == null){
+            return entity.items.total() > 0;
+        }else{
+            return entity.items.has(item);
+        }
+    }
+
     @Override
     public void draw(Tile tile){
         super.draw(tile);
 
         SortedUnloaderEntity entity = tile.entity();
 
-        Draw.color(entity.sortItem == null ? Color.CLEAR : entity.sortItem.color);
+        Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
         Fill.square(tile.worldx(), tile.worldy(), 1f);
         Draw.color();
     }

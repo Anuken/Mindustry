@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.Tile;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 /** A drone that only mines.*/
 public class MinerDrone extends BaseDrone implements MinerTrait{
@@ -46,7 +46,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
                 setState(drop);
             }else{
                 if(retarget() && targetItem != null){
-                    target = world.indexer.findClosestOre(x, y, targetItem);
+                    target = indexer.findClosestOre(x, y, targetItem);
                 }
 
                 if(target instanceof Tile){
@@ -174,6 +174,6 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         if(entity == null){
             return;
         }
-        targetItem = Structs.findMin(type.toMine, world.indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+        targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 }

@@ -16,12 +16,14 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.EffectEntity;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
@@ -36,16 +38,15 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
     private Bloom bloom;
     private Color clearColor;
-    private float targetscale = UnitScl.dp.scl(4);
+    private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
+    private float landscale = 0f, landTime;
+    private float minZoomScl = Scl.scl(0.01f);
     private Rectangle rect = new Rectangle(), rect2 = new Rectangle();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
         camera = new Camera();
-        if(settings.getBool("bloom")){
-            setupBloom();
-        }
         Shaders.init();
 
         Effects.setScreenShakeProvider((intensity, duration) -> {
@@ -94,16 +95,30 @@ public class Renderer implements ApplicationListener{
     }
 
     @Override
+    public void init(){
+        if(settings.getBool("bloom")){
+            setupBloom();
+        }
+    }
+
+    @Override
     public void update(){
-        //TODO hack, find source of this bug
-        Color.WHITE.set(1f, 1f, 1f, 1f);
+        Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+
+        if(landTime > 0){
+            landTime -= Time.delta();
+            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            camerascale = landscale;
+        }
+
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
         if(state.is(State.menu)){
-            graphics.clear(Color.BLACK);
+            landTime = 0f;
+            graphics.clear(Color.black);
         }else{
             Vector2 position = Tmp.v3.set(player);
 
@@ -114,7 +129,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(!mobile || settings.getBool("keyboard")){
+            }else if(control.input instanceof DesktopInput){
                 camera.position.lerpDelta(position, 0.08f);
             }
 
@@ -125,6 +140,10 @@ public class Renderer implements ApplicationListener{
                 draw();
             }
         }
+    }
+
+    public float landScale(){
+        return landTime > 0 ? landscale : 1f;
     }
 
     @Override
@@ -158,7 +177,7 @@ public class Renderer implements ApplicationListener{
             e.printStackTrace();
             settings.put("bloom", false);
             settings.save();
-            ui.showError("$error.bloom");
+            ui.showErrorMessage("$error.bloom");
         }
     }
 
@@ -205,9 +224,9 @@ public class Renderer implements ApplicationListener{
 
         blocks.floor.drawFloor();
 
-        draw(groundEffectGroup, e -> e instanceof BelowLiquidTrait);
-        draw(puddleGroup);
-        draw(groundEffectGroup, e -> !(e instanceof BelowLiquidTrait));
+        groundEffectGroup.draw(e -> e instanceof BelowLiquidTrait);
+        puddleGroup.draw();
+        groundEffectGroup.draw(e -> !(e instanceof BelowLiquidTrait));
 
         blocks.processBlocks();
 
@@ -244,8 +263,8 @@ public class Renderer implements ApplicationListener{
             bloom.capture();
         }
 
-        draw(bulletGroup);
-        draw(effectGroup);
+        bulletGroup.draw();
+        effectGroup.draw();
 
         Draw.flush();
         if(bloom != null && !pixelator.enabled()){
@@ -253,15 +272,15 @@ public class Renderer implements ApplicationListener{
         }
 
         overlays.drawBottom();
-        draw(playerGroup, p -> true, Player::drawBuildRequests);
+        playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
 
-        if(Entities.countInBounds(shieldGroup) > 0){
-            if(settings.getBool("animatedshields")){
+        if(shieldGroup.countInBounds() > 0){
+            if(settings.getBool("animatedshields") && Shaders.shield != null){
                 Draw.flush();
                 shieldBuffer.begin();
-                graphics.clear(Color.CLEAR);
-                Entities.draw(shieldGroup);
-                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawOver());
+                graphics.clear(Color.clear);
+                shieldGroup.draw();
+                shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
                 Draw.flush();
                 shieldBuffer.end();
                 Draw.shader(Shaders.shield);
@@ -270,16 +289,43 @@ public class Renderer implements ApplicationListener{
                 Draw.color();
                 Draw.shader();
             }else{
-                Entities.draw(shieldGroup, shield -> true, shield -> ((ShieldEntity)shield).drawSimple());
+                shieldGroup.draw(shield -> true, ShieldEntity::drawSimple);
             }
         }
 
         overlays.drawTop();
 
-        draw(playerGroup, p -> !p.isDead() && !p.isLocal, Player::drawName);
+        playerGroup.draw(p -> !p.isDead(), Player::drawName);
+
+        drawLanding();
 
         Draw.color();
         Draw.flush();
+    }
+
+    private void drawLanding(){
+        if(landTime > 0 && player.getClosestCore() != null){
+            float fract = landTime / Fx.coreLand.lifetime;
+            TileEntity entity = player.getClosestCore();
+
+            TextureRegion reg = entity.block.icon(Block.Icon.full);
+            float scl = Scl.scl(4f) / camerascale;
+            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+
+            Draw.color(Pal.lightTrail);
+            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+
+            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
+                Lines.stroke(scl * fin);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+            });
+
+            Draw.color();
+            Draw.mixcol(Color.white, fract);
+            Draw.rect(reg, entity.x, entity.y, reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+
+            Draw.reset();
+        }
     }
 
     private void drawGroundShadows(){
@@ -293,12 +339,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                draw(group, unit -> !unit.isDead(), draw::accept);
+                group.draw(unit -> !unit.isDead(), draw::accept);
             }
         }
 
         if(!playerGroup.isEmpty()){
-            draw(playerGroup, unit -> !unit.isDead(), draw::accept);
+            playerGroup.draw(unit -> !unit.isDead(), draw::accept);
         }
 
         Draw.color();
@@ -310,12 +356,12 @@ public class Renderer implements ApplicationListener{
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                draw(group, unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
+                group.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
             }
         }
 
         if(!playerGroup.isEmpty()){
-            draw(playerGroup, unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
+            playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
         }
 
         Draw.color();
@@ -327,27 +373,15 @@ public class Renderer implements ApplicationListener{
 
             if(group.count(p -> p.isFlying() == flying) + playerGroup.count(p -> p.isFlying() == flying && p.getTeam() == team) == 0 && flying) continue;
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team && !p.isDead(), Unit::drawUnder);
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawAll);
 
-            draw(unitGroups[team.ordinal()], u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-            draw(playerGroup, p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
+            unitGroups[team.ordinal()].draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
+            playerGroup.draw(p -> p.isFlying() == flying && p.getTeam() == team, Unit::drawOver);
         }
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group){
-        draw(group, t -> true, DrawTrait::draw);
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw){
-        draw(group, toDraw, DrawTrait::draw);
-    }
-
-    public <T extends DrawTrait> void draw(EntityGroup<T> group, Predicate<T> toDraw, Consumer<T> drawer){
-        Entities.draw(group, toDraw, drawer);
     }
 
     public void scaleCamera(float amount){
@@ -356,7 +390,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = UnitScl.dp.scl(1f);
+        float s = Scl.scl(1f);
         targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
     }
 
@@ -367,6 +401,11 @@ public class Renderer implements ApplicationListener{
     public void setScale(float scl){
         targetscale = scl;
         clampScale();
+    }
+
+    public void zoomIn(float duration){
+        landscale = minZoomScl;
+        landTime = duration;
     }
 
     public void takeMapScreenshot(){

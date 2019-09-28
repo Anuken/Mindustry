@@ -47,7 +47,7 @@ public enum CacheLayer{
 
         renderer.blocks.floor.endc();
         renderer.shieldBuffer.begin();
-        Core.graphics.clear(Color.CLEAR);
+        Core.graphics.clear(Color.clear);
         renderer.blocks.floor.beginc();
     }
 

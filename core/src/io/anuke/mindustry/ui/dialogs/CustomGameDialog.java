@@ -6,12 +6,12 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.ui.*;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class CustomGameDialog extends FloatingDialog{
     private MapPlayDialog dialog = new MapPlayDialog();
@@ -37,18 +37,18 @@ public class CustomGameDialog extends FloatingDialog{
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
-        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / UnitScl.dp.scl(200)), 1, 8);
+        int maxwidth = Mathf.clamp((int)(Core.graphics.getWidth() / Scl.scl(200)), 1, 8);
         float images = 146f;
 
         int i = 0;
         maps.defaults().width(170).fillY().top().pad(4f);
-        for(Map map : world.maps.all()){
+        for(Map map : Vars.maps.all()){
 
             if(i % maxwidth == 0){
                 maps.row();
             }
 
-            ImageButton image = new ImageButton(new TextureRegion(map.texture), "clear");
+            ImageButton image = new ImageButton(new TextureRegion(map.safeTexture()), Styles.cleari);
             image.margin(5);
             image.top();
 
@@ -60,19 +60,19 @@ public class CustomGameDialog extends FloatingDialog{
                 t.left();
                 for(Gamemode mode : Gamemode.all){
                     if(mode.valid(map) && Core.atlas.has("icon-mode-" + mode.name())){
-                        t.addImage("icon-mode-" + mode.name()).size(16f).pad(4f);
+                        t.addImage(Core.atlas.drawable("icon-mode-" + mode.name())).size(16f).pad(4f);
                     }
                 }
             }).left();
             image.row();
             image.add(map.name()).pad(1f).growX().wrap().left().get().setEllipsis(true);
             image.row();
-            image.addImage("whiteui", Pal.gray).growX().pad(3).height(4f);
+            image.addImage(Tex.whiteui, Pal.gray).growX().pad(3).height(4f);
             image.row();
             image.add(img).size(images);
 
 
-            BorderImage border = new BorderImage(map.texture, 3f);
+            BorderImage border = new BorderImage(map.safeTexture(), 3f);
             border.setScaling(Scaling.fit);
             image.replaceImage(border);
 
@@ -83,7 +83,7 @@ public class CustomGameDialog extends FloatingDialog{
             i++;
         }
 
-        if(world.maps.all().size == 0){
+        if(Vars.maps.all().size == 0){
             maps.add("$maps.none").pad(50);
         }
 

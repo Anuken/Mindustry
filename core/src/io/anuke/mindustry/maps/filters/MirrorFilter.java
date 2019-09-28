@@ -17,7 +17,6 @@ public class MirrorFilter extends GenerateFilter{
 
     {
         options(new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45));
-        buffered = true;
     }
 
     @Override
@@ -34,7 +33,9 @@ public class MirrorFilter extends GenerateFilter{
             mirror(v3, v1.x, v1.y, v2.x, v2.y);
             Tile tile = in.tile(v3.x, v3.y);
             in.floor = tile.floor();
-            in.block = tile.block();
+            if(!tile.block().synthetic()){
+                in.block = tile.block();
+            }
             in.ore = tile.overlay();
         }
     }
@@ -58,7 +59,7 @@ public class MirrorFilter extends GenerateFilter{
         clamper.accept(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
         clamper.accept(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()).rotate(180f).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
 
-        Lines.stroke(UnitScl.dp.scl(3f), Pal.accent);
+        Lines.stroke(Scl.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
         Draw.reset();
     }

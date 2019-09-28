@@ -9,7 +9,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.maps;
 
 public class Map implements Comparable<Map>{
     /** Whether this is a custom map. */
@@ -20,6 +20,8 @@ public class Map implements Comparable<Map>{
     public final FileHandle file;
     /** Format version. */
     public final int version;
+    /** Whether this map is managed, e.g. downloaded from the Steam workshop.*/
+    public boolean workshop;
     /** Map width/height, shorts. */
     public int width, height;
     /** Preview texture. */
@@ -55,6 +57,18 @@ public class Map implements Comparable<Map>{
 
     public int getHightScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
+    }
+
+    public Texture safeTexture(){
+        return texture == null ? Core.assets.get("sprites/error.png") : texture;
+    }
+
+    public FileHandle previewFile(){
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
+    }
+
+    public FileHandle cacheFile(){
+        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + "-cache.dat");
     }
 
     public void setHighScore(int score){
@@ -94,7 +108,7 @@ public class Map implements Comparable<Map>{
         if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
             return Array.with();
         }
-        return world.maps.readFilters(tags.get("genfilters", ""));
+        return maps.readFilters(tags.get("genfilters", ""));
     }
 
     public String author(){
@@ -119,12 +133,14 @@ public class Map implements Comparable<Map>{
 
     @Override
     public int compareTo(Map map){
+        int work = -Boolean.compare(workshop, map.workshop);
+        if(work != 0) return work;
         int type = -Boolean.compare(custom, map.custom);
-        if(type != 0){
-            return type;
-        }else{
-            return name().compareTo(map.name());
-        }
+        if(type != 0) return type;
+        int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));
+        if(modes != 0) return modes;
+
+        return name().compareTo(map.name());
     }
 
     @Override

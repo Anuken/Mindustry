@@ -2,6 +2,7 @@ package io.anuke.mindustry.entities.type;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -11,7 +12,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
-import io.anuke.mindustry.entities.impl.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -19,9 +19,9 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -78,7 +78,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
     @Override
     public void damage(float amount){
-        if(!Net.client()){
+        if(!net.client()){
             super.damage(calculateDamage(amount));
         }
         hitTime = hitDuration;
@@ -110,6 +110,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         drownTime = 0f;
         status.clear();
         Events.fire(new UnitDestroyEvent(this));
+
+        if(explosiveness > 7f && this == player){
+            Events.fire(Trigger.suicideBomb);
+        }
     }
 
     @Override
@@ -209,15 +213,25 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         float radScl = 1.5f;
         float fsize = getSize() / radScl;
         moveVector.setZero();
+        float cx = x - fsize/2f, cy = y - fsize/2f;
 
-        Units.nearby(x - fsize/2f, y - fsize/2f, fsize, fsize, en -> {
-            if(en == this || en.isFlying() != isFlying()) return;
+        for(Team team : Team.all){
+            avoid(unitGroups[team.ordinal()].intersect(cx, cy, fsize, fsize));
+        }
+
+        avoid(playerGroup.intersect(cx, cy, fsize, fsize));
+        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
+    }
+
+    private void avoid(Array<? extends Unit> arr){
+        float radScl = 1.5f;
+
+        for(Unit en : arr){
+            if(en.isFlying() != isFlying()) continue;
             float dst = dst(en);
             float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));
             moveVector.add(Tmp.v1.set((x - en.x) * scl, (y - en.y) * scl).limit(0.4f));
-        });
-
-        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
+        }
     }
 
     public @Nullable TileEntity getClosestCore(){
@@ -256,7 +270,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         //apply knockback based on spawns
         if(getTeam() != waveTeam){
             float relativeSize = state.rules.dropZoneRadius + getSize()/2f + 1f;
-            for(Tile spawn : world.spawner.getGroundSpawns()){
+            for(Tile spawn : spawner.getGroundSpawns()){
                 if(withinDst(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velocity.add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }
@@ -308,8 +322,11 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
 
             drownTime = Mathf.clamp(drownTime);
 
-            if(drownTime >= 0.999f && !Net.client()){
+            if(drownTime >= 0.999f && !net.client()){
                 damage(health + 1);
+                if(this == player){
+                    Events.fire(Trigger.drown);
+                }
             }
 
             float px = x, py = y;
@@ -347,7 +364,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void applyEffect(StatusEffect effect, float duration){
-        if(dead || Net.client()) return; //effects are synced and thus not applied through clients
+        if(dead || net.client()) return; //effects are synced and thus not applied through clients
         status.handleApply(this, effect, duration);
     }
 
@@ -372,7 +389,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x, y, rotation - 90);
         Draw.color();
 
@@ -400,10 +417,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
                 (3f + Mathf.absin(Time.time(), 5f, 1f)) * itemtime);
 
             if(number){
-                Core.scene.skin.getFont("outline").draw(item.amount + "",
+                Fonts.outline.draw(item.amount + "",
                     x + Angles.trnsx(rotation + 180f, backTrns),
                     y + Angles.trnsy(rotation + 180f, backTrns) - 3,
-                    Pal.accent, 0.25f * itemtime / UnitScl.dp.scl(1f), false, Align.center
+                    Pal.accent, 0.25f * itemtime / Scl.scl(1f), false, Align.center
                 );
             }
         }

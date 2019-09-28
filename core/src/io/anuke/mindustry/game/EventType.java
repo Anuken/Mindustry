@@ -1,12 +1,63 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.Tile;
 
 public class EventType{
+
+    //events that occur very often
+    public enum Trigger{
+        shock,
+        phaseDeflectHit,
+        impactPower,
+        thoriumReactorOverheat,
+        itemLaunch,
+        fireExtinguish,
+        newGame,
+        tutorialComplete,
+        flameAmmo,
+        turretCool,
+        enablePixelation,
+        drown,
+        exclusionDeath,
+        suicideBomb,
+        openWiki
+    }
+
+    public static class WinEvent{}
+
+    public static class LoseEvent{}
+
+    public static class LaunchEvent{}
+
+    public static class MapMakeEvent{}
+
+    public static class MapPublishEvent{}
+
+    public static class CommandIssueEvent{
+        public final Tile tile;
+        public final UnitCommand command;
+
+        public CommandIssueEvent(Tile tile, UnitCommand command){
+            this.tile = tile;
+            this.command = command;
+        }
+    }
+
+    public static class PlayerChatEvent{
+        public final Player player;
+        public final String message;
+
+        public PlayerChatEvent(Player player, String message){
+            this.player = player;
+            this.message = message;
+        }
+    }
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
@@ -27,8 +78,8 @@ public class EventType{
         }
     }
 
-    /** Called when the game is first loaded. */
-    public static class GameLoadEvent{
+    /** Called when the client game is first loaded. */
+    public static class ClientLoadEvent{
 
     }
 
@@ -117,6 +168,14 @@ public class EventType{
         }
     }
 
+    public static class ResearchEvent{
+        public final UnlockableContent content;
+
+        public ResearchEvent(UnlockableContent content){
+            this.content = content;
+        }
+    }
+
     /**
      * Called when block building begins by placing down the BuildBlock.
      * The tile's block will nearly always be a BuildBlock.
@@ -136,11 +195,13 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
+        public final @Nullable Player player;
         public final boolean breaking;
 
-        public BlockBuildEndEvent(Tile tile, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Player player, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
+            this.player = player;
             this.breaking = breaking;
         }
     }
@@ -181,8 +242,53 @@ public class EventType{
         }
     }
 
+    public static class UnitCreateEvent{
+        public final BaseUnit unit;
+
+        public UnitCreateEvent(BaseUnit unit){
+            this.unit = unit;
+        }
+    }
+
     public static class ResizeEvent{
 
     }
+
+    public static class MechChangeEvent{
+        public final Player player;
+        public final Mech mech;
+
+        public MechChangeEvent(Player player, Mech mech){
+            this.player = player;
+            this.mech = mech;
+        }
+    }
+
+    /** Called after connecting; when a player recieves world data and is ready to play.*/
+    public static class PlayerJoin{
+        public final Player player;
+        
+        public PlayerJoin(Player player){
+            this.player = player;
+        }
+    }
+
+    /** Called when a player connects, but has not joined the game yet.*/
+    public static class PlayerConnect{
+        public final Player player;
+
+        public PlayerConnect(Player player){
+            this.player = player;
+        }
+    }
+
+    public static class PlayerLeave{
+        public final Player player;
+        
+        public PlayerLeave(Player player){
+            this.player = player;
+        }
+    }
+           
 }
 

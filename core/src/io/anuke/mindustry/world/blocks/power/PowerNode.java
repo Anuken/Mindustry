@@ -2,16 +2,17 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -20,9 +21,7 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    //last distribution block placed
-    public static int lastPlaced = -1;
-
+    protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
 
@@ -42,6 +41,7 @@ public class PowerNode extends PowerBlock{
     public static void linkPowerNodes(Player player, Tile tile, Tile other){
         if(tile.entity == null || other == null || tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)
         || tile.entity.power.links.size >= ((PowerNode)tile.block()).maxNodes) return;
+        if(!Units.canInteract(player, tile)) return;
 
         TileEntity entity = tile.entity();
 
@@ -62,6 +62,7 @@ public class PowerNode extends PowerBlock{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
         if(tile.entity.power == null || other.entity == null || other.entity.power == null) return;
+        if(!Units.canInteract(player, tile)) return;
 
         TileEntity entity = tile.entity();
 
@@ -97,25 +98,19 @@ public class PowerNode extends PowerBlock{
         ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance() * 60, 1))),
         () -> Pal.powerBar,
         () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
-    }
 
-    @Override
-    public void playerPlaced(Tile tile){
-        Tile before = world.tile(lastPlaced);
-
-        if(linkValid(tile, before) && !before.entity.proximity().contains(tile)){
-            Call.linkPowerNodes(null, tile, before);
-        }
-
-        lastPlaced = tile.pos();
-        super.playerPlaced(tile);
+        bars.add("batteries", entity -> new Bar(() ->
+        Core.bundle.format("bar.powerstored",
+        (ui.formatAmount((int)entity.power.graph.getBatteryStored())), ui.formatAmount((int)entity.power.graph.getTotalBatteryCapacity())),
+        () -> Pal.powerBar,
+        () -> Mathf.clamp(entity.power.graph.getBatteryStored() / entity.power.graph.getTotalBatteryCapacity())));
     }
 
     @Override
     public void placed(Tile tile){
-        if(Net.client()) return;
+        if(net.client()) return;
 
-        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower)) && linkValid(tile, other)
+        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
@@ -130,6 +125,28 @@ public class PowerNode extends PowerBlock{
         tempTiles.each(valid, other -> Call.linkPowerNodes(null, tile, other));
 
         super.placed(tile);
+    }
+
+    private void getPotentialLinks(Tile tile, Consumer<Tile> others){
+        Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
+        ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
+        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
+        && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
+
+        tempTiles.clear();
+        graphs.clear();
+        Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
+            Tile other = world.ltile(x, y);
+            if(valid.test(other)){
+                tempTiles.add(other);
+            }
+        });
+
+        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.each(valid, t -> {
+            graphs.add(t.entity.power.graph);
+            others.accept(t);
+        });
     }
 
     @Override
@@ -213,15 +230,7 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        for(int cx = (int)(x - laserRange - 1); cx <= x + laserRange + 1; cx++){
-            for(int cy = (int)(y - laserRange - 1); cy <= y + laserRange + 1; cy++){
-                Tile link = world.ltile(cx, cy);
-
-                if(link != null && !(link.x == x && link.y == y) && link.block().hasPower && overlaps(x * tilesize + offset(), y *tilesize + offset(), link, laserRange * tilesize)){
-                    Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 2f, link.pos() == lastPlaced ? Pal.place : Pal.accent);
-                }
-            }
-        }
+        getPotentialLinks(tile, other -> Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place));
 
         Draw.reset();
     }
@@ -285,8 +294,8 @@ public class PowerNode extends PowerBlock{
 
         float fract = 1f-tile.entity.power.graph.getSatisfaction();
 
-        Draw.color(Color.WHITE, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
-        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.4f);
+        Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.3f);
         Draw.color();
     }
 

@@ -11,11 +11,14 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
+import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -25,7 +28,6 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Base class for AI units. */
 public abstract class BaseUnit extends Unit implements ShooterTrait{
-
     protected static int timerIndex = 0;
 
     protected static final int timerTarget = timerIndex++;
@@ -33,6 +35,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
+    protected boolean loaded;
     protected UnitType type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
@@ -48,7 +51,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public static void onUnitDeath(BaseUnit unit){
         if(unit == null) return;
 
-        if(Net.server() || !Net.active()){
+        if(net.server() || !net.active()){
             UnitDrops.dropItems(unit);
         }
 
@@ -56,9 +59,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         unit.type.deathSound.at(unit);
 
         //visual only.
-        if(Net.client()){
+        if(net.client()){
             Tile tile = world.tile(unit.spawner);
-            if(tile != null && !Net.client()){
+            if(tile != null){
                 tile.block().unitRemoved(tile, unit);
             }
 
@@ -79,8 +82,35 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return type.typeID;
     }
 
+    @Override
+    public void onHit(SolidTrait entity){
+        if(entity instanceof Bullet && ((Bullet)entity).getOwner() instanceof DeflectorEntity && player != null && getTeam() != player.getTeam()){
+            Core.app.post(() -> {
+                if(isDead()){
+                    Events.fire(Trigger.phaseDeflectHit);
+                }
+            });
+        }
+    }
+
     public @Nullable Tile getSpawner(){
         return world.tile(spawner);
+    }
+
+    public boolean isCommanded(){
+        return indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
+    }
+
+    public @Nullable UnitCommand getCommand(){
+        if(isCommanded()){
+            return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
+        }
+        return null;
+    }
+
+    /**Called when a command is recieved from the command center.*/
+    public void onCommand(UnitCommand command){
+
     }
 
     /** Initialize the type and team of this unit. Only call once! */
@@ -129,12 +159,12 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     }
 
     public void targetClosestAllyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer.getAllied(team, flag));
+        Tile target = Geometry.findClosest(x, y, indexer.getAllied(team, flag));
         if(target != null) this.target = target.entity;
     }
 
     public void targetClosestEnemyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(x, y, world.indexer.getEnemy(team, flag));
+        Tile target = Geometry.findClosest(x, y, indexer.getEnemy(team, flag));
         if(target != null) this.target = target.entity;
     }
 
@@ -145,8 +175,15 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public TileEntity getClosestEnemyCore(){
+    public Tile getClosest(BlockFlag flag){
+        return Geometry.findClosest(x, y, indexer.getAllied(team, flag));
+    }
 
+    public Tile getClosestSpawner(){
+        return Geometry.findClosest(x, y, Vars.spawner.getGroundSpawns());
+    }
+
+    public TileEntity getClosestEnemyCore(){
         for(Team enemy : Vars.state.teams.enemiesOf(team)){
             Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
             if(tile != null){
@@ -239,13 +276,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
         hitTime -= Time.delta();
 
-        if(Net.client()){
+        if(net.client()){
             interpolate();
             status.update(this);
             return;
         }
 
-        if(!isFlying() && (world.tileWorld(x, y) != null && world.tileWorld(x, y).solid())){
+        if(!isFlying() && (world.tileWorld(x, y) != null && !(world.tileWorld(x, y).block() instanceof BuildBlock) && world.tileWorld(x, y).solid())){
             kill();
         }
 
@@ -281,7 +318,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void removed(){
         super.removed();
         Tile tile = world.tile(spawner);
-        if(tile != null && !Net.client()){
+        if(tile != null && !net.client()){
             tile.block().unitRemoved(tile, this);
         }
 
@@ -302,7 +339,13 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void added(){
         state.set(getStartState());
 
-        health(maxHealth());
+        if(!loaded){
+            health(maxHealth());
+        }
+
+        if(isCommanded()){
+            onCommand(getCommand());
+        }
     }
 
     @Override
@@ -335,6 +378,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
         super.readSave(stream, version);
+        loaded = true;
         byte type = stream.readByte();
         this.spawner = stream.readInt();
 

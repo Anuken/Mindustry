@@ -3,7 +3,6 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
-import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -28,7 +27,7 @@ public class Zone extends UnlockableContent{
     public int configureWave = 15;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
-    public Texture preview;
+    public TextureRegion preview;
 
     protected ItemStack[] baseLaunchCost = {};
     protected Array<ItemStack> startingItems = new Array<>();
@@ -39,6 +38,11 @@ public class Zone extends UnlockableContent{
     public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
+    }
+
+    @Override
+    public void load(){
+        preview = Core.atlas.find("zone-" + name);
     }
 
     public Rules getRules(){
@@ -171,13 +175,6 @@ public class Zone extends UnlockableContent{
         Array<ItemStack> arr = Core.settings.getObject(name + "-starting-items", Array.class, () -> null);
         if(arr != null){
             startingItems = arr;
-        }
-    }
-
-    @Override
-    public void load(){
-        if(Core.files.internal("zones/" + name + ".png").exists() && !headless){
-            preview = new Texture(Core.files.internal("zones/" + name + ".png"));
         }
     }
 

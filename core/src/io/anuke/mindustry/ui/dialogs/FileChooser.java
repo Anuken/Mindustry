@@ -1,22 +1,21 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.graphics.g2d.GlyphLayout;
-import io.anuke.arc.scene.event.Touchable;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.scene.ui.layout.UnitScl;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.core.Platform;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.platform;
 
 public class FileChooser extends FloatingDialog{
     private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
@@ -31,25 +30,22 @@ public class FileChooser extends FloatingDialog{
     private Predicate<FileHandle> filter;
     private Consumer<FileHandle> selectListener;
     private boolean open;
-    private int lastWidth = Core.graphics.getWidth(), lastHeight = Core.graphics.getHeight();
-
-    public static final Predicate<String> pngFiles = str -> str.equals("png");
-    public static final Predicate<String> anyMapFiles = str -> str.equals(oldMapExtension) || str.equals(mapExtension);
-    public static final Predicate<String> mapFiles = str -> str.equals(mapExtension);
-    public static final Predicate<String> saveFiles = str -> str.equals(saveExtension);
 
     public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
         super(title);
+        setFillParent(true);
         this.open = open;
         this.filter = filter;
         this.selectListener = result;
 
-        update(() -> {
-            if(Core.graphics.getWidth() != lastWidth || Core.graphics.getHeight() != lastHeight){
-                updateFiles(false);
-                lastHeight = Core.graphics.getHeight();
-                lastWidth = Core.graphics.getWidth();
-            }
+        onResize(() -> {
+            cont.clear();
+            setupWidgets();
+        });
+
+        shown(() -> {
+            cont.clear();
+            setupWidgets();
         });
     }
 
@@ -60,7 +56,7 @@ public class FileChooser extends FloatingDialog{
 
         filefield = new TextField();
         filefield.setOnlyFontChars(false);
-        if(!open) Platform.instance.addDialog(filefield);
+        if(!open) platform.addDialog(filefield);
         filefield.setDisabled(open);
 
         ok = new TextButton(open ? "$load" : "$save");
@@ -88,11 +84,7 @@ public class FileChooser extends FloatingDialog{
         files.marginRight(10);
         files.marginLeft(3);
 
-        pane = new ScrollPane(files){
-            public float getPrefHeight(){
-                return Core.graphics.getHeight();
-            }
-        };
+        pane = new ScrollPane(files);
         pane.setOverscroll(false, false);
         pane.setFadeScrollBars(false);
 
@@ -100,10 +92,7 @@ public class FileChooser extends FloatingDialog{
 
         Table icontable = new Table();
 
-        float isize = iconsize;
-
-        ImageButton up = new ImageButton("icon-folder-parent");
-        up.resizeImage(isize);
+        ImageButton up = new ImageButton(Icon.folderParent);
         up.clicked(() -> {
             directory = directory.parent();
             updateFiles(true);
@@ -114,18 +103,15 @@ public class FileChooser extends FloatingDialog{
             up.setDisabled(true);
         }
 
-        ImageButton back = new ImageButton("icon-arrow-left");
-        back.resizeImage(isize);
-
-        ImageButton forward = new ImageButton("icon-arrow-right");
-        forward.resizeImage(isize);
+        ImageButton back = new ImageButton(Icon.arrowLeft);
+        ImageButton forward = new ImageButton(Icon.arrowRight);
 
         forward.clicked(() -> stack.forward());
-
         back.clicked(() -> stack.back());
+        forward.setDisabled(() -> !stack.canForward());
+        back.setDisabled(() -> !stack.canBack());
 
-        ImageButton home = new ImageButton("icon-home");
-        home.resizeImage(isize);
+        ImageButton home = new ImageButton(Icon.home);
         home.clicked(() -> {
             directory = homeDirectory;
             lastDirectory = directory;
@@ -151,7 +137,7 @@ public class FileChooser extends FloatingDialog{
         content.add(icontable).expandX().fillX();
         content.row();
 
-        content.center().add(pane).width(Core.graphics.isPortrait() ? Core.graphics.getWidth() / UnitScl.dp.scl(1) : Core.graphics.getWidth() / UnitScl.dp.scl(2)).colspan(3).grow();
+        content.center().add(pane).colspan(3).grow();
         content.row();
 
         if(!open){
@@ -161,7 +147,7 @@ public class FileChooser extends FloatingDialog{
 
         content.add(buttons).growX();
 
-        cont.add(content);
+        cont.add(content).grow();
     }
 
     private void updateFileFieldStatus(){
@@ -190,7 +176,7 @@ public class FileChooser extends FloatingDialog{
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
-        layout.setText(Core.scene.skin.getFont("default"), navigation.getText());
+        layout.setText(Fonts.def, navigation.getText());
 
         if(layout.width < navigation.getWidth()){
             navigation.setCursorPosition(0);
@@ -206,15 +192,15 @@ public class FileChooser extends FloatingDialog{
 
         //macs are confined to the Downloads/ directory
         if(!OS.isMac){
-            Image upimage = new Image("icon-folder-parent");
-            TextButton upbutton = new TextButton(".." + directory.toString(), "clear-toggle");
+            Image upimage = new Image(Icon.folderParentSmall);
+            TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
             upbutton.clicked(() -> {
                 directory = directory.parent();
                 lastDirectory = directory;
                 updateFiles(true);
             });
 
-            upbutton.left().add(upimage).padRight(4f).size(iconsize);
+            upbutton.left().add(upimage).padRight(4f).padLeft(4);
             upbutton.getLabel().setAlignment(Align.left);
             upbutton.getCells().reverse();
 
@@ -230,7 +216,7 @@ public class FileChooser extends FloatingDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(shorten(filename), "clear-toggle");
+            TextButton button = new TextButton(shorten(filename), Styles.clearTogglet);
             group.add(button);
 
             button.clicked(() -> {
@@ -248,9 +234,9 @@ public class FileChooser extends FloatingDialog{
                 button.setChecked(filename.equals(filefield.getText()));
             });
 
-            Image image = new Image(file.isDirectory() ? "icon-folder" : "icon-file-text");
+            Image image = new Image(file.isDirectory() ? Icon.folderSmall : Icon.fileTextSmall);
 
-            button.add(image).padRight(4f).size(iconsize);
+            button.add(image).padRight(4f).padLeft(4);
             button.getCells().reverse();
             files.top().left().add(button).align(Align.topLeft).fillX().expandX()
             .height(50).pad(2).padTop(0).padBottom(0).colspan(2);
@@ -271,17 +257,6 @@ public class FileChooser extends FloatingDialog{
         }else{
             return string.substring(0, max - 3).concat("...");
         }
-    }
-
-    @Override
-    public Dialog show(){
-        Time.runTask(2f, () -> {
-            cont.clear();
-            setupWidgets();
-            super.show();
-            Core.scene.setScrollFocus(pane);
-        });
-        return this;
     }
 
     public class FileHistory{

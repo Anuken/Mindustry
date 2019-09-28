@@ -24,7 +24,7 @@ public class BlockIndexer{
     private final static int quadrantSize = 16;
 
     /** Set of all ores that are being scanned. */
-    private final ObjectSet<Item> scanOres = ObjectSet.with(Item.getAllOres().toArray(Item.class));
+    private final ObjectSet<Item> scanOres = new ObjectSet<>();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
     private ObjectMap<Item, ObjectSet<Tile>> ores;
@@ -57,6 +57,8 @@ public class BlockIndexer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
+            scanOres.clear();
+            scanOres.addAll(Item.getAllOres());
             damagedTiles = new ObjectSet[Team.all.length];
             flagMap = new ObjectSet[Team.all.length][BlockFlag.all.length];
 
@@ -119,7 +121,7 @@ public class BlockIndexer{
 
         ObjectSet<Tile> set = damagedTiles[team.ordinal()];
         for(Tile tile : set){
-            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) && !(tile.block() instanceof BuildBlock)){
+            if((tile.entity == null || tile.entity.getTeam() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
             }
         }
@@ -141,8 +143,11 @@ public class BlockIndexer{
         returnArray.clear();
         for(Team enemy : state.teams.enemiesOf(team)){
             if(state.teams.isActive(enemy)){
-                for(Tile tile : getFlagged(enemy)[type.ordinal()]){
-                    returnArray.add(tile);
+                ObjectSet<Tile> set = getFlagged(enemy)[type.ordinal()];
+                if(set != null){
+                    for(Tile tile : set){
+                        returnArray.add(tile);
+                    }
                 }
             }
         }
@@ -240,14 +245,13 @@ public class BlockIndexer{
         int quadrantY = tile.y / quadrantSize;
         itemSet.clear();
 
-        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1),
-        Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
+        Tile rounded = world.tile(Mathf.clamp(quadrantX * quadrantSize + quadrantSize / 2, 0, world.width() - 1), Mathf.clamp(quadrantY * quadrantSize + quadrantSize / 2, 0, world.height() - 1));
 
         //find all items that this quadrant contains
-        for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
-            for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
+        for(int x = Math.max(0, rounded.x - quadrantSize / 2); x < rounded.x + quadrantSize / 2 && x < world.width(); x++){
+            for(int y = Math.max(0, rounded.y - quadrantSize / 2); y < rounded.y + quadrantSize / 2 && y < world.height(); y++){
                 Tile result = world.tile(x, y);
-                if(result == null || result.drop() == null || !scanOres.contains(result.drop())) continue;
+                if(result == null || result.drop() == null || !scanOres.contains(result.drop()) || result.block() != Blocks.air) continue;
 
                 itemSet.add(result.drop());
             }

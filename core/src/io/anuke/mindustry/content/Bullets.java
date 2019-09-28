@@ -7,12 +7,14 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Bullets implements ContentList{
     public static BulletType
@@ -249,7 +251,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 25f;
             splashDamage = 10f;
             lifetime = 120f;
-            trailColor = Color.GRAY;
+            trailColor = Color.gray;
             backColor = Pal.bulletYellowBack;
             frontColor = Pal.bulletYellow;
             hitEffect = Fx.blastExplosion;
@@ -267,7 +269,7 @@ public class Bullets implements ContentList{
             keepVelocity = false;
             splashDamageRadius = 25f;
             splashDamage = 10f;
-            lifetime = 50f;
+            lifetime = 60f;
             trailColor = Pal.unitBack;
             backColor = Pal.unitBack;
             frontColor = Pal.unitFront;
@@ -395,7 +397,7 @@ public class Bullets implements ContentList{
                 Draw.color(Pal.heal);
                 Lines.stroke(2f);
                 Lines.lineAngleCenter(b.x, b.y, b.rot(), 7f);
-                Draw.color(Color.WHITE);
+                Draw.color(Color.white);
                 Lines.lineAngleCenter(b.x, b.y, b.rot(), 3f);
                 Draw.reset();
             }
@@ -429,7 +431,7 @@ public class Bullets implements ContentList{
 
             @Override
             public void draw(Bullet b){
-                Draw.color(Pal.lightFlame, Pal.darkFlame, Color.GRAY, b.fin());
+                Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, b.fin());
                 Fill.circle(b.x, b.y, 3f * b.fout());
                 Draw.reset();
             }
@@ -497,7 +499,7 @@ public class Bullets implements ContentList{
         };
 
         lancerLaser = new BulletType(0.001f, 140){
-            Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.WHITE};
+            Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] lenscales = {1f, 1.1f, 1.13f, 1.14f};
             float length = 160f;
@@ -539,7 +541,7 @@ public class Bullets implements ContentList{
 
         meltdownLaser = new BulletType(0.001f, 70){
             Color tmpColor = new Color();
-            Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.WHITE};
+            Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
             float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
             float[] strokes = {2f, 1.5f, 1f, 0.3f};
             float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
@@ -631,11 +633,11 @@ public class Bullets implements ContentList{
 
             @Override
             public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 30);
+                Lightning.create(b.getTeam(), Pal.lancerLaser, damage * (b.getOwner() instanceof Player ? state.rules.playerDamageMultiplier : 1f), b.x, b.y, b.rot(), 30);
             }
         };
 
-        arc = new BulletType(0.001f, 25){
+        arc = new BulletType(0.001f, 21){
             {
                 lifetime = 1;
                 despawnEffect = Fx.none;
@@ -687,7 +689,7 @@ public class Bullets implements ContentList{
                 bulletHeight = 12f;
                 hitEffect = Fx.pulverize;
                 backColor = new Color(0x4f4f4fff);
-                frontColor = Color.GRAY;
+                frontColor = Color.gray;
             }
 
             @Override

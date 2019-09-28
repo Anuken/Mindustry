@@ -8,10 +8,13 @@ import io.anuke.mindustry.world.Block;
 import static io.anuke.mindustry.content.Blocks.*;
 
 public class TechTree implements ContentList{
+    public static Array<TechNode> all;
     public static TechNode root;
 
     @Override
     public void load(){
+        all = new Array<>();
+
         root = node(coreShard, () -> {
 
             node(conveyor, () -> {
@@ -27,6 +30,7 @@ public class TechTree implements ContentList{
 
                         node(distributor);
                         node(sorter, () -> {
+                            node(message);
                             node(overflowGate);
                         });
                         node(container, () -> {
@@ -41,6 +45,10 @@ public class TechTree implements ContentList{
                                 node(massDriver, () -> {
 
                                 });
+                            });
+
+                            node(armoredConveyor, () -> {
+
                             });
                         });
                     });
@@ -227,12 +235,14 @@ public class TechTree implements ContentList{
 
                         node(turbineGenerator, () -> {
                             node(thermalGenerator, () -> {
-                                node(rtgGenerator, () -> {
-                                    node(differentialGenerator, () -> {
-                                        node(thoriumReactor, () -> {
-                                            node(impactReactor, () -> {
+                                node(differentialGenerator, () -> {
+                                    node(thoriumReactor, () -> {
+                                        node(impactReactor, () -> {
 
-                                            });
+                                        });
+
+                                        node(rtgGenerator, () -> {
+
                                         });
                                     });
                                 });
@@ -252,6 +262,7 @@ public class TechTree implements ContentList{
                         });
 
                         node(daggerFactory, () -> {
+                            node(commandCenter, () -> {});
                             node(crawlerFactory, () -> {
                                 node(titanFactory, () -> {
                                     node(fortressFactory, () -> {
@@ -294,7 +305,7 @@ public class TechTree implements ContentList{
     private TechNode node(Block block, Runnable children){
         ItemStack[] requirements = new ItemStack[block.buildRequirements.length];
         for(int i = 0; i < requirements.length; i++){
-            requirements[i] = new ItemStack(block.buildRequirements[i].item, 30 + block.buildRequirements[i].amount * 5);
+            requirements[i] = new ItemStack(block.buildRequirements[i].item, 30 + block.buildRequirements[i].amount * 6);
         }
 
         return new TechNode(block, requirements, children);
@@ -323,6 +334,7 @@ public class TechTree implements ContentList{
             context = this;
             children.run();
             context = last;
+            all.add(this);
         }
     }
 }

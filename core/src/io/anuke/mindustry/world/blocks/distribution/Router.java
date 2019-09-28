@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.*;
@@ -17,6 +18,7 @@ public class Router extends Block{
         hasItems = true;
         itemCapacity = 1;
         group = BlockGroup.transportation;
+        unloadable = false;
     }
 
     @Override
@@ -61,8 +63,8 @@ public class Router extends Block{
         int counter = tile.rotation();
         for(int i = 0; i < proximity.size; i++){
             Tile other = proximity.get((i + counter) % proximity.size);
-            if(tile == from) continue;
             if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
+            if(other == from && from.block() == Blocks.overflowGate) continue;
             if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
                 return other;
             }

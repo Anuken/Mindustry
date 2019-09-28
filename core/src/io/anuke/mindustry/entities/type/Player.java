@@ -1,32 +1,32 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Queue;
-import io.anuke.arc.graphics.Color;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.Vars;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.InputHandler.PlaceDraw;
-import io.anuke.mindustry.io.TypeIO;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.NetConnection;
+import io.anuke.mindustry.input.InputHandler.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.net.Administration.*;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
@@ -36,6 +36,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
     public static final int timerAbility = 3;
+    public static final int timerTransfer = 4;
     private static final int timerShootLeft = 0;
     private static final int timerShootRight = 1;
     private static final float liftoffBoost = 0.2f;
@@ -46,8 +47,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     public float baseRotation;
     public float pointerX, pointerY;
-    public String name = "name";
-    public String uuid, usid;
+    public String name = "noname";
+    public @Nullable String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -56,13 +57,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public SpawnerTrait spawner, lastSpawner;
     public int respawns;
 
-    public NetConnection con;
+    public @Nullable NetConnection con;
     public boolean isLocal = false;
-    public Interval timer = new Interval(4);
+    public Interval timer = new Interval(6);
     public TargetTrait target;
     public TargetTrait moveTarget;
 
-    public String lastText;
+    public @Nullable String lastText;
     public float textFadeTime;
 
     private float walktime, itemtime;
@@ -70,7 +71,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     private Tile mining;
     private Vector2 movement = new Vector2();
     private boolean moved;
-    private SoundLoop buildSound = new SoundLoop(Sounds.build, 0.75f);
 
     //endregion
 
@@ -129,11 +129,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else{
             moveBy(x, y);
         }
-    }
-
-    @Override
-    public void removed(){
-        buildSound.stop();
     }
 
     @Override
@@ -232,7 +227,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void damage(float amount){
         hitTime = hitDuration;
-        if(!Net.client()){
+        if(!net.client()){
             health -= calculateDamage(amount);
         }
 
@@ -259,7 +254,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public String toString(){
-        return "Player{" + id + ", mech=" + mech.name + ", local=" + isLocal + ", " + x + ", " + y + "}";
+        return "Player{" + name + ", mech=" + mech.name + ", id=" + id + ", local=" + isLocal + ", " + x + ", " + y + "}";
     }
 
     @Override
@@ -301,11 +296,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Floor floor = getFloorOn();
 
         Draw.color();
-        Draw.mixcol(Color.WHITE, hitTime / hitDuration);
+        Draw.mixcol(Color.white, hitTime / hitDuration);
 
         if(!mech.flying){
             if(floor.isLiquid){
-                Draw.color(Color.WHITE, floor.color, 0.5f);
+                Draw.color(Color.white, floor.color, 0.5f);
             }
 
             float boostTrnsY = -boostHeat * 3f;
@@ -325,9 +320,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(floor.isLiquid){
-            Draw.color(Color.WHITE, floor.color, drownTime);
+            Draw.color(Color.white, floor.color, drownTime);
         }else{
-            Draw.color(Color.WHITE);
+            Draw.color(Color.white);
         }
 
         Draw.rect(mech.region, x, y, rotation - 90);
@@ -350,7 +345,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void drawStats(){
-        Draw.color(Color.BLACK, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
+        Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
@@ -372,35 +367,37 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset), y + Angles.trnsy(rotation + 180, mech.engineOffset),
         size + Mathf.absin(Time.time(), 2f, size / 4f));
 
-        Draw.color(Color.WHITE);
+        Draw.color(Color.white);
         Fill.circle(x + Angles.trnsx(rotation + 180, mech.engineOffset - 1f), y + Angles.trnsy(rotation + 180, mech.engineOffset - 1f),
         (size + Mathf.absin(Time.time(), 2f, size / 4f)) / 2f);
         Draw.color();
     }
 
     public void drawName(){
-        BitmapFont font = Core.scene.skin.getFont("default");
+        BitmapFont font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / UnitScl.dp.scl(1f));
+        font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
-        Draw.color(0f, 0f, 0f, 0.3f);
-        Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
-        Draw.color();
-        font.setColor(color);
 
-        font.draw(name, x, y + nameHeight, 0, Align.center, false);
+        if(!isLocal){
+            Draw.color(0f, 0f, 0f, 0.3f);
+            Fill.rect(x, y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
+            Draw.color();
+            font.setColor(color);
+            font.draw(name, x, y + nameHeight, 0, Align.center, false);
 
-        if(isAdmin){
-            float s = 3f;
-            Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
-            Draw.color(color);
-            Draw.rect(Core.atlas.find("icon-admin-small"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            if(isAdmin){
+                float s = 3f;
+                Draw.color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, 1f);
+                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1.5f, s, s);
+                Draw.color(color);
+                Draw.rect(Core.atlas.find("icon-admin-badge"), x + layout.width / 2f + 2 + 1, y + nameHeight - 1f, s, s);
+            }
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || isTyping)){
@@ -409,7 +406,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);
 
-            layout.setText(font, text, Color.WHITE, width, Align.bottom, true);
+            layout.setText(font, text, Color.white, width, Align.bottom, true);
 
             Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
             Fill.rect(x, y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
@@ -419,7 +416,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
         Pools.free(layout);
         font.getData().setScale(1f);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.white);
         font.setUseIntegerPositions(ints);
     }
 
@@ -514,11 +511,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         if(!isDead() && isFlying()){
-            loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.4f);
+            loops.play(Sounds.thruster, this, Mathf.clamp(velocity.len() * 2f) * 0.3f);
         }
 
         BuildRequest request = buildRequest();
-        buildSound.update(request == null ? x : request.x * tilesize, request == null ? y : request.y * tilesize, isBuilding() && (Mathf.within(request.x * tilesize, request.y * tilesize, x, y, placeDistance) || state.isEditor()));
+        if(isBuilding() && request.tile() != null && (request.tile().withinDst(x, y, placeDistance) || state.isEditor())){
+            loops.play(Sounds.build, request.tile(), 0.75f);
+        }
 
         if(isDead()){
             isBoosting = false;
@@ -531,7 +530,9 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             spawner = null;
         }
 
-        avoidOthers();
+        if(isLocal || net.server()){
+            avoidOthers();
+        }
 
         Tile tile = world.tileWorld(x, y);
 
@@ -560,7 +561,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             status.update(this); //status effect updating also happens with non locals for effect purposes
             updateVelocityStatus(); //velocity too, for visual purposes
 
-            if(Net.server()){
+            if(net.server()){
                 updateShooting(); //server simulates player shooting
             }
             return;
@@ -569,7 +570,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             data.unlockContent(mech);
         }
 
-        if(mobile && !Core.settings.getBool("keyboard")){
+        if(control.input instanceof MobileInput){
             updateTouch();
         }else{
             updateKeyboard();
@@ -606,7 +607,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode)){
+        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -725,56 +726,80 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         //update shooting if not building, not mining and there's ammo left
         if(!isBuilding() && getMineTile() == null){
 
-            //autofire: mobile only!
-            if(mobile){
-                if(target == null){
-                    isShooting = false;
-                    if(Core.settings.getBool("autotarget")){
-                        target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
+            //autofire
+            if(target == null){
+                isShooting = false;
+                if(Core.settings.getBool("autotarget")){
+                    target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
-                        if(mech.canHeal && target == null){
-                            target = Geometry.findClosest(x, y, world.indexer.getDamaged(Team.sharded));
-                            if(target != null && dst(target) > getWeapon().bullet.range()){
-                                target = null;
-                            }else if(target != null){
-                                target = ((Tile)target).entity;
-                            }
-                        }
-
-                        if(target != null){
-                            setMineTile(null);
+                    if(mech.canHeal && target == null){
+                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
+                        if(target != null && dst(target) > getWeapon().bullet.range()){
+                            target = null;
+                        }else if(target != null){
+                            target = ((Tile)target).entity;
                         }
                     }
-                }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
-                mech.canHeal && dst(target) < getWeapon().bullet.range())){
-                    //rotate toward and shoot the target
-                    if(mech.turnCursor){
-                        rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
+
+                    if(target != null){
+                        setMineTile(null);
                     }
-
-                    Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
-
-                    pointerX = intercept.x;
-                    pointerY = intercept.y;
-
-                    updateShooting();
-                    isShooting = true;
+                }
+            }else if(target.isValid() || (target instanceof TileEntity && ((TileEntity)target).damaged() && target.getTeam() == team &&
+            mech.canHeal && dst(target) < getWeapon().bullet.range())){
+                //rotate toward and shoot the target
+                if(mech.turnCursor){
+                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
                 }
 
-            }else if(isShooting()){
-                Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(),
-                control.input.getMouseY());
-                pointerX = vec.x;
-                pointerY = vec.y;
+                Vector2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
+
+                pointerX = intercept.x;
+                pointerY = intercept.y;
 
                 updateShooting();
+                isShooting = true;
             }
+
         }
     }
 
     //endregion
 
     //region utility methods
+
+    public void sendMessage(String text){
+        if(isLocal){
+            if(Vars.ui != null){
+                Log.info("add " + text);
+                Vars.ui.chatfrag.addMessage(text, null);
+            }
+        }else{
+            Call.sendMessage(con, text, null, null);
+        }
+    }
+
+    public void sendMessage(String text, Player from){
+        sendMessage(text, from, NetClient.colorizeName(from.id, from.name));
+    }
+
+    public void sendMessage(String text, Player from, String fromName){
+        if(isLocal){
+            if(Vars.ui != null){
+                Vars.ui.chatfrag.addMessage(text, fromName);
+            }
+        }else{
+            Call.sendMessage(con, text, fromName, from);
+        }
+    }
+
+    public PlayerInfo getInfo(){
+        if(uuid == null){
+            throw new IllegalArgumentException("Local players cannot be traced and do not have info.");
+        }else{
+            return netServer.admins.getInfo(uuid);
+        }
+    }
 
     /** Resets all values of the player. */
     public void reset(){
@@ -789,6 +814,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         item.amount = 0;
         placeQueue.clear();
         dead = true;
+        lastText = null;
+        textFadeTime = 0f;
         target = null;
         moveTarget = null;
         spawner = lastSpawner = null;
@@ -801,7 +828,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public boolean isShooting(){
-        return isShooting && (!isBoosting || mech.flying) && mining == null;
+        return isShooting && (boostHeat < 0.1f || mech.flying) && mining == null;
     }
 
     public void updateRespawning(){
@@ -813,7 +840,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }else if(spawner != null && spawner.isValid()){
             spawner.updateSpawning(this);
         }else if(!netServer.isWaitingForPlayers()){
-            if(!Net.client()){
+            if(!net.client()){
                 if(lastSpawner != null && lastSpawner.isValid()){
                     this.spawner = lastSpawner;
                 }else if(getClosestCore() != null){
@@ -885,7 +912,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
-        buffer.writeInt(spawner == null ? noSpawner : spawner.getTile().pos());
+        buffer.writeInt(spawner == null || !spawner.hasUnit(this) ? noSpawner : spawner.getTile().pos());
         buffer.writeShort((short)(baseRotation * 2));
 
         writeBuilding(buffer);

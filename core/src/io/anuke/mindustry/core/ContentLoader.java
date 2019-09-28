@@ -1,16 +1,14 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Pixmap;
-import io.anuke.arc.util.Log;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.bullet.BulletType;
+import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.LegacyColorMapper;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.files;
 
@@ -21,8 +19,6 @@ import static io.anuke.arc.Core.files;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private boolean loaded = false;
-    private boolean verbose = false;
-
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
@@ -45,12 +41,8 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
-    public void setVerbose(){
-        verbose = true;
-    }
-
     /** Creates all content types. */
-    public void load(){
+    public void createContent(){
         if(loaded){
             Log.info("Content already loaded, skipping.");
             return;
@@ -65,8 +57,6 @@ public class ContentLoader{
             list.load();
         }
 
-        int total = 0;
-
         for(ContentType type : ContentType.values()){
 
             for(Content c : contentMap[type.ordinal()]){
@@ -77,7 +67,6 @@ public class ContentLoader{
                     }
                     contentNameMap[type.ordinal()].put(name, (MappableContent)c);
                 }
-                total++;
             }
         }
 
@@ -91,25 +80,32 @@ public class ContentLoader{
             }
         }
 
-        if(verbose){
-            Log.info("--- CONTENT INFO ---");
-            for(int k = 0; k < contentMap.length; k++){
-                Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
-            }
-            Log.info("Total content loaded: {0}", total);
-            Log.info("-------------------");
-        }
-
         loaded = true;
     }
 
-    public void initialize(Consumer<Content> callable){
-        initialize(callable, false);
+    /** Logs content statistics.*/
+    public void logContent(){
+        Log.info("--- CONTENT INFO ---");
+        for(int k = 0; k < contentMap.length; k++){
+            Log.info("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+        }
+        Log.info("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.info("-------------------");
+    }
+
+    /** Calls Content#init() on everything. Use only after all modules have been created.*/
+    public void init(){
+        initialize(Content::init);
+    }
+
+    /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
+    public void load(){
+        initialize(Content::load);
     }
 
     /** Initializes all content with the specified function. */
-    public void initialize(Consumer<Content> callable, boolean override){
-        if(initialization.contains(callable) && !override) return;
+    private void initialize(Consumer<Content> callable){
+        if(initialization.contains(callable)) return;
 
         for(ContentType type : ContentType.values()){
             for(Content content : contentMap[type.ordinal()]){
@@ -136,12 +132,8 @@ public class ContentLoader{
         pixmap.dispose();
     }
 
-    public void verbose(boolean verbose){
-        this.verbose = verbose;
-    }
-
     public void dispose(){
-        //clear all content, currently not needed
+        //clear all content, currently not used
     }
 
     public void handleContent(Content content){
@@ -171,7 +163,7 @@ public class ContentLoader{
                 return null;
             }
             if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
-                return getByID(type, 0); //default value is always ID 0
+                return (T)contentMap[type.ordinal()].get(0); //default value is always ID 0
             }
             return (T)temporaryMapper[type.ordinal()][id];
         }

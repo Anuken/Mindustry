@@ -1,28 +1,57 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Input.TextInput;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
-import io.anuke.arc.math.RandomXS128;
-import io.anuke.arc.scene.ui.TextField;
-import io.anuke.arc.util.serialization.Base64Coder;
+import io.anuke.arc.*;
+import io.anuke.arc.Input.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.mobile;
 
-public abstract class Platform{
-    /** Each separate game platform should set this instance to their own implementation. */
-    public static Platform instance = new Platform(){
-    };
+public interface Platform{
+
+    /** Steam: Update lobby visibility.*/
+    default void updateLobby(){}
+
+    /** Steam: Show multiplayer friend invite dialog.*/
+    default void inviteFriends(){}
+
+    /** Steam: Share a map on the workshop.*/
+    default void publishMap(Map map){}
+
+    /** Steam: Return external workshop maps to be loaded.*/
+    default Array<FileHandle> getExternalMaps(){
+        return Array.with();
+    }
+
+    /** Steam: View a map listing on the workshop.*/
+    default void viewMapListing(Map map){}
+
+    /** Steam: View a map listing on the workshop.*/
+    default void viewMapListing(String mapid){}
+
+    /** Steam: Open workshop for maps.*/
+    default void openWorkshop(){}
+
+    /** Get the networking implementation.*/
+    default NetProvider getNet(){
+        return new ArcNetImpl();
+    }
 
     /** Add a text input dialog that should show up after the field is tapped. */
-    public void addDialog(TextField field){
+    default void addDialog(TextField field){
         addDialog(field, 16);
     }
 
     /** See addDialog(). */
-    public void addDialog(TextField field, int maxLength){
+    default void addDialog(TextField field, int maxLength){
         if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
 
         field.tapped(() -> {
@@ -39,22 +68,17 @@ public abstract class Platform{
         });
     }
 
-    /** Request external read/write perms. Run callback when complete.*/
-    public void requestExternalPerms(Runnable callback){
-        callback.run();
-    }
-
     /** Update discord RPC. */
-    public void updateRPC(){
+    default void updateRPC(){
     }
 
     /** Whether donating is supported. */
-    public boolean canDonate(){
+    default boolean canDonate(){
         return false;
     }
 
     /** Must be a base64 string 8 bytes in length. */
-    public String getUUID(){
+    default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
             byte[] result = new byte[8];
@@ -68,29 +92,34 @@ public abstract class Platform{
     }
 
     /** Only used for iOS or android: open the share menu for a map or save. */
-    public void shareFile(FileHandle file){
+    default void shareFile(FileHandle file){
     }
 
     /**
      * Show a file chooser.
-     * @param text File chooser title text
-     * @param content Description of the type of files to be loaded
      * @param cons Selection listener
      * @param open Whether to open or save files
-     * @param filetype File extension to filter
+     * @param extension File extension to filter
      */
-    public void showFileChooser(String text, String content, Consumer<FileHandle> cons, boolean open, Predicate<String> filetype){
+    default void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+        new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
+            if(!open){
+                cons.accept(file.parent().child(file.nameWithoutExtension() + "." + extension));
+            }else{
+                cons.accept(file);
+            }
+        }).show();
     }
 
     /** Hide the app. Android only. */
-    public void hide(){
+    default void hide(){
     }
 
-    /** Forces the app into landscape mode. Currently Android only. */
-    public void beginForceLandscape(){
+    /** Forces the app into landscape mode.*/
+    default void beginForceLandscape(){
     }
 
-    /** Stops forcing the app into landscape orientation. Currently Android only. */
-    public void endForceLandscape(){
+    /** Stops forcing the app into landscape orientation.*/
+    default void endForceLandscape(){
     }
 }

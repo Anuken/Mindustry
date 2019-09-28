@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -39,6 +38,7 @@ public abstract class InputHandler implements InputProcessor{
     public final OverlayFragment frag = new OverlayFragment();
 
     public Block block;
+    public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
 
@@ -49,21 +49,22 @@ public abstract class InputHandler implements InputProcessor{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
-        if(Net.server() && player.item().amount <= 0){
+        if(net.server() && player.item().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Effects.effect(Fx.dropItem, Color.WHITE, player.x, player.y, angle, player.item().item);
+        Effects.effect(Fx.dropItem, Color.white, player.x, player.y, angle, player.item().item);
         player.clearItem();
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
-        if(Net.server() && (player.item().amount <= 0 || player.isTransferring)){
+        if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
+        if(net.server() && (player.item().amount <= 0 || player.isTransferring|| !Units.canInteract(player, tile))){
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        if(player == null || tile.entity == null) return;
+        if(tile.entity == null) return;
 
         player.isTransferring = true;
 
@@ -109,6 +110,7 @@ public abstract class InputHandler implements InputProcessor{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void onTileTapped(Player player, Tile tile){
         if(tile == null || player == null) return;
+        if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
     }
 
@@ -132,7 +134,7 @@ public abstract class InputHandler implements InputProcessor{
 
     }
 
-    public void updateController(){
+    public void updateState(){
 
     }
 
@@ -273,6 +275,23 @@ public abstract class InputHandler implements InputProcessor{
     public void remove(){
         Core.input.removeProcessor(this);
         frag.remove();
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+            }
+        }
+    }
+
+    public void add(){
+        Core.input.addProcessor(this);
+        if(Core.scene != null){
+            Table table = (Table)Core.scene.find("inputTable");
+            if(table != null){
+                table.clear();
+                buildUI(table);
+            }
+        }
     }
 
     public boolean canShoot(){
@@ -288,7 +307,7 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public void tryDropItems(Tile tile, float x, float y){
-        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused()){
+        if(!droppingItem || player.item().amount <= 0 || canTapPlayer(x, y) || state.isPaused() || !player.timer.check(Player.timerTransfer, 40)){
             droppingItem = false;
             return;
         }
@@ -297,7 +316,7 @@ public abstract class InputHandler implements InputProcessor{
 
         ItemStack stack = player.item();
 
-        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems){
+        if(tile.block().acceptStack(stack.item, stack.amount, tile, player) > 0 && tile.interactable(player.getTeam()) && tile.block().hasItems && player.item().amount > 0 && !player.isTransferring && tile.interactable(player.getTeam())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -363,7 +382,10 @@ public abstract class InputHandler implements InputProcessor{
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);
-        int baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        int baseRotation = rotation;
+        if (!overrideLineRotation || diagonal){
+                baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+        }
 
         Tmp.r3.set(-1, -1, 0, 0);
 
@@ -377,7 +399,11 @@ public abstract class InputHandler implements InputProcessor{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            if (!overrideLineRotation || diagonal){
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+            }else{
+                line.rotation = rotation;
+            }
             line.last = next == null;
             cons.accept(line);
 

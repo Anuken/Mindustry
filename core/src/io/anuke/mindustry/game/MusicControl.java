@@ -14,15 +14,12 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.3f, musicWaveChance = 0.24f;
+    private static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
 
     /** normal, ambient music, plays at any time */
-    public final Array<Music> ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+    public Array<Music> ambientMusic = Array.with();
     /** darker music, used in times of conflict  */
-    public final Array<Music> darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
-    /** all music, both dark and ambient */
-    public final Array<Music> allMusic = Array.withArrays(ambientMusic, darkMusic);
-
+    public Array<Music> darkMusic = Array.with();
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
     private @Nullable Music current;
@@ -30,6 +27,11 @@ public class MusicControl{
     private boolean silenced;
 
     public MusicControl(){
+        Events.on(ClientLoadEvent.class, e -> {
+            ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+            darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
+        });
+
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
             if(Mathf.chance(musicWaveChance)){
@@ -88,7 +90,7 @@ public class MusicControl{
         }
 
         //dark based on enemies
-        return Mathf.chance(state.enemies() / 70f);
+        return Mathf.chance(state.enemies() / 70f + 0.1f);
     }
 
     /** Plays and fades in a music track. This must be called every frame.
@@ -136,8 +138,8 @@ public class MusicControl{
     }
 
     /** Plays a music track once and only once. If something is already playing, does nothing.*/
-    private void playOnce(@NonNull Music music){
-        if(current != null) return; //do not interrupt already-playing tracks
+    private void playOnce(Music music){
+        if(current != null || music == null) return; //do not interrupt already-playing tracks
 
         //save last random track played to prevent duplicates
         lastRandomPlayed = music;

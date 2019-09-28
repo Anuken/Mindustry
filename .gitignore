@@ -4,6 +4,7 @@ logs/
 /core/assets/bundles/output/
 /core/assets/.gifimages/
 /deploy/
+/out/
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/
@@ -19,10 +20,13 @@ logs/
 /tools/build/
 /tests/build/
 /server/build/
+changelog
+saves/
+core/assets/saves/
+/core/assets/saves/
+steam_appid.txt
 /test_files/
 /annotations/build/
-/desktop-sdl/build/
-desktop-sdl/build/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
@@ -33,7 +37,9 @@ desktop-sdl/build/
 ios/robovm.properties
 packr-out/
 config/
+changelog
 *.gif
+/core/assets/saves/
 
 version.properties
 

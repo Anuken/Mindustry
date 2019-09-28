@@ -1,33 +1,34 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
-import io.anuke.arc.files.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
+import java.text.*;
+import java.util.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.Vars.net;
 
 /**
  * Control module.
@@ -35,10 +36,10 @@ import static io.anuke.mindustry.Vars.*;
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
-public class Control implements ApplicationListener{
-    public final Saves saves;
-    public final MusicControl music;
-    public final Tutorial tutorial;
+public class Control implements ApplicationListener, Loadable{
+    public Saves saves;
+    public MusicControl music;
+    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -46,45 +47,18 @@ public class Control implements ApplicationListener{
     private boolean wasPaused = false;
 
     public Control(){
-        batch = new SpriteBatch();
         saves = new Saves();
         tutorial = new Tutorial();
         music = new MusicControl();
 
-        UnitScl.dp.setProduct(settings.getInt("uiscale", 100) / 100f);
-
-        Core.input.setCatch(KeyCode.BACK, true);
-
-        content.initialize(Content::init);
-        Core.atlas = new TextureAtlas("sprites/sprites.atlas");
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
-        content.initialize(Content::load, true);
-
-        data.load();
-
-        Core.settings.setAppName(appName);
-        Core.settings.defaults(
-            "ip", "localhost",
-            "color-0", Color.rgba8888(playerColors[8]),
-            "color-1", Color.rgba8888(playerColors[11]),
-            "color-2", Color.rgba8888(playerColors[13]),
-            "color-3", Color.rgba8888(playerColors[9]),
-            "name", "",
-            "lastBuild", 0
-        );
-
-        createPlayer();
-
-        saves.load();
-
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
-                Time.runTask(5f, Platform.instance::updateRPC);
+                Time.runTask(5f, platform::updateRPC);
             }
         });
 
         Events.on(PlayEvent.class, event -> {
-            player.setTeam(defaultTeam);
+            player.setTeam(state.rules.pvp ? netServer.assignTeam(player, playerGroup.all()) : defaultTeam);
             player.setDead(true);
             player.add();
 
@@ -93,9 +67,9 @@ public class Control implements ApplicationListener{
 
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> Core.app.post(() -> {
-                if(Net.active() && player.getClosestCore() != null){
+                if(net.active() && player.getClosestCore() != null){
                     //set to closest core since that's where the player will probably respawn; prevents camera jumps
-                    Core.camera.position.set(player.getClosestCore());
+                    Core.camera.position.set(player.isDead() ? player.getClosestCore() : player);
                 }else{
                     //locally, set to player position since respawning occurs immediately
                     Core.camera.position.set(player);
@@ -125,7 +99,7 @@ public class Control implements ApplicationListener{
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.onGameOver(event.winner);
-            if(state.rules.zone != null && !Net.client()){
+            if(state.rules.zone != null && !net.client()){
                 //remove zone save on game over
                 if(saves.getZoneSlot() != null && !state.rules.tutorial){
                     saves.getZoneSlot().delete();
@@ -135,12 +109,12 @@ public class Control implements ApplicationListener{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> {
-            if(state.rules.pvp && !Net.active()){
+            if(state.rules.pvp && !net.active()){
                 try{
-                    Net.host(port);
+                    net.host(port);
                     player.isAdmin = true;
                 }catch(IOException e){
-                    ui.showError(Core.bundle.format("server.error", Strings.parseException(e, true)));
+                    ui.showException("$server.error", e);
                     Core.app.post(() -> state.set(State.menu));
                 }
             }
@@ -178,40 +152,39 @@ public class Control implements ApplicationListener{
             ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
         });
 
-        if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
+        Events.on(Trigger.newGame, () -> {
+            TileEntity core = player.getClosestCore();
 
-            checkClassicData();
-        }
+            if(core == null) return;
+
+            app.post(() -> ui.hudfrag.showLand());
+            renderer.zoomIn(Fx.coreLand.lifetime);
+            app.post(() -> Effects.effect(Fx.coreLand, core.x, core.y, 0, core.block));
+            Time.run(Fx.coreLand.lifetime, () -> {
+                Effects.effect(Fx.launch, core);
+                Effects.shake(5f, 5f, core);
+            });
+        });
     }
 
-    //checks for existing 3.5 app data, android only
-    public void checkClassicData(){
-        try{
-            if(files.local("mindustry-maps").exists() || files.local("mindustry-saves").exists()){
-                settings.getBoolOnce("classic-backup-check", () -> {
-                    app.post(() -> app.post(() -> ui.showConfirm("$classic.export", "$classic.export.text", () -> {
-                        try{
-                            Platform.instance.requestExternalPerms(() -> {
-                                FileHandle external = files.external("MindustryClassic");
-                                if(files.local("mindustry-maps").exists()){
-                                    files.local("mindustry-maps").copyTo(external);
-                                }
+    @Override
+    public void loadAsync(){
+        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
-                                if(files.local("mindustry-saves").exists()){
-                                    files.local("mindustry-saves").copyTo(external);
-                                }
-                            });
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showError(Strings.parseException(e, true));
-                        }
-                    })));
-                });
-            }
-        }catch(Throwable t){
-            t.printStackTrace();
-        }
+        Core.input.setCatch(KeyCode.BACK, true);
+
+        data.load();
+
+        Core.settings.defaults(
+        "ip", "localhost",
+        "color-0", Color.rgba8888(playerColors[8]),
+        "name", "",
+        "lastBuild", 0
+        );
+
+        createPlayer();
+
+        saves.load();
     }
 
     void createPlayer(){
@@ -231,22 +204,39 @@ public class Control implements ApplicationListener{
             player.add();
         }
 
-        Core.input.addProcessor(input);
+        Events.on(ClientLoadEvent.class, e -> input.add());
+    }
+
+    public void setInput(InputHandler newInput){
+        Block block = input.block;
+        boolean added = Core.input.getInputProcessors().contains(input);
+        input.remove();
+        this.input = newInput;
+        newInput.block = block;
+        if(added){
+            newInput.add();
+        }
     }
 
     public void playMap(Map map, Rules rules){
         ui.loadAnd(() -> {
             logic.reset();
-            world.loadMap(map);
+            world.loadMap(map, rules);
             state.rules = rules;
+            state.rules.zone = null;
+            state.rules.editor = false;
             logic.play();
+            if(settings.getBool("savecreate") && !world.isInvalidMap()){
+                control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
+            }
+            Events.fire(Trigger.newGame);
         });
     }
 
     public void playZone(Zone zone){
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
             world.loadGenerator(zone.generator);
             zone.rules.accept(state.rules);
             state.rules.zone = zone;
@@ -258,6 +248,7 @@ public class Control implements ApplicationListener{
             state.set(State.playing);
             control.saves.zoneSave();
             logic.play();
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -265,7 +256,7 @@ public class Control implements ApplicationListener{
         Zone zone = Zones.groundZero;
         ui.loadAnd(() -> {
             logic.reset();
-            Net.reset();
+            net.reset();
 
             world.beginMapLoad();
 
@@ -310,6 +301,7 @@ public class Control implements ApplicationListener{
             state.rules.waveSpacing = 60f * 30;
             state.rules.buildCostMultiplier = 0.3f;
             state.rules.tutorial = true;
+            Events.fire(Trigger.newGame);
         });
     }
 
@@ -320,7 +312,7 @@ public class Control implements ApplicationListener{
     @Override
     public void dispose(){
         content.dispose();
-        Net.dispose();
+        net.dispose();
         Musics.dispose();
         Sounds.dispose();
         ui.editor.dispose();
@@ -341,7 +333,7 @@ public class Control implements ApplicationListener{
 
     @Override
     public void init(){
-        Platform.instance.updateRPC();
+        platform.updateRPC();
 
         //play tutorial on stop
         if(!settings.getBool("playedtutorial", false)){
@@ -350,43 +342,55 @@ public class Control implements ApplicationListener{
 
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
-            FloatingDialog dialog = new FloatingDialog("$confirm");
+            Core.app.post(() -> Core.app.post(() -> {
+                FloatingDialog dialog = new FloatingDialog("$confirm");
+                dialog.setFillParent(true);
 
-            float[] countdown = {60 * 11};
-            Runnable exit = () -> {
-                Core.settings.put("uiscale", 100);
-                Core.settings.put("uiscalechanged", false);
-                settings.save();
-                dialog.hide();
-                Core.app.exit();
-            };
+                float[] countdown = {60 * 11};
+                Runnable exit = () -> {
+                    Core.settings.put("uiscale", 100);
+                    Core.settings.put("uiscalechanged", false);
+                    settings.save();
+                    dialog.hide();
+                    Core.app.exit();
+                };
 
-            dialog.setFillParent(false);
-            dialog.cont.label(() -> {
-                if(countdown[0] <= 0){
-                    exit.run();
-                }
-                return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
-            }).pad(10f).expand().left();
+                dialog.cont.label(() -> {
+                    if(countdown[0] <= 0){
+                        exit.run();
+                    }
+                    return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
+                }).pad(10f).expand().center();
 
-            dialog.buttons.defaults().size(200f, 60f);
-            dialog.buttons.addButton("$uiscale.cancel", exit);
+                dialog.buttons.defaults().size(200f, 60f);
+                dialog.buttons.addButton("$uiscale.cancel", exit);
 
-            dialog.buttons.addButton("$ok", () -> {
-                Core.settings.put("uiscalechanged", false);
-                settings.save();
-                dialog.hide();
-            });
+                dialog.buttons.addButton("$ok", () -> {
+                    Core.settings.put("uiscalechanged", false);
+                    settings.save();
+                    dialog.hide();
+                });
 
-            Core.app.post(dialog::show);
+                dialog.show();
+            }));
+        }
+
+        if(android){
+            Sounds.empty.loop(0f, 1f, 0f);
         }
     }
 
     @Override
     public void update(){
+        //TODO find out why this happens on Android
+        if(assets == null) return;
+
         saves.update();
 
-        input.updateController();
+        //update and load any requested assets
+        assets.update();
+
+        input.updateState();
 
         //autosave global data if it's modified
         data.checkSave();
@@ -394,13 +398,24 @@ public class Control implements ApplicationListener{
         music.update();
         loops.update();
 
+        if(Core.input.keyTap(Binding.fullscreen)){
+            boolean full = settings.getBool("fullscreen");
+            if(full){
+                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
+            }else{
+                graphics.setFullscreenMode(graphics.getDisplayMode());
+            }
+            settings.put("fullscreen", !full);
+            settings.save();
+        }
+
         if(!state.is(State.menu)){
             input.update();
 
             if(world.isZone()){
                 for(Tile tile : state.teams.get(player.getTeam()).cores){
                     for(Item item : content.items()){
-                        if(tile.entity.items.has(item)){
+                        if(tile.entity != null && tile.entity.items.has(item)){
                             data.unlockContent(item);
                         }
                     }
@@ -413,7 +428,7 @@ public class Control implements ApplicationListener{
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
-                Platform.instance.updateRPC();
+                platform.updateRPC();
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
@@ -439,7 +454,7 @@ public class Control implements ApplicationListener{
             }
 
             if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.BACK)){
-                Platform.instance.hide();
+                platform.hide();
             }
         }
     }

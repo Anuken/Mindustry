@@ -3,16 +3,18 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.backends.iosrobovm.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
-import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.net.*;
+import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
+import org.robovm.apple.uikit.UIBarButtonItem.*;
+import org.robovm.objc.block.*;
 
 import java.io.*;
 import java.util.*;
@@ -26,21 +28,76 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     protected IOSApplication createApplication(){
-        Net.setClientProvider(new ArcNetClient());
-        Net.setServerProvider(new ArcNetServer());
 
         if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
-            UnitScl.dp.addition = 0.5f;
+            Scl.setAddition(0.5f);
         }else{
-            UnitScl.dp.addition = -0.5f;
+            Scl.setAddition(-0.5f);
         }
 
-        Platform.instance = new Platform(){
+        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        return new IOSApplication(new ClientLauncher(){
+
+            @Override
+            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
+
+                NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
+                    uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
+
+                cont.setAllowsDocumentCreation(!open);
+                cont.setAdditionalLeadingNavigationBarButtonItems(arr);
+
+                class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
+                    @Override
+                    public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+
+                    }
+
+                    @Override
+                    public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+                        if(documentURLs.size() < 1) return;
+
+                        cont.dismissViewController(true, () -> {});
+                        cons.accept(Core.files.absolute(documentURLs.get(0).getPath()));
+                    }
+
+                    @Override
+                    public void didRequestDocumentCreationWithHandler(UIDocumentBrowserViewController controller, VoidBlock2<NSURL, UIDocumentBrowserImportMode> importHandler){
+
+                    }
+
+                    @Override
+                    public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
+                        cons.accept(Core.files.absolute(destinationURL.getAbsoluteString()));
+                    }
+
+                    @Override
+                    public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
+
+                    }
+
+                    @Override
+                    public NSArray<UIActivity> applicationActivities(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
+                        return null;
+                    }
+
+                    @Override
+                    public void willPresentActivityViewController(UIDocumentBrowserViewController controller, UIActivityViewController activityViewController){
+
+                    }
+                }
+
+                cont.setDelegate(new ChooserDelegate());
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
+
+                });
+            }
 
             @Override
             public void shareFile(FileHandle file){
                 Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name()/* + ".png"*/);
+                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
                 file.copyTo(to);
 
                 NSURL url = new NSURL(to.file());
@@ -53,7 +110,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void beginForceLandscape(){
-                Log.info("begin force landscape");
                 forced = true;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
@@ -63,10 +119,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        };
-
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new Mindustry(), config);
+        }, config);
     }
 
     @Override
@@ -91,17 +144,19 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
-        Core.app.post(() -> Core.app.post(() -> {
-            Core.scene.table("dialogDim", t -> {
-                t.visible(() -> {
-                    if(!forced) return false;
-                    t.toFront();
-                    UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
-                    return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+        Events.on(ClientLoadEvent.class, e -> {
+            Core.app.post(() -> Core.app.post(() -> {
+                Core.scene.table(Styles.black9, t -> {
+                    t.visible(() -> {
+                        if(!forced) return false;
+                        t.toFront();
+                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+                    });
+                    t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
                 });
-                t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
-            });
-        }));
+            }));
+        });
 
         return b;
     }
@@ -129,10 +184,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             ui.load.runLoadSave(slot);
                         }
                     }catch(IOException e){
-                        ui.showError(Core.bundle.format("save.import.fail", Strings.parseException(e, true)));
+                        ui.showException("$save.import.fail", e);
                     }
                 }else{
-                    ui.showError("save.import.invalid");
+                    ui.showErrorMessage("$save.import.invalid");
                 }
 
             }

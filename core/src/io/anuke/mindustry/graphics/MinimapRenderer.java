@@ -36,6 +36,10 @@ public class MinimapRenderer implements Disposable{
         Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
     }
 
+    public Pixmap getPixmap(){
+        return pixmap;
+    }
+
     public Texture getTexture(){
         return texture;
     }
@@ -78,7 +82,7 @@ public class MinimapRenderer implements Disposable{
         for(Unit unit : units){
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, UnitScl.dp.scl(baseSize / 2f), UnitScl.dp.scl(baseSize / 2f));
+            Fill.rect(x + rx, y + ry, Scl.scl(baseSize / 2f), Scl.scl(baseSize / 2f));
         }
 
         Draw.color();
