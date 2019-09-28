@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.*;
@@ -108,6 +109,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                     listener.init();
                 }
                 super.resize(graphics.getWidth(), graphics.getHeight());
+                mods.each(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
             }

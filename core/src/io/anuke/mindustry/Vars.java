@@ -245,6 +245,7 @@ public class Vars implements Loadable{
 
         modDirectory.mkdirs();
 
+        mods.load();
         maps.load();
     }
 

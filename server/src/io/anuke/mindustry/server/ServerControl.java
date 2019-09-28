@@ -21,8 +21,6 @@ import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.plugin.*;
-import io.anuke.mindustry.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -52,7 +50,6 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
 
     public ServerControl(String[] args){
-
         Core.settings.defaults(
             "shufflemode", "normal",
             "bans", "",
@@ -109,9 +106,6 @@ public class ServerControl implements ApplicationListener{
         Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
-
-        //load plugins
-        plugins.load();
 
         registerCommands();
 
@@ -175,9 +169,6 @@ public class ServerControl implements ApplicationListener{
                 net.closeServer();
             }
         });
-
-        //initialize plugins
-        plugins.each(Plugin::init);
 
         if(!mods.all().isEmpty()){
             info("&lc{0} plugins loaded.", mods.all().size);
