@@ -35,7 +35,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = false;
+    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
 
     public static void main(String[] arg){
         try{
@@ -213,6 +213,11 @@ public class DesktopLauncher extends ClientLauncher{
     @Override
     public void viewMapListing(String mapid){
         SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
+    }
+
+    @Override
+    public void viewMapListingInfo(Map map){
+        SVars.workshop.viewMapListingInfo(map);
     }
 
     @Override

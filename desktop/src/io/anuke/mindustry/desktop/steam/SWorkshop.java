@@ -6,6 +6,8 @@ import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -20,6 +22,7 @@ public class SWorkshop implements SteamUGCCallback{
 
     private Map lastMap;
     private Array<FileHandle> mapFiles;
+    private ObjectMap<SteamUGCQuery, BiConsumer<SteamUGCDetails, SteamResult>> detailHandlers = new ObjectMap<>();
 
     public SWorkshop(){
         int items = ugc.getNumSubscribedItems();
@@ -51,6 +54,8 @@ public class SWorkshop implements SteamUGCCallback{
 
         //update author name when publishing
         map.tags.put("author", SVars.net.friends.getPersonaName());
+        ui.editor.editor.getTags().put("author", map.tags.get("author"));
+        ui.editor.save();
 
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
@@ -70,9 +75,101 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.show();
     }
 
+    public void viewMapListingInfo(Map map){
+
+        String id = map.tags.get("steamid");
+        long handle = Strings.parseLong(id, -1);
+        SteamPublishedFileID fid = new SteamPublishedFileID(handle);
+
+        Log.info("Requesting map listing view; id = " + id);
+
+        ui.loadfrag.show();
+        SteamUGCQuery query = ugc.createQueryUGCDetailsRequest(fid);
+        Log.info("POST " + query);
+
+        detailHandlers.put(query, (details, result) -> {
+            ui.loadfrag.hide();
+
+            Log.info("Map listing result: " + result + " " + details.getResult() + " " + details.getFileName() + " " + details.getTitle());
+
+            if(result == SteamResult.OK){
+                if(details.getResult() == SteamResult.OK){
+                    if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
+
+                        FloatingDialog dialog = new FloatingDialog("$editor.mapinfo");
+                        dialog.setFillParent(false);
+                        dialog.cont.add("$map.menu").pad(20f);
+                        dialog.addCloseButton();
+
+                        dialog.buttons.addImageTextButton("$view.workshop", Icon.linkSmall, () -> {
+                            platform.viewMapListing(id);
+                            dialog.hide();
+                        }).size(210f, 64f);
+
+                        dialog.buttons.addImageTextButton("$map.update", Icon.upgradeSmall, () -> {
+                            new FloatingDialog("$map.update"){{
+                                setFillParent(false);
+                                cont.margin(10).add("$map.changelog").padRight(6f);
+                                cont.row();
+                                TextArea field = cont.addArea("", t -> {}).size(500f, 160f).get();
+                                field.setMaxLength(400);
+                                buttons.defaults().size(120, 54).pad(4);
+                                buttons.addButton("$ok", () -> {
+                                    ui.loadfrag.show("$map.publishing");
+                                    lastMap = map;
+                                    updateMap(map, details.getPublishedFileID(), field.getText().replace("\r", "\n"));
+                                    dialog.hide();
+                                    hide();
+
+                                    Log.info("Update map " + map.name());
+                                });
+                                buttons.addButton("$cancel", this::hide);
+                            }}.show();
+
+                        }).size(210f, 64f);
+                        dialog.show();
+
+                    }else{
+                        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(details.getPublishedFileID()));
+                    }
+                }else if(details.getResult() == SteamResult.FileNotFound){
+                    //force-remove tags
+                    ui.editor.editor.getTags().remove("steamid");
+                    map.tags.remove("steamid");
+                    ui.editor.save();
+
+                    ui.showErrorMessage("$map.missing");
+                }else{
+                    ui.showErrorMessage(Core.bundle.format("map.load.error", result.name()));
+                }
+            }else{
+                ui.showErrorMessage(Core.bundle.format("map.load.error", result.name()));
+            }
+        });
+
+        ugc.sendQueryUGCRequest(query);
+    }
+
+    @Override
+    public void onRequestUGCDetails(SteamUGCDetails details, SteamResult result){
+
+    }
+
     @Override
     public void onUGCQueryCompleted(SteamUGCQuery query, int numResultsReturned, int totalMatchingResults, boolean isCachedData, SteamResult result){
+        Log.info("GET " + query);
 
+        if(detailHandlers.containsKey(query)){
+            if(numResultsReturned > 0){
+                SteamUGCDetails details = new SteamUGCDetails();
+                ugc.getQueryUGCResult(query, 0, details);
+                detailHandlers.get(query).accept(details, result);
+            }else{
+                detailHandlers.get(query).accept(null, SteamResult.FileNotFound);
+            }
+
+            detailHandlers.remove(query);
+        }
     }
 
     @Override
@@ -91,11 +188,6 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     @Override
-    public void onRequestUGCDetails(SteamUGCDetails details, SteamResult result){
-
-    }
-
-    @Override
     public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         if(lastMap == null){
             Log.err("No map to publish?");
@@ -108,40 +200,44 @@ public class SWorkshop implements SteamUGCCallback{
         Log.info("Create item {0} result {1} {2}", SteamNativeHandle.getNativeHandle(publishedFileID), result, needsToAcceptWLA);
 
         if(result == SteamResult.OK){
-            SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
-
-            Gamemode mode = Gamemode.attack.valid(map) ? Gamemode.attack : Gamemode.survival;
-            FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("map.msav");
-            lastMap.file.copyTo(mapFile);
-
-            Log.info(mapFile.parent().absolutePath());
-            Log.info(map.previewFile().absolutePath());
-
-            ugc.setItemTitle(h, map.name());
-            ugc.setItemDescription(h, map.description());
-            ugc.setItemTags(h, new String[]{"map", mode.name()});
-            ugc.setItemVisibility(h, PublishedFileVisibility.Private);
-            ugc.setItemPreview(h, map.previewFile().absolutePath());
-            ugc.setItemContent(h, mapFile.parent().absolutePath());
-            ugc.addItemKeyValueTag(h, "mode", mode.name());
-            ugc.submitItemUpdate(h, "Map created");
-
-            ItemUpdateInfo info = new ItemUpdateInfo();
-
-            ui.loadfrag.setProgress(() -> {
-                ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
-                ui.loadfrag.setText("$" + status.name().toLowerCase());
-                if(status == ItemUpdateStatus.Invalid){
-                    ui.loadfrag.setText("$done");
-                    return 1f;
-                }
-                return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;
-            });
+            updateMap(map, publishedFileID, "<Map Created>");
         }else{
             ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
         }
 
         lastMap = null;
+    }
+
+    void updateMap(Map map, SteamPublishedFileID publishedFileID, String changelog){
+        SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
+
+        Gamemode mode = Gamemode.attack.valid(map) ? Gamemode.attack : Gamemode.survival;
+        FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("map.msav");
+        lastMap.file.copyTo(mapFile);
+
+        Log.info(mapFile.parent().absolutePath());
+        Log.info(map.previewFile().absolutePath());
+
+        ugc.setItemTitle(h, map.name());
+        ugc.setItemDescription(h, map.description());
+        ugc.setItemTags(h, new String[]{"map", mode.name()});
+        ugc.setItemVisibility(h, PublishedFileVisibility.Private);
+        ugc.setItemPreview(h, map.previewFile().absolutePath());
+        ugc.setItemContent(h, mapFile.parent().absolutePath());
+        ugc.addItemKeyValueTag(h, "mode", mode.name());
+        ugc.submitItemUpdate(h, changelog);
+
+        ItemUpdateInfo info = new ItemUpdateInfo();
+
+        ui.loadfrag.setProgress(() -> {
+            ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
+            ui.loadfrag.setText("$" + status.name().toLowerCase());
+            if(status == ItemUpdateStatus.Invalid){
+                ui.loadfrag.setText("$done");
+                return 1f;
+            }
+            return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;
+        });
     }
 
     @Override
