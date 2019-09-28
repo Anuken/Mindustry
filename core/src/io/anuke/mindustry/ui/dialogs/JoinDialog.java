@@ -38,7 +38,9 @@ public class JoinDialog extends FloatingDialog{
         addCloseButton();
 
         buttons.add().growX();
-        buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+        if(!steam){
+            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+        }
 
         add = new FloatingDialog("$joingame.title");
         add.cont.add("$joingame.ip").padRight(5f).left();
@@ -87,7 +89,9 @@ public class JoinDialog extends FloatingDialog{
             refreshLocal();
             refreshRemote();
 
-            Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
+            if(!steam){
+                Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
+            }
         });
 
         onResize(this::setup);
