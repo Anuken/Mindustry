@@ -39,7 +39,7 @@ public class ItemBridge extends Block{
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
-        unloadable = false;
+        unloadable = true;
         group = BlockGroup.transportation;
     }
 
