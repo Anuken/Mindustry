@@ -168,8 +168,6 @@ public class LoadDialog extends FloatingDialog{
 
         slots.row();
 
-        if(ios) return;
-
         slots.addImageTextButton("$save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
