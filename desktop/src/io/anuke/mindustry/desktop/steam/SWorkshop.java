@@ -76,7 +76,6 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     public void viewMapListingInfo(Map map){
-
         String id = map.tags.get("steamid");
         long handle = Strings.parseLong(id, -1);
         SteamPublishedFileID fid = new SteamPublishedFileID(handle);

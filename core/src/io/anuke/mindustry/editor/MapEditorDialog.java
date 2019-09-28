@@ -1,5 +1,6 @@
 package io.anuke.mindustry.editor;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -147,9 +148,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
+                Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
+                if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
+                    platform.viewMapListing(editor.getTags().get("steamid"));
+                    return;
+                }
+
                 Map map = save();
 
-                if(editor.getTags().containsKey("steamid")){
+                if(editor.getTags().containsKey("steamid") && map != null){
                     platform.viewMapListingInfo(map);
                     return;
                 }
@@ -287,7 +294,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
-    public Map save(){
+    public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
         String name = editor.getTags().get("name", "").trim();
