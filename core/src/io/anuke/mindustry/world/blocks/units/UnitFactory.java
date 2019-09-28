@@ -190,6 +190,11 @@ public class UnitFactory extends Block{
         return entity.spawned < maxSpawn;
     }
 
+    @Override
+    public boolean shouldConsume(Tile tile){
+        return canProduce(tile);
+    }
+
     public static class UnitFactoryEntity extends TileEntity{
         float buildTime;
         float time;
