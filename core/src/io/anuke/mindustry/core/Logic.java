@@ -34,7 +34,7 @@ public class Logic implements ApplicationListener{
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
             }
-            for (Player p : playerGroup.all()) {
+            for(Player p : playerGroup.all()){
                 p.respawns = state.rules.respawns;
             }
         });

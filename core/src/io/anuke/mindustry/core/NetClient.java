@@ -329,6 +329,11 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onStateSnapshot(float waveTime, int wave, int enemies, short coreDataLen, byte[] coreData){
         try{
+            if(wave > state.wave){
+                state.wave = wave;
+                Events.fire(new WaveEvent());
+            }
+
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
