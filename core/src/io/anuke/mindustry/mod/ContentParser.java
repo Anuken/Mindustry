@@ -1,14 +1,15 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.*;
-import io.anuke.arc.util.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
@@ -19,24 +20,24 @@ import io.anuke.mindustry.world.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
+        put(BulletType.class, (type, data) -> field(Bullets.class, data));
+        put(Effect.class, (type, data) -> field(Fx.class, data));
+    }};
 
     private Json parser = new Json(){
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData){
-            try{
-                if(type == BulletType.class){
-                    BulletType b = (BulletType)Bullets.class.getField(jsonData.asString()).get(null);
-                    if(b == null) throw new IllegalArgumentException("Bullet type not found: " + jsonData.asString());
-                    return (T)b;
+            if(type != null){
+                if(classParsers.containsKey(type)){
+                    return (T)classParsers.get(type).parse(type, jsonData);
                 }
 
-                if(type != null && Content.class.isAssignableFrom(type)){
+                if(Content.class.isAssignableFrom(type)){
                     return (T)Vars.content.getByName(contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName())), jsonData.asString());
                 }
-
-                return super.readValue(type, elementType, jsonData);
-            }catch(Exception e){
-                throw new RuntimeException(e);
             }
+
+            return super.readValue(type, elementType, jsonData);
         }
     };
 
@@ -55,11 +56,6 @@ public class ContentParser{
 
             return block;
         },
-        ContentType.item, (TypeParser<Item>)(mod, name, value) -> {
-            Item item = new Item(mod + "-" + name, new Color(Color.black));
-            readFields(item, value);
-            return item;
-        },
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             String clas = value.getString("type");
             Class<BaseUnit> type = resolve("io.anuke.mindustry.entities.type.base." + clas);
@@ -75,8 +71,19 @@ public class ContentParser{
             readFields(unit, value);
 
             return unit;
-        }
+        },
+        ContentType.item, parser(Item::new),
+        ContentType.liquid, parser(Liquid::new),
+        ContentType.mech, parser(Mech::new)
     );
+
+    private <T extends Content> TypeParser<T> parser(Function<String, T> constructor){
+        return (mod, name, value) -> {
+            T item = constructor.get(mod + "-" + name);
+            readFields(item, value);
+            return item;
+        };
+    }
 
     private void init(){
         for(ContentType type : ContentType.all){
@@ -113,6 +120,21 @@ public class ContentParser{
         Content c = parsers.get(type).parse(mod, name, value);
         checkNulls(c);
         return c;
+    }
+
+    private Object field(Class<?> type, JsonValue value){
+        return field(type, value.asString());
+    }
+
+    /** Gets a field from a static class by name, throwing a descriptive exception if not found. */
+    private Object field(Class<?> type, String name){
+        try{
+            Object b = type.getField(name).get(null);
+            if(b == null) throw new IllegalArgumentException(type.getSimpleName() + ": not found: '" + name + "'");
+            return b;
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     /** Checks all @NonNull fields in this object, recursively.
@@ -186,7 +208,11 @@ public class ContentParser{
         throw new IllegalArgumentException("Type not found: " + potentials[0]);
     }
 
-    public interface TypeParser<T extends Content>{
+    private interface FieldParser{
+        Object parse(Class<?> type, JsonValue value);
+    }
+
+    private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
     }
 

@@ -11,9 +11,9 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
@@ -188,6 +188,10 @@ public class DesktopInput extends InputHandler{
 
             if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
                 cursorType = ui.unloadCursor;
+            }
+
+            if(!isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+                Call.rotateBlock(player, cursor, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
 

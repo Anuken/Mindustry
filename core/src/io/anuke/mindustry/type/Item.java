@@ -39,6 +39,10 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         this.description = Core.bundle.getOrNull("item." + this.name + ".description");
     }
 
+    public Item(String name){
+        this(name, new Color(Color.black));
+    }
+
     @Override
     public void load(){
         regions = new TextureRegion[Icon.values().length];

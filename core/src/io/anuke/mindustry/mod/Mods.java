@@ -102,6 +102,7 @@ public class Mods implements Loadable{
     public void loadSync(){
         if(packer == null) return;
 
+        //get textures packed
         if(totalSprites > 0){
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
             packer.getPages().each(page -> page.updateTexture(filter, filter, false));
@@ -139,6 +140,9 @@ public class Mods implements Loadable{
                 e.printStackTrace();
             }
         }
+
+        //sort mods to make sure servers handle them properly.
+        loaded.sort(Structs.comparing(m -> m.name));
 
         buildFiles();
     }
@@ -280,5 +284,7 @@ public class Mods implements Loadable{
     public static class ModMeta{
         public String name, author, description, version, main;
         public String[] dependencies = {}; //TODO implement
+        /** Hidden mods are only server-side or client-side, and do not support adding new content. */
+        public boolean hidden;
     }
 }

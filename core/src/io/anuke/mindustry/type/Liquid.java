@@ -34,6 +34,11 @@ public class Liquid extends UnlockableContent{
         this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
+    /** For modding only.*/
+    public Liquid(String name){
+        this(name, new Color(Color.black));
+    }
+
     public boolean canExtinguish(){
         return flammability < 0.1f && temperature <= 0.5f;
     }

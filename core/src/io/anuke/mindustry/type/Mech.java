@@ -41,6 +41,10 @@ public class Mech extends UnlockableContent{
         this.description = Core.bundle.get("mech." + name + ".description");
     }
 
+    public Mech(String name){
+        this(name, false);
+    }
+
     public String localizedName(){
         return Core.bundle.get("mech." + name + ".name");
     }

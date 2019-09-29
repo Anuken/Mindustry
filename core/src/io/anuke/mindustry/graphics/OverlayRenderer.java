@@ -2,8 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.Lines;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.math.geom.Vector2;
@@ -14,7 +13,7 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.input.InputHandler;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Tile;
 
@@ -112,6 +111,13 @@ public class OverlayRenderer{
 
             if(tile != null && tile.block() != Blocks.air && tile.getTeam() == player.getTeam()){
                 tile.block().drawSelect(tile);
+
+                if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate){
+                    control.input.drawArrow(tile.block(), tile.x, tile.y, tile.rotation(), true);
+                    Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
+                    Fill.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize/2f);
+                    Draw.color();
+                }
             }
         }
 

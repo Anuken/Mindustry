@@ -57,6 +57,20 @@ public abstract class InputHandler implements InputProcessor{
         player.clearItem();
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
+    public static void rotateBlock(Player player, Tile tile, boolean direction){
+        if(net.server() && !Units.canInteract(player, tile)){
+            throw new ValidateException(player, "Player cannot drop an item.");
+        }
+
+        tile.rotation(Mathf.mod(tile.rotation() + Mathf.sign(direction), 4));
+
+        if(tile.entity != null){
+            tile.entity.updateProximity();
+            tile.entity.noSleep();
+        }
+    }
+
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Tile tile){
         if(player == null || player.timer == null || !player.timer.get(Player.timerTransfer, 40)) return;
@@ -352,15 +366,19 @@ public abstract class InputHandler implements InputProcessor{
         player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }
 
-    void drawArrow(Block block, int x, int y, int rotation){
-        Draw.color(!validPlace(x, y, block, rotation) ? Pal.removeBack : Pal.accentBack);
+    public void drawArrow(Block block, int x, int y, int rotation){
+        drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation));
+    }
+
+    public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
+        Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset() - 1,
         Core.atlas.find("place-arrow").getWidth() * Draw.scl,
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
 
-        Draw.color(!validPlace(x, y, block, rotation) ? Pal.remove : Pal.accent);
+        Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset(),
