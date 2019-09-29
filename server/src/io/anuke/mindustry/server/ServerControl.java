@@ -173,7 +173,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         if(!mods.all().isEmpty()){
-            info("&lc{0} plugins loaded.", mods.all().size);
+            info("&lc{0} mods loaded.", mods.all().size);
         }
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
