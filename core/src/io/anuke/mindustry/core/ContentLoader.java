@@ -60,7 +60,9 @@ public class ContentLoader{
 
         setupMapping();
 
-        mods.loadContent();
+        if(mods != null){
+            mods.loadContent();
+        }
 
         setupMapping();
 

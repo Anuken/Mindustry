@@ -1,6 +1,5 @@
 package io.anuke.mindustry.mod;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
@@ -11,6 +10,7 @@ import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
@@ -43,7 +43,8 @@ public class Mods implements Loadable{
     }
 
     /** @return the loaded mod found by class, or null if not found. */
-    public @Nullable LoadedMod getMod(Class<? extends Mod> type){
+    public @Nullable
+    LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
@@ -186,7 +187,7 @@ public class Mods implements Loadable{
             if(mod.root.child("content").exists()){
                 FileHandle contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
-                    FileHandle folder = contentRoot.child(type.name() + "s");
+                    FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
                     if(folder.exists()){
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){

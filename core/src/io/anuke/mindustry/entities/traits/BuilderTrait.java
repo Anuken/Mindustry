@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.collection.*;
@@ -8,6 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.type.*;
@@ -200,7 +200,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
      * Return the build requests currently active, or the one at the top of the queue.
      * May return null.
      */
-    default @Nullable BuildRequest buildRequest(){
+    default @Nullable
+    BuildRequest buildRequest(){
         return buildQueue().size == 0 ? null : buildQueue().first();
     }
 

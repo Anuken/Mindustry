@@ -1,11 +1,16 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -17,10 +22,21 @@ public class ContentParser{
 
     private Json parser = new Json(){
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData){
-            if(type != null && Content.class.isAssignableFrom(type)){
-                return (T)Vars.content.getByName(contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName())), jsonData.asString());
+            try{
+                if(type == BulletType.class){
+                    BulletType b = (BulletType)Bullets.class.getField(jsonData.asString()).get(null);
+                    if(b == null) throw new IllegalArgumentException("Bullet type not found: " + jsonData.asString());
+                    return (T)b;
+                }
+
+                if(type != null && Content.class.isAssignableFrom(type)){
+                    return (T)Vars.content.getByName(contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName())), jsonData.asString());
+                }
+
+                return super.readValue(type, elementType, jsonData);
+            }catch(Exception e){
+                throw new RuntimeException(e);
             }
-            return super.readValue(type, elementType, jsonData);
         }
     };
 
@@ -38,6 +54,27 @@ public class ContentParser{
             }
 
             return block;
+        },
+        ContentType.item, (TypeParser<Item>)(mod, name, value) -> {
+            Item item = new Item(mod + "-" + name, new Color(Color.black));
+            readFields(item, value);
+            return item;
+        },
+        ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
+            String clas = value.getString("type");
+            Class<BaseUnit> type = resolve("io.anuke.mindustry.entities.type.base." + clas);
+            java.lang.reflect.Constructor<BaseUnit> cons = type.getDeclaredConstructor();
+            UnitType unit = new UnitType(mod + "-" + name, type, () -> {
+                try{
+                    return cons.newInstance();
+                }catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            });
+            value.remove("type");
+            readFields(unit, value);
+
+            return unit;
         }
     );
 
@@ -73,7 +110,35 @@ public class ContentParser{
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        return parsers.get(type).parse(mod, name, value);
+        Content c = parsers.get(type).parse(mod, name, value);
+        checkNulls(c);
+        return c;
+    }
+
+    private void checkNulls(Object object){
+        checkNulls(object, new ObjectSet<>());
+    }
+
+    private void checkNulls(Object object, ObjectSet<Object> checked){
+        checked.add(object);
+
+        parser.getFields(object.getClass()).each((name, field) -> {
+            try{
+                if(field.field.getType().isPrimitive()) return;
+
+                Object obj = field.field.get(object);
+                if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
+                    throw new RuntimeException("Field '" + name + "' in " + object.getClass().getSimpleName() + " is missing!");
+                }
+
+                if(obj != null && !checked.contains(obj)){
+                    checkNulls(obj, checked);
+                    checked.add(obj);
+                }
+            }catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void readFields(Object object, JsonValue jsonMap){

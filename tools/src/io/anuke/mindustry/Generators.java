@@ -218,7 +218,7 @@ public class Generators{
         });
 
         ImagePacker.generate("unit-icons", () -> {
-            content.<UnitType>getBy(ContentType.unit).each(type -> !type.isFlying, type -> {
+            content.<UnitType>getBy(ContentType.unit).each(type -> !type.flying, type -> {
                 type.load();
                 type.weapon.load();
 

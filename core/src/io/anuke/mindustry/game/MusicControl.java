@@ -1,11 +1,11 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
@@ -22,7 +22,8 @@ public class MusicControl{
     public Array<Music> darkMusic = Array.with();
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
-    private @Nullable Music current;
+    private @Nullable
+    Music current;
     private float fade;
     private boolean silenced;
 
