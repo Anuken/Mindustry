@@ -1,10 +1,16 @@
 package io.anuke.mindustry.mod;
 
 import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Pixmap.*;
+import io.anuke.arc.graphics.Texture.*;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.type.*;
 
@@ -15,9 +21,12 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Mods{
     private Json json = new Json();
+    private ContentParser parser = new ContentParser();
+    private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
+    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
+
     private Array<LoadedMod> loaded = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private ContentParser parser = new ContentParser();
     private boolean requiresRestart;
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -53,6 +62,47 @@ public class Mods{
         }
     }
 
+    /** Repacks all in-game sprites. */
+    public void packSprites(){
+        int total = 0;
+
+        PixmapPacker packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+        for(LoadedMod mod : loaded){
+            try{
+                int packed = 0;
+                for(FileHandle file : mod.root.child("sprites").list()){
+                    if(file.extension().equals("png")){
+                        try(InputStream stream = file.read()){
+                            byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                            Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
+                            packer.pack(mod.meta.name + ":" + file.nameWithoutExtension(), pixmap);
+                            pixmap.dispose();
+                            packed ++;
+                            total ++;
+                        }
+                    }
+                }
+                Log.info("Packed {0} images for mod '{1}'.", packed, mod.meta.name);
+            }catch(IOException e){
+                Log.err("Error packing images for mod: {0}", mod.meta.name);
+                e.printStackTrace();
+                if(!headless) ui.showException(e);
+            }
+        }
+
+        if(total > 0){
+            Core.app.post(() -> {
+                TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+
+                packer.getPages().each(page -> page.updateTexture(filter, filter, false));
+                packer.getPages().each(page -> page.getRects().each((name, rect) -> Core.atlas.addRegion(name, page.getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
+                packer.dispose();
+            });
+        }else{
+            packer.dispose();
+        }
+    }
+
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
         mod.file.delete();
@@ -78,7 +128,45 @@ public class Mods{
             }
         }
 
-        filet.buildFiles(loaded);
+        buildFiles();
+    }
+
+    private void buildFiles(){
+        for(LoadedMod mod : loaded){
+            for(FileHandle file : mod.root.list()){
+                //ignore special folders like bundles or sprites
+                if(file.isDirectory() && !specialFolders.contains(file.name())){
+                    //TODO calling child/parent on these files will give you gibberish; create wrapper class.
+                    file.walk(f -> filet.addFile(f));
+                }
+            }
+
+            //load up bundles.
+            FileHandle folder = mod.root.child("bundles");
+            if(folder.exists()){
+                for(FileHandle file : folder.list()){
+                    if(file.name().startsWith("bundle") && file.extension().equals("properties")){
+                        String name = file.nameWithoutExtension();
+                        bundles.getOr(name, Array::new).add(file);
+                    }
+                }
+            }
+        }
+
+        //add new keys to each bundle
+        I18NBundle bundle = Core.bundle;
+        while(bundle != null){
+            String str = bundle.getLocale().toString();
+            String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
+            for(FileHandle file : bundles.getOr(locale, Array::new)){
+                try{
+                    PropertiesUtils.load(bundle.getProperties(), file.reader());
+                }catch(Exception e){
+                    throw new RuntimeException("Error loading bundle: " + file + "/" + locale, e);
+                }
+            }
+            bundle = bundle.getParent();
+        }
     }
 
     /** Creates all the content found in mod files. */

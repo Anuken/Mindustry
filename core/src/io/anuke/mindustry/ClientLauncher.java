@@ -55,6 +55,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             atlas = (TextureAtlas)t;
         };
 
+        if(!mods.all().isEmpty()){
+            assets.loadRun("mods", Mods.class, () -> {
+                mods.packSprites();
+            });
+        }
+
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -186,7 +192,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("content") ? "content" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+                String key = name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
                 font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - Scl.scl(10f), Align.center);
             }
         }
