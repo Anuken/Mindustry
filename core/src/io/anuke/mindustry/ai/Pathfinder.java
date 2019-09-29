@@ -92,7 +92,11 @@ public class Pathfinder implements Runnable{
 
         int x = tile.x, y = tile.y;
 
-        tile.getLinkedTiles(t -> tiles[t.x][t.y] = packTile(t));
+        tile.getLinkedTiles(t -> {
+            if(Structs.inBounds(t.x, t.y, tiles)){
+                tiles[t.x][t.y] = packTile(t);
+            }
+        });
 
         //can't iterate through array so use the map, which should not lead to problems
         for(PathData[] arr : pathMap){
