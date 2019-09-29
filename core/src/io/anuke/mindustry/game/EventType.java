@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
@@ -195,7 +195,8 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
-        public final @Nullable Player player;
+        public final @Nullable
+        Player player;
         public final boolean breaking;
 
         public BlockBuildEndEvent(Tile tile, @Nullable Player player, Team team, boolean breaking){

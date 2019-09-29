@@ -1,6 +1,5 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
@@ -9,6 +8,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -234,7 +234,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         }
     }
 
-    public @Nullable TileEntity getClosestCore(){
+    public @Nullable
+    TileEntity getClosestCore(){
         TeamData data = state.teams.get(team);
 
         Tile tile = Geometry.findClosest(x, y, data.cores);

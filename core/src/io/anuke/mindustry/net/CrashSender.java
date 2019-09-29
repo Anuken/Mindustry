@@ -26,7 +26,7 @@ public class CrashSender{
             exception.printStackTrace();
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1) return;
+            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))) return;
 
             //attempt to load version regardless
             if(Version.number == 0){
@@ -143,8 +143,7 @@ public class CrashSender{
     private static void ex(Runnable r){
         try{
             r.run();
-        }catch(Throwable t){
-            t.printStackTrace();
+        }catch(Throwable ignored){
         }
     }
 }

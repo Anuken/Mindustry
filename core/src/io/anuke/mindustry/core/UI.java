@@ -68,6 +68,7 @@ public class UI implements ApplicationListener, Loadable{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
+    public ModsDialog mods;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -222,6 +223,7 @@ public class UI implements ApplicationListener, Loadable{
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
+        mods = new ModsDialog();
 
         Group group = Core.scene.root;
 
@@ -407,6 +409,18 @@ public class UI implements ApplicationListener, Loadable{
         }
         dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
         dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.show();
+    }
+
+    public void showOkText(String title, String text, Runnable confirmed){
+        FloatingDialog dialog = new FloatingDialog(title);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
+        dialog.buttons.addButton("$ok", () -> {
+            dialog.hide();
+            confirmed.run();
+        });
         dialog.show();
     }
 

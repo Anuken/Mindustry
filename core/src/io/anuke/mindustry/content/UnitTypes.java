@@ -18,7 +18,7 @@ public class UnitTypes implements ContentList{
     @Override
     public void load(){
         draug = new UnitType("draug", Draug.class, Draug::new){{
-            isFlying = true;
+            flying = true;
             drag = 0.01f;
             speed = 0.3f;
             maxVelocity = 1.2f;
@@ -33,7 +33,7 @@ public class UnitTypes implements ContentList{
         }};
 
         spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
-            isFlying = true;
+            flying = true;
             drag = 0.01f;
             speed = 0.4f;
             maxVelocity = 1.6f;
@@ -54,7 +54,7 @@ public class UnitTypes implements ContentList{
         }};
 
         phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
-            isFlying = true;
+            flying = true;
             drag = 0.01f;
             mass = 2f;
             speed = 0.45f;
@@ -244,7 +244,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.9f;
             drag = 0.01f;
             mass = 1.5f;
-            isFlying = true;
+            flying = true;
             health = 75;
             engineOffset = 5.5f;
             range = 140f;
@@ -264,7 +264,7 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.4f;
             mass = 3f;
             drag = 0.01f;
-            isFlying = true;
+            flying = true;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -291,7 +291,7 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             range = 80f;
             shootCone = 40f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 12f;
             engineSize = 3f;
@@ -322,7 +322,7 @@ public class UnitTypes implements ContentList{
             drag = 0.02f;
             range = 80f;
             shootCone = 20f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -355,7 +355,7 @@ public class UnitTypes implements ContentList{
             drag = 0.02f;
             range = 80f;
             shootCone = 30f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 40;
             engineSize = 7.3f;

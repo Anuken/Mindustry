@@ -11,6 +11,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.files;
+import static io.anuke.mindustry.Vars.mods;
 
 /**
  * Loads all game content.
@@ -57,6 +58,23 @@ public class ContentLoader{
             list.load();
         }
 
+        setupMapping();
+
+        if(mods != null){
+            mods.loadContent();
+        }
+
+        setupMapping();
+
+        loaded = true;
+    }
+
+    private void setupMapping(){
+
+        for(ContentType type : ContentType.values()){
+            contentNameMap[type.ordinal()].clear();
+        }
+
         for(ContentType type : ContentType.values()){
 
             for(Content c : contentMap[type.ordinal()]){
@@ -79,8 +97,6 @@ public class ContentLoader{
                 }
             }
         }
-
-        loaded = true;
     }
 
     /** Logs content statistics.*/

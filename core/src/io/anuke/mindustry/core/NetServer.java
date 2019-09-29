@@ -200,6 +200,11 @@ public class NetServer implements ApplicationListener{
         registerCommands();
     }
 
+    @Override
+    public void init(){
+        mods.each(mod -> mod.registerClientCommands(clientCommands));
+    }
+
     private void registerCommands(){
         clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
             if(args.length > 0 && !Strings.canParseInt(args[0])){

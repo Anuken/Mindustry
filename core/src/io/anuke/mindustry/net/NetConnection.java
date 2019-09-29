@@ -1,7 +1,7 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.*;
@@ -15,7 +15,8 @@ import static io.anuke.mindustry.Vars.netServer;
 public abstract class NetConnection{
     public final String address;
     public boolean mobile, modclient;
-    public @Nullable Player player;
+    public @Nullable
+    Player player;
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;

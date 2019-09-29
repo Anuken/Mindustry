@@ -1,6 +1,5 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -16,6 +15,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -24,7 +24,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
