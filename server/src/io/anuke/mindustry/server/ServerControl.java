@@ -155,7 +155,7 @@ public class ServerControl implements ApplicationListener{
                     maps.shuffle();
 
                     Map previous = world.getMap();
-                    Map map = maps.find(m -> m != previous);
+                    Map map = maps.find(m -> m != previous || maps.size == 1);
 
                     if(map != null){
 
@@ -168,6 +168,8 @@ public class ServerControl implements ApplicationListener{
                         info("Selected next map to be {0}.", map.name());
 
                         play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                    }else{
+                        Log.err("No suitable map found.");
                     }
                 }
             }else{
