@@ -163,6 +163,7 @@ public class MenuFragment extends Fragment{
                 ),
                 new Buttoni("$editor", Icon.editorSmall, ui.maps::show),
                 steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
+                new Buttoni("$mods", Icon.wikiSmall, ui.mods::show),
                 new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
                 new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
                 new Buttoni("$quit", Icon.exitSmall, Core.app::exit)
