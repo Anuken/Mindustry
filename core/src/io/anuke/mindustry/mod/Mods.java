@@ -6,6 +6,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.type.*;
 
 import java.io.*;
 import java.net.*;
@@ -16,6 +17,7 @@ public class Mods{
     private Json json = new Json();
     private Array<LoadedMod> loaded = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
+    private ContentParser parser = new ContentParser();
     private boolean requiresRestart;
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -77,6 +79,29 @@ public class Mods{
         }
 
         filet.buildFiles(loaded);
+    }
+
+    /** Creates all the content found in mod files. */
+    public void loadContent(){
+        for(LoadedMod mod : loaded){
+            if(mod.root.child("content").exists()){
+                FileHandle contentRoot = mod.root.child("content");
+                for(ContentType type : ContentType.all){
+                    FileHandle folder = contentRoot.child(type.name());
+                    if(folder.exists()){
+                        for(FileHandle file : folder.list()){
+                            if(file.extension().equals("json")){
+                                try{
+                                    parser.parse(file.nameWithoutExtension(), file.readString(), type);
+                                }catch(Exception e){
+                                    throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /** @return all loaded mods. */

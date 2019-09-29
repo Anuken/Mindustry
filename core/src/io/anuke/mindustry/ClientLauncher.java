@@ -63,6 +63,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.loadRun("contentcreate", Content.class, () -> {
             content.createContent();
             content.loadColors();
+
+            mods.loadContent();
         });
 
         add(logic = new Logic());
