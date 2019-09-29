@@ -12,6 +12,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -75,7 +76,7 @@ public class Mods{
                         try(InputStream stream = file.read()){
                             byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
                             Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                            packer.pack(mod.meta.name + ":" + file.nameWithoutExtension(), pixmap);
+                            packer.pack(mod.name + ":" + file.nameWithoutExtension(), pixmap);
                             pixmap.dispose();
                             packed ++;
                             total ++;
@@ -90,6 +91,8 @@ public class Mods{
             }
         }
 
+        //only pack if there's something to be packed
+        //TODO is disposing necessary/safe?
         if(total > 0){
             Core.app.post(() -> {
                 TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
@@ -180,7 +183,8 @@ public class Mods{
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){
                                 try{
-                                    parser.parse(file.nameWithoutExtension(), file.readString(), type);
+                                    Content loaded = parser.parse(file.nameWithoutExtension(), file.readString(), type);
+                                    Log.info("[{0}] Loaded '{1}'", loaded, mod.meta.name);
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
                                 }
@@ -243,8 +247,11 @@ public class Mods{
         public final FileHandle root;
         /** The mod's main class; may be null. */
         public final @Nullable Mod mod;
+        /** Internal mod name. Used for textures. */
+        public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
+
         //TODO implement
         protected boolean enabled;
 
@@ -253,6 +260,7 @@ public class Mods{
             this.file = file;
             this.mod = mod;
             this.meta = meta;
+            this.name = Strings.camelize(meta.name);
         }
     }
 
