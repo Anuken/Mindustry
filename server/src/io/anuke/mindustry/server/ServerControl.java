@@ -332,7 +332,7 @@ public class ServerControl implements ApplicationListener{
                 info("Name: &ly{0}", mod.meta.name);
                 info("Version: &ly{0}", mod.meta.version);
                 info("Author: &ly{0}", mod.meta.author);
-                info("Path: &ly{0}", mod.jarFile.path());
+                info("Path: &ly{0}", mod.file.path());
                 info("Description: &ly{0}", mod.meta.description);
             }else{
                 info("No mod with name &ly'{0}'&lg found.");

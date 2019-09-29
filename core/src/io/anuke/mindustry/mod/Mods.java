@@ -23,15 +23,15 @@ public class Mods{
         return modDirectory.child(load.name).child("config.json");
     }
 
-    /** @return the loaded plugin found by class, or null if not found. */
+    /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
-    /** Loads all plugins from the folder, but does call any methods on them.*/
+    /** Loads all mods from the folder, but does call any methods on them.*/
     public void load(){
         for(FileHandle file : modDirectory.list()){
-            if(!file.extension().equals("jar") || !file.extension().equals("zi[")) continue;
+            if(!file.extension().equals("jar") || !file.extension().equals("zip")) continue;
 
             try{
                 loaded.add(loadmod(file));
@@ -41,16 +41,18 @@ public class Mods{
                 e.printStackTrace();
             }
         }
+
+        filet.buildFiles(loaded);
     }
 
-    /** @return all loaded plugins. */
+    /** @return all loaded mods. */
     public Array<LoadedMod> all(){
         return loaded;
     }
 
-    /** Iterates through each plugin.*/
+    /** Iterates through each mod with a main class.*/
     public void each(Consumer<Mod> cons){
-        loaded.each(p -> cons.accept(p.mod));
+        loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
     }
 
     private LoadedMod loadmod(FileHandle jar) throws Exception{
@@ -63,23 +65,37 @@ public class Mods{
         }
 
         ModMeta meta = JsonIO.read(ModMeta.class, metaf.readString());
+        String camelized = meta.name.replace(" ", "");
+        String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
+        Mod mainMod;
 
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-        Class<?> main = classLoader.loadClass(meta.main);
-        metas.put(main, meta);
-        return new LoadedMod(jar, zip, (Mod)main.getDeclaredConstructor().newInstance(), meta);
+        //make sure the main class exists before loading it; if it doesn't just don't put it there
+        if(zip.child(mainClass.replace('.', '/') + ".class").exists()){
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+            Class<?> main = classLoader.loadClass(mainClass);
+            metas.put(main, meta);
+            mainMod = (Mod)main.getDeclaredConstructor().newInstance();
+        }else{
+            mainMod = null;
+        }
+
+        return new LoadedMod(jar, zip, mainMod, meta);
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
     public static class LoadedMod{
-        public final FileHandle jarFile;
-        public final FileHandle zipRoot;
+        /** The location of this mod's zip file on the disk. */
+        public final FileHandle file;
+        /** The root zip file; points to the contents of this mod. */
+        public final FileHandle root;
+        /** The mod's main class; may be null. */
         public final @Nullable Mod mod;
+        /** This mod's metadata. */
         public final ModMeta meta;
 
-        public LoadedMod(FileHandle jarFile, FileHandle zipRoot, Mod mod, ModMeta meta){
-            this.zipRoot = zipRoot;
-            this.jarFile = jarFile;
+        public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
+            this.root = root;
+            this.file = file;
             this.mod = mod;
             this.meta = meta;
         }
@@ -88,5 +104,6 @@ public class Mods{
     /** Plugin metadata information.*/
     public static class ModMeta{
         public String name, author, description, version, main;
+        public String[] dependencies = {}; //TODO implement
     }
 }
