@@ -115,6 +115,8 @@ public class ContentParser{
         return c;
     }
 
+    /** Checks all @NonNull fields in this object, recursively.
+     * Throws an exception if any are null.*/
     private void checkNulls(Object object){
         checkNulls(object, new ObjectSet<>());
     }
