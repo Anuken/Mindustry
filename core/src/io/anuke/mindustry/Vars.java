@@ -25,7 +25,7 @@ import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static io.anuke.arc.Core.settings;
+import static io.anuke.arc.Core.*;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
@@ -195,7 +195,9 @@ public class Vars implements Loadable{
         Version.init();
 
         filet = new FileTree();
-        mods = new Mods();
+        if(mods == null){
+            mods = new Mods();
+        }
         content = new ContentLoader();
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();

@@ -2,6 +2,7 @@ package io.anuke.mindustry.mod;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
@@ -20,11 +21,14 @@ import java.net.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Mods{
+public class Mods implements Loadable{
     private Json json = new Json();
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Array<FileHandle>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites");
+
+    private int totalSprites;
+    private PixmapPacker packer;
 
     private Array<LoadedMod> loaded = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
@@ -64,10 +68,11 @@ public class Mods{
     }
 
     /** Repacks all in-game sprites. */
-    public void packSprites(){
-        int total = 0;
+    @Override
+    public void loadAsync(){
+        if(loaded.isEmpty()) return;
 
-        PixmapPacker packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+        packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
         for(LoadedMod mod : loaded){
             try{
                 int packed = 0;
@@ -76,10 +81,10 @@ public class Mods{
                         try(InputStream stream = file.read()){
                             byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
                             Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                            packer.pack(mod.name + ":" + file.nameWithoutExtension(), pixmap);
+                            packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
                             pixmap.dispose();
                             packed ++;
-                            total ++;
+                            totalSprites ++;
                         }
                     }
                 }
@@ -90,25 +95,28 @@ public class Mods{
                 if(!headless) ui.showException(e);
             }
         }
+    }
 
-        //only pack if there's something to be packed
-        //TODO is disposing necessary/safe?
-        if(total > 0){
-            Core.app.post(() -> {
-                TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+    @Override
+    public void loadSync(){
+        if(packer == null) return;
 
-                packer.getPages().each(page -> page.updateTexture(filter, filter, false));
-                packer.getPages().each(page -> page.getRects().each((name, rect) -> Core.atlas.addRegion(name, page.getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
-                packer.dispose();
-            });
-        }else{
-            packer.dispose();
+        if(totalSprites > 0){
+            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+            packer.getPages().each(page -> page.updateTexture(filter, filter, false));
+            packer.getPages().each(page -> page.getRects().each((name, rect) -> Core.atlas.addRegion(name, page.getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
         }
+
+        packer.dispose();
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        mod.file.delete();
+        if(mod.file.isDirectory()){
+            mod.file.deleteDirectory();
+        }else{
+            mod.file.delete();
+        }
         loaded.remove(mod);
         requiresRestart = true;
     }
@@ -120,7 +128,7 @@ public class Mods{
     /** Loads all mods from the folder, but does call any methods on them.*/
     public void load(){
         for(FileHandle file : modDirectory.list()){
-            if(!file.extension().equals("jar") && !file.extension().equals("zip")) continue;
+            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
             try{
                 loaded.add(loadMod(file));
@@ -178,13 +186,13 @@ public class Mods{
             if(mod.root.child("content").exists()){
                 FileHandle contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
-                    FileHandle folder = contentRoot.child(type.name());
+                    FileHandle folder = contentRoot.child(type.name() + "s");
                     if(folder.exists()){
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){
                                 try{
-                                    Content loaded = parser.parse(file.nameWithoutExtension(), file.readString(), type);
-                                    Log.info("[{0}] Loaded '{1}'", loaded, mod.meta.name);
+                                    Content loaded = parser.parse(mod.name, file.nameWithoutExtension(), file.readString(), type);
+                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
                                 }
@@ -206,13 +214,14 @@ public class Mods{
         loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
     }
 
-    /** Loads a mod file+meta, but does not add it to the list. */
-    private LoadedMod loadMod(FileHandle jar) throws Exception{
-        FileHandle zip = new ZipFileHandle(jar);
+    /** Loads a mod file+meta, but does not add it to the list.
+     * Note that directories can be loaded as mods.*/
+    private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
+        FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
 
         FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("plugin.json");
         if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json' file, skipping.", jar);
+            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 
@@ -228,7 +237,7 @@ public class Mods{
                 throw new IllegalArgumentException("This mod is not compatible with " + (ios ? "iOS" : "Android") + ".");
             }
 
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
             Class<?> main = classLoader.loadClass(mainClass);
             metas.put(main, meta);
             mainMod = (Mod)main.getDeclaredConstructor().newInstance();
@@ -236,14 +245,14 @@ public class Mods{
             mainMod = null;
         }
 
-        return new LoadedMod(jar, zip, mainMod, meta);
+        return new LoadedMod(sourceFile, zip, mainMod, meta);
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
     public static class LoadedMod{
-        /** The location of this mod's zip file on the disk. */
+        /** The location of this mod's zip file/folder on the disk. */
         public final FileHandle file;
-        /** The root zip file; points to the contents of this mod. */
+        /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
         public final FileHandle root;
         /** The mod's main class; may be null. */
         public final @Nullable Mod mod;
@@ -260,7 +269,7 @@ public class Mods{
             this.file = file;
             this.mod = mod;
             this.meta = meta;
-            this.name = Strings.camelize(meta.name);
+            this.name = meta.name.toLowerCase().replace(" ", "-");
         }
     }
 

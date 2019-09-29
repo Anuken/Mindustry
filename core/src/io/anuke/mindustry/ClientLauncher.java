@@ -44,6 +44,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
+        Vars.mods = new Mods();
 
         UI.loadSystemCursors();
 
@@ -55,12 +56,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             atlas = (TextureAtlas)t;
         };
 
-        if(!mods.all().isEmpty()){
-            assets.loadRun("mods", Mods.class, () -> {
-                mods.packSprites();
-            });
-        }
-
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -69,8 +64,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.loadRun("contentcreate", Content.class, () -> {
             content.createContent();
             content.loadColors();
-
-            mods.loadContent();
         });
 
         add(logic = new Logic());
@@ -79,6 +72,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         add(ui = new UI());
         add(netServer = new NetServer());
         add(netClient = new NetClient());
+
+        assets.load(mods);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> {
             content.init();

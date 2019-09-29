@@ -142,8 +142,7 @@ public class CrashSender{
     private static void ex(Runnable r){
         try{
             r.run();
-        }catch(Throwable t){
-            t.printStackTrace();
+        }catch(Throwable ignored){
         }
     }
 }
