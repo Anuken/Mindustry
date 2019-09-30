@@ -35,10 +35,10 @@ public class UnitTypes implements ContentList{
         spirit = new UnitType("spirit", Spirit::new){{
             flying = true;
             drag = 0.01f;
-            speed = 0.4f;
+            speed = 0.42f;
             maxVelocity = 1.6f;
             range = 50f;
-            health = 60;
+            health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
             weapon = new Weapon("heal-blaster"){{
@@ -48,7 +48,7 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                bullet = Bullets.healBullet;
+                bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
             }};
         }};

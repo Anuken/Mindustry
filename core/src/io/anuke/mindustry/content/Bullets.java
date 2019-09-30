@@ -8,11 +8,9 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -39,7 +37,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, pyraFlame, driverBolt, healBullet, frag, eruptorShot,
+    fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag, eruptorShot,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil;
@@ -376,43 +374,13 @@ public class Bullets implements ContentList{
             statusDuration = 10f;
         }};
 
-        healBullet = new BulletType(5.2f, 13){
-            float healPercent = 3f;
+        healBullet = new HealBulletType(5.2f, 13){{
+            healPercent = 3f;
+        }};
 
-            {
-                shootEffect = Fx.shootHeal;
-                smokeEffect = Fx.hitLaser;
-                hitEffect = Fx.hitLaser;
-                despawnEffect = Fx.hitLaser;
-                collidesTeam = true;
-            }
-
-            @Override
-            public boolean collides(Bullet b, Tile tile){
-                return tile.getTeam() != b.getTeam() || tile.entity.healthf() < 1f;
-            }
-
-            @Override
-            public void draw(Bullet b){
-                Draw.color(Pal.heal);
-                Lines.stroke(2f);
-                Lines.lineAngleCenter(b.x, b.y, b.rot(), 7f);
-                Draw.color(Color.white);
-                Lines.lineAngleCenter(b.x, b.y, b.rot(), 3f);
-                Draw.reset();
-            }
-
-            @Override
-            public void hitTile(Bullet b, Tile tile){
-                super.hit(b);
-                tile = tile.link();
-
-                if(tile.entity != null && tile.getTeam() == b.getTeam() && !(tile.block() instanceof BuildBlock)){
-                    Effects.effect(Fx.healBlockFull, Pal.heal, tile.drawx(), tile.drawy(), tile.block().size);
-                    tile.entity.healBy(healPercent / 100f * tile.entity.maxHealth());
-                }
-            }
-        };
+        healBulletBig = new HealBulletType(5.2f, 15){{
+            healPercent = 5.5f;
+        }};
 
         fireball = new BulletType(1f, 4){
             {

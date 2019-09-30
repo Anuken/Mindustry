@@ -1631,18 +1631,18 @@ public class Blocks implements ContentList{
             produceTime = 2500;
             size = 2;
             maxSpawn = 1;
-            consumes.power(1.1f);
+            consumes.power(1.2f);
             consumes.items();
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.metaglass, 45, Items.lead, 55, Items.silicon, 45));
             type = UnitTypes.spirit;
-            produceTime = 3500;
+            produceTime = 4000;
             size = 2;
-            maxSpawn = 2;
-            consumes.power(0.80f);
-            consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 15));
+            maxSpawn = 1;
+            consumes.power(1.2f);
+            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{

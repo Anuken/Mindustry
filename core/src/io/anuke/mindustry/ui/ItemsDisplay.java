@@ -28,9 +28,7 @@ public class ItemsDisplay extends Table{
 
         table(Tex.button,t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
-            t.add("$launcheditems").colspan(3).left();
-            t.row();
-            t.label(() -> state.is(State.menu) ? "" : "$launchinfo").colspan(3).width(210f).wrap().padBottom(4).left();
+            t.label(() -> state.is(State.menu) ? "$launcheditems" : "$launchinfo").colspan(3).padBottom(4).left().colspan(3).width(210f).wrap();
             t.row();
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
