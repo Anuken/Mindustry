@@ -6,7 +6,7 @@
 A sandbox tower defense game written in Java.
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
-_[Wiki](http://mindustry.wikia.com/wiki/Mindustry_Wiki)_ 
+_[Wiki](https://mindustrygame.github.io/wiki)_ 
 
 ### Building
 
