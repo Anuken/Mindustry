@@ -128,6 +128,13 @@ public abstract class InputHandler implements InputProcessor{
         tile.block().tapped(tile, player);
     }
 
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void onTileConfig(Player player, Tile tile, int value){
+        if(tile == null || !Units.canInteract(player, tile)) return;
+        //TODO
+        //tile.block().cofigured(tile, player, value);
+    }
+
     public OverlayFragment getFrag(){
         return frag;
     }
