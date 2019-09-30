@@ -43,7 +43,9 @@ public class Logic implements ApplicationListener{
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             Block block = tile.block();
-            if(block instanceof BuildBlock){
+            if(tile.entity == null) return;
+            if(block instanceof BuildBlock ){
+
                 BuildEntity entity = tile.entity();
 
                 //update block to reflect the fact that something was being constructed
@@ -56,7 +58,7 @@ public class Logic implements ApplicationListener{
             }
 
             TeamData data = state.teams.get(tile.getTeam());
-            data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, tile.rotation(), block.id));
+            data.brokenBlocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
         });
     }
 

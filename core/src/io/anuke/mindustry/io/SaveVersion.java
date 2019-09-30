@@ -6,7 +6,6 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -288,19 +287,6 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(arr.size);
                 for(Content c : arr){
                     stream.writeUTF(((MappableContent)c).name);
-                }
-            }
-        }
-    }
-
-    /** sometimes it's necessary to remap IDs after the content header is read.*/
-    public void remapContent(){
-        for(Team team : Team.all){
-            if(state.teams.isActive(team)){
-                LongQueue queue = state.teams.get(team).brokenBlocks;
-                for(int i = 0; i < queue.size; i++){
-                    //remap broken block IDs
-                    queue.set(i, BrokenBlock.block(queue.get(i), content.block(BrokenBlock.block(queue.get(i))).id));
                 }
             }
         }

@@ -1,0 +1,15 @@
+- Fixed iOS/Android having frozen multiplayer
+- Fixed Veins map not having a silicon source
+- Fixed inaccurate enemy shoot prediction
+- Fixed server crash exploit
+- Fixed panes not scrolling with mousewheel [Desktop]
+- Fixed incorrect PvP team assignment
+- Fixed not being able to tap 'ok' in UI scale changed dialog
+- Fixed not being able to play on PvP maps without orange team
+- Fixed error message on exiting server after saved map
+- Fixed attack map completion displaying low rank
+- Possibly fixed Mac version not starting
+- Switched to TCP from UDP - experimental
+- Added descriptive display when failing to connect due to version mismatch
+- Improved smoothness of multiplayer building, rotation and collision
+- Improved power node linking
