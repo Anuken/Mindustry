@@ -63,7 +63,8 @@ public class ContentParser{
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new),
-        ContentType.mech, parser(ContentType.mech, Mech::new)
+        ContentType.mech, parser(ContentType.mech, Mech::new),
+        ContentType.zone, parser(ContentType.zone, Zone::new)
     );
 
     private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
