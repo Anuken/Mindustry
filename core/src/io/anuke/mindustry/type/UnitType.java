@@ -14,9 +14,8 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.ui.*;
 
 public class UnitType extends UnlockableContent{
-    public final @NonNull
-    TypeID typeID;
-    public final @NonNull Supplier<? extends BaseUnit> constructor;
+    public @NonNull TypeID typeID;
+    public @NonNull Supplier<? extends BaseUnit> constructor;
 
     public float health = 60;
     public float hitsize = 7f;
@@ -43,8 +42,17 @@ public class UnitType extends UnlockableContent{
 
     public TextureRegion iconRegion, legRegion, baseRegion, region;
 
-    public <T extends BaseUnit> UnitType(String name, Class<T> type, Supplier<T> mainConstructor){
+    public <T extends BaseUnit> UnitType(String name, Supplier<T> mainConstructor){
+        this(name);
+        create(mainConstructor);
+    }
+
+    public <T extends BaseUnit> UnitType(String name){
         super(name);
+        this.description = Core.bundle.getOrNull("unit." + name + ".description");
+    }
+
+    public <T extends BaseUnit> void create(Supplier<T> mainConstructor){
         this.constructor = mainConstructor;
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
         this.typeID = new TypeID(name, mainConstructor);

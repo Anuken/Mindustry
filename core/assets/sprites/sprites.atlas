@@ -15031,7 +15031,6 @@ scroll-knob-horizontal-black
   rotate: false
   xy: 1937, 749
   size: 40, 24
-  split: 11, 10, 10, 10
   orig: 40, 24
   offset: 0, 0
   index: -1
@@ -15039,7 +15038,6 @@ scroll-knob-vertical-black
   rotate: false
   xy: 1832, 429
   size: 24, 40
-  split: 10, 10, 6, 10
   orig: 24, 40
   offset: 0, 0
   index: -1

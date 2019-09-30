@@ -215,14 +215,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 return;
             }
 
-            Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
-
-            if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
-                Core.scene.setScrollFocus(pane);
-            }else{
-                Core.scene.setScrollFocus(null);
-            }
-
             if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
                 doInput();
             }

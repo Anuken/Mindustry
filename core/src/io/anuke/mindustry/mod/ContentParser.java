@@ -43,11 +43,9 @@ public class ContentParser{
 
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
-            String clas = value.getString("type");
-            Class<Block> type = resolve("io.anuke.mindustry.world." + clas, "io.anuke.mindustry.world.blocks." + clas, "io.anuke.mindustry.world.blocks.defense" + clas);
+            Class<Block> type = resolve(value.getString("type"), "io.anuke.mindustry.world", "io.anuke.mindustry.world.blocks", "io.anuke.mindustry.world.blocks.defense");
             Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
-            value.remove("type");
-            readFields(block, value);
+            readFields(block, value, true);
 
             //make block visible
             if(block.buildRequirements != null){
@@ -57,29 +55,25 @@ public class ContentParser{
             return block;
         },
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
-            String clas = value.getString("type");
-            Class<BaseUnit> type = resolve("io.anuke.mindustry.entities.type.base." + clas);
-            java.lang.reflect.Constructor<BaseUnit> cons = type.getDeclaredConstructor();
-            UnitType unit = new UnitType(mod + "-" + name, type, () -> {
-                try{
-                    return cons.newInstance();
-                }catch(Exception e){
-                    throw new RuntimeException(e);
-                }
-            });
-            value.remove("type");
-            readFields(unit, value);
+            Class<BaseUnit> type = resolve(value.getString("type"), "io.anuke.mindustry.entities.type.base");
+            UnitType unit = new UnitType(mod + "-" + name, supply(type));
+            readFields(unit, value, true);
 
             return unit;
         },
-        ContentType.item, parser(Item::new),
-        ContentType.liquid, parser(Liquid::new),
-        ContentType.mech, parser(Mech::new)
+        ContentType.item, parser(ContentType.item, Item::new),
+        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
+        ContentType.mech, parser(ContentType.mech, Mech::new)
     );
 
-    private <T extends Content> TypeParser<T> parser(Function<String, T> constructor){
+    private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
         return (mod, name, value) -> {
-            T item = constructor.get(mod + "-" + name);
+            T item;
+            if(Vars.content.getByName(type, name) != null){
+                item = (T)Vars.content.getByName(type, name);
+            }else{
+                item = constructor.get(mod + "-" + name);
+            }
             readFields(item, value);
             return item;
         };
@@ -120,6 +114,21 @@ public class ContentParser{
         Content c = parsers.get(type).parse(mod, name, value);
         checkNulls(c);
         return c;
+    }
+
+    private <T> Supplier<T> supply(Class<T> type){
+        try{
+            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            return () -> {
+                try{
+                    return cons.newInstance();
+                }catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            };
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     private Object field(Class<?> type, JsonValue value){
@@ -165,6 +174,11 @@ public class ContentParser{
         });
     }
 
+    private void readFields(Object object, JsonValue jsonMap, boolean stripType){
+        if(stripType) jsonMap.remove("type");
+        readFields(object, jsonMap);
+    }
+
     private void readFields(Object object, JsonValue jsonMap){
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
@@ -198,10 +212,10 @@ public class ContentParser{
     }
 
     /** Tries to resolve a class from a list of potential class names. */
-    private <T> Class<T> resolve(String... potentials) throws Exception{
+    private <T> Class<T> resolve(String base, String... potentials) throws Exception{
         for(String type : potentials){
             try{
-                return (Class<T>)Class.forName(type);
+                return (Class<T>)Class.forName(type + '.' + base);
             }catch(Exception ignored){
             }
         }
