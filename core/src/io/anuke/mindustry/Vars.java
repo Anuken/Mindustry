@@ -130,7 +130,7 @@ public class Vars implements Loadable{
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
-    public static FileTree filet;
+    public static FileTree tree;
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
@@ -194,7 +194,7 @@ public class Vars implements Loadable{
 
         Version.init();
 
-        filet = new FileTree();
+        tree = new FileTree();
         if(mods == null){
             mods = new Mods();
         }
