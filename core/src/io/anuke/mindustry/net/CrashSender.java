@@ -93,6 +93,7 @@ public class CrashSender{
             ex(() -> value.addChild("versionNumber", new JsonValue(Version.number)));
             ex(() -> value.addChild("versionModifier", new JsonValue(Version.modifier)));
             ex(() -> value.addChild("build", new JsonValue(Version.build)));
+            ex(() -> value.addChild("revision", new JsonValue(Version.revision)));
             ex(() -> value.addChild("net", new JsonValue(fn)));
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
