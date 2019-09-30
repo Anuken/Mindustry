@@ -104,6 +104,23 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            Array<String> extraMods = packet.mods.copy();
+            Array<String> missingMods = mods.getIncompatibility(extraMods);
+
+            if(!extraMods.isEmpty() || !missingMods.isEmpty()){
+                //can't easily be localized since kick reasons can't have formatted text with them
+                StringBuilder result = new StringBuilder("[accent]Incompatible mods![]\n\n");
+                if(!missingMods.isEmpty()){
+                    result.append("Missing:[lightgray]\n").append("> ").append(missingMods.toString("\n> "));
+                    result.append("[]\n");
+                }
+
+                if(!extraMods.isEmpty()){
+                    result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
+                }
+                con.kick(result.toString());
+            }
+
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
                 info.adminUsid = packet.usid;
                 info.lastName = packet.name;

@@ -9,11 +9,12 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -221,6 +222,19 @@ public class Mods implements Loadable{
         return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
     }
 
+    /** @return the mods that the client is missing.
+     * The inputted array is changed to contain the extra mods that the client has but the server does.*/
+    public Array<String> getIncompatibility(Array<String> out){
+        Array<String> mods = getModStrings();
+        Array<String> result = mods.copy();
+        for(String mod : mods){
+            if(out.remove(mod)){
+                result.remove(mod);
+            }
+        }
+        return result;
+    }
+
     /** Iterates through each mod with a main class.*/
     public void each(Consumer<Mod> cons){
         loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
@@ -242,8 +256,16 @@ public class Mods implements Loadable{
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         Mod mainMod;
 
+        FileHandle mainFile = zip;
+        String[] path = (mainClass.replace('.', '/') + ".class").split("/");
+        for(String str : path){
+            if(!str.isEmpty()){
+                mainFile = mainFile.child(str);
+            }
+        }
+
         //make sure the main class exists before loading it; if it doesn't just don't put it there
-        if(zip.child(mainClass.replace('.', '/') + ".class").exists()){
+        if(mainFile.exists()){
             //other platforms don't have standard java class loaders
             if(mobile){
                 throw new IllegalArgumentException("This mod is not compatible with " + (ios ? "iOS" : "Android") + ".");
@@ -255,6 +277,11 @@ public class Mods implements Loadable{
             mainMod = (Mod)main.getDeclaredConstructor().newInstance();
         }else{
             mainMod = null;
+        }
+
+        //all plugins are hidden implicitly
+        if(mainMod instanceof Plugin){
+            meta.hidden = true;
         }
 
         return new LoadedMod(sourceFile, zip, mainMod, meta);

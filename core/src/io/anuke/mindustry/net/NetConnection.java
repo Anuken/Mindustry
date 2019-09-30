@@ -49,7 +49,7 @@ public abstract class NetConnection{
 
     /** Kick with an arbitrary reason. */
     public void kick(String reason){
-        Log.info("Kicking connection {0}; Reason: {1}", address, reason);
+        Log.info("Kicking connection {0}; Reason: {1}", address, reason.replace("\n", " "));
 
         if(player != null  && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);

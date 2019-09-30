@@ -236,7 +236,7 @@ public class NetClient implements ApplicationListener{
         netClient.disconnectQuietly();
         state.set(State.menu);
         logic.reset();
-        ui.showText("$disconnect", reason);
+        ui.showText("$disconnect", reason, Align.left);
         ui.loadfrag.hide();
     }
 
