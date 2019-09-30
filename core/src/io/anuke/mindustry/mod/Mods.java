@@ -216,6 +216,11 @@ public class Mods implements Loadable{
         return loaded;
     }
 
+    /** @return a list of mods and versions, in the format name:version. */
+    public Array<String> getModStrings(){
+        return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
+    }
+
     /** Iterates through each mod with a main class.*/
     public void each(Consumer<Mod> cons){
         loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
