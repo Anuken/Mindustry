@@ -1,22 +1,21 @@
 package io.anuke.mindustry.ui;
 
-import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.type.ItemType;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.text.*;
+import java.util.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.data;
+import static io.anuke.mindustry.Vars.*;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
     private static final NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
+    private StringBuilder builder = new StringBuilder();
 
     public ItemsDisplay(){
         rebuild();
@@ -29,17 +28,28 @@ public class ItemsDisplay extends Table{
 
         table(Tex.button,t -> {
             t.margin(10).marginLeft(15).marginTop(15f);
-            t.add("$launcheditems").colspan(3).left().padBottom(5);
+            t.add("$launcheditems").colspan(3).left();
             t.row();
-            ObjectIntMap<Item> items = data.items();
+            t.label(() -> state.is(State.menu) ? "" : "$launchinfo").colspan(3).width(210f).wrap().padBottom(4).left();
+            t.row();
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
-                    t.label(() -> format.format(items.get(item, 0))).left();
+                    t.label(() -> format(item)).left();
                     t.addImage(item.icon(Icon.medium)).size(8 * 3).padLeft(4).padRight(4);
                     t.add(item.localizedName()).color(Color.lightGray).left();
                     t.row();
                 }
             }
         });
+    }
+
+    private String format(Item item){
+        builder.setLength(0);
+        builder.append(ui.formatAmount(data.items().get(item, 0)));
+        if(!state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity != null){
+            builder.append(" [unlaunched]+ ");
+            builder.append(ui.formatAmount(state.teams.get(player.getTeam()).cores.first().entity.items.get(item)));
+        }
+        return builder.toString();
     }
 }

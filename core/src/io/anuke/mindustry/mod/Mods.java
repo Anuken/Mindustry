@@ -217,6 +217,11 @@ public class Mods implements Loadable{
         return loaded;
     }
 
+    /** @return a list of mod names only, without versions. */
+    public Array<String> getModNames(){
+        return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
+    }
+
     /** @return a list of mods and versions, in the format name:version. */
     public Array<String> getModStrings(){
         return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);

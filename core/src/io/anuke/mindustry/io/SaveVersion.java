@@ -66,6 +66,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
+            "mods", JsonIO.write(mods.getModNames().toArray(String.class)),
             "width", world.width(),
             "height", world.height()
         ).merge(tags));
@@ -80,6 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
+        String[] mods = JsonIO.read(String[].class, map.get("mods", "[]"));
 
         Map worldmap = maps.byName(map.get("mapname", "\\\\\\"));
         world.setMap(worldmap == null ? new Map(StringMap.of(

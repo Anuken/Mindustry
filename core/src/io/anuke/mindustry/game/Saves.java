@@ -262,6 +262,10 @@ public class Saves{
             Core.settings.save();
         }
 
+        public String[] getMods(){
+            return meta.mods;
+        }
+
         public Zone getZone(){
             return meta == null || meta.rules == null ? null : meta.rules.zone;
         }
