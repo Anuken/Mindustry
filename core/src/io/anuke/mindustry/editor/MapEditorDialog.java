@@ -680,6 +680,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         pane = new ScrollPane(content);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
+        pane.exited(() -> {
+            if(pane.hasScroll()){
+                Core.scene.setScrollFocus(view);
+            }
+        });
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
         int i = 0;
