@@ -61,7 +61,33 @@ public class Logic implements ApplicationListener{
             }
 
             TeamData data = state.teams.get(tile.getTeam());
+
+            //remove existing blocks that have been placed here.
+            //painful O(n) iteration + copy
+            for(int i = 0; i < data.brokenBlocks.size; i++){
+                BrokenBlock b = data.brokenBlocks.get(i);
+                if(b.x == tile.x && b.y == tile.y){
+                    data.brokenBlocks.removeIndex(i);
+                    break;
+                }
+            }
+
             data.brokenBlocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+        });
+
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(!event.breaking){
+                TeamData data = state.teams.get(event.team);
+
+                //painful O(n) iteration + copy
+                for(int i = 0; i < data.brokenBlocks.size; i++){
+                    BrokenBlock b = data.brokenBlocks.get(i);
+                    if(b.x == event.tile.x && b.y == event.tile.y){
+                        data.brokenBlocks.removeIndex(i);
+                        break;
+                    }
+                }
+            }
         });
     }
 

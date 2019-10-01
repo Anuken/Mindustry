@@ -187,9 +187,10 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 TeamData data = Vars.state.teams.get(team);
                 if(!data.brokenBlocks.isEmpty()){
                     BrokenBlock block = data.brokenBlocks.removeLast();
-
-                    placeQueue.addFirst(new BuildRequest(block.x, block.y, block.rotation, content.block(block.block)).configure(block.config));
-                    setState(build);
+                    if(Build.validPlace(getTeam(), block.x, block.y, content.block(block.block), block.rotation)){
+                        placeQueue.addFirst(new BuildRequest(block.x, block.y, block.rotation, content.block(block.block)).configure(block.config));
+                        setState(build);
+                    }
                 }
             }
         }

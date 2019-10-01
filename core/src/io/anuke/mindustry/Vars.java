@@ -31,6 +31,8 @@ import static io.anuke.arc.Core.*;
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
+    /** Maximum number of broken blocks.*/
+    public static final int maxBrokenBlocks = 256;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */

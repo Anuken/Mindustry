@@ -240,6 +240,8 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 
+        blocks.drawBroken();
+
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
         Draw.shader();
