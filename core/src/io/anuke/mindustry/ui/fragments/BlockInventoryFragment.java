@@ -193,10 +193,14 @@ public class BlockInventoryFragment extends Fragment{
 
     private String round(float f){
         f = (int)f;
-        if(f >= 1000000){
+        if(f >= 10000000){
             return (int)(f / 1000000f) + "[gray]mil[]";
-        }else if(f >= 1000){
+        }else if(f >= 1000000){
+            return (Math.floor(f / 100000) / 10f) + "[gray]mil[]";
+        }else if(f >= 10000){
             return (int)(f / 1000) + "k";
+        }else if(f >= 1000){
+            return (Math.floor(f / 100) / 10) + "k";
         }else{
             return (int)f + "";
         }
