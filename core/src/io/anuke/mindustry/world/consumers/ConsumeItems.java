@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item.Icon;
@@ -19,9 +20,9 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void applyItemFilter(boolean[] filter){
+    public void applyItemFilter(Bits filter){
         for(ItemStack stack : items){
-            filter[stack.item.id] = true;
+            filter.set(stack.item.id);
         }
     }
 
