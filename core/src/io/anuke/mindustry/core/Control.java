@@ -388,7 +388,10 @@ public class Control implements ApplicationListener, Loadable{
         saves.update();
 
         //update and load any requested assets
-        assets.update();
+        try{
+            assets.update();
+        }catch(Exception ignored){
+        }
 
         input.updateState();
 

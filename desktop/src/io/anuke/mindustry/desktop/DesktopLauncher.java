@@ -26,7 +26,9 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.*;
 
+import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -36,6 +38,12 @@ public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
     boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+
+    static{
+        if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
+            System.setProperty("com.codedisaster.steamworks.SharedLibraryExtractPath", new File("").getAbsolutePath());
+        }
+    }
 
     public static void main(String[] arg){
         try{
