@@ -1646,13 +1646,13 @@ public class Blocks implements ContentList{
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{
-            requirements(Category.units, ItemStack.with(Items.titanium, 45, Items.thorium, 40, Items.lead, 55, Items.silicon, 105));
+            requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.thorium, 60, Items.lead, 65, Items.silicon, 105));
             type = UnitTypes.phantom;
-            produceTime = 3650;
+            produceTime = 4400;
             size = 2;
-            maxSpawn = 2;
-            consumes.power(2f);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 10));
+            maxSpawn = 1;
+            consumes.power(2.5f);
+            consumes.items(new ItemStack(Items.silicon, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.titanium, 20));
         }};
 
         commandCenter = new CommandCenter("command-center"){{

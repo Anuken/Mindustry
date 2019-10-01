@@ -96,9 +96,9 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                     incDrones(playerTarget);
                     TargetTrait prev = target;
                     target = playerTarget;
-                    float dst = 90f + (id % 4)*30;
+                    float dst = 90f + (id % 10)*3;
                     float tdst = dst(target);
-                    float scale = (Mathf.lerp(1f, 0.77f, 1f - Mathf.clamp((tdst - dst) / dst)));
+                    float scale = (Mathf.lerp(1f, 0.2f, 1f - Mathf.clamp((tdst - dst) / dst)));
                     circle(dst);
                     velocity.scl(scale);
                     target = prev;
@@ -148,8 +148,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
     }
 
     boolean canRebuild(){
-        //disabled until further notice, reason being that it's too annoying when playing enemies and too broken for ally use
-        return timer.get(timerTarget, 80) && Units.closestEnemy(getTeam(), x, y, 100f, u -> !(u instanceof BaseDrone)) == null;
+        return true;
     }
 
     @Override
@@ -184,7 +183,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 }
             }
 
-            if(canRebuild() && !isBuilding()){
+            if(timer.get(timerTarget, 80) && Units.closestEnemy(getTeam(), x, y, 100f, u -> !(u instanceof BaseDrone)) == null && !isBuilding()){
                 TeamData data = Vars.state.teams.get(team);
                 if(!data.brokenBlocks.isEmpty()){
                     BrokenBlock block = data.brokenBlocks.removeLast();

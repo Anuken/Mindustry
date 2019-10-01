@@ -61,9 +61,8 @@ public class UnitTypes implements ContentList{
             maxVelocity = 1.9f;
             range = 70f;
             itemCapacity = 70;
-            health = 220;
-            buildPower = 0.9f;
-            minePower = 1.1f;
+            health = 400;
+            buildPower = 1f;
             engineOffset = 6.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
             weapon = new Weapon("heal-blaster"){{

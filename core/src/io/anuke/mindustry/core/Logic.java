@@ -16,6 +16,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,8 +44,10 @@ public class Logic implements ApplicationListener{
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             Block block = tile.block();
-            if(tile.entity == null) return;
-            if(block instanceof BuildBlock ){
+            //skip null entities or nukes, for obvious reasons
+            if(tile.entity == null || tile.block() instanceof NuclearReactor) return;
+
+            if(block instanceof BuildBlock){
 
                 BuildEntity entity = tile.entity();
 

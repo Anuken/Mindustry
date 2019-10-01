@@ -105,7 +105,12 @@ public class PowerNode extends PowerBlock{
             }
         }else if(linkValid(tile, other) && valid && entity.power.links.size < maxNodes){
 
+            if(!entity.power.links.contains(other.pos())){
+                entity.power.links.add(other.pos());
+            }
+
             if(other.getTeamID() == tile.getTeamID()){
+
                 if(!other.entity.power.links.contains(tile.pos())){
                     other.entity.power.links.add(tile.pos());
                 }
