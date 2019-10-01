@@ -125,11 +125,11 @@ public class DesktopLauncher extends ClientLauncher{
                 if(!SteamAPI.init()){
                     Log.err("Steam client not running.");
                 }else{
-                    Vars.steam = true;
                     initSteam(args);
-
+                    Vars.steam = true;
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
+                steam = false;
                 Log.err("Failed to load Steam native libraries.");
                 e.printStackTrace();
             }
@@ -199,9 +199,6 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public Array<FileHandle> getExternalMaps(){
-        if(steam && SVars.workshop == null){
-            SVars.workshop = new SWorkshop();
-        }
         return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
     }
 
@@ -222,7 +219,6 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public NetProvider getNet(){
-        if(steam && SVars.net == null) SVars.net = new SNet(new ArcNetImpl());
         return steam ? SVars.net : new ArcNetImpl();
     }
 
