@@ -168,7 +168,6 @@ public class ItemBridge extends Block{
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            entity.link = Pos.invalid;
             tryDump(tile);
             entity.uptime = 0f;
         }else{
