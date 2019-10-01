@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -21,8 +22,8 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void applyItemFilter(boolean[] arr){
-        content.items().each(filter, item -> arr[item.id] = true);
+    public void applyItemFilter(Bits arr){
+        content.items().each(filter, item -> arr.set(item.id));
     }
 
     @Override

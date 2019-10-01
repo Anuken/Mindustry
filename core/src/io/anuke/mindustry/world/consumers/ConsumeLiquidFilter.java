@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.Predicate;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -23,8 +23,8 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void applyLiquidFilter(boolean[] arr){
-        content.liquids().each(filter, item -> arr[item.id] = true);
+    public void applyLiquidFilter(Bits arr){
+        content.liquids().each(filter, item -> arr.set(item.id));
     }
 
     @Override

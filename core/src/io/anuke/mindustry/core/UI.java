@@ -417,6 +417,22 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+
+    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed){
+        FloatingDialog dialog = new FloatingDialog(title);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
+        dialog.buttons.addButton(no, dialog::hide);
+        dialog.buttons.addButton(yes, () -> {
+            dialog.hide();
+            confirmed.run();
+        });
+        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.show();
+    }
+
     public void showOkText(String title, String text, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);

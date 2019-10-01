@@ -91,11 +91,11 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public boolean acceptItem(Item item, Tile tile, Tile source){
-        return consumes.itemFilters[item.id] && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
+        return consumes.itemFilters.get(item.id) && tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }
 
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity && consumes.liquidfilters[liquid.id];
+        return hasLiquids && tile.entity.liquids.get(liquid) + amount < liquidCapacity && consumes.liquidfilters.get(liquid.id);
     }
 
     public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
