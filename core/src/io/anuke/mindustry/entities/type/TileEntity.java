@@ -43,8 +43,7 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     private boolean dead = false;
     private boolean sleeping;
     private float sleepTime;
-    private @Nullable
-    SoundLoop sound;
+    private @Nullable SoundLoop sound;
 
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
@@ -230,6 +229,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     public Array<Tile> proximity(){
         return proximity;
+    }
+
+    /** Tile configuration. Defaults to 0. Used for block rebuilding. */
+    public int config(){
+        return 0;
     }
 
     @Override

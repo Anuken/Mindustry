@@ -66,7 +66,7 @@ public class Packets{
     public static class ConnectPacket implements Packet{
         public int version;
         public String versionType;
-        public Array<String> mods = new Array<>();
+        public Array<String> mods;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
@@ -98,6 +98,7 @@ public class Packets{
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
             int totalMods = buffer.getInt();
+            mods = new Array<>(totalMods);
             for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));
             }

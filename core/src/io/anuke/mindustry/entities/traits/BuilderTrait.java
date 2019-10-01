@@ -104,7 +104,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(current.breaking){
             entity.deconstruct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
+            if(entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier)){
+                if(current.hasConfig){
+                    Call.onTileConfig(null, tile, current.config);
+                }
+            }
         }
 
         current.progress = entity.progress;
@@ -257,6 +261,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public final int x, y, rotation;
         public final Block block;
         public final boolean breaking;
+        public boolean hasConfig;
+        public int config;
 
         public float progress;
         public boolean initialized;
@@ -277,6 +283,12 @@ public interface BuilderTrait extends Entity, TeamTrait{
             this.rotation = -1;
             this.block = world.tile(x, y).block();
             this.breaking = true;
+        }
+
+        public BuildRequest configure(int config){
+            this.config = config;
+            this.hasConfig = true;
+            return this;
         }
 
         public Tile tile(){

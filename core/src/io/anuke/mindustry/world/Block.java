@@ -15,11 +15,11 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -315,7 +315,10 @@ public class Block extends BlockStorage{
             });
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
             if(!tempTiles.isEmpty()){
-                Call.linkPowerNodes(null, tempTiles.first(), tile);
+                Tile toLink = tempTiles.first();
+                if(!toLink.entity.power.links.contains(tile.pos())){
+                    toLink.configure(tile.pos());
+                }
             }
         }
     }
@@ -430,6 +433,11 @@ public class Block extends BlockStorage{
 
     /** Called when the block is tapped. */
     public void tapped(Tile tile, Player player){
+
+    }
+
+    /** Called when arbitrary configuration is applied to a tile. */
+    public void configured(Tile tile, @Nullable Player player, int value){
 
     }
 

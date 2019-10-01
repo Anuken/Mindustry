@@ -188,10 +188,10 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public void construct(Unit builder, @Nullable TileEntity core, float amount){
+        public boolean construct(Unit builder, @Nullable TileEntity core, float amount){
             if(cblock == null){
                 kill();
-                return;
+                return false;
             }
 
             float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
@@ -212,7 +212,9 @@ public class BuildBlock extends Block{
 
             if(progress >= 1f || state.rules.infiniteResources){
                 Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam());
+                return true;
             }
+            return false;
         }
 
         public void deconstruct(Unit builder, @Nullable TileEntity core, float amount){

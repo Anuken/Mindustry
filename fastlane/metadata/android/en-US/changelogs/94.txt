@@ -1,0 +1,8 @@
+- Fixed tutorial displaying Desktop text on Android
+- Fixed common crash related to status effects
+- Fixed launch pads launching entire core contents
+- Fixed new maps overwriting old ones without warning
+- Fixed phase conveyors operating on near-0 power
+- Fixed incorrect message dialog layout
+- Fixed some crashes
+- Reverted removal of router passback

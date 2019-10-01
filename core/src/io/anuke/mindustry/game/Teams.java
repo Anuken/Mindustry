@@ -1,9 +1,8 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.collection.*;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.world.*;
 
 /** Class for various team-based utilities. */
 public class Teams{
@@ -52,7 +51,7 @@ public class Teams{
         public final ObjectSet<Tile> cores = new ObjectSet<>();
         public final EnumSet<Team> enemies;
         public final Team team;
-        public LongQueue brokenBlocks = new LongQueue();
+        public Queue<BrokenBlock> brokenBlocks = new Queue<>();
 
         public TeamData(Team team, EnumSet<Team> enemies){
             this.team = team;
@@ -62,8 +61,16 @@ public class Teams{
 
     /** Represents a block made by this team that was destroyed somewhere on the map.
      * This does not include deconstructed blocks.*/
-    @Struct
-    public class BrokenBlockStruct{
-        public short x, y, rotation, block;
+    public static class BrokenBlock{
+        public final short x, y, rotation, block;
+        public final int config;
+
+        public BrokenBlock(short x, short y, short rotation, short block, int config){
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.block = block;
+            this.config = config;
+        }
     }
 }
