@@ -31,7 +31,7 @@ import static io.anuke.arc.Core.*;
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
-    /** Maximum number of broken blocks.*/
+    /** Maximum number of broken blocks. TODO implement or remove.*/
     public static final int maxBrokenBlocks = 256;
     /** IO buffer size. */
     public static final int bufferSize = 8192;

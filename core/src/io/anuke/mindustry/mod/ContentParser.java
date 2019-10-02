@@ -70,6 +70,9 @@ public class ContentParser{
             Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
             read(() -> {
                 readFields(block, value, true);
+                if(value.has("research")){
+                    TechTree.create(Vars.content.getByName(ContentType.block, value.get("research").asString()), block);
+                }
 
                 //make block visible
                 if(block.requirements != null){
