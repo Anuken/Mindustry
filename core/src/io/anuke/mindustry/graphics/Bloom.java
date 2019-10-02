@@ -29,7 +29,7 @@ public class Bloom{
     public int blurPasses = 1;
 
     private Shader tresholdShader;
-    private Shader bloomShader;
+    private static Shader bloomShader;
 
     private Mesh fullScreenQuad;
 
@@ -43,7 +43,7 @@ public class Bloom{
 
     private Shader blurShader;
 
-    private float bloomIntensity;
+    private static float bloomIntensity;
     private float originalIntensity;
     private float threshold;
     private int w;
@@ -331,7 +331,7 @@ public class Bloom{
      * @param intensity multiplier for blurred texture in combining phase. must be
      * positive.
      */
-    public void setBloomIntesity(float intensity){
+    public static void setBloomIntesity(float intensity){
         bloomIntensity = intensity;
         bloomShader.begin();
         {
