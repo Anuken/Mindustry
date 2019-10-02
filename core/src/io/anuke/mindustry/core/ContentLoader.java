@@ -58,37 +58,11 @@ public class ContentLoader{
             list.load();
         }
 
-        setupMapping();
-
         if(mods != null){
             mods.loadContent();
         }
 
-        setupMapping();
-
-        loaded = true;
-    }
-
-    private void setupMapping(){
-
-        for(ContentType type : ContentType.values()){
-            contentNameMap[type.ordinal()].clear();
-        }
-
-        for(ContentType type : ContentType.values()){
-
-            for(Content c : contentMap[type.ordinal()]){
-                if(c instanceof MappableContent){
-                    String name = ((MappableContent)c).name;
-                    if(contentNameMap[type.ordinal()].containsKey(name)){
-                        throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + name + "')");
-                    }
-                    contentNameMap[type.ordinal()].put(name, (MappableContent)c);
-                }
-            }
-        }
-
-        //set up ID mapping
+        //check up ID mapping, make sure it's linear
         for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
@@ -97,6 +71,8 @@ public class ContentLoader{
                 }
             }
         }
+
+        loaded = true;
     }
 
     /** Logs content statistics.*/
@@ -125,6 +101,7 @@ public class ContentLoader{
 
         for(ContentType type : ContentType.values()){
             for(Content content : contentMap[type.ordinal()]){
+                //TODO catch error and display it per mod
                 callable.accept(content);
             }
         }
@@ -154,6 +131,14 @@ public class ContentLoader{
 
     public void handleContent(Content content){
         contentMap[content.getContentType().ordinal()].add(content);
+
+    }
+
+    public void handleMappableContent(MappableContent content){
+        if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
+            throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+        }
+        contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }
 
     public void setTemporaryMapper(MappableContent[][] temporaryMapper){

@@ -44,8 +44,7 @@ public class Mods implements Loadable{
     }
 
     /** @return the loaded mod found by class, or null if not found. */
-    public @Nullable
-    LoadedMod getMod(Class<? extends Mod> type){
+    public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
@@ -76,26 +75,29 @@ public class Mods implements Loadable{
 
         packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
         for(LoadedMod mod : loaded){
-            try{
-                int packed = 0;
-                for(FileHandle file : mod.root.child("sprites").list()){
-                    if(file.extension().equals("png")){
-                        try(InputStream stream = file.read()){
-                            byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
-                            Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                            packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
-                            pixmap.dispose();
-                            packed ++;
-                            totalSprites ++;
-                        }
+            int[] packed = {0};
+            boolean[] failed = {false};
+            mod.root.child("sprites").walk(file -> {
+                if(failed[0]) return;
+                if(file.extension().equals("png")){
+                    try(InputStream stream = file.read()){
+                        byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                        Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
+                        packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
+                        pixmap.dispose();
+                        packed[0] ++;
+                        totalSprites ++;
+                    }catch(IOException e){
+                        failed[0] = true;
+                        Core.app.post(() -> {
+                            Log.err("Error packing images for mod: {0}", mod.meta.name);
+                            e.printStackTrace();
+                            if(!headless) ui.showException(e);
+                        });
                     }
                 }
-                Log.info("Packed {0} images for mod '{1}'.", packed, mod.meta.name);
-            }catch(IOException e){
-                Log.err("Error packing images for mod: {0}", mod.meta.name);
-                e.printStackTrace();
-                if(!headless) ui.showException(e);
-            }
+            });
+            Log.info("Packed {0} images for mod '{1}'.", packed[0], mod.meta.name);
         }
     }
 
@@ -197,7 +199,7 @@ public class Mods implements Loadable{
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){
                                 try{
-                                    Content loaded = parser.parse(mod.name, file.nameWithoutExtension(), file.readString(), type);
+                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
                                     Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
@@ -208,6 +210,8 @@ public class Mods implements Loadable{
                 }
             }
         }
+
+        parser.finishParsing();
 
         each(Mod::loadContent);
     }

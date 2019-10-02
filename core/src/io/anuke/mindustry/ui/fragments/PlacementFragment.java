@@ -80,7 +80,7 @@ public class PlacementFragment extends Fragment{
                 Block tryRecipe = tile.block();
                 if(tryRecipe.isVisible() && unlocked(tryRecipe)){
                     input.block = tryRecipe;
-                    currentCategory = input.block.buildCategory;
+                    currentCategory = input.block.category;
                     return true;
                 }
             }
@@ -92,7 +92,7 @@ public class PlacementFragment extends Fragment{
             for(KeyCode key : inputCatGrid){
                 if(Core.input.keyDown(key)){
                     input.block = getByCategory(Category.all[i]).first();
-                    currentCategory = input.block.buildCategory;
+                    currentCategory = input.block.category;
                 }
                 i++;
             }
@@ -147,7 +147,7 @@ public class PlacementFragment extends Fragment{
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
                         });
@@ -205,7 +205,7 @@ public class PlacementFragment extends Fragment{
                             topTable.table(req -> {
                                 req.top().left();
 
-                                for(ItemStack stack : lastDisplay.buildRequirements){
+                                for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
@@ -296,7 +296,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.buildCategory == cat && block.isVisible()){
+            if(block.category == cat && block.isVisible()){
                 returnArray.add(block);
             }
         }

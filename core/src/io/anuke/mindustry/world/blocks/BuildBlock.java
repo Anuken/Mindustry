@@ -196,8 +196,8 @@ public class BuildBlock extends Block{
 
             float maxProgress = core == null ? amount : checkRequired(core.items, amount, false);
 
-            for(int i = 0; i < cblock.buildRequirements.length; i++){
-                int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.buildRequirements[i].amount);
+            for(int i = 0; i < cblock.requirements.length; i++){
+                int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
                 accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001f); //add min amount progressed to the accumulator
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
@@ -221,7 +221,7 @@ public class BuildBlock extends Block{
             float deconstructMultiplier = 0.5f;
 
             if(cblock != null){
-                ItemStack[] requirements = cblock.buildRequirements;
+                ItemStack[] requirements = cblock.requirements;
                 if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
                     setDeconstruct(previous);
                 }
@@ -258,15 +258,15 @@ public class BuildBlock extends Block{
         private float checkRequired(ItemModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
-            for(int i = 0; i < cblock.buildRequirements.length; i++){
-                int sclamount = Math.round(state.rules.buildCostMultiplier * cblock.buildRequirements[i].amount);
+            for(int i = 0; i < cblock.requirements.length; i++){
+                int sclamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
                 int required = (int)(accumulator[i]); //calculate items that are required now
 
-                if(inventory.get(cblock.buildRequirements[i].item) == 0 && sclamount != 0){
+                if(inventory.get(cblock.requirements[i].item) == 0 && sclamount != 0){
                     maxProgress = 0f;
                 }else if(required > 0){ //if this amount is positive...
                     //calculate how many items it can actually use
-                    int maxUse = Math.min(required, inventory.get(cblock.buildRequirements[i].item));
+                    int maxUse = Math.min(required, inventory.get(cblock.requirements[i].item));
                     //get this as a fraction
                     float fraction = maxUse / (float)required;
 
@@ -277,7 +277,7 @@ public class BuildBlock extends Block{
 
                     //remove stuff that is actually used
                     if(remove){
-                        inventory.remove(cblock.buildRequirements[i].item, maxUse);
+                        inventory.remove(cblock.requirements[i].item, maxUse);
                     }
                 }
                 //else, no items are required yet, so just keep going
@@ -293,8 +293,8 @@ public class BuildBlock extends Block{
         public void setConstruct(Block previous, Block block){
             this.cblock = block;
             this.previous = previous;
-            this.accumulator = new float[block.buildRequirements.length];
-            this.totalAccumulator = new float[block.buildRequirements.length];
+            this.accumulator = new float[block.requirements.length];
+            this.totalAccumulator = new float[block.requirements.length];
             this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
         }
 
@@ -303,8 +303,8 @@ public class BuildBlock extends Block{
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){
                 this.cblock = previous;
-                this.accumulator = new float[previous.buildRequirements.length];
-                this.totalAccumulator = new float[previous.buildRequirements.length];
+                this.accumulator = new float[previous.requirements.length];
+                this.totalAccumulator = new float[previous.requirements.length];
                 this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             }else{
                 this.buildCost = 20f; //default no-requirement build cost is 20

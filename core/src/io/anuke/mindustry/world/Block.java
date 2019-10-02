@@ -114,9 +114,9 @@ public class Block extends BlockStorage{
     public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
-    public ItemStack[] buildRequirements = new ItemStack[]{};
+    public ItemStack[] requirements = new ItemStack[]{};
     /** Category in place menu. */
-    public Category buildCategory = Category.distribution;
+    public Category category = Category.distribution;
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
@@ -387,7 +387,7 @@ public class Block extends BlockStorage{
         }
 
         buildCost = 0f;
-        for(ItemStack stack : buildRequirements){
+        for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
 
@@ -493,7 +493,7 @@ public class Block extends BlockStorage{
         stats.add(BlockStat.health, health, StatUnit.none);
         if(isBuildable()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
-            stats.add(BlockStat.buildCost, new ItemListValue(false, buildRequirements));
+            stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
         consumes.display(stats);
@@ -772,11 +772,11 @@ public class Block extends BlockStorage{
 
     /** Sets up requirements. Use only this method to set up requirements. */
     protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
-        this.buildCategory = cat;
-        this.buildRequirements = stacks;
+        this.category = cat;
+        this.requirements = stacks;
         this.buildVisibility = visible;
 
-        Arrays.sort(buildRequirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
+        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
     }
 
     public enum Icon{

@@ -781,7 +781,7 @@ public class Blocks implements ContentList{
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(copperWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -792,7 +792,7 @@ public class Blocks implements ContentList{
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(titaniumWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -803,7 +803,7 @@ public class Blocks implements ContentList{
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(thoriumWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -814,7 +814,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseWallLarge = new DeflectorWall("phase-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(phaseWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -825,7 +825,7 @@ public class Blocks implements ContentList{
         }};
 
         surgeWallLarge = new SurgeWall("surge-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(surgeWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -836,7 +836,7 @@ public class Blocks implements ContentList{
         }};
 
         doorLarge = new Door("door-large"){{
-            requirements(Category.defense, ItemStack.mult(door.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(door.requirements, 4));
             openfx = Fx.dooropenlarge;
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
