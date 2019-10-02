@@ -104,7 +104,9 @@ public class Renderer implements ApplicationListener{
         Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
-
+        
+        Bloom.setBloomIntesity(12f / camerascale);
+        
         if(landTime > 0){
             landTime -= Time.delta();
             landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
