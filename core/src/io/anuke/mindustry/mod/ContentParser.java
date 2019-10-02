@@ -2,6 +2,7 @@ package io.anuke.mindustry.mod;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.reflect.*;
@@ -24,6 +25,8 @@ public class ContentParser{
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
+        put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
+        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
@@ -69,6 +72,31 @@ public class ContentParser{
 
             Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
             read(() -> {
+                if(value.has("consumes")){
+                    for(JsonValue child : value.get("consumes")){
+                        if(child.name.equals("item")){
+                            if(child.isString()){
+                                block.consumes.item(Vars.content.getByName(ContentType.item, child.asString()));
+                            }else{
+                                ItemStack stack = parser.readValue(ItemStack.class, child);
+                                block.consumes.item(stack.item, stack.amount);
+                            }
+                        }else if(child.name.equals("items")){
+                            block.consumes.items(parser.readValue(ItemStack[].class, child));
+                        }else if(child.name.equals("liquid")){
+                            LiquidStack stack = parser.readValue(LiquidStack.class, child);
+                            block.consumes.liquid(stack.liquid, stack.amount);
+                        }else if(child.name.equals("power")){
+                            block.consumes.power(child.asFloat());
+                        }else if(child.name.equals("powerBuffered")){
+                            block.consumes.powerBuffered(child.asFloat());
+                        }else{
+                            throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+                        }
+                    }
+                    value.remove("consumes");
+                }
+
                 readFields(block, value, true);
 
                 //add research tech node

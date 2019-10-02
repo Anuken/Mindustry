@@ -35,6 +35,10 @@ public class Logic implements ApplicationListener{
             for(Player p : playerGroup.all()){
                 p.respawns = state.rules.respawns;
             }
+
+            if(world.isZone()){
+                world.getZone().updateWave(state.wave);
+            }
         });
 
         Events.on(BlockDestroyEvent.class, event -> {

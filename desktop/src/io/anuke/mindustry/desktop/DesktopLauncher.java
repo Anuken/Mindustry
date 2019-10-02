@@ -139,7 +139,7 @@ public class DesktopLauncher extends ClientLauncher{
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                e.printStackTrace();
+                Log.err(e);
             }
         }
     }

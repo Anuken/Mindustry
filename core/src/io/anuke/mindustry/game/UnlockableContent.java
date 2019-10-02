@@ -22,7 +22,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public void createIcons(){
-        //TODO implement.
+        //TODO implement; generate special icons, like mech icons or ores w/ pixmaps
     }
 
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/

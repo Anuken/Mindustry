@@ -258,7 +258,7 @@ public class Vars implements Loadable{
     public static void loadSettings(){
         Core.settings.setAppName(appName);
 
-        if(steam){
+        if(steam || Version.modifier.equals("steam")){
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 
