@@ -15,7 +15,7 @@ void main()
 	if(color.r + color.g + color.b > 0.5 * 3.0){
 		gl_FragColor = color;
 	}else{
-		gl_FragColor = vec4(0.0);
+		gl_FragColor = vec4(color.r, color.g, color.b, 0.0);
 	}
  	//gl_FragColor = (texture2D(u_texture0, v_texCoords) - vec4(threshold.r))  * threshold.g;
 }
