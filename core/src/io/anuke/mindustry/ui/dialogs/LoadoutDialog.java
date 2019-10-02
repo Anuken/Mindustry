@@ -7,6 +7,7 @@ import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -55,7 +56,7 @@ public class LoadoutDialog extends FloatingDialog{
                 }).size(300f, 36f).get();
                 button.clearChildren();
                 button.left();
-                button.addImage(item.icon(Item.Icon.medium)).size(8 * 3).pad(4);
+                button.addImage(item.icon(Cicon.small)).size(8 * 3).pad(4);
                 button.add(item.localizedName);
                 dialog.cont.row();
             }
@@ -118,7 +119,7 @@ public class LoadoutDialog extends FloatingDialog{
                 ui.showInfo(Core.bundle.format("configure.invalid", capacity));
             })).size(bsize);
 
-            items.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(4).padLeft(4);
+            items.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
             items.label(() -> stack.amount + "").left();
 
             items.row();

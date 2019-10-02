@@ -236,7 +236,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public TextureRegion getIconRegion(){
-        return type.iconRegion;
+        return type.icon(Cicon.full);
     }
 
     @Override

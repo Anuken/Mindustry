@@ -702,7 +702,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         for(Block block : blocksOut){
-            TextureRegion region = block.icon(Block.Icon.medium);
+            TextureRegion region = block.icon(Cicon.medium);
 
             if(!Core.atlas.isFound(region)) continue;
 

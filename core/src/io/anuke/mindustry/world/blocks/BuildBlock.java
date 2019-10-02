@@ -1,27 +1,24 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.Graphics.Cursor;
-import io.anuke.arc.Graphics.Cursor.SystemCursor;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.*;
+import io.anuke.arc.Graphics.*;
+import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.ArcAnnotate.*;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.effect.RubbleDecal;
-import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.EventType.BlockBuildEndEvent;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.modules.ItemModule;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.modules.*;
 
 import java.io.*;
 
@@ -93,7 +90,7 @@ public class BuildBlock extends Block{
     @Override
     public TextureRegion getDisplayIcon(Tile tile){
         BuildEntity entity = tile.entity();
-        return (entity.cblock == null ? entity.previous : entity.cblock).icon(Icon.full);
+        return (entity.cblock == null ? entity.previous : entity.cblock).icon(Cicon.full);
     }
 
     @Override
@@ -138,8 +135,8 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        if(Core.atlas.isFound(entity.previous.icon(Icon.full))){
-            Draw.rect(entity.previous.icon(Icon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
+        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
+            Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }
 

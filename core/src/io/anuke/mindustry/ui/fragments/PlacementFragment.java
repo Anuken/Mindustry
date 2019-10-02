@@ -11,6 +11,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -143,7 +144,7 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Block.Icon.medium));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
@@ -189,7 +190,7 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new Image(lastDisplay.icon(Block.Icon.medium))).size(8 * 4);
+                                header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -208,7 +209,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
+                                        line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();

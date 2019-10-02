@@ -8,6 +8,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
@@ -87,7 +88,7 @@ public class LiquidSource extends Block{
                 control.input.frag.config.hideConfig();
                 lastLiquid = items.get(f);
             });
-            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
+            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).icon(Cicon.medium));
             button.setChecked(entity.source == items.get(i));
 
             if(i % 4 == 3){

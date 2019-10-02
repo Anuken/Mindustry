@@ -199,11 +199,6 @@ public class Zone extends UnlockableContent{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return null;
-    }
-
-    @Override
     public String localizedName(){
         return Core.bundle.get("zone." + name + ".name");
     }

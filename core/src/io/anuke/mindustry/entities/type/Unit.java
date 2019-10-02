@@ -407,7 +407,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
-            Draw.rect(item.item.icon(Item.Icon.large),
+            Draw.rect(item.item.icon(Cicon.medium),
                 x + Angles.trnsx(rotation + 180f, backTrns),
                 y + Angles.trnsy(rotation + 180f, backTrns),
                 size, size, rotation);

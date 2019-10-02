@@ -129,7 +129,6 @@ public class Block extends BlockStorage{
     protected Array<String> cacheRegionStrings = new Array<>();
 
     protected Array<Tile> tempTiles = new Array<>();
-    protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
@@ -360,11 +359,6 @@ public class Block extends BlockStorage{
     @Override
     public String localizedName(){
         return localizedName;
-    }
-
-    @Override
-    public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
     }
 
     @Override
@@ -631,7 +625,7 @@ public class Block extends BlockStorage{
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return icon(Icon.medium);
+        return icon(Cicon.medium);
     }
 
     public void display(Tile tile, Table table){
@@ -667,16 +661,8 @@ public class Block extends BlockStorage{
         }
     }
 
-    public TextureRegion icon(Icon icon){
-        if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ?
-                getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
-        }
-        return icons[icon.ordinal()];
-    }
-
     public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.region = icon(Icon.full);
+        draw.region = icon(Cicon.full);
         draw.scalex = draw.scaley = 1;
         draw.rotation = rotation;
     }
@@ -713,7 +699,7 @@ public class Block extends BlockStorage{
 
     public TextureRegion[] variantRegions(){
         if(variantRegions == null){
-            variantRegions = new TextureRegion[]{icon(Icon.full)};
+            variantRegions = new TextureRegion[]{icon(Cicon.full)};
         }
         return variantRegions;
     }
@@ -779,18 +765,4 @@ public class Block extends BlockStorage{
         Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
     }
 
-    public enum Icon{
-        //these are stored in the UI atlases
-        small(8 * 3),
-        medium(8 * 4),
-        large(8 * 6),
-        /** uses whatever the size of the block is. this is always stored in the main game atlas! */
-        full(0);
-
-        public final int size;
-
-        Icon(int size){
-            this.size = size;
-        }
-    }
 }

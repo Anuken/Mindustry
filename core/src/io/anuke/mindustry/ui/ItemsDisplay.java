@@ -3,18 +3,14 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Item.Icon;
-
-import java.text.*;
-import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
-    private static final NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
     private StringBuilder builder = new StringBuilder();
 
     public ItemsDisplay(){
@@ -33,7 +29,7 @@ public class ItemsDisplay extends Table{
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
                     t.label(() -> format(item)).left();
-                    t.addImage(item.icon(Icon.medium)).size(8 * 3).padLeft(4).padRight(4);
+                    t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                     t.add(item.localizedName()).color(Color.lightGray).left();
                     t.row();
                 }
@@ -44,7 +40,7 @@ public class ItemsDisplay extends Table{
     private String format(Item item){
         builder.setLength(0);
         builder.append(ui.formatAmount(data.items().get(item, 0)));
-        if(!state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity != null){
+        if(!state.teams.get(player.getTeam()).cores.isEmpty() && state.teams.get(player.getTeam()).cores.first().entity != null && state.teams.get(player.getTeam()).cores.first().entity.items.get(item) > 0){
             builder.append(" [unlaunched]+ ");
             builder.append(ui.formatAmount(state.teams.get(player.getTeam()).cores.first().entity.items.get(item)));
         }

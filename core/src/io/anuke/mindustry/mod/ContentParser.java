@@ -70,12 +70,14 @@ public class ContentParser{
             Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
             read(() -> {
                 readFields(block, value, true);
+
+                //add research tech node
                 if(value.has("research")){
                     TechTree.create(Vars.content.getByName(ContentType.block, value.get("research").asString()), block);
                 }
 
                 //make block visible
-                if(block.requirements != null){
+                if(value.has("requirements")){
                     block.buildVisibility = () -> true;
                 }
             });
@@ -108,6 +110,7 @@ public class ContentParser{
         };
     }
 
+    /** Call to read a content's extra info later.*/
     private void read(Runnable run){
         LoadedMod mod = currentMod;
         reads.add(() -> {

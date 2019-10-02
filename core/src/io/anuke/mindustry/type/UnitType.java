@@ -40,7 +40,7 @@ public class UnitType extends UnlockableContent{
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
 
-    public TextureRegion iconRegion, legRegion, baseRegion, region;
+    public TextureRegion legRegion, baseRegion, region;
 
     public <T extends BaseUnit> UnitType(String name, Supplier<T> mainConstructor){
         this(name);
@@ -69,14 +69,8 @@ public class UnitType extends UnlockableContent{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return iconRegion;
-    }
-
-    @Override
     public void load(){
         weapon.load();
-        iconRegion = Core.atlas.find("unit-icon-" + name, Core.atlas.find(name));
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");

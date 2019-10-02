@@ -20,7 +20,7 @@ public class RespawnBlock{
 
         Draw.reset();
         if(player != null){
-            TextureRegion region = to.iconRegion;
+            TextureRegion region = player.getIconRegion();
 
             Draw.color(0f, 0f, 0f, 0.4f * progress);
             Draw.rect("circle-shadow", tile.drawx(), tile.drawy(), region.getWidth() / 3f, region.getWidth() / 3f);

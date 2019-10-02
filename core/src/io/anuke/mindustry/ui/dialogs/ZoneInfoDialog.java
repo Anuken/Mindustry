@@ -45,7 +45,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 if(i++ % 2 == 0){
                     iteminfo.row();
                 }
-                iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(1);
+                iteminfo.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.lightGray).padRight(5);
             }
         };
@@ -82,7 +82,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Block block : zone.blockRequirements){
-                                r.addImage(block.icon(Block.Icon.small)).size(8 * 3).padRight(4);
+                                r.addImage(block.icon(Cicon.small)).size(8 * 3).padRight(4);
                                 r.add(block.localizedName).color(Color.lightGray);
                                 r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
@@ -111,7 +111,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                                 t.left();
                                 int i = 0;
                                 for(Item item : zone.resources){
-                                    r.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
+                                    r.addImage(item.icon(Cicon.small)).size(8 * 3);
                                     if(++i % 4 == 0){
                                         r.row();
                                     }

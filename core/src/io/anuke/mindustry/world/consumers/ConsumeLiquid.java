@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.consumers;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.Tile;
@@ -24,7 +25,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Tile tile, Table table){
-        table.add(new ReqImage(liquid.getContentIcon(), () -> valid(tile.entity))).size(8 * 4);
+        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile.entity))).size(8 * 4);
     }
 
     @Override
