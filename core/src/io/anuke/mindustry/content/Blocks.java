@@ -1315,7 +1315,8 @@ public class Blocks implements ContentList{
             requirements(Category.turret, ItemStack.with(Items.copper, 85, Items.lead, 45));
             ammo(
             Items.scrap, Bullets.flakScrap,
-            Items.lead, Bullets.flakLead
+            Items.lead, Bullets.flakLead,
+            Items.metaglass, Bullets.flakGlass
             );
             reload = 18f;
             range = 170f;
@@ -1558,6 +1559,7 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
+            Items.metaglass, Bullets.flakGlass,
             Items.blastCompound, Bullets.flakExplosive,
             Items.plastanium, Bullets.flakPlastic,
             Items.surgealloy, Bullets.flakSurge

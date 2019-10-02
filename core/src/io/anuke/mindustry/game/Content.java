@@ -1,12 +1,16 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.Vars;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.ContentType;
 
 
 /** Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}. */
 public abstract class Content{
     public final short id;
+    /** The mod that loaded this piece of content. */
+    public @Nullable LoadedMod mod;
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;

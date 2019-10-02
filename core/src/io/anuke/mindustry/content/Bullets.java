@@ -21,7 +21,7 @@ public class Bullets implements ContentList{
     artilleryDense, arilleryPlastic, artilleryPlasticFrag, artilleryHoming, artlleryIncendiary, artilleryExplosive, artilleryUnit,
 
     //flak
-    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge,
+    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge, flakGlass, glassFrag,
 
     //missiles
     missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm, missileRevenant,
@@ -55,7 +55,7 @@ public class Bullets implements ContentList{
             splashDamage = 33f;
         }};
 
-        artilleryPlasticFrag = new BasicBulletType(2.5f, 7, "bullet"){{
+        artilleryPlasticFrag = new BasicBulletType(2.5f, 10, "bullet"){{
             bulletWidth = 10f;
             bulletHeight = 12f;
             bulletShrink = 1f;
@@ -132,6 +132,16 @@ public class Bullets implements ContentList{
             frontColor = Pal.bulletYellow;
         }};
 
+        glassFrag = new BasicBulletType(3f, 6, "bullet"){{
+            bulletWidth = 5f;
+            bulletHeight = 12f;
+            bulletShrink = 1f;
+            lifetime = 20f;
+            backColor = Pal.gray;
+            frontColor = Color.white;
+            despawnEffect = Fx.none;
+        }};
+
         flakLead = new FlakBulletType(4.2f, 3){{
             lifetime = 60f;
             ammoMultiplier = 4f;
@@ -155,8 +165,23 @@ public class Bullets implements ContentList{
             splashDamageRadius = 24f;
         }};
 
+        flakGlass = new FlakBulletType(4f, 3){{
+            lifetime = 70f;
+            ammoMultiplier = 5f;
+            shootEffect = Fx.shootSmall;
+            reloadMultiplier = 0.8f;
+            bulletWidth = 6f;
+            bulletHeight = 8f;
+            hitEffect = Fx.flakExplosion;
+            splashDamage = 30f;
+            splashDamageRadius = 26f;
+            fragBullet = glassFrag;
+            fragBullets = 6;
+        }};
+
         flakPlastic = new FlakBulletType(4f, 6){{
             splashDamageRadius = 50f;
+            splashDamage = 25f;
             fragBullet = artilleryPlasticFrag;
             fragBullets = 6;
             hitEffect = Fx.plasticExplosion;
