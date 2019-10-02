@@ -91,6 +91,10 @@ public class Control implements ApplicationListener, Loadable{
                 hiscore = true;
                 world.getMap().setHighScore(state.wave);
             }
+
+            if(world.isZone()){
+                world.getZone().updateWave(state.wave);
+            }
             Sounds.wave.play();
         });
 
