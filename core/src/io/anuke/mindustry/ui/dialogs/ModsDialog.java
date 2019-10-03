@@ -2,6 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.mod.Mods.*;
@@ -36,6 +37,8 @@ public class ModsDialog extends FloatingDialog{
     void setup(){
         cont.clear();
         cont.defaults().width(520f).pad(4);
+        cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
+        cont.row();
         if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
             cont.pane(table -> {
                 table.margin(10f).top();

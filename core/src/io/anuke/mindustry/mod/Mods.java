@@ -221,18 +221,26 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Reloads all mod content.*/
+    /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
     public void reloadContent(){
         //epic memory leak
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
         Tex.load();
         Tex.loadStyles();
         Styles.load();
+        loaded.clear();
+        disabled.clear();
+        load();
+        buildFiles();
+        Musics.dispose();
+        Sounds.dispose();
+        Musics.load();
+        Sounds.load();
+        Core.assets.finishLoading();
         content.clear();
         content.createContent();
         loadAsync();
         loadSync();
-        buildFiles();
         content.init();
         content.load();
         content.loadColors();
