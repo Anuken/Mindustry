@@ -2741,11 +2741,11 @@ omega-mech-pad
   orig: 96, 96
   offset: 0, 0
   index: -1
-block-ore-coal-large
+block-ore-coal-full
   rotate: false
-  xy: 609, 1296
-  size: 40, 40
-  orig: 40, 40
+  xy: 661, 46
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-coal-medium
@@ -2755,11 +2755,11 @@ block-ore-coal-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-coal-icon-full
+block-ore-coal-large
   rotate: false
-  xy: 661, 46
-  size: 32, 32
-  orig: 32, 32
+  xy: 609, 1296
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-coal-small
@@ -2783,11 +2783,11 @@ block-ore-coal-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-ore-copper-large
+block-ore-copper-full
   rotate: false
-  xy: 1557, 1253
-  size: 40, 40
-  orig: 40, 40
+  xy: 695, 80
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-copper-medium
@@ -2797,11 +2797,11 @@ block-ore-copper-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-copper-icon-full
+block-ore-copper-large
   rotate: false
-  xy: 695, 80
-  size: 32, 32
-  orig: 32, 32
+  xy: 1557, 1253
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-copper-small
@@ -2825,11 +2825,11 @@ block-ore-copper-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-ore-lead-large
+block-ore-lead-full
   rotate: false
-  xy: 1557, 1211
-  size: 40, 40
-  orig: 40, 40
+  xy: 729, 114
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-lead-medium
@@ -2839,11 +2839,11 @@ block-ore-lead-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-lead-icon-full
+block-ore-lead-large
   rotate: false
-  xy: 729, 114
-  size: 32, 32
-  orig: 32, 32
+  xy: 1557, 1211
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-lead-small
@@ -2867,11 +2867,11 @@ block-ore-lead-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-ore-scrap-large
+block-ore-scrap-full
   rotate: false
-  xy: 1557, 1169
-  size: 40, 40
-  orig: 40, 40
+  xy: 661, 12
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-scrap-medium
@@ -2881,11 +2881,11 @@ block-ore-scrap-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-scrap-icon-full
+block-ore-scrap-large
   rotate: false
-  xy: 661, 12
-  size: 32, 32
-  orig: 32, 32
+  xy: 1557, 1169
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-scrap-small
@@ -2909,11 +2909,11 @@ block-ore-scrap-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-ore-thorium-large
+block-ore-thorium-full
   rotate: false
-  xy: 1557, 1127
-  size: 40, 40
-  orig: 40, 40
+  xy: 695, 46
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-thorium-medium
@@ -2923,11 +2923,11 @@ block-ore-thorium-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-thorium-icon-full
+block-ore-thorium-large
   rotate: false
-  xy: 695, 46
-  size: 32, 32
-  orig: 32, 32
+  xy: 1557, 1127
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-thorium-small
@@ -2951,11 +2951,11 @@ block-ore-thorium-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-ore-titanium-large
+block-ore-titanium-full
   rotate: false
-  xy: 1557, 1085
-  size: 40, 40
-  orig: 40, 40
+  xy: 729, 80
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 block-ore-titanium-medium
@@ -2965,11 +2965,11 @@ block-ore-titanium-medium
   orig: 32, 32
   offset: 0, 0
   index: -1
-ore-titanium-icon-full
+block-ore-titanium-large
   rotate: false
-  xy: 729, 80
-  size: 32, 32
-  orig: 32, 32
+  xy: 1557, 1085
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
 block-ore-titanium-small

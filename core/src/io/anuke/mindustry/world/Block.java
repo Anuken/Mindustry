@@ -667,6 +667,13 @@ public class Block extends BlockStorage{
         draw.rotation = rotation;
     }
 
+    @Override
+    public void createIcons(PixmapPacker out, PixmapPacker editor){
+        super.createIcons(out, editor);
+
+        editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+    }
+
     /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
         if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");

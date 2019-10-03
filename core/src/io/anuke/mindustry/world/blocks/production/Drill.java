@@ -144,9 +144,9 @@ public class Drill extends Block{
             float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
             float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(returnItem.icon(Cicon.medium), dx, dy - 1);
+            Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
-            Draw.rect(returnItem.icon(Cicon.medium), dx, dy);
+            Draw.rect(returnItem.icon(Cicon.small), dx, dy);
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
@@ -163,9 +163,9 @@ public class Drill extends Block{
         if(entity.dominantItem != null){
             float dx = tile.drawx() - size * tilesize/2f, dy = tile.drawy() + size * tilesize/2f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(entity.dominantItem.icon(Cicon.medium), dx, dy);
+            Draw.rect(entity.dominantItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
-            Draw.rect(entity.dominantItem.icon(Cicon.medium), dx, dy);
+            Draw.rect(entity.dominantItem.icon(Cicon.small), dx, dy);
         }
     }
 

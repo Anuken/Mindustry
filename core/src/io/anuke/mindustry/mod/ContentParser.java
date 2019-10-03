@@ -261,7 +261,9 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    if(!child.name.equals("research")){
+                        Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    }
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");

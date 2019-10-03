@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -44,7 +45,8 @@ public class Mods implements Loadable{
     }
 
     /** @return the loaded mod found by class, or null if not found. */
-    public @Nullable LoadedMod getMod(Class<? extends Mod> type){
+    public @Nullable
+    LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
@@ -74,6 +76,7 @@ public class Mods implements Loadable{
         if(loaded.isEmpty()) return;
 
         packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+
         for(LoadedMod mod : loaded){
             int[] packed = {0};
             boolean[] failed = {false};
@@ -105,11 +108,32 @@ public class Mods implements Loadable{
     public void loadSync(){
         if(packer == null) return;
 
+        Texture editor = Core.atlas.find("clear-editor").getTexture();
+        PixmapPacker editorPacker = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+
+        for(AtlasRegion region : Core.atlas.getRegions()){
+            if(region.getTexture() == editor){
+                editorPacker.pack(region.name, Core.atlas.getPixmap(region).crop());
+            }
+        }
+
         //get textures packed
         if(totalSprites > 0){
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
-            packer.getPages().each(page -> page.updateTexture(filter, filter, false));
-            packer.getPages().each(page -> page.getRects().each((name, rect) -> Core.atlas.addRegion(name, page.getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
+
+            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
+            //generate new icons
+            for(Array<Content> arr : content.getContentMap()){
+                arr.each(c -> {
+                    if(c instanceof UnlockableContent && c.mod != null){
+                        UnlockableContent u = (UnlockableContent)c;
+                        u.createIcons(packer, editorPacker);
+                    }
+                });
+            }
+
+            editorPacker.updateTextureAtlas(Core.atlas, filter, filter, false);
+            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
         }
 
         packer.dispose();
@@ -199,6 +223,7 @@ public class Mods implements Loadable{
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){
                                 try{
+                                    //this binds the content but does not load it entirely
                                     Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
                                     Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
                                 }catch(Exception e){
@@ -211,6 +236,7 @@ public class Mods implements Loadable{
             }
         }
 
+        //this finishes parsing content fields
         parser.finishParsing();
 
         each(Mod::loadContent);

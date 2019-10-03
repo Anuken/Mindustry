@@ -265,7 +265,7 @@ public class Generators{
                     image.save("../editor/editor-ore-" + item.name + (i + 1));
 
                     //save icons
-                    image.save(ore.name + "-icon-full");
+                    image.save("block-" + ore.name + "-full");
                     for(Cicon icon : Cicon.scaled){
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);

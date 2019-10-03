@@ -317,6 +317,10 @@ public class SettingsMenuDialog extends SettingsDialog{
                 tex.setFilter(filter, filter);
             }
         }
+
+        if(!mobile){
+            Core.settings.put("swapdiagonal", false);
+        }
     }
 
     private void back(){

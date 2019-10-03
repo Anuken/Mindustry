@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -21,8 +22,10 @@ public abstract class UnlockableContent extends MappableContent{
         this.description = Core.bundle.getOrNull(getContentType() + "." + name + ".description");
     }
 
-    public void createIcons(){
-        //TODO implement; generate special icons, like mech icons or ores w/ pixmaps
+    /** Generate any special icons for this content. Called asynchronously.*/
+    @CallSuper
+    public void createIcons(PixmapPacker out, PixmapPacker editor){
+
     }
 
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
