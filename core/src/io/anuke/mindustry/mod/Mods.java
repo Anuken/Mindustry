@@ -18,7 +18,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -225,9 +224,6 @@ public class Mods implements Loadable{
     public void reloadContent(){
         //epic memory leak
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
-        Tex.load();
-        Tex.loadStyles();
-        Styles.load();
         loaded.clear();
         disabled.clear();
         load();
@@ -244,6 +240,8 @@ public class Mods implements Loadable{
         content.init();
         content.load();
         content.loadColors();
+        data.load();
+        requiresReload = false;
     }
 
     /** Creates all the content found in mod files. */

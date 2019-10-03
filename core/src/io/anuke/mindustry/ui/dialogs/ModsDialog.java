@@ -60,10 +60,10 @@ public class ModsDialog extends FloatingDialog{
                             title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled")));
                             title.add().growX();
 
-                            title.addButton(mod.enabled() ? "$mod.disable" : "$mod.enable", Styles.cleart, () -> {
+                            title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
-                            }).height(50f).margin(8f).width(100f);
+                            }).height(50f).margin(8f).width(130f);
 
                             title.addImageButton(Icon.trash16Small, Styles.cleari, () -> ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                 mods.removeMod(mod);
