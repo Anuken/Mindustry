@@ -258,7 +258,7 @@ public class Mods implements Loadable{
     }
 
     /** @return the mods that the client is missing.
-     * The inputted array is changed to contain the extra mods that the client has but the server does.*/
+     * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
     public Array<String> getIncompatibility(Array<String> out){
         Array<String> mods = getModStrings();
         Array<String> result = mods.copy();
