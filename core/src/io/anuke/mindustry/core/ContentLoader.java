@@ -42,6 +42,14 @@ public class ContentLoader{
         new LegacyColorMapper(),
     };
 
+    /** Clears all initialized content.*/
+    public void clear(){
+        contentNameMap = new ObjectMap[ContentType.values().length];
+        contentMap = new Array[ContentType.values().length];
+        initialization = new ObjectSet<>();
+        loaded = false;
+    }
+
     /** Creates all content types. */
     public void createContent(){
         if(loaded){

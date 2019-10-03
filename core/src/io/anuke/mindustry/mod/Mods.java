@@ -15,8 +15,10 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -33,8 +35,9 @@ public class Mods implements Loadable{
     private PixmapPacker packer;
 
     private Array<LoadedMod> loaded = new Array<>();
+    private Array<LoadedMod> disabled = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private boolean requiresRestart;
+    private boolean requiresReload;
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
      * Call this in init(). */
@@ -60,7 +63,7 @@ public class Mods implements Loadable{
         file.copyTo(dest);
         try{
             loaded.add(loadMod(file));
-            requiresRestart = true;
+            requiresReload = true;
         }catch(IOException e){
             dest.delete();
             throw e;
@@ -137,6 +140,7 @@ public class Mods implements Loadable{
         }
 
         packer.dispose();
+        packer = null;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -147,11 +151,11 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
-        requiresRestart = true;
+        requiresReload = true;
     }
 
-    public boolean requiresRestart(){
-        return requiresRestart;
+    public boolean requiresReload(){
+        return requiresReload;
     }
 
     /** Loads all mods from the folder, but does call any methods on them.*/
@@ -160,7 +164,12 @@ public class Mods implements Loadable{
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
             try{
-                loaded.add(loadMod(file));
+                LoadedMod mod = loadMod(file);
+                if(mod.enabled()){
+                    loaded.add(mod);
+                }else{
+                    disabled.add(mod);
+                }
             }catch(IllegalArgumentException ignored){
             }catch(Exception e){
                 Log.err("Failed to load plugin file {0}. Skipping.", file);
@@ -212,6 +221,23 @@ public class Mods implements Loadable{
         }
     }
 
+    /** Reloads all mod content.*/
+    public void reloadContent(){
+        //epic memory leak
+        Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+        Tex.load();
+        Tex.loadStyles();
+        Styles.load();
+        content.clear();
+        content.createContent();
+        loadAsync();
+        loadSync();
+        buildFiles();
+        content.init();
+        content.load();
+        content.loadColors();
+    }
+
     /** Creates all the content found in mod files. */
     public void loadContent(){
         for(LoadedMod mod : loaded){
@@ -247,6 +273,11 @@ public class Mods implements Loadable{
         return loaded;
     }
 
+    /** @return all disabled mods. */
+    public Array<LoadedMod> disabled(){
+        return disabled;
+    }
+
     /** @return a list of mod names only, without versions. */
     public Array<String> getModNames(){
         return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
@@ -255,6 +286,21 @@ public class Mods implements Loadable{
     /** @return a list of mods and versions, in the format name:version. */
     public Array<String> getModStrings(){
         return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
+    }
+
+    /** Makes a mod enabled or disabled. shifts it.*/
+    public void setEnabled(LoadedMod mod, boolean enabled){
+        if(mod.enabled() != enabled){
+            Core.settings.putSave(mod.name + "-enabled", enabled);
+            requiresReload = true;
+            if(!enabled){
+                loaded.remove(mod);
+                disabled.add(mod);
+            }else{
+                loaded.add(mod);
+                disabled.remove(mod);
+            }
+        }
     }
 
     /** @return the mods that the client is missing.
@@ -335,15 +381,16 @@ public class Mods implements Loadable{
         /** This mod's metadata. */
         public final ModMeta meta;
 
-        //TODO implement
-        protected boolean enabled;
-
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
             this.file = file;
             this.mod = mod;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
+        }
+
+        public boolean enabled(){
+            return Core.settings.getBool(name + "-enabled", true);
         }
     }
 

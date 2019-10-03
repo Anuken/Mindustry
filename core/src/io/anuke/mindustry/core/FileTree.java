@@ -22,6 +22,11 @@ public class FileTree implements FileHandleResolver{
         }
     }
 
+    /** Clears all mod files.*/
+    public void clear(){
+        files.clear();
+    }
+
     @Override
     public FileHandle resolve(String fileName){
         return get(fileName);

@@ -83,6 +83,10 @@ public class EventType{
 
     }
 
+    public static class ContentReloadEvent{
+
+    }
+
     public static class DisposeEvent{
 
     }
