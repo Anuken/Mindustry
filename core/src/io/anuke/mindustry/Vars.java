@@ -196,7 +196,7 @@ public class Vars implements Loadable{
 
         Version.init();
 
-        if(files ==null) tree = new FileTree();
+        if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
@@ -254,16 +254,12 @@ public class Vars implements Loadable{
         maps.load();
     }
 
-    public static void createDirectories(){
+    public static void loadSettings(){
         Core.settings.setAppName(appName);
 
-        if(steam || Version.modifier.equals("steam")){
+        if(steam || "steam".equals(Version.modifier)){
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
-    }
-
-    public static void loadSettings(){
-        createDirectories();
 
         Core.settings.defaults("locale", "default");
         Core.keybinds.setDefaults(Binding.values());
