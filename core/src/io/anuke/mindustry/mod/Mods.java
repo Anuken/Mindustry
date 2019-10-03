@@ -180,7 +180,7 @@ public class Mods implements Loadable{
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
-                    file.walk(f -> tree.addFile(f));
+                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) : f.path(), f));
                 }
             }
 

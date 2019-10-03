@@ -1,5 +1,7 @@
 package io.anuke.mindustry.mod;
 
+import io.anuke.arc.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
@@ -14,6 +16,7 @@ import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -27,6 +30,23 @@ public class ContentParser{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Music.class, (type, data) -> {
+            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
+
+            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
+            Core.assets.load(path, Music.class);
+            Core.assets.finishLoadingAsset(path);
+            return Core.assets.get(path);
+        });
+        put(Sound.class, (type, data) -> {
+            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
+
+            String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
+            Core.assets.load(path, Sound.class);
+            Core.assets.finishLoadingAsset(path);
+            Log.info(Core.assets.get(path));
+            return Core.assets.get(path);
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
@@ -218,6 +238,16 @@ public class ContentParser{
             return b;
         }catch(Exception e){
             throw new RuntimeException(e);
+        }
+    }
+
+    private Object fieldOpt(Class<?> type, JsonValue value){
+        try{
+            Object b = type.getField(value.asString()).get(null);
+            if(b == null) return null;
+            return b;
+        }catch(Exception e){
+            return null;
         }
     }
 
