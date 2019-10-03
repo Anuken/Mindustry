@@ -23,6 +23,8 @@ import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.bundle;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.core.Control.controltype_ship;
+import static io.anuke.mindustry.core.Control.controltype_camera;
 
 public class SettingsMenuDialog extends SettingsDialog{
     private SettingsTable graphics;
@@ -227,6 +229,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("savecreate", true);
 
         game.checkPref("hints", true);
+
+        if(!mobile){
+            game.sliderPref("controltype", controltype_ship, controltype_ship, controltype_camera, i -> (i == 0  ? Core.bundle.get("controltype.ship") : Core.bundle.get("controltype.camera")));
+            game.sliderPref("cameraspeed", 6, 3, 18, i -> (Strings.format("Camera speed: {0}", i)));
+        }
 
         if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {

@@ -26,6 +26,8 @@ import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.core.Control.controltype_camera;
+import static io.anuke.mindustry.core.Control.controltype_ship;
 
 public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
@@ -127,7 +129,7 @@ public class Renderer implements ApplicationListener{
                 }else{
                     camera.position.lerpDelta(position, 0.08f);
                 }
-            }else if(control.input instanceof DesktopInput){
+            }else if(control.input instanceof DesktopInput && Core.settings.getInt("controltype", controltype_ship) != controltype_camera){
                 camera.position.lerpDelta(position, 0.08f);
             }
 

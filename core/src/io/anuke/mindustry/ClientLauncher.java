@@ -73,8 +73,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             content.loadColors();
         });
 
-        add(logic = new Logic());
         add(control = new Control());
+        add(logic = new Logic());
         add(renderer = new Renderer());
         add(ui = new UI());
         add(netServer = new NetServer());

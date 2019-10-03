@@ -31,6 +31,8 @@ import io.anuke.mindustry.world.blocks.*;
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.core.Control.controltype_camera;
+import static io.anuke.mindustry.core.Control.controltype_ship;
 
 public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public static final int timerSync = 2;
@@ -551,7 +553,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(control.input instanceof MobileInput){
             updateTouch();
         }else{
-            updateKeyboard();
+            switch(Core.settings.getInt("controltype", controltype_ship)){
+                case controltype_camera:
+                    updateTouch();
+                case controltype_ship:
+                default:
+                    updateKeyboard();
+            }
         }
 
         isTyping = ui.chatfrag.chatOpen();

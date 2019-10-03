@@ -5,9 +5,11 @@ import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -18,6 +20,8 @@ import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
+import static io.anuke.mindustry.core.Control.controltype_camera;
+import static io.anuke.mindustry.core.Control.controltype_ship;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
@@ -188,6 +192,8 @@ public class DesktopInput extends InputHandler{
         }
 
         cursorType = SystemCursor.arrow;
+
+        updateCamera();
     }
 
     @Override
@@ -331,4 +337,128 @@ public class DesktopInput extends InputHandler{
             sreq = null;
         }
     }
+
+
+    protected void updateCamera() {
+
+        if (!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)) {
+
+            Vector2 cameraMovement = new Vector2().setZero();
+
+            if(Core.settings.getInt("controltype", controltype_ship) == controltype_camera){
+                // Keyboard input
+                Vector2 keyboardCamera = new Vector2(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y));
+                cameraMovement.add(keyboardCamera);
+
+                // Mouse input
+                Vector2 mouseCamera = mouseCameraVector();
+
+                cameraMovement.add(mouseCamera);
+            }
+
+            float camSpeed = (float) Core.settings.getInt("cameraspeed");
+            cameraMovement.scl(Time.delta() * camSpeed);
+
+            Core.camera.position.add(cameraMovement);
+            clampCameraPosition();
+        }
+    }
+
+    protected void clampCameraPosition(){
+        ui.hudfrag.showDebug(Core.camera.position.toString());
+        Core.camera.position.clamp(0f - scene.getWidth()/tilesize/4, world.width() * tilesize - tilesize + scene.getWidth()/tilesize/4, 0F - scene.getHeight()/tilesize /4, world.height() * tilesize - tilesize + scene.getHeight() /tilesize/4);
+        ui.hudfrag.showDebug(Core.camera.position.toString());
+    }
+
+    protected Vector2 mouseCameraVector() {
+        Vector2 directionVector = new Vector2().setZero();
+
+        if (mouseHit(true) == null ||
+                getMouseX() <= 1f || getMouseY() <= 1f
+                || getMouseX() >= scene.getWidth() - 1f || getMouseY() >= scene.getHeight() - 1f
+        ) {
+            float mouseXRatio = getMouseX() / scene.getWidth();
+            float mouseYRatio = getMouseY() / scene.getHeight();
+
+            directionVector.set(getMouseX() - scene.getWidth() / 2, getMouseY() - scene.getHeight() / 2);
+
+            float linearTresholdX = linearTreshold(mouseXRatio, 0.1f);
+            float accelerationX = accelerationCalc(linearTresholdX);
+
+            float linearTresholdY = linearTreshold(mouseYRatio, 0.1f);
+            float accelerationY = accelerationCalc(linearTresholdY);
+
+            Vector2 accelerationVector = new Vector2(accelerationX, accelerationY);
+            directionVector.setLength(accelerationVector.len());
+        }
+        return directionVector;
+    }
+
+    public static Element mouseHit(boolean touchable) {
+        return Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), touchable);
+    }
+
+    /**
+     *
+     * @param val      float [-1,1]
+     * @return float [-1,1]
+     */
+    protected float accelerationCalc(float val) {
+        val = Mathf.clamp(val, -1f, 1f);
+        return (Mathf.cos(Mathf.PI + Mathf.PI* val)+ 1)/2;
+    }
+
+    /**
+     * <pre>
+     *
+     *  1    │                        /
+     *       │    ╷treshold          /
+     *       │    ╷                 /
+     *  0 ___│____╷‗‗‗‗‗‗‗╷‗‗‗‗‗‗‗‗/____
+     *       │   /
+     *       │  /
+     *       │ /
+     * -1    │/
+     *
+     *       0           0.5           1
+     *
+     * </pre>
+     * @param val       float [0,1]
+     * @param threshold float [0,1] (percentage)
+     * @return float [-1,1]
+     */
+    protected float linearTreshold(float val, float threshold) {
+        val = Mathf.clamp(val, 0f, 1f);
+        float returnVal = 0;
+        if (val < threshold) {
+            returnVal = (val - threshold) / threshold;
+        } else if (val > (1 - threshold)) {
+            returnVal = (val - (1- threshold )) / threshold;
+        }
+        return returnVal;
+    }
+
+    /**
+     * <pre>
+     *
+     *  1    │                 /
+     *       │                /
+     *       │
+     *  0 ___│__‗‗‗‗‗‗╷‗‗‗‗‗‗___╷
+     *       │
+     *       │
+     *       │ /
+     *  -1   │/
+     *       │
+     *
+     *       0       0.5        1
+     * </pre>
+     * @param val       float [0,1]
+     * @param threshold float [0,0.5] (percentage)
+     * @return float [-1,1]
+     */
+    protected float accelerationCalcRound(float val, float threshold) {
+        return (float) Math.round(Math.abs((2 * (1 - threshold) * val))) * val;
+    }
+
 }
