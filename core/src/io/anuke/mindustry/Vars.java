@@ -45,6 +45,8 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
+    /** URL the links to the wiki's modding guide.*/
+    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
     /** maximum distance between mine and core that supports automatic transferring */

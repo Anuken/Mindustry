@@ -17,6 +17,10 @@ public class ModsDialog extends FloatingDialog{
     public ModsDialog(){
         super("$mods");
         addCloseButton();
+        buttons.addImageTextButton("$mods.guide", Icon.wiki,
+        () -> Core.net.openURI(modGuideURL))
+        .size(290f, 64f);
+
         shown(this::setup);
 
         hidden(() -> {
