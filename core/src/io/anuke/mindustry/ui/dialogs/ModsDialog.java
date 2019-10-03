@@ -3,6 +3,8 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.mod.Mods.*;
@@ -107,5 +109,27 @@ public class ModsDialog extends FloatingDialog{
                 }
             });
         }).margin(12f).width(500f);
+
+        //not well tested currently
+        if(Version.build == -1){
+            cont.row();
+
+            cont.addImageTextButton("$mod.import.github", Icon.github, () -> {
+                ui.showTextInput("$mod.import.github", "", "Anuken/ExampleMod", text -> {
+                    Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                        Core.net.httpGet(loc.getHeader("Location"), result -> {
+                            try{
+                                Streams.copyStream(result.getResultAsStream(), modDirectory.child(text.replace("/", "") + ".zip").write(false));
+                                ui.loadAnd(() -> {
+                                    mods.reloadContent();
+                                });
+                            }catch(Exception e){
+                                ui.showException(e);
+                            }
+                        }, ui::showException);
+                    }, ui::showException);
+                });
+            }).margin(12f).width(500f);
+        }
     }
 }

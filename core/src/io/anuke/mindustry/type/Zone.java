@@ -47,7 +47,7 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void load(){
-        preview = Core.atlas.find("zone-" + name);
+        preview = Core.atlas.find("zone-" + name, Core.atlas.find(name + "-zone"));
     }
 
     public Rules getRules(){
@@ -209,12 +209,16 @@ public class Zone extends UnlockableContent{
     }
 
     public static class ZoneRequirement{
-        public final Zone zone;
-        public final int wave;
+        public @NonNull Zone zone;
+        public @NonNull int wave;
 
         public ZoneRequirement(Zone zone, int wave){
             this.zone = zone;
             this.wave = wave;
+        }
+
+        protected ZoneRequirement(){
+
         }
 
         public static ZoneRequirement[] with(Object... objects){

@@ -331,6 +331,9 @@ public class Mods implements Loadable{
      * Note that directories can be loaded as mods.*/
     private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
         FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
+        if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+            zip = zip.list()[0];
+        }
 
         FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("plugin.json");
         if(!metaf.exists()){
@@ -341,6 +344,12 @@ public class Mods implements Loadable{
         ModMeta meta = json.fromJson(ModMeta.class, metaf.readString());
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
+        String baseName = meta.name.toLowerCase().replace(" ", "-");
+
+        if(loaded.contains(m -> m.name.equals(baseName)) || disabled.contains(m -> m.name.equals(baseName))){
+            throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+        }
+
         Mod mainMod;
 
         FileHandle mainFile = zip;

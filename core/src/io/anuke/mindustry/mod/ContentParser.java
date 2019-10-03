@@ -2,11 +2,13 @@ package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.reflect.Field;
 import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
@@ -21,6 +23,8 @@ import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
+import java.lang.reflect.*;
+
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
@@ -29,6 +33,7 @@ public class ContentParser{
         put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
+        put(Loadout.class, (type, data) -> field(Loadouts.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(Music.class, (type, data) -> {
             if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
@@ -173,7 +178,7 @@ public class ContentParser{
             if(!arr.isEmpty()){
                 Class<?> c = arr.first().getClass();
                 //get base content class, skipping intermediates
-                while(!(c.getSuperclass() == Content.class || c.getSuperclass() == UnlockableContent.class || c.getSuperclass() == UnlockableContent.class)){
+                while(!(c.getSuperclass() == Content.class || c.getSuperclass() == UnlockableContent.class || Modifier.isAbstract(c.getSuperclass().getModifiers()))){
                     c = c.getSuperclass();
                 }
 
@@ -260,13 +265,13 @@ public class ContentParser{
     private void checkNulls(Object object, ObjectSet<Object> checked){
         checked.add(object);
 
-        parser.getFields(object.getClass()).each((name, field) -> {
+        parser.getFields(object.getClass()).values().toArray().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 
                 Object obj = field.field.get(object);
                 if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
-                    throw new RuntimeException("Field '" + name + "' in " + object.getClass().getSimpleName() + " is missing!");
+                    throw new RuntimeException("Field '" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
                 }
 
                 if(obj != null && !checked.contains(obj)){
