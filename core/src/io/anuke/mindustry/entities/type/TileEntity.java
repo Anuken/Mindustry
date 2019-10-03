@@ -7,6 +7,7 @@ import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.HealthTrait;
 import io.anuke.mindustry.entities.traits.TargetTrait;
@@ -228,6 +229,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     public Array<Tile> proximity(){
         return proximity;
+    }
+
+    /** Tile configuration. Defaults to 0. Used for block rebuilding. */
+    public int config(){
+        return 0;
     }
 
     @Override

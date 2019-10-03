@@ -216,7 +216,9 @@ public class FileChooser extends FloatingDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(shorten(filename), Styles.clearTogglet);
+            TextButton button = new TextButton(filename, Styles.clearTogglet);
+            button.getLabel().setWrap(false);
+            button.getLabel().setEllipsis(true);
             group.add(button);
 
             button.clicked(() -> {

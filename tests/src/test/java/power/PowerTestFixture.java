@@ -5,6 +5,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.power.*;
@@ -26,7 +27,12 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         Core.graphics = new FakeGraphics();
-        Vars.content = new ContentLoader();
+        Vars.content = new ContentLoader(){
+            @Override
+            public void handleMappableContent(MappableContent content){
+
+            }
+        };
         content.createContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);

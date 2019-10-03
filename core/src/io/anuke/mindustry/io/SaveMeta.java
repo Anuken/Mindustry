@@ -15,6 +15,7 @@ public class SaveMeta{
     public int wave;
     public Rules rules;
     public StringMap tags;
+    public String[] mods;
 
     public SaveMeta(int version, long timestamp, long timePlayed, int build, String map, int wave, Rules rules, StringMap tags){
         this.version = version;
@@ -25,5 +26,6 @@ public class SaveMeta{
         this.wave = wave;
         this.rules = rules;
         this.tags = tags;
+        this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
     }
 }

@@ -2,15 +2,19 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture.TextureFilter;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.graphics.glutils.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.Block.*;
 
 import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
@@ -118,6 +122,20 @@ public class BlockRenderer implements Disposable{
         Draw.shader(Shaders.fog);
         Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
         Draw.shader();
+    }
+
+    public void drawBroken(){
+        if(unitGroups[player.getTeam().ordinal()].all().contains(p -> p instanceof BuilderDrone)){
+            for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
+                Block b = content.block(block.block);
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
+
+                Draw.alpha(0.5f);
+                Draw.mixcol(Pal.accent, 0.2f + Mathf.absin(5f, 0.2f));
+                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
+            }
+            Draw.reset();
+        }
     }
 
     public void drawShadows(){

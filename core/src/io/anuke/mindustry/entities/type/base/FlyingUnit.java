@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.type;
+package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -8,6 +8,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
@@ -15,8 +16,8 @@ import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class FlyingUnit extends BaseUnit{
-    protected float[] weaponAngles = {0, 0};
+public class FlyingUnit extends BaseUnit{
+    protected float[] weaponAngles = {0,0};
 
     protected final UnitState
 
@@ -36,13 +37,14 @@ public abstract class FlyingUnit extends BaseUnit{
 
                 if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
                 if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
+
+                if(target == null && isCommanded() && getCommand() != UnitCommand.attack){
+                    onCommand(getCommand());
+                }
             }
 
-            if(target == null){
+            if(getClosestSpawner() == null && getSpawner() != null && target == null){
                 target = getSpawner();
-            }
-
-            if(target == getSpawner() && getSpawner() != null){
                 circle(80f + Mathf.randomSeed(id) * 120);
             }else if(target != null){
                 attack(type.attackLength);

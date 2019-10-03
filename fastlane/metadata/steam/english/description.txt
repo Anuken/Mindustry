@@ -1,0 +1,60 @@
+Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
+
+[img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
+
+[h2]Gameplay[/h2]
+
+[list]
+[*] Create drills and conveyors to move resources into your Core. 
+[*] Use production blocks to create advanced materials.
+[*] Build drones for automatically mining resources, assisting in building and protecting your base.
+[*] Distribute liquids and fight outbreaks of fire.
+[*] Boost production by supplying optional coolant and lubricant to your defense and production blocks.
+[/list]
+
+[h2]Campaign[/h2]
+
+[list]
+[*] Advance through 12 replayable built-in zones with randomized spawn points
+[*] Collect and launch resources
+[*] Research new blocks to fuel progress
+[*] Configure launch loadouts to bring resources to each zone
+[*] Variety of mission objectives and goals
+[*] Invite your friends to complete missions together
+[*] 120+ technology blocks to master
+[*] 19 different types of drones, mechs and ships
+[*] 50+ achievements to complete
+[/list]
+
+[h2][h2]Gamemodes[/h2][/h2]
+
+[*] [b]Survival[/b]: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
+[*] [b]Attack[/b]: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals.
+[*] [b]PvP[/b]: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.
+[*] [b]Sandbox[/b]: Play around with infinite resources and no enemy threat. Use sandbox-specific item and liquid source blocks to test out designs, and spawn in enemies on request.
+[/list]
+
+[h2]Custom Games & Cross-Platform Multiplayer[/h2]
+
+[list]
+[*] 12 built in maps for custom games, in addition to campaign
+[*] Play Co-op, PvP or sandbox
+[*] Join a public dedicated server, or invite friends to your own private session
+[*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
+[*] Mix&match gamemodes: Combine PvP and PvE gamemodes together
+[/list]
+
+[h2]Custom Map Editor[/h2]
+
+[list]
+[*] Paint terrain with an editor UI
+[*] Edit and preview structures in-game
+[*] Configurable tool modes: Change how each tool functions
+[*] Powerful map generation system, with many different types of filters for procedural manipulation of terrain
+[*] Apply noise, distortion, smoothing, erosion, symmetry, ore generation and random terrain to your maps
+[*] Randomize and configure ore generation, as well as placement of river and resource tiles
+[*] Configure enemy wave layouts
+[*] Share exported maps on the Steam Workshop
+[*] Customize base map rules
+[*] Use 75+ different environmental blocks
+[/list]

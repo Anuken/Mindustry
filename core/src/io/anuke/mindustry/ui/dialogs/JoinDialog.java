@@ -38,7 +38,9 @@ public class JoinDialog extends FloatingDialog{
         addCloseButton();
 
         buttons.add().growX();
-        buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+        if(!steam){
+            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+        }
 
         add = new FloatingDialog("$joingame.title");
         add.cont.add("$joingame.ip").padRight(5f).left();
@@ -87,7 +89,9 @@ public class JoinDialog extends FloatingDialog{
             refreshLocal();
             refreshRemote();
 
-            Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
+            if(!steam){
+                Core.app.post(() -> Core.settings.getBoolOnce("joininfo", () -> ui.showInfo("$join.info")));
+            }
         });
 
         onResize(this::setup);
@@ -198,10 +202,12 @@ public class JoinDialog extends FloatingDialog{
         }else if(host.version > Version.build && Version.build != -1){
             versionString = Core.bundle.get("server.outdated.client") + "\n" +
             Core.bundle.format("server.version", host.version, "");
+        }else if(host.version == Version.build && Version.type.equals(host.versionType)){
+            //not important
+            versionString = "";
         }else{
             versionString = Core.bundle.format("server.version", host.version, host.versionType);
         }
-
 
         content.table(t -> {
             t.add("[lightgray]" + host.name + "   " + versionString).width(targetWidth() - 10f).left().get().setEllipsis(true);

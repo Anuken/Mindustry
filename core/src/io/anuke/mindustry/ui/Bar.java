@@ -41,6 +41,10 @@ public class Bar extends Element{
 
     }
 
+    public void reset(float value){
+        this.value = lastValue = blink = value;
+    }
+
     public void set(Supplier<String> name, FloatProvider fraction, Color color){
         this.fraction = fraction;
         this.lastValue = fraction.get();

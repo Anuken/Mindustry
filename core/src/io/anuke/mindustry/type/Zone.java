@@ -6,6 +6,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -17,7 +18,7 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
-    public final Generator generator;
+    public @NonNull Generator generator;
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
     public Item[] resources = {};
@@ -38,6 +39,10 @@ public class Zone extends UnlockableContent{
     public Zone(String name, Generator generator){
         super(name);
         this.generator = generator;
+    }
+
+    public Zone(String name){
+        this(name, new MapGenerator(name));
     }
 
     @Override
@@ -191,11 +196,6 @@ public class Zone extends UnlockableContent{
     //neither of these are implemented, as zones are not displayed in a normal fashion... yet
     @Override
     public void displayInfo(Table table){
-    }
-
-    @Override
-    public TextureRegion getContentIcon(){
-        return null;
     }
 
     @Override

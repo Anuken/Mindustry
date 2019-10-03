@@ -42,6 +42,8 @@ public class CustomRulesDialog extends FloatingDialog{
         main.addButton("$settings.reset", () -> {
             rules = resetter.get();
             setup();
+            requestKeyboard();
+            requestScroll();
         }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
         main.row();
