@@ -11,6 +11,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -80,7 +81,7 @@ public class PlacementFragment extends Fragment{
                 Block tryRecipe = tile.block();
                 if(tryRecipe.isVisible() && unlocked(tryRecipe)){
                     input.block = tryRecipe;
-                    currentCategory = input.block.buildCategory;
+                    currentCategory = input.block.category;
                     return true;
                 }
             }
@@ -92,7 +93,7 @@ public class PlacementFragment extends Fragment{
             for(KeyCode key : inputCatGrid){
                 if(Core.input.keyDown(key)){
                     input.block = getByCategory(Category.all[i]).first();
-                    currentCategory = input.block.buildCategory;
+                    currentCategory = input.block.category;
                 }
                 i++;
             }
@@ -143,11 +144,11 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Block.Icon.medium));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
                         });
@@ -189,7 +190,7 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new Image(lastDisplay.icon(Block.Icon.medium))).size(8 * 4);
+                                header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -205,10 +206,10 @@ public class PlacementFragment extends Fragment{
                             topTable.table(req -> {
                                 req.top().left();
 
-                                for(ItemStack stack : lastDisplay.buildRequirements){
+                                for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
+                                        line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
@@ -296,7 +297,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.buildCategory == cat && block.isVisible()){
+            if(block.category == cat && block.isVisible()){
                 returnArray.add(block);
             }
         }

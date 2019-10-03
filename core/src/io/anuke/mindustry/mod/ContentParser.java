@@ -1,7 +1,10 @@
 package io.anuke.mindustry.mod;
 
+import io.anuke.arc.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.reflect.*;
@@ -13,6 +16,8 @@ import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -23,7 +28,30 @@ public class ContentParser{
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
+        put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
+        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Music.class, (type, data) -> {
+            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
+
+            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
+            Core.assets.load(path, Music.class);
+            Core.assets.finishLoadingAsset(path);
+            return Core.assets.get(path);
+        });
+        put(Sound.class, (type, data) -> {
+            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
+
+            String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
+            Core.assets.load(path, Sound.class);
+            Core.assets.finishLoadingAsset(path);
+            Log.info(Core.assets.get(path));
+            return Core.assets.get(path);
+        });
     }};
+    /** Stores things that need to be parsed fully, e.g. reading fields of content.
+     * This is done to accomodate binding of content names first.*/
+    private Array<Runnable> reads = new Array<>();
+    private LoadedMod currentMod;
 
     private Json parser = new Json(){
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData){
@@ -33,7 +61,11 @@ public class ContentParser{
                 }
 
                 if(Content.class.isAssignableFrom(type)){
-                    return (T)Vars.content.getByName(contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName())), jsonData.asString());
+                    ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
+                    String prefix = currentMod != null ? currentMod.name + "-" : "";
+                    T one = (T)Vars.content.getByName(ctype, prefix + jsonData.asString());
+                    if(one != null) return one;
+                    return (T)Vars.content.getByName(ctype, jsonData.asString());
                 }
             }
 
@@ -43,21 +75,67 @@ public class ContentParser{
 
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
-            Class<Block> type = resolve(value.getString("type"), "io.anuke.mindustry.world", "io.anuke.mindustry.world.blocks", "io.anuke.mindustry.world.blocks.defense");
-            Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
-            readFields(block, value, true);
+            //TODO generate dynamically instead of doing.. this
+            Class<? extends Block> type = resolve(value.getString("type"),
+            "io.anuke.mindustry.world",
+            "io.anuke.mindustry.world.blocks",
+            "io.anuke.mindustry.world.blocks.defense",
+            "io.anuke.mindustry.world.blocks.defense.turrets",
+            "io.anuke.mindustry.world.blocks.distribution",
+            "io.anuke.mindustry.world.blocks.logic",
+            "io.anuke.mindustry.world.blocks.power",
+            "io.anuke.mindustry.world.blocks.production",
+            "io.anuke.mindustry.world.blocks.sandbox",
+            "io.anuke.mindustry.world.blocks.storage",
+            "io.anuke.mindustry.world.blocks.units"
+            );
 
-            //make block visible
-            if(block.buildRequirements != null){
-                block.buildVisibility = () -> true;
-            }
+            Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+            read(() -> {
+                if(value.has("consumes")){
+                    for(JsonValue child : value.get("consumes")){
+                        if(child.name.equals("item")){
+                            if(child.isString()){
+                                block.consumes.item(Vars.content.getByName(ContentType.item, child.asString()));
+                            }else{
+                                ItemStack stack = parser.readValue(ItemStack.class, child);
+                                block.consumes.item(stack.item, stack.amount);
+                            }
+                        }else if(child.name.equals("items")){
+                            block.consumes.items(parser.readValue(ItemStack[].class, child));
+                        }else if(child.name.equals("liquid")){
+                            LiquidStack stack = parser.readValue(LiquidStack.class, child);
+                            block.consumes.liquid(stack.liquid, stack.amount);
+                        }else if(child.name.equals("power")){
+                            block.consumes.power(child.asFloat());
+                        }else if(child.name.equals("powerBuffered")){
+                            block.consumes.powerBuffered(child.asFloat());
+                        }else{
+                            throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+                        }
+                    }
+                    value.remove("consumes");
+                }
+
+                readFields(block, value, true);
+
+                //add research tech node
+                if(value.has("research")){
+                    TechTree.create(Vars.content.getByName(ContentType.block, value.get("research").asString()), block);
+                }
+
+                //make block visible
+                if(value.has("requirements")){
+                    block.buildVisibility = () -> true;
+                }
+            });
 
             return block;
         },
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             Class<BaseUnit> type = resolve(value.getString("type"), "io.anuke.mindustry.entities.type.base");
             UnitType unit = new UnitType(mod + "-" + name, supply(type));
-            readFields(unit, value, true);
+            read(() -> readFields(unit, value, true));
 
             return unit;
         },
@@ -75,9 +153,18 @@ public class ContentParser{
             }else{
                 item = constructor.get(mod + "-" + name);
             }
-            readFields(item, value);
+            read(() -> readFields(item, value));
             return item;
         };
+    }
+
+    /** Call to read a content's extra info later.*/
+    private void read(Runnable run){
+        LoadedMod mod = currentMod;
+        reads.add(() -> {
+            this.currentMod = mod;
+            run.run();
+        });
     }
 
     private void init(){
@@ -95,6 +182,11 @@ public class ContentParser{
         }
     }
 
+    public void finishParsing(){
+        reads.each(Runnable::run);
+        reads.clear();
+    }
+
     /**
      * Parses content from a json file.
      * @param name the name of the file without its extension
@@ -102,7 +194,7 @@ public class ContentParser{
      * @param type the type of content this is
      * @return the content that was parsed
      */
-    public Content parse(String mod, String name, String json, ContentType type) throws Exception{
+    public Content parse(LoadedMod mod, String name, String json, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -112,7 +204,9 @@ public class ContentParser{
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        Content c = parsers.get(type).parse(mod, name, value);
+        currentMod = mod;
+        Content c = parsers.get(type).parse(mod.name, name, value);
+        c.mod = mod;
         checkNulls(c);
         return c;
     }
@@ -144,6 +238,16 @@ public class ContentParser{
             return b;
         }catch(Exception e){
             throw new RuntimeException(e);
+        }
+    }
+
+    private Object fieldOpt(Class<?> type, JsonValue value){
+        try{
+            Object b = type.getField(value.asString()).get(null);
+            if(b == null) return null;
+            return b;
+        }catch(Exception e){
+            return null;
         }
     }
 
@@ -187,7 +291,9 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    if(!child.name.equals("research")){
+                        Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    }
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");

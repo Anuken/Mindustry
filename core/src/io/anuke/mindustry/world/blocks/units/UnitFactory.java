@@ -10,6 +10,7 @@ import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
@@ -121,7 +122,7 @@ public class UnitFactory extends Block{
     @Override
     public void draw(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        TextureRegion region = type.iconRegion;
+        TextureRegion region = type.icon(Cicon.full);
 
         Draw.rect(name, tile.drawx(), tile.drawy());
 

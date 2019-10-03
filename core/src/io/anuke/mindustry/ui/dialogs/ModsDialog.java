@@ -1,7 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.ui.*;
 
@@ -17,9 +20,9 @@ public class ModsDialog extends FloatingDialog{
         shown(this::setup);
 
         hidden(() -> {
-            if(mods.requiresRestart()){
-                ui.showOkText("$mods", "$mod.requiresrestart", () -> {
-                    Core.app.exit();
+            if(mods.requiresReload()){
+                ui.loadAnd("$reloading", () -> {
+                    mods.reloadContent();
                 });
             }
         });
@@ -34,17 +37,33 @@ public class ModsDialog extends FloatingDialog{
     void setup(){
         cont.clear();
         cont.defaults().width(520f).pad(4);
-        if(!mods.all().isEmpty()){
+        cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
+        cont.row();
+        if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
             cont.pane(table -> {
                 table.margin(10f).top();
-                for(LoadedMod mod : mods.all()){
+                Array<LoadedMod> all = Array.withArrays(mods.all(), mods.disabled());
+
+                boolean anyDisabled = false;
+                for(LoadedMod mod : all){
+                    if(!mod.enabled() && !anyDisabled && mods.all().size > 0){
+                        anyDisabled = true;
+                        table.row();
+                        table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
+                    }
+
                     table.table(Styles.black6, t -> {
                         t.defaults().pad(2).left().top();
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version);
+                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled")));
                             title.add().growX();
+
+                            title.addButton(mod.enabled() ? "$mod.disable" : "$mod.enable", Styles.cleart, () -> {
+                                mods.setEnabled(mod, !mod.enabled());
+                                setup();
+                            }).height(50f).margin(8f).width(100f);
 
                             title.addImageButton(Icon.trash16Small, Styles.cleari, () -> ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                 mods.removeMod(mod);

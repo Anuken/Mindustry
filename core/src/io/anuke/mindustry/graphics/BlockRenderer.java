@@ -132,7 +132,7 @@ public class BlockRenderer implements Disposable{
 
                 Draw.alpha(0.5f);
                 Draw.mixcol(Pal.accent, 0.2f + Mathf.absin(5f, 0.2f));
-                Draw.rect(b.icon(Icon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
+                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
             }
             Draw.reset();
         }

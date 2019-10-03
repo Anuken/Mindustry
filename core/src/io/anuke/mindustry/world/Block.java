@@ -114,9 +114,9 @@ public class Block extends BlockStorage{
     public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
-    public ItemStack[] buildRequirements = new ItemStack[]{};
+    public ItemStack[] requirements = new ItemStack[]{};
     /** Category in place menu. */
-    public Category buildCategory = Category.distribution;
+    public Category category = Category.distribution;
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
@@ -129,7 +129,6 @@ public class Block extends BlockStorage{
     protected Array<String> cacheRegionStrings = new Array<>();
 
     protected Array<Tile> tempTiles = new Array<>();
-    protected TextureRegion[] icons = new TextureRegion[Icon.values().length];
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
@@ -363,11 +362,6 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return icon(Icon.medium);
-    }
-
-    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }
@@ -387,7 +381,7 @@ public class Block extends BlockStorage{
         }
 
         buildCost = 0f;
-        for(ItemStack stack : buildRequirements){
+        for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
 
@@ -493,7 +487,7 @@ public class Block extends BlockStorage{
         stats.add(BlockStat.health, health, StatUnit.none);
         if(isBuildable()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
-            stats.add(BlockStat.buildCost, new ItemListValue(false, buildRequirements));
+            stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
         consumes.display(stats);
@@ -631,7 +625,7 @@ public class Block extends BlockStorage{
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return icon(Icon.medium);
+        return icon(Cicon.medium);
     }
 
     public void display(Tile tile, Table table){
@@ -667,18 +661,17 @@ public class Block extends BlockStorage{
         }
     }
 
-    public TextureRegion icon(Icon icon){
-        if(icons[icon.ordinal()] == null){
-            icons[icon.ordinal()] = Core.atlas.find(name + "-icon-" + icon.name(), icon == Icon.full ?
-                getGeneratedIcons()[0] : Core.atlas.find(name + "-icon-full", getGeneratedIcons()[0]));
-        }
-        return icons[icon.ordinal()];
-    }
-
     public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.region = icon(Icon.full);
+        draw.region = icon(Cicon.full);
         draw.scalex = draw.scaley = 1;
         draw.rotation = rotation;
+    }
+
+    @Override
+    public void createIcons(PixmapPacker out, PixmapPacker editor){
+        super.createIcons(out, editor);
+
+        editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
     }
 
     /** Never use outside of the editor! */
@@ -713,7 +706,7 @@ public class Block extends BlockStorage{
 
     public TextureRegion[] variantRegions(){
         if(variantRegions == null){
-            variantRegions = new TextureRegion[]{icon(Icon.full)};
+            variantRegions = new TextureRegion[]{icon(Cicon.full)};
         }
         return variantRegions;
     }
@@ -772,25 +765,11 @@ public class Block extends BlockStorage{
 
     /** Sets up requirements. Use only this method to set up requirements. */
     protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
-        this.buildCategory = cat;
-        this.buildRequirements = stacks;
+        this.category = cat;
+        this.requirements = stacks;
         this.buildVisibility = visible;
 
-        Arrays.sort(buildRequirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
+        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
     }
 
-    public enum Icon{
-        //these are stored in the UI atlases
-        small(8 * 3),
-        medium(8 * 4),
-        large(8 * 6),
-        /** uses whatever the size of the block is. this is always stored in the main game atlas! */
-        full(0);
-
-        public final int size;
-
-        Icon(int size){
-            this.size = size;
-        }
-    }
 }

@@ -216,10 +216,14 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         float cx = x - fsize/2f, cy = y - fsize/2f;
 
         for(Team team : Team.all){
-            avoid(unitGroups[team.ordinal()].intersect(cx, cy, fsize, fsize));
+            if(team != getTeam() || !(this instanceof Player)){
+                avoid(unitGroups[team.ordinal()].intersect(cx, cy, fsize, fsize));
+            }
         }
 
-        avoid(playerGroup.intersect(cx, cy, fsize, fsize));
+        if(!(this instanceof Player)){
+            avoid(playerGroup.intersect(cx, cy, fsize, fsize));
+        }
         velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
     }
 
@@ -227,15 +231,14 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         float radScl = 1.5f;
 
         for(Unit en : arr){
-            if(en.isFlying() != isFlying()) continue;
+            if(en.isFlying() != isFlying() || (en instanceof Player && en.getTeam() != getTeam())) continue;
             float dst = dst(en);
             float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));
             moveVector.add(Tmp.v1.set((x - en.x) * scl, (y - en.y) * scl).limit(0.4f));
         }
     }
 
-    public @Nullable
-    TileEntity getClosestCore(){
+    public @Nullable TileEntity getClosestCore(){
         TeamData data = state.teams.get(team);
 
         Tile tile = Geometry.findClosest(x, y, data.cores);
@@ -404,7 +407,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
-            Draw.rect(item.item.icon(Item.Icon.large),
+            Draw.rect(item.item.icon(Cicon.medium),
                 x + Angles.trnsx(rotation + 180f, backTrns),
                 y + Angles.trnsy(rotation + 180f, backTrns),
                 size, size, rotation);

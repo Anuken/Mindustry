@@ -186,22 +186,23 @@ public class LoadDialog extends FloatingDialog{
     }
 
     public void runLoadSave(SaveSlot slot){
-        hide();
-        ui.paused.hide();
-
-        ui.loadAnd(() -> {
-            try{
-                net.reset();
-                slot.load();
-                state.rules.editor = false;
-                state.rules.zone = null;
-                state.set(State.playing);
-            }catch(SaveException e){
-                Log.err(e);
-                state.set(State.menu);
-                logic.reset();
-                ui.showErrorMessage("$save.corrupted");
-            }
+        slot.cautiousLoad(() -> {
+            ui.loadAnd(() -> {
+                hide();
+                ui.paused.hide();
+                try{
+                    net.reset();
+                    slot.load();
+                    state.rules.editor = false;
+                    state.rules.zone = null;
+                    state.set(State.playing);
+                }catch(SaveException e){
+                    Log.err(e);
+                    state.set(State.menu);
+                    logic.reset();
+                    ui.showErrorMessage("$save.corrupted");
+                }
+            });
         });
     }
 

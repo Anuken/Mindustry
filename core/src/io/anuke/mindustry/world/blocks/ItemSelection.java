@@ -5,9 +5,10 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -29,7 +30,7 @@ public class ItemSelection{
 
             ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.accept(button.isChecked() ? item : null));
-            button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Item.Icon.medium));
+            button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
             button.update(() -> button.setChecked(holder.get() == item));
 
             if(i++ % 4 == 3){

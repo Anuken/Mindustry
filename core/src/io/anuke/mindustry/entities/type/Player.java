@@ -160,7 +160,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public TextureRegion getIconRegion(){
-        return mech.iconRegion;
+        return mech.icon(Cicon.full);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawShadow(float offsetX, float offsetY){
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
-        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
+        Draw.rect(getIconRegion(), x + offsetX * scl, y + offsetY * scl, rotation - 90);
     }
 
     @Override

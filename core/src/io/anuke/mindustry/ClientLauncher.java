@@ -2,6 +2,8 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.assets.loaders.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -41,10 +43,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
+
+        tree = new FileTree();
+        assets.setLoader(Sound.class, new SoundLoader(tree));
+        assets.setLoader(Music.class, new MusicLoader(tree));
+
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
-        Vars.mods = new Mods();
+        mods = new Mods();
 
         UI.loadSystemCursors();
 

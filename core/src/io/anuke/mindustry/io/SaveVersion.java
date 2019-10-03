@@ -66,7 +66,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
-            "mods", JsonIO.write(mods.getModNames().toArray(String.class)),
+            "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
             "height", world.height()
         ).merge(tags));

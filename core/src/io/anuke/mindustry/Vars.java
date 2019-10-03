@@ -31,7 +31,7 @@ import static io.anuke.arc.Core.*;
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
-    /** Maximum number of broken blocks.*/
+    /** Maximum number of broken blocks. TODO implement or remove.*/
     public static final int maxBrokenBlocks = 256;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
@@ -196,10 +196,9 @@ public class Vars implements Loadable{
 
         Version.init();
 
-        tree = new FileTree();
-        if(mods == null){
-            mods = new Mods();
-        }
+        if(tree == null) tree = new FileTree();
+        if(mods == null) mods = new Mods();
+
         content = new ContentLoader();
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();
@@ -258,7 +257,7 @@ public class Vars implements Loadable{
     public static void loadSettings(){
         Core.settings.setAppName(appName);
 
-        if(steam){
+        if(steam || "steam".equals(Version.modifier)){
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 

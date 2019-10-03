@@ -9,13 +9,16 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 import java.io.*;
 import java.net.*;
@@ -32,8 +35,9 @@ public class Mods implements Loadable{
     private PixmapPacker packer;
 
     private Array<LoadedMod> loaded = new Array<>();
+    private Array<LoadedMod> disabled = new Array<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private boolean requiresRestart;
+    private boolean requiresReload;
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
      * Call this in init(). */
@@ -59,7 +63,7 @@ public class Mods implements Loadable{
         file.copyTo(dest);
         try{
             loaded.add(loadMod(file));
-            requiresRestart = true;
+            requiresReload = true;
         }catch(IOException e){
             dest.delete();
             throw e;
@@ -75,27 +79,31 @@ public class Mods implements Loadable{
         if(loaded.isEmpty()) return;
 
         packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+
         for(LoadedMod mod : loaded){
-            try{
-                int packed = 0;
-                for(FileHandle file : mod.root.child("sprites").list()){
-                    if(file.extension().equals("png")){
-                        try(InputStream stream = file.read()){
-                            byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
-                            Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                            packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
-                            pixmap.dispose();
-                            packed ++;
-                            totalSprites ++;
-                        }
+            int[] packed = {0};
+            boolean[] failed = {false};
+            mod.root.child("sprites").walk(file -> {
+                if(failed[0]) return;
+                if(file.extension().equals("png")){
+                    try(InputStream stream = file.read()){
+                        byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                        Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
+                        packer.pack(mod.name + "-" + file.nameWithoutExtension(), pixmap);
+                        pixmap.dispose();
+                        packed[0] ++;
+                        totalSprites ++;
+                    }catch(IOException e){
+                        failed[0] = true;
+                        Core.app.post(() -> {
+                            Log.err("Error packing images for mod: {0}", mod.meta.name);
+                            e.printStackTrace();
+                            if(!headless) ui.showException(e);
+                        });
                     }
                 }
-                Log.info("Packed {0} images for mod '{1}'.", packed, mod.meta.name);
-            }catch(IOException e){
-                Log.err("Error packing images for mod: {0}", mod.meta.name);
-                e.printStackTrace();
-                if(!headless) ui.showException(e);
-            }
+            });
+            Log.info("Packed {0} images for mod '{1}'.", packed[0], mod.meta.name);
         }
     }
 
@@ -103,14 +111,36 @@ public class Mods implements Loadable{
     public void loadSync(){
         if(packer == null) return;
 
+        Texture editor = Core.atlas.find("clear-editor").getTexture();
+        PixmapPacker editorPacker = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+
+        for(AtlasRegion region : Core.atlas.getRegions()){
+            if(region.getTexture() == editor){
+                editorPacker.pack(region.name, Core.atlas.getPixmap(region).crop());
+            }
+        }
+
         //get textures packed
         if(totalSprites > 0){
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
-            packer.getPages().each(page -> page.updateTexture(filter, filter, false));
-            packer.getPages().each(page -> page.getRects().each((name, rect) -> Core.atlas.addRegion(name, page.getTexture(), (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height)));
+
+            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
+            //generate new icons
+            for(Array<Content> arr : content.getContentMap()){
+                arr.each(c -> {
+                    if(c instanceof UnlockableContent && c.mod != null){
+                        UnlockableContent u = (UnlockableContent)c;
+                        u.createIcons(packer, editorPacker);
+                    }
+                });
+            }
+
+            editorPacker.updateTextureAtlas(Core.atlas, filter, filter, false);
+            packer.updateTextureAtlas(Core.atlas, filter, filter, false);
         }
 
         packer.dispose();
+        packer = null;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -121,11 +151,11 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
-        requiresRestart = true;
+        requiresReload = true;
     }
 
-    public boolean requiresRestart(){
-        return requiresRestart;
+    public boolean requiresReload(){
+        return requiresReload;
     }
 
     /** Loads all mods from the folder, but does call any methods on them.*/
@@ -134,7 +164,12 @@ public class Mods implements Loadable{
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
             try{
-                loaded.add(loadMod(file));
+                LoadedMod mod = loadMod(file);
+                if(mod.enabled()){
+                    loaded.add(mod);
+                }else{
+                    disabled.add(mod);
+                }
             }catch(IllegalArgumentException ignored){
             }catch(Exception e){
                 Log.err("Failed to load plugin file {0}. Skipping.", file);
@@ -154,7 +189,7 @@ public class Mods implements Loadable{
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
-                    file.walk(f -> tree.addFile(f));
+                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) : f.path(), f));
                 }
             }
 
@@ -186,6 +221,31 @@ public class Mods implements Loadable{
         }
     }
 
+    /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
+    public void reloadContent(){
+        //epic memory leak
+        Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+        Tex.load();
+        Tex.loadStyles();
+        Styles.load();
+        loaded.clear();
+        disabled.clear();
+        load();
+        buildFiles();
+        Musics.dispose();
+        Sounds.dispose();
+        Musics.load();
+        Sounds.load();
+        Core.assets.finishLoading();
+        content.clear();
+        content.createContent();
+        loadAsync();
+        loadSync();
+        content.init();
+        content.load();
+        content.loadColors();
+    }
+
     /** Creates all the content found in mod files. */
     public void loadContent(){
         for(LoadedMod mod : loaded){
@@ -197,7 +257,8 @@ public class Mods implements Loadable{
                         for(FileHandle file : folder.list()){
                             if(file.extension().equals("json")){
                                 try{
-                                    Content loaded = parser.parse(mod.name, file.nameWithoutExtension(), file.readString(), type);
+                                    //this binds the content but does not load it entirely
+                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
                                     Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
@@ -209,12 +270,20 @@ public class Mods implements Loadable{
             }
         }
 
+        //this finishes parsing content fields
+        parser.finishParsing();
+
         each(Mod::loadContent);
     }
 
     /** @return all loaded mods. */
     public Array<LoadedMod> all(){
         return loaded;
+    }
+
+    /** @return all disabled mods. */
+    public Array<LoadedMod> disabled(){
+        return disabled;
     }
 
     /** @return a list of mod names only, without versions. */
@@ -227,8 +296,23 @@ public class Mods implements Loadable{
         return loaded.select(l -> !l.meta.hidden).map(l -> l.name + ":" + l.meta.version);
     }
 
+    /** Makes a mod enabled or disabled. shifts it.*/
+    public void setEnabled(LoadedMod mod, boolean enabled){
+        if(mod.enabled() != enabled){
+            Core.settings.putSave(mod.name + "-enabled", enabled);
+            requiresReload = true;
+            if(!enabled){
+                loaded.remove(mod);
+                disabled.add(mod);
+            }else{
+                loaded.add(mod);
+                disabled.remove(mod);
+            }
+        }
+    }
+
     /** @return the mods that the client is missing.
-     * The inputted array is changed to contain the extra mods that the client has but the server does.*/
+     * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
     public Array<String> getIncompatibility(Array<String> out){
         Array<String> mods = getModStrings();
         Array<String> result = mods.copy();
@@ -272,8 +356,8 @@ public class Mods implements Loadable{
         //make sure the main class exists before loading it; if it doesn't just don't put it there
         if(mainFile.exists()){
             //other platforms don't have standard java class loaders
-            if(mobile){
-                throw new IllegalArgumentException("This mod is not compatible with " + (ios ? "iOS" : "Android") + ".");
+            if(!headless && Version.build != -1){
+                throw new IllegalArgumentException("Java class mods are currently unsupported outside of custom builds.");
             }
 
             URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
@@ -305,15 +389,16 @@ public class Mods implements Loadable{
         /** This mod's metadata. */
         public final ModMeta meta;
 
-        //TODO implement
-        protected boolean enabled;
-
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
             this.file = file;
             this.mod = mod;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
+        }
+
+        public boolean enabled(){
+            return Core.settings.getBool(name + "-enabled", true);
         }
     }
 

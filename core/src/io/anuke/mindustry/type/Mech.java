@@ -33,7 +33,7 @@ public class Mech extends UnlockableContent{
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public Weapon weapon;
 
-    public TextureRegion baseRegion, legRegion, region, iconRegion;
+    public TextureRegion baseRegion, legRegion, region;
 
     public Mech(String name, boolean flying){
         super(name);
@@ -95,11 +95,6 @@ public class Mech extends UnlockableContent{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return iconRegion;
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.mech;
     }
@@ -113,7 +108,6 @@ public class Mech extends UnlockableContent{
         }
 
         region = Core.atlas.find(name);
-        iconRegion = Core.atlas.find("mech-icon-" + name);
     }
 
     @Override
