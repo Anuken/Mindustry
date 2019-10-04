@@ -96,6 +96,8 @@ public class Block extends BlockStorage{
     public boolean targetable = true;
     /** Whether the overdrive core has any effect on this block. */
     public boolean canOverdrive = true;
+    /** Outlined icon color.*/
+    public Color outlineColor = Color.valueOf("404049");
     /** Whether the icon region has an outline added. */
     public boolean outlineIcon = false;
     /** Whether this block has a shadow under it. */
@@ -385,6 +387,10 @@ public class Block extends BlockStorage{
             buildCost += stack.amount * stack.item.cost;
         }
 
+        if(consumes.has(ConsumeType.power)) hasPower = true;
+        if(consumes.has(ConsumeType.item)) hasItems = true;
+        if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
+
         setStats();
         setBars();
 
@@ -668,14 +674,64 @@ public class Block extends BlockStorage{
     }
 
     @Override
-    public void createIcons(PixmapPacker out, PixmapPacker editor){
-        super.createIcons(out, editor);
+    public void createIcons(PixmapPacker packer, PixmapPacker editor){
+        super.createIcons(packer, editor);
 
         editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
 
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
             color.set(image.getPixel(image.width/2, image.height/2));
+        }
+
+        getGeneratedIcons();
+
+        Pixmap last = null;
+
+        if(outlineIcon){
+            final int radius = 4;
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
+            Pixmap out = new Pixmap(region.width, region.height);
+            Color color = new Color();
+            for(int x = 0; x < region.width; x++){
+                for(int y = 0; y < region.height; y++){
+
+                    region.getPixel(x, y, color);
+                    out.draw(x, y, color);
+                    if(color.a < 1f){
+                        boolean found = false;
+                        outer:
+                        for(int rx = -radius; rx <= radius; rx++){
+                            for(int ry = -radius; ry <= radius; ry++){
+                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
+                                    found = true;
+                                    break outer;
+                                }
+                            }
+                        }
+                        if(found){
+                            out.draw(x, y, outlineColor);
+                        }
+                    }
+                }
+            }
+            last = out;
+
+            packer.pack(name, out);
+        }
+
+        if(generatedIcons.length > 1){
+            Pixmap base = Core.atlas.getPixmap(generatedIcons[0]).crop();
+            for(int i = 1; i < generatedIcons.length; i++){
+                if(i == generatedIcons.length - 1 && last != null){
+                    base.drawPixmap(last);
+                }else{
+                    base.draw(Core.atlas.getPixmap(generatedIcons[i]));
+                }
+            }
+            packer.pack("block-" + name + "-full", base);
+            generatedIcons = null;
+            Arrays.fill(cicons, null);
         }
     }
 

@@ -23,6 +23,10 @@ public class MissileBulletType extends BasicBulletType{
         hitSound = Sounds.explosion;
     }
 
+    public MissileBulletType(){
+        this(1f, 1f, "missile");
+    }
+
     @Override
     public void update(Bullet b){
         super.update(b);

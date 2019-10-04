@@ -121,7 +121,7 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+            TextureFilter filter = TextureFilter.Nearest;
 
             packer.updateTextureAtlas(Core.atlas, filter, filter, false);
             //generate new icons
@@ -175,7 +175,7 @@ public class Mods implements Loadable{
             }
         }
 
-        //load mods now
+        //load workshop mods now
         for(FileHandle file : platform.getExternalMods()){
             try{
                 LoadedMod mod = loadMod(file, true);
@@ -185,7 +185,7 @@ public class Mods implements Loadable{
                     disabled.add(mod);
                 }
             }catch(Exception e){
-                Log.err("Failed to load mod file {0}. Skipping.", file);
+                Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
             }
         }

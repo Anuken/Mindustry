@@ -149,6 +149,7 @@ public class DesktopLauncher extends ClientLauncher{
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
+        boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
             player.name = SVars.net.friends.getPersonaName();
@@ -177,8 +178,18 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             });
         });
+
+        Events.on(DisposeEvent.class, event -> {
+            SteamAPI.shutdown();
+            isShutdown[0] = true;
+        });
+
         //steam shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(!isShutdown[0]){
+                SteamAPI.shutdown();
+            }
+        }));
     }
 
     static void handleCrash(Throwable e){
