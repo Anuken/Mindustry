@@ -76,10 +76,16 @@ public class ModsDialog extends FloatingDialog{
                                 setup();
                             }).height(50f).margin(8f).width(130f);
 
-                            title.addImageButton(Icon.trash16Small, Styles.cleari, () -> ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
-                                mods.removeMod(mod);
-                                setup();
-                            })).size(50f);
+                            title.addImageButton(mod.workshopID != null ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
+                                if(mod.workshopID == null){
+                                    ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
+                                        mods.removeMod(mod);
+                                        setup();
+                                    });
+                                }else{
+                                    platform.viewListing(mod.workshopID);
+                                }
+                            }).size(50f);
                         }).growX().left().padTop(-14f).padRight(-14f);
 
                         t.row();

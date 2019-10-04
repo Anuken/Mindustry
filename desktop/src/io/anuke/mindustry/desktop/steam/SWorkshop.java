@@ -112,7 +112,7 @@ public class SWorkshop implements SteamUGCCallback{
                         dialog.addCloseButton();
 
                         dialog.buttons.addImageTextButton("$view.workshop", Icon.linkSmall, () -> {
-                            platform.viewMapListing(id);
+                            platform.viewListing(id);
                             dialog.hide();
                         }).size(210f, 64f);
 

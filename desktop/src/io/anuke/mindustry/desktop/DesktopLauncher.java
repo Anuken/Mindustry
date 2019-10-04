@@ -228,11 +228,11 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void viewMapListing(Map map){
-        viewMapListing(map.file.parent().name());
+        viewListing(map.file.parent().name());
     }
 
     @Override
-    public void viewMapListing(String mapid){
+    public void viewListing(String mapid){
         SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
     }
 

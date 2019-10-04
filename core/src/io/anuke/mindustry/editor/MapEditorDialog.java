@@ -150,7 +150,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
                 Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
                 if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
-                    platform.viewMapListing(editor.getTags().get("steamid"));
+                    platform.viewListing(editor.getTags().get("steamid"));
                     return;
                 }
 

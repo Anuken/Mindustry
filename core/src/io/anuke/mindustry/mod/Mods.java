@@ -76,6 +76,7 @@ public class Mods implements Loadable{
     @Override
     public void loadAsync(){
         if(loaded.isEmpty()) return;
+        Time.mark();
 
         packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
 
@@ -104,11 +105,14 @@ public class Mods implements Loadable{
             });
             Log.info("Packed {0} images for mod '{1}'.", packed[0], mod.meta.name);
         }
+
+        Log.info("Time to pack textures: {0}", Time.elapsed());
     }
 
     @Override
     public void loadSync(){
         if(packer == null) return;
+        Time.mark();
 
         Texture editor = Core.atlas.find("clear-editor").getTexture();
         PixmapPacker editorPacker = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
@@ -140,6 +144,7 @@ public class Mods implements Loadable{
 
         packer.dispose();
         packer = null;
+        Log.info("Time to update textures: {0}", Time.elapsed());
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -271,7 +276,7 @@ public class Mods implements Loadable{
                                 try{
                                     //this binds the content but does not load it entirely
                                     Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
-                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
+                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
                                 }
