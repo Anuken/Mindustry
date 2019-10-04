@@ -104,6 +104,23 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            Array<String> extraMods = packet.mods.copy();
+            Array<String> missingMods = mods.getIncompatibility(extraMods);
+
+            if(!extraMods.isEmpty() || !missingMods.isEmpty()){
+                //can't easily be localized since kick reasons can't have formatted text with them
+                StringBuilder result = new StringBuilder("[accent]Incompatible mods![]\n\n");
+                if(!missingMods.isEmpty()){
+                    result.append("Missing:[lightgray]\n").append("> ").append(missingMods.toString("\n> "));
+                    result.append("[]\n");
+                }
+
+                if(!extraMods.isEmpty()){
+                    result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
+                }
+                con.kick(result.toString());
+            }
+
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
                 info.adminUsid = packet.usid;
                 info.lastName = packet.name;
@@ -200,6 +217,11 @@ public class NetServer implements ApplicationListener{
         registerCommands();
     }
 
+    @Override
+    public void init(){
+        mods.each(mod -> mod.registerClientCommands(clientCommands));
+    }
+
     private void registerCommands(){
         clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
             if(args.length > 0 && !Strings.canParseInt(args[0])){
@@ -262,7 +284,7 @@ public class NetServer implements ApplicationListener{
             }
 
             boolean checkPass(){
-                if(votes >= votesRequired() && target.isAdded() && target.con.isConnected()){
+                if(votes >= votesRequired()){
                     Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60)));
                     target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
                     playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.kick(KickReason.vote));

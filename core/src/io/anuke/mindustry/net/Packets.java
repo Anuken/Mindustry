@@ -1,6 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.util.serialization.Base64Coder;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.io.TypeIO;
@@ -65,6 +66,7 @@ public class Packets{
     public static class ConnectPacket implements Packet{
         public int version;
         public String versionType;
+        public Array<String> mods;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
@@ -78,6 +80,10 @@ public class Packets{
             buffer.put(mobile ? (byte)1 : 0);
             buffer.putInt(color);
             buffer.put(Base64Coder.decode(uuid));
+            buffer.putInt(mods.size);
+            for(int i = 0; i < mods.size; i++){
+                TypeIO.writeString(buffer, mods.get(i));
+            }
         }
 
         @Override
@@ -91,6 +97,11 @@ public class Packets{
             byte[] idbytes = new byte[8];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
+            int totalMods = buffer.getInt();
+            mods = new Array<>(totalMods);
+            for(int i = 0; i < totalMods; i++){
+                mods.add(TypeIO.readString(buffer));
+            }
         }
     }
 

@@ -20,6 +20,7 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
 
+    /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Tile tile){
         return player == null || tile == null || tile.interactable(player.getTeam());
     }

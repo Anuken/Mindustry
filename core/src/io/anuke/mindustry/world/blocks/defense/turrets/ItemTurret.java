@@ -7,6 +7,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -44,7 +45,7 @@ public class ItemTurret extends CooledTurret{
             @Override
             public void build(Tile tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Item.Icon.large)),
+                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);

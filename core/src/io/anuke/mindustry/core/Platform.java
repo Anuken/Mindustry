@@ -37,6 +37,10 @@ public interface Platform{
     /** Steam: View a map listing on the workshop.*/
     default void viewMapListing(String mapid){}
 
+    /** Steam: View map workshop info, removing the map ID tag if its listing is deleted.
+     * Also presents the option to update the map. */
+    default void viewMapListingInfo(Map map){}
+
     /** Steam: Open workshop for maps.*/
     default void openWorkshop(){}
 

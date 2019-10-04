@@ -6,6 +6,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -17,7 +18,7 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
-    public final Generator generator;
+    public @NonNull Generator generator;
     public Block[] blockRequirements = {};
     public ZoneRequirement[] zoneRequirements = {};
     public Item[] resources = {};
@@ -40,9 +41,13 @@ public class Zone extends UnlockableContent{
         this.generator = generator;
     }
 
+    public Zone(String name){
+        this(name, new MapGenerator(name));
+    }
+
     @Override
     public void load(){
-        preview = Core.atlas.find("zone-" + name);
+        preview = Core.atlas.find("zone-" + name, Core.atlas.find(name + "-zone"));
     }
 
     public Rules getRules(){
@@ -194,11 +199,6 @@ public class Zone extends UnlockableContent{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return null;
-    }
-
-    @Override
     public String localizedName(){
         return Core.bundle.get("zone." + name + ".name");
     }
@@ -209,12 +209,16 @@ public class Zone extends UnlockableContent{
     }
 
     public static class ZoneRequirement{
-        public final Zone zone;
-        public final int wave;
+        public @NonNull Zone zone;
+        public @NonNull int wave;
 
         public ZoneRequirement(Zone zone, int wave){
             this.zone = zone;
             this.wave = wave;
+        }
+
+        protected ZoneRequirement(){
+
         }
 
         public static ZoneRequirement[] with(Object... objects){

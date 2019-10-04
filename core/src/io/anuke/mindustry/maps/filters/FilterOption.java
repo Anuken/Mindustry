@@ -8,20 +8,20 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.Block.*;
 import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.updateEditorOnChange;
 
 public abstract class FilterOption{
-    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full));
-    public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full));
-    public static final Predicate<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full)));
-    public static final Predicate<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Icon.full)));
-    public static final Predicate<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Icon.full)));
-    public static final Predicate<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(Icon.full));
+    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Predicate<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Predicate<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Predicate<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Predicate<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(Cicon.full));
     public static final Predicate<Block> anyOptional = b -> floorsOnly.test(b) || wallsOnly.test(b) || oresOnly.test(b) || b == Blocks.air;
 
     public abstract void build(Table table);
@@ -76,15 +76,15 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> b.addImage(supplier.get().icon(Icon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
-                .setRegion(supplier.get() == Blocks.air ? Core.atlas.find("icon-none") : supplier.get().icon(Icon.small))).size(8 * 3), () -> {
+            table.addButton(b -> b.addImage(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
+                .setRegion(supplier.get() == Blocks.air ? Core.atlas.find("icon-none") : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
                 FloatingDialog dialog = new FloatingDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.test(block)) continue;
 
-                    dialog.cont.addImage(block == Blocks.air ? Core.atlas.find("icon-none-small") : block.icon(Icon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.addImage(block == Blocks.air ? Core.atlas.find("icon-none-small") : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.accept(block);
                         dialog.hide();
                         changed.run();

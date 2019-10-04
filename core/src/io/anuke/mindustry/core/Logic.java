@@ -16,6 +16,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,11 +32,12 @@ public class Logic implements ApplicationListener{
 
     public Logic(){
         Events.on(WaveEvent.class, event -> {
+            for(Player p : playerGroup.all()){
+                p.respawns = state.rules.respawns;
+            }
+
             if(world.isZone()){
                 world.getZone().updateWave(state.wave);
-            }
-            for (Player p : playerGroup.all()) {
-                p.respawns = state.rules.respawns;
             }
         });
 
@@ -43,7 +45,11 @@ public class Logic implements ApplicationListener{
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             Block block = tile.block();
+            //skip null entities or nukes, for obvious reasons
+            if(tile.entity == null || tile.block() instanceof NuclearReactor) return;
+
             if(block instanceof BuildBlock){
+
                 BuildEntity entity = tile.entity();
 
                 //update block to reflect the fact that something was being constructed
@@ -56,7 +62,33 @@ public class Logic implements ApplicationListener{
             }
 
             TeamData data = state.teams.get(tile.getTeam());
-            data.brokenBlocks.addFirst(BrokenBlock.get(tile.x, tile.y, tile.rotation(), block.id));
+
+            //remove existing blocks that have been placed here.
+            //painful O(n) iteration + copy
+            for(int i = 0; i < data.brokenBlocks.size; i++){
+                BrokenBlock b = data.brokenBlocks.get(i);
+                if(b.x == tile.x && b.y == tile.y){
+                    data.brokenBlocks.removeIndex(i);
+                    break;
+                }
+            }
+
+            data.brokenBlocks.addFirst(new BrokenBlock(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+        });
+
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(!event.breaking){
+                TeamData data = state.teams.get(event.team);
+
+                //painful O(n) iteration + copy
+                for(int i = 0; i < data.brokenBlocks.size; i++){
+                    BrokenBlock b = data.brokenBlocks.get(i);
+                    if(b.x == event.tile.x && b.y == event.tile.y){
+                        data.brokenBlocks.removeIndex(i);
+                        break;
+                    }
+                }
+            }
         });
     }
 

@@ -1,12 +1,11 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.content.StatusEffects;
-import io.anuke.mindustry.game.UnlockableContent;
-import io.anuke.mindustry.ui.ContentDisplay;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{
     public final Color color;
@@ -25,8 +24,6 @@ public class Liquid extends UnlockableContent{
     public Color flameColor = Color.valueOf("ffb763");
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
-    /** Displayed icon. TODO fix it by removing autogen, draw icons manually */
-    public TextureRegion iconRegion;
 
     public Liquid(String name, Color color){
         super(name);
@@ -34,13 +31,13 @@ public class Liquid extends UnlockableContent{
         this.description = Core.bundle.getOrNull("liquid." + name + ".description");
     }
 
-    public boolean canExtinguish(){
-        return flammability < 0.1f && temperature <= 0.5f;
+    /** For modding only.*/
+    public Liquid(String name){
+        this(name, new Color(Color.black));
     }
 
-    @Override
-    public void load(){
-        iconRegion = Core.atlas.find("liquid-" + name);
+    public boolean canExtinguish(){
+        return flammability < 0.1f && temperature <= 0.5f;
     }
 
     @Override
@@ -51,11 +48,6 @@ public class Liquid extends UnlockableContent{
     @Override
     public String localizedName(){
         return Core.bundle.get("liquid." + this.name + ".name");
-    }
-
-    @Override
-    public TextureRegion getContentIcon(){
-        return iconRegion;
     }
 
     @Override

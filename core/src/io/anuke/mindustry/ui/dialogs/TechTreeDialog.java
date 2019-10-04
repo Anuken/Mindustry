@@ -15,14 +15,13 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.TreeLayout.*;
-import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -144,7 +143,7 @@ public class TechTreeDialog extends FloatingDialog{
             infoTable.touchable(Touchable.enabled);
 
             for(TechTreeNode node : nodes){
-                ImageButton button = new ImageButton(node.node.block.icon(Block.Icon.medium), Styles.nodei);
+                ImageButton button = new ImageButton(node.node.block.icon(Cicon.medium), Styles.nodei);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(mobile){
@@ -190,7 +189,7 @@ public class TechTreeDialog extends FloatingDialog{
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !data.hasItems(node.node.requirements) ? Tex.buttonRed : Tex.button;
                     ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.block.icon(Block.Icon.medium) : Core.atlas.find("icon-locked"));
+                    .setRegion(node.visible ? node.node.block.icon(Cicon.medium) : Core.atlas.find("icon-locked"));
                     button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
                 });
                 addChild(button);
@@ -277,7 +276,7 @@ public class TechTreeDialog extends FloatingDialog{
                             for(ItemStack req : node.requirements){
                                 t.table(list -> {
                                     list.left();
-                                    list.addImage(req.item.icon(Item.Icon.medium)).size(8 * 3).padRight(3);
+                                    list.addImage(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                     list.add(req.item.localizedName()).color(Color.lightGray);
                                     list.label(() -> " " + Math.min(data.getItem(req.item), req.amount) + " / " + req.amount)
                                     .update(l -> l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet));

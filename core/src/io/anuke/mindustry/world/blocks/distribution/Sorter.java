@@ -1,17 +1,15 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.ItemSelection;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -37,9 +35,12 @@ public class Sorter extends Block{
 
     @Override
     public void playerPlaced(Tile tile){
-        Core.app.post(() -> Call.setSorterItem(null, tile, lastItem));
+        if(lastItem != null){
+            Core.app.post(() -> tile.configure(lastItem.id));
+        }
     }
 
+    /*
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void setSorterItem(Player player, Tile tile, Item item){
         if(!Units.canInteract(player, tile)) return;
@@ -47,6 +48,11 @@ public class Sorter extends Block{
         if(entity != null){
             entity.sortItem = item;
         }
+    }*/
+
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.<SorterEntity>entity().sortItem = content.item(value);
     }
 
     @Override
@@ -127,7 +133,7 @@ public class Sorter extends Block{
         SorterEntity entity = tile.entity();
         ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
-            Call.setSorterItem(null, tile, item);
+            tile.configure(item == null ? -1 : item.id);
         });
     }
 
@@ -138,7 +144,12 @@ public class Sorter extends Block{
 
 
     public class SorterEntity extends TileEntity{
-        Item sortItem;
+        @Nullable Item sortItem;
+
+        @Override
+        public int config(){
+            return sortItem == null ? -1 : sortItem.id;
+        }
 
         @Override
         public byte version(){

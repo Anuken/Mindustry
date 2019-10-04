@@ -103,19 +103,21 @@ public class DeployDialog extends FloatingDialog{
                 }
 
                 TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), Styles.squaret, () -> {
-                    hide();
-                    ui.loadAnd(() -> {
-                        logic.reset();
-                        net.reset();
-                        try{
-                            control.saves.getZoneSlot().load();
-                            state.set(State.playing);
-                        }catch(SaveException e){ //make sure to handle any save load errors!
-                            e.printStackTrace();
-                            if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
-                            Core.app.post(() -> ui.showInfo("$save.corrupted"));
-                            show();
-                        }
+                    control.saves.getZoneSlot().cautiousLoad(() -> {
+                        hide();
+                        ui.loadAnd(() -> {
+                            logic.reset();
+                            net.reset();
+                            try{
+                                slot.load();
+                                state.set(State.playing);
+                            }catch(SaveException e){ //make sure to handle any save load errors!
+                                e.printStackTrace();
+                                if(control.saves.getZoneSlot() != null) control.saves.getZoneSlot().delete();
+                                Core.app.post(() -> ui.showInfo("$save.corrupted"));
+                                show();
+                            }
+                        });
                     });
                 });
 

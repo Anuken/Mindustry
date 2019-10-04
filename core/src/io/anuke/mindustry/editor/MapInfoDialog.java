@@ -59,18 +59,25 @@ public class MapInfoDialog extends FloatingDialog{
 
             t.row();
             t.add("$editor.rules").padRight(8).left();
-            t.addButton("$edit", () -> ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules())).left().width(200f);
+            t.addButton("$edit", () -> {
+                ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules());
+                hide();
+            }).left().width(200f);
 
             t.row();
             t.add("$editor.waves").padRight(8).left();
-            t.addButton("$edit", waveInfo::show).left().width(200f);
+            t.addButton("$edit", () -> {
+                waveInfo.show();
+                hide();
+            }).left().width(200f);
 
             t.row();
             t.add("$editor.generation").padRight(8).left();
-            t.addButton("$edit",
-                () -> generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
-                filters -> editor.getTags().put("genfilters", JsonIO.write(filters)))
-            ).left().width(200f);
+            t.addButton("$edit", () -> {
+                generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
+                filters -> editor.getTags().put("genfilters", JsonIO.write(filters)));
+                hide();
+            }).left().width(200f);
 
             name.change();
             description.change();

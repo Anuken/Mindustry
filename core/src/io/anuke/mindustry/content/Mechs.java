@@ -220,7 +220,7 @@ public class Mechs implements ContentList{
         dart = new Mech("dart-ship", true){
             {
                 drillPower = 1;
-                mineSpeed = 0.9f;
+                mineSpeed = 3f;
                 speed = 0.5f;
                 drag = 0.09f;
                 health = 200f;

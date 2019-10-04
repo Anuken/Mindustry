@@ -7,14 +7,13 @@ import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
-import io.anuke.arc.input.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.ArcNetImpl.*;
+import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.Packets.*;
 
@@ -302,6 +301,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Log.info("found {0} matches {1}", matches, lobbyDoneCallback);
 
         if(lobbyDoneCallback != null){
+            Array<Host> hosts = new Array<>();
             for(int i = 0; i < matches; i++){
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
@@ -316,12 +316,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby)
                     );
-
-                    lobbyCallback.accept(out);
+                    hosts.add(out);
                 }catch(Exception e){
                     Log.err(e);
                 }
             }
+
+            hosts.sort(Structs.comparingInt(h -> -h.players));
+            hosts.each(lobbyCallback);
 
             lobbyDoneCallback.run();
         }
@@ -344,7 +346,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             currentLobby = steamID;
 
             smat.setLobbyData(steamID, "name", player.name);
-            smat.setLobbyData(steamID, "mapname", world.getMap() == null ? "Unknown" : world.getMap().name());
+            smat.setLobbyData(steamID, "mapname", world.getMap() == null ? "Unknown" : state.rules.zone == null ? world.getMap().name() : state.rules.zone.localizedName);
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");

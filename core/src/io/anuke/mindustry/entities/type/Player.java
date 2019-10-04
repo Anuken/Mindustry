@@ -10,6 +10,7 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
@@ -48,7 +49,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public float baseRotation;
     public float pointerX, pointerY;
     public String name = "noname";
-    public @Nullable String uuid, usid;
+    public @Nullable
+    String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
@@ -158,7 +160,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public TextureRegion getIconRegion(){
-        return mech.iconRegion;
+        return mech.icon(Cicon.full);
     }
 
     @Override
@@ -279,7 +281,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawShadow(float offsetX, float offsetY){
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
-        Draw.rect(mech.iconRegion, x + offsetX * scl, y + offsetY * scl, rotation - 90);
+        Draw.rect(getIconRegion(), x + offsetX * scl, y + offsetY * scl, rotation - 90);
     }
 
     @Override

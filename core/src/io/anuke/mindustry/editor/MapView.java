@@ -56,8 +56,14 @@ public class MapView extends Element implements GestureListener{
             public boolean mouseMoved(InputEvent event, float x, float y){
                 mousex = x;
                 mousey = y;
+                requestScroll();
 
                 return false;
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
+                requestScroll();
             }
 
             @Override

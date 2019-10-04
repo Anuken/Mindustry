@@ -1,17 +1,18 @@
 package io.anuke.mindustry.graphics;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.graphics.glutils.Shader;
 import io.anuke.arc.scene.ui.layout.Scl;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.Time;
 
 public class Shaders{
     public static Shadow shadow;
     public static BlockBuild blockbuild;
-    public static @Nullable Shield shield;
+    public static @Nullable
+    Shield shield;
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;

@@ -1,12 +1,10 @@
 package io.anuke.mindustry.io;
 
-import io.anuke.arc.collection.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -98,6 +96,7 @@ public class JsonIO{
             }
         });
 
+        /*
         json.setSerializer(TeamData.class, new Serializer<TeamData>(){
             @Override
             public void write(Json json, TeamData object, Class knownType){
@@ -115,7 +114,7 @@ public class JsonIO{
                 out.brokenBlocks = new LongQueue(blocks);
                 return out;
             }
-        });
+        });*/
 
         json.setSerializer(ItemStack.class, new Serializer<ItemStack>(){
             @Override

@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.type;
+package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -9,6 +9,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.ai.Pathfinder.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
@@ -18,7 +19,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class GroundUnit extends BaseUnit{
+public class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
 
     protected float walkTime;

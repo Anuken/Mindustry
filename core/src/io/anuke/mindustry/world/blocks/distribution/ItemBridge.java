@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.IntSet.*;
@@ -9,9 +8,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -43,23 +40,19 @@ public class ItemBridge extends Block{
         group = BlockGroup.transportation;
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void linkItemBridge(Player player, Tile tile, Tile other){
-        if(!Units.canInteract(player, tile)) return;
+    @Override
+    public void configured(Tile tile, Player player, int value){
         ItemBridgeEntity entity = tile.entity();
-        ItemBridgeEntity oe = other.entity();
-        entity.link = other.pos();
-        oe.incoming.add(tile.pos());
-    }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void unlinkItemBridge(Player player, Tile tile, Tile other){
-        if(!Units.canInteract(player, tile)) return;
-        ItemBridgeEntity entity = tile.entity();
-        entity.link = -1;
-        if(other != null){
-            ItemBridgeEntity oe = other.entity();
+        if(world.tile(entity.link) != null && world.tile(entity.link).entity instanceof ItemBridgeEntity){
+            ItemBridgeEntity oe = world.tile(entity.link).entity();
             oe.incoming.remove(tile.pos());
+        }
+
+        entity.link = value;
+
+        if(world.tile(value) != null && world.tile(value).entity instanceof ItemBridgeEntity){
+            ((ItemBridgeEntity)world.tile(value).entity).incoming.add(tile.pos());
         }
     }
 
@@ -76,7 +69,7 @@ public class ItemBridge extends Block{
     public void playerPlaced(Tile tile){
         Tile link = findLink(tile.x, tile.y);
         if(linkValid(tile, link)){
-            Call.linkItemBridge(null, link, tile);
+            link.configure(tile.pos());
         }
 
         lastPlaced = tile.pos();
@@ -148,9 +141,9 @@ public class ItemBridge extends Block{
 
         if(linkValid(tile, other)){
             if(entity.link == other.pos()){
-                Call.unlinkItemBridge(null, tile, other);
+                tile.configure(Pos.invalid);
             }else{
-                Call.linkItemBridge(null, tile, other);
+                tile.configure(other.pos());
             }
             return false;
         }
@@ -175,7 +168,6 @@ public class ItemBridge extends Block{
 
         Tile other = world.tile(entity.link);
         if(!linkValid(tile, other)){
-            entity.link = Pos.invalid;
             tryDump(tile);
             entity.uptime = 0f;
         }else{
@@ -363,6 +355,11 @@ public class ItemBridge extends Block{
         public float time;
         public float time2;
         public float cycleSpeed = 1f;
+
+        @Override
+        public int config(){
+            return link;
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{
