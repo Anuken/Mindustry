@@ -672,6 +672,28 @@ public class Block extends BlockStorage{
         super.createIcons(out, editor);
 
         editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+
+        if(!synthetic()){
+            PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
+
+            Color average = this.color;
+            Color color = new Color();
+            for(int x = 0; x < image.width; x++){
+                for(int y = 0; y < image.height; y++){
+                    image.getPixel(x, y, color);
+                    average.r += color.r;
+                    average.g += color.g;
+                    average.b += color.b;
+                }
+            }
+            average.mul(1f / (image.width * image.height));
+            if(isFloor()){
+                average.mul(0.8f);
+            }else{
+                average.mul(1.1f);
+            }
+            average.a = 1f;
+        }
     }
 
     /** Never use outside of the editor! */
