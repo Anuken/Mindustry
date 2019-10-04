@@ -61,7 +61,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file));
+            loaded.add(loadMod(file, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -163,16 +163,30 @@ public class Mods implements Loadable{
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
             try{
-                LoadedMod mod = loadMod(file);
+                LoadedMod mod = loadMod(file, false);
                 if(mod.enabled()){
                     loaded.add(mod);
                 }else{
                     disabled.add(mod);
                 }
-            }catch(IllegalArgumentException ignored){
             }catch(Exception e){
-                Log.err("Failed to load plugin file {0}. Skipping.", file);
-                e.printStackTrace();
+                Log.err("Failed to load mod file {0}. Skipping.", file);
+                Log.err(e);
+            }
+        }
+
+        //load mods now
+        for(FileHandle file : platform.getExternalMods()){
+            try{
+                LoadedMod mod = loadMod(file, true);
+                if(mod.enabled()){
+                    loaded.add(mod);
+                }else{
+                    disabled.add(mod);
+                }
+            }catch(Exception e){
+                Log.err("Failed to load mod file {0}. Skipping.", file);
+                Log.err(e);
             }
         }
 
@@ -329,7 +343,7 @@ public class Mods implements Loadable{
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
-    private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
+    private LoadedMod loadMod(FileHandle sourceFile, boolean workshop) throws Exception{
         FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
         if(zip.list().length == 1 && zip.list()[0].isDirectory()){
             zip = zip.list()[0];
@@ -395,6 +409,8 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
+        /** The ID of this mod in the workshop.*/
+        public @Nullable String workshopID;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;

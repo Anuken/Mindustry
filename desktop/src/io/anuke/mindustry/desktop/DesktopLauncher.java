@@ -211,6 +211,11 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public Array<FileHandle> getExternalMods(){
+        return !steam ? super.getExternalMods() : SVars.workshop.getModFiles();
+    }
+
+    @Override
     public void viewMapListing(Map map){
         viewMapListing(map.file.parent().name());
     }
