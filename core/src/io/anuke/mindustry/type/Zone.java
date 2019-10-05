@@ -19,13 +19,14 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Zone extends UnlockableContent{
     public @NonNull Generator generator;
-    public Block[] blockRequirements = {};
-    public ZoneRequirement[] zoneRequirements = {};
+    //public Block[] blockRequirements = {};
+    public Objective[] requirements = {};
+    public Objective configureObjective; //TODO
     public Item[] resources = {};
+
     public Consumer<Rules> rules = rules -> {};
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
-    public int configureWave = 15;
     public int launchPeriod = 10;
     public Loadout loadout = Loadouts.basicShard;
     public TextureRegion preview;
