@@ -136,8 +136,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
-        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -178,6 +177,10 @@ public class Logic implements ApplicationListener{
 
         for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
             Effects.effect(Fx.launch, tile);
+        }
+
+        if(world.getZone() != null){
+            world.getZone().setLaunched();
         }
 
         Time.runTask(30f, () -> {

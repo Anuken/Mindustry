@@ -151,6 +151,10 @@ public class PlacementFragment extends Fragment{
                             Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
+
+                            if(state.rules.bannedBlocks.contains(block)){
+                                button.forEach(elem -> elem.setColor(Color.darkGray));
+                            }
                         });
 
                         button.hovered(() -> hovered = block);
@@ -225,6 +229,15 @@ public class PlacementFragment extends Fragment{
                                     req.row();
                                 }
                             }).growX().left().margin(3);
+
+                            if(state.rules.bannedBlocks.contains(lastDisplay)){
+                                topTable.row();
+                                topTable.table(b -> {
+                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.add("$banned");
+                                    b.left();
+                                }).padTop(2).left();
+                            }
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
@@ -301,7 +314,11 @@ public class PlacementFragment extends Fragment{
                 returnArray.add(block);
             }
         }
-        returnArray.sort((b1, b2) -> -Boolean.compare(unlocked(b1), unlocked(b2)));
+        returnArray.sort((b1, b2) -> {
+            int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
+            if(locked != 0) return locked;
+            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+        });
         return returnArray;
     }
 

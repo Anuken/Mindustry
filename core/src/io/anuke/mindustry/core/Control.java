@@ -151,11 +151,15 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(ZoneRequireCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", state.wave, e.zone.localizedName));
+            if(e.objective.display() != null){
+                ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", e.zoneForMet.localizedName, e.objective.display()));
+            }
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
+            if(e.zone.configureObjective.display() != null){
+                ui.hudfrag.showToast(Core.bundle.format("zone.config.unlocked", e.zone.configureObjective.display()));
+            }
         });
 
         Events.on(Trigger.newGame, () -> {
