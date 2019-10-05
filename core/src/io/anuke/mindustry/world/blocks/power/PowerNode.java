@@ -322,6 +322,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
+        float opacity = Core.settings.getInt("lasersopacity") / 100f;
         float x1 = tile.drawx(), y1 = tile.drawy(),
         x2 = target.drawx(), y2 = target.drawy();
 
@@ -337,6 +338,7 @@ public class PowerNode extends PowerBlock{
         float fract = 1f-tile.entity.power.graph.getSatisfaction();
 
         Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Draw.alpha(opacity);
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.3f);
         Draw.color();
     }
