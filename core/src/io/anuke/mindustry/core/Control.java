@@ -2,6 +2,8 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.audio.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -54,6 +56,9 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
+                for(Sound sound : assets.getAll(Sound.class, new Array<>())){
+                    sound.stop();
+                }
             }
         });
 
