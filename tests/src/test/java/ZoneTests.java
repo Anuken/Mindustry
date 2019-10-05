@@ -1,18 +1,14 @@
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.ObjectSet;
-import io.anuke.arc.util.Structs;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.SpawnGroup;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Zone;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.storage.CoreBlock;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 import org.junit.jupiter.api.*;
 
 import static io.anuke.mindustry.Vars.*;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class ZoneTests{
@@ -68,7 +64,7 @@ public class ZoneTests{
                 assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && !state.teams.get(waveTeam).cores.isEmpty()), "Zone \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
 
                 for(Item item : resources){
-                    assertTrue(Structs.contains(zone.resources, item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");
+                    assertTrue(zone.resources.contains(item), "Zone \"" + zone.name + "\" is missing item in resource list: \"" + item.name + "\"");
                 }
 
                 for(Item item : zone.resources){
