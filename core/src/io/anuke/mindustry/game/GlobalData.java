@@ -150,6 +150,7 @@ public class GlobalData{
 
     @SuppressWarnings("unchecked")
     public void load(){
+        items.clear();
         unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
         for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));

@@ -139,7 +139,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
 
             loadBegin.addStatement("io.anuke.arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
 
-            dispose.addStatement(name + ".dispose()");
+            dispose.addStatement("io.anuke.arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         });

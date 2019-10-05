@@ -5,6 +5,7 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.StatUnit;
 
@@ -20,7 +21,7 @@ public class LiquidDisplay extends Table{
         this.perSecond = perSecond;
 
         add(new Stack(){{
-            add(new Image(liquid.getContentIcon()));
+            add(new Image(liquid.icon(Cicon.medium)));
 
             if(amount != 0){
                 Table t = new Table().left().bottom();

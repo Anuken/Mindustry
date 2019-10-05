@@ -7,6 +7,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.InputHandler.*;
@@ -161,7 +162,7 @@ public class Conveyor extends Block{
                 tr1.trns(rotation * 90, tilesize, 0);
                 tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
-                Draw.rect(pos.item.icon(Item.Icon.medium),
+                Draw.rect(pos.item.icon(Cicon.medium),
                 (tile.x * tilesize + tr1.x * pos.y + tr2.x),
                 (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
             }

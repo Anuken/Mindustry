@@ -67,6 +67,15 @@ public class HostDialog extends FloatingDialog{
             try{
                 net.host(Vars.port);
                 player.isAdmin = true;
+
+                if(steam){
+                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic", () -> {
+                        ui.showCustomConfirm("$setting.publichost.name", "$public.confirm", "$yes", "$no", () -> {
+                            Core.settings.putSave("publichost", true);
+                            platform.updateLobby();
+                        });
+                    }));
+                }
             }catch(IOException e){
                 ui.showException("$server.error", e);
             }

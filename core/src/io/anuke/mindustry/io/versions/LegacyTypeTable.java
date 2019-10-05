@@ -118,7 +118,7 @@ public class LegacyTypeTable{
 
     public static Supplier[] getTable(int build){
         if(build == -1 || build == 81){
-            //return most recent one since that's probably is; not guaranteed
+            //return most recent one since that's probably it; not guaranteed
             return build81Table;
         }else if(build == 80){
             return build80Table;

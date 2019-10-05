@@ -16,7 +16,7 @@ import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.BlockPart;
 
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
@@ -52,6 +52,9 @@ public class MapEditor{
 
         loading = true;
         tags.putAll(map.tags);
+        if(map.file.parent().parent().name().equals("1127400") && steam){
+            tags.put("steamid",  map.file.parent().name());
+        }
         MapIO.loadMap(map, context);
         checkLinkedTiles();
         renderer.resize(width(), height());

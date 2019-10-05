@@ -135,6 +135,13 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     }
 
     @Override
+    public void killed(Entity other){
+        if(owner instanceof KillerTrait){
+            ((KillerTrait)owner).killed(other);
+        }
+    }
+
+    @Override
     public void absorb(){
         supressCollision = true;
         remove();

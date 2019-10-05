@@ -7,6 +7,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
@@ -253,6 +254,17 @@ public class Saves{
             return meta.map;
         }
 
+        public void cautiousLoad(Runnable run){
+            Array<String> mods = Array.with(getMods());
+            mods.removeAll(Vars.mods.getModStrings());
+
+            if(!mods.isEmpty()){
+                ui.showConfirm("$warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
+            }else{
+                run.run();
+            }
+        }
+
         public String getName(){
             return Core.settings.getString("save-" + index + "-name", "untitled");
         }
@@ -260,6 +272,10 @@ public class Saves{
         public void setName(String name){
             Core.settings.put("save-" + index + "-name", name);
             Core.settings.save();
+        }
+
+        public String[] getMods(){
+            return meta.mods;
         }
 
         public Zone getZone(){

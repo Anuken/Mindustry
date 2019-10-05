@@ -77,7 +77,9 @@ public class Drawf{
         Draw.rect(edge, x2, y2, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation);
 
         Lines.stroke(12f * scale);
+        Lines.precise(true);
         Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
+        Lines.precise(false);
         Lines.stroke(1f);
     }
 

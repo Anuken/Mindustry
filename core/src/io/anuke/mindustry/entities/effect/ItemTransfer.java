@@ -9,7 +9,7 @@ import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.Time;
 import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.entities.traits.DrawTrait;
 import io.anuke.mindustry.entities.type.Unit;
@@ -48,8 +48,7 @@ public class ItemTransfer extends TimedEntity implements DrawTrait{
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
         if(tile == null || tile.entity == null || tile.entity.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> create(item, x, y, tile, () -> {
-            }));
+            Time.run(i * 3, () -> create(item, x, y, tile, () -> {}));
         }
         tile.entity.items.add(item, amount);
     }

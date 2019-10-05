@@ -91,6 +91,7 @@ public class Control implements ApplicationListener, Loadable{
                 hiscore = true;
                 world.getMap().setHighScore(state.wave);
             }
+
             Sounds.wave.play();
         });
 
@@ -388,7 +389,10 @@ public class Control implements ApplicationListener, Loadable{
         saves.update();
 
         //update and load any requested assets
-        assets.update();
+        try{
+            assets.update();
+        }catch(Exception ignored){
+        }
 
         input.updateState();
 

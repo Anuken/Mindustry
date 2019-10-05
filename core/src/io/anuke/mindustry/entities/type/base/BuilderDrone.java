@@ -1,23 +1,19 @@
 package io.anuke.mindustry.entities.type.base;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.IntIntMap;
-import io.anuke.arc.collection.Queue;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.units.UnitState;
-import io.anuke.mindustry.game.EventType.BuildSelectEvent;
-import io.anuke.mindustry.game.Teams.TeamData;
-import io.anuke.mindustry.gen.BrokenBlock;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.BuildBlock;
-import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.entities.units.*;
+import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.BuildBlock.*;
 
 import java.io.*;
 
@@ -45,7 +41,7 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
             BuildEntity entity = (BuildEntity)target;
             TileEntity core = getClosestCore();
 
-            if(isBuilding() && entity == null && isRebuild()){
+            if(isBuilding() && entity == null && canRebuild()){
                 target = world.tile(buildRequest().x, buildRequest().y);
                 circle(placeDistance * 0.7f);
                 target = null;
@@ -100,9 +96,9 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                     incDrones(playerTarget);
                     TargetTrait prev = target;
                     target = playerTarget;
-                    float dst = 90f + (id % 4)*30;
+                    float dst = 90f + (id % 10)*3;
                     float tdst = dst(target);
-                    float scale = (Mathf.lerp(1f, 0.77f, 1f - Mathf.clamp((tdst - dst) / dst)));
+                    float scale = (Mathf.lerp(1f, 0.2f, 1f - Mathf.clamp((tdst - dst) / dst)));
                     circle(dst);
                     velocity.scl(scale);
                     target = prev;
@@ -151,9 +147,8 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
         }
     }
 
-    boolean isRebuild(){
-        //disabled until further notice, reason being that it's too annoying when playing enemies and too broken for ally use
-        return false; //Vars.state.rules.enemyCheat && team == waveTeam;
+    boolean canRebuild(){
+        return true;
     }
 
     @Override
@@ -188,13 +183,14 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                 }
             }
 
-            if(isRebuild() && !isBuilding()){
+            if(timer.get(timerTarget, 80) && Units.closestEnemy(getTeam(), x, y, 100f, u -> !(u instanceof BaseDrone)) == null && !isBuilding()){
                 TeamData data = Vars.state.teams.get(team);
                 if(!data.brokenBlocks.isEmpty()){
-                    long block = data.brokenBlocks.removeLast();
-
-                    placeQueue.addFirst(new BuildRequest(BrokenBlock.x(block), BrokenBlock.y(block), BrokenBlock.rotation(block), content.block(BrokenBlock.block(block))));
-                    setState(build);
+                    BrokenBlock block = data.brokenBlocks.removeLast();
+                    if(Build.validPlace(getTeam(), block.x, block.y, content.block(block.block), block.rotation)){
+                        placeQueue.addFirst(new BuildRequest(block.x, block.y, block.rotation, content.block(block.block)).configure(block.config));
+                        setState(build);
+                    }
                 }
             }
         }

@@ -26,7 +26,9 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.*;
 
+import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -35,7 +37,13 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = true;
+    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+
+    static{
+        if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
+            System.setProperty("com.codedisaster.steamworks.SharedLibraryExtractPath", new File("").getAbsolutePath());
+        }
+    }
 
     public static void main(String[] arg){
         try{
@@ -125,13 +133,13 @@ public class DesktopLauncher extends ClientLauncher{
                 if(!SteamAPI.init()){
                     Log.err("Steam client not running.");
                 }else{
-                    Vars.steam = true;
                     initSteam(args);
-
+                    Vars.steam = true;
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
+                steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                e.printStackTrace();
+                Log.err(e);
             }
         }
     }
@@ -204,7 +212,17 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void viewMapListing(Map map){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.file.parent().name());
+        viewMapListing(map.file.parent().name());
+    }
+
+    @Override
+    public void viewMapListing(String mapid){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
+    }
+
+    @Override
+    public void viewMapListingInfo(Map map){
+        SVars.workshop.viewMapListingInfo(map);
     }
 
     @Override

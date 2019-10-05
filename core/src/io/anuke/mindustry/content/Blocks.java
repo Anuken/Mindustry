@@ -781,7 +781,7 @@ public class Blocks implements ContentList{
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(copperWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -792,7 +792,7 @@ public class Blocks implements ContentList{
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(titaniumWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -803,7 +803,7 @@ public class Blocks implements ContentList{
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(thoriumWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -814,7 +814,7 @@ public class Blocks implements ContentList{
         }};
 
         phaseWallLarge = new DeflectorWall("phase-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(phaseWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -825,7 +825,7 @@ public class Blocks implements ContentList{
         }};
 
         surgeWallLarge = new SurgeWall("surge-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(surgeWall.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -836,7 +836,7 @@ public class Blocks implements ContentList{
         }};
 
         doorLarge = new Door("door-large"){{
-            requirements(Category.defense, ItemStack.mult(door.buildRequirements, 4));
+            requirements(Category.defense, ItemStack.mult(door.requirements, 4));
             openfx = Fx.dooropenlarge;
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
@@ -915,7 +915,7 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
             speed = 26;
-            capacity = 15;
+            capacity = 12;
             health = 30;
         }};
 
@@ -923,7 +923,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, ItemStack.with(Items.lead, 4, Items.copper, 4));
             range = 4;
             speed = 70f;
-            bufferCapacity = 15;
+            bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -1194,7 +1194,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(0.90f);
+            consumes.power(1f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -1315,7 +1315,8 @@ public class Blocks implements ContentList{
             requirements(Category.turret, ItemStack.with(Items.copper, 85, Items.lead, 45));
             ammo(
             Items.scrap, Bullets.flakScrap,
-            Items.lead, Bullets.flakLead
+            Items.lead, Bullets.flakLead,
+            Items.metaglass, Bullets.flakGlass
             );
             reload = 18f;
             range = 170f;
@@ -1558,6 +1559,7 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, ItemStack.with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
+            Items.metaglass, Bullets.flakGlass,
             Items.blastCompound, Bullets.flakExplosive,
             Items.plastanium, Bullets.flakPlastic,
             Items.surgealloy, Bullets.flakSurge
@@ -1630,29 +1632,29 @@ public class Blocks implements ContentList{
             type = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
-            maxSpawn = 2;
-            consumes.power(1.1f);
+            maxSpawn = 1;
+            consumes.power(1.2f);
             consumes.items();
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.metaglass, 45, Items.lead, 55, Items.silicon, 45));
             type = UnitTypes.spirit;
-            produceTime = 3500;
+            produceTime = 4000;
             size = 2;
-            maxSpawn = 2;
-            consumes.power(0.80f);
-            consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.lead, 15));
+            maxSpawn = 1;
+            consumes.power(1.2f);
+            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }};
 
         phantomFactory = new UnitFactory("phantom-factory"){{
-            requirements(Category.units, ItemStack.with(Items.titanium, 45, Items.thorium, 40, Items.lead, 55, Items.silicon, 105));
+            requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.thorium, 60, Items.lead, 65, Items.silicon, 105));
             type = UnitTypes.phantom;
-            produceTime = 3650;
+            produceTime = 4400;
             size = 2;
-            maxSpawn = 2;
-            consumes.power(2f);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 20), new ItemStack(Items.titanium, 10));
+            maxSpawn = 1;
+            consumes.power(2.5f);
+            consumes.items(new ItemStack(Items.silicon, 50), new ItemStack(Items.lead, 30), new ItemStack(Items.titanium, 20));
         }};
 
         commandCenter = new CommandCenter("command-center"){{

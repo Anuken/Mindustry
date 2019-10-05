@@ -70,7 +70,7 @@ public class Maps{
      * Does not add this map to the map list.
      */
     public Map loadInternalMap(String name){
-        FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+        FileHandle file = tree.get("maps/" + name + "." + mapExtension);
 
         try{
             return MapIO.createMap(file, false);
@@ -106,7 +106,9 @@ public class Maps{
         //workshop
         for(FileHandle file : platform.getExternalMaps()){
             try{
-                loadMap(file, false).workshop = true;
+                Map map = loadMap(file, false);
+                map.workshop = true;
+                map.tags.put("steamid", file.parent().name());
             }catch(Exception e){
                 Log.err("Failed to load workshop map file '{0}'!", file);
                 Log.err(e);

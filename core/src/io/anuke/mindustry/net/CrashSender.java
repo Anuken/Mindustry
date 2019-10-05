@@ -3,6 +3,7 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.*;
 import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -13,11 +14,10 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.game.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.*;
 import java.text.*;
 import java.util.*;
-import static io.anuke.mindustry.Vars.*;
+
+import static io.anuke.mindustry.Vars.net;
 
 public class CrashSender{
 
@@ -26,7 +26,7 @@ public class CrashSender{
             exception.printStackTrace();
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1) return;
+            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))) return;
 
             //attempt to load version regardless
             if(Version.number == 0){
@@ -52,9 +52,8 @@ public class CrashSender{
 
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
-                Files.createDirectories(Paths.get(OS.getAppDataDirectoryString(Vars.appName), "crashes"));
-                Files.write(file.toPath(), parseException(exception).getBytes());
-
+                new FileHandle(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
+                new FileHandle(file).writeString(parseException(exception));
                 writeListener.accept(file);
             }catch(Throwable e){
                 e.printStackTrace();
@@ -94,12 +93,15 @@ public class CrashSender{
             ex(() -> value.addChild("versionNumber", new JsonValue(Version.number)));
             ex(() -> value.addChild("versionModifier", new JsonValue(Version.modifier)));
             ex(() -> value.addChild("build", new JsonValue(Version.build)));
+            ex(() -> value.addChild("revision", new JsonValue(Version.revision)));
             ex(() -> value.addChild("net", new JsonValue(fn)));
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Vars.playerGroup.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
             ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
+            ex(() -> value.addChild("javaVersion", new JsonValue(System.getProperty("java.version"))));
+            ex(() -> value.addChild("javaArch", new JsonValue(System.getProperty("sun.arch.data.model"))));
 
             boolean[] sent = {false};
 
@@ -142,8 +144,7 @@ public class CrashSender{
     private static void ex(Runnable r){
         try{
             r.run();
-        }catch(Throwable t){
-            t.printStackTrace();
+        }catch(Throwable ignored){
         }
     }
 }

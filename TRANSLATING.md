@@ -31,6 +31,10 @@ There are two ways to test the translation bundle:
 1) Assuming you have the PC version downloaded, download your bundle file, name it `bundle.properties`, then place it in the same folder as the Mindustry desktop executable and run it. *You should get a popup message in-game confirming that you have loaded an external translation.*
 2) For advanced users: simply download your fork of mindustry and compile/run the game.
 
+#### Translating for stores (Steam, Google Play)
+
+If you would like to translate the descriptions for Google Play or Steam, see the [Fastlane Metadata folder](https://github.com/Anuken/Mindustry/tree/master/fastlane/metadata) and submit a pull request for files there. On Google Play, you would create or edit the folder with the correct local code; for Steam, I have to update the translations manually, so just name the folder with the language name, and include the same files as the English folder does.
+
 **And that's it.**  
 
 *(...of course, that's never really it. Bother me on Discord when something inevitably goes wrong.)*
