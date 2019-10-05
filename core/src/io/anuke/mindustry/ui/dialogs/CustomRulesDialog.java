@@ -1,6 +1,7 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.style.*;
@@ -34,9 +35,14 @@ public class CustomRulesDialog extends FloatingDialog{
 
         banDialog.shown(this::rebuildBanned);
         banDialog.buttons.addImageTextButton("$addall", Icon.arrow16Small, () -> {
-            rules.bannedBlocks.addAll(content.blocks());
+            rules.bannedBlocks.addAll(content.blocks().select(Block::isBuildable));
             rebuildBanned();
-        }).size(210f, 64f);
+        }).size(180, 64f);
+
+        banDialog.buttons.addImageTextButton("$clear", Icon.trash16Small, () -> {
+            rules.bannedBlocks.clear();
+            rebuildBanned();
+        }).size(180, 64f);
 
         setFillParent(true);
         shown(this::setup);
@@ -44,40 +50,58 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     private void rebuildBanned(){
-        float previousScroll = banDialog.getChildren().isEmpty() ? 0f : ((ScrollPane)banDialog.getChildren().first()).getScrollY();
+        float previousScroll = banDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)banDialog.cont.getChildren().first()).getScrollY();
         banDialog.cont.clear();
         banDialog.cont.pane(t -> {
             t.margin(10f);
-            for(Block block : rules.bannedBlocks){
-                t.table(Styles.flatOver, b -> {
-                    b.left().margin(4f);
-                    b.addImage(block.icon(Cicon.medium));
-                    b.add(block.localizedName).padLeft(3).growX().left().wrap();
 
-                    b.addImageButton(Icon.cancelSmall, () -> {
+            if(rules.bannedBlocks.isEmpty()){
+                t.add("$empty");
+            }
+
+            Array<Block> array = Array.with(rules.bannedBlocks);
+            array.sort();
+
+            int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
+            int i = 0;
+
+            for(Block block : array){
+                t.table(Tex.underline, b -> {
+                    b.left().margin(4f);
+                    b.addImage(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
+                    b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
+
+                    b.addImageButton(Icon.cancelSmall, Styles.clearPartiali, () -> {
                        rules.bannedBlocks.remove(block);
                        rebuildBanned();
                     }).size(70f).pad(-4f).padLeft(0f);
-                }).size(300f, 70f);
-                t.row();
+                }).size(300f, 70f).padRight(5);
+
+                if(++i % cols == 0){
+                    t.row();
+                }
             }
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
         banDialog.cont.addImageTextButton("$add", Icon.addSmall, () -> {
             FloatingDialog dialog = new FloatingDialog("$add");
-            content.blocks().each(b -> !rules.bannedBlocks.contains(b), b -> {
-                int cols = mobile && Core.graphics.isPortrait() ? 4 : 8;
-                int i = 0;
-                dialog.cont.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
-                    rules.bannedBlocks.add(b);
-                    rebuildBanned();
-                    dialog.hide();
-                }).size(80f);
+            dialog.cont.pane(t -> {
+                t.left().margin(14f);
+                int[] i = {0};
+                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.isBuildable(), b -> {
+                    int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
+                    t.addImageButton(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
+                        rules.bannedBlocks.add(b);
+                        rebuildBanned();
+                        dialog.hide();
+                    }).size(60f).get().resizeImage(Cicon.medium.size);
 
-                if(++i % cols == 0){
-                    dialog.cont.row();
-                }
+                    if(++i[0] % cols == 0){
+                        t.row();
+                    }
+                });
             });
+
             dialog.addCloseButton();
             dialog.show();
         }).size(300f, 64f);

@@ -18,6 +18,7 @@ import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Objectives.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
@@ -59,6 +60,13 @@ public class ContentParser{
             Core.assets.finishLoadingAsset(path);
             Log.info(Core.assets.get(path));
             return Core.assets.get(path);
+        });
+        put(Objective.class, (type, data) -> {
+            Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.objectives") : ZoneWave.class;
+            data.remove("type");
+            Objective obj = oc.getDeclaredConstructor().newInstance();
+            readFields(obj, data);
+            return obj;
         });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.

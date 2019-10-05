@@ -1,16 +1,21 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.type.*;
+
 /** Holds objective classes. */
 public class Objectives{
 
-    public static class WaveObjective implements Objective{
+    //TODO
+    public static class Wave implements Objective{
         public int wave;
 
-        public WaveObjective(int wave){
+        public Wave(int wave){
             this.wave = wave;
         }
 
-        protected WaveObjective(){}
+        protected Wave(){}
 
         @Override
         public boolean complete(){
@@ -19,20 +24,72 @@ public class Objectives{
 
         @Override
         public String display(){
+            //TODO
             return null;
         }
     }
 
-    public static class LaunchObjective implements Objective{
+    public static class Unlock implements Objective{
+        public @NonNull UnlockableContent content;
+
+        public Unlock(UnlockableContent content){
+            this.content = content;
+        }
+
+        protected Unlock(){}
 
         @Override
         public boolean complete(){
-            return false;
+            return content.unlocked();
         }
 
         @Override
         public String display(){
-            return null;
+            return Core.bundle.format("requirement.unlock", content.localizedName);
         }
+    }
+
+    public static class ZoneWave extends ZoneObjective{
+        public int wave;
+
+        public ZoneWave(Zone zone, int wave){
+            this.zone = zone;
+            this.wave = wave;
+        }
+
+        protected ZoneWave(){}
+
+        @Override
+        public boolean complete(){
+            return zone.bestWave() >= wave;
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.wave", wave, zone.localizedName);
+        }
+    }
+
+    public static class Launched extends ZoneObjective{
+
+        public Launched(Zone zone){
+            this.zone = zone;
+        }
+
+        protected Launched(){}
+
+        @Override
+        public boolean complete(){
+            return zone.hasLaunched();
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.core", zone.localizedName);
+        }
+    }
+
+    public abstract static class ZoneObjective implements Objective{
+        public @NonNull Zone zone;
     }
 }
