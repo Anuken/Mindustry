@@ -40,7 +40,7 @@ public class ContentParser{
         put(BulletType.class, (type, data) -> {
             Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
             data.remove("type");
-            BulletType result = bc.getDeclaredConstructor().newInstance();
+            BulletType result = make(bc);
             readFields(result, data);
             return result;
         });
@@ -62,9 +62,9 @@ public class ContentParser{
             return Core.assets.get(path);
         });
         put(Objective.class, (type, data) -> {
-            Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.objectives") : ZoneWave.class;
+            Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.Objectives") : ZoneWave.class;
             data.remove("type");
-            Objective obj = oc.getDeclaredConstructor().newInstance();
+            Objective obj = make(oc);
             readFields(obj, data);
             return obj;
         });
@@ -123,6 +123,7 @@ public class ContentParser{
             );
 
             Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+            currentContent = block;
             read(() -> {
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
@@ -167,6 +168,7 @@ public class ContentParser{
 
             Class<BaseUnit> type = resolve(value.getString("type"), "io.anuke.mindustry.entities.type.base");
             UnitType unit = new UnitType(mod + "-" + name, supply(type));
+            currentContent = unit;
             read(() -> readFields(unit, value, true));
 
             return unit;
@@ -187,6 +189,7 @@ public class ContentParser{
 
                 item = constructor.get(mod + "-" + name);
             }
+            currentContent = item;
             read(() -> readFields(item, value));
             return item;
         };
@@ -233,7 +236,11 @@ public class ContentParser{
     }
 
     public void finishParsing(){
-        reads.each(Runnable::run);
+        try{
+            reads.each(Runnable::run);
+        }catch(Exception e){
+            throw new RuntimeException("Error occurred parsing content: " + currentContent, e);
+        }
         reads.clear();
     }
 
@@ -259,6 +266,16 @@ public class ContentParser{
         c.mod = mod;
         checkNulls(c);
         return c;
+    }
+
+    private <T> T make(Class<T> type){
+        try{
+            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            cons.setAccessible(true);
+            return cons.newInstance();
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     private <T> Supplier<T> supply(Class<T> type){
@@ -374,9 +391,13 @@ public class ContentParser{
             try{
                 return (Class<T>)Class.forName(type + '.' + base);
             }catch(Exception ignored){
+                try{
+                    return (Class<T>)Class.forName(type + '$' + base);
+                }catch(Exception ignored2){
+                }
             }
         }
-        throw new IllegalArgumentException("Type not found: " + potentials[0]);
+        throw new IllegalArgumentException("Types not found: " + base + "." + potentials[0]);
     }
 
     private interface FieldParser{

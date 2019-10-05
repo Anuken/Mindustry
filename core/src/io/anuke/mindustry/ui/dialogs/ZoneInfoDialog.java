@@ -84,9 +84,9 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Unlock blocko : blocks){
-                                r.addImage(blocko.content.icon(Cicon.small)).size(8 * 3).padRight(5);
-                                r.add(blocko.content.localizedName).color(Color.lightGray).left();
-                                r.addImage(blocko.content.unlocked() ? Icon.checkSmall : Icon.cancelSmall, blocko.content.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
+                                r.addImage(blocko.block.icon(Cicon.small)).size(8 * 3).padRight(5);
+                                r.add(blocko.block.localizedName).color(Color.lightGray).left();
+                                r.addImage(blocko.block.unlocked() ? Icon.checkSmall : Icon.cancelSmall, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
 

@@ -3,6 +3,7 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 /** Holds objective classes. */
 public class Objectives{
@@ -30,22 +31,22 @@ public class Objectives{
     }
 
     public static class Unlock implements Objective{
-        public @NonNull UnlockableContent content;
+        public @NonNull Block block;
 
-        public Unlock(UnlockableContent content){
-            this.content = content;
+        public Unlock(Block block){
+            this.block = block;
         }
 
         protected Unlock(){}
 
         @Override
         public boolean complete(){
-            return content.unlocked();
+            return block.unlocked();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.unlock", content.localizedName);
+            return Core.bundle.format("requirement.unlock", block.localizedName);
         }
     }
 
