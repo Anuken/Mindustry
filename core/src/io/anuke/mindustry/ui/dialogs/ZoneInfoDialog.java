@@ -66,10 +66,12 @@ public class ZoneInfoDialog extends FloatingDialog{
                         req.table(r -> {
                             r.add("$complete").colspan(2).left();
                             r.row();
-                            for(ZoneRequirement other : zone.zoneRequirements){
+                            for(ZoneRequirement zreq : zone.zoneRequirements){
                                 r.addImage(Icon.terrain).padRight(4);
-                                r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.lightGray);
-                                r.addImage(other.zone.bestWave() >= other.wave ? Icon.checkSmall : Icon.cancelSmall, other.zone.bestWave() >= other.wave ? Color.lightGray : Color.scarlet).padLeft(3);
+                                r.add(!zreq.zone.getRules().attackMode ?
+                                    Core.bundle.format("zone.requirement.wave", zreq.wave, zreq.zone.localizedName()) :
+                                    Core.bundle.format("zone.requirement", zreq.zone.localizedName)).color(Color.lightGray);
+                                r.addImage(zreq.isComplete() ? Icon.checkSmall : Icon.cancelSmall, zreq.isComplete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
                         });
@@ -82,8 +84,8 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Block block : zone.blockRequirements){
-                                r.addImage(block.icon(Cicon.small)).size(8 * 3).padRight(4);
-                                r.add(block.localizedName).color(Color.lightGray);
+                                r.addImage(block.icon(Cicon.small)).size(8 * 3).padRight(5);
+                                r.add(block.localizedName).color(Color.lightGray).left();
                                 r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
@@ -136,7 +138,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.row();
 
                 cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave),
-                () -> loadout.show(zone.loadout.core().itemCapacity, zone::getStartingItems, zone::resetStartingItems, zone::updateLaunchCost, rebuildItems, item -> data.getItem(item) > 0 && item.type == ItemType.material)
+                () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
                 ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
             cont.marginRight(12f);

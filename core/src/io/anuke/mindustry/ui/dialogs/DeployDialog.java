@@ -129,7 +129,7 @@ public class DeployDialog extends FloatingDialog{
 
                 button.defaults().colspan(2);
                 button.row();
-                button.add(Core.bundle.format("save.wave", color + slot.getWave()));
+                button.add(Core.bundle.format("save", color + slot.getWave()));
                 button.row();
                 button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
                 button.row();

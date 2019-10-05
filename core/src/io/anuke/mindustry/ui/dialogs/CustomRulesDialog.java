@@ -1,16 +1,14 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.function.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.game.Rules;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -69,13 +67,11 @@ public class CustomRulesDialog extends FloatingDialog{
         main.addButton("$configure",
                 () -> loadoutDialog.show(
                     Blocks.coreShard.itemCapacity,
-                    () -> rules.loadout,
+                    rules.loadout,
                     () -> {
                         rules.loadout.clear();
                         rules.loadout.add(new ItemStack(Items.copper, 100));
-                    },
-                    () -> {}, () -> {},
-                    item -> item.type == ItemType.material
+                    }, () -> {}, () -> {}
         )).left().width(300f);
         main.row();
 

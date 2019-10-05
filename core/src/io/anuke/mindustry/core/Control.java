@@ -146,7 +146,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(ZoneRequireCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", state.wave, e.zone.localizedName));
+            ui.hudfrag.showToast(Core.bundle.format("zone.requirements.met", e.zone.localizedName));
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {

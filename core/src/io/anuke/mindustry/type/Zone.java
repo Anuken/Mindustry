@@ -5,8 +5,8 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -74,7 +74,7 @@ public class Zone extends UnlockableContent{
         }
 
         for(ZoneRequirement other : zoneRequirements){
-            if(other.zone.bestWave() < other.wave){
+            if(!other.isComplete()){
                 return false;
             }
         }
@@ -104,6 +104,23 @@ public class Zone extends UnlockableContent{
         defaultStartingItems.each(stack -> startingItems.add(new ItemStack(stack.item, stack.amount)));
     }
 
+    public boolean hasLaunched(){
+        return Core.settings.getBool(name + "-launched", false);
+    }
+
+    public void setLaunched(){
+        if(!hasLaunched() && getRules().attackMode){
+            for(Zone zone : content.zones()){
+                ZoneRequirement req = Structs.find(zone.zoneRequirements, f -> f.zone == this);
+                if(req != null && req.isComplete()){
+                    Events.fire(new ZoneRequireCompleteEvent(zone, this));
+                }
+            }
+        }
+        Core.settings.put(name + "-launched", true);
+        data.modified();
+    }
+
     public void updateWave(int wave){
         int value = Core.settings.getInt(name + "-wave", 0);
         if(value < wave){
@@ -112,7 +129,7 @@ public class Zone extends UnlockableContent{
 
             for(Zone zone : content.zones()){
                 ZoneRequirement req = Structs.find(zone.zoneRequirements, f -> f.zone == this);
-                if(req != null && wave == req.wave + 1){
+                if(req != null && wave == req.wave + 1 && req.isComplete()){
                     Events.fire(new ZoneRequireCompleteEvent(zone, this));
                 }
             }
@@ -127,7 +144,8 @@ public class Zone extends UnlockableContent{
         return Core.settings.getInt(name + "-wave", 0);
     }
 
-    public boolean isCompleted(){
+    /** @return whether initial conditions to launch are met. */
+    public boolean isLaunchMet(){
         return bestWave() >= conditionWave;
     }
 
@@ -208,17 +226,31 @@ public class Zone extends UnlockableContent{
         return ContentType.zone;
     }
 
+    /*
     public static class ZoneRequirement{
+
         public @NonNull Zone zone;
-        public @NonNull int wave;
+        public int wave;
 
         public ZoneRequirement(Zone zone, int wave){
             this.zone = zone;
             this.wave = wave;
         }
 
+        public ZoneRequirement(Zone zone){
+            this.zone = zone;
+        }
+
         protected ZoneRequirement(){
 
+        }
+
+        public boolean isComplete(){
+            if(zone.getRules().attackMode){
+                return zone.hasLaunched();
+            }else{
+                return zone.bestWave() >= wave;
+            }
         }
 
         public static ZoneRequirement[] with(Object... objects){
@@ -228,6 +260,6 @@ public class Zone extends UnlockableContent{
             }
             return out;
         }
-    }
+    }*/
 
 }

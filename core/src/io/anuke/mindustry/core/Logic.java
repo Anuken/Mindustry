@@ -180,6 +180,10 @@ public class Logic implements ApplicationListener{
             Effects.effect(Fx.launch, tile);
         }
 
+        if(world.getZone() != null){
+            world.getZone().setLaunched();
+        }
+
         Time.runTask(30f, () -> {
             for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
                 for(Item item : content.items()){

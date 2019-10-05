@@ -965,12 +965,12 @@ public class Blocks implements ContentList{
         //region liquid
 
         mechanicalPump = new Pump("mechanical-pump"){{
-            requirements(Category.liquid, ItemStack.with(Items.copper, 15, Items.lead, 10));
+            requirements(Category.liquid, ItemStack.with(Items.copper, 15, Items.metaglass, 10));
             pumpAmount = 0.1f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
-            requirements(Category.liquid, ItemStack.with(Items.copper, 70, Items.lead, 50, Items.silicon, 20, Items.titanium, 35));
+            requirements(Category.liquid, ItemStack.with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
             pumpAmount = 0.8f;
             consumes.power(0.15f);
             liquidCapacity = 30f;
@@ -979,7 +979,7 @@ public class Blocks implements ContentList{
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            requirements(Category.liquid, ItemStack.with(Items.copper, 80, Items.lead, 65, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
+            requirements(Category.liquid, ItemStack.with(Items.copper, 80, Items.metaglass, 70, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
             pumpAmount = 1.5f;
             consumes.power(0.30f);
             liquidCapacity = 40f;
@@ -993,13 +993,13 @@ public class Blocks implements ContentList{
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 1, Items.metaglass, 1));
+            requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
             health = 90;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 2));
+            requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
         }};
 
@@ -1011,11 +1011,11 @@ public class Blocks implements ContentList{
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 2));
+            requirements(Category.liquid, ItemStack.with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
         bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.titanium, 4, Items.metaglass, 4));
+            requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 8));
             range = 4;
             hasPower = false;
         }};
