@@ -19,6 +19,16 @@ public enum Binding implements KeyBind{
     dash(KeyCode.SHIFT_LEFT),
     gridMode(KeyCode.BACKTICK),
     gridModeShift(KeyCode.ALT_LEFT),
+    build_category_1(KeyCode.NUM_1),
+    build_category_2(KeyCode.NUM_2),
+    build_category_3(KeyCode.NUM_3),
+    build_category_4(KeyCode.NUM_4),
+    build_category_5(KeyCode.NUM_5),
+    build_category_6(KeyCode.NUM_6),
+    build_category_7(KeyCode.NUM_7),
+    build_category_8(KeyCode.NUM_8),
+    build_category_9(KeyCode.NUM_9),
+    build_category_10(KeyCode.NUM_0),
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),
@@ -32,6 +42,7 @@ public enum Binding implements KeyBind{
     chat_history_prev(KeyCode.UP),
     chat_history_next(KeyCode.DOWN),
     chat_scroll(new Axis(KeyCode.SCROLL)),
+
 
     ;
 

@@ -34,6 +34,7 @@ public class PlacementFragment extends Fragment{
     Tile hoverTile;
     Table blockTable, toggler, topTable;
     boolean lastGround;
+    boolean selectingRecipe;
 
     //not configurable, no plans to make it configurable
     final KeyCode[] inputGrid = {
@@ -47,6 +48,20 @@ public class PlacementFragment extends Fragment{
         KeyCode.A, KeyCode.S,
         KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
     };
+
+    final Binding[] categoryKey = {
+            Binding.build_category_1,
+            Binding.build_category_2,
+            Binding.build_category_3,
+            Binding.build_category_4,
+            Binding.build_category_5,
+            Binding.build_category_6,
+            Binding.build_category_7,
+            Binding.build_category_8,
+            Binding.build_category_9,
+            Binding.build_category_10,
+    };
+
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -87,7 +102,26 @@ public class PlacementFragment extends Fragment{
             }
         }
 
-        if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
+        if(ui.chatfrag.chatOpen()) return false;
+
+
+
+        if (selectingRecipe) {
+            // Recently selected a category by hotkey.
+            // Enable grid of recipes until a selection is made.
+
+            int i = 0;
+            Array<Block> recipes = getByCategory(currentCategory);
+            for(KeyCode key : inputGrid){
+                if(Core.input.keyTap(key)) {
+                    input.block = (i < recipes.size && unlocked(recipes.get(i))) ? recipes.get(i) : null;
+                    selectingRecipe = false;
+                    return  true;
+                }
+                i++;
+            }
+        }
+
         if(Core.input.keyDown(Binding.gridModeShift)){ //select category
             int i = 0;
             for(KeyCode key : inputCatGrid){
@@ -98,7 +132,7 @@ public class PlacementFragment extends Fragment{
                 i++;
             }
             return true;
-        }else{ //select block
+        } else if (Core.input.keyDown(Binding.gridMode)) { //select block
             int i = 0;
             Array<Block> recipes = getByCategory(currentCategory);
             for(KeyCode key : inputGrid){
@@ -106,9 +140,23 @@ public class PlacementFragment extends Fragment{
                     input.block = (i < recipes.size && unlocked(recipes.get(i))) ? recipes.get(i) : null;
                 i++;
             }
+            return true;
         }
+
+        for (int i=0; i<categoryKey.length; i++) {
+            if (Core.input.keyTap(categoryKey[i])) {
+                if (i >= Category.all.length) continue;
+                currentCategory = Category.all[i];
+
+                // Temporary grid select mode.
+                selectingRecipe = true;
+                return true;
+            }
+        }
+
         return false;
     }
+
 
     @Override
     public void build(Group parent){
