@@ -242,29 +242,39 @@ public class BlockRenderer implements Disposable{
     }
 
     public void drawBlocks(Layer stopAt){
-
+        int startIdx = iterateidx;
         for(; iterateidx < requestidx; iterateidx++){
+            BlockRequest request = requests.get(iterateidx);
 
-            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+            if (request.layer.ordinal() > stopAt.ordinal()){
                 break;
             }
 
-            BlockRequest req = requests.get(iterateidx);
-            Block block = req.tile.block();
-
-            if(req.layer == Layer.block){
-                block.draw(req.tile);
-                if(req.tile.entity != null && req.tile.entity.damaged()){
-                    block.drawCracks(req.tile);
+            if (request.layer == Layer.power) {
+                if (iterateidx - startIdx > 0 && request.tile.pos() == requests.get(iterateidx - 1).tile.pos()) {
+                    continue;
                 }
-                if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
-                    block.drawTeam(req.tile);
-                }
-            }else if(req.layer == block.layer){
-                block.drawLayer(req.tile);
-            }else if(req.layer == block.layer2){
-                block.drawLayer2(req.tile);
             }
+            drawBlock(request);
+        }
+    }
+
+    private void drawBlock(BlockRequest req) {
+
+        Block block = req.tile.block();
+
+        if(req.layer == Layer.block){
+            block.draw(req.tile);
+            if(req.tile.entity != null && req.tile.entity.damaged()){
+                block.drawCracks(req.tile);
+            }
+            if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
+                block.drawTeam(req.tile);
+            }
+        }else if(req.layer == block.layer){
+            block.drawLayer(req.tile);
+        }else if(req.layer == block.layer2){
+            block.drawLayer2(req.tile);
         }
     }
 
@@ -328,7 +338,9 @@ public class BlockRenderer implements Disposable{
 
         @Override
         public int compareTo(BlockRequest other){
-            return layer.compareTo(other.layer);
+            int compare = layer.compareTo(other.layer);
+
+            return (compare != 0) ? compare : Integer.compare(tile.pos(), other.tile.pos());
         }
 
         @Override

@@ -281,9 +281,13 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link) && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
-                drawLaser(tile, link);
-            }
+            if (!linkValid(tile, link))
+                continue;
+
+            if (link.block() instanceof PowerNode && !(link.pos() < tile.pos()))
+                continue;
+
+            drawLaser(tile, link);
         }
 
         Draw.reset();
