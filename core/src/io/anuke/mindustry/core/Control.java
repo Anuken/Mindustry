@@ -175,6 +175,12 @@ public class Control implements ApplicationListener, Loadable{
                 Effects.shake(5f, 5f, core);
             });
         });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit instanceof BaseUnit){
+                data.unlockContent(((BaseUnit)e.unit).getType());
+            }
+        });
     }
 
     @Override
