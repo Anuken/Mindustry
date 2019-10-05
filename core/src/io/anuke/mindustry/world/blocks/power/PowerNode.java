@@ -281,11 +281,10 @@ public class PowerNode extends PowerBlock{
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if (!linkValid(tile, link))
-                continue;
 
-            if (link.block() instanceof PowerNode && !(link.pos() < tile.pos()))
-                continue;
+            if(!linkValid(tile, link)) continue;
+
+            if(link.block() instanceof PowerNode && !(link.pos() < tile.pos())) continue;
 
             drawLaser(tile, link);
         }
@@ -322,7 +321,11 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
-        float opacity = Core.settings.getInt("lasersopacity") / 100f;
+        int opacityPercentage = Core.settings.getInt("lasersopacity");
+        if(opacityPercentage == 0) return;
+
+        float opacity = opacityPercentage / 100f;
+
         float x1 = tile.drawx(), y1 = tile.drawy(),
         x2 = target.drawx(), y2 = target.drawy();
 
@@ -337,7 +340,7 @@ public class PowerNode extends PowerBlock{
 
         float fract = 1f-tile.entity.power.graph.getSatisfaction();
 
-        Draw.color(Pal.powerLight, Pal.powerLightLowPower, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
