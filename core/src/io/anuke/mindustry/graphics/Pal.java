@@ -65,7 +65,8 @@ public class Pal{
     range = Color.valueOf("f4ba6e"),
     power = Color.valueOf("fbad67"),
     powerBar = Color.valueOf("ec7b4c"),
-    powerLight = Color.valueOf("fbd367"),
+    powerLight = Color.valueOf("fefbd9"),
+    powerLightLowPower = Color.valueOf("a68d5d"),
     placing = accent,
 
     unitFront = Color.valueOf("ffa665"),
