@@ -475,7 +475,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = rotation;
-        if (!overrideLineRotation || diagonal){
+        if(!overrideLineRotation || diagonal){
                 baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
         }
 
@@ -491,7 +491,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if (!overrideLineRotation || diagonal){
+            if(!overrideLineRotation || diagonal){
                 line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
             }else{
                 line.rotation = rotation;

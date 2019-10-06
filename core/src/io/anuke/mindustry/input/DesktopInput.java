@@ -141,6 +141,9 @@ public class DesktopInput extends InputHandler{
         }
 
         rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+        if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
+            updateLine(selectX, selectY);
+        }
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
@@ -225,7 +228,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(mode == placing && block != null){
-            if (!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int) Core.input.axisTap(Binding.rotate) != 0)){
+            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int) Core.input.axisTap(Binding.rotate) != 0)){
                 rotation = ((int)((Angles.angle(selectX, selectY, cursorX, cursorY) + 45) / 90f)) % 4;
                 overrideLineRotation = true;
             }

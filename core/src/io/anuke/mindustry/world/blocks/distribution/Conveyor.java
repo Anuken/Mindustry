@@ -7,7 +7,6 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
@@ -15,14 +14,14 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
-import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Conveyor extends Block{
+public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -103,76 +102,17 @@ public class Conveyor extends Block{
 
     @Override
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
-        if(req.tile() == null) return;
+        int[] bits = getTiling(req, list);
 
-        Arrays.fill(directionals, null);
-        list.each(other -> {
-            if(other.breaking || other == req) return;
-
-            int i = 0;
-            for(Point2 point : Geometry.d4){
-                int x = req.x + point.x, y = req.y + point.y;
-                if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
-                    directionals[i] = other;
-                }
-                i++;
-            }
-        });
-
-        int[] bits = buildBlending(req.tile(), req.rotation, directionals);
+        if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-
         Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
     }
 
-    protected int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional){
-        int blendbits = 0;
-        int blendsclx = 1, blendscly = 1;
-
-        if(blends(tile, rotation, directional, 2) && blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)){
-            blendbits = 3;
-        }else if(blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)){
-            blendbits = 4;
-        }else if(blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 2)){
-            blendbits = 2;
-        }else if(blends(tile, rotation, directional, 3) && blends(tile, rotation, directional, 2)){
-            blendbits = 2;
-            blendscly = -1;
-        }else if(blends(tile, rotation, directional, 1)){
-            blendbits = 1;
-            blendscly = -1;
-        }else if(blends(tile, rotation, directional, 3)){
-            blendbits = 1;
-        }
-
-        blendresult[0] = blendbits;
-        blendresult[1] = blendsclx;
-        blendresult[2] = blendscly;
-        return blendresult;
-    }
-
-    protected boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction){
-        int realDir = Mathf.mod(rotation - direction, 4);
-        if(directional != null && directional[realDir] != null){
-            BuildRequest req = directional[realDir];
-            //Log.info("Check if blends: {0},{1} {2} | {3},{4} {5}", tile.x, tile.y, rotation, req.x, req.y, req.rotation);
-            if(blends(tile, rotation, req.x, req.y, req.rotation, req.block)){
-                return true;
-            }
-        }
-        return blends(tile, rotation, direction);
-    }
-
-    protected boolean blends(Tile tile, int rotation, int direction){
-        Tile other = tile.getNearby(Mathf.mod(rotation - direction, 4));
-        if(other != null) other = other.link();
-        return other != null && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
-    }
-
-    protected boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-                || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
