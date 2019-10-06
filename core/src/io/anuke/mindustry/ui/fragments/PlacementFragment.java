@@ -106,7 +106,7 @@ public class PlacementFragment extends Fragment{
 
 
 
-        if (selectingRecipe) {
+        if(selectingRecipe) {
             // Recently selected a category by hotkey.
             // Enable grid of recipes until a selection is made.
 
@@ -132,7 +132,7 @@ public class PlacementFragment extends Fragment{
                 i++;
             }
             return true;
-        } else if (Core.input.keyDown(Binding.gridMode)) { //select block
+        } else if(Core.input.keyDown(Binding.gridMode)) { //select block
             int i = 0;
             Array<Block> recipes = getByCategory(currentCategory);
             for(KeyCode key : inputGrid){
@@ -143,9 +143,9 @@ public class PlacementFragment extends Fragment{
             return true;
         }
 
-        for (int i=0; i<categoryKey.length; i++) {
-            if (Core.input.keyTap(categoryKey[i])) {
-                if (i >= Category.all.length) continue;
+        for(int i=0; i<categoryKey.length; i++) {
+            if(Core.input.keyTap(categoryKey[i])) {
+                if(i >= Category.all.length) continue;
                 currentCategory = Category.all[i];
 
                 // Temporary grid select mode.
