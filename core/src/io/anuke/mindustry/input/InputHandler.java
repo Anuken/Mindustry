@@ -7,8 +7,11 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
+import io.anuke.arc.input.GestureDetector.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
@@ -26,7 +29,7 @@ import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class InputHandler implements InputProcessor{
+public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     /** Maximum line length. */
@@ -41,9 +44,13 @@ public abstract class InputHandler implements InputProcessor{
     public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
+    public Group uiGroup;
 
-    protected PlaceDraw placeDraw = new PlaceDraw();
-    private PlaceLine line = new PlaceLine();
+    protected GestureDetector detector;
+    protected PlaceLine line = new PlaceLine();
+    protected BuildRequest brequest = new BuildRequest();
+    protected Array<BuildRequest> lineRequests = new Array<>();
+    protected Array<BuildRequest> selectRequests = new Array<>();
 
     //methods to override
 
@@ -134,6 +141,14 @@ public abstract class InputHandler implements InputProcessor{
         tile.block().configured(tile, player, value);
     }
 
+    public Eachable<BuildRequest> allRequests(){
+        return cons -> {
+            for(BuildRequest request : player.buildQueue()) cons.accept(request);
+            for(BuildRequest request : selectRequests) cons.accept(request);
+            for(BuildRequest request : lineRequests) cons.accept(request);
+        };
+    }
+
     public OverlayFragment getFrag(){
         return frag;
     }
@@ -150,7 +165,11 @@ public abstract class InputHandler implements InputProcessor{
         return Core.input.mouseY();
     }
 
-    public void buildUI(Table table){
+    public void buildPlacementUI(Table table){
+
+    }
+
+    public void buildUI(Group group){
 
     }
 
@@ -168,6 +187,32 @@ public abstract class InputHandler implements InputProcessor{
 
     public boolean isDrawing(){
         return false;
+    }
+
+    protected void flushRequests(Array<BuildRequest> requests){
+        for(BuildRequest req : requests){
+            if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
+                player.addBuildRequest(req);
+            }
+        }
+    }
+
+    protected void drawRequest(BuildRequest request){
+        drawRequest(request.x, request.y, request.block, request.rotation);
+    }
+
+    /** Draws a placement icon for a specific block. */
+    protected void drawRequest(int x, int y, Block block, int rotation){
+        brequest.set(x, y, rotation, block);
+        block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
+    }
+
+    protected void updateLine(int selectX, int selectY){
+        lineRequests.clear();
+        iterateLine(selectX, selectY, tileX(getMouseX()), tileY(getMouseY()), l -> {
+            rotation = l.rotation;
+            lineRequests.add(new BuildRequest(l.x, l.y, l.rotation, block));
+        });
     }
 
     /** Handles tile tap events that are not platform specific. */
@@ -216,7 +261,7 @@ public abstract class InputHandler implements InputProcessor{
 
         //clear when the player taps on something else
         if(!consumed && !mobile && player.isBuilding() && block == null){
-            player.clearBuilding();
+            //player.clearBuilding();
             block = null;
             return true;
         }
@@ -301,16 +346,30 @@ public abstract class InputHandler implements InputProcessor{
                 table.clear();
             }
         }
+        if(detector != null){
+            Core.input.removeProcessor(detector);
+        }
+        if(uiGroup != null){
+            uiGroup.remove();
+            uiGroup = null;
+        }
     }
 
     public void add(){
+        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.4f, 0.15f, this));
         Core.input.addProcessor(this);
         if(Core.scene != null){
             Table table = (Table)Core.scene.find("inputTable");
             if(table != null){
                 table.clear();
-                buildUI(table);
+                buildPlacementUI(table);
             }
+
+            uiGroup = new WidgetGroup();
+            uiGroup.touchable(Touchable.childrenOnly);
+            uiGroup.setFillParent(true);
+            ui.hudGroup.addChild(uiGroup);
+            buildUI(uiGroup);
         }
     }
 
@@ -356,6 +415,15 @@ public abstract class InputHandler implements InputProcessor{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation){
+        return validPlace(x, y, type, rotation, null);
+    }
+
+    public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
+        for(BuildRequest req : player.buildQueue()){
+            if(req != ignore && !req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))){
+                return false;
+            }
+        }
         return Build.validPlace(player.getTeam(), x, y, type, rotation);
     }
 
@@ -433,13 +501,6 @@ public abstract class InputHandler implements InputProcessor{
 
             Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
         }
-    }
-
-    public static class PlaceDraw{
-        public int rotation, scalex, scaley;
-        public TextureRegion region;
-
-        public static final PlaceDraw instance = new PlaceDraw();
     }
 
     class PlaceLine{

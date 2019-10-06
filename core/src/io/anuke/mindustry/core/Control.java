@@ -177,7 +177,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit instanceof BaseUnit){
+            if(e.unit instanceof BaseUnit && world.isZone()){
                 data.unlockContent(((BaseUnit)e.unit).getType());
             }
         });

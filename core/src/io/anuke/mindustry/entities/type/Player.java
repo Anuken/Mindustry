@@ -21,7 +21,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
@@ -424,7 +423,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
-        BuildRequest last = null;
+        if(!isLocal) return;
+
         for(BuildRequest request : buildQueue()){
             if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
@@ -446,35 +446,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 request.x * tilesize + block.offset(),
                 request.y * tilesize + block.offset(), rad);
             }else{
-                Draw.color();
-                PlaceDraw draw = PlaceDraw.instance;
-
-                draw.scalex = 1;
-                draw.scaley = 1;
-                draw.rotation = request.rotation;
-
-                if(last == null){
-                    request.block.getPlaceDraw(draw, request.rotation, request.x, request.y, request.rotation);
-                }else{
-                    request.block.getPlaceDraw(draw, request.rotation, last.x - request.x, last.y - request.y, last.rotation);
-                }
-
-                TextureRegion region = draw.region;
-
-                Draw.rect(region,
-                request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                region.getWidth() * 1f * Draw.scl * draw.scalex,
-                region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
-
-                Draw.color(Pal.accent);
-                for(int i = 0; i < 4; i++){
-                    Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
-                }
-                Draw.color();
-
-                last = request;
+                request.block.drawRequest(request, control.input.allRequests(), true);
             }
         }
 

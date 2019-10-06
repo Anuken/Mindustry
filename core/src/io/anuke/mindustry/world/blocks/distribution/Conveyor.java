@@ -2,20 +2,23 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -27,6 +30,8 @@ public class Conveyor extends Block{
     private static ItemPos pos2 = new ItemPos();
     private final Vector2 tr1 = new Vector2();
     private final Vector2 tr2 = new Vector2();
+    private final int[] blendresult = new int[3];
+    private final BuildRequest[] directionals = new BuildRequest[4];
 
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
@@ -90,55 +95,84 @@ public class Conveyor extends Block{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        entity.blendbits = 0;
-        entity.blendsclx = entity.blendscly = 1;
-
-        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 3;
-        }else if(blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 4;
-        }else if(blends(tile, 1) && blends(tile, 2)){
-            entity.blendbits = 2;
-        }else if(blends(tile, 3) && blends(tile, 2)){
-            entity.blendbits = 2;
-            entity.blendscly = -1;
-        }else if(blends(tile, 1)){
-            entity.blendbits = 1;
-            entity.blendscly = -1;
-        }else if(blends(tile, 3)){
-            entity.blendbits = 1;
-        }
+        int[] bits = buildBlending(tile, tile.rotation(), null);
+        entity.blendbits = bits[0];
+        entity.blendsclx = bits[1];
+        entity.blendscly = bits[2];
     }
 
     @Override
-    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.rotation = rotation;
-        draw.scalex = draw.scaley = 1;
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        if(req.tile() == null) return;
 
+        Arrays.fill(directionals, null);
+        list.each(other -> {
+            if(other.breaking || other == req) return;
+
+            int i = 0;
+            for(Point2 point : Geometry.d4){
+                int x = req.x + point.x, y = req.y + point.y;
+                if(x >= other.x -(other.block.size - 1) / 2 && x <= other.x + (other.block.size / 2) && y >= other.y -(other.block.size - 1) / 2 && y <= other.y + (other.block.size / 2)){
+                    directionals[i] = other;
+                }
+                i++;
+            }
+        });
+
+        int[] bits = buildBlending(req.tile(), req.rotation, directionals);
+
+        TextureRegion region = regions[bits[0]][0];
+
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
+    }
+
+    protected int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional){
         int blendbits = 0;
+        int blendsclx = 1, blendscly = 1;
 
-        if(blends(rotation, 1, prevX, prevY, prevRotation)){
+        if(blends(tile, rotation, directional, 2) && blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)){
+            blendbits = 3;
+        }else if(blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)){
+            blendbits = 4;
+        }else if(blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 2)){
+            blendbits = 2;
+        }else if(blends(tile, rotation, directional, 3) && blends(tile, rotation, directional, 2)){
+            blendbits = 2;
+            blendscly = -1;
+        }else if(blends(tile, rotation, directional, 1)){
             blendbits = 1;
-            draw.scaley = -1;
-        }else if(blends(rotation, 3, prevX, prevY, prevRotation)){
+            blendscly = -1;
+        }else if(blends(tile, rotation, directional, 3)){
             blendbits = 1;
         }
 
-        draw.rotation = rotation;
-        draw.region = regions[blendbits][0];
+        blendresult[0] = blendbits;
+        blendresult[1] = blendsclx;
+        blendresult[2] = blendscly;
+        return blendresult;
     }
 
-    protected boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
-        Point2 left = Geometry.d4(rotation - offset);
-        return left.equals(prevX, prevY) && prevRotation == Mathf.mod(rotation + offset, 4);
+    protected boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction){
+        int realDir = Mathf.mod(rotation - direction, 4);
+        if(directional != null && directional[realDir] != null){
+            BuildRequest req = directional[realDir];
+            //Log.info("Check if blends: {0},{1} {2} | {3},{4} {5}", tile.x, tile.y, rotation, req.x, req.y, req.rotation);
+            if(blends(tile, rotation, req.x, req.y, req.rotation, req.block)){
+                return true;
+            }
+        }
+        return blends(tile, rotation, direction);
     }
 
-    protected boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
+    protected boolean blends(Tile tile, int rotation, int direction){
+        Tile other = tile.getNearby(Mathf.mod(rotation - direction, 4));
         if(other != null) other = other.link();
+        return other != null && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
+    }
 
-        return other != null && other.block().outputsItems()
-        && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
+    protected boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+                || (!otherblock.rotate || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     @Override

@@ -19,11 +19,11 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -667,10 +667,21 @@ public class Block extends BlockStorage{
         }
     }
 
-    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.region = icon(Cicon.full);
-        draw.scalex = draw.scaley = 1;
-        draw.rotation = rotation;
+    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+        Draw.mixcol(!valid ? Pal.breakInvalid : Pal.accent, 0.12f + Mathf.absin(Time.time(), 8f, 0.35f));
+        drawRequestRegion(req, list);
+
+        //Draw.color(Pal.accent);
+        for(int i = 0; i < 4; i++){
+            Point2 p = Geometry.d8edge[i];
+            float offset = -Math.max(size - 1, 0) / 2f * tilesize;
+            //if(i % 2 == 0) Draw.rect("block-select", req.drawx() + offset * p.x, req.drawy() + offset * p.y, i * 90);
+        }
+        Draw.reset();
+    }
+
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
     }
 
     @Override
@@ -783,6 +794,10 @@ public class Block extends BlockStorage{
     /** Offset for placing and drawing multiblocks. */
     public float offset(){
         return ((size + 1) % 2) * tilesize / 2f;
+    }
+
+    public Rectangle bounds(int x, int y, Rectangle rect){
+        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
     }
 
     public boolean isMultiblock(){
