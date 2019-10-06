@@ -275,7 +275,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        if(!Core.settings.getBool("lasers")) return;
+        if(Core.settings.getInt("lasersopacity") == 0) return;
 
         TileEntity entity = tile.entity();
 
