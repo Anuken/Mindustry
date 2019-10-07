@@ -669,7 +669,7 @@ public class Block extends BlockStorage{
 
     public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Pal.accent, 0.24f + Mathf.absin(Time.globalTime(), 7f, 0.3f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
         Draw.alpha(1f);
         drawRequestRegion(req, list);
         Draw.reset();

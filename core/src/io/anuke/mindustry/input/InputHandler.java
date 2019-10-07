@@ -20,12 +20,16 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
+
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -189,18 +193,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return false;
     }
 
+    public void drawSelected(int x, int y, Block block, Color color){
+        Draw.color(Pal.remove);
+        for(int i = 0; i < 4; i++){
+            Point2 p = Geometry.d8edge[i];
+            float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+            Draw.rect("block-select",
+                x*tilesize + block.offset() + offset * p.x,
+                y*tilesize + block.offset() + offset * p.y, i * 90);
+        }
+        Draw.reset();
+    }
+
     public void drawBreaking(BuildRequest request){
         if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
-            Block block = request.block;
-            Draw.color(Pal.remove);
-            for(int i = 0; i < 4; i++){
-                Point2 p = Geometry.d8edge[i];
-                float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
-                Draw.rect("block-select", request.drawx() + offset * p.x, request.drawy() + offset * p.y, i * 90);
-            }
-            Draw.reset();
+            drawSelected(request.x, request.y, request.block, Pal.remove);
         }
     }
 
@@ -209,13 +218,47 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null) return;
         Block block = tile.block();
 
-        Draw.color(Pal.remove);
-        for(int i = 0; i < 4; i++){
-            Point2 p = Geometry.d8edge[i];
-            float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
-            Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
+        drawSelected(x, y, block, Pal.remove);
+    }
+
+    protected void drawSelection(int x1, int y1, int x2, int y2){
+        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+
+        for(int x = dresult.x; x <= dresult.x2; x++){
+            for(int y = dresult.y; y <= dresult.y2; y++){
+                Tile tile = world.ltile(x, y);
+                if(tile == null || !validBreak(tile.x, tile.y)) continue;
+
+                drawBreaking(tile.x, tile.y);
+            }
         }
-        Draw.reset();
+
+        Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        Draw.color(Pal.remove);
+        Lines.stroke(1f);
+
+        for(BuildRequest req : player.buildQueue()){
+            if(req.breaking) continue;
+            if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                drawBreaking(req);
+            }
+        }
+
+        for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
+            Block block = content.block(req.block);
+            if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
+                drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
+            }
+        }
+
+        Lines.stroke(2f);
+
+        Draw.color(Pal.removeBack);
+        Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+        Draw.color(Pal.remove);
+        Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
     protected void flushRequests(Array<BuildRequest> requests){
@@ -234,6 +277,39 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void drawRequest(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
         block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
+    }
+
+    /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2){
+        NormalizeResult result = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
+            for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
+                int wx = x1 + x * Mathf.sign(x2 - x1);
+                int wy = y1 + y * Mathf.sign(y2 - y1);
+
+                tryBreakBlock(wx, wy);
+            }
+        }
+
+        //remove build requests
+        Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+        Iterator<BuildRequest> it = player.buildQueue().iterator();
+        while(it.hasNext()){
+            BuildRequest req = it.next();
+            if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                it.remove();
+            }
+        }
+
+        //remove blocks to rebuild
+        Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
+        while(broken.hasNext()){
+            BrokenBlock req = broken.next();
+            Block block = content.block(req.block);
+            if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
+                broken.remove();
+            }
+        }
     }
 
     protected void updateLine(int selectX, int selectY){

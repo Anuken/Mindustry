@@ -355,7 +355,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawOver(){
         if(dead) return;
 
-        drawMechanics();
+        if(isBuilding()){
+            if(!state.isPaused()){
+                drawBuilding();
+            }
+        }else{
+            drawMining();
+        }
     }
 
     @Override

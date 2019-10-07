@@ -7,18 +7,12 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
-
-import java.util.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -44,7 +38,7 @@ public class DesktopInput extends InputHandler{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.1f));
+            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
             t.table(Styles.black6, b -> b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel)).margin(10f);
         });
     }
@@ -65,36 +59,7 @@ public class DesktopInput extends InputHandler{
                 drawRequest(lineRequests.get(i));
             }
         }else if(mode == breaking){
-            NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursorX, cursorY, false, maxLength, 1f);
-            NormalizeResult dresult = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
-
-            for(int x = dresult.x; x <= dresult.x2; x++){
-                for(int y = dresult.y; y <= dresult.y2; y++){
-                    Tile tile = world.ltile(x, y);
-                    if(tile == null || !validBreak(tile.x, tile.y)) continue;
-
-                    drawBreaking(tile.x, tile.y);
-                }
-            }
-
-            Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
-            Draw.color(Pal.remove);
-            Lines.stroke(1f);
-
-            for(BuildRequest req : player.buildQueue()){
-                if(req.breaking) continue;
-                if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                    drawBreaking(req);
-                }
-            }
-
-            Lines.stroke(2f);
-
-            Draw.color(Pal.removeBack);
-            Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-            Draw.color(Pal.remove);
-            Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+            drawSelection(selectX, selectY, cursorX, cursorY);
         }else if(isPlacing()){
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
@@ -257,24 +222,7 @@ public class DesktopInput extends InputHandler{
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
-                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                        int wx = selectX + x * Mathf.sign(cursorX - selectX);
-                        int wy = selectY + y * Mathf.sign(cursorY - selectY);
-
-                        tryBreakBlock(wx, wy);
-                    }
-                }
-
-                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
-                Iterator<BuildRequest> it = player.buildQueue().iterator();
-                while(it.hasNext()){
-                    BuildRequest req = it.next();
-                    if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                        it.remove();
-                    }
-                }
+                removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
             if(selected != null){
