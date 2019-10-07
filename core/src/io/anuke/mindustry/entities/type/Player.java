@@ -436,7 +436,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             if(request.breaking){
                 control.input.drawBreaking(request);
             }else{
-                request.block.drawRequest(request, control.input.allRequests(), true);
+                request.block.drawRequest(request, control.input.allRequests(),
+                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation));
             }
         }
 

@@ -39,6 +39,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Vector2 stackTrns = new Vector2();
+    final static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
@@ -52,6 +53,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected GestureDetector detector;
     protected PlaceLine line = new PlaceLine();
+    protected BuildRequest resultreq;
     protected BuildRequest brequest = new BuildRequest();
     protected Array<BuildRequest> lineRequests = new Array<>();
     protected Array<BuildRequest> selectRequests = new Array<>();
@@ -194,7 +196,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawSelected(int x, int y, Block block, Color color){
-        Draw.color(Pal.remove);
+        Draw.color(color);
         for(int i = 0; i < 4; i++){
             Point2 p = Geometry.d8edge[i];
             float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
@@ -219,6 +221,46 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Block block = tile.block();
 
         drawSelected(x, y, block, Pal.remove);
+    }
+
+    /** Returns the selection request that overlaps this position, or null. */
+    protected BuildRequest getRequest(int x, int y){
+        return getRequest(x, y, 1, null);
+    }
+
+    /** Returns the selection request that overlaps this position, or null. */
+    protected BuildRequest getRequest(int x, int y, int size, BuildRequest skip){
+        float offset = ((size + 1) % 2) * tilesize / 2f;
+        r2.setSize(tilesize * size);
+        r2.setCenter(x * tilesize + offset, y * tilesize + offset);
+        resultreq = null;
+
+        Predicate<BuildRequest> test = req -> {
+            if(req == skip) return false;
+            Tile other = req.tile();
+
+            if(other == null) return false;
+
+            if(!req.breaking){
+                r1.setSize(req.block.size * tilesize);
+                r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+            }else{
+                r1.setSize(other.block().size * tilesize);
+                r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
+            }
+
+            return r2.overlaps(r1);
+        };
+
+        for(BuildRequest req : player.buildQueue()){
+            if(test.test(req)) return req;
+        }
+
+        for(BuildRequest req : selectRequests){
+            if(test.test(req)) return req;
+        }
+
+        return null;
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2){

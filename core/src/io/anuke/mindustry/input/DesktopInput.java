@@ -7,10 +7,12 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
@@ -29,6 +31,8 @@ public class DesktopInput extends InputHandler{
     private PlaceMode mode;
     /** Animation scale for line. */
     private float selectScale;
+    /** Selected build request for movement. */
+    private @Nullable BuildRequest sreq;
 
     @Override
     public boolean isDrawing(){
@@ -67,6 +71,24 @@ public class DesktopInput extends InputHandler{
             Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+        }
+
+        if(mode == none && !isPlacing()){
+            BuildRequest req = getRequest(cursorX, cursorY);
+            if(req != null){
+                drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
+            }
+        }
+
+        if(sreq != null){
+            boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
+            if(sreq.block.rotate){
+                drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
+            }
+
+            sreq.block.drawRequest(sreq, allRequests(), valid);
+
+            drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
         Draw.reset();
@@ -121,6 +143,11 @@ public class DesktopInput extends InputHandler{
         }
 
         rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+
+        if(sreq != null){
+            sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+        }
+
         if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
             updateLine(selectX, selectY);
         }
@@ -138,6 +165,10 @@ public class DesktopInput extends InputHandler{
 
             if(!isPlacing() && canMine(cursor)){
                 cursorType = ui.drillCursor;
+            }
+
+            if(getRequest(cursor.x, cursor.y) != null && mode == none){
+                cursorType = SystemCursor.hand;
             }
 
             if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
@@ -169,6 +200,14 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
+        if(sreq != null){
+            float offset = ((sreq.block.size + 2) % 2) * tilesize / 2f;
+            float x = Core.input.mouseWorld().x + offset;
+            float y = Core.input.mouseWorld().y + offset;
+            sreq.x = (int)(x / tilesize);
+            sreq.y = (int)(y / tilesize);
+        }
+
         if(block == null || mode != placing){
             lineRequests.clear();
         }
@@ -180,6 +219,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            BuildRequest req = getRequest(cursorX, cursorY);
+
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -187,6 +228,8 @@ public class DesktopInput extends InputHandler{
                 lastLineY = cursorY;
                 mode = placing;
                 updateLine(selectX, selectY);
+            }else if(req != null && !req.breaking && mode == none){
+                sreq = req;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
@@ -229,6 +272,13 @@ public class DesktopInput extends InputHandler{
                 tryDropItems(selected.link(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             }
 
+            if(sreq != null){
+                if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
+                    player.buildQueue().removeValue(sreq, true);
+                }
+                sreq = null;
+            }
+
             mode = none;
         }
     }
@@ -254,6 +304,7 @@ public class DesktopInput extends InputHandler{
             droppingItem = false;
             mode = none;
             block = null;
+            sreq = null;
         }
     }
 }

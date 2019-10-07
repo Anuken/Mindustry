@@ -29,7 +29,6 @@ import static io.anuke.mindustry.input.PlaceMode.*;
 public class MobileInput extends InputHandler implements GestureListener{
     /** Maximum speed the player can pan. */
     private static final float maxPanSpeed = 1.3f;
-    private static Rectangle r1 = new Rectangle(), r2 = new Rectangle();
     /** Distance to edge of screen to start panning. */
     private final float edgePan = Scl.scl(60f);
 
