@@ -668,15 +668,10 @@ public class Block extends BlockStorage{
     }
 
     public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
-        Draw.mixcol(!valid ? Pal.breakInvalid : Pal.accent, 0.12f + Mathf.absin(Time.time(), 8f, 0.35f));
+        Draw.reset();
+        Draw.mixcol(!valid ? Pal.breakInvalid : Pal.accent, 0.24f + Mathf.absin(Time.globalTime(), 7f, 0.3f));
+        Draw.alpha(1f);
         drawRequestRegion(req, list);
-
-        //Draw.color(Pal.accent);
-        for(int i = 0; i < 4; i++){
-            Point2 p = Geometry.d8edge[i];
-            float offset = -Math.max(size - 1, 0) / 2f * tilesize;
-            //if(i % 2 == 0) Draw.rect("block-select", req.drawx() + offset * p.x, req.drawy() + offset * p.y, i * 90);
-        }
         Draw.reset();
     }
 

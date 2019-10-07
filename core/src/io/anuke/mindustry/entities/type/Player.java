@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
@@ -429,22 +428,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
             if(request.breaking){
-                Block block = world.ltile(request.x, request.y).block();
-
-                //draw removal request
-                Lines.stroke(2f, Pal.removeBack);
-
-                float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
-                Lines.square(
-                request.x * tilesize + block.offset(),
-                request.y * tilesize + block.offset() - 1,
-                rad);
-
-                Draw.color(Pal.remove);
-
-                Lines.square(
-                request.x * tilesize + block.offset(),
-                request.y * tilesize + block.offset(), rad);
+                control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(), true);
             }

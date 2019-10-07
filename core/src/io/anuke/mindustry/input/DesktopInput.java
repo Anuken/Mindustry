@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
@@ -16,6 +17,8 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+
+import java.util.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -47,7 +50,7 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public void drawOutlined(){
+    public void drawTop(){
         Lines.stroke(1f);
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
@@ -56,7 +59,7 @@ public class DesktopInput extends InputHandler{
         if(mode == placing && block != null){
             for(int i = 0; i < lineRequests.size; i++){
                 BuildRequest req = lineRequests.get(i);
-                if(i == lineRequests.size - 1){
+                if(i == lineRequests.size - 1 && req.block.rotate){
                     drawArrow(block, req.x, req.y, req.rotation);
                 }
                 drawRequest(lineRequests.get(i));
@@ -70,12 +73,23 @@ public class DesktopInput extends InputHandler{
                     Tile tile = world.ltile(x, y);
                     if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
-                    Draw.color(Pal.removeBack);
-                    Lines.square(tile.drawx(), tile.drawy() - 1, tile.block().size * tilesize / 2f - 1);
-                    Draw.color(Pal.remove);
-                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f - 1);
+                    drawBreaking(tile.x, tile.y);
                 }
             }
+
+            Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+            Draw.color(Pal.remove);
+            Lines.stroke(1f);
+
+            for(BuildRequest req : player.buildQueue()){
+                if(req.breaking) continue;
+                if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                    drawBreaking(req);
+                }
+            }
+
+            Lines.stroke(2f);
 
             Draw.color(Pal.removeBack);
             Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
@@ -85,6 +99,7 @@ public class DesktopInput extends InputHandler{
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
             }
+            Draw.color();
             drawRequest(cursorX, cursorY, block, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
@@ -216,8 +231,7 @@ public class DesktopInput extends InputHandler{
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Core.input.keyTap(Binding.deselect) && (block != null || mode != none || player.isBuilding()) &&
-        !(player.buildRequest() != null && player.buildRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
+        }else if(Core.input.keyTap(Binding.deselect) && block != null){
             block = null;
             mode = none;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
@@ -250,6 +264,15 @@ public class DesktopInput extends InputHandler{
                         int wy = selectY + y * Mathf.sign(cursorY - selectY);
 
                         tryBreakBlock(wx, wy);
+                    }
+                }
+
+                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+                Iterator<BuildRequest> it = player.buildQueue().iterator();
+                while(it.hasNext()){
+                    BuildRequest req = it.next();
+                    if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                        it.remove();
                     }
                 }
             }

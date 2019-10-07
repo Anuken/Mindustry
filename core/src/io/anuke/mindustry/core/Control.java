@@ -416,6 +416,7 @@ public class Control implements ApplicationListener, Loadable{
 
         music.update();
         loops.update();
+        Time.updateGlobal();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");

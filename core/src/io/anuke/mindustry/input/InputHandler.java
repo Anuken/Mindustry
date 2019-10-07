@@ -177,7 +177,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     }
 
-    public void drawOutlined(){
+    public void drawBottom(){
 
     }
 
@@ -187,6 +187,35 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean isDrawing(){
         return false;
+    }
+
+    public void drawBreaking(BuildRequest request){
+        if(request.breaking){
+            drawBreaking(request.x, request.y);
+        }else{
+            Block block = request.block;
+            Draw.color(Pal.remove);
+            for(int i = 0; i < 4; i++){
+                Point2 p = Geometry.d8edge[i];
+                float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+                Draw.rect("block-select", request.drawx() + offset * p.x, request.drawy() + offset * p.y, i * 90);
+            }
+            Draw.reset();
+        }
+    }
+
+    public void drawBreaking(int x, int y){
+        Tile tile = world.ltile(x, y);
+        if(tile == null) return;
+        Block block = tile.block();
+
+        Draw.color(Pal.remove);
+        for(int i = 0; i < 4; i++){
+            Point2 p = Geometry.d8edge[i];
+            float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+            Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
+        }
+        Draw.reset();
     }
 
     protected void flushRequests(Array<BuildRequest> requests){
@@ -476,7 +505,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = rotation;
         if(!overrideLineRotation || diagonal){
-                baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
+            baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
         }
 
         Tmp.r3.set(-1, -1, 0, 0);

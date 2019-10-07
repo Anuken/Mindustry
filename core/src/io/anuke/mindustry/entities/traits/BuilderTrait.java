@@ -302,6 +302,14 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         }
 
+        public Rectangle bounds(Rectangle rect){
+            if(breaking){
+                return rect.set(-100f, -100f, 0f, 0f);
+            }else{
+                return block.bounds(x, y, rect);
+            }
+        }
+
         public BuildRequest set(int x, int y, int rotation, Block block){
             this.x = x;
             this.y = y;

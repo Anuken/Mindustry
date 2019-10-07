@@ -241,7 +241,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public void drawOutlined(){
+    public void drawBottom(){
         Lines.stroke(1f);
 
         //draw removals
@@ -255,8 +255,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             drawRequest(request);
         }
-
-        BuildRequest last = null;
 
         //draw list of requests
         for(BuildRequest request : selection){
@@ -288,8 +286,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                 Draw.mixcol();
                 request.block.drawPlace(tile.x, tile.y, rotation, validPlace(tile.x, tile.y, request.block, rotation));
             }
-
-            last = request;
         }
 
         Draw.mixcol();

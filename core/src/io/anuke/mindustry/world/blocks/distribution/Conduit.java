@@ -51,14 +51,17 @@ public class Conduit extends LiquidBlock implements Autotiler{
         if(bits == null) return;
 
         Draw.colorl(0.34f);
+        Draw.alpha(0.5f);
         Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
         Draw.color();
+
+
         Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
     }
 
     @Override
     public void transformCase(int num, int[] bits){
-        bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 6 ? 1 : 0;
+        bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 5 ? 1 : 0;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class OverlayRenderer{
 
         if(!input.isDrawing() || player.isDead()) return;
 
-        input.drawOutlined();
+        input.drawBottom();
     }
 
     public void drawTop(){
