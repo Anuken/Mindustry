@@ -325,6 +325,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         Draw.reset();
     }
 
+    @Override
+    protected void drawRequest(BuildRequest request){
+        drawRequest(request.x, request.y, request.block, request.rotation);
+        if(!request.breaking){
+            drawSelected(request.x, request.y, request.block, Pal.accent);
+        }
+    }
+
     //endregion
     //region input events
 
