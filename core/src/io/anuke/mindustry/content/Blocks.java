@@ -224,12 +224,20 @@ public class Blocks implements ContentList{
         hotrock = new Floor("hotrock"){{
             attributes.set(Attribute.heat, 0.5f);
             blendGroup = ignarock;
+            
+            speedMultiplier = 0.5f;
+            liquidDrop = Liquids.slag;
+            isLiquid = true;
         }};
 
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
+            
+            speedMultiplier = 1f;
+            liquidDrop = Liquids.slag;
+            isLiquid = true;
         }};
 
         sand = new Floor("sand"){{
