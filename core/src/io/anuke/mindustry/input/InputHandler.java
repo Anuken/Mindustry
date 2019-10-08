@@ -518,6 +518,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             ui.hudGroup.addChild(uiGroup);
             buildUI(uiGroup);
         }
+
+        if(player != null){
+            player.isBuilding = true;
+        }
     }
 
     public boolean canShoot(){

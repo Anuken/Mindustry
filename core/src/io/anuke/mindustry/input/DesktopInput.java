@@ -33,6 +33,8 @@ public class DesktopInput extends InputHandler{
     private float selectScale;
     /** Selected build request for movement. */
     private @Nullable BuildRequest sreq;
+    /** Whether player is currently deleting removal requests. */
+    private boolean deleting = false;
 
     @Override
     public boolean isDrawing(){
@@ -43,7 +45,13 @@ public class DesktopInput extends InputHandler{
     public void buildUI(Group group){
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
-            t.table(Styles.black6, b -> b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel)).margin(10f);
+            t.visible(() -> Core.settings.getBool("hints"));
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
+            }).margin(10f);
         });
     }
 
@@ -212,6 +220,10 @@ public class DesktopInput extends InputHandler{
             lineRequests.clear();
         }
 
+        if(Core.input.keyTap(Binding.pause_building)){
+            player.isBuilding = !player.isBuilding;
+        }
+
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
             updateLine(selectX, selectY);
             lastLineX = cursorX;
@@ -230,6 +242,8 @@ public class DesktopInput extends InputHandler{
                 updateLine(selectX, selectY);
             }else if(req != null && !req.breaking && mode == none){
                 sreq = req;
+            }else if(req != null && req.breaking){
+                deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
@@ -244,9 +258,19 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
+            deleting = false;
             mode = breaking;
             selectX = tileX(Core.input.mouseX());
             selectY = tileY(Core.input.mouseY());
+        }
+
+        if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
+            BuildRequest req = getRequest(cursorX, cursorY);
+            if(req != null && req.breaking){
+                player.buildQueue().remove(req);
+            }
+        }else{
+            deleting = false;
         }
 
         if(mode == placing && block != null){
@@ -274,7 +298,7 @@ public class DesktopInput extends InputHandler{
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
-                    player.buildQueue().removeValue(sreq, true);
+                    player.buildQueue().remove(sreq, true);
                 }
                 sreq = null;
             }

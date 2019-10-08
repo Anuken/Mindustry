@@ -225,6 +225,8 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
+        game.checkPref("hints", true);
+
         if(steam){
             game.checkPref("publichost", false, i -> {
                 platform.updateLobby();

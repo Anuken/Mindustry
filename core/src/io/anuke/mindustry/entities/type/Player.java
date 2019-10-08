@@ -49,7 +49,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String name = "noname";
     public @Nullable
     String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -356,7 +356,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(dead) return;
 
         if(isBuilding()){
-            if(!state.isPaused()){
+            if(!state.isPaused() && isBuilding){
                 drawBuilding();
             }
         }else{
@@ -449,6 +449,18 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //region update methods
 
     @Override
+    public void updateMechanics(){
+        if(isBuilding){
+            updateBuilding();
+        }
+
+        //mine only when not building
+        if(buildRequest() == null){
+            updateMining();
+        }
+    }
+
+    @Override
     public void update(){
         hitTime -= Time.delta();
         textFadeTime -= Time.delta() / (60 * 5);
@@ -480,7 +492,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         BuildRequest request = buildRequest();
-        if(isBuilding() && request.tile() != null && (request.tile().withinDst(x, y, placeDistance) || state.isEditor())){
+        if(isBuilding() && isBuilding && request.tile() != null && (request.tile().withinDst(x, y, placeDistance) || state.isEditor())){
             loops.play(Sounds.build, request.tile(), 0.75f);
         }
 
@@ -780,6 +792,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         placeQueue.clear();
         dead = true;
         lastText = null;
+        isBuilding = true;
         textFadeTime = 0f;
         target = null;
         moveTarget = null;
@@ -873,7 +886,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name);
-        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3));
+        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
@@ -895,6 +908,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
         isTyping = (bools & 8) != 0;
+        boolean building = (bools & 16) != 0;
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
@@ -913,6 +927,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             velocity.y = lastvy;
         }else{
             mining = world.tile(mine);
+            isBuilding = building;
             isBoosting = boosting;
         }
 
