@@ -331,13 +331,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2){
+        removeSelection(x1, y1, x2, y2, false);
+    }
+
+    /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
         NormalizeResult result = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                tryBreakBlock(wx, wy);
+                if(!flush){
+                    tryBreakBlock(wx, wy);
+                }else{
+                    selectRequests.add(new BuildRequest(wx, wy));
+                }
             }
         }
 

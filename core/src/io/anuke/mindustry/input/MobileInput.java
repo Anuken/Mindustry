@@ -3,8 +3,8 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.input.*;
 import io.anuke.arc.input.GestureDetector.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
@@ -245,7 +244,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             request.animScale = Mathf.lerpDelta(request.animScale, 0f, 0.2f);
             request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0f, 0.2f);
 
-            drawRequest(request);
+            //TODO
+            //drawRequest(request);
         }
 
         //draw list of requests
@@ -298,27 +298,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     drawRequest(lineRequests.get(i));
                 }
             }else if(mode == breaking){
-                //draw breaking
-                NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, lineStartX, lineStartY, tileX, tileY, false, maxLength, 1f);
-                NormalizeResult dresult = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
-
-                for(int x = dresult.x; x <= dresult.x2; x++){
-                    for(int y = dresult.y; y <= dresult.y2; y++){
-                        Tile other = world.ltile(x, y);
-                        if(other == null || !validBreak(other.x, other.y)) continue;
-
-                        Draw.color(Pal.removeBack);
-                        Lines.square(other.drawx(), other.drawy() - 1, other.block().size * tilesize / 2f - 1);
-                        Draw.color(Pal.remove);
-                        Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f - 1);
-                    }
-                }
-
-                Draw.color(Pal.removeBack);
-                Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-                Draw.color(Pal.remove);
-                Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
+                drawSelection(lineStartX, lineStartY, tileX, tileY);
             }
         }
 
@@ -393,26 +373,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 flushSelectRequests(lineRequests);
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){
-                //normalize area
-                NormalizeResult result = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
-
-                //break everything in area
-                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                        int wx = lineStartX + x * Mathf.sign(tileX - lineStartX);
-                        int wy = lineStartY + y * Mathf.sign(tileY - lineStartY);
-
-                        Tile tar = world.ltile(wx, wy);
-
-                        if(tar == null) continue;
-
-                        if(!hasRequest(world.tile(tar.x, tar.y)) && validBreak(tar.x, tar.y)){
-                            BuildRequest request = new BuildRequest(tar.x, tar.y);
-                            request.animScale = 1f;
-                            selectRequests.add(request);
-                        }
-                    }
-                }
+                removeSelection(lineStartX, lineStartY, tileX, tileY, true);
             }
 
             lineMode = false;
@@ -442,12 +403,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         lineStartY = cursor.y;
         lastLineX = cursor.x;
         lastLineY = cursor.y;
-        updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
         lineMode = true;
 
         if(mode == breaking){
             Effects.effect(Fx.tapBlock, cursor.worldx(), cursor.worldy(), 1f);
         }else if(block != null){
+            updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
             Effects.effect(Fx.tapBlock, cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
         }
 
@@ -576,7 +537,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
 
-            if(lastLineX != lx || lastLineY != ly){
+            if((lastLineX != lx || lastLineY != ly) && isPlacing()){
                 lastLineX = lx;
                 lastLineY = ly;
                 updateLine(lineStartX, lineStartY, lx, ly);
