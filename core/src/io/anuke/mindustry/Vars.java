@@ -185,8 +185,8 @@ public class Vars implements Loadable{
         if(loadLocales){
             //load locales
             String[] stra = Core.files.internal("locales").readString().split("\n");
-            locales = new Locale[stra.length];
-            for(int i = 0; i < locales.length; i++){
+            locales = new Locale[stra.length+1];
+            for(int i = 0; i < locales.length-1; i++){
                 String code = stra[i];
                 if(code.contains("_")){
                     locales[i] = new Locale(code.split("_")[0], code.split("_")[1]);
@@ -194,7 +194,7 @@ public class Vars implements Loadable{
                     locales[i] = new Locale(code);
                 }
             }
-
+            locales[locales.length-1] = new Locale("oh", "NO"); // ugly arc workaround
             Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
         }
 
