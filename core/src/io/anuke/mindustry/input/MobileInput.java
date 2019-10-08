@@ -37,7 +37,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
-    private int lineStartX, lineStartY;
+    private int lineStartX, lineStartY, lastLineX, lastLineY;
 
     /** Animation scale for line. */
     private float lineScale;
@@ -228,11 +228,6 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public boolean isDrawing(){
-        return selectRequests.size > 0 || removals.size > 0 || lineMode || player.target != null || mode != PlaceMode.none;
-    }
-
-    @Override
     public boolean isPlacing(){
         return super.isPlacing() && mode == placing;
     }
@@ -293,19 +288,16 @@ public class MobileInput extends InputHandler implements GestureListener{
             int tileX = tileX(Core.input.mouseX());
             int tileY = tileY(Core.input.mouseY());
 
-            /*if(mode == placing && block != null){
+            if(mode == placing && block != null){
                 //draw placing
-
-                iterateLine(lineStartX, lineStartY, tileX, tileY, l -> {
-                    if(l.last && block.rotate){
-                        drawArrow(block, l.x, l.y, l.rotation);
+                for(int i = 0; i < lineRequests.size; i++){
+                    BuildRequest req = lineRequests.get(i);
+                    if(i == lineRequests.size - 1 && req.block.rotate){
+                        drawArrow(block, req.x, req.y, req.rotation);
                     }
-                    drawRequest(l.x, l.y, block, l.rotation);
-
-                    rotation = l.rotation;
-                });
-            }else */
-            if(mode == breaking){
+                    drawRequest(lineRequests.get(i));
+                }
+            }else if(mode == breaking){
                 //draw breaking
                 NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, lineStartX, lineStartY, tileX, tileY, false, maxLength, 1f);
                 NormalizeResult dresult = PlaceUtils.normalizeArea(lineStartX, lineStartY, tileX, tileY, rotation, false, maxLength);
@@ -398,16 +390,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             int tileY = tileY(screenY);
 
             if(mode == placing && isPlacing()){
-                iterateLine(lineStartX, lineStartY, tileX, tileY, l -> {
-                    Tile tile = world.tile(l.x, l.y);
-                    if(tile != null && checkOverlapPlacement(tile.x, tile.y, block)){
-                        return;
-                    }
-
-                    BuildRequest request = new BuildRequest(l.x, l.y, l.rotation, block);
-                    request.animScale = 1f;
-                    selectRequests.add(request);
-                });
+                flushSelectRequests(lineRequests);
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){
                 //normalize area
@@ -457,6 +440,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         //long pressing enables line mode otherwise
         lineStartX = cursor.x;
         lineStartY = cursor.y;
+        lastLineX = cursor.x;
+        lastLineY = cursor.y;
+        updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
         lineMode = true;
 
         if(mode == breaking){
@@ -559,7 +545,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             lineScale = Mathf.lerpDelta(lineScale, 1f, 0.1f);
 
             //When in line mode, pan when near screen edges automatically
-            if(Core.input.isTouched(0) && lineMode){
+            if(Core.input.isTouched(0)){
                 float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
 
                 float panX = 0, panY = 0;
@@ -587,7 +573,16 @@ public class MobileInput extends InputHandler implements GestureListener{
                 Core.camera.position.x += vector.x;
                 Core.camera.position.y += vector.y;
             }
+
+            int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
+
+            if(lastLineX != lx || lastLineY != ly){
+                lastLineX = lx;
+                lastLineY = ly;
+                updateLine(lineStartX, lineStartY, lx, ly);
+            }
         }else{
+            lineRequests.clear();
             lineScale = 0f;
         }
 

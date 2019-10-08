@@ -303,6 +303,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
+    protected void flushSelectRequests(Array<BuildRequest> requests){
+        for(BuildRequest req : requests){
+            if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
+                selectRequests.add(req);
+            }
+        }
+    }
+
     protected void flushRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
@@ -354,12 +362,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    protected void updateLine(int selectX, int selectY){
+    protected void updateLine(int x1, int y1, int x2, int y2){
         lineRequests.clear();
-        iterateLine(selectX, selectY, tileX(getMouseX()), tileY(getMouseY()), l -> {
+        iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
             lineRequests.add(new BuildRequest(l.x, l.y, l.rotation, block));
         });
+    }
+
+    protected void updateLine(int x1, int y1){
+        updateLine(x1, y1, tileX(getMouseX()), tileY(getMouseY()));
     }
 
     /** Handles tile tap events that are not platform specific. */
