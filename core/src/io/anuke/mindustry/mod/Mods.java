@@ -203,11 +203,14 @@ public class Mods implements Loadable{
 
     private void buildFiles(){
         for(LoadedMod mod : loaded){
+            boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
+            String parentName = zipFolder ? mod.root.name() : null;
             for(FileHandle file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
-                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) : f.path(), f));
+                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
+                        zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
             }
 

@@ -538,6 +538,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             uiGroup.setFillParent(true);
             ui.hudGroup.addChild(uiGroup);
             buildUI(uiGroup);
+
+            frag.add();
         }
 
         if(player != null){

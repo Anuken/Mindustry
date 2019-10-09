@@ -238,7 +238,6 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
