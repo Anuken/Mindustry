@@ -279,15 +279,18 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawLayer(Tile tile){
-        if(!Core.settings.getBool("lasers")) return;
+        if(Core.settings.getInt("lasersopacity") == 0) return;
 
         TileEntity entity = tile.entity();
 
         for(int i = 0; i < entity.power.links.size; i++){
             Tile link = world.tile(entity.power.links.get(i));
-            if(linkValid(tile, link) && (link.pos() < tile.pos() || !(link.block() instanceof PowerNode) || !Core.camera.bounds(Tmp.r1).contains(link.drawx(), link.drawy()))){
-                drawLaser(tile, link);
-            }
+
+            if(!linkValid(tile, link)) continue;
+
+            if(link.block() instanceof PowerNode && !(link.pos() < tile.pos())) continue;
+
+            drawLaser(tile, link);
         }
 
         Draw.reset();
@@ -322,6 +325,11 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Tile tile, Tile target){
+        int opacityPercentage = Core.settings.getInt("lasersopacity");
+        if(opacityPercentage == 0) return;
+
+        float opacity = opacityPercentage / 100f;
+
         float x1 = tile.drawx(), y1 = tile.drawy(),
         x2 = target.drawx(), y2 = target.drawy();
 
@@ -337,7 +345,8 @@ public class PowerNode extends PowerBlock{
         float fract = 1f-tile.entity.power.graph.getSatisfaction();
 
         Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
-        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.3f);
+        Draw.alpha(opacity);
+        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
     }
 

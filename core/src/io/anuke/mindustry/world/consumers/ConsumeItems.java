@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
@@ -11,10 +12,15 @@ import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
-    public final ItemStack[] items;
+    public final @NonNull ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
+    }
+
+    /** Mods.*/
+    protected ConsumeItems(){
+        this(new ItemStack[]{});
     }
 
     @Override

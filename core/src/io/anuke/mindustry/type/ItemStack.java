@@ -19,6 +19,10 @@ public class ItemStack implements Comparable<ItemStack>{
         item = Items.copper;
     }
 
+    public ItemStack copy(){
+        return new ItemStack(item, amount);
+    }
+
     public boolean equals(ItemStack other){
         return other != null && other.item == item && other.amount == amount;
     }

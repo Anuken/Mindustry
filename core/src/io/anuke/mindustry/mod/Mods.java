@@ -61,7 +61,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file));
+            loaded.add(loadMod(file, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -76,6 +76,7 @@ public class Mods implements Loadable{
     @Override
     public void loadAsync(){
         if(loaded.isEmpty()) return;
+        Time.mark();
 
         packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
 
@@ -104,11 +105,14 @@ public class Mods implements Loadable{
             });
             Log.info("Packed {0} images for mod '{1}'.", packed[0], mod.meta.name);
         }
+
+        Log.info("Time to pack textures: {0}", Time.elapsed());
     }
 
     @Override
     public void loadSync(){
         if(packer == null) return;
+        Time.mark();
 
         Texture editor = Core.atlas.find("clear-editor").getTexture();
         PixmapPacker editorPacker = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
@@ -140,6 +144,7 @@ public class Mods implements Loadable{
 
         packer.dispose();
         packer = null;
+        Log.info("Time to update textures: {0}", Time.elapsed());
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -163,16 +168,30 @@ public class Mods implements Loadable{
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
             try{
-                LoadedMod mod = loadMod(file);
+                LoadedMod mod = loadMod(file, false);
                 if(mod.enabled()){
                     loaded.add(mod);
                 }else{
                     disabled.add(mod);
                 }
-            }catch(IllegalArgumentException ignored){
             }catch(Exception e){
-                Log.err("Failed to load plugin file {0}. Skipping.", file);
-                e.printStackTrace();
+                Log.err("Failed to load mod file {0}. Skipping.", file);
+                Log.err(e);
+            }
+        }
+
+        //load workshop mods now
+        for(FileHandle file : platform.getExternalMods()){
+            try{
+                LoadedMod mod = loadMod(file, true);
+                if(mod.enabled()){
+                    loaded.add(mod);
+                }else{
+                    disabled.add(mod);
+                }
+            }catch(Exception e){
+                Log.err("Failed to load mod workshop file {0}. Skipping.", file);
+                Log.err(e);
             }
         }
 
@@ -257,7 +276,7 @@ public class Mods implements Loadable{
                                 try{
                                     //this binds the content but does not load it entirely
                                     Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
-                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, loaded);
+                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
                                 }
@@ -329,7 +348,7 @@ public class Mods implements Loadable{
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
-    private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
+    private LoadedMod loadMod(FileHandle sourceFile, boolean workshop) throws Exception{
         FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
         if(zip.list().length == 1 && zip.list()[0].isDirectory()){
             zip = zip.list()[0];
@@ -395,6 +414,8 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
+        /** The ID of this mod in the workshop.*/
+        public @Nullable String workshopID;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;

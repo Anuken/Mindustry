@@ -61,11 +61,13 @@ public class EventType{
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
-        public final Zone zone, required;
+        public final Zone zoneMet, zoneForMet;
+        public final Objective objective;
 
-        public ZoneRequireCompleteEvent(Zone zone, Zone required){
-            this.zone = zone;
-            this.required = required;
+        public ZoneRequireCompleteEvent(Zone zoneMet, Zone zoneForMet, Objective objective){
+            this.zoneMet = zoneMet;
+            this.zoneForMet = zoneForMet;
+            this.objective = objective;
         }
     }
 

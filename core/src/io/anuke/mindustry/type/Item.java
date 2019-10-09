@@ -10,7 +10,7 @@ import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class Item extends UnlockableContent implements Comparable<Item>{
+public class Item extends UnlockableContent{
     public final Color color;
 
     /** type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}. */
@@ -59,11 +59,6 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     @Override
     public String toString(){
         return localizedName();
-    }
-
-    @Override
-    public int compareTo(Item item){
-        return Integer.compare(id, item.id);
     }
 
     @Override

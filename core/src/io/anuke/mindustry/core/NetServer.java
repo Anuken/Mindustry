@@ -94,11 +94,6 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
-                con.kick(KickReason.banned);
-                return;
-            }
-
             if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
                 con.kick(KickReason.playerLimit);
                 return;

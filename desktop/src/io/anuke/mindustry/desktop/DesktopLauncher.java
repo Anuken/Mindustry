@@ -15,6 +15,7 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -64,7 +65,7 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Log.setUseColors(false);
         Version.init();
-        boolean useSteam = Version.modifier.equals("steam");
+        boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
@@ -129,7 +130,13 @@ public class DesktopLauncher extends ClientLauncher{
             }
 
             try{
-                SteamAPI.loadLibraries();
+                try{
+                    SteamAPI.loadLibraries();
+                }catch(Throwable t){
+                    Log.err(t);
+                    fallbackSteam();
+                }
+
                 if(!SteamAPI.init()){
                     Log.err("Steam client not running.");
                 }else{
@@ -144,11 +151,25 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
+    void fallbackSteam(){
+        try{
+            String name = "steam_api";
+            if(OS.isMac || OS.isLinux) name = "lib" + name;
+            if(OS.isWindows && OS.is64Bit) name += "64";
+            name += (OS.isLinux ? ".so" : OS.isMac ? ".dylib" : ".dll");
+            Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
+            System.loadLibrary(new File(name).getAbsolutePath());
+        }catch(Throwable e){
+            Log.err(e);
+        }
+    }
+
     void initSteam(String[] args){
         SVars.net = new SNet(new ArcNetImpl());
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
+        boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
             player.name = SVars.net.friends.getPersonaName();
@@ -177,8 +198,18 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             });
         });
+
+        Events.on(DisposeEvent.class, event -> {
+            SteamAPI.shutdown();
+            isShutdown[0] = true;
+        });
+
         //steam shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(!isShutdown[0]){
+                SteamAPI.shutdown();
+            }
+        }));
     }
 
     static void handleCrash(Throwable e){
@@ -211,12 +242,17 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void viewMapListing(Map map){
-        viewMapListing(map.file.parent().name());
+    public Array<FileHandle> getExternalMods(){
+        return !steam ? super.getExternalMods() : SVars.workshop.getModFiles();
     }
 
     @Override
-    public void viewMapListing(String mapid){
+    public void viewMapListing(Map map){
+        viewListing(map.file.parent().name());
+    }
+
+    @Override
+    public void viewListing(String mapid){
         SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
     }
 
