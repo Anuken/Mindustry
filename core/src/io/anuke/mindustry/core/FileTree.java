@@ -4,14 +4,12 @@ import io.anuke.arc.*;
 import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.util.*;
 
 /** Handles files in a modded context. */
 public class FileTree implements FileHandleResolver{
     private ObjectMap<String, FileHandle> files = new ObjectMap<>();
 
     public void addFile(String path, FileHandle f){
-        Log.info("Add " + path);
         files.put(path, f);
     }
 

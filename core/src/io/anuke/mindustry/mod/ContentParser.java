@@ -107,22 +107,33 @@ public class ContentParser{
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
 
-            //TODO generate dynamically instead of doing.. this
-            Class<? extends Block> type = resolve(value.getString("type"),
-            "io.anuke.mindustry.world",
-            "io.anuke.mindustry.world.blocks",
-            "io.anuke.mindustry.world.blocks.defense",
-            "io.anuke.mindustry.world.blocks.defense.turrets",
-            "io.anuke.mindustry.world.blocks.distribution",
-            "io.anuke.mindustry.world.blocks.logic",
-            "io.anuke.mindustry.world.blocks.power",
-            "io.anuke.mindustry.world.blocks.production",
-            "io.anuke.mindustry.world.blocks.sandbox",
-            "io.anuke.mindustry.world.blocks.storage",
-            "io.anuke.mindustry.world.blocks.units"
-            );
+            Block block;
 
-            Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+            if(Vars.content.getByName(ContentType.block, name) != null){
+                block = Vars.content.getByName(ContentType.block, name);
+
+                if(value.has("type")){
+                    throw new IllegalArgumentException("When overwriting an existing block, you may not declared its type. The original type will be used. Block: " + name);
+                }
+            }else{
+                //TODO generate dynamically instead of doing.. this
+                Class<? extends Block> type = resolve(value.getString("type"),
+                "io.anuke.mindustry.world",
+                "io.anuke.mindustry.world.blocks",
+                "io.anuke.mindustry.world.blocks.defense",
+                "io.anuke.mindustry.world.blocks.defense.turrets",
+                "io.anuke.mindustry.world.blocks.distribution",
+                "io.anuke.mindustry.world.blocks.logic",
+                "io.anuke.mindustry.world.blocks.power",
+                "io.anuke.mindustry.world.blocks.production",
+                "io.anuke.mindustry.world.blocks.sandbox",
+                "io.anuke.mindustry.world.blocks.storage",
+                "io.anuke.mindustry.world.blocks.units"
+                );
+
+                block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+            }
+
             currentContent = block;
             read(() -> {
                 if(value.has("consumes")){
