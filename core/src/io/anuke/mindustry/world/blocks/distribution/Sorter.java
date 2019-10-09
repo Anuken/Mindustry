@@ -4,14 +4,11 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.Align;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -161,44 +158,13 @@ public class Sorter extends Block{
             tile.configure(item == null ? -1 : item.id);
         });
 
-        ButtonGroup<ImageButton> modeSelect = new ButtonGroup<>();
-        Table cont = new Table();
-        cont.defaults().size(38);
-
-        ImageButton forwardButton = cont.addImageButton(Core.atlas.drawable("icon-arrow-forward-small"), Styles.clearToggleTransi, 28f, () -> {})
-                .group(modeSelect)
-                .align(Align.left)
-                .checked(entity.forwardWhenMatch)
-                .margin(4)
-                .get();
-
-        forwardButton.changed(() -> {
-            if (forwardButton.isChecked()) {
-                entity.forwardWhenMatch = true;
-                lastForwardWhenMatch = true;
-            }
-        });
-
-        forwardButton.update(() -> forwardButton.setChecked(entity.forwardWhenMatch));
-
-        ImageButton splitButton = cont.addImageButton(Core.atlas.drawable("icon-arrow-split-small"), Styles.clearToggleTransi, 28f, () -> {})
-                .group(modeSelect)
-                .align(Align.left)
-                .checked(!entity.forwardWhenMatch)
-                .margin(4)
-                .get();
-
-        splitButton.changed(() -> {
-            if (splitButton.isChecked()) {
-                entity.forwardWhenMatch = false;
-                lastForwardWhenMatch = false;
-            }
-        });
-
-        splitButton.update(() -> splitButton.setChecked(!entity.forwardWhenMatch));
-
         table.row();
-        table.add(cont).align(Align.left);
+
+        OptionSelection.create()
+                .addOption("icon-arrow-forward-small",() -> entity.forwardWhenMatch = lastForwardWhenMatch = true, () -> entity.forwardWhenMatch)
+                .addOption("icon-arrow-split-small", () -> entity.forwardWhenMatch = lastForwardWhenMatch = false, () -> !entity.forwardWhenMatch)
+                .buildOptionTable(table).align(Align.left);
+
     }
 
     @Override

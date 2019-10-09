@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
@@ -17,6 +16,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.OptionSelection;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
@@ -89,14 +89,15 @@ public class CommandCenter extends Block{
     @Override
     public void buildTable(Tile tile, Table table){
         CommandCenterEntity entity = tile.entity();
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        Table buttons = new Table();
+
+        OptionSelection options = OptionSelection.create();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
-            .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
+            options.addOption("icon-command-" + cmd.name() + "-small", () -> tile.configure(cmd.ordinal()), () -> entity.command == cmd);
         }
-        table.add(buttons);
+
+        options.buildOptionTable(table);
+
         table.row();
         table.label(() -> entity.command.localized()).style(Styles.outlineLabel).center().growX().get().setAlignment(Align.center);
     }
