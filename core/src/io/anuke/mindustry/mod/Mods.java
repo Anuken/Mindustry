@@ -125,7 +125,7 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
-            TextureFilter filter = TextureFilter.Nearest;
+            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
 
             packer.updateTextureAtlas(Core.atlas, filter, filter, false);
             //generate new icons

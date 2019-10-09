@@ -1,5 +1,6 @@
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
@@ -28,6 +29,7 @@ public class ZoneTests{
     @TestFactory
     DynamicTest[] testZoneValidity(){
         Array<DynamicTest> out = new Array<>();
+        if(world == null) world = new World();
 
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {

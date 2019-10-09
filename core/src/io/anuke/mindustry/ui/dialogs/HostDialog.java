@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.ui.*;
 
@@ -75,6 +76,12 @@ public class HostDialog extends FloatingDialog{
                             platform.updateLobby();
                         });
                     }));
+                }
+
+                if(Version.modifier.contains("beta")){
+                    Core.settings.putSave("publichost", false);
+                    platform.updateLobby();
+                    Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("$public.beta"));
                 }
             }catch(IOException e){
                 ui.showException("$server.error", e);
