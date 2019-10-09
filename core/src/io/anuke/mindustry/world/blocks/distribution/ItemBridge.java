@@ -9,6 +9,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.PlayerLog;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -47,12 +48,14 @@ public class ItemBridge extends Block{
         if(world.tile(entity.link) != null && world.tile(entity.link).entity instanceof ItemBridgeEntity){
             ItemBridgeEntity oe = world.tile(entity.link).entity();
             oe.incoming.remove(tile.pos());
+            PlayerLog.INSTANCE.record(player, PlayerLog.Action.unlinked, tile, oe.tile);
         }
 
         entity.link = value;
 
         if(world.tile(value) != null && world.tile(value).entity instanceof ItemBridgeEntity){
             ((ItemBridgeEntity)world.tile(value).entity).incoming.add(tile.pos());
+            PlayerLog.INSTANCE.record(player, PlayerLog.Action.linked, tile, world.tile(value));
         }
     }
 

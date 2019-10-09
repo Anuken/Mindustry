@@ -9,6 +9,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.PlayerLog;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
@@ -85,7 +86,8 @@ public class PowerNode extends PowerBlock{
     public void configured(Tile tile, Player player, int value){
         TileEntity entity = tile.entity;
         Tile other = world.tile(value);
-        boolean contains = entity.power.links.contains(value), valid = other != null && other.entity != null && other.entity.power != null;
+        boolean contains = entity.power.links.contains(value);
+        boolean valid = other != null && other.entity != null && other.entity.power != null;
 
         if(contains){
             //unlink
@@ -103,6 +105,7 @@ public class PowerNode extends PowerBlock{
                 //reflow from other end
                 og.reflow(other);
             }
+            PlayerLog.INSTANCE.record(player, PlayerLog.Action.unlinked, tile, other);
         }else if(linkValid(tile, other) && valid && entity.power.links.size < maxNodes){
 
             if(!entity.power.links.contains(other.pos())){
@@ -117,6 +120,7 @@ public class PowerNode extends PowerBlock{
             }
 
             entity.power.graph.add(other.entity.power.graph);
+            PlayerLog.INSTANCE.record(player, PlayerLog.Action.linked, tile, other);
         }
     }
 

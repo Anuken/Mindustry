@@ -387,6 +387,10 @@ public class NetServer implements ApplicationListener{
                 netServer.sendWorldData(player);
             }
         });
+
+        clientCommands.<Player>register("plog", "[.] [-action] [player] [page]", "Show player action log.", (args, player) -> {
+            player.sendMessage(PlayerLog.INSTANCE.search(args, player));
+        });
     }
 
     public int votesRequired(){

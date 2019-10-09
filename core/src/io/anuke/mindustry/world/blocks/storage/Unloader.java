@@ -5,6 +5,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.PlayerLog;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -50,6 +51,7 @@ public class Unloader extends Block{
     public void configured(Tile tile, Player player, int value){
         tile.entity.items.clear();
         tile.<UnloaderEntity>entity().sortItem = content.item(value);
+        PlayerLog.INSTANCE.record(player, PlayerLog.Action.configured, tile, null);
     }
 
     @Override

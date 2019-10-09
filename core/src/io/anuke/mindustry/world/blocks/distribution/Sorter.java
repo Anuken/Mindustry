@@ -6,6 +6,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.PlayerLog;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -53,6 +54,7 @@ public class Sorter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<SorterEntity>entity().sortItem = content.item(value);
+        PlayerLog.INSTANCE.record(player, PlayerLog.Action.configured, tile, null);
     }
 
     @Override

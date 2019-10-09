@@ -51,8 +51,10 @@ public class BuildBlock extends Block{
         Team team = tile.getTeam();
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
-        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
+        final Player player = playerGroup.getByID(builderID);
+        Events.fire(new BlockBuildEndEvent(tile, player, team, true));
         Sounds.breaks.at(tile, Mathf.random(0.7f, 1.4f));
+        PlayerLog.INSTANCE.record(player, PlayerLog.Action.deconstructed, tile, null);
     }
 
     @Remote(called = Loc.server)
@@ -72,8 +74,10 @@ public class BuildBlock extends Block{
             //event first before they can recieve the placed() event modification results
             Core.app.post(() -> tile.block().playerPlaced(tile));
         }
-        Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false)));
+        final Player player = playerGroup.getByID(builderID);
+        Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, player, team, false)));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
+        PlayerLog.INSTANCE.record(player, PlayerLog.Action.constructed, tile, null);
     }
 
     @Override
