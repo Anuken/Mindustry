@@ -172,6 +172,7 @@ public class Vars implements Loadable{
     public static EntityGroup<BaseUnit>[] unitGroups;
 
     public static Player player;
+    public static PlayerLog playerLog;
 
     @Override
     public void loadAsync(){
@@ -256,6 +257,8 @@ public class Vars implements Loadable{
 
         mods.load();
         maps.load();
+
+        playerLog = new PlayerLog(PlayerLog.BUFFER_SIZE, PlayerLog.PAGE_SIZE);
     }
 
     public static void loadSettings(){

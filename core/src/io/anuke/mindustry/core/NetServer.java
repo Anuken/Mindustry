@@ -384,7 +384,7 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("plog", "[.] [-action] [player] [page]", "Show player action log.", (args, player) -> {
-            player.sendMessage(PlayerLog.INSTANCE.search(args, player));
+            player.sendMessage(playerLog.search(args, player));
         });
     }
 

@@ -54,7 +54,7 @@ public class BuildBlock extends Block{
         final Player player = playerGroup.getByID(builderID);
         Events.fire(new BlockBuildEndEvent(tile, player, team, true));
         Sounds.breaks.at(tile, Mathf.random(0.7f, 1.4f));
-        PlayerLog.INSTANCE.record(player, PlayerLog.Action.deconstructed, tile, null);
+        playerLog.record(player, PlayerLog.Action.deconstructed, tile, null);
     }
 
     @Remote(called = Loc.server)
@@ -77,7 +77,7 @@ public class BuildBlock extends Block{
         final Player player = playerGroup.getByID(builderID);
         Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, player, team, false)));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
-        PlayerLog.INSTANCE.record(player, PlayerLog.Action.constructed, tile, null);
+        playerLog.record(player, PlayerLog.Action.constructed, tile, null);
     }
 
     @Override

@@ -13,6 +13,7 @@ import io.anuke.mindustry.world.blocks.*;
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.playerLog;
 
 public class Unloader extends Block{
     protected float speed = 1f;
@@ -51,7 +52,7 @@ public class Unloader extends Block{
     public void configured(Tile tile, Player player, int value){
         tile.entity.items.clear();
         tile.<UnloaderEntity>entity().sortItem = content.item(value);
-        PlayerLog.INSTANCE.record(player, PlayerLog.Action.configured, tile, null);
+        playerLog.record(player, PlayerLog.Action.configured, tile, null);
     }
 
     @Override

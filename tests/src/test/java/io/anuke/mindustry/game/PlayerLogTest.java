@@ -1,5 +1,6 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.entities.type.Player;
@@ -25,7 +26,7 @@ public class PlayerLogTest{
 
     private StringBuilder sb;
     private int now;
-    private ConcurrentMap<String, Integer> players;
+    private ObjectSet<String> players;
     private Player player;
     private PlayerEvent event;
 
@@ -33,10 +34,10 @@ public class PlayerLogTest{
     public void setUp(){
         sb = new StringBuilder();
         now = 3333;
-        players = new ConcurrentHashMap<>();
-        players.put(PLAYER, 555);
-        players.put("Sally", 1234);
-        players.put("Billy", 5678);
+        players = new ObjectSet<>();
+        players.add(PLAYER);
+        players.add("Sally");
+        players.add("Billy");
         Vars.content = new ContentLoader();
         Vars.content.createContent();
         player = new Player() { };
@@ -92,7 +93,7 @@ public class PlayerLogTest{
     @Test
     public void LogFilter_MultiplePlayer_Throws(){
         final Exception e = assertThrows(IllegalArgumentException.class, () -> createFilter("ly"));
-        assertEquals("Did you mean: Billy, Sally?", e.getMessage());
+        assertEquals("Did you mean: Sally, Billy?", e.getMessage());
     }
 
     @Test

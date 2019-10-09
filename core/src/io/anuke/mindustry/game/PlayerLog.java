@@ -1,18 +1,13 @@
 package io.anuke.mindustry.game;
 
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.arc.math.geom.Rectangle;
 import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.world.Tile;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
- * Maintains a thread-safe fixed-window log of player actions, primarily to aid griefer detection.
+ * Maintains a fixed-window log of player actions, primarily to aid griefer detection.
  */
 public class PlayerLog{
     public enum Action{
@@ -33,22 +28,19 @@ public class PlayerLog{
         }
     }
     /** The size of the log; for 16 players averaging 200 APM this will save about 5 min of actions */
-    private static final int BUFFER_SIZE = 16*1024;
+    public static final int BUFFER_SIZE = 16*1024;
     /** Events per "page" when returning results */
-    private static final int PAGE_SIZE = 16;
+    public static final int PAGE_SIZE = 16;
 
-    /** Global singleton */
-    public static final PlayerLog INSTANCE = new PlayerLog(BUFFER_SIZE, PAGE_SIZE);
-
-    private final ConcurrentMap<String, Integer> players;
+    private final ObjectSet<String> players;
     private final PlayerEvent[] ringBuffer;
-    private final AtomicInteger last;
     private final int pageSize;
+    private int last;
 
-    PlayerLog(int size, int pageSize){
-        this.players = new ConcurrentHashMap<>();
+    public PlayerLog(int size, int pageSize){
+        this.players = new ObjectSet<>();
         this.ringBuffer = new PlayerEvent[size];
-        this.last = new AtomicInteger(0);
+        this.last = 0;
         this.pageSize = pageSize;
     }
 
@@ -56,8 +48,9 @@ public class PlayerLog{
     public void record(Player player, Action action, Tile tile1, Tile tile2){
         int now = (int)(Time.time() / 60f);
         final String name = player == null ? "<unknown>" : player.name;
-        players.put(name, now);
-        int next = last.getAndAccumulate(1, (v, i) -> ++v < ringBuffer.length ? v : 0);
+        players.add(name);
+        int next = last++;
+        if(last == ringBuffer.length) last = 0;
         ringBuffer[next] = tile2 == null
             ? new PlayerEvent(now, name, action, tile1.block().localizedName(), tile1.x, tile1.y)
             : new PlayerEvent(now, name, action, tile1.block().localizedName(), tile1.x, tile1.y,
@@ -72,9 +65,8 @@ public class PlayerLog{
             final StringBuilder sb = new StringBuilder();
             // There is a race condition where another thread could call record() and inject a new record in place of the
             // oldest.  This is a benign race and is not worth avoiding.
-            int lastEvent = last.get();
             int now = (int) (Time.time() / 60f);
-            for(int i = lastEvent - 1; i != lastEvent; --i){
+            for(int i = last - 1; i != last; --i){
                 if(i < 0){
                     i = ringBuffer.length - 1;
                 }
@@ -143,7 +135,7 @@ class LogFilter{
     private int pageEnd;
     private int count;
 
-    LogFilter(int pageSize, String[] args, ConcurrentMap<String, Integer> players, Player player){
+    LogFilter(int pageSize, String[] args, ObjectSet<String> players, Player player){
         // Default to page 0, whole map scope, all players
         this.pageSize = pageSize;
         this.scope = new Rectangle(0, 0, Float.MAX_VALUE, Float.MAX_VALUE);
@@ -213,14 +205,14 @@ class LogFilter{
         return "Showing page " + (pageBegin / pageSize + 1) + " of " + (count + pageSize - 1) / pageSize + '\n';
     }
 
-    private String findPlayer(ConcurrentMap<String, Integer> players, String player){
+    private String findPlayer(ObjectSet<String> players, String player){
         // Exact match is best
-        if(players.containsKey(player)){
+        if(players.contains(player)){
             return player;
         }
         // Look for case-sensitive match
         String result = null;
-        for(String name : players.keySet()){
+        for(String name : players){
             if(name.contains(player)){
                 if(result == null){
                     result = name;
@@ -232,7 +224,7 @@ class LogFilter{
         if(result != null) return result;
         // Look for case-insensitive match
         player = player.toLowerCase();
-        for(String name : players.keySet()){
+        for(String name : players){
             if(name.toLowerCase().contains(player)){
                 if(result == null){
                     result = name;

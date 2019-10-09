@@ -105,7 +105,7 @@ public class PowerNode extends PowerBlock{
                 //reflow from other end
                 og.reflow(other);
             }
-            PlayerLog.INSTANCE.record(player, PlayerLog.Action.unlinked, tile, other);
+            playerLog.record(player, PlayerLog.Action.unlinked, tile, other);
         }else if(linkValid(tile, other) && valid && entity.power.links.size < maxNodes){
 
             if(!entity.power.links.contains(other.pos())){
@@ -120,7 +120,7 @@ public class PowerNode extends PowerBlock{
             }
 
             entity.power.graph.add(other.entity.power.graph);
-            PlayerLog.INSTANCE.record(player, PlayerLog.Action.linked, tile, other);
+            playerLog.record(player, PlayerLog.Action.linked, tile, other);
         }
     }
 

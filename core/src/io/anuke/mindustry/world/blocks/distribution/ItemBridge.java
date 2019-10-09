@@ -48,14 +48,14 @@ public class ItemBridge extends Block{
         if(world.tile(entity.link) != null && world.tile(entity.link).entity instanceof ItemBridgeEntity){
             ItemBridgeEntity oe = world.tile(entity.link).entity();
             oe.incoming.remove(tile.pos());
-            PlayerLog.INSTANCE.record(player, PlayerLog.Action.unlinked, tile, oe.tile);
+            playerLog.record(player, PlayerLog.Action.unlinked, tile, oe.tile);
         }
 
         entity.link = value;
 
         if(world.tile(value) != null && world.tile(value).entity instanceof ItemBridgeEntity){
             ((ItemBridgeEntity)world.tile(value).entity).incoming.add(tile.pos());
-            PlayerLog.INSTANCE.record(player, PlayerLog.Action.linked, tile, world.tile(value));
+            playerLog.record(player, PlayerLog.Action.linked, tile, world.tile(value));
         }
     }
 

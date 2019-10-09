@@ -15,6 +15,7 @@ import io.anuke.mindustry.world.meta.*;
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
+import static io.anuke.mindustry.Vars.playerLog;
 
 public class Sorter extends Block{
     private static Item lastItem;
@@ -54,7 +55,7 @@ public class Sorter extends Block{
     @Override
     public void configured(Tile tile, Player player, int value){
         tile.<SorterEntity>entity().sortItem = content.item(value);
-        PlayerLog.INSTANCE.record(player, PlayerLog.Action.configured, tile, null);
+        playerLog.record(player, PlayerLog.Action.configured, tile, null);
     }
 
     @Override
