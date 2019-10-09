@@ -15,6 +15,7 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -64,7 +65,7 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Log.setUseColors(false);
         Version.init();
-        boolean useSteam = Version.modifier.equals("steam");
+        boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
@@ -129,7 +130,13 @@ public class DesktopLauncher extends ClientLauncher{
             }
 
             try{
-                SteamAPI.loadLibraries();
+                try{
+                    SteamAPI.loadLibraries();
+                }catch(Throwable t){
+                    Log.err(t);
+                    fallbackSteam();
+                }
+
                 if(!SteamAPI.init()){
                     Log.err("Steam client not running.");
                 }else{
@@ -141,6 +148,19 @@ public class DesktopLauncher extends ClientLauncher{
                 Log.err("Failed to load Steam native libraries.");
                 Log.err(e);
             }
+        }
+    }
+
+    void fallbackSteam(){
+        try{
+            String name = "steam_api";
+            if(OS.isMac || OS.isLinux) name = "lib" + name;
+            if(OS.isWindows && OS.is64Bit) name += "64";
+            name += (OS.isLinux ? ".so" : OS.isMac ? ".dylib" : ".dll");
+            Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
+            System.loadLibrary(new File(name).getAbsolutePath());
+        }catch(Throwable e){
+            Log.err(e);
         }
     }
 

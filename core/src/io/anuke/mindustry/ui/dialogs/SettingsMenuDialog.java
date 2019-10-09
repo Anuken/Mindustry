@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -227,7 +228,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("hints", true);
 
-        if(steam){
+        if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {
                 platform.updateLobby();
             });
