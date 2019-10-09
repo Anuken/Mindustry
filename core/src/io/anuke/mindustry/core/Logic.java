@@ -204,6 +204,7 @@ public class Logic implements ApplicationListener{
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
         netClient.setQuiet();
+        playerLog.clear();
     }
 
     @Override

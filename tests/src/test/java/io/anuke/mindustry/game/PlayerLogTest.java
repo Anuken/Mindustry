@@ -1,47 +1,51 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.ContentLoader;
 import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.world.Tile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 
 /**
  * Unit Tests for PlayerLog.
  */
 public class PlayerLogTest{
     private static final int TIMESTAMP = 1234;
-    private static final String PLAYER = "Bob";
-    private static final String TILE1 = "Steam Gen";
-    private static final String TILE2 = "Power Node";
+    private static final String PLAYER_NAME = "Bob";
+    private static final String TILE1_NAME = "Steam Gen";
+    private static final String TILE2_NAME = "Power Node";
     private static final short IN_XY = 20;
     private static final short OUT_XY = 21;
+    private static final int LOG_SIZE = 16;
+    private static final String[] SEARCH_ALL = { };
+    private static final Tile TILE_1 = new Tile(IN_XY, IN_XY);
+    private static final Tile TILE_2 = new Tile(OUT_XY, OUT_XY);;
 
     private StringBuilder sb;
     private int now;
     private ObjectSet<String> players;
     private Player player;
     private PlayerEvent event;
+    private PlayerLog log;
 
     @BeforeEach
     public void setUp(){
         sb = new StringBuilder();
         now = 3333;
         players = new ObjectSet<>();
-        players.add(PLAYER);
+        players.add(PLAYER_NAME);
         players.add("Sally");
         players.add("Billy");
         Vars.content = new ContentLoader();
         Vars.content.createContent();
         player = new Player() { };
         event = createEvent(IN_XY);
+        log = new PlayerLog(LOG_SIZE, 4);
     }
 
     private LogFilter createFilter(String... args){
@@ -49,11 +53,11 @@ public class PlayerLogTest{
     }
 
     private PlayerEvent createEvent(short xy){
-        return new PlayerEvent(TIMESTAMP, PLAYER, PlayerLog.Action.linked, TILE1, xy, xy);
+        return new PlayerEvent(TIMESTAMP, PLAYER_NAME, PlayerLog.Action.linked, TILE1_NAME, xy, xy);
     }
 
     private PlayerEvent createEvent(short xy1, short xy2){
-        return new PlayerEvent(TIMESTAMP, PLAYER, PlayerLog.Action.linked, TILE1, xy1, xy1, TILE2, xy2, xy2);
+        return new PlayerEvent(TIMESTAMP, PLAYER_NAME, PlayerLog.Action.linked, TILE1_NAME, xy1, xy1, TILE2_NAME, xy2, xy2);
     }
 
     @Test
@@ -135,7 +139,7 @@ public class PlayerLogTest{
 
     @Test
     public void matches_Player_True(){
-        assertTrue(createFilter(PLAYER).matches(event));
+        assertTrue(createFilter(PLAYER_NAME).matches(event));
     }
 
     @Test
@@ -167,5 +171,61 @@ public class PlayerLogTest{
         filter.matches(event);
         filter.matches(event);
         assertEquals("Showing page 1 of 2\n", filter.summary());
+    }
+
+    @Test
+    public void PlayerLog_SmallSize_Throws(){
+        final Exception e = assertThrows(IllegalArgumentException.class, () -> new PlayerLog(15, 2));
+        assertEquals("Size must be at least 16", e.getMessage());
+    }
+
+    @Test
+    public void PlayerLog_SmallPageSize_Throws(){
+        final Exception e = assertThrows(IllegalArgumentException.class, () -> new PlayerLog(16, 17));
+        assertEquals("LogSize: 16 < PageSize: 17", e.getMessage());
+    }
+
+    @Test
+    public void clear_Succeeds(){
+        log.record(null, PlayerLog.Action.unlinked, TILE_1, null);
+        log.clear();
+        assertEquals("No results.", log.search(SEARCH_ALL, player));
+    }
+
+    @Test
+    public void record_NullPlayerSingleTile_Succeeds(){
+        log.record(null, PlayerLog.Action.unlinked, TILE_1, null);
+        assertEquals("Showing page 1 of 1\n00:00:00: (<unknown>) unlinked air@20,20\n", log.search(SEARCH_ALL, player));
+    }
+
+    @Test
+    public void record_PlayerDoubleTile_Succeeds(){
+        log.record(player, PlayerLog.Action.unlinked, TILE_1, TILE_2);
+        assertEquals("Showing page 1 of 1\n00:00:00: (noname) unlinked air@20,20 air@21,21\n", log.search(SEARCH_ALL, player));
+    }
+
+    @Test
+    public void record_WrapLog_Succeeds(){
+        Time.setDeltaProvider(() -> 270f);
+        for(int i = -4; i != LOG_SIZE; ++i){
+            log.record(player, PlayerLog.Action.unlinked, TILE_1, TILE_2);
+            Time.update();
+        }
+        assertEquals(
+            "Showing page 3 of 4\n" +
+            "00:00:41: (noname) unlinked air@20,20 air@21,21\n" +
+            "00:00:45: (noname) unlinked air@20,20 air@21,21\n" +
+            "00:00:50: (noname) unlinked air@20,20 air@21,21\n" +
+            "00:00:54: (noname) unlinked air@20,20 air@21,21\n", log.search(new String[]{"3"}, player));
+    }
+
+    @Test
+    public void search_Empty_Succeeds(){
+        assertEquals("No results.", log.search(SEARCH_ALL, player));
+    }
+
+    @Test
+    public void search_Error_Succeeds(){
+        assertEquals("Player tammy not found.", log.search(new String[]{"tammy"}, player));
     }
 }

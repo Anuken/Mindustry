@@ -6,6 +6,8 @@ import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.world.Tile;
 
+import java.util.Arrays;
+
 /**
  * Maintains a fixed-window log of player actions, primarily to aid griefer detection.
  */
@@ -38,10 +40,22 @@ public class PlayerLog{
     private int last;
 
     public PlayerLog(int size, int pageSize){
+        if(size < 16){
+            throw new IllegalArgumentException("Size must be at least 16");
+        }
+        if(size < pageSize){
+            throw new IllegalArgumentException("LogSize: " + size + " < PageSize: " + pageSize);
+        }
         this.players = new ObjectSet<>();
         this.ringBuffer = new PlayerEvent[size];
         this.last = 0;
         this.pageSize = pageSize;
+    }
+
+    public void clear(){
+        players.clear();
+        Arrays.fill(ringBuffer, null);
+        last = 0;
     }
 
     /** Records a new event and updates the player map */
@@ -49,23 +63,19 @@ public class PlayerLog{
         int now = (int)(Time.time() / 60f);
         final String name = player == null ? "<unknown>" : player.name;
         players.add(name);
-        int next = last++;
-        if(last == ringBuffer.length) last = 0;
-        ringBuffer[next] = tile2 == null
+        ringBuffer[last++] = tile2 == null
             ? new PlayerEvent(now, name, action, tile1.block().localizedName(), tile1.x, tile1.y)
             : new PlayerEvent(now, name, action, tile1.block().localizedName(), tile1.x, tile1.y,
                 tile2.block().localizedName(), tile2.x, tile2.y);
+        if(last == ringBuffer.length) last = 0;
     }
 
     /** Returns matching log records from newest to oldest as a String */
     public String search(String[] args, Player player){
         try{
             final LogFilter filter = new LogFilter(pageSize, args, players, player);
-            // Build result
             final StringBuilder sb = new StringBuilder();
-            // There is a race condition where another thread could call record() and inject a new record in place of the
-            // oldest.  This is a benign race and is not worth avoiding.
-            int now = (int) (Time.time() / 60f);
+            int now = (int)(Time.time() / 60f);
             for(int i = last - 1; i != last; --i){
                 if(i < 0){
                     i = ringBuffer.length - 1;
@@ -86,6 +96,9 @@ public class PlayerLog{
     }
 }
 
+/**
+ * Minimal data about a player action; enough to filter by location, player and action.
+ */
 class PlayerEvent{
     final int timestamp;
     final String player;
@@ -126,6 +139,9 @@ class PlayerEvent{
     }
 }
 
+/**
+ * Stateful filter which parses command args and determines which events match the filter.
+ */
 class LogFilter{
     private final int pageSize;
     private final Rectangle scope;
