@@ -1,12 +1,17 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.scene.ui.ButtonGroup;
+import io.anuke.arc.scene.ui.ImageButton;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.Align;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -17,6 +22,9 @@ import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block{
     private static Item lastItem;
+    private static boolean lastForwardWhenMatch = true;
+
+    protected TextureRegion modeRegion;
 
     public Sorter(String name){
         super(name);
@@ -36,8 +44,17 @@ public class Sorter extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem.id));
+            Core.app.post(() -> {
+                tile.configure(lastItem.id);
+            });
         }
+        tile.<SorterEntity>entity().forwardWhenMatch = lastForwardWhenMatch;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        modeRegion = Core.atlas.find(name + "-mode");
     }
 
     /*
@@ -60,10 +77,17 @@ public class Sorter extends Block{
         super.draw(tile);
 
         SorterEntity entity = tile.entity();
-        if(entity.sortItem == null) return;
 
-        Draw.color(entity.sortItem.color);
-        Draw.rect("center", tile.worldx(), tile.worldy());
+        if (!entity.forwardWhenMatch){
+            Draw.color(Color.red, 0.5f);
+            Draw.rect(modeRegion, tile.worldx(), tile.worldy());
+        }
+
+        if(entity.sortItem != null){
+            Draw.color(entity.sortItem.color);
+            Draw.rect("center", tile.worldx(), tile.worldy());
+        }
+
         Draw.color();
     }
 
@@ -92,7 +116,8 @@ public class Sorter extends Block{
         if(dir == -1) return null;
         Tile to;
 
-        if(item == entity.sortItem){
+
+        if((item == entity.sortItem) ^ !entity.forwardWhenMatch){
             //prevent 3-chains
             if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
                 return null;
@@ -135,6 +160,45 @@ public class Sorter extends Block{
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
+
+        ButtonGroup<ImageButton> modeSelect = new ButtonGroup<>();
+        Table cont = new Table();
+        cont.defaults().size(38);
+
+        ImageButton forwardButton = cont.addImageButton(Core.atlas.drawable("icon-arrow-forward-small"), Styles.clearToggleTransi, 28f, () -> {})
+                .group(modeSelect)
+                .align(Align.left)
+                .checked(entity.forwardWhenMatch)
+                .margin(4)
+                .get();
+
+        forwardButton.changed(() -> {
+            if (forwardButton.isChecked()) {
+                entity.forwardWhenMatch = true;
+                lastForwardWhenMatch = true;
+            }
+        });
+
+        forwardButton.update(() -> forwardButton.setChecked(entity.forwardWhenMatch));
+
+        ImageButton splitButton = cont.addImageButton(Core.atlas.drawable("icon-arrow-split-small"), Styles.clearToggleTransi, 28f, () -> {})
+                .group(modeSelect)
+                .align(Align.left)
+                .checked(!entity.forwardWhenMatch)
+                .margin(4)
+                .get();
+
+        splitButton.changed(() -> {
+            if (splitButton.isChecked()) {
+                entity.forwardWhenMatch = false;
+                lastForwardWhenMatch = false;
+            }
+        });
+
+        splitButton.update(() -> splitButton.setChecked(!entity.forwardWhenMatch));
+
+        table.row();
+        table.add(cont).align(Align.left);
     }
 
     @Override
@@ -145,6 +209,7 @@ public class Sorter extends Block{
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;
+        boolean forwardWhenMatch = true;
 
         @Override
         public int config(){
@@ -160,12 +225,14 @@ public class Sorter extends Block{
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeShort(sortItem == null ? -1 : sortItem.id);
+            stream.writeBoolean(forwardWhenMatch);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
             sortItem = content.item(stream.readShort());
+            forwardWhenMatch = stream.readBoolean();
             if(revision == 1){
                 new DirectionalItemBuffer(20, 45f).read(stream);
             }

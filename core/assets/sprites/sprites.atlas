@@ -3525,6 +3525,13 @@ sorter
   orig: 32, 32
   offset: 0, 0
   index: -1
+sorter-mode
+   rotate: false
+   xy: 865, 12
+   size: 32, 32
+   orig: 32, 32
+   offset: 0, 0
+   index: -1
 block-spawn-full
   rotate: false
   xy: 717, 518
@@ -18983,6 +18990,20 @@ icon-zoom-tiny
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
+  index: -1
+icon-arrow-forward-small
+  rotate: false
+  xy: 1883, 278
+  size: 32, 32
+  orig: 32, 32
+  offset: 30, 30
+  index: -1
+icon-arrow-split-small
+  rotate: false
+  xy: 1915, 278
+  size: 32, 32
+  orig: 32, 32
+  offset: 30, 30
   index: -1
 info-banner
   rotate: false
