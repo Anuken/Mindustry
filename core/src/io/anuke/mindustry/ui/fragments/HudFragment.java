@@ -37,6 +37,10 @@ public class HudFragment extends Fragment{
     private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
+
+    private Table lastDebugTable;
+    private boolean lastDebugTableFlag = false;
+
     private boolean shown = true;
     private float dsize = 59;
 
@@ -540,6 +544,30 @@ public class HudFragment extends Fragment{
             }
         });
         Core.scene.add(image);
+    }
+
+    public void showDebug(String text){
+        if(lastDebugTable == null){
+            lastDebugTable = new Table(Tex.button);
+            lastDebugTable.update(() -> {
+                if(state.is(State.menu)){
+                    lastDebugTable.remove();
+                    lastDebugTable = null;
+                }
+                lastDebugTableFlag = true;
+            });
+            lastDebugTable.margin(12);
+            Table container = Core.scene.table();
+            container.bottom().add(lastDebugTable);
+        }
+        if(lastDebugTableFlag){
+            lastDebugTableFlag = false;
+            lastDebugTable.clearChildren();
+        }
+
+        lastDebugTable.row().add(text).wrap().width(280f).get().setAlignment(Align.center, Align.left);
+        lastDebugTable.pack();
+
     }
 
     private void showLaunchConfirm(){
