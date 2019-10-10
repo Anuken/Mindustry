@@ -278,7 +278,7 @@ public class Mods implements Loadable{
                             if(file.extension().equals("json")){
                                 try{
                                     //this binds the content but does not load it entirely
-                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
+                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), type);
                                     Log.info("[{0}] Loaded '{1}'.", mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                 }catch(Exception e){
                                     throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
