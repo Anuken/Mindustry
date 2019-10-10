@@ -63,27 +63,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //region utility methods
 
-    /** Check and assign targets for a specific position. */
-    void checkTargets(float x, float y){
-        Unit unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
-
-        if(unit != null){
-            player.setMineTile(null);
-            player.target = unit;
-        }else{
-            Tile tile = world.ltileWorld(x, y);
-
-            if(tile != null && tile.synthetic() && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
-                TileEntity entity = tile.entity;
-                player.setMineTile(null);
-                player.target = entity;
-            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
-                player.setMineTile(null);
-                player.target = tile.entity;
-            }
-        }
-    }
-
     /** Returns whether this tile is in the list of requests, or at least colliding with one. */
     boolean hasRequest(Tile tile){
         return getRequest(tile) != null;

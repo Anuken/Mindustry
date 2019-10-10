@@ -464,6 +464,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Tries to select the player to drop off items, returns true if successful. */
+    boolean tryTapPlayer(Position p){
+        return tryTapPlayer(p.getX(), p.getY());
+    }
+
+    /** Tries to select the player to drop off items, returns true if successful. */
     boolean tryTapPlayer(float x, float y){
         if(canTapPlayer(x, y)){
             droppingItem = true;
@@ -492,6 +497,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.acceptsItem(tile.drop())
         && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= Player.mineDistance;
+    }
+
+    /** Returns the tile at the specified MOUSE coordinates. */
+    Tile tileAtMouse() {
+        return tileAt(Core.input.mouse());
+    }
+
+    /** Returns the tile at the specified MOUSE coordinates. */
+    Tile tileAt(Position p) {
+        return tileAt(p.getX(), p.getY());
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -700,6 +715,32 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             cons.accept(line);
 
             Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
+        }
+    }
+
+    /** Check and assign targets for a specific position. */
+    void checkTargets(Position p){
+        checkTargets(p.getX(),p.getY());
+    }
+
+    /** Check and assign targets for a specific position. */
+    void checkTargets(float x, float y){
+        Unit unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
+
+        if(unit != null){
+            player.setMineTile(null);
+            player.target = unit;
+        }else{
+            Tile tile = world.ltileWorld(x, y);
+
+            if(tile != null && tile.synthetic() && state.teams.areEnemies(player.getTeam(), tile.getTeam())){
+                TileEntity entity = tile.entity;
+                player.setMineTile(null);
+                player.target = entity;
+            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
+                player.setMineTile(null);
+                player.target = tile.entity;
+            }
         }
     }
 

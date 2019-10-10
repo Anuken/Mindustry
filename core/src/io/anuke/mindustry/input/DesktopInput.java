@@ -5,6 +5,7 @@ import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
@@ -12,6 +13,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
+import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -39,6 +41,11 @@ public class DesktopInput extends InputHandler{
     private @Nullable BuildRequest sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false;
+
+    private TargetTrait lastClickTarget;
+    private TargetTrait clickTarget;
+    private long clickStart = 0;
+    private long lastClick = 0;
 
     @Override
     public void buildUI(Group group){
@@ -238,7 +245,11 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
-
+            if (clickStart == 0) {
+                clickStart = Time.millis();
+                clickTarget = null;
+            }
+            boolean moveToCursor = false;
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -252,7 +263,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld()) && player.buildQueue().size == 0 && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }
@@ -286,6 +297,26 @@ public class DesktopInput extends InputHandler{
             }
         }else{
             overrideLineRotation = false;
+        }
+        if(Core.input.keyRelease(Binding.select)){
+            float clickDuration = Time.timeSinceMillis(clickStart);
+            clickStart = 0;
+
+            ui.hudfrag.showDebug("click clickDuration:" + clickDuration + "ms");
+            int singleClickDuration = 200; // TODO make this a setting
+            int doubleClickDelay = 200; // TODO make this a setting
+            if (clickDuration < singleClickDuration) {
+                float lastClickDelay = Time.timeSinceMillis(lastClick);
+                ui.hudfrag.showDebug("double click speed:" + lastClickDelay + "ms");
+                lastClickTarget = tileAtMouse();
+                if (lastClickDelay < doubleClickDelay && (lastClickTarget == clickTarget)){
+                    clickTarget = tileAtMouse();
+                    ui.hudfrag.showDebug("target:" + clickTarget.toString());
+                }
+
+                lastClick = Time.millis();
+            }
+
         }
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
@@ -357,7 +388,26 @@ public class DesktopInput extends InputHandler{
             }
 
             float camSpeed = (float) Core.settings.getInt("cameraspeed");
-            cameraMovement.scl(Time.delta() * camSpeed);
+            if(!cameraMovement.isZero()){
+
+                ui.hudfrag.showDebug("camera movement");
+                cameraMovement.scl(Time.delta() * camSpeed);
+                clickTarget = null;
+            } else if (clickTarget != null){
+                float clickTargetDst = Core.camera.position.dst(clickTarget);
+
+                ui.hudfrag.showDebug("target dist: "+ String.valueOf(clickTargetDst));
+                if(clickTargetDst > 0 ){
+                    cameraMovement.set(Math.min(clickTargetDst, Time.delta()*camSpeed),0);
+                    cameraMovement.setAngle(Core.camera.position.angleTo(clickTarget));
+                } else {
+                    clickTarget = null;
+                }
+            } else {
+
+                ui.hudfrag.showDebug("no target");
+            }
+
 
             Core.camera.position.add(cameraMovement);
             clampCameraPosition();
@@ -365,15 +415,13 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void clampCameraPosition(){
-        ui.hudfrag.showDebug(Core.camera.position.toString());
         Core.camera.position.clamp(0f - scene.getWidth()/tilesize/4, world.width() * tilesize - tilesize + scene.getWidth()/tilesize/4, 0F - scene.getHeight()/tilesize /4, world.height() * tilesize - tilesize + scene.getHeight() /tilesize/4);
-        ui.hudfrag.showDebug(Core.camera.position.toString());
     }
 
     protected Vector2 mouseCameraVector() {
         Vector2 directionVector = new Vector2().setZero();
 
-        if (mouseHit(true) == null ||
+        if (!Core.scene.hasMouse() ||
                 getMouseX() <= 1f || getMouseY() <= 1f
                 || getMouseX() >= scene.getWidth() - 1f || getMouseY() >= scene.getHeight() - 1f
         ) {
@@ -392,10 +440,6 @@ public class DesktopInput extends InputHandler{
             directionVector.setLength(accelerationVector.len());
         }
         return directionVector;
-    }
-
-    public static Element mouseHit(boolean touchable) {
-        return Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), touchable);
     }
 
     /**
