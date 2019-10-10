@@ -195,9 +195,9 @@ public class ContentParser{
             T item;
             if(Vars.content.getByName(type, name) != null){
                 item = (T)Vars.content.getByName(type, name);
+                readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
-
                 item = constructor.get(mod + "-" + name);
             }
             currentContent = item;
@@ -207,17 +207,22 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        String entryName = type + "." + currentMod.name + "-" + name + ".";
+        UnlockableContent cont = Vars.content.getByName(type, name) instanceof UnlockableContent ?
+                                Vars.content.getByName(type, name) : null;
+
+        String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
             bundle.getProperties().put(entryName + "name", value.getString("name"));
+            if(cont != null) cont.localizedName = value.getString("name");
             value.remove("name");
         }
 
         if(value.has("description")){
             bundle.getProperties().put(entryName + "description", value.getString("description"));
+            if(cont != null) cont.description = value.getString("description");
             value.remove("description");
         }
     }
