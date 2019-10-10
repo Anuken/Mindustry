@@ -131,7 +131,7 @@ public class ContentParser{
                 "io.anuke.mindustry.world.blocks.units"
                 );
 
-                block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+                block = make(type, mod + "-" + name);
             }
 
             currentContent = block;
@@ -284,6 +284,16 @@ public class ContentParser{
             java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
             return cons.newInstance();
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> T make(Class<T> type, String name){
+        try{
+            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor(String.class);
+            cons.setAccessible(true);
+            return cons.newInstance(name);
         }catch(Exception e){
             throw new RuntimeException(e);
         }
