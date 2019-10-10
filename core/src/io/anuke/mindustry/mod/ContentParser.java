@@ -113,7 +113,7 @@ public class ContentParser{
                 block = Vars.content.getByName(ContentType.block, name);
 
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When overwriting an existing block, you may not declared its type. The original type will be used. Block: " + name);
+                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declared its type. The original type will be used. Block: " + name);
                 }
             }else{
                 //TODO generate dynamically instead of doing.. this

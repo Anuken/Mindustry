@@ -35,7 +35,7 @@ public class OreBlock extends OverlayFloor{
     @Override
     @OverrideCallSuper
     public void createIcons(PixmapPacker out, PixmapPacker editor){
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < variants; i++){
             Pixmap image = new Pixmap(32, 32);
             PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
 

@@ -94,6 +94,14 @@ public class Floor extends Block{
             return;
         }
 
+        if(variants > 0){
+            variantRegions();
+
+            for(int i = 0; i < variantRegions.length; i++){
+                editor.pack("editor-" + ((AtlasRegion)variantRegions[i]).name, Core.atlas.getPixmap((AtlasRegion)variantRegions[i]).crop());
+            }
+        }
+
         Color color = new Color();
         Color color2 = new Color();
         PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)generateIcons()[0]);
