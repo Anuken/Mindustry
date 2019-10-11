@@ -132,7 +132,13 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
-
+        public final Tile tile;
+        public final Player player;
+        
+        public DepositEvent(Tile tile, Player player){
+            this.tile = tile;
+            this.player = player;
+        }
     }
 
     public static class GameOverEvent{

@@ -105,7 +105,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
-        Events.fire(new DepositEvent());
+        Core.app.post(() -> Events.fire(new DepositEvent(tile, player)));
 
         for(int i = 0; i < sent; i++){
             boolean end = i == sent - 1;
