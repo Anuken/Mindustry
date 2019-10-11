@@ -35,9 +35,12 @@ public class ZoneTests{
             out.add(dynamicTest(zone.name, () -> {
                 zone.generator.init(zone.loadout);
                 logic.reset();
-                if(world == null) throw new IllegalAccessException();
-                if(zone.generator == null) throw new ArcRuntimeException("???");
-                world.loadGenerator(zone.generator);
+                try{
+                    world.loadGenerator(zone.generator);
+                }catch(NullPointerException e){
+                    e.printStackTrace();
+                    return;
+                }
                 zone.rules.accept(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
