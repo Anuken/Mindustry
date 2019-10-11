@@ -37,11 +37,6 @@ public class DesktopInput extends InputHandler{
     private boolean deleting = false;
 
     @Override
-    public boolean isDrawing(){
-        return mode != none || block != null;
-    }
-
-    @Override
     public void buildUI(Group group){
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
