@@ -270,7 +270,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
             }
 
-            Draw.mixcol(Tmp.c1, 1f);
+            //Draw.mixcol(Tmp.c1, 1f);
+            Draw.reset();
             drawRequest(request);
 
             //draw last placed request
@@ -327,8 +328,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     protected void drawRequest(BuildRequest request){
-        drawRequest(request.x, request.y, request.block, request.rotation);
-        if(!request.breaking){
+        if(request.breaking){
+            drawSelected(request.x, request.y, request.block, Pal.remove);
+        }else{
+            drawRequest(request.x, request.y, request.block, request.rotation);
             drawSelected(request.x, request.y, request.block, Pal.accent);
         }
     }
@@ -456,9 +459,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
-        if(state.is(State.menu) || player.isDead()){
+        if(state.is(State.menu) ){
             selectRequests.clear();
             removals.clear();
+            mode = none;
+        }
+
+        if(player.isDead()){
             mode = none;
         }
 
@@ -487,8 +494,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == none){
             selecting = false;
             lineMode = false;
-            removals.addAll(selectRequests);
-            selectRequests.clear();
         }
 
         if(lineMode && mode == placing && block == null){

@@ -211,7 +211,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
-            drawSelected(request.x, request.y, request.block, Pal.remove);
+            drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
         }
     }
 
@@ -288,6 +288,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
+        /*
+        for(BuildRequest req : selectRequests){
+            if(req.breaking) continue;
+            if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                drawBreaking(req);
+            }
+        }*/
+
         for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
@@ -342,16 +350,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
+                Tile tile = world.ltile(wx, wy);
+
+                if(tile == null) continue;
+
                 if(!flush){
                     tryBreakBlock(wx, wy);
-                }else{
-                    selectRequests.add(new BuildRequest(wx, wy));
+                }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile().link() == tile)){
+                    selectRequests.add(new BuildRequest(tile.x, tile.y));
                 }
             }
         }
 
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
         Iterator<BuildRequest> it = player.buildQueue().iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
@@ -359,6 +372,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 it.remove();
             }
         }
+
+        /*
+        it = selectRequests.iterator();
+        while(it.hasNext()){
+            BuildRequest req = it.next();
+            if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                it.remove();
+            }
+        }*/
 
         //remove blocks to rebuild
         Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
