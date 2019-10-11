@@ -3,6 +3,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
@@ -37,7 +38,7 @@ public class ZoneTests{
                 logic.reset();
                 try{
                     world.loadGenerator(zone.generator);
-                }catch(NullPointerException e){
+                }catch(SaveException e){
                     e.printStackTrace();
                     return;
                 }
