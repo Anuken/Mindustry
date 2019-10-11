@@ -23,6 +23,7 @@ import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.*;
@@ -229,7 +230,10 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
-            Throwable cause = Strings.getFinalCause(e);
+            Array<Throwable> causes = Strings.getCauses(e);
+            Throwable fc = causes.find(t -> t instanceof ModLoadException);
+            if(fc == null) fc = Strings.getFinalCause(e);
+            Throwable cause = fc;
             if(!fbgp){
                 dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }

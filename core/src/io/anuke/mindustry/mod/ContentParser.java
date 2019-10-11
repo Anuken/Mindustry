@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -229,9 +230,11 @@ public class ContentParser{
 
     /** Call to read a content's extra info later.*/
     private void read(Runnable run){
+        Content cont = currentContent;
         LoadedMod mod = currentMod;
         reads.add(() -> {
             this.currentMod = mod;
+            this.currentContent = cont;
             run.run();
         });
     }
@@ -255,7 +258,7 @@ public class ContentParser{
         try{
             reads.each(Runnable::run);
         }catch(Exception e){
-            throw new RuntimeException("Error occurred parsing content: " + currentContent, e);
+            Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
     }
@@ -265,9 +268,10 @@ public class ContentParser{
      * @param name the name of the file without its extension
      * @param json the json to parse
      * @param type the type of content this is
+     * @param file file that this content is being parsed from
      * @return the content that was parsed
      */
-    public Content parse(LoadedMod mod, String name, String json, ContentType type) throws Exception{
+    public Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -279,6 +283,7 @@ public class ContentParser{
 
         currentMod = mod;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        c.sourceFile = file;
         c.mod = mod;
         checkNulls(c);
         return c;

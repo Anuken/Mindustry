@@ -70,7 +70,7 @@ public class HostDialog extends FloatingDialog{
                 player.isAdmin = true;
 
                 if(steam){
-                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic", () -> {
+                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {
                         ui.showCustomConfirm("$setting.publichost.name", "$public.confirm", "$yes", "$no", () -> {
                             Core.settings.putSave("publichost", true);
                             platform.updateLobby();
