@@ -35,6 +35,8 @@ public class ZoneTests{
             out.add(dynamicTest(zone.name, () -> {
                 zone.generator.init(zone.loadout);
                 logic.reset();
+                if(world == null) throw new IllegalAccessException();
+                if(zone.generator == null) throw new ArcRuntimeException("???");
                 world.loadGenerator(zone.generator);
                 zone.rules.accept(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
