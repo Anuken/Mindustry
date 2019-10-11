@@ -8,6 +8,7 @@ import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic.*;
 import javax.tools.*;
+import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
 
@@ -34,11 +35,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         if(round++ != 0) return false; //only process 1 round
 
         try{
-            path = Paths.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                        .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
-                        .getParent().getParent().getParent().getParent().getParent().getParent().toString();
-            path = path.replace("%20", " ");
-
+            path = System.getProperty("corePath");
             processSounds("Sounds", path + "/assets/sounds", "io.anuke.arc.audio.Sound");
             processSounds("Musics", path + "/assets/music", "io.anuke.arc.audio.Music");
             processUI(roundEnv.getElementsAnnotatedWith(StyleDefaults.class));
@@ -117,7 +114,6 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-
         HashSet<String> names = new HashSet<>();
         Files.list(Paths.get(path)).forEach(p -> {
             String fname = p.getFileName().toString();
