@@ -9,6 +9,10 @@ public class SingleTypeGenerator extends ItemLiquidGenerator{
         super(hasItems, hasLiquids, name);
     }
 
+    public SingleTypeGenerator(String name){
+        super(name);
+    }
+
     @Override
     protected float getItemEfficiency(Item item){
         return 1f;

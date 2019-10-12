@@ -83,6 +83,14 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useSteam){
+            //delete leftover dlls
+            FileHandle file = new FileHandle(".");
+            for(FileHandle other : file.parent().list()){
+                if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
+                    other.delete();
+                }
+            }
+
             if(showConsole){
                 StringBuilder base = new StringBuilder();
                 Log.setLogger(new LogHandler(){
