@@ -72,7 +72,7 @@ public class MinimapRenderer implements Disposable{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h){
+    public void drawEntities(float x, float y, float w, float h, boolean withLabels){
         updateUnitArray();
 
         float sz = baseSize * zoom;
@@ -87,7 +87,7 @@ public class MinimapRenderer implements Disposable{
             float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
             Draw.color(unit.getTeam().color);
 
-            if (unit.getTypeID() == TypeIDs.player) {
+            if (withLabels && unit instanceof Player) {
                 Player pl = (Player) unit;
                 if (!pl.isLocal) {
                     // Only display names for other players.
@@ -99,6 +99,10 @@ public class MinimapRenderer implements Disposable{
         }
 
         Draw.color();
+    }
+
+    public void drawEntities(float x, float y, float w, float h){
+        drawEntities(x, y, w, h, true);
     }
 
     public TextureRegion getRegion(){
