@@ -289,9 +289,12 @@ public class ContentParser{
         }
 
         currentMod = mod;
+        boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
-        c.sourceFile = file;
-        c.mod = mod;
+        if(!exists){
+            c.sourceFile = file;
+            c.mod = mod;
+        }
         checkNulls(c);
         return c;
     }

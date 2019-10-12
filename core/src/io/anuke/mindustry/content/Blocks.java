@@ -1083,11 +1083,12 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        differentialGenerator = new SingleTypeGenerator(true, false, "differential-generator"){{
+        differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 16f;
             itemDuration = 120f;
             hasLiquids = true;
+            hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
