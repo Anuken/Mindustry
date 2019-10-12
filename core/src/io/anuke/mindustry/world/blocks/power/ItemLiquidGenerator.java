@@ -33,12 +33,21 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion, liquidRegion;
     protected boolean randomlyExplode = true;
+    protected boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         super(name);
         this.hasItems = hasItems;
         this.hasLiquids = hasLiquids;
 
+        setDefaults();
+    }
+
+    public ItemLiquidGenerator(String name){
+        super(name);
+    }
+
+    protected void setDefaults(){
         if(hasItems){
             consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true, false);
         }
@@ -46,10 +55,16 @@ public class ItemLiquidGenerator extends PowerGenerator{
         if(hasLiquids){
             consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false).optional(true, false);
         }
+
+        defaults = true;
     }
 
-    public ItemLiquidGenerator(String name){
-        super(name);
+    @Override
+    public void init(){
+        if(!defaults){
+            setDefaults();
+        }
+        super.init();
     }
 
     @Override
