@@ -295,6 +295,7 @@ public class Mods implements Loadable{
         //this finishes parsing content fields
         parser.finishParsing();
 
+        //load content for code mods
         each(Mod::loadContent);
     }
 
@@ -465,6 +466,15 @@ public class Mods implements Loadable{
 
         public boolean enabled(){
             return Core.settings.getBool(name + "-enabled", true);
+        }
+
+        @Override
+        public String toString(){
+            return "LoadedMod{" +
+            "file=" + file +
+            ", root=" + root +
+            ", name='" + name + '\'' +
+            '}';
         }
     }
 
