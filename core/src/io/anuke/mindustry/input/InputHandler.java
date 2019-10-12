@@ -330,6 +330,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Draws a placement icon for a specific block. */
     protected void drawRequest(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
+        brequest.animScale = 1f;
         block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
     }
 
@@ -393,7 +394,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lineRequests.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            lineRequests.add(new BuildRequest(l.x, l.y, l.rotation, block));
+            BuildRequest req = new BuildRequest(l.x, l.y, l.rotation, block);
+            req.animScale = 1f;
+            lineRequests.add(req);
         });
     }
 
@@ -445,12 +448,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
+        /*
         //clear when the player taps on something else
         if(!consumed && !mobile && player.isBuilding() && block == null){
             //player.clearBuilding();
             block = null;
             return true;
-        }
+        }*/
 
         if(!showedInventory){
             frag.inv.hide();

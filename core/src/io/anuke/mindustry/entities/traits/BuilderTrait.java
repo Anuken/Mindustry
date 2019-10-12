@@ -277,7 +277,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public boolean initialized;
 
         //animation variables
-        public float animScale;
+        public float animScale = 0f;
         public float animInvalid;
 
         /** This creates a build request. */

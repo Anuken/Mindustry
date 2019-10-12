@@ -140,7 +140,7 @@ public class ContentParser{
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
                         if(child.name.equals("item")){
-                            block.consumes.item(Vars.content.getByName(ContentType.item, child.asString()));
+                            block.consumes.item(find(ContentType.item, child.asString()));
                         }else if(child.name.equals("items")){
                             block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                         }else if(child.name.equals("liquid")){
@@ -164,7 +164,7 @@ public class ContentParser{
 
                 //add research tech node
                 if(value.has("research")){
-                    TechTree.create(Vars.content.getByName(ContentType.block, value.get("research").asString()), block);
+                    TechTree.create(find(ContentType.block, value.get("research").asString()), block);
                 }
 
                 //make block visible
@@ -190,6 +190,13 @@ public class ContentParser{
         ContentType.mech, parser(ContentType.mech, Mech::new),
         ContentType.zone, parser(ContentType.zone, Zone::new)
     );
+
+    private <T extends Content> T find(ContentType type, String name){
+        Content c = Vars.content.getByName(type, name);
+        if(c == null) c = Vars.content.getByName(type, currentMod.name + "-" + name);
+        if(c == null) throw new IllegalArgumentException("No " + type + " found with name '" + name + "'");
+        return (T)c;
+    }
 
     private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
         return (mod, name, value) -> {
@@ -418,6 +425,8 @@ public class ContentParser{
 
     /** Tries to resolve a class from a list of potential class names. */
     private <T> Class<T> resolve(String base, String... potentials){
+        if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
+
         for(String type : potentials){
             try{
                 return (Class<T>)Class.forName(type + '.' + base);

@@ -235,7 +235,7 @@ public class DesktopInput extends InputHandler{
                 lastLineY = cursorY;
                 mode = placing;
                 updateLine(selectX, selectY);
-            }else if(req != null && !req.breaking && mode == none){
+            }else if(req != null && !req.breaking && mode == none && !req.initialized){
                 sreq = req;
             }else if(req != null && req.breaking){
                 deleting = true;
