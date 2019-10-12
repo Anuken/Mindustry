@@ -84,8 +84,8 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
-            Draw.color(unit.getTeam().color);
+            float rx = (unit.x - rect.x) / rect.width * w;
+            float ry = (unit.y - rect.y) / rect.width * h;
 
             if (withLabels && unit instanceof Player) {
                 Player pl = (Player) unit;
@@ -95,6 +95,7 @@ public class MinimapRenderer implements Disposable{
                 }
             }
 
+            Draw.color(unit.getTeam().color);
             Fill.rect(x + rx, y + ry, Scl.scl(baseSize / 2f), Scl.scl(baseSize / 2f));
         }
 
