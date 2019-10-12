@@ -16,12 +16,38 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 
 public class Mechs implements ContentList{
-    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static Mech base, alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
     public static Mech starter;
 
     @Override
     public void load(){
+        base = new Mech("base-mech", false){
+            {
+                drillPower = 1;
+                mineSpeed = 4f;
+                speed = 0.5f;
+                drag = 0.09f;
+                health = 200f;
+                weaponOffsetX = -1;
+                weaponOffsetY = -1;
+                engineColor = Pal.lightTrail;
+                cellTrnsY = 1f;
+                buildPower = 1.2f;
+                weapon = new Weapon("blaster"){{
+                    length = 1.5f;
+                    reload = 20f;
+                    roundrobin = true;
+                    ejectEffect = Fx.shellEjectSmall;
+                    bullet = Bullets.standardCopper;
+                }};
+            }
+
+            @Override
+            public boolean alwaysUnlocked(){
+                return true;
+            }
+        };
 
         alpha = new Mech("alpha-mech", false){
             {
@@ -80,6 +106,7 @@ public class Mechs implements ContentList{
                 }};
             }
 
+            //todo this is a useless ability
             @Override
             public void onLand(Player player){
                 if(player.timer.get(Player.timerAbility, cooldown)){
@@ -220,7 +247,7 @@ public class Mechs implements ContentList{
         dart = new Mech("dart-ship", true){
             {
                 drillPower = 1;
-                mineSpeed = 3f;
+                mineSpeed = 2f;
                 speed = 0.5f;
                 drag = 0.09f;
                 health = 200f;
@@ -373,6 +400,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = dart;
+        starter = base;
     }
 }
