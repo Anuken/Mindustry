@@ -72,7 +72,7 @@ public class MinimapRenderer implements Disposable{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, boolean withLabels){
+    public void drawEntities(float x, float y, float w, float h){
         updateUnitArray();
 
         float sz = baseSize * zoom;
@@ -99,10 +99,6 @@ public class MinimapRenderer implements Disposable{
         }
 
         Draw.color();
-    }
-
-    public void drawEntities(float x, float y, float w, float h){
-        drawEntities(x, y, w, h, false);
     }
 
     public TextureRegion getRegion(){
