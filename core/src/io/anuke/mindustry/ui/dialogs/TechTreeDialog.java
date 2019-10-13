@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
@@ -134,7 +135,7 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     class View extends Group{
-        float panX = 0, panY = -200;
+        float panX = 0, panY = -200, lastZoom = -1;
         boolean moved = false;
         ImageButton hoverNode;
         Table infoTable = new Table();
@@ -205,12 +206,47 @@ public class TechTreeDialog extends FloatingDialog{
                 });
             }
 
-            dragged((x, y) -> {
+            TechTreeDialog.this.dragged((x, y) -> {
                 moved = true;
-                panX += x;
-                panY += y;
+                panX += x / getScaleX();
+                panY += y / getScaleY();
                 clamp();
             });
+
+            addListener(new InputListener(){
+                @Override
+                public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                    setScale(Mathf.clamp(getScaleX() - amountY / 100f, 0.2f, 1f));
+                    setOrigin(Align.center);
+                    setTransform(true);
+                    return true;
+                }
+
+                @Override
+                public boolean mouseMoved(InputEvent event, float x, float y){
+                    requestScroll();
+                    return super.mouseMoved(event, x, y);
+                }
+            });
+
+            addListener(new ElementGestureListener(){
+                @Override
+                public void zoom(InputEvent event, float initialDistance, float distance){
+                    if(lastZoom < 0){
+                        lastZoom = getScaleX();
+                    }
+
+                    setScale(Mathf.clamp(distance / initialDistance * lastZoom, 0.2f, 1f));
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    lastZoom = getScaleX();
+                }
+            });
+
+            setOrigin(Align.center);
+            setTransform(true);
         }
 
         void clamp(){
@@ -308,9 +344,9 @@ public class TechTreeDialog extends FloatingDialog{
         }
 
         @Override
-        public void draw(){
+        public void drawChildren(){
             clamp();
-            float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
+            float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
 
             for(TechTreeNode node : nodes){
                 if(!node.visible) continue;
@@ -324,7 +360,7 @@ public class TechTreeDialog extends FloatingDialog{
             }
 
             Draw.reset();
-            super.draw();
+            super.drawChildren();
         }
     }
 }

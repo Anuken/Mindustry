@@ -22,27 +22,37 @@ public class SWorkshop implements SteamUGCCallback{
 
     private Map lastMap;
     private Array<FileHandle> mapFiles;
-    private ObjectMap<SteamUGCQuery, BiConsumer<SteamUGCDetails, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Array<FileHandle> modFiles;
+    private ObjectMap<SteamUGCQuery, BiConsumer<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
 
     public SWorkshop(){
         int items = ugc.getNumSubscribedItems();
         SteamPublishedFileID[] ids = new SteamPublishedFileID[items];
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
-        mapFiles = Array.with(ids).map(f -> {
+
+        Array<FileHandle> folders = Array.with(ids).map(f -> {
             ugc.getItemInstallInfo(f, info);
             return new FileHandle(info.getFolder());
-        }).select(f -> f.list().length > 0).map(f -> f.list()[0]);
+        }).select(f -> f != null && f.list().length > 0);
 
-        if(items > 0){
+        mapFiles = folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(mapExtension)).map(f -> f.list()[0]);
+        modFiles = folders.select(f -> f.child("mod.json").exists());
+
+        if(!mapFiles.isEmpty()){
             SAchievement.downloadMapWorkshop.complete();
         }
 
-        Log.info("Fetching {0} subscribed maps.", items);
+        Log.info("Fetching {0} subscribed maps.", mapFiles.size);
+        Log.info("Fetching {0} subscribed mods.", modFiles.size);
     }
 
     public Array<FileHandle> getMapFiles(){
         return mapFiles;
+    }
+
+    public Array<FileHandle> getModFiles(){
+        return modFiles;
     }
 
     public void publishMap(Map map){
@@ -86,12 +96,13 @@ public class SWorkshop implements SteamUGCCallback{
         SteamUGCQuery query = ugc.createQueryUGCDetailsRequest(fid);
         Log.info("POST " + query);
 
-        detailHandlers.put(query, (details, result) -> {
+        detailHandlers.put(query, (detailsList, result) -> {
             ui.loadfrag.hide();
 
-            Log.info("Map listing result: " + result + " " + details.getResult() + " " + details.getFileName() + " " + details.getTitle());
+            Log.info("Map listing result: " + result + " " + detailsList);
 
             if(result == SteamResult.OK){
+                SteamUGCDetails details = detailsList.first();
                 if(details.getResult() == SteamResult.OK){
                     if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
 
@@ -101,7 +112,7 @@ public class SWorkshop implements SteamUGCCallback{
                         dialog.addCloseButton();
 
                         dialog.buttons.addImageTextButton("$view.workshop", Icon.linkSmall, () -> {
-                            platform.viewMapListing(id);
+                            platform.viewListing(id);
                             dialog.hide();
                         }).size(210f, 64f);
 
@@ -160,11 +171,14 @@ public class SWorkshop implements SteamUGCCallback{
 
         if(detailHandlers.containsKey(query)){
             if(numResultsReturned > 0){
-                SteamUGCDetails details = new SteamUGCDetails();
-                ugc.getQueryUGCResult(query, 0, details);
+                Array<SteamUGCDetails> details = new Array<>();
+                for(int i = 0; i < numResultsReturned; i++){
+                    details.set(i, new SteamUGCDetails());
+                    ugc.getQueryUGCResult(query, i, details.get(i));
+                }
                 detailHandlers.get(query).accept(details, result);
             }else{
-                detailHandlers.get(query).accept(null, SteamResult.FileNotFound);
+                detailHandlers.get(query).accept(new Array<>(), SteamResult.FileNotFound);
             }
 
             detailHandlers.remove(query);

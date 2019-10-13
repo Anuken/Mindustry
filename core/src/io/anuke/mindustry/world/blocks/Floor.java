@@ -94,6 +94,13 @@ public class Floor extends Block{
             return;
         }
 
+        if(variants > 0){
+            for(int i = 0; i < variants; i++){
+                String rname = name + (i + 1);
+                editor.pack("editor-" + rname, Core.atlas.getPixmap(rname).crop());
+            }
+        }
+
         Color color = new Color();
         Color color2 = new Color();
         PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)generateIcons()[0]);
@@ -202,10 +209,6 @@ public class Floor extends Block{
 
     protected boolean edgeOnto(Floor other){
         return true;
-    }
-
-    boolean eq(int i){
-        return (eq & (1 << Mathf.mod(i, 8))) != 0;
     }
 
     TextureRegion edge(Floor block, int x, int y){

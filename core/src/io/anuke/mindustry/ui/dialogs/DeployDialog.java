@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -21,9 +20,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Zone.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -129,7 +126,7 @@ public class DeployDialog extends FloatingDialog{
 
                 button.defaults().colspan(2);
                 button.row();
-                button.add(Core.bundle.format("save.wave", color + slot.getWave()));
+                button.add(Core.bundle.format("save", color + slot.getWave()));
                 button.row();
                 button.label(() -> Core.bundle.format("save.playtime", color + slot.getPlayTime()));
                 button.row();
@@ -155,8 +152,8 @@ public class DeployDialog extends FloatingDialog{
         for(ZoneNode node : nodes){
             node.allChildren.clear();
             node.allChildren.addAll(node.children);
-            for(ZoneNode other : new ObjectSetIterator<>(nodes)){
-                if(Structs.contains(other.zone.zoneRequirements, req -> req.zone == node.zone)){
+            for(ZoneNode other : nodes){
+                if(other.zone.requirements.contains(req -> req.zone() == node.zone)){
                     node.allChildren.add(other);
                 }
             }
@@ -164,12 +161,7 @@ public class DeployDialog extends FloatingDialog{
     }
 
     boolean hidden(Zone zone){
-        for(ZoneRequirement other : zone.zoneRequirements){
-            if(!data.isUnlocked(other.zone)){
-                return true;
-            }
-        }
-        return false;
+        return zone.requirements.contains(o -> o.zone() != null && o.zone().locked());
     }
 
     void buildButton(Zone zone, Button button){
@@ -258,7 +250,7 @@ public class DeployDialog extends FloatingDialog{
             //this.height /= 2f;
             nodes.add(this);
 
-            arr.selectFrom(content.zones(), other -> other.zoneRequirements.length > 0 && other.zoneRequirements[0].zone == zone);
+            arr.selectFrom(content.zones(), other -> other.requirements.size > 0 && other.requirements.first().zone() == zone);
 
             children = new ZoneNode[arr.size];
             for(int i = 0; i < children.length; i++){
