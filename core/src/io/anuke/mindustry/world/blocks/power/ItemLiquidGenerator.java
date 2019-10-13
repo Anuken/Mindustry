@@ -92,7 +92,12 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public void update(Tile tile){
+    public void update(Tile tile, float amountOfPowerUsed){
+    	// TODO: will refactor later
+    	if (amountOfPowerUsed <= 0f)
+    	{
+    		return;
+    	}
         ItemLiquidGeneratorEntity entity = tile.entity();
 
         //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.

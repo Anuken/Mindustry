@@ -57,6 +57,11 @@ public class FakeGraphics extends Graphics{
     public long getFrameId(){
         return frame++;
     }
+    
+    public void setFrameId(int frameId)
+    {
+    	frame = frameId;
+    }
 
     @Override
     public float getDeltaTime(){

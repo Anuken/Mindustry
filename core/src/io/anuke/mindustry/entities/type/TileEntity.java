@@ -307,14 +307,18 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         }
 
         Block previous = block;
-        block.update(tile);
+        // TODO: how would block not == previous?
         if(block == previous && cons != null){
             cons.update();
         }
 
+        float amountOfPowerUsed = 0.0f;
+        
         if(block == previous && power != null){
-            power.graph.update();
+            amountOfPowerUsed = power.graph.update();
         }
+        
+    	block.update(tile, amountOfPowerUsed);
     }
 
     @Override

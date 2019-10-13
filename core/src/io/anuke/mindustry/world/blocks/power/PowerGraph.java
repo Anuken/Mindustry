@@ -172,16 +172,16 @@ public class PowerGraph{
         }
     }
 
-    public void update(){
+    public float update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
-            return;
+            return 0.0f;
         }else if(!consumers.isEmpty() && consumers.first().isEnemyCheat()){
             //when cheating, just set satisfaction to 1
             for(Tile tile : consumers){
                 tile.entity.power.satisfaction = 1f;
             }
 
-            return;
+            return 0.0f;
         }
 
         lastFrameUpdated = Core.graphics.getFrameId();
@@ -192,10 +192,8 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
-
         if(consumers.size == 0 && producers.size == 0 && batteries.size == 0){
-            return;
+            return 0.0f;
         }
 
         if(!Mathf.isEqual(powerNeeded, powerProduced)){
@@ -205,8 +203,18 @@ public class PowerGraph{
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
-
-        distributePower(powerNeeded, powerProduced);
+        if (Mathf.isZero(powerNeeded))
+        {
+        	return 0.0f;
+        }
+        else
+        {
+        	distributePower(powerNeeded, powerProduced);
+            powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
+            
+            // TODO: return correct amount. Using as indication of 'power was used'. Will fix this later
+            return 1.0f;
+        }
     }
 
     public void add(PowerGraph graph){

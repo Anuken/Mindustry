@@ -49,10 +49,22 @@ public class PowerTestFixture{
             consumes.powerBuffered(capacity);
         }};
     }
+    
+    protected static Battery createFakeBatteryPower(float capacity) {
+    	return new Battery("fakebattery"){{
+    		consumes.power(capacity);
+    	}};
+    }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
             consumes.power(powerPerTick);
+        }};
+    }
+    
+    protected static Block createFakePowerGenerator(float powerPerTick){
+        return new PowerGenerator("fakepowergenerator"){{
+        	consumes.power(powerPerTick);
         }};
     }
 
