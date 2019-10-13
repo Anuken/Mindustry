@@ -19,6 +19,7 @@ import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.bullet.BulletType;
 import io.anuke.mindustry.entities.traits.TargetTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.Block;
@@ -194,7 +195,14 @@ public abstract class Turret extends Block{
         if(targetAir && !targetGround){
             entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && e.isFlying());
         }else{
-            entity.target = Units.closestTarget(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            TargetTrait target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), range, e -> !e.isDead() && (!e.isFlying() || targetAir) && (e.isFlying() || targetGround));
+            if(target == null){
+                target = Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), range, t -> t.block() instanceof Turret);
+            }
+            if(target == null){
+                target = Units.findEnemyTile(tile.getTeam(), tile.drawx(), tile.drawy(), range, t -> true);
+            }
+            entity.target = target;
         }
     }
 
