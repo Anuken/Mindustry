@@ -22,7 +22,8 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.TreeLayout.*;
+import io.anuke.mindustry.ui.layout.*;
+import io.anuke.mindustry.ui.layout.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -101,13 +102,10 @@ public class TechTreeDialog extends FloatingDialog{
     }
 
     void treeLayout(){
-        TreeLayout layout = new TreeLayout();
-        layout.gapBetweenLevels = Scl.scl(60f);
-        layout.gapBetweenNodes = Scl.scl(40f);
+        RadialTreeLayout layout = new RadialTreeLayout();
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
-        bounds.set(layout.getBounds());
-        bounds.y += nodeSize*1.5f;
+        //bounds.y += nodeSize*1.5f;
         copyInfo(node);
     }
 
@@ -156,7 +154,7 @@ public class TechTreeDialog extends FloatingDialog{
             this.parent = parent;
             this.width = this.height = nodeSize;
             if(node.children != null){
-                children = Array.with(node.children).select(n -> n.visible).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
+                children = Array.with(node.children).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
             }
         }
     }

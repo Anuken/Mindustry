@@ -23,7 +23,8 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.TreeLayout.*;
+import io.anuke.mindustry.ui.layout.*;
+import io.anuke.mindustry.ui.layout.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -39,7 +40,7 @@ public class DeployDialog extends FloatingDialog{
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
-        TreeLayout layout = new TreeLayout();
+        BranchTreeLayout layout = new BranchTreeLayout();
         layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
         layout.gapBetweenNodes = Scl.scl(120f);
         layout.layout(root);
