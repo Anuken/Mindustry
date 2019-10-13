@@ -4,10 +4,12 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.function.Predicate;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.BuildBlock;
@@ -81,12 +83,17 @@ public class Build{
             return false;
         }
 
-        //check for enemy cores
         for(Team enemy : state.teams.enemiesOf(team)){
+            // Check for enemy cores.
             for(Tile core : state.teams.get(enemy).cores){
                 if(Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.drawx(), core.drawy()) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f){
                     return false;
                 }
+            }
+
+            // Check for nearby enemy structures.
+            if (indexer.findTile(enemy, x * tilesize + type.offset(), y * tilesize + type.offset(), state.rules.enemyBuildRadius, t -> true) != null) {
+                return false;
             }
         }
 

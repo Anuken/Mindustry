@@ -41,6 +41,8 @@ public class Rules{
     public float buildSpeedMultiplier = 1f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** No-build zone around all enemy buildings radius. Shorter range than Scorch tower as a rule of thumb. */
+    public float enemyBuildRadius = 50f;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Player respawn time in ticks. */
