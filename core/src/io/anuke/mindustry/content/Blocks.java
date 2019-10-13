@@ -58,7 +58,7 @@ public class Blocks implements ContentList{
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -935,7 +935,11 @@ public class Blocks implements ContentList{
 
         sorter = new Sorter("sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+        }};
 
+        invertedSorter = new Sorter("inverted-sorter"){{
+            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            invert = true;
         }};
 
         router = new Router("router"){{
