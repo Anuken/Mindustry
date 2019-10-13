@@ -216,7 +216,7 @@ public class TechTreeDialog extends FloatingDialog{
             addListener(new InputListener(){
                 @Override
                 public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                    setScale(Mathf.clamp(getScaleX() - amountY / 100f, 0.2f, 1f));
+                    setScale(Mathf.clamp(getScaleX() - amountY / 40f, 0.2f, 1f));
                     setOrigin(Align.center);
                     setTransform(true);
                     return true;
