@@ -16,13 +16,13 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 
 public class Mechs implements ContentList{
-    public static Mech base, alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static Mech vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
     public static Mech starter;
 
     @Override
     public void load(){
-        base = new Mech("base-mech", false){
+        vanguard = new Mech("vanguard-ship", true){
             {
                 drillPower = 1;
                 mineSpeed = 4f;
@@ -34,12 +34,18 @@ public class Mechs implements ContentList{
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildPower = 1.2f;
-                weapon = new Weapon("blaster"){{
+                weapon = new Weapon("seeker"){{
                     length = 1.5f;
                     reload = 20f;
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardCopper;
+                    bullet = new BasicBulletType(){{
+                        homingPower = 5f;
+                        damage = 3f;
+                        bulletWidth = 4f;
+                        bulletHeight = 4f;
+
+                    }};
                 }};
             }
 
@@ -395,6 +401,6 @@ public class Mechs implements ContentList{
             }
         };
 
-        starter = base;
+        starter = vanguard;
     }
 }
