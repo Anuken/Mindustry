@@ -4,6 +4,9 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 
 public class RadialTreeLayout implements TreeLayout{
+    private static ObjectSet<TreeNode> visited = new ObjectSet<>();
+    private static Queue<TreeNode> queue = new Queue<>();
+
     public float startRadius, delta;
 
     @Override
@@ -31,17 +34,15 @@ public class RadialTreeLayout implements TreeLayout{
             child.x = x;
             child.y = y;
 
-            if(child.children.length > 0){
-                radialize(child, theta, mi);
-            }
+            if(child.children.length > 0) radialize(child, theta, mi);
             theta = mi;
         }
     }
 
     int bfs(TreeNode node, boolean assign){
+        visited.clear();
+        queue.clear();
         if(assign) node.number = 0;
-        ObjectSet<TreeNode> visited = new ObjectSet<>();
-        Queue<TreeNode> queue = new Queue<>();
         int leaves = 0;
 
         visited.add(node);
