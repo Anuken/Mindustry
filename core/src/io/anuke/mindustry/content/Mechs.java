@@ -264,11 +264,6 @@ public class Mechs implements ContentList{
                     bullet = Bullets.standardCopper;
                 }};
             }
-
-            @Override
-            public boolean alwaysUnlocked(){
-                return true;
-            }
         };
 
         javelin = new Mech("javelin-ship", true){

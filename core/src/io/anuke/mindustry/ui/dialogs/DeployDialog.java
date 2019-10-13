@@ -2,7 +2,6 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -153,7 +152,7 @@ public class DeployDialog extends FloatingDialog{
         for(ZoneNode node : nodes){
             node.allChildren.clear();
             node.allChildren.addAll(node.children);
-            for(ZoneNode other : new ObjectSetIterator<>(nodes)){
+            for(ZoneNode other : nodes){
                 if(other.zone.requirements.contains(req -> req.zone() == node.zone)){
                     node.allChildren.add(other);
                 }
