@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -175,7 +174,7 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+        for(Tile tile : state.teams.get(defaultTeam).cores){
             Effects.effect(Fx.launch, tile);
         }
 
@@ -184,7 +183,7 @@ public class Logic implements ApplicationListener{
         }
 
         Time.runTask(30f, () -> {
-            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            for(Tile tile : state.teams.get(defaultTeam).cores){
                 for(Item item : content.items()){
                     if(tile == null || tile.entity == null || tile.entity.items == null) continue;
                     data.addItem(item, tile.entity.items.get(item));

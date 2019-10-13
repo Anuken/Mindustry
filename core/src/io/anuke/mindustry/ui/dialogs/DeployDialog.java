@@ -153,7 +153,7 @@ public class DeployDialog extends FloatingDialog{
         for(ZoneNode node : nodes){
             node.allChildren.clear();
             node.allChildren.addAll(node.children);
-            for(ZoneNode other : new ObjectSetIterator<>(nodes)){
+            for(ZoneNode other : nodes){
                 if(other.zone.requirements.contains(req -> req.zone() == node.zone)){
                     node.allChildren.add(other);
                 }
