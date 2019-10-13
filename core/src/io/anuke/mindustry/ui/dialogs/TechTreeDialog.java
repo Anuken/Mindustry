@@ -32,13 +32,14 @@ public class TechTreeDialog extends FloatingDialog{
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private Rectangle bounds = new Rectangle();
     private ItemsDisplay items;
+    private View view;
 
     public TechTreeDialog(){
         super("");
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        cont.stack(new View(), items = new ItemsDisplay()).grow();
+        cont.stack(view = new View(), items = new ItemsDisplay()).grow();
 
         shown(() -> {
             checkNodes(root);
@@ -53,6 +54,50 @@ public class TechTreeDialog extends FloatingDialog{
             hide();
             ui.database.show();
         }).size(210f, 64f);
+
+        //scaling/drag input
+
+        addListener(new InputListener(){
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                view.setScale(Mathf.clamp(view.getScaleX() - amountY / 40f, 0.25f, 1f));
+                view.setOrigin(Align.center);
+                view.setTransform(true);
+                return true;
+            }
+
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y){
+                view.requestScroll();
+                return super.mouseMoved(event, x, y);
+            }
+        });
+
+        addListener(new ElementGestureListener(){
+            @Override
+            public void zoom(InputEvent event, float initialDistance, float distance){
+                if(view.lastZoom < 0){
+                    view.lastZoom = view.getScaleX();
+                }
+
+                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
+                view.setOrigin(Align.center);
+                view.setTransform(true);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                view.lastZoom = view.getScaleX();
+            }
+
+            @Override
+            public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
+                view.panX += deltaX / view.getScaleX();
+                view.panY += deltaY / view.getScaleY();
+                view.moved = true;
+                view.clamp();
+            }
+        });
     }
 
     void treeLayout(){
@@ -147,6 +192,8 @@ public class TechTreeDialog extends FloatingDialog{
                 ImageButton button = new ImageButton(node.node.block.icon(Cicon.medium), Styles.nodei);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
+                    if(moved) return;
+
                     if(mobile){
                         hoverNode = button;
                         rebuild();
@@ -183,7 +230,6 @@ public class TechTreeDialog extends FloatingDialog{
                 });
                 button.touchable(() -> !node.visible ? Touchable.disabled : Touchable.enabled);
                 button.setUserObject(node.node);
-                button.tapped(() -> moved = false);
                 button.setSize(nodeSize);
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
@@ -206,47 +252,9 @@ public class TechTreeDialog extends FloatingDialog{
                 });
             }
 
-            TechTreeDialog.this.dragged((x, y) -> {
-                moved = true;
-                panX += x / getScaleX();
-                panY += y / getScaleY();
-                clamp();
-            });
-
-            addListener(new InputListener(){
-                @Override
-                public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                    setScale(Mathf.clamp(getScaleX() - amountY / 40f, 0.2f, 1f));
-                    setOrigin(Align.center);
-                    setTransform(true);
-                    return true;
-                }
-
-                @Override
-                public boolean mouseMoved(InputEvent event, float x, float y){
-                    requestScroll();
-                    return super.mouseMoved(event, x, y);
-                }
-            });
-
-            addListener(new ElementGestureListener(){
-                @Override
-                public void zoom(InputEvent event, float initialDistance, float distance){
-                    if(lastZoom < 0){
-                        lastZoom = getScaleX();
-                    }
-
-                    setScale(Mathf.clamp(distance / initialDistance * lastZoom, 0.2f, 1f));
-                }
-
-                @Override
-                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                    lastZoom = getScaleX();
-                }
-            });
-
             setOrigin(Align.center);
             setTransform(true);
+            released(() -> moved = false);
         }
 
         void clamp(){
