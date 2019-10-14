@@ -83,6 +83,8 @@ public class Block extends BlockStorage{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
+    /** Targeting priority of this block, as seen by enemies.*/
+    public TargetPriority priority = TargetPriority.base;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */

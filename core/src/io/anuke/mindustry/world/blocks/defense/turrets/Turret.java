@@ -72,6 +72,7 @@ public abstract class Turret extends Block{
 
     public Turret(String name){
         super(name);
+        priority = TargetPriority.turret;
         update = true;
         solid = true;
         layer = Layer.turret;
