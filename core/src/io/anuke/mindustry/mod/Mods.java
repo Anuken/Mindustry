@@ -47,8 +47,7 @@ public class Mods implements Loadable{
     }
 
     /** @return the loaded mod found by class, or null if not found. */
-    public @Nullable
-    LoadedMod getMod(Class<? extends Mod> type){
+    public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
@@ -125,7 +124,7 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
-            TextureFilter filter = TextureFilter.Nearest;
+            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
 
             packer.updateTextureAtlas(Core.atlas, filter, filter, false);
             //generate new icons
@@ -203,11 +202,14 @@ public class Mods implements Loadable{
 
     private void buildFiles(){
         for(LoadedMod mod : loaded){
+            boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
+            String parentName = zipFolder ? mod.root.name() : null;
             for(FileHandle file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
-                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) : f.path(), f));
+                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
+                        zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
             }
 
@@ -266,30 +268,34 @@ public class Mods implements Loadable{
     /** Creates all the content found in mod files. */
     public void loadContent(){
         for(LoadedMod mod : loaded){
-            if(mod.root.child("content").exists()){
-                FileHandle contentRoot = mod.root.child("content");
-                for(ContentType type : ContentType.all){
-                    FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
-                    if(folder.exists()){
-                        for(FileHandle file : folder.list()){
-                            if(file.extension().equals("json")){
-                                try{
-                                    //this binds the content but does not load it entirely
-                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
-                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
-                                }catch(Exception e){
-                                    throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
+            safeRun(mod, () -> {
+                if(mod.root.child("content").exists()){
+                    FileHandle contentRoot = mod.root.child("content");
+                    for(ContentType type : ContentType.all){
+                        FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
+                        if(folder.exists()){
+                            for(FileHandle file : folder.list()){
+                                if(file.extension().equals("json")){
+                                    try{
+                                        //this binds the content but does not load it entirely
+                                        Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
+                                        Log.info("[{0}] Loaded '{1}'.", mod.meta.name,
+                                        (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                                    }catch(Exception e){
+                                        throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
+            });
         }
 
         //this finishes parsing content fields
         parser.finishParsing();
 
+        //load content for code mods
         each(Mod::loadContent);
     }
 
@@ -343,7 +349,40 @@ public class Mods implements Loadable{
 
     /** Iterates through each mod with a main class.*/
     public void each(Consumer<Mod> cons){
-        loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
+        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.accept(p.mod)));
+    }
+
+    public void handleError(Throwable t, LoadedMod mod){
+        Array<Throwable> causes = Strings.getCauses(t);
+        Content content = null;
+        for(Throwable e : causes){
+            if(e instanceof ModLoadException && ((ModLoadException) e).content != null){
+                content = ((ModLoadException) e).content;
+            }
+        }
+
+        String realCause = "<???>";
+        for(int i = causes.size -1 ; i >= 0; i--){
+            if(causes.get(i).getMessage() != null){
+                realCause = causes.get(i).getMessage();
+                break;
+            }
+        }
+
+        if(content != null){
+            throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
+                content, mod.meta.name, content.sourceFile.name(), realCause), content, t);
+        }else{
+            throw new ModLoadException("Error loading mod " + mod.meta.name, t);
+        }
+    }
+
+    public void safeRun(LoadedMod mod, Runnable run){
+        try{
+            run.run();
+        }catch(Throwable t){
+            handleError(t, mod);
+        }
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
@@ -428,6 +467,15 @@ public class Mods implements Loadable{
         public boolean enabled(){
             return Core.settings.getBool(name + "-enabled", true);
         }
+
+        @Override
+        public String toString(){
+            return "LoadedMod{" +
+            "file=" + file +
+            ", root=" + root +
+            ", name='" + name + '\'' +
+            '}';
+        }
     }
 
     /** Plugin metadata information.*/
@@ -436,5 +484,23 @@ public class Mods implements Loadable{
         public String[] dependencies = {}; //TODO implement
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
+    }
+
+    /** Thrown when an error occurs while loading a mod.*/
+    public static class ModLoadException extends RuntimeException{
+        public Content content;
+        public LoadedMod mod;
+
+        public ModLoadException(String message, Throwable cause){
+            super(message, cause);
+        }
+
+        public ModLoadException(String message, @Nullable Content content, Throwable cause){
+            super(message, cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
     }
 }

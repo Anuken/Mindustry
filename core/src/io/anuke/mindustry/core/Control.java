@@ -177,7 +177,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit instanceof BaseUnit){
+            if(e.unit instanceof BaseUnit && world.isZone()){
                 data.unlockContent(((BaseUnit)e.unit).getType());
             }
         });
@@ -416,6 +416,7 @@ public class Control implements ApplicationListener, Loadable{
 
         music.update();
         loops.update();
+        Time.updateGlobal();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");

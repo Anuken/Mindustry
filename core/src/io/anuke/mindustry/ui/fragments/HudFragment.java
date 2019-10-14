@@ -51,6 +51,7 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
+            cont.setName("overlaymarker");
             cont.top().left();
 
             if(mobile){

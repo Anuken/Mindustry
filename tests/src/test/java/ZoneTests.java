@@ -1,7 +1,9 @@
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
@@ -28,12 +30,18 @@ public class ZoneTests{
     @TestFactory
     DynamicTest[] testZoneValidity(){
         Array<DynamicTest> out = new Array<>();
+        if(world == null) world = new World();
 
         for(Zone zone : content.zones()){
             out.add(dynamicTest(zone.name, () -> {
                 zone.generator.init(zone.loadout);
                 logic.reset();
-                world.loadGenerator(zone.generator);
+                try{
+                    world.loadGenerator(zone.generator);
+                }catch(SaveException e){
+                    e.printStackTrace();
+                    return;
+                }
                 zone.rules.accept(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;

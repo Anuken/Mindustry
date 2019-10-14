@@ -2,13 +2,14 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -22,7 +23,8 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.SaveIO.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.TreeLayout.*;
+import io.anuke.mindustry.ui.layout.*;
+import io.anuke.mindustry.ui.layout.TreeLayout.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -31,13 +33,14 @@ public class DeployDialog extends FloatingDialog{
     private ObjectSet<ZoneNode> nodes = new ObjectSet<>();
     private ZoneInfoDialog info = new ZoneInfoDialog();
     private Rectangle bounds = new Rectangle();
+    private View view = new View();
 
     public DeployDialog(){
         super("", Styles.fullDialog);
 
         ZoneNode root = new ZoneNode(Zones.groundZero, null);
 
-        TreeLayout layout = new TreeLayout();
+        BranchTreeLayout layout = new BranchTreeLayout();
         layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
         layout.gapBetweenNodes = Scl.scl(120f);
         layout.layout(root);
@@ -48,6 +51,51 @@ public class DeployDialog extends FloatingDialog{
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
 
         shown(this::setup);
+
+        //view input.
+
+        addListener(new InputListener(){
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                view.setScale(Mathf.clamp(view.getScaleX() - amountY / 40f, 0.25f, 1f));
+                view.setOrigin(Align.center);
+                view.setTransform(true);
+                return true;
+            }
+
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y){
+                view.requestScroll();
+                return super.mouseMoved(event, x, y);
+            }
+        });
+
+        addListener(new ElementGestureListener(){
+            @Override
+            public void zoom(InputEvent event, float initialDistance, float distance){
+                if(view.lastZoom < 0){
+                    view.lastZoom = view.getScaleX();
+                }
+
+                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
+                view.setOrigin(Align.center);
+                view.setTransform(true);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                view.lastZoom = view.getScaleX();
+            }
+
+            @Override
+            public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
+                view.panX += deltaX / view.getScaleX();
+                view.panY += deltaY / view.getScaleY();
+                view.moved = true;
+                view.clamp();
+            }
+        });
+
     }
 
     public void setup(){
@@ -72,7 +120,7 @@ public class DeployDialog extends FloatingDialog{
             update(() -> {
                 setOrigin(Align.center);
                 time[0] += Core.graphics.getDeltaTime() * 10f;
-                setTranslation(Mathf.sin(time[0], 60f, 70f) + panX / 30f, Mathf.cos(time[0], 140f, 80f) + (panY + 200) / 30f);
+                setTranslation(Mathf.sin(time[0], 60f, 70f) + view.panX / 30f, Mathf.cos(time[0], 140f, 80f) + (view.panY + 200) / 30f);
             });
         }}.setScaling(Scaling.fit));
 
@@ -142,7 +190,7 @@ public class DeployDialog extends FloatingDialog{
                 }).width(size).height(50f).padTop(3);
             }));
         }else{
-            stack.add(new View());
+            stack.add(view = new View());
         }
 
         stack.add(new ItemsDisplay());
@@ -153,12 +201,15 @@ public class DeployDialog extends FloatingDialog{
         for(ZoneNode node : nodes){
             node.allChildren.clear();
             node.allChildren.addAll(node.children);
-            for(ZoneNode other : new ObjectSetIterator<>(nodes)){
+            for(ZoneNode other : nodes){
                 if(other.zone.requirements.contains(req -> req.zone() == node.zone)){
                     node.allChildren.add(other);
                 }
             }
         }
+
+        view.setOrigin(Align.center);
+        view.setTransform(true);
     }
 
     boolean hidden(Zone zone){
@@ -167,7 +218,11 @@ public class DeployDialog extends FloatingDialog{
 
     void buildButton(Zone zone, Button button){
         button.setDisabled(() -> hidden(zone));
-        button.clicked(() -> info.show(zone));
+        button.clicked(() -> {
+            if(!view.moved){
+                info.show(zone);
+            }
+        });
 
         if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
@@ -179,10 +234,9 @@ public class DeployDialog extends FloatingDialog{
         }
     }
 
-    //should be static variables of View, but that's impossible
-    static float panX = 0, panY = -200;
-
     class View extends Group{
+        float panX = 0, panY = -200, lastZoom = -1;
+        boolean moved = false;
 
         {
             for(ZoneNode node : nodes){
@@ -202,11 +256,7 @@ public class DeployDialog extends FloatingDialog{
                 addChild(stack);
             }
 
-            dragged((x, y) -> {
-                panX += x;
-                panY += y;
-                clamp();
-            });
+            released(() -> moved = false);
         }
 
         void clamp(){
@@ -222,9 +272,9 @@ public class DeployDialog extends FloatingDialog{
         }
 
         @Override
-        public void draw(){
+        public void drawChildren(){
             clamp();
-            float offsetX = panX + width / 2f + x, offsetY = panY + height / 2f + y;
+            float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
 
             for(ZoneNode node : nodes){
                 for(ZoneNode child : node.allChildren){
@@ -235,7 +285,7 @@ public class DeployDialog extends FloatingDialog{
             }
 
             Draw.reset();
-            super.draw();
+            super.drawChildren();
         }
     }
 

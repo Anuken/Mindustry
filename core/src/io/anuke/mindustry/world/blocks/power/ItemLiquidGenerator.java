@@ -1,24 +1,20 @@
 package io.anuke.mindustry.world.blocks.power;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.consumers.ConsumeItemFilter;
-import io.anuke.mindustry.world.consumers.ConsumeLiquidFilter;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Power generation block which can use items, liquids or both as input sources for power production.
@@ -33,17 +29,26 @@ public class ItemLiquidGenerator extends PowerGenerator{
     /** Maximum liquid used per frame. */
     protected float maxLiquidGenerate = 0.4f;
 
-    protected Effects.Effect generateEffect = Fx.generatespark;
-    protected Effects.Effect explodeEffect = Fx.generatespark;
+    protected Effect generateEffect = Fx.generatespark;
+    protected Effect explodeEffect = Fx.generatespark;
     protected Color heatColor = Color.valueOf("ff9b59");
     protected TextureRegion topRegion, liquidRegion;
     protected boolean randomlyExplode = true;
+    protected boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         super(name);
         this.hasItems = hasItems;
         this.hasLiquids = hasLiquids;
 
+        setDefaults();
+    }
+
+    public ItemLiquidGenerator(String name){
+        super(name);
+    }
+
+    protected void setDefaults(){
         if(hasItems){
             consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true, false);
         }
@@ -51,6 +56,16 @@ public class ItemLiquidGenerator extends PowerGenerator{
         if(hasLiquids){
             consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false).optional(true, false);
         }
+
+        defaults = true;
+    }
+
+    @Override
+    public void init(){
+        if(!defaults){
+            setDefaults();
+        }
+        super.init();
     }
 
     @Override

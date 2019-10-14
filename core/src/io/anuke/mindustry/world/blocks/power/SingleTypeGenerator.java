@@ -5,8 +5,9 @@ import io.anuke.mindustry.type.Liquid;
 
 public class SingleTypeGenerator extends ItemLiquidGenerator{
 
-    public SingleTypeGenerator(boolean hasItems, boolean hasLiquids, String name){
-        super(hasItems, hasLiquids, name);
+    public SingleTypeGenerator(String name){
+        super(name);
+        defaults = true;
     }
 
     @Override

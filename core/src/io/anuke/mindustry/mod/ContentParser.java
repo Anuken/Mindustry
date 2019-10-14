@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -95,7 +96,7 @@ public class ContentParser{
                     T two = (T)Vars.content.getByName(ctype, jsonData.asString());
 
                     if(two != null) return two;
-                    throw new IllegalArgumentException("No " + ctype + " found with name: '" + jsonData.asString() + "'");
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.");
                 }
             }
 
@@ -107,28 +108,39 @@ public class ContentParser{
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
 
-            //TODO generate dynamically instead of doing.. this
-            Class<? extends Block> type = resolve(value.getString("type"),
-            "io.anuke.mindustry.world",
-            "io.anuke.mindustry.world.blocks",
-            "io.anuke.mindustry.world.blocks.defense",
-            "io.anuke.mindustry.world.blocks.defense.turrets",
-            "io.anuke.mindustry.world.blocks.distribution",
-            "io.anuke.mindustry.world.blocks.logic",
-            "io.anuke.mindustry.world.blocks.power",
-            "io.anuke.mindustry.world.blocks.production",
-            "io.anuke.mindustry.world.blocks.sandbox",
-            "io.anuke.mindustry.world.blocks.storage",
-            "io.anuke.mindustry.world.blocks.units"
-            );
+            Block block;
 
-            Block block = type.getDeclaredConstructor(String.class).newInstance(mod + "-" + name);
+            if(Vars.content.getByName(ContentType.block, name) != null){
+                block = Vars.content.getByName(ContentType.block, name);
+
+                if(value.has("type")){
+                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declared its type. The original type will be used. Block: " + name);
+                }
+            }else{
+                //TODO generate dynamically instead of doing.. this
+                Class<? extends Block> type = resolve(value.getString("type"),
+                "io.anuke.mindustry.world",
+                "io.anuke.mindustry.world.blocks",
+                "io.anuke.mindustry.world.blocks.defense",
+                "io.anuke.mindustry.world.blocks.defense.turrets",
+                "io.anuke.mindustry.world.blocks.distribution",
+                "io.anuke.mindustry.world.blocks.logic",
+                "io.anuke.mindustry.world.blocks.power",
+                "io.anuke.mindustry.world.blocks.production",
+                "io.anuke.mindustry.world.blocks.sandbox",
+                "io.anuke.mindustry.world.blocks.storage",
+                "io.anuke.mindustry.world.blocks.units"
+                );
+
+                block = make(type, mod + "-" + name);
+            }
+
             currentContent = block;
             read(() -> {
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
                         if(child.name.equals("item")){
-                            block.consumes.item(Vars.content.getByName(ContentType.item, child.asString()));
+                            block.consumes.item(find(ContentType.item, child.asString()));
                         }else if(child.name.equals("items")){
                             block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                         }else if(child.name.equals("liquid")){
@@ -152,7 +164,7 @@ public class ContentParser{
 
                 //add research tech node
                 if(value.has("research")){
-                    TechTree.create(Vars.content.getByName(ContentType.block, value.get("research").asString()), block);
+                    TechTree.create(find(ContentType.block, value.get("research").asString()), block);
                 }
 
                 //make block visible
@@ -179,14 +191,21 @@ public class ContentParser{
         ContentType.zone, parser(ContentType.zone, Zone::new)
     );
 
+    private <T extends Content> T find(ContentType type, String name){
+        Content c = Vars.content.getByName(type, name);
+        if(c == null) c = Vars.content.getByName(type, currentMod.name + "-" + name);
+        if(c == null) throw new IllegalArgumentException("No " + type + " found with name '" + name + "'");
+        return (T)c;
+    }
+
     private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
         return (mod, name, value) -> {
             T item;
             if(Vars.content.getByName(type, name) != null){
                 item = (T)Vars.content.getByName(type, name);
+                readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
-
                 item = constructor.get(mod + "-" + name);
             }
             currentContent = item;
@@ -196,26 +215,33 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        String entryName = type + "." + currentMod.name + "-" + name + ".";
+        UnlockableContent cont = Vars.content.getByName(type, name) instanceof UnlockableContent ?
+                                Vars.content.getByName(type, name) : null;
+
+        String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
             bundle.getProperties().put(entryName + "name", value.getString("name"));
+            if(cont != null) cont.localizedName = value.getString("name");
             value.remove("name");
         }
 
         if(value.has("description")){
             bundle.getProperties().put(entryName + "description", value.getString("description"));
+            if(cont != null) cont.description = value.getString("description");
             value.remove("description");
         }
     }
 
     /** Call to read a content's extra info later.*/
     private void read(Runnable run){
+        Content cont = currentContent;
         LoadedMod mod = currentMod;
         reads.add(() -> {
             this.currentMod = mod;
+            this.currentContent = cont;
             run.run();
         });
     }
@@ -239,7 +265,7 @@ public class ContentParser{
         try{
             reads.each(Runnable::run);
         }catch(Exception e){
-            throw new RuntimeException("Error occurred parsing content: " + currentContent, e);
+            Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
     }
@@ -249,9 +275,10 @@ public class ContentParser{
      * @param name the name of the file without its extension
      * @param json the json to parse
      * @param type the type of content this is
+     * @param file file that this content is being parsed from
      * @return the content that was parsed
      */
-    public Content parse(LoadedMod mod, String name, String json, ContentType type) throws Exception{
+    public Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -262,8 +289,12 @@ public class ContentParser{
         }
 
         currentMod = mod;
+        boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
-        c.mod = mod;
+        if(!exists){
+            c.sourceFile = file;
+            c.mod = mod;
+        }
         checkNulls(c);
         return c;
     }
@@ -273,6 +304,16 @@ public class ContentParser{
             java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
             return cons.newInstance();
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> T make(Class<T> type, String name){
+        try{
+            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor(String.class);
+            cons.setAccessible(true);
+            return cons.newInstance(name);
         }catch(Exception e){
             throw new RuntimeException(e);
         }
@@ -387,6 +428,8 @@ public class ContentParser{
 
     /** Tries to resolve a class from a list of potential class names. */
     private <T> Class<T> resolve(String base, String... potentials){
+        if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
+
         for(String type : potentials){
             try{
                 return (Class<T>)Class.forName(type + '.' + base);
