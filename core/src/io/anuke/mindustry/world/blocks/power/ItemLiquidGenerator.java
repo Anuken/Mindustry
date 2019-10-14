@@ -93,7 +93,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     @Override
     public void update(Tile tile, float amountOfPowerUsed){
-    	// TODO: will refactor later
+    	// Should not update or do anything if we havn't consumed any power. This will leave the tower in a 'pause' state rather than consuming materials.
     	if (amountOfPowerUsed <= 0f)
     	{
     		return;
