@@ -49,6 +49,7 @@ public class PowerGraphTest extends PowerTestFixture{
 	}
 	
 	// TODO: this test is invalid.
+	/*
 	@Test
 	public void testUpdateConsumersProducersBatteries()
 	{
@@ -64,6 +65,7 @@ public class PowerGraphTest extends PowerTestFixture{
 		float result = pg.update();
 		assertEquals(0.0f, result);
 	}
+	*/
 	
 	// TODO: move to superclass
 	private Tile createCheatTile(int x, int y, float capacity){
