@@ -115,4 +115,12 @@ public class PowerTestFixture{
             throw new RuntimeException(ex);
         }
     }
+    
+    protected static Tile createCheatTile(int x, int y, float capacity){
+		Tile fakeTile = createFakeTile(x, y, createFakeBatteryPower(capacity));
+		
+		fakeTile.setTeam(Vars.waveTeam);
+		
+		return fakeTile;
+	}
 }

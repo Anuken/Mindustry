@@ -143,7 +143,8 @@ public class PowerGraph{
         return Math.min(excess, capacity);
     }
 
-    public void distributePower(float needed, float produced){
+    private float distributePower(float needed, float produced){
+    	float amountOfPowerUsed = 0.0f;
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
         float coverage = Mathf.isZero(needed) && Mathf.isZero(produced) ? 0f : Mathf.isZero(needed) ? 1f : Math.min(1, produced / needed);
         for(Tile consumer : consumers){
@@ -168,8 +169,12 @@ public class PowerGraph{
                         }
                     }
                 }
+                
+                amountOfPowerUsed += consumer.entity.power.satisfaction;
             }
         }
+        
+        return amountOfPowerUsed;
     }
 
     public float update(){
