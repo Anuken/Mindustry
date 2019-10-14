@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.consumers;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
@@ -14,7 +15,7 @@ import io.anuke.mindustry.world.meta.values.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final Predicate<Item> filter;
+    public final @NonNull Predicate<Item> filter;
 
     public ConsumeItemFilter(Predicate<Item> item){
         this.filter = item;
