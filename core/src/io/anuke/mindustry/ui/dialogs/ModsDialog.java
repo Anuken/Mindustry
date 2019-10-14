@@ -30,7 +30,7 @@ public class ModsDialog extends FloatingDialog{
         .size(210f, 64f);
 
         buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-            ui.showTextInput("$mod.import.github", "", "Anuken/ExampleMod", text -> {
+            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
                 ui.loadfrag.show();
                 Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                     Core.net.httpGet(loc.getHeader("Location"), result -> {
