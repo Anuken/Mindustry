@@ -214,11 +214,10 @@ public class PowerGraph{
         }
         else
         {
-        	distributePower(powerNeeded, powerProduced);
+        	float powerUsed = distributePower(powerNeeded, powerProduced);
             powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
             
-            // TODO: return correct amount. Using as indication of 'power was used'. Will fix this later
-            return 1.0f;
+            return powerUsed;
         }
     }
 
