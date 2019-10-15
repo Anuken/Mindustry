@@ -40,10 +40,12 @@ public class Mechs implements ContentList{
                     roundrobin = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = new BasicBulletType(){{
-                        homingPower = 5f;
+                        homingPower = 20f;
                         damage = 3f;
+                        speed = 3f;
                         bulletWidth = 4f;
                         bulletHeight = 4f;
+                        lifetime = 60f;
 
                     }};
                 }};
