@@ -523,6 +523,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return block != null;
     }
 
+    public boolean isBreaking(){
+        return false;
+    }
+
     public float mouseAngle(float x, float y){
         return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
     }

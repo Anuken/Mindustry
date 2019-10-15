@@ -125,6 +125,8 @@ public class Block extends BlockStorage{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BooleanProvider buildVisibility = invisible;
+    /** Multiplier for speed of building this block. */
+    public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -388,6 +390,7 @@ public class Block extends BlockStorage{
         for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
+        buildCost *= buildCostMultiplier;
 
         if(consumes.has(ConsumeType.power)) hasPower = true;
         if(consumes.has(ConsumeType.item)) hasItems = true;
