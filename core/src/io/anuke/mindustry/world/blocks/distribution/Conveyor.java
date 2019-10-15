@@ -2,23 +2,26 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Conveyor extends Block{
+public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -26,6 +29,8 @@ public class Conveyor extends Block{
     private static ItemPos pos2 = new ItemPos();
     private final Vector2 tr1 = new Vector2();
     private final Vector2 tr2 = new Vector2();
+    private final int[] blendresult = new int[3];
+    private final BuildRequest[] directionals = new BuildRequest[4];
 
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
@@ -89,55 +94,25 @@ public class Conveyor extends Block{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        entity.blendbits = 0;
-        entity.blendsclx = entity.blendscly = 1;
-
-        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 3;
-        }else if(blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 4;
-        }else if(blends(tile, 1) && blends(tile, 2)){
-            entity.blendbits = 2;
-        }else if(blends(tile, 3) && blends(tile, 2)){
-            entity.blendbits = 2;
-            entity.blendscly = -1;
-        }else if(blends(tile, 1)){
-            entity.blendbits = 1;
-            entity.blendscly = -1;
-        }else if(blends(tile, 3)){
-            entity.blendbits = 1;
-        }
+        int[] bits = buildBlending(tile, tile.rotation(), null);
+        entity.blendbits = bits[0];
+        entity.blendsclx = bits[1];
+        entity.blendscly = bits[2];
     }
 
     @Override
-    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.rotation = rotation;
-        draw.scalex = draw.scaley = 1;
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        int[] bits = getTiling(req, list);
 
-        int blendbits = 0;
+        if(bits == null) return;
 
-        if(blends(rotation, 1, prevX, prevY, prevRotation)){
-            blendbits = 1;
-            draw.scaley = -1;
-        }else if(blends(rotation, 3, prevX, prevY, prevRotation)){
-            blendbits = 1;
-        }
-
-        draw.rotation = rotation;
-        draw.region = regions[blendbits][0];
+        TextureRegion region = regions[bits[0]][0];
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
     }
 
-    protected boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
-        Point2 left = Geometry.d4(rotation - offset);
-        return left.equals(prevX, prevY) && prevRotation == Mathf.mod(rotation + offset, 4);
-    }
-
-    protected boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
-        if(other != null) other = other.link();
-
-        return other != null && other.block().outputsItems()
-        && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -161,7 +136,7 @@ public class Conveyor extends Block{
                 tr1.trns(rotation * 90, tilesize, 0);
                 tr2.trns(rotation * 90, -tilesize / 2f, pos.x * tilesize / 2f);
 
-                Draw.rect(pos.item.icon(Item.Icon.medium),
+                Draw.rect(pos.item.icon(Cicon.medium),
                 (tile.x * tilesize + tr1.x * pos.y + tr2.x),
                 (tile.y * tilesize + tr1.y * pos.y + tr2.y), itemSize, itemSize);
             }

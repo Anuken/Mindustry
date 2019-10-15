@@ -1,23 +1,21 @@
 package io.anuke.mindustry;
 
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.noise.RidgedPerlin;
-import io.anuke.mindustry.ImagePacker.GenRegion;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.ImagePacker.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Block.Icon;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class Generators{
 
@@ -70,7 +68,6 @@ public class Generators{
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(content.blocks().size, 1);
-            Color outlineColor = Color.valueOf("404049");
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
@@ -116,7 +113,7 @@ public class Generators{
                                         }
                                     }
                                     if(found){
-                                        out.draw(x, y, outlineColor);
+                                        out.draw(x, y, block.outlineColor);
                                     }
                                 }
                             }
@@ -143,15 +140,14 @@ public class Generators{
                         }
                     }
 
-                    image.save(block.name + "-icon-full");
+                    image.save("block-" + block.name + "-full");
 
                     image.save("../editor/" + block.name + "-icon-editor");
 
-                    for(Icon icon : Icon.values()){
-                        if(icon.size == 0) continue;
+                    for(Cicon icon : Cicon.scaled){
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save("../ui/" + block.name + "-icon-" + icon.name());
+                        scaled.save("../ui/block-" + block.name + "-" + icon.name());
                     }
 
                     Color average = new Color();
@@ -182,13 +178,13 @@ public class Generators{
         });
 
         ImagePacker.generate("item-icons", () -> {
-            for(Item item : content.items()){
-                Image base = ImagePacker.get("item-" + item.name);
-                for(Item.Icon icon : Item.Icon.values()){
-                    if(icon.size == base.width) continue;
+            for(UnlockableContent item : (Array<? extends UnlockableContent>)(Array)Array.withArrays(content.items(), content.liquids())){
+                Image base = ImagePacker.get(item.getContentType().name() + "-" + item.name);
+                for(Cicon icon : Cicon.scaled){
+                    //if(icon.size == base.width) continue;
                     Image image = new Image(icon.size, icon.size);
                     image.drawScaled(base);
-                    image.save("item-" + item.name + "-" + icon.name(), false);
+                    image.save(item.getContentType().name() + "-" + item.name + "-" + icon.name(), false);
                 }
             }
         });
@@ -213,12 +209,12 @@ public class Generators{
                     image.draw(mech.weapon.region, i * (int)mech.weaponOffsetX*4 + off, -(int)mech.weaponOffsetY*4 + off, i > 0, false);
                 }
 
-                image.save("mech-icon-" + mech.name);
+                image.save("mech-" + mech.name + "-full");
             }
         });
 
         ImagePacker.generate("unit-icons", () -> {
-            content.<UnitType>getBy(ContentType.unit).each(type -> !type.isFlying, type -> {
+            content.<UnitType>getBy(ContentType.unit).each(type -> !type.flying, type -> {
                 type.load();
                 type.weapon.load();
 
@@ -236,7 +232,7 @@ public class Generators{
                     b, false);
                 }
 
-                image.save("unit-icon-" + type.name);
+                image.save("unit-" + type.name + "-full");
             });
         });
 
@@ -268,12 +264,11 @@ public class Generators{
                     image.save("../editor/editor-ore-" + item.name + (i + 1));
 
                     //save icons
-                    image.save(ore.name + "-icon-full");
-                    for(Icon icon : Icon.values()){
-                        if(icon.size == 0) continue;
+                    image.save("block-" + ore.name + "-full");
+                    for(Cicon icon : Cicon.scaled){
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
-                        scaled.save(ore.name + "-icon-" + icon.name());
+                        scaled.save("block-" + ore.name + "-" + icon.name());
                     }
                 }
             });

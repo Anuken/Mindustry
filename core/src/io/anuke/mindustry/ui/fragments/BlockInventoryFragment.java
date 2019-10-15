@@ -1,32 +1,27 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.function.BooleanProvider;
-import io.anuke.arc.function.Supplier;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.input.KeyCode;
-import io.anuke.arc.math.Interpolation;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Vector2;
-import io.anuke.arc.scene.Element;
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.actions.Actions;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.function.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.actions.*;
 import io.anuke.arc.scene.event.*;
-import io.anuke.arc.scene.ui.Image;
-import io.anuke.arc.scene.ui.layout.Stack;
-import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.Player;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -140,7 +135,7 @@ public class BlockInventoryFragment extends Fragment{
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
-                Element image = itemImage(item.icon(Icon.xlarge), () -> {
+                Element image = itemImage(item.icon(Cicon.xlarge), () -> {
                     if(tile == null || tile.entity == null){
                         return "";
                     }

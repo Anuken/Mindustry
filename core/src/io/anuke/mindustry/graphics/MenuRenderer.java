@@ -14,6 +14,7 @@ import io.anuke.arc.util.noise.RidgedPerlin;
 import io.anuke.arc.util.noise.Simplex;
 import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.content.UnitTypes;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.Floor;
@@ -252,7 +253,9 @@ public class MenuRenderer implements Disposable{
     private void drawFlyers(){
         Draw.color(0f, 0f, 0f, 0.4f);
 
-        float size = Math.max(flyerType.iconRegion.getWidth(), flyerType.iconRegion.getHeight()) * Draw.scl * 1.6f;
+        TextureRegion icon = flyerType.icon(Cicon.full);
+
+        float size = Math.max(icon.getWidth(), icon.getHeight()) * Draw.scl * 1.6f;
 
         flyers((x, y) -> {
             Draw.rect(flyerType.region, x - 12f, y - 13f, flyerRot - 90);

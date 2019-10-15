@@ -91,16 +91,28 @@ public class GlobalData{
         state.stats.itemsDelivered.getAndIncrement(item, 0, amount);
     }
 
+    public boolean hasItems(Array<ItemStack> stacks){
+        return !stacks.contains(s -> items.get(s.item, 0) < s.amount);
+    }
+
     public boolean hasItems(ItemStack[] stacks){
         for(ItemStack stack : stacks){
-            if(items.get(stack.item, 0) < stack.amount){
+            if(!has(stack.item, stack.amount)){
                 return false;
             }
         }
+
         return true;
     }
 
     public void removeItems(ItemStack[] stacks){
+        for(ItemStack stack : stacks){
+            items.getAndIncrement(stack.item, 0, -stack.amount);
+        }
+        modified = true;
+    }
+
+    public void removeItems(Array<ItemStack> stacks){
         for(ItemStack stack : stacks){
             items.getAndIncrement(stack.item, 0, -stack.amount);
         }
@@ -150,6 +162,7 @@ public class GlobalData{
 
     @SuppressWarnings("unchecked")
     public void load(){
+        items.clear();
         unlocked = Core.settings.getObject("unlocks", ObjectMap.class, ObjectMap::new);
         for(Item item : Vars.content.items()){
             items.put(item, Core.settings.getInt("item-" + item.name, 0));

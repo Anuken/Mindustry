@@ -10,8 +10,7 @@ import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.game.Content;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.type.ContentType;
@@ -56,7 +55,7 @@ public class DatabaseDialog extends FloatingDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.getContentIcon()) : new Image(Icon.lockedSmall, Pal.gray);
+                    Image image = unlocked(unlock) ? new Image(unlock.icon(Cicon.medium)) : new Image(Icon.lockedSmall, Pal.gray);
                     list.add(image).size(8*4).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);

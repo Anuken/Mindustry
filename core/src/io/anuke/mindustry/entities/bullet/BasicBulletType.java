@@ -22,6 +22,11 @@ public class BasicBulletType extends BulletType{
         this.bulletSprite = bulletSprite;
     }
 
+    /** For mods. */
+    public BasicBulletType(){
+        this(1f, 1f, "bullet");
+    }
+
     @Override
     public void load(){
         backRegion = Core.atlas.find(bulletSprite + "-back");

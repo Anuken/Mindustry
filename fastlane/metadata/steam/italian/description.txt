@@ -1,0 +1,60 @@
+Crea un'elaborata filera di nastri trasportatori per rifornire di proiettili le tue torrette, produrre materiali per la costruzione e difendere le tue strutture da ondate di nemici. Gioca con i tuoi amici in multigiocatore cross-platform in partite co-op, oppure afrontali in duelli PVP a squadre.
+
+[img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
+
+[h2]Gameplay[/h2]
+
+[list]
+[*] Crea trivelle e nastri per trasportare le risorse nel tuo nucleo. 
+[*] Usa i blocchi per la produzione per creare materiali avanzati.
+[*] Costruisci droni per raccogliere risorse automaticamente, assisterti nella costruzione e proteggere la tua base.
+[*] Distribuisci i liquidi e combatti l'insorgere d'incendi.
+[*] Incrementa la produzione rifornendo di refrigerante e lubrificante le tue torrette e i tuoi blocchi per la produzione.
+[/list]
+
+[h2]Campagna[/h2]
+
+[list]
+[*] Avanza attraverso 12 zone rigiocabili già incluse, con punti di generazione casuali
+[*] Raccogli e lancia risorse
+[*] Ricerca nuovi blocchi per progredire nella campagna
+[*] Configura l'equipaggiamento al lancio per portare risorse personalizzate in ogni zona
+[*] Varietà di traguardi ed obiettivi
+[*] Invita i tuoi amici per completare le missioni insieme
+[*] 120+ blocchi tecnologici da padroneggiare
+[*] 19 diversi tipi di droni, mech e navi
+[*] 50+ achievement da completare
+[/list]
+
+[h2][h2]Modalità di gioco[/h2][/h2]
+
+[*] [b]Sopravvivenza[/b]: Costruisci torrette per difenderti dai nemici in questa modalità tower-defense. Sopravvivi più a lungo che puoi e possibilmente lancia il tuo nucleo per utilizzare le risorse raccolte per la ricerca. Prepara la tua base per gli attacchi intermittenti di Boss volanti.
+[*] [b]Schermaglia[/b]: Costruisci fabbriche di unità per distruggere i nuclei nemici, proteggendo simultanemante la tua base da ondate di unità nemiche. Crea un esercito di unità offensive e di supporto per assisterti in battaglia.
+[*] [b]PvP[/b]: Competi con altri giocatori fino a 4 squadre per distruggere i nuclei avversari. Crea unità o colpisci i nuclei nemici direttamente col tuo mech.
+[*] [b]Creativa[/b]: Divertiti con risorse infinite e senza una minaccia nemica. Usa oggetti creativi come le sorgenti di liquidi ed oggetti per testare la tua filiera e genera nemici su richiesta.
+[/list]
+
+[h2]Partite personalizzate & Multigiocatore Cross-Platform[/h2]
+
+[list]
+[*] 12 mappe incluse per partite personalizzate, oltre alla campagna
+[*] Gioca in Co-op, PvP o in creativa
+[*] Unisciti a server pubblici dedicati o invita i tuoi amici nella tua partita
+[*] Regole personalizzate: Cambia il costo dei blocchi, le statistiche dei nemici, le risorse iniziali, il tempo tre le ondate ed altro
+[*] Combina le modalità: Unisci PvP e PvE in scontri epici
+[/list]
+
+[h2]Editor di mappe[/h2]
+
+[list]
+[*] Crea il tuo scenario con l'editor
+[*] Avvia un'anteprima direttamente dall'editor
+[*] Configura gli attrezzi: modifica il funzionamento dei singoli strumenti
+[*] Potente sistema di generazione delle mappe, con tantissimi tipi di filtri per la generazione procedurale o manipolazione del terreno
+[*] Applica disturbo, distorci, fluidifica, erodi, rendi simmetrica la generazione dei minerali ed il terreno casuale nelle tue mappe
+[*] Casualizza e configura la generazione dei minerali, così come il posizionamento di fiumi e caselle delle risorse
+[*] Configura le ondate nemiche
+[*] Condividi le mappe esportate sul Workshop di Steam
+[*] Personalizza le regole delle mappe create
+[*] Usa 75+ blocchi ambientali differenti
+[/list]

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.world.Block;
@@ -75,6 +75,7 @@ public abstract class StorageBlock extends Block{
     }
 
     public class StorageBlockEntity extends TileEntity{
-        protected @Nullable Tile linkedCore;
+        protected @Nullable
+        Tile linkedCore;
     }
 }
