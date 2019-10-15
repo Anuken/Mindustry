@@ -18,6 +18,7 @@ public enum Binding implements KeyBind{
     rotateplaced(KeyCode.R),
     diagonal_placement(KeyCode.CONTROL_LEFT),
     pick(KeyCode.MOUSE_MIDDLE),
+    schematic(KeyCode.F),
     dash(KeyCode.SHIFT_LEFT),
     gridMode(KeyCode.BACKTICK),
     gridModeShift(KeyCode.ALT_LEFT),

@@ -3,18 +3,23 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+
+import java.io.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -24,7 +29,7 @@ public class DesktopInput extends InputHandler{
     /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
-    private int selectX, selectY;
+    private int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
     private int lastLineX, lastLineY;
     /** Whether selecting mode is active. */
@@ -35,6 +40,8 @@ public class DesktopInput extends InputHandler{
     private @Nullable BuildRequest sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false;
+
+    private Schematic __REMOVE__;
 
     @Override
     public void buildUI(Group group){
@@ -94,7 +101,21 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
+        if(Core.input.keyDown(Binding.schematic)){
+            Lines.stroke(2f);
+
+            Draw.color(Pal.accent);
+            Lines.rect(schemX * tilesize, schemY * tilesize, (cursorX - schemX) * tilesize, (cursorY - schemY) * tilesize);
+        }
+
         Draw.reset();
+
+        if(__REMOVE__ != null){
+            Texture tex = schematics.getPreview(__REMOVE__);
+            Draw.blend(Blending.disabled);
+            Draw.rect(Draw.wrap(tex), Core.camera.position.x, Core.camera.position.y, tex.getWidth() / 8f, tex.getHeight() / 8f);
+            Draw.blend();
+        }
     }
 
     @Override
@@ -194,6 +215,7 @@ public class DesktopInput extends InputHandler{
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
+        int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
 
         if(Core.input.keyTap(Binding.deselect)){
             player.setMineTile(null);
@@ -201,6 +223,22 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.clear_building)){
             player.clearBuilding();
+        }
+
+        if(Core.input.keyTap(Binding.schematic)){
+            schemX = rawCursorX;
+            schemY = rawCursorY;
+        }
+
+        if(Core.input.keyRelease(Binding.schematic)){
+            Schematic schem = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+            __REMOVE__= schem;
+            Log.info(schematics.writeBase64(schem));
+            try{
+                Schematics.write(schem, Core.files.external("schematic.msch"));
+            }catch(IOException e){
+                throw new RuntimeException(e);
+            }
         }
 
         if(sreq != null){

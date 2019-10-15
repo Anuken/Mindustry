@@ -236,6 +236,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return 0;
     }
 
+    /** @return whether the config is a position that should be translated.*/
+    public boolean posConfig(){
+        return false;
+    }
+
     @Override
     public void removed(){
         if(sound != null){

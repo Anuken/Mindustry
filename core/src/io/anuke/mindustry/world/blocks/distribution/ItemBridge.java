@@ -362,6 +362,11 @@ public class ItemBridge extends Block{
         }
 
         @Override
+        public boolean posConfig(){
+            return true;
+        }
+
+        @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeInt(link);
