@@ -16,19 +16,17 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -256,8 +254,8 @@ public class HudFragment extends Fragment{
             t.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
             t.row();
             //position
-            t.label(() -> (int)player.x + "," + (int)player.y).visible(
-                () -> Core.settings.getBool("position") && !state.rules.tutorial);
+            t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))
+                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
             t.top().right();
         });
 
