@@ -104,6 +104,8 @@ public class Schematics{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), buffer.getHeight());
             Draw.color();
 
+            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
+
             schematic.tiles.each(t -> {
                 float offset = (t.block.size + 1) % 2 / 2f;
                 Draw.rect(t.block.icon(Cicon.full),
