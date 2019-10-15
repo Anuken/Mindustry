@@ -2,6 +2,8 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.audio.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -54,6 +56,9 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
+                for(Sound sound : assets.getAll(Sound.class, new Array<>())){
+                    sound.stop();
+                }
             }
         });
 
@@ -91,6 +96,7 @@ public class Control implements ApplicationListener, Loadable{
                 hiscore = true;
                 world.getMap().setHighScore(state.wave);
             }
+
             Sounds.wave.play();
         });
 
@@ -145,11 +151,15 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(ZoneRequireCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", state.wave, e.zone.localizedName));
+            if(e.objective.display() != null){
+                ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", e.zoneForMet.localizedName, e.objective.display()));
+            }
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            ui.hudfrag.showToast(Core.bundle.format("zone.config.complete", e.zone.configureWave));
+            if(e.zone.configureObjective.display() != null){
+                ui.hudfrag.showToast(Core.bundle.format("zone.config.unlocked", e.zone.configureObjective.display()));
+            }
         });
 
         Events.on(Trigger.newGame, () -> {
@@ -164,6 +174,12 @@ public class Control implements ApplicationListener, Loadable{
                 Effects.effect(Fx.launch, core);
                 Effects.shake(5f, 5f, core);
             });
+        });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit instanceof BaseUnit && world.isZone()){
+                data.unlockContent(((BaseUnit)e.unit).getType());
+            }
         });
     }
 
@@ -388,7 +404,10 @@ public class Control implements ApplicationListener, Loadable{
         saves.update();
 
         //update and load any requested assets
-        assets.update();
+        try{
+            assets.update();
+        }catch(Exception ignored){
+        }
 
         input.updateState();
 
@@ -397,6 +416,7 @@ public class Control implements ApplicationListener, Loadable{
 
         music.update();
         loops.update();
+        Time.updateGlobal();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");

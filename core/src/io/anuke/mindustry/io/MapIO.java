@@ -81,8 +81,8 @@ public class MapIO{
                     super.setBlock(type);
                     int c = colorFor(Blocks.air, block(), Blocks.air, getTeam());
                     if(c != black){
-                        walls.drawPixel(x, floors.getHeight() - 1 - y, c);
-                        floors.drawPixel(x, floors.getHeight() - 1 - y + 1, shade);
+                        walls.draw(x, floors.getHeight() - 1 - y, c);
+                        floors.draw(x, floors.getHeight() - 1 - y + 1, shade);
                     }
                 }
 
@@ -112,9 +112,9 @@ public class MapIO{
                 @Override
                 public Tile create(int x, int y, int floorID, int overlayID, int wallID){
                     if(overlayID != 0){
-                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
+                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
                     }else{
-                        floors.drawPixel(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.derelict));
+                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.derelict));
                     }
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
@@ -136,7 +136,7 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles[x][y];
-                pixmap.drawPixel(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
+                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam()));
             }
         }
         return pixmap;

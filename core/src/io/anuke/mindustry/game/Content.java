@@ -1,12 +1,19 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.arc.files.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.mod.Mods.*;
+import io.anuke.mindustry.type.*;
 
 
 /** Base class for a content type that is loaded in {@link io.anuke.mindustry.core.ContentLoader}. */
-public abstract class Content{
+public abstract class Content implements Comparable<Content>{
     public final short id;
+    /** The mod that loaded this piece of content. */
+    public @Nullable LoadedMod mod;
+    /** File that this content was loaded from. */
+    public @Nullable FileHandle sourceFile;
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;
@@ -28,6 +35,11 @@ public abstract class Content{
      * Use for loading regions or other image data.
      */
     public void load(){
+    }
+
+    @Override
+    public int compareTo(Content c){
+        return Integer.compare(id, c.id);
     }
 
     @Override

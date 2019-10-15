@@ -4,7 +4,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.Units;
-import io.anuke.mindustry.entities.type.FlyingUnit;
 
 public class Revenant extends FlyingUnit{
 

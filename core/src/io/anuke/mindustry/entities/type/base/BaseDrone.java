@@ -2,7 +2,6 @@ package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
-import io.anuke.mindustry.entities.type.FlyingUnit;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;

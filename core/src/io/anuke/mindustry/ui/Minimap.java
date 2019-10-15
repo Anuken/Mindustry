@@ -91,8 +91,8 @@ public class Minimap extends Table{
 
             Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
             if(e != null && e.isDescendantOf(this)){
-                Core.scene.setScrollFocus(this);
-            }else if(Core.scene.getScrollFocus() == this){
+                requestScroll();
+            }else if(hasScroll()){
                 Core.scene.setScrollFocus(null);
             }
         });

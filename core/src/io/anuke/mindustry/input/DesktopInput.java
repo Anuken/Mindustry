@@ -5,15 +5,15 @@ import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.math.geom.*;
+import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
-import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
@@ -23,99 +23,75 @@ import static io.anuke.mindustry.input.PlaceMode.*;
 public class DesktopInput extends InputHandler{
     /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
-
     /** Position where the player started dragging a line. */
     private int selectX, selectY;
+    /** Last known line positions.*/
+    private int lastLineX, lastLineY;
     /** Whether selecting mode is active. */
     private PlaceMode mode;
     /** Animation scale for line. */
     private float selectScale;
+    /** Selected build request for movement. */
+    private @Nullable BuildRequest sreq;
+    /** Whether player is currently deleting removal requests. */
+    private boolean deleting = false;
 
-    private int prevX, prevY, prevRotation;
-
-    /** Draws a placement icon for a specific block. */
-    void drawPlace(int x, int y, Block block, int rotation, int prevX, int prevY, int prevRotation){
-        if(validPlace(x, y, block, rotation)){
-            block.getPlaceDraw(placeDraw, rotation, prevX, prevY, prevRotation);
-
-            Draw.color();
-            Draw.mixcol(Pal.accent, 0.12f + Mathf.absin(Time.time(), 8f, 0.35f));
-            Draw.rect(placeDraw.region, x * tilesize + block.offset(), y * tilesize + block.offset(),
-            placeDraw.region.getWidth() * selectScale * Draw.scl * placeDraw.scalex,
-            placeDraw.region.getHeight() * selectScale * Draw.scl * placeDraw.scaley,
-            block.rotate ? placeDraw.rotation * 90 : 0);
-
-            Draw.color(Pal.accent);
-            for(int i = 0; i < 4; i++){
-                Point2 p = Geometry.d8edge[i];
-                float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
-                if(i % 2 == 0)
-                    Draw.rect("block-select", x * tilesize + block.offset() + offset * p.x, y * tilesize + block.offset() + offset * p.y, i * 90);
-            }
-            Draw.color();
-            Draw.mixcol();
-        }else{
-            Draw.color(Pal.removeBack);
-            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset() - 1, block.size * tilesize / 2f - 1);
-            Draw.color(Pal.remove);
-            Lines.square(x * tilesize + block.offset(), y * tilesize + block.offset(), block.size * tilesize / 2f - 1);
-        }
+    @Override
+    public void buildUI(Group group){
+        group.fill(t -> {
+            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
+            t.visible(() -> Core.settings.getBool("hints"));
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
+            }).margin(10f);
+        });
     }
 
     @Override
-    public boolean isDrawing(){
-        return mode != none || block != null;
-    }
-
-    @Override
-    public void drawOutlined(){
+    public void drawTop(){
         Lines.stroke(1f);
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
 
         //draw selection(s)
         if(mode == placing && block != null){
-            prevX = selectX;
-            prevY = selectY;
-            prevRotation = rotation;
-
-            iterateLine(selectX, selectY, cursorX, cursorY, l -> {
-                if(l.last && block.rotate){
-                    drawArrow(block, l.x, l.y, l.rotation);
+            for(int i = 0; i < lineRequests.size; i++){
+                BuildRequest req = lineRequests.get(i);
+                if(i == lineRequests.size - 1 && req.block.rotate){
+                    drawArrow(block, req.x, req.y, req.rotation);
                 }
-                drawPlace(l.x, l.y, block, l.rotation, prevX - l.x, prevY - l.y, prevRotation);
-
-                prevX = l.x;
-                prevY = l.y;
-                prevRotation = l.rotation;
-            });
-
-        }else if(mode == breaking){
-            NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, selectX, selectY, cursorX, cursorY, false, maxLength, 1f);
-            NormalizeResult dresult = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
-
-            for(int x = dresult.x; x <= dresult.x2; x++){
-                for(int y = dresult.y; y <= dresult.y2; y++){
-                    Tile tile = world.ltile(x, y);
-                    if(tile == null || !validBreak(tile.x, tile.y)) continue;
-
-                    Draw.color(Pal.removeBack);
-                    Lines.square(tile.drawx(), tile.drawy() - 1, tile.block().size * tilesize / 2f - 1);
-                    Draw.color(Pal.remove);
-                    Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f - 1);
-                }
+                drawRequest(lineRequests.get(i));
             }
-
-            Draw.color(Pal.removeBack);
-            Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-            Draw.color(Pal.remove);
-            Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+        }else if(mode == breaking){
+            drawSelection(selectX, selectY, cursorX, cursorY);
         }else if(isPlacing()){
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
             }
-            drawPlace(cursorX, cursorY, block, rotation, cursorX, cursorY, rotation);
+            Draw.color();
+            drawRequest(cursorX, cursorY, block, rotation);
             block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+        }
+
+        if(mode == none && !isPlacing()){
+            BuildRequest req = getRequest(cursorX, cursorY);
+            if(req != null){
+                drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
+            }
+        }
+
+        if(sreq != null){
+            boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
+            if(sreq.block.rotate){
+                drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
+            }
+
+            sreq.block.drawRequest(sreq, allRequests(), valid);
+
+            drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
         Draw.reset();
@@ -171,6 +147,14 @@ public class DesktopInput extends InputHandler{
 
         rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
 
+        if(sreq != null){
+            sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+        }
+
+        if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
+            updateLine(selectX, selectY);
+        }
+
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
@@ -186,8 +170,16 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.drillCursor;
             }
 
+            if(getRequest(cursor.x, cursor.y) != null && mode == none){
+                cursorType = SystemCursor.hand;
+            }
+
             if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
                 cursorType = ui.unloadCursor;
+            }
+
+            if(!isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+                Call.rotateBlock(player, cursor, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
 
@@ -207,11 +199,46 @@ public class DesktopInput extends InputHandler{
             player.setMineTile(null);
         }
 
+        if(Core.input.keyTap(Binding.clear_building)){
+            player.clearBuilding();
+        }
+
+        if(sreq != null){
+            float offset = ((sreq.block.size + 2) % 2) * tilesize / 2f;
+            float x = Core.input.mouseWorld().x + offset;
+            float y = Core.input.mouseWorld().y + offset;
+            sreq.x = (int)(x / tilesize);
+            sreq.y = (int)(y / tilesize);
+        }
+
+        if(block == null || mode != placing){
+            lineRequests.clear();
+        }
+
+        if(Core.input.keyTap(Binding.pause_building)){
+            player.isBuilding = !player.isBuilding;
+        }
+
+        if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
+            updateLine(selectX, selectY);
+            lastLineX = cursorX;
+            lastLineY = cursorY;
+        }
+
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            BuildRequest req = getRequest(cursorX, cursorY);
+
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
+                lastLineX = cursorX;
+                lastLineY = cursorY;
                 mode = placing;
+                updateLine(selectX, selectY);
+            }else if(req != null && !req.breaking && mode == none && !req.initialized){
+                sreq = req;
+            }else if(req != null && req.breaking){
+                deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
@@ -221,23 +248,28 @@ public class DesktopInput extends InputHandler{
             }else if(!ui.chatfrag.chatOpen()){ //if it's out of bounds, shooting is just fine
                 player.isShooting = true;
             }
-        }else if(Core.input.keyTap(Binding.deselect) && (block != null || mode != none || player.isBuilding()) &&
-        !(player.buildRequest() != null && player.buildRequest().breaking && Core.keybinds.get(Binding.deselect) == Core.keybinds.get(Binding.break_block))){
-            if(block == null){
-                player.clearBuilding();
-            }
-
+        }else if(Core.input.keyTap(Binding.deselect) && block != null){
             block = null;
             mode = none;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
+            deleting = false;
             mode = breaking;
             selectX = tileX(Core.input.mouseX());
             selectY = tileY(Core.input.mouseY());
         }
 
-        if (mode == placing && block != null){
-            if (!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int) Core.input.axisTap(Binding.rotate) != 0)){
+        if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
+            BuildRequest req = getRequest(cursorX, cursorY);
+            if(req != null && req.breaking){
+                player.buildQueue().remove(req);
+            }
+        }else{
+            deleting = false;
+        }
+
+        if(mode == placing && block != null){
+            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int) Core.input.axisTap(Binding.rotate) != 0)){
                 rotation = ((int)((Angles.angle(selectX, selectY, cursorX, cursorY) + 45) / 90f)) % 4;
                 overrideLineRotation = true;
             }
@@ -248,25 +280,22 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
-                iterateLine(selectX, selectY, cursorX, cursorY, l -> {
-                    rotation = l.rotation;
-                    tryPlaceBlock(l.x, l.y);
-                });
+                flushRequests(lineRequests);
+                lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                NormalizeResult result = PlaceUtils.normalizeArea(selectX, selectY, cursorX, cursorY, rotation, false, maxLength);
-                for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
-                    for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
-                        int wx = selectX + x * Mathf.sign(cursorX - selectX);
-                        int wy = selectY + y * Mathf.sign(cursorY - selectY);
-
-                        tryBreakBlock(wx, wy);
-                    }
-                }
+                removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
             if(selected != null){
                 tryDropItems(selected.link(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            }
+
+            if(sreq != null){
+                if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
+                    player.buildQueue().remove(sreq, true);
+                }
+                sreq = null;
             }
 
             mode = none;
@@ -294,6 +323,7 @@ public class DesktopInput extends InputHandler{
             droppingItem = false;
             mode = none;
             block = null;
+            sreq = null;
         }
     }
 }

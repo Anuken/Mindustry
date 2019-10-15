@@ -1,15 +1,15 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.Objectives.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Zone.*;
-import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -38,14 +38,13 @@ public class ZoneInfoDialog extends FloatingDialog{
 
             if(!zone.unlocked()) return;
 
-            ItemStack[] stacks = zone.getLaunchCost();
-            for(ItemStack stack : stacks){
+            for(ItemStack stack : zone.getLaunchCost()){
                 if(stack.amount == 0) continue;
 
                 if(i++ % 2 == 0){
                     iteminfo.row();
                 }
-                iteminfo.addImage(stack.item.icon(Item.Icon.medium)).size(8 * 3).padRight(1);
+                iteminfo.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.lightGray).padRight(5);
             }
         };
@@ -62,29 +61,32 @@ public class ZoneInfoDialog extends FloatingDialog{
                 cont.table(req -> {
                     req.defaults().left();
 
-                    if(zone.zoneRequirements.length > 0){
+                    Array<Objective> zones = zone.requirements.select(o -> !(o instanceof Unlock));
+
+                    if(!zones.isEmpty()){
                         req.table(r -> {
                             r.add("$complete").colspan(2).left();
                             r.row();
-                            for(ZoneRequirement other : zone.zoneRequirements){
+                            for(Objective o : zones){
                                 r.addImage(Icon.terrain).padRight(4);
-                                r.add(Core.bundle.format("zone.requirement", other.wave, other.zone.localizedName())).color(Color.lightGray);
-                                r.addImage(other.zone.bestWave() >= other.wave ? Icon.checkSmall : Icon.cancelSmall, other.zone.bestWave() >= other.wave ? Color.lightGray : Color.scarlet).padLeft(3);
+                                r.add(o.display()).color(Color.lightGray);
+                                r.addImage(o.complete() ? Icon.checkSmall : Icon.cancelSmall, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
                         });
                     }
 
                     req.row();
+                    Array<Unlock> blocks = zone.requirements.select(o -> o instanceof Unlock).as(Unlock.class);
 
-                    if(zone.blockRequirements.length > 0){
+                    if(!blocks.isEmpty()){
                         req.table(r -> {
                             r.add("$research.list").colspan(2).left();
                             r.row();
-                            for(Block block : zone.blockRequirements){
-                                r.addImage(block.icon(Block.Icon.small)).size(8 * 3).padRight(4);
-                                r.add(block.localizedName).color(Color.lightGray);
-                                r.addImage(data.isUnlocked(block) ? Icon.checkSmall : Icon.cancelSmall, data.isUnlocked(block) ? Color.lightGray : Color.scarlet).padLeft(3);
+                            for(Unlock blocko : blocks){
+                                r.addImage(blocko.block.icon(Cicon.small)).size(8 * 3).padRight(5);
+                                r.add(blocko.block.localizedName).color(Color.lightGray).left();
+                                r.addImage(blocko.block.unlocked() ? Icon.checkSmall : Icon.cancelSmall, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
                             }
 
@@ -106,12 +108,12 @@ public class ZoneInfoDialog extends FloatingDialog{
                         t.left();
                         t.add("$zone.resources").padRight(6);
 
-                        if(zone.resources.length > 0){
+                        if(zone.resources.size > 0){
                             t.table(r -> {
                                 t.left();
                                 int i = 0;
                                 for(Item item : zone.resources){
-                                    r.addImage(item.icon(Item.Icon.medium)).size(8 * 3);
+                                    r.addImage(item.icon(Cicon.small)).size(8 * 3);
                                     if(++i % 4 == 0){
                                         r.row();
                                     }
@@ -135,8 +137,8 @@ public class ZoneInfoDialog extends FloatingDialog{
 
                 cont.row();
 
-                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureWave),
-                () -> loadout.show(zone.loadout.core().itemCapacity, zone::getStartingItems, zone::resetStartingItems, zone::updateLaunchCost, rebuildItems, item -> data.getItem(item) > 0 && item.type == ItemType.material)
+                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
+                () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
                 ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
             cont.marginRight(12f);

@@ -15,6 +15,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -23,7 +24,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -147,12 +148,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
-                if(editor.getTags().containsKey("steamid")){
-                    platform.viewMapListing(editor.getTags().get("steamid"));
+                Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
+                if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
+                    platform.viewListing(editor.getTags().get("steamid"));
                     return;
                 }
 
                 Map map = save();
+
+                if(editor.getTags().containsKey("steamid") && map != null){
+                    platform.viewMapListingInfo(map);
+                    return;
+                }
 
                 if(map == null) return;
 
@@ -167,7 +174,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
 
                 platform.publishMap(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? "$view.workshop" : "$editor.publish.workshop"));
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -206,14 +213,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         update(() -> {
             if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
                 return;
-            }
-
-            Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
-
-            if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
-                Core.scene.setScrollFocus(pane);
-            }else{
-                Core.scene.setScrollFocus(null);
             }
 
             if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
@@ -287,7 +286,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
-    public Map save(){
+    public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
         String name = editor.getTags().get("name", "").trim();
@@ -681,6 +680,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         pane = new ScrollPane(content);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
+        pane.exited(() -> {
+            if(pane.hasScroll()){
+                Core.scene.setScrollFocus(view);
+            }
+        });
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
         int i = 0;
@@ -698,7 +702,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         for(Block block : blocksOut){
-            TextureRegion region = block.icon(Block.Icon.medium);
+            TextureRegion region = block.icon(Cicon.medium);
 
             if(!Core.atlas.isFound(region)) continue;
 

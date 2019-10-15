@@ -2,11 +2,10 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Stats.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.Item.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -69,7 +68,7 @@ public class GameOverDialog extends FloatingDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Icon.medium)).size(8 * 3).pad(4);
+                                items.addImage(item.icon(Cicon.small)).size(8 * 3).pad(4);
                             }).left();
                             t.row();
                         }

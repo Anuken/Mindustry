@@ -19,6 +19,10 @@ public abstract class FlakBulletType extends BasicBulletType{
         bulletHeight = 10f;
     }
 
+    public FlakBulletType(){
+        this(1f, 1f);
+    }
+
     @Override
     public void update(Bullet b){
         super.update(b);

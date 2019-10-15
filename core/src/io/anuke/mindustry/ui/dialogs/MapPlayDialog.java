@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
@@ -15,7 +15,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    @NonNull Gamemode selectedGamemode = Gamemode.survival;
+    @NonNull
+    Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
 
     public MapPlayDialog(){

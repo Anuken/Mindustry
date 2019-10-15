@@ -1,27 +1,22 @@
 package io.anuke.mindustry.world.blocks.sandbox;
 
-import io.anuke.annotations.Annotations.Loc;
-import io.anuke.annotations.Annotations.Remote;
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.scene.style.TextureRegionDrawable;
-import io.anuke.arc.scene.ui.ButtonGroup;
-import io.anuke.arc.scene.ui.ImageButton;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.style.*;
+import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.content;
-import static io.anuke.mindustry.Vars.control;
+import static io.anuke.mindustry.Vars.*;
 
 public class LiquidSource extends Block{
     private static Liquid lastLiquid;
@@ -38,7 +33,9 @@ public class LiquidSource extends Block{
 
     @Override
     public void playerPlaced(Tile tile){
-        if(lastLiquid != null) Core.app.post(() -> Call.setLiquidSourceLiquid(null, tile, lastLiquid));
+        if(lastLiquid != null){
+            Core.app.post(() -> tile.configure(lastLiquid.id));
+        }
     }
 
     @Override
@@ -87,11 +84,11 @@ public class LiquidSource extends Block{
             final int f = i;
             ImageButton button = cont.addImageButton(Tex.clear, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).size(38).group(group).get();
             button.changed(() -> {
-                Call.setLiquidSourceLiquid(null, tile, button.isChecked() ? items.get(f) : null);
+                tile.configure(button.isChecked() ? items.get(f).id : -1);
                 control.input.frag.config.hideConfig();
                 lastLiquid = items.get(f);
             });
-            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).iconRegion);
+            button.getStyle().imageUp = new TextureRegionDrawable(items.get(i).icon(Cicon.medium));
             button.setChecked(entity.source == items.get(i));
 
             if(i % 4 == 3){
@@ -107,15 +104,18 @@ public class LiquidSource extends Block{
         return new LiquidSourceEntity();
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setLiquidSourceLiquid(Player player, Tile tile, Liquid liquid){
-        if(!Units.canInteract(player, tile)) return;
-        LiquidSourceEntity entity = tile.entity();
-        if(entity != null) entity.source = liquid;
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.<LiquidSourceEntity>entity().source = content.liquid(value);
     }
 
     class LiquidSourceEntity extends TileEntity{
-        public Liquid source = null;
+        public @Nullable Liquid source = null;
+
+        @Override
+        public int config(){
+            return source == null ? -1 : source.id;
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{

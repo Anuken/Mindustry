@@ -70,7 +70,7 @@ public class Maps{
      * Does not add this map to the map list.
      */
     public Map loadInternalMap(String name){
-        FileHandle file = Core.files.internal("maps/" + name + "." + mapExtension);
+        FileHandle file = tree.get("maps/" + name + "." + mapExtension);
 
         try{
             return MapIO.createMap(file, false);

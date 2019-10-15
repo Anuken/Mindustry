@@ -1,16 +1,13 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.ItemSelection;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 
@@ -44,20 +41,20 @@ public class Unloader extends Block{
 
     @Override
     public void playerPlaced(Tile tile){
-        Core.app.post(() -> Call.setSortedUnloaderItem(null, tile, lastItem));
+        if(lastItem != null){
+            Core.app.post(() -> tile.configure(lastItem.id));
+        }
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setSortedUnloaderItem(Player player, Tile tile, Item item){
-        if(!Units.canInteract(player, tile)) return;
-        SortedUnloaderEntity entity = tile.entity();
-        entity.items.clear();
-        entity.sortItem = item;
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.entity.items.clear();
+        tile.<UnloaderEntity>entity().sortItem = content.item(value);
     }
 
     @Override
     public void update(Tile tile){
-        SortedUnloaderEntity entity = tile.entity();
+        UnloaderEntity entity = tile.entity();
 
         if(tile.entity.timer.get(timerUnload, speed / entity.timeScale) && tile.entity.items.total() == 0){
             for(Tile other : tile.entity.proximity()){
@@ -109,7 +106,7 @@ public class Unloader extends Block{
     public void draw(Tile tile){
         super.draw(tile);
 
-        SortedUnloaderEntity entity = tile.entity();
+        UnloaderEntity entity = tile.entity();
 
         Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
         Fill.square(tile.worldx(), tile.worldy(), 1f);
@@ -118,20 +115,25 @@ public class Unloader extends Block{
 
     @Override
     public void buildTable(Tile tile, Table table){
-        SortedUnloaderEntity entity = tile.entity();
+        UnloaderEntity entity = tile.entity();
         ItemSelection.buildItemTable(table, () -> entity.sortItem, item -> {
             lastItem = item;
-            Call.setSortedUnloaderItem(null, tile, item);
+            tile.configure(item == null ? -1 : item.id);
         });
     }
 
     @Override
     public TileEntity newEntity(){
-        return new SortedUnloaderEntity();
+        return new UnloaderEntity();
     }
 
-    public static class SortedUnloaderEntity extends TileEntity{
+    public static class UnloaderEntity extends TileEntity{
         public Item sortItem = null;
+
+        @Override
+        public int config(){
+            return sortItem == null ? -1 : sortItem.id;
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{

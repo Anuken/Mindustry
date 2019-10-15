@@ -13,7 +13,6 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
-import org.robovm.apple.uikit.UIBarButtonItem.*;
 import org.robovm.objc.block.*;
 
 import java.io.*;
@@ -59,7 +58,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         if(documentURLs.size() < 1) return;
 
                         cont.dismissViewController(true, () -> {});
-                        cons.accept(Core.files.absolute(documentURLs.get(0).getPath()));
+                        controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> cons.accept(Core.files.absolute(url.getPath())));
                     }
 
                     @Override

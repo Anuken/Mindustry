@@ -6,6 +6,7 @@ import io.anuke.arc.audio.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
@@ -25,7 +26,7 @@ public class Weapon{
     protected static float minPlayerDist = 20f;
     protected static int sequenceNum = 0;
     /** bullet shot */
-    public BulletType bullet;
+    public @NonNull BulletType bullet;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
     /** weapon reload in frames */
