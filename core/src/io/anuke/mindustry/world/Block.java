@@ -19,11 +19,11 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -38,8 +38,6 @@ import static io.anuke.mindustry.Vars.*;
 
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;
-
-    private static final BooleanProvider invisible = () -> false;
 
     /** whether this block has a tile entity that updates */
     public boolean update;
@@ -83,6 +81,8 @@ public class Block extends BlockStorage{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
+    /** Targeting priority of this block, as seen by enemies.*/
+    public TargetPriority priority = TargetPriority.base;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
@@ -96,6 +96,8 @@ public class Block extends BlockStorage{
     public boolean targetable = true;
     /** Whether the overdrive core has any effect on this block. */
     public boolean canOverdrive = true;
+    /** Outlined icon color.*/
+    public Color outlineColor = Color.valueOf("404049");
     /** Whether the icon region has an outline added. */
     public boolean outlineIcon = false;
     /** Whether this block has a shadow under it. */
@@ -120,7 +122,9 @@ public class Block extends BlockStorage{
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
-    public BooleanProvider buildVisibility = invisible;
+    public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Multiplier for speed of building this block. */
+    public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -151,7 +155,7 @@ public class Block extends BlockStorage{
     }
 
     public boolean isBuildable(){
-        return buildVisibility != invisible;
+        return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 
     public boolean isStatic(){
@@ -384,6 +388,11 @@ public class Block extends BlockStorage{
         for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
+        buildCost *= buildCostMultiplier;
+
+        if(consumes.has(ConsumeType.power)) hasPower = true;
+        if(consumes.has(ConsumeType.item)) hasItems = true;
+        if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
 
         setStats();
         setBars();
@@ -661,17 +670,81 @@ public class Block extends BlockStorage{
         }
     }
 
-    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.region = icon(Cicon.full);
-        draw.scalex = draw.scaley = 1;
-        draw.rotation = rotation;
+    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+        Draw.reset();
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.alpha(1f);
+        drawRequestRegion(req, list);
+        Draw.reset();
+    }
+
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        TextureRegion reg = icon(Cicon.full);
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
+            reg.getWidth() * req.animScale * Draw.scl, reg.getHeight() * req.animScale * Draw.scl,
+                !rotate ? 0 : req.rotation * 90);
     }
 
     @Override
-    public void createIcons(PixmapPacker out, PixmapPacker editor){
-        super.createIcons(out, editor);
+    public void createIcons(PixmapPacker packer, PixmapPacker editor){
+        super.createIcons(packer, editor);
 
         editor.pack(name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+
+        if(!synthetic()){
+            PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
+            color.set(image.getPixel(image.width/2, image.height/2));
+        }
+
+        getGeneratedIcons();
+
+        Pixmap last = null;
+
+        if(outlineIcon){
+            final int radius = 4;
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
+            Pixmap out = new Pixmap(region.width, region.height);
+            Color color = new Color();
+            for(int x = 0; x < region.width; x++){
+                for(int y = 0; y < region.height; y++){
+
+                    region.getPixel(x, y, color);
+                    out.draw(x, y, color);
+                    if(color.a < 1f){
+                        boolean found = false;
+                        outer:
+                        for(int rx = -radius; rx <= radius; rx++){
+                            for(int ry = -radius; ry <= radius; ry++){
+                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
+                                    found = true;
+                                    break outer;
+                                }
+                            }
+                        }
+                        if(found){
+                            out.draw(x, y, outlineColor);
+                        }
+                    }
+                }
+            }
+            last = out;
+
+            packer.pack(name, out);
+        }
+
+        if(generatedIcons.length > 1){
+            Pixmap base = Core.atlas.getPixmap(generatedIcons[0]).crop();
+            for(int i = 1; i < generatedIcons.length; i++){
+                if(i == generatedIcons.length - 1 && last != null){
+                    base.drawPixmap(last);
+                }else{
+                    base.draw(Core.atlas.getPixmap(generatedIcons[i]));
+                }
+            }
+            packer.pack("block-" + name + "-full", base);
+            generatedIcons = null;
+            Arrays.fill(cicons, null);
+        }
     }
 
     /** Never use outside of the editor! */
@@ -724,12 +797,16 @@ public class Block extends BlockStorage{
         return ((size + 1) % 2) * tilesize / 2f;
     }
 
+    public Rectangle bounds(int x, int y, Rectangle rect){
+        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
+    }
+
     public boolean isMultiblock(){
         return size > 1;
     }
 
     public boolean isVisible(){
-        return buildVisibility.get() && !isHidden();
+        return buildVisibility.visible() && !isHidden();
     }
 
     public boolean isFloor(){
@@ -746,7 +823,7 @@ public class Block extends BlockStorage{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.get();
+        return !buildVisibility.visible();
     }
 
     @Override
@@ -755,21 +832,21 @@ public class Block extends BlockStorage{
     }
 
     protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
     protected void requirements(Category cat, ItemStack[] stacks){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
+    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
 
-        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
+        Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
 }

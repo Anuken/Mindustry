@@ -59,7 +59,7 @@ public class AboutDialog extends FloatingDialog{
             }).size(h - 5, h);
 
             table.table(inset -> {
-                inset.add("[accent]" + Strings.capitalize(link.name.replace("-", " "))).growX().left();
+                inset.add("[accent]" + link.title).growX().left();
                 inset.row();
                 inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);

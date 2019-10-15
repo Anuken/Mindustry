@@ -22,6 +22,10 @@ public class HealBulletType extends BulletType{
         collidesTeam = true;
     }
 
+    public HealBulletType(){
+        this(1f, 1f);
+    }
+
     @Override
     public boolean collides(Bullet b, Tile tile){
         return tile.getTeam() != b.getTeam() || tile.entity.healthf() < 1f;

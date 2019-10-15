@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -136,8 +135,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
-        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -176,12 +174,16 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+        for(Tile tile : state.teams.get(defaultTeam).cores){
             Effects.effect(Fx.launch, tile);
         }
 
+        if(world.getZone() != null){
+            world.getZone().setLaunched();
+        }
+
         Time.runTask(30f, () -> {
-            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            for(Tile tile : state.teams.get(defaultTeam).cores){
                 for(Item item : content.items()){
                     if(tile == null || tile.entity == null || tile.entity.items == null) continue;
                     data.addItem(item, tile.entity.items.get(item));

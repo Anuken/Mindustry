@@ -87,7 +87,7 @@ public class Units{
         if(team == Team.derelict) return null;
 
         for(Team enemy : state.teams.enemiesOf(team)){
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred);
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
             }
