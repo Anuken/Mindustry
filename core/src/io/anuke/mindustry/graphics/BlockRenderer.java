@@ -2,14 +2,17 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.Texture.TextureFilter;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.graphics.glutils.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.type.base.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;
@@ -120,6 +123,20 @@ public class BlockRenderer implements Disposable{
         Draw.shader();
     }
 
+    public void drawBroken(){
+        if(unitGroups[player.getTeam().ordinal()].all().contains(p -> p instanceof BuilderDrone)){
+            for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
+                Block b = content.block(block.block);
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
+
+                Draw.alpha(0.5f);
+                Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime(), 6f, 0.2f));
+                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
+            }
+            Draw.reset();
+        }
+    }
+
     public void drawShadows(){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
@@ -224,28 +241,34 @@ public class BlockRenderer implements Disposable{
     }
 
     public void drawBlocks(Layer stopAt){
-
+        int startIdx = iterateidx;
         for(; iterateidx < requestidx; iterateidx++){
+            BlockRequest request = requests.get(iterateidx);
 
-            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
+            if(request.layer.ordinal() > stopAt.ordinal()){
                 break;
             }
 
-            BlockRequest req = requests.get(iterateidx);
-            Block block = req.tile.block();
+            if(request.layer == Layer.power){
+                if(iterateidx - startIdx > 0 && request.tile.pos() == requests.get(iterateidx - 1).tile.pos()){
+                    continue;
+                }
+            }
 
-            if(req.layer == Layer.block){
-                block.draw(req.tile);
-                if(req.tile.entity != null && req.tile.entity.damaged()){
-                    block.drawCracks(req.tile);
+            Block block = request.tile.block();
+
+            if(request.layer == Layer.block){
+                block.draw(request.tile);
+                if(request.tile.entity != null && request.tile.entity.damaged()){
+                    block.drawCracks(request.tile);
                 }
-                if(block.synthetic() && req.tile.getTeam() != player.getTeam()){
-                    block.drawTeam(req.tile);
+                if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
+                    block.drawTeam(request.tile);
                 }
-            }else if(req.layer == block.layer){
-                block.drawLayer(req.tile);
-            }else if(req.layer == block.layer2){
-                block.drawLayer2(req.tile);
+            }else if(request.layer == block.layer){
+                block.drawLayer(request.tile);
+            }else if(request.layer == block.layer2){
+                block.drawLayer2(request.tile);
             }
         }
     }
@@ -310,7 +333,9 @@ public class BlockRenderer implements Disposable{
 
         @Override
         public int compareTo(BlockRequest other){
-            return layer.compareTo(other.layer);
+            int compare = layer.compareTo(other.layer);
+
+            return (compare != 0) ? compare : Integer.compare(tile.pos(), other.tile.pos());
         }
 
         @Override

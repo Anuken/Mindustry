@@ -20,6 +20,10 @@ public class ArtilleryBulletType extends BasicBulletType{
         hitSound = Sounds.explosion;
     }
 
+    public ArtilleryBulletType(){
+        this(1f, 1f, "shell");
+    }
+
     @Override
     public void update(io.anuke.mindustry.entities.type.Bullet b){
         super.update(b);

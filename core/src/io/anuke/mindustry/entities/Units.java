@@ -20,6 +20,11 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
 
+    /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
+    public static boolean canInteract(Player player, Tile tile){
+        return player == null || tile == null || tile.interactable(player.getTeam());
+    }
+
     /**
      * Validates a target.
      * @param target The target to validate
@@ -82,7 +87,7 @@ public class Units{
         if(team == Team.derelict) return null;
 
         for(Team enemy : state.teams.enemiesOf(team)){
-            TileEntity entity = indexer.findTile(enemy, x, y, range, pred);
+            TileEntity entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
             }

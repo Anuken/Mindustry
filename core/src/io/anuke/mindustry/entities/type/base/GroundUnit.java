@@ -1,4 +1,4 @@
-package io.anuke.mindustry.entities.type;
+package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -6,17 +6,20 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ai.Pathfinder.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class GroundUnit extends BaseUnit{
+public class GroundUnit extends BaseUnit{
     protected static Vector2 vec = new Vector2();
 
     protected float walkTime;
@@ -34,31 +37,30 @@ public abstract class GroundUnit extends BaseUnit{
             TileEntity core = getClosestEnemyCore();
 
             if(core == null){
-                setState(patrol);
-                return;
-            }
+                Tile closestSpawn = getClosestSpawner();
+                if(closestSpawn == null || !withinDst(closestSpawn, Vars.state.rules.dropZoneRadius + 85f)){
+                    moveToCore(PathTarget.enemyCores);
+                }
+            }else{
 
-            float dst = dst(core);
+                float dst = dst(core);
 
-            if(dst < getWeapon().bullet.range() / 1.1f){
-                target = core;
-            }
+                if(dst < getWeapon().bullet.range() / 1.1f){
+                    target = core;
+                }
 
-            if(dst > getWeapon().bullet.range() * 0.5f){
-                moveToCore();
+                if(dst > getWeapon().bullet.range() * 0.5f){
+                    moveToCore(PathTarget.enemyCores);
+                }
             }
         }
     },
-    patrol = new UnitState(){
+    rally = new UnitState(){
         public void update(){
-            TileEntity target = getClosestCore();
+            Tile target = getClosest(BlockFlag.rally);
 
-            if(target != null){
-                if(dst(target) > 400f){
-                    moveAwayFromCore();
-                }else if(!(!Units.invalidateTarget(GroundUnit.this.target, GroundUnit.this) && dst(GroundUnit.this.target) < getWeapon().bullet.range())){
-                    patrol();
-                }
+            if(target != null && dst(target) > 80f){
+                moveToCore(PathTarget.rallyPoints);
             }
         }
     },
@@ -76,7 +78,7 @@ public abstract class GroundUnit extends BaseUnit{
     public void onCommand(UnitCommand command){
         state.set(command == UnitCommand.retreat ? retreat :
         command == UnitCommand.attack ? attack :
-        command == UnitCommand.patrol ? patrol :
+        command == UnitCommand.rally ? rally :
         null);
     }
 
@@ -220,10 +222,10 @@ public abstract class GroundUnit extends BaseUnit{
         velocity.add(vec);
     }
 
-    protected void moveToCore(){
+    protected void moveToCore(PathTarget path){
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(team, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, team, path);
 
         if(tile == targetTile) return;
 
@@ -242,11 +244,18 @@ public abstract class GroundUnit extends BaseUnit{
             }
         }
 
+        if(enemy == null){
+            for(Team team : Vars.state.teams.enemiesOf(team)){
+                enemy = team;
+                break;
+            }
+        }
+
         if(enemy == null) return;
 
         Tile tile = world.tileWorld(x, y);
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(enemy, tile);
+        Tile targetTile = pathfinder.getTargetTile(tile, enemy, PathTarget.enemyCores);
         TileEntity core = getClosestCore();
 
         if(tile == targetTile || core == null || dst(core) < 120f) return;

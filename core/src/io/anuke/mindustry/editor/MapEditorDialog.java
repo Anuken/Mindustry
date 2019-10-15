@@ -15,6 +15,7 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -23,7 +24,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -85,37 +86,35 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.row();
 
-            if(!ios){
-                t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
-                createDialog("$editor.import",
-                "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
-                "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showInfo("$editor.errorimage");
-                        }else{
-                            editor.beginEdit(MapIO.createMap(file, true));
-                        }
-                    });
-                })),
-
-                "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
-                platform.showFileChooser(true, "png", file ->
-                ui.loadAnd(() -> {
-                    try{
-                        Pixmap pixmap = new Pixmap(file);
-                        editor.beginEdit(pixmap);
-                        pixmap.dispose();
-                    }catch(Exception e){
-                        ui.showException("$editor.errorload", e);
-                        Log.err(e);
+            t.addImageTextButton("$editor.import", Icon.loadMapSmall, () ->
+            createDialog("$editor.import",
+            "$editor.importmap", "$editor.importmap.description", Icon.loadMap, (Runnable)loadDialog::show,
+            "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
+            platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showInfo("$editor.errorimage");
+                    }else{
+                        editor.beginEdit(MapIO.createMap(file, true));
                     }
-                })))
-                );
-            }
+                });
+            })),
 
-            Cell cell = t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
+            "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
+            platform.showFileChooser(true, "png", file ->
+            ui.loadAnd(() -> {
+                try{
+                    Pixmap pixmap = new Pixmap(file);
+                    editor.beginEdit(pixmap);
+                    pixmap.dispose();
+                }catch(Exception e){
+                    ui.showException("$editor.errorload", e);
+                    Log.err(e);
+                }
+            })))
+            );
+
+            t.addImageTextButton("$editor.export", Icon.saveMapSmall, () -> {
                 if(!ios){
                     platform.showFileChooser(false, mapExtension, file -> {
                         ui.loadAnd(() -> {
@@ -143,21 +142,39 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     });
                 }
             });
-
-            if(ios){
-                cell.size(swidth * 2f + 10, 60f).colspan(2);
-            }
         });
 
         menu.cont.row();
 
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
-                Map map = save();
-                if(map != null){
-                    platform.publishMap(map);
+                Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
+                if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
+                    platform.viewListing(editor.getTags().get("steamid"));
+                    return;
                 }
-            }).padTop(-3).size(swidth * 2f + 10, 60f);
+
+                Map map = save();
+
+                if(editor.getTags().containsKey("steamid") && map != null){
+                    platform.viewMapListingInfo(map);
+                    return;
+                }
+
+                if(map == null) return;
+
+                if(map.tags.get("description", "").length() < 4){
+                    ui.showErrorMessage("$editor.nodescription");
+                    return;
+                }
+
+                if(!Structs.contains(Gamemode.all, g -> g.valid(map))){
+                    ui.showErrorMessage("$map.nospawn");
+                    return;
+                }
+
+                platform.publishMap(map);
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -196,14 +213,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         update(() -> {
             if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
                 return;
-            }
-
-            Vector2 v = pane.stageToLocalCoordinates(Core.input.mouse());
-
-            if(v.x >= 0 && v.y >= 0 && v.x <= pane.getWidth() && v.y <= pane.getHeight()){
-                Core.scene.setScrollFocus(pane);
-            }else{
-                Core.scene.setScrollFocus(null);
             }
 
             if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
@@ -255,6 +264,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
+            state.rules.zone = null;
             world.setMap(new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),
@@ -276,7 +286,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
     }
 
-    private Map save(){
+    public @Nullable Map save(){
+        boolean isEditor = state.rules.editor;
+        state.rules.editor = false;
         String name = editor.getTags().get("name", "").trim();
         editor.getTags().put("rules", JsonIO.write(state.rules));
         editor.getTags().remove("width");
@@ -300,6 +312,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.hide();
         saved = true;
+        state.rules.editor = isEditor;
         return returned;
     }
 
@@ -667,6 +680,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         pane = new ScrollPane(content);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
+        pane.exited(() -> {
+            if(pane.hasScroll()){
+                Core.scene.setScrollFocus(view);
+            }
+        });
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
         int i = 0;
@@ -684,7 +702,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         for(Block block : blocksOut){
-            TextureRegion region = block.icon(Block.Icon.medium);
+            TextureRegion region = block.icon(Cicon.medium);
 
             if(!Core.atlas.isFound(region)) continue;
 

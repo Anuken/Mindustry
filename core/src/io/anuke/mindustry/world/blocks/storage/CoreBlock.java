@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.storage;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -33,7 +32,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
-        flags = EnumSet.of(BlockFlag.target, BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer);
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
@@ -97,8 +96,10 @@ public class CoreBlock extends StorageBlock{
             entity.storageCapacity += other.block().itemCapacity + other.entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         }
 
-        for(Item item : content.items()){
-            entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
+        if(!world.isGenerating()){
+            for(Item item : content.items()){
+                entity.items.set(item, Math.min(entity.items.get(item), entity.storageCapacity));
+            }
         }
 
         for(Tile other : state.teams.get(tile.getTeam()).cores){
@@ -155,7 +156,7 @@ public class CoreBlock extends StorageBlock{
             tile.entity.items.set(item, Math.min(tile.entity.items.get(item), max));
         }
 
-        for(Tile other : new ObjectSetIterator<>(state.teams.get(tile.getTeam()).cores)){
+        for(Tile other : state.teams.get(tile.getTeam()).cores){
             other.block().onProximityUpdate(other);
         }
     }

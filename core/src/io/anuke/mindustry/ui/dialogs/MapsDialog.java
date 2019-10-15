@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -44,7 +43,7 @@ public class MapsDialog extends FloatingDialog{
     void setup(){
         buttons.clearChildren();
 
-        if(Core.graphics.isPortrait() && !ios){
+        if(Core.graphics.isPortrait()){
             buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f*2f, 64f).colspan(2);
             buttons.row();
         }else{
@@ -53,64 +52,69 @@ public class MapsDialog extends FloatingDialog{
 
         buttons.addImageTextButton("$editor.newmap", Icon.add, () -> {
             ui.showTextInput("$editor.newmap", "$name", "", text -> {
-                ui.loadAnd(() -> {
+                Runnable show = () -> ui.loadAnd(() -> {
                     hide();
                     ui.editor.show();
                     ui.editor.editor.getTags().put("name", text);
                     Events.fire(new MapMakeEvent());
                 });
+
+                if(maps.byName(text) != null){
+                    ui.showErrorMessage("$editor.exists");
+                }else{
+                    show.run();
+                }
             });
         }).size(210f, 64f);
 
-        if(!ios){
-            buttons.addImageTextButton("$editor.importmap", Icon.load, () -> {
-                platform.showFileChooser(true, mapExtension, file -> {
-                    ui.loadAnd(() -> {
-                        maps.tryCatchMapError(() -> {
-                            if(MapIO.isImage(file)){
-                                ui.showErrorMessage("$editor.errorimage");
-                                return;
-                            }
+        buttons.addImageTextButton("$editor.importmap", Icon.load, () -> {
+            platform.showFileChooser(true, mapExtension, file -> {
+                ui.loadAnd(() -> {
+                    maps.tryCatchMapError(() -> {
+                        if(MapIO.isImage(file)){
+                            ui.showErrorMessage("$editor.errorimage");
+                            return;
+                        }
 
-                            Map map = MapIO.createMap(file, true);
+                        Map map = MapIO.createMap(file, true);
 
 
-                            //when you attempt to import a save, it will have no name, so generate one
-                            String name = map.tags.getOr("name", () -> {
-                                String result = "unknown";
-                                int number = 0;
-                                while(maps.byName(result + number++) != null);
-                                return result + number;
-                            });
-
-                            //this will never actually get called, but it remains just in case
-                            if(name == null){
-                                ui.showErrorMessage("$editor.errorname");
-                                return;
-                            }
-
-                            Map conflict = maps.all().find(m -> m.name().equals(name));
-
-                            if(conflict != null && !conflict.custom){
-                                ui.showInfo(Core.bundle.format("editor.import.exists", name));
-                            }else if(conflict != null){
-                                ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
-                                    maps.tryCatchMapError(() -> {
-                                        maps.removeMap(conflict);
-                                        maps.importMap(map.file);
-                                        setup();
-                                    });
-                                });
-                            }else{
-                                maps.importMap(map.file);
-                                setup();
-                            }
-
+                        //when you attempt to import a save, it will have no name, so generate one
+                        String name = map.tags.getOr("name", () -> {
+                            String result = "unknown";
+                            int number = 0;
+                            while(maps.byName(result + number++) != null);
+                            return result + number;
                         });
+
+                        //this will never actually get called, but it remains just in case
+                        if(name == null){
+                            ui.showErrorMessage("$editor.errorname");
+                            return;
+                        }
+
+                        Map conflict = maps.all().find(m -> m.name().equals(name));
+
+                        if(conflict != null && !conflict.custom){
+                            ui.showInfo(Core.bundle.format("editor.import.exists", name));
+                        }else if(conflict != null){
+                            ui.showConfirm("$confirm", "$editor.overwrite.confirm", () -> {
+                                maps.tryCatchMapError(() -> {
+                                    maps.removeMap(conflict);
+                                    maps.importMap(map.file);
+                                    setup();
+                                });
+                            });
+                        }else{
+                            maps.importMap(map.file);
+                            setup();
+                        }
+
                     });
                 });
-            }).size(210f, 64f);
-        }
+            });
+        }).size(210f, 64f);
+
 
         cont.clear();
 
@@ -137,9 +141,9 @@ public class MapsDialog extends FloatingDialog{
             button.row();
             button.addImage().growX().pad(4).color(Pal.gray);
             button.row();
-            button.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize - 20f);
+            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : "$builtin").color(Color.gray).padTop(3);
+            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : "$builtin").color(Color.gray).padTop(3);
 
             i++;
         }
@@ -160,7 +164,7 @@ public class MapsDialog extends FloatingDialog{
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
         Table table = dialog.cont;
 
-        table.stack(new Image(map.texture).setScaling(Scaling.fit), new BorderImage(map.texture).setScaling(Scaling.fit)).size(mapsize);
+        table.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize);
 
         table.table(Styles.black, desc -> {
             desc.top();
@@ -199,13 +203,17 @@ public class MapsDialog extends FloatingDialog{
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.addImageTextButton("$delete", Icon.trash16Small, () -> {
-            ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
-                maps.removeMap(map);
-                dialog.hide();
-                setup();
-            });
-        }).fillX().height(54f).marginLeft(10).disabled(!map.custom).touchable(map.custom ? Touchable.enabled : Touchable.disabled);
+        table.addImageTextButton(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.linkSmall : Icon.trash16Small, () -> {
+            if(map.workshop && steam){
+                platform.viewMapListing(map);
+            }else{
+                ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
+                    maps.removeMap(map);
+                    dialog.hide();
+                    setup();
+                });
+            }
+        }).fillX().height(54f).marginLeft(10).disabled(!map.workshop && !map.custom);
 
         dialog.show();
     }

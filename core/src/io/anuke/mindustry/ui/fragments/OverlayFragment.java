@@ -1,11 +1,12 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.scene.Group;
-import io.anuke.arc.scene.event.Touchable;
-import io.anuke.arc.scene.ui.layout.WidgetGroup;
+import io.anuke.arc.*;
+import io.anuke.arc.scene.event.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.*;
 
 /** Fragment for displaying overlays such as block inventories. */
-public class OverlayFragment extends Fragment{
+public class OverlayFragment{
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;
 
@@ -17,10 +18,9 @@ public class OverlayFragment extends Fragment{
         config = new BlockConfigFragment();
     }
 
-    @Override
-    public void build(Group parent){
+    public void add(){
         group.setFillParent(true);
-        parent.addChild(group);
+        Vars.ui.hudGroup.addChildBefore(Core.scene.find("overlaymarker"), group);
 
         inv.build(group);
         config.build(group);

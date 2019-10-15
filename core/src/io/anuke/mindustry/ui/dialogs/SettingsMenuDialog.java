@@ -14,9 +14,11 @@ import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.ui.*;
 
 import static io.anuke.arc.Core.bundle;
@@ -126,24 +128,21 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
-            //iOS doesn't have a file chooser.
-            //if(!ios){
-                t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
-                    try{
-                        data.importData(file);
-                        Core.app.exit();
-                    }catch(IllegalArgumentException e){
+            t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+                try{
+                    data.importData(file);
+                    Core.app.exit();
+                }catch(IllegalArgumentException e){
+                    ui.showErrorMessage("$data.invalid");
+                }catch(Exception e){
+                    e.printStackTrace();
+                    if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                        ui.showException(e);
+                    }else{
                         ui.showErrorMessage("$data.invalid");
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        if(e.getMessage() == null || !e.getMessage().contains("too short")){
-                            ui.showException(e);
-                        }else{
-                            ui.showErrorMessage("$data.invalid");
-                        }
                     }
-                })));
-            //}
+                }
+            })));
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -205,8 +204,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.screenshakePref();
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false);
+            game.checkPref("keyboard", false, val -> control.setInput(val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("keyboard")){
+                control.setInput(new DesktopInput());
+            }
         }
+        //the issue with touchscreen support on desktop is that:
+        //1) I can't test it
+        //2) the SDL backend doesn't support multitouch
+        /*else{
+            game.checkPref("touchscreen", false, val -> control.setInput(!val ? new DesktopInput() : new MobileInput()));
+            if(Core.settings.getBool("touchscreen")){
+                control.setInput(new MobileInput());
+            }
+        }*/
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
@@ -215,7 +226,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
-        if(steam){
+        game.checkPref("hints", true);
+
+        if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {
                 platform.updateLobby();
             });
@@ -240,8 +253,9 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
-        graphics.sliderPref("fpscap", 240, 5, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -287,14 +301,13 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
         graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
-        graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);
             }
         });
 
-        graphics.checkPref("linear", false, b -> {
+        graphics.checkPref("linear", !mobile, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
                 tex.setFilter(filter, filter);
@@ -306,6 +319,10 @@ public class SettingsMenuDialog extends SettingsDialog{
                 TextureFilter filter = TextureFilter.Linear;
                 tex.setFilter(filter, filter);
             }
+        }
+
+        if(!mobile){
+            Core.settings.put("swapdiagonal", false);
         }
     }
 

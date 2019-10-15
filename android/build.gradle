@@ -69,7 +69,8 @@ android{
     }
 
     defaultConfig{
-        Integer vcode = new Properties().with{p -> p.load(new FileInputStream(file('../core/assets/version.properties'))); return p }['androidBuildCode']?.toInteger() ?: 1
+        Properties props = new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
+        Integer vcode = props['androidBuildCode']?.toInteger() ?: 1
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 
         applicationId "io.anuke.mindustry"
@@ -78,6 +79,11 @@ android{
         
         versionName versionNameResult
         versionCode vcode
+
+        if(project.hasProperty("release")){
+            props['androidBuildCode'] = (vcode + 1).toString()
+        }
+        props.store(file('../core/assets/version.properties').newWriter(), null)
     }
 
     compileOptions{

@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
@@ -104,7 +104,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(current.breaking){
             entity.deconstruct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
+            if(entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier)){
+                if(current.hasConfig){
+                    Call.onTileConfig(null, tile, current.config);
+                }
+            }
         }
 
         current.progress = entity.progress;
@@ -184,6 +188,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
     default void addBuildRequest(BuildRequest place){
+        addBuildRequest(place, true);
+    }
+
+    /** Add another build requests to the queue, if it doesn't exist there yet. */
+    default void addBuildRequest(BuildRequest place, boolean tail){
         for(BuildRequest request : buildQueue()){
             if(request.x == place.x && request.y == place.y){
                 return;
@@ -193,14 +202,19 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(tile != null && tile.entity instanceof BuildEntity){
             place.progress = tile.<BuildEntity>entity().progress;
         }
-        buildQueue().addLast(place);
+        if(tail){
+            buildQueue().addLast(place);
+        }else{
+            buildQueue().addFirst(place);
+        }
     }
 
     /**
      * Return the build requests currently active, or the one at the top of the queue.
      * May return null.
      */
-    default @Nullable BuildRequest buildRequest(){
+    default @Nullable
+    BuildRequest buildRequest(){
         return buildQueue().size == 0 ? null : buildQueue().first();
     }
 
@@ -253,12 +267,18 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Class for storing build requests. Can be either a place or remove request. */
     class BuildRequest{
-        public final int x, y, rotation;
-        public final Block block;
-        public final boolean breaking;
+        public int x, y, rotation;
+        public @Nullable Block block;
+        public boolean breaking;
+        public boolean hasConfig;
+        public int config;
 
         public float progress;
         public boolean initialized;
+
+        //animation variables
+        public float animScale = 0f;
+        public float animInvalid;
 
         /** This creates a build request. */
         public BuildRequest(int x, int y, int rotation, Block block){
@@ -278,7 +298,42 @@ public interface BuilderTrait extends Entity, TeamTrait{
             this.breaking = true;
         }
 
-        public Tile tile(){
+        public BuildRequest(){
+
+        }
+
+        public Rectangle bounds(Rectangle rect){
+            if(breaking){
+                return rect.set(-100f, -100f, 0f, 0f);
+            }else{
+                return block.bounds(x, y, rect);
+            }
+        }
+
+        public BuildRequest set(int x, int y, int rotation, Block block){
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.block = block;
+            this.breaking = false;
+            return this;
+        }
+
+        public float drawx(){
+            return x*tilesize + block.offset();
+        }
+
+        public float drawy(){
+            return y*tilesize + block.offset();
+        }
+
+        public BuildRequest configure(int config){
+            this.config = config;
+            this.hasConfig = true;
+            return this;
+        }
+
+        public @Nullable Tile tile(){
             return world.tile(x, y);
         }
 

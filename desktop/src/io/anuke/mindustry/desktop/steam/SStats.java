@@ -158,15 +158,15 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(Trigger.drown, drown::complete);
 
-        Events.on(Trigger.impactPower, powerupImpactReactor::complete);
+        trigger(Trigger.impactPower, powerupImpactReactor);
 
-        Events.on(Trigger.flameAmmo, useFlameAmmo::complete);
+        trigger(Trigger.flameAmmo, useFlameAmmo);
 
-        Events.on(Trigger.turretCool, coolTurret::complete);
+        trigger(Trigger.turretCool, coolTurret);
+
+        trigger(Trigger.suicideBomb, suicideBomb);
 
         Events.on(Trigger.enablePixelation, enablePixelation::complete);
-
-        Events.on(Trigger.suicideBomb, suicideBomb::complete);
 
         Events.on(Trigger.thoriumReactorOverheat, () -> {
             if(campaign()){
@@ -174,11 +174,11 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(Trigger.shock, shockWetEnemy::complete);
+        trigger(Trigger.shock, shockWetEnemy);
 
-        Events.on(Trigger.phaseDeflectHit, killEnemyPhaseWall::complete);
+        trigger(Trigger.phaseDeflectHit, killEnemyPhaseWall);
 
-        Events.on(Trigger.itemLaunch, launchItemPad::complete);
+        trigger(Trigger.itemLaunch, launchItemPad);
 
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign() && e.unit.getTeam() == player.getTeam()){
@@ -259,6 +259,14 @@ public class SStats implements SteamUserStatsCallback{
                     Core.settings.putObject("mechs", mechs);
                     Core.settings.save();
                 }
+            }
+        });
+    }
+
+    private void trigger(Trigger trigger, SAchievement ach){
+        Events.on(trigger, () -> {
+            if(campaign()){
+                ach.complete();
             }
         });
     }

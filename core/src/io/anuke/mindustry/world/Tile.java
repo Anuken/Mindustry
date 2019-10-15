@@ -8,6 +8,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.modules.*;
@@ -50,6 +51,10 @@ public class Tile implements Position, TargetTrait{
         return Pos.get(x, y);
     }
 
+    public byte relativeTo(Tile tile){
+        return relativeTo(tile.x, tile.y);
+    }
+
     /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
     public byte relativeTo(int cx, int cy){
         if(x == cx && y == cy - 1) return 1;
@@ -81,6 +86,11 @@ public class Tile implements Position, TargetTrait{
         if(x <= cx - 1 && y == cy) return 0;
         if(x >= cx + 1 && y == cy) return 2;
         return -1;
+    }
+
+    /** Configure a tile with the current, local player. */
+    public void configure(int value){
+        Call.onTileConfig(player, this, value);
     }
 
     @SuppressWarnings("unchecked")

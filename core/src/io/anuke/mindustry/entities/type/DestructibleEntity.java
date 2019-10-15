@@ -15,8 +15,12 @@ public abstract class DestructibleEntity extends SolidEntity implements HealthTr
     @Override
     public void collision(SolidTrait other, float x, float y){
         if(other instanceof DamageTrait){
+            boolean wasDead = isDead();
             onHit(other);
             damage(((DamageTrait)other).damage());
+            if(!wasDead && isDead()){
+                ((DamageTrait)other).killed(this);
+            }
         }
     }
 

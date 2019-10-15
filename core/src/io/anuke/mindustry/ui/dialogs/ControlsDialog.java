@@ -13,13 +13,7 @@ public class ControlsDialog extends KeybindDialog{
         setFillParent(true);
         title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.add(new Image())
-        .growX().height(3f).pad(4f).get().setColor(Pal.accent);
-        if(Vars.mobile){
-            cont.row();
-            cont.add("$keybinds.mobile")
-            .center().growX().wrap().get().setAlignment(Align.center);
-        }
+        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
     }
 
     @Override

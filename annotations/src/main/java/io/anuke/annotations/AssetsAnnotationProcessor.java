@@ -37,6 +37,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
             path = Paths.get(Utils.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
                         .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
                         .getParent().getParent().getParent().getParent().getParent().getParent().toString();
+            path = path.replace("%20", " ");
 
             processSounds("Sounds", path + "/assets/sounds", "io.anuke.arc.audio.Sound");
             processSounds("Musics", path + "/assets/music", "io.anuke.arc.audio.Music");
@@ -139,7 +140,7 @@ public class AssetsAnnotationProcessor extends AbstractProcessor{
 
             loadBegin.addStatement("io.anuke.arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
 
-            dispose.addStatement(name + ".dispose()");
+            dispose.addStatement("io.anuke.arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new io.anuke.arc.audio.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
         });

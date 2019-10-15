@@ -1,13 +1,14 @@
 package io.anuke.mindustry.entities.type;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -212,15 +213,29 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         float radScl = 1.5f;
         float fsize = getSize() / radScl;
         moveVector.setZero();
+        float cx = x - fsize/2f, cy = y - fsize/2f;
 
-        Units.nearby(x - fsize/2f, y - fsize/2f, fsize, fsize, en -> {
-            if(en == this || en.isFlying() != isFlying()) return;
+        for(Team team : Team.all){
+            if(team != getTeam() || !(this instanceof Player)){
+                avoid(unitGroups[team.ordinal()].intersect(cx, cy, fsize, fsize));
+            }
+        }
+
+        if(!(this instanceof Player)){
+            avoid(playerGroup.intersect(cx, cy, fsize, fsize));
+        }
+        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
+    }
+
+    private void avoid(Array<? extends Unit> arr){
+        float radScl = 1.5f;
+
+        for(Unit en : arr){
+            if(en.isFlying() != isFlying() || (en instanceof Player && en.getTeam() != getTeam())) continue;
             float dst = dst(en);
             float scl = Mathf.clamp(1f - dst / (getSize()/(radScl*2f) + en.getSize()/(radScl*2f)));
             moveVector.add(Tmp.v1.set((x - en.x) * scl, (y - en.y) * scl).limit(0.4f));
-        });
-
-        velocity.add(moveVector.x / mass() * Time.delta(), moveVector.y / mass() * Time.delta());
+        }
     }
 
     public @Nullable TileEntity getClosestCore(){
@@ -392,7 +407,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * itemtime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
-            Draw.rect(item.item.icon(Item.Icon.large),
+            Draw.rect(item.item.icon(Cicon.medium),
                 x + Angles.trnsx(rotation + 180f, backTrns),
                 y + Angles.trnsy(rotation + 180f, backTrns),
                 size, size, rotation);

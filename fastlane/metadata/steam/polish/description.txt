@@ -1,0 +1,60 @@
+Twórz skomplikowane linie transportowe przy użyciu przenośników by zaopatrzyć wieżyczki w amunicję, produkować materiały używane do budowy, oraz broń swoje struktury przed falami wrogów. Graj ze swoimi przyjaciółmi w międzyplatformowych rozgrywkach wieloosobwych typu co-op, lub rzuć im wyzwanie w drużynowych rozgrywkach PvP.
+
+[img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
+
+[h2]Rozgrywka[/h2]
+
+[list]
+[*] Twórz wiertła oraz przenośniki by przenieść surowce do twojego Rdzenia. 
+[*] Używaj bloków produkcyjnych do tworzenia zaawansowanych materiałów.
+[*] Buduj drony do automatycznego wydobycia surowców, pomocy przy budowie i obrony twojej bazy.
+[*] Rozprowadzaj płyny i walcz z nagłymi pożarami.
+[*] Przyśpiesz produkcje poprzez opcjonalne zaopatrzenie swoich linii obronnych i bloków produkcyjnych w chłodziwo.
+[/list]
+
+[h2]Kampania[/h2]
+
+[list]
+[*] Przejdź przez 12 powtarzalnych wbudowanych stref z losowymi punktami startu
+[*] Zbieraj i wystrzeliwuj surowce
+[*] Badaj nowe bloki by zwiększyć postęp
+[*] Konfiguruj ładunek by przenieść surowce do każdej strefy
+[*] Różnorodność celów misji
+[*] Zapraszaj znajomych by razem wykonywać misje
+[*] 120+ technologii do zbadania
+[*] 19 różnych typów dronów, mechów oraz statków
+[*] 50+ osiągnięć do ukończenia
+[/list]
+
+[h2][h2]Tryby Gry[/h2][/h2]
+
+[*] [b]Przetrwanie[/b]: Buduj wieżyczki by obronić się przed wrogami w opartej na gatunku tower-defense rozgrywce. Przetrwaj tak długo jak to możliwe, opcjonalnie wystrzel swój rdzeń by użyć zebrane surowce do badań. Przygotuj swoją bazę na sporadyczne ataki powietrznych bossów.
+[*] [b]Atak[/b]: Buduj fabryki jednostek by zniszczyć rdzenie wroga, jednocześnie broniąc swoją bazę przed falami jednostek wroga. Twórz rozmaite jednostki typu wsparcia i ofensywy które pomogą ci osiągnąć twoje cele.
+[*] [b]PvP[/b]: Rywalizuj z innymi graczami z maksymalnie 4 drużyn gdzie celem jest zniszczenie wrogich rdzeni. Twórz jednostki, lub atakuj cudze bazy bezpośrednio przy użyciu swoich mechów.
+[*] [b]Sandbox[/b]: Graj z nieskończoną ilością surowców i bez żadnego zagrożenia ze strony wroga. Używaj przeznaczonych dla tego trybu specjalnych bloków które są źródłami przedmiotów i płynów by przetestować różne projekty, oraz tworzyć wrogów na żądanie.
+[/list]
+
+[h2]Gra Niestandardowa & Międzyplatformowa Gra Wieloosobowa[/h2]
+
+[list]
+[*] 12 wbudowanych map do gier niestandardowych, oprócz kampanii
+[*] Graj w trybie Co-op, PvP lub sandbox
+[*] Dołącz do publicznych serwerów dedykowanych, lub zaproś przyjaciół do twoich własnych prywatnych rozgrywek
+[*] Konfigurowalne zasady gry: Zmień koszt budowy, statystyki wrogów, przedmioty początkowe, odstęp fal i więcej
+[*] Możliwość mieszania trybów gry: Połącz ze sobą tyby PvP oraz PvE
+[/list]
+
+[h2]Edytor Map[/h2]
+
+[list]
+[*] Twórz teren przy użyciu UI edytora
+[*] Edytuj i testuj w grze
+[*] Konfigurowalne tryby narzędzi: Zmieniaj to jak działa każde narzędzie
+[*] Potężny system generacji mapy, z wieloma różnymi typami filtrów do proceduralnej manipulacji terenem
+[*] Zastosuj szumy, zniekształcenia, wygładzenie, erozje, symetrie, generacje rud oraz losowy teren do twoich map
+[*] Randomizuj i konfiguruj generacje rud, jak również położenie rzek i kratek rud
+[*] Konfiguruj układ fal wroga
+[*] Publikuj eksportowane mapy na Warsztacie Steam
+[*] Dostosuj standardowy zasady mapy
+[*] Użyj 75+ róznych bloków terenu
+[/list]

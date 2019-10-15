@@ -1,10 +1,10 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -21,7 +21,8 @@ public class Net{
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
-    private @Nullable StreamBuilder currentStream;
+    private @Nullable
+    StreamBuilder currentStream;
 
     private final Array<Object> packetQueue = new Array<>();
     private final ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
@@ -46,7 +47,9 @@ public class Net{
                 t = t.getCause();
             }
 
-            String error = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
+            String baseError = Strings.getFinalMesage(e);
+
+            String error = baseError == null ? "" : baseError.toLowerCase();
             String type = t.getClass().toString().toLowerCase();
             boolean isError = false;
 

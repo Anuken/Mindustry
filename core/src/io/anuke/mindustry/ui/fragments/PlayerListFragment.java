@@ -87,7 +87,7 @@ public class PlayerListFragment extends Fragment{
                 }
             };
             table.margin(8);
-            table.add(new Image(user.mech.getContentIcon()).setScaling(Scaling.none)).grow();
+            table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
@@ -129,6 +129,11 @@ public class PlayerListFragment extends Fragment{
                     t.addImageButton(Icon.zoomSmall, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
+            }else if((!user.isLocal && !user.isAdmin) && net.client() && playerGroup.size() >= 3){ //votekick
+                button.add().growY();
+
+                button.addImageButton(Icon.banSmall, Styles.clearPartiali,
+                () -> ui.showConfirm("$confirm", "$confirmvotekick", () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);

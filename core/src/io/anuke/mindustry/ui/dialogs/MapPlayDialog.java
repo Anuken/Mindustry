@@ -1,10 +1,10 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
@@ -15,7 +15,8 @@ import static io.anuke.mindustry.Vars.*;
 public class MapPlayDialog extends FloatingDialog{
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
-    @NonNull Gamemode selectedGamemode = Gamemode.survival;
+    @NonNull
+    Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
 
     public MapPlayDialog(){
@@ -69,7 +70,7 @@ public class MapPlayDialog extends FloatingDialog{
         cont.row();
         cont.addImageTextButton("$customize", Icon.toolsSmall, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
-        cont.add(new BorderImage(map.texture, 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
+        cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
         if(Gamemode.survival.valid(map)){
             cont.row();

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.State;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
@@ -61,11 +61,13 @@ public class EventType{
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
-        public final Zone zone, required;
+        public final Zone zoneMet, zoneForMet;
+        public final Objective objective;
 
-        public ZoneRequireCompleteEvent(Zone zone, Zone required){
-            this.zone = zone;
-            this.required = required;
+        public ZoneRequireCompleteEvent(Zone zoneMet, Zone zoneForMet, Objective objective){
+            this.zoneMet = zoneMet;
+            this.zoneForMet = zoneForMet;
+            this.objective = objective;
         }
     }
 
@@ -80,6 +82,10 @@ public class EventType{
 
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{
+
+    }
+
+    public static class ContentReloadEvent{
 
     }
 
@@ -126,7 +132,13 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
-
+        public final Tile tile;
+        public final Player player;
+        
+        public DepositEvent(Tile tile, Player player){
+            this.tile = tile;
+            this.player = player;
+        }
     }
 
     public static class GameOverEvent{
@@ -195,7 +207,8 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
-        public final @Nullable Player player;
+        public final @Nullable
+        Player player;
         public final boolean breaking;
 
         public BlockBuildEndEvent(Tile tile, @Nullable Player player, Team team, boolean breaking){

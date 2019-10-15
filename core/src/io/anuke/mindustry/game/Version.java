@@ -33,7 +33,7 @@ public class Version{
             PropertiesUtils.load(map, file.reader());
 
             type = map.get("type");
-            number = Integer.parseInt(map.get("number"));
+            number = Integer.parseInt(map.get("number", "4"));
             modifier = map.get("modifier");
             if(map.get("build").contains(".")){
                 String[] split = map.get("build").split("\\.");

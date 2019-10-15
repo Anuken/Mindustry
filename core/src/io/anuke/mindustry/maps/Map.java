@@ -20,6 +20,8 @@ public class Map implements Comparable<Map>{
     public final FileHandle file;
     /** Format version. */
     public final int version;
+    /** Whether this map is managed, e.g. downloaded from the Steam workshop.*/
+    public boolean workshop;
     /** Map width/height, shorts. */
     public int width, height;
     /** Preview texture. */
@@ -57,8 +59,12 @@ public class Map implements Comparable<Map>{
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
     }
 
+    public Texture safeTexture(){
+        return texture == null ? Core.assets.get("sprites/error.png") : texture;
+    }
+
     public FileHandle previewFile(){
-        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + ".png");
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
     }
 
     public FileHandle cacheFile(){
@@ -127,6 +133,8 @@ public class Map implements Comparable<Map>{
 
     @Override
     public int compareTo(Map map){
+        int work = -Boolean.compare(workshop, map.workshop);
+        if(work != 0) return work;
         int type = -Boolean.compare(custom, map.custom);
         if(type != 0) return type;
         int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));

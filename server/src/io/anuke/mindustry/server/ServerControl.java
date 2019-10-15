@@ -18,10 +18,9 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Packets.*;
-import io.anuke.mindustry.plugin.*;
-import io.anuke.mindustry.plugin.Plugins.*;
 import io.anuke.mindustry.type.*;
 
 import java.io.*;
@@ -41,7 +40,6 @@ public class ServerControl implements ApplicationListener{
 
     private final CommandHandler handler = new CommandHandler("");
     private final FileHandle logFolder = Core.settings.getDataDirectory().child("logs/");
-    private final io.anuke.mindustry.plugin.Plugins plugins = new Plugins();
 
     private FileHandle currentLogFile;
     private boolean inExtraRound;
@@ -109,9 +107,6 @@ public class ServerControl implements ApplicationListener{
         Effects.setScreenShakeProvider((a, b) -> {});
         Effects.setEffectProvider((a, b, c, d, e, f) -> {});
 
-        //load plugins
-        plugins.load();
-
         registerCommands();
 
         Core.app.post(() -> {
@@ -133,7 +128,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
-        pluginDirectory.mkdirs();
 
         Thread thread = new Thread(this::readCommands, "Server Controls");
         thread.setDaemon(true);
@@ -150,20 +144,26 @@ public class ServerControl implements ApplicationListener{
 
             if(Core.settings.getBool("shuffle")){
                 if(maps.all().size > 0){
-                    Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
+                    Array<Map> maps = Array.with(Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
+                    maps.shuffle();
 
                     Map previous = world.getMap();
-                    Map map = maps.random(previous);
+                    Map map = maps.find(m -> m != previous || maps.size == 1);
 
-                    Call.onInfoMessage((state.rules.pvp
-                    ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                    + "\nNext selected map:[accent] " + map.name() + "[]"
-                    + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                    "\nNew game begins in " + roundExtraTime + "[] seconds.");
+                    if(map != null){
 
-                    info("Selected next map to be {0}.", map.name());
+                        Call.onInfoMessage((state.rules.pvp
+                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                        + "\nNext selected map:[accent] " + map.name() + "[]"
+                        + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
+                        "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                    play(true, () -> world.loadMap(map,  map.applyRules(lastMode)));
+                        info("Selected next map to be {0}.", map.name());
+
+                        play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                    }else{
+                        Log.err("No suitable map found.");
+                    }
                 }
             }else{
                 netServer.kickAll(KickReason.gameover);
@@ -172,11 +172,8 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        //initialize plugins
-        plugins.each(io.anuke.mindustry.plugin.Plugin::init);
-
-        if(!plugins.all().isEmpty()){
-            info("&lc{0} plugins loaded.", plugins.all().size);
+        if(!mods.all().isEmpty()){
+            info("&lc{0} mods loaded.", mods.all().size);
         }
 
         info("&lcServer loaded. Type &ly'help'&lc for help.");
@@ -319,28 +316,28 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("plugins", "Display all loaded plugins.", arg -> {
-            if(!plugins.all().isEmpty()){
-                info("Plugins:");
-                for(LoadedPlugin plugin : plugins.all()){
-                    info("  &ly{0} &lcv{1}", plugin.meta.name, plugin.meta.version);
+        handler.register("mods", "Display all loaded mods.", arg -> {
+            if(!mods.all().isEmpty()){
+                info("Mods:");
+                for(LoadedMod mod : mods.all()){
+                    info("  &ly{0} &lcv{1}", mod.meta.name, mod.meta.version);
                 }
             }else{
-                info("No plugins found.");
+                info("No mods found.");
             }
-            info("&lyPlugin directory: &lb&fi{0}", pluginDirectory.file().getAbsoluteFile().toString());
+            info("&lyMod directory: &lb&fi{0}", modDirectory.file().getAbsoluteFile().toString());
         });
 
-        handler.register("plugin", "<name...>", "Display information about a loaded plugin.", arg -> {
-            LoadedPlugin plugin = plugins.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
-            if(plugin != null){
-                info("Name: &ly{0}", plugin.meta.name);
-                info("Version: &ly{0}", plugin.meta.version);
-                info("Author: &ly{0}", plugin.meta.author);
-                info("Path: &ly{0}", plugin.jarFile.path());
-                info("Description: &ly{0}", plugin.meta.description);
+        handler.register("mod", "<name...>", "Display information about a loaded plugin.", arg -> {
+            LoadedMod mod = mods.all().find(p -> p.meta.name.equalsIgnoreCase(arg[0]));
+            if(mod != null){
+                info("Name: &ly{0}", mod.meta.name);
+                info("Version: &ly{0}", mod.meta.version);
+                info("Author: &ly{0}", mod.meta.author);
+                info("Path: &ly{0}", mod.file.path());
+                info("Description: &ly{0}", mod.meta.description);
             }else{
-                info("No plugin with name &ly'{0}'&lg found.");
+                info("No mod with name &ly'{0}'&lg found.");
             }
         });
 
@@ -687,6 +684,7 @@ public class ServerControl implements ApplicationListener{
             Core.app.post(() -> {
                 try{
                     SaveIO.loadFromSlot(slot);
+                    state.rules.zone = null;
                 }catch(Throwable t){
                     err("Failed to load save. Outdated or corrupt file.");
                 }
@@ -751,8 +749,9 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
 
-        plugins.each(p -> p.registerServerCommands(handler));
-        plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
+        mods.each(p -> p.registerServerCommands(handler));
+        //TODO
+        //plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -797,7 +796,6 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-
             Array<Player> players = new Array<>();
             for(Player p : playerGroup.all()){
                 players.add(p);
@@ -812,6 +810,8 @@ public class ServerControl implements ApplicationListener{
             state.rules = world.getMap().applyRules(lastMode);
 
             for(Player p : players){
+                if(p.con == null) continue;
+
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));

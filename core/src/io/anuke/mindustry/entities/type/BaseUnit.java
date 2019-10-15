@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
@@ -16,6 +17,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
@@ -34,6 +36,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
+    protected boolean loaded;
     protected UnitType type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
@@ -91,7 +94,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public @Nullable Tile getSpawner(){
+    public @Nullable
+    Tile getSpawner(){
         return world.tile(spawner);
     }
 
@@ -99,7 +103,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         return indexer.getAllied(team, BlockFlag.comandCenter).size != 0 && indexer.getAllied(team, BlockFlag.comandCenter).first().entity instanceof CommandCenterEntity;
     }
 
-    public UnitCommand getCommand(){
+    public @Nullable UnitCommand getCommand(){
         if(isCommanded()){
             return indexer.getAllied(team, BlockFlag.comandCenter).first().<CommandCenterEntity>entity().command;
         }
@@ -173,8 +177,15 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public TileEntity getClosestEnemyCore(){
+    public Tile getClosest(BlockFlag flag){
+        return Geometry.findClosest(x, y, indexer.getAllied(team, flag));
+    }
 
+    public Tile getClosestSpawner(){
+        return Geometry.findClosest(x, y, Vars.spawner.getGroundSpawns());
+    }
+
+    public TileEntity getClosestEnemyCore(){
         for(Team enemy : Vars.state.teams.enemiesOf(team)){
             Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
             if(tile != null){
@@ -225,7 +236,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public TextureRegion getIconRegion(){
-        return type.iconRegion;
+        return type.icon(Cicon.full);
     }
 
     @Override
@@ -254,7 +265,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public boolean isFlying(){
-        return type.isFlying;
+        return type.flying;
     }
 
     @Override
@@ -273,7 +284,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
             return;
         }
 
-        if(!isFlying() && (world.tileWorld(x, y) != null && world.tileWorld(x, y).solid())){
+        if(!isFlying() && (world.tileWorld(x, y) != null && !(world.tileWorld(x, y).block() instanceof BuildBlock) && world.tileWorld(x, y).solid())){
             kill();
         }
 
@@ -330,7 +341,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void added(){
         state.set(getStartState());
 
-        health(maxHealth());
+        if(!loaded){
+            health(maxHealth());
+        }
 
         if(isCommanded()){
             onCommand(getCommand());
@@ -367,6 +380,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
         super.readSave(stream, version);
+        loaded = true;
         byte type = stream.readByte();
         this.spawner = stream.readInt();
 

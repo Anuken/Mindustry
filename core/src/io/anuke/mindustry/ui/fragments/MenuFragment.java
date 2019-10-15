@@ -65,7 +65,7 @@ public class MenuFragment extends Fragment{
             parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build);
+        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
 
         parent.fill((x, y, w, h) -> {
             Texture logo = Core.assets.get("sprites/logo.png");
@@ -161,8 +161,8 @@ public class MenuFragment extends Fragment{
                     new Buttoni("$loadgame", Icon.loadSmall, ui.load::show),
                     new Buttoni("$tutorial", Icon.infoSmall, control::playTutorial)
                 ),
-                new Buttoni("$editor", Icon.editorSmall, ui.maps::show),
-                steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
+                new Buttoni("$editor", Icon.editorSmall, ui.maps::show), steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
+                new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.wikiSmall, ui.mods::show),
                 new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
                 new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
                 new Buttoni("$quit", Icon.exitSmall, Core.app::exit)
