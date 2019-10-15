@@ -25,6 +25,7 @@ import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.lang.reflect.*;
 
@@ -173,9 +174,9 @@ public class ContentParser{
                     TechTree.create(find(ContentType.block, value.get("research").asString()), block);
                 }
 
-                //make block visible
-                if(value.has("requirements")){
-                    block.buildVisibility = () -> true;
+                //make block visible by default if there are requirements and no visibility set
+                if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
+                    block.buildVisibility = BuildVisibility.shown;
                 }
             });
 

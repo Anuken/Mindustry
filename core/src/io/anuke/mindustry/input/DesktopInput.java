@@ -211,6 +211,11 @@ public class DesktopInput extends InputHandler{
         cursorType = SystemCursor.arrow;
     }
 
+    @Override
+    public boolean isBreaking(){
+        return mode == breaking;
+    }
+
     void pollInput(){
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());

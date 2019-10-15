@@ -349,6 +349,11 @@ public class MobileInput extends InputHandler implements GestureListener{
     //region input events
 
     @Override
+    public boolean isBreaking(){
+        return mode == breaking;
+    }
+
+    @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
         if(state.is(State.menu) || player.isDead()) return false;
 
