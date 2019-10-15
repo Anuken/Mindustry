@@ -46,7 +46,7 @@ public class MapResizeDialog extends FloatingDialog{
 
         buttons.defaults().size(200f, 50f);
         buttons.addButton("$cancel", this::hide);
-        buttons.addButton("$editor.resize", () -> {
+        buttons.addButton("$ok", () -> {
             cons.accept(width, height);
             hide();
         });
