@@ -45,6 +45,7 @@ public class ApplicationTests{
                 public void setup(){
                     headless = true;
                     net = new Net(null);
+                    tree = new FileTree();
                     Vars.init();
                     content.createContent();
 

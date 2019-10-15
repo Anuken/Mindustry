@@ -51,6 +51,7 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
+            cont.setName("overlaymarker");
             cont.top().left();
 
             if(mobile){
@@ -187,10 +188,10 @@ public class HudFragment extends Fragment{
                             FloatingDialog dialog = new FloatingDialog("$editor.spawn");
                             int i = 0;
                             for(UnitType type : content.<UnitType>getBy(ContentType.unit)){
-                                dialog.cont.addImageButton(Tex.whiteui, 48, () -> {
+                                dialog.cont.addImageButton(Tex.whiteui, 8 * 6f, () -> {
                                     Call.spawnUnitEditor(player, type);
                                     dialog.hide();
-                                }).get().getStyle().imageUp = new TextureRegionDrawable(type.iconRegion);
+                                }).get().getStyle().imageUp = new TextureRegionDrawable(type.icon(Cicon.xlarge));
                                 if(++i % 4 == 0) dialog.cont.row();
                             }
                             dialog.addCloseButton();
@@ -421,7 +422,7 @@ public class HudFragment extends Fragment{
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
         //also don't play in the tutorial to prevent confusion
-        if(content.getContentIcon() == null || state.is(State.menu) || state.rules.tutorial) return;
+        if(state.is(State.menu) || state.rules.tutorial) return;
 
         Sounds.message.play();
 
@@ -441,10 +442,10 @@ public class HudFragment extends Fragment{
                 Table in = new Table();
 
                 //create texture stack for displaying
-                Image image = new Image(content.getContentIcon());
+                Image image = new Image(content.icon(Cicon.xlarge));
                 image.setScaling(Scaling.fit);
 
-                in.add(image).size(48f).pad(2);
+                in.add(image).size(8 * 6).pad(2);
 
                 //add to table
                 table.add(in).padRight(8);
@@ -495,7 +496,7 @@ public class HudFragment extends Fragment{
             //if there's space, add it
             if(esize < cap){
 
-                Image image = new Image(content.getContentIcon());
+                Image image = new Image(content.icon(Cicon.medium));
                 image.setScaling(Scaling.fit);
 
                 lastUnlockLayout.add(image);

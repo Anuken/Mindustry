@@ -5,7 +5,7 @@ import io.anuke.mindustry.content.Items;
 
 public class ItemStack implements Comparable<ItemStack>{
     public Item item;
-    public int amount;
+    public int amount = 1;
 
     public ItemStack(Item item, int amount){
         if(item == null) item = Items.copper;
@@ -17,6 +17,10 @@ public class ItemStack implements Comparable<ItemStack>{
     public ItemStack(){
         //prevent nulls.
         item = Items.copper;
+    }
+
+    public ItemStack copy(){
+        return new ItemStack(item, amount);
     }
 
     public boolean equals(ItemStack other){

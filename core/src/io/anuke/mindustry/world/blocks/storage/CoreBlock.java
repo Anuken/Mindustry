@@ -3,7 +3,6 @@ package io.anuke.mindustry.world.blocks.storage;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -157,7 +156,7 @@ public class CoreBlock extends StorageBlock{
             tile.entity.items.set(item, Math.min(tile.entity.items.get(item), max));
         }
 
-        for(Tile other : new ObjectSetIterator<>(state.teams.get(tile.getTeam()).cores)){
+        for(Tile other : state.teams.get(tile.getTeam()).cores){
             other.block().onProximityUpdate(other);
         }
     }

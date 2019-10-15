@@ -20,6 +20,10 @@ public class ConsumePower extends Consume{
         this.buffered = buffered;
     }
 
+    protected ConsumePower(){
+        this(0f, 0f, false);
+    }
+
     @Override
     public ConsumeType type(){
         return ConsumeType.power;

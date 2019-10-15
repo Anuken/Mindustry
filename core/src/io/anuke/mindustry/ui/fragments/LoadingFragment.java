@@ -38,6 +38,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void setProgress(FloatProvider progress){
+        bar.reset(0f);
         bar.visible(true);
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
     }

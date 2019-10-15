@@ -28,16 +28,21 @@ public class Mech extends UnlockableContent{
     public int itemCapacity = 30;
     public boolean turnCursor = true;
     public boolean canHeal = false;
+    public float compoundSpeed, compoundSpeedBoost;
 
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
     public Weapon weapon;
 
-    public TextureRegion baseRegion, legRegion, region, iconRegion;
+    public TextureRegion baseRegion, legRegion, region;
 
     public Mech(String name, boolean flying){
         super(name);
         this.flying = flying;
         this.description = Core.bundle.get("mech." + name + ".description");
+    }
+
+    public Mech(String name){
+        this(name, false);
     }
 
     public String localizedName(){
@@ -70,13 +75,23 @@ public class Mech extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayMech(table, this);
+    public void init(){
+        super.init();
+
+        for(int i = 0; i < 500; i++){
+            compoundSpeed *= (1f - drag);
+            compoundSpeed += speed;
+        }
+
+        for(int i = 0; i < 500; i++){
+            compoundSpeedBoost *= (1f - drag);
+            compoundSpeedBoost += boostSpeed;
+        }
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return iconRegion;
+    public void displayInfo(Table table){
+        ContentDisplay.displayMech(table, this);
     }
 
     @Override
@@ -93,7 +108,6 @@ public class Mech extends UnlockableContent{
         }
 
         region = Core.atlas.find(name);
-        iconRegion = Core.atlas.find("mech-icon-" + name);
     }
 
     @Override

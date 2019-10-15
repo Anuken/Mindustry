@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
@@ -35,6 +36,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     protected static final int timerShootLeft = timerIndex++;
     protected static final int timerShootRight = timerIndex++;
 
+    protected boolean loaded;
     protected UnitType type;
     protected Interval timer = new Interval(5);
     protected StateMachine state = new StateMachine();
@@ -92,7 +94,8 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
         }
     }
 
-    public @Nullable Tile getSpawner(){
+    public @Nullable
+    Tile getSpawner(){
         return world.tile(spawner);
     }
 
@@ -233,7 +236,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public TextureRegion getIconRegion(){
-        return type.iconRegion;
+        return type.icon(Cicon.full);
     }
 
     @Override
@@ -262,7 +265,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     @Override
     public boolean isFlying(){
-        return type.isFlying;
+        return type.flying;
     }
 
     @Override
@@ -338,7 +341,9 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     public void added(){
         state.set(getStartState());
 
-        health(maxHealth());
+        if(!loaded){
+            health(maxHealth());
+        }
 
         if(isCommanded()){
             onCommand(getCommand());
@@ -375,6 +380,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
     @Override
     public void readSave(DataInput stream, byte version) throws IOException{
         super.readSave(stream, version);
+        loaded = true;
         byte type = stream.readByte();
         this.spawner = stream.readInt();
 

@@ -10,13 +10,16 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -73,16 +76,20 @@ public class PlacementFragment extends Fragment{
 
     boolean gridUpdate(InputHandler input){
         if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
-            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block tryRecipe = tile == null ? null : tile.block();
 
-            if(tile != null){
-                tile = tile.link();
-                Block tryRecipe = tile.block();
-                if(tryRecipe.isVisible() && unlocked(tryRecipe)){
-                    input.block = tryRecipe;
-                    currentCategory = input.block.buildCategory;
-                    return true;
+            for(BuildRequest req : player.buildQueue()){
+                if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
+                    tryRecipe = req.block;
+                    break;
                 }
+            }
+
+            if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
+                input.block = tryRecipe;
+                currentCategory = input.block.category;
+                return true;
             }
         }
 
@@ -92,7 +99,7 @@ public class PlacementFragment extends Fragment{
             for(KeyCode key : inputCatGrid){
                 if(Core.input.keyDown(key)){
                     input.block = getByCategory(Category.all[i]).first();
-                    currentCategory = input.block.buildCategory;
+                    currentCategory = input.block.category;
                 }
                 i++;
             }
@@ -143,13 +150,17 @@ public class PlacementFragment extends Fragment{
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
-                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Block.Icon.medium));
+                        button.getStyle().imageUp = new TextureRegionDrawable(block.icon(Cicon.medium));
 
                         button.update(() -> { //color unplacable things gray
                             TileEntity core = player.getClosestCore();
-                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.buildRequirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
+                            Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
+
+                            if(state.rules.bannedBlocks.contains(block)){
+                                button.forEach(elem -> elem.setColor(Color.darkGray));
+                            }
                         });
 
                         button.hovered(() -> hovered = block);
@@ -189,7 +200,7 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 header.left();
-                                header.add(new Image(lastDisplay.icon(Block.Icon.medium))).size(8 * 4);
+                                header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -205,10 +216,10 @@ public class PlacementFragment extends Fragment{
                             topTable.table(req -> {
                                 req.top().left();
 
-                                for(ItemStack stack : lastDisplay.buildRequirements){
+                                for(ItemStack stack : lastDisplay.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.addImage(stack.item.icon(Item.Icon.small)).size(8 * 2);
+                                        line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
@@ -224,6 +235,15 @@ public class PlacementFragment extends Fragment{
                                     req.row();
                                 }
                             }).growX().left().margin(3);
+
+                            if(state.rules.bannedBlocks.contains(lastDisplay)){
+                                topTable.row();
+                                topTable.table(b -> {
+                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.add("$banned");
+                                    b.left();
+                                }).padTop(2).left();
+                            }
 
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
@@ -249,7 +269,7 @@ public class PlacementFragment extends Fragment{
                     blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
-                    blocksSelect.table(control.input::buildUI).name("inputTable").growX();
+                    blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
                 frame.table(categories -> {
                     categories.defaults().size(50f);
@@ -296,11 +316,15 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.buildCategory == cat && block.isVisible()){
+            if(block.category == cat && block.isVisible()){
                 returnArray.add(block);
             }
         }
-        returnArray.sort((b1, b2) -> -Boolean.compare(unlocked(b1), unlocked(b2)));
+        returnArray.sort((b1, b2) -> {
+            int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
+            if(locked != 0) return locked;
+            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+        });
         return returnArray;
     }
 

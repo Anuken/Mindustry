@@ -76,6 +76,7 @@ public class NetClient implements ApplicationListener{
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
+            c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
             c.color = Color.rgba8888(player.color);
@@ -133,7 +134,7 @@ public class NetClient implements ApplicationListener{
     //called on all clients
     @Remote(called = Loc.server, targets = Loc.server, variants = Variant.both)
     public static void sendMessage(String message, String sender, Player playersender){
-        if(Vars.ui != null){
+        if(Vars.ui != null && !(playersender != null && net.server() && sender.startsWith("[#" + player.getTeam().color.toString() + "]<T>"))){
             Vars.ui.chatfrag.addMessage(message, sender);
         }
 
@@ -235,7 +236,7 @@ public class NetClient implements ApplicationListener{
         netClient.disconnectQuietly();
         state.set(State.menu);
         logic.reset();
-        ui.showText("$disconnect", reason);
+        ui.showText("$disconnect", reason, Align.left);
         ui.loadfrag.hide();
     }
 
@@ -329,6 +330,11 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void onStateSnapshot(float waveTime, int wave, int enemies, short coreDataLen, byte[] coreData){
         try{
+            if(wave > state.wave){
+                state.wave = wave;
+                Events.fire(new WaveEvent());
+            }
+
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;

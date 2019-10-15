@@ -1,7 +1,7 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.*;
@@ -15,14 +15,15 @@ import static io.anuke.mindustry.Vars.netServer;
 public abstract class NetConnection{
     public final String address;
     public boolean mobile, modclient;
-    public @Nullable Player player;
+    public @Nullable
+    Player player;
 
     /** ID of last recieved client snapshot. */
     public int lastRecievedClientSnapshot = -1;
     /** Timestamp of last recieved snapshot. */
     public long lastRecievedClientTime;
 
-    public boolean hasConnected, hasBegunConnecting;
+    public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){
@@ -48,7 +49,7 @@ public abstract class NetConnection{
 
     /** Kick with an arbitrary reason. */
     public void kick(String reason){
-        Log.info("Kicking connection {0}; Reason: {1}", address, reason);
+        Log.info("Kicking connection {0}; Reason: {1}", address, reason.replace("\n", " "));
 
         if(player != null  && player.uuid != null){
             PlayerInfo info = netServer.admins.getInfo(player.uuid);

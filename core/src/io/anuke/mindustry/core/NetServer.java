@@ -79,6 +79,11 @@ public class NetServer implements ApplicationListener{
             con.hasBegunConnecting = true;
             con.mobile = packet.mobile;
 
+            if(packet.uuid == null || packet.usid == null){
+                con.kick(KickReason.idInUse);
+                return;
+            }
+
             if(admins.isIDBanned(uuid)){
                 con.kick(KickReason.banned);
                 return;
@@ -89,14 +94,26 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
-                con.kick(KickReason.banned);
-                return;
-            }
-
             if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
                 con.kick(KickReason.playerLimit);
                 return;
+            }
+
+            Array<String> extraMods = packet.mods.copy();
+            Array<String> missingMods = mods.getIncompatibility(extraMods);
+
+            if(!extraMods.isEmpty() || !missingMods.isEmpty()){
+                //can't easily be localized since kick reasons can't have formatted text with them
+                StringBuilder result = new StringBuilder("[accent]Incompatible mods![]\n\n");
+                if(!missingMods.isEmpty()){
+                    result.append("Missing:[lightgray]\n").append("> ").append(missingMods.toString("\n> "));
+                    result.append("[]\n");
+                }
+
+                if(!extraMods.isEmpty()){
+                    result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
+                }
+                con.kick(result.toString());
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
@@ -124,7 +141,7 @@ public class NetServer implements ApplicationListener{
                         return;
                     }
 
-                    if(player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid)){
+                    if(player.uuid != null && player.usid != null && (player.uuid.equals(packet.uuid) || player.usid.equals(packet.usid))){
                         con.kick(KickReason.idInUse);
                         return;
                     }
@@ -195,6 +212,11 @@ public class NetServer implements ApplicationListener{
         registerCommands();
     }
 
+    @Override
+    public void init(){
+        mods.each(mod -> mod.registerClientCommands(clientCommands));
+    }
+
     private void registerCommands(){
         clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
             if(args.length > 0 && !Strings.canParseInt(args[0])){
@@ -257,7 +279,7 @@ public class NetServer implements ApplicationListener{
             }
 
             boolean checkPass(){
-                if(votes >= votesRequired() && target.isAdded() && target.con.isConnected()){
+                if(votes >= votesRequired()){
                     Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] {0}[orange] will be banned from the server for {1} minutes.", target.name, (kickDuration/60)));
                     target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
                     playerGroup.all().each(p -> p.uuid != null && p.uuid.equals(target.uuid), p -> p.con.kick(KickReason.vote));
@@ -330,6 +352,11 @@ public class NetServer implements ApplicationListener{
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
+                if(player.isLocal){
+                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    return;
+                }
+
                 //hosts can vote all they want
                 if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");
@@ -400,22 +427,18 @@ public class NetServer implements ApplicationListener{
             return;
         }
 
-        if(player.con.hasConnected){
-            Events.fire(new PlayerLeave(player));
-            Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-            Call.onPlayerDisconnect(player.id);
-        }
-        player.remove();
-        Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
-    }
+        if(!player.con.hasDisconnected){
+            if(player.con.hasConnected){
+                Events.fire(new PlayerLeave(player));
+                Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                Call.onPlayerDisconnect(player.id);
+            }
 
-    private static float compound(float speed, float drag){
-        float total = 0f;
-        for(int i = 0; i < 50; i++){
-            total *= (1f - drag);
-            total += speed;
+            Log.info("&lm[{1}] &lc{0} has disconnected. &lg&fi({2})", player.name, player.uuid, reason);
         }
-        return total;
+
+        player.remove();
+        player.con.hasDisconnected = true;
     }
 
     @Remote(targets = Loc.client, unreliable = true)
@@ -445,8 +468,8 @@ public class NetServer implements ApplicationListener{
 
         long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
 
-        float maxSpeed = boosting && !player.mech.flying ? player.mech.boostSpeed : player.mech.speed;
-        float maxMove = elapsed / 1000f * 60f * Math.min(compound(maxSpeed, player.mech.drag) * 1.25f, player.mech.maxSpeed * 1.2f);
+        float maxSpeed = boosting && !player.mech.flying ? player.mech.compoundSpeedBoost : player.mech.compoundSpeed;
+        float maxMove = elapsed / 1000f * 60f * Math.min(maxSpeed, player.mech.maxSpeed) * 1.2f;
 
         player.pointerX = pointerX;
         player.pointerY = pointerY;
@@ -704,7 +727,12 @@ public class NetServer implements ApplicationListener{
             //iterate through each player
             for(int i = 0; i < playerGroup.size(); i++){
                 Player player = playerGroup.all().get(i);
-                if(player.isLocal || player.con == null) continue;
+                if(player.isLocal) continue;
+
+                if(player.con == null || !player.con.isConnected()){
+                    onDisconnect(player, "disappeared");
+                    continue;
+                }
 
                 NetConnection connection = player.con;
 

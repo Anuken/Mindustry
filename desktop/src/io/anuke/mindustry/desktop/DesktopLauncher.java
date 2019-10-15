@@ -15,6 +15,7 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -22,11 +23,14 @@ import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.ui.*;
 
+import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -35,7 +39,13 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = true;
+    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+
+    static{
+        if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
+            System.setProperty("com.codedisaster.steamworks.SharedLibraryExtractPath", new File("").getAbsolutePath());
+        }
+    }
 
     public static void main(String[] arg){
         try{
@@ -56,7 +66,7 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Log.setUseColors(false);
         Version.init();
-        boolean useSteam = Version.modifier.equals("steam");
+        boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
@@ -73,6 +83,14 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useSteam){
+            //delete leftover dlls
+            FileHandle file = new FileHandle(".");
+            for(FileHandle other : file.parent().list()){
+                if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
+                    other.delete();
+                }
+            }
+
             if(showConsole){
                 StringBuilder base = new StringBuilder();
                 Log.setLogger(new LogHandler(){
@@ -121,18 +139,37 @@ public class DesktopLauncher extends ClientLauncher{
             }
 
             try{
-                SteamAPI.loadLibraries();
+                try{
+                    SteamAPI.loadLibraries();
+                }catch(Throwable t){
+                    Log.err(t);
+                    fallbackSteam();
+                }
+
                 if(!SteamAPI.init()){
                     Log.err("Steam client not running.");
                 }else{
-                    Vars.steam = true;
                     initSteam(args);
-
+                    Vars.steam = true;
                 }
-            }catch(Exception e){
+            }catch(Throwable e){
+                steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                e.printStackTrace();
+                Log.err(e);
             }
+        }
+    }
+
+    void fallbackSteam(){
+        try{
+            String name = "steam_api";
+            if(OS.isMac || OS.isLinux) name = "lib" + name;
+            if(OS.isWindows && OS.is64Bit) name += "64";
+            name += (OS.isLinux ? ".so" : OS.isMac ? ".dylib" : ".dll");
+            Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
+            System.loadLibrary(new File(name).getAbsolutePath());
+        }catch(Throwable e){
+            Log.err(e);
         }
     }
 
@@ -141,6 +178,7 @@ public class DesktopLauncher extends ClientLauncher{
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
+        boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
             player.name = SVars.net.friends.getPersonaName();
@@ -169,8 +207,18 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             });
         });
+
+        Events.on(DisposeEvent.class, event -> {
+            SteamAPI.shutdown();
+            isShutdown[0] = true;
+        });
+
         //steam shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(!isShutdown[0]){
+                SteamAPI.shutdown();
+            }
+        }));
     }
 
     static void handleCrash(Throwable e){
@@ -190,7 +238,10 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
-            Throwable cause = Strings.getFinalCause(e);
+            Array<Throwable> causes = Strings.getCauses(e);
+            Throwable fc = causes.find(t -> t instanceof ModLoadException);
+            if(fc == null) fc = Strings.getFinalCause(e);
+            Throwable cause = fc;
             if(!fbgp){
                 dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
@@ -203,8 +254,23 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public Array<FileHandle> getExternalMods(){
+        return !steam ? super.getExternalMods() : SVars.workshop.getModFiles();
+    }
+
+    @Override
     public void viewMapListing(Map map){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + map.file.parent().name());
+        viewListing(map.file.parent().name());
+    }
+
+    @Override
+    public void viewListing(String mapid){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
+    }
+
+    @Override
+    public void viewMapListingInfo(Map map){
+        SVars.workshop.viewMapListingInfo(map);
     }
 
     @Override
