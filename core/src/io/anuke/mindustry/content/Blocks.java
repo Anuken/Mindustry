@@ -79,7 +79,7 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, alphaPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
 
     @Override
     public void load(){
@@ -1742,7 +1742,14 @@ public class Blocks implements ContentList{
         //endregion
         //region upgrades
 
-        dartPad = new MechPad("dart-mech-pad"){{
+        dartPad = new MechPad("dart-ship-pad"){{
+            requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
+            mech = Mechs.dart;
+            size = 2;
+            consumes.power(0.5f);
+        }};
+
+        alphaPad = new MechPad("alpha-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 100, Items.graphite, 50, Items.copper, 75));
             mech = Mechs.alpha;
             size = 2;

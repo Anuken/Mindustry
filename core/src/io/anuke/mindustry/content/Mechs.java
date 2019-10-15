@@ -43,10 +43,9 @@ public class Mechs implements ContentList{
                         homingPower = 20f;
                         damage = 3f;
                         speed = 3f;
-                        bulletWidth = 4f;
-                        bulletHeight = 4f;
+                        bulletWidth = 6f;
+                        bulletHeight = 6f;
                         lifetime = 60f;
-
                     }};
                 }};
             }
