@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.units;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
@@ -13,9 +12,8 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
@@ -95,7 +93,7 @@ public class CommandCenter extends Block{
         Table buttons = new Table();
 
         for(UnitCommand cmd : UnitCommand.all){
-            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> Call.onCommandCenterSet(player, tile, cmd))
+            buttons.addImageButton(Core.atlas.drawable("icon-command-" + cmd.name() + "-small"), Styles.clearToggleTransi, () -> tile.configure(cmd.ordinal()))
             .size(44).group(group).update(b -> b.setChecked(entity.command == cmd));
         }
         table.add(buttons);
@@ -103,10 +101,9 @@ public class CommandCenter extends Block{
         table.label(() -> entity.command.localized()).style(Styles.outlineLabel).center().growX().get().setAlignment(Align.center);
     }
 
-    @Remote(called = Loc.server, forward = true, targets = Loc.both)
-    public static void onCommandCenterSet(Player player, Tile tile, UnitCommand command){
-        if(player == null || tile == null || !Units.canInteract(player, tile)) return;
-
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        UnitCommand command = UnitCommand.all[value];
         Effects.effect(((CommandCenter)tile.block()).effect, tile);
 
         for(Tile center : indexer.getAllied(tile.getTeam(), BlockFlag.comandCenter)){
@@ -132,6 +129,11 @@ public class CommandCenter extends Block{
 
     public class CommandCenterEntity extends TileEntity{
         public UnitCommand command = UnitCommand.attack;
+
+        @Override
+        public int config(){
+            return command.ordinal();
+        }
 
         @Override
         public void write(DataOutput stream) throws IOException{

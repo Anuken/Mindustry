@@ -2,6 +2,8 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
+import io.anuke.arc.assets.loaders.*;
+import io.anuke.arc.audio.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -13,6 +15,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
 
 import static io.anuke.arc.Core.*;
@@ -40,9 +43,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
+
+        tree = new FileTree();
+        assets.setLoader(Sound.class, new SoundLoader(tree));
+        assets.setLoader(Music.class, new MusicLoader(tree));
+
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
+        mods = new Mods();
 
         UI.loadSystemCursors();
 
@@ -70,6 +79,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         add(ui = new UI());
         add(netServer = new NetServer());
         add(netClient = new NetClient());
+
+        assets.load(mods);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> {
             content.init();
@@ -108,6 +119,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                     listener.init();
                 }
                 super.resize(graphics.getWidth(), graphics.getHeight());
+                mods.each(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
             }
@@ -182,7 +194,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
             if(assets.getCurrentLoading() != null){
                 String name = assets.getCurrentLoading().fileName.toLowerCase();
-                String key = name.contains("content") ? "content" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
+                String key = name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") || name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
                 font.draw(bundle.get("load." + key, ""), graphics.getWidth() / 2f, graphics.getHeight() / 2f - height / 2f - Scl.scl(10f), Align.center);
             }
         }

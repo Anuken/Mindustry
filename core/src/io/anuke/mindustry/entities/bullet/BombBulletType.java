@@ -17,4 +17,8 @@ public class BombBulletType extends BasicBulletType{
         collidesAir = false;
         hitSound = Sounds.explosion;
     }
+
+    public BombBulletType(){
+        this(1f, 1f, "shell");
+    }
 }

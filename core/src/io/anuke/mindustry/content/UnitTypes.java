@@ -17,8 +17,8 @@ public class UnitTypes implements ContentList{
 
     @Override
     public void load(){
-        draug = new UnitType("draug", Draug.class, Draug::new){{
-            isFlying = true;
+        draug = new UnitType("draug", Draug::new){{
+            flying = true;
             drag = 0.01f;
             speed = 0.3f;
             maxVelocity = 1.2f;
@@ -32,13 +32,13 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        spirit = new UnitType("spirit", Spirit.class, Spirit::new){{
-            isFlying = true;
+        spirit = new UnitType("spirit", Spirit::new){{
+            flying = true;
             drag = 0.01f;
-            speed = 0.4f;
+            speed = 0.42f;
             maxVelocity = 1.6f;
             range = 50f;
-            health = 60;
+            health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
             weapon = new Weapon("heal-blaster"){{
@@ -48,22 +48,21 @@ public class UnitTypes implements ContentList{
                 roundrobin = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                bullet = Bullets.healBullet;
+                bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
             }};
         }};
 
-        phantom = new UnitType("phantom", Phantom.class, Phantom::new){{
-            isFlying = true;
+        phantom = new UnitType("phantom", Phantom::new){{
+            flying = true;
             drag = 0.01f;
             mass = 2f;
             speed = 0.45f;
             maxVelocity = 1.9f;
             range = 70f;
             itemCapacity = 70;
-            health = 220;
-            buildPower = 0.9f;
-            minePower = 1.1f;
+            health = 400;
+            buildPower = 0.4f;
             engineOffset = 6.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
             weapon = new Weapon("heal-blaster"){{
@@ -77,7 +76,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        dagger = new UnitType("dagger", Dagger.class, Dagger::new){{
+        dagger = new UnitType("dagger", Dagger::new){{
             maxVelocity = 1.1f;
             speed = 0.2f;
             drag = 0.4f;
@@ -93,7 +92,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        crawler = new UnitType("crawler", Crawler.class, Crawler::new){{
+        crawler = new UnitType("crawler", Crawler::new){{
             maxVelocity = 1.27f;
             speed = 0.285f;
             drag = 0.4f;
@@ -124,7 +123,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        titan = new UnitType("titan", Titan.class, Titan::new){{
+        titan = new UnitType("titan", Titan::new){{
             maxVelocity = 0.8f;
             speed = 0.22f;
             drag = 0.4f;
@@ -146,7 +145,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        fortress = new UnitType("fortress", Fortress.class, Fortress::new){{
+        fortress = new UnitType("fortress", Fortress::new){{
             maxVelocity = 0.78f;
             speed = 0.15f;
             drag = 0.4f;
@@ -168,7 +167,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        eruptor = new UnitType("eruptor", Eruptor.class, Eruptor::new){{
+        eruptor = new UnitType("eruptor", Eruptor::new){{
             maxVelocity = 0.81f;
             speed = 0.16f;
             drag = 0.4f;
@@ -190,7 +189,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        chaosArray = new UnitType("chaos-array", Dagger.class, Dagger::new){{
+        chaosArray = new UnitType("chaos-array", Dagger::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
             drag = 0.4f;
@@ -214,7 +213,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        eradicator = new UnitType("eradicator", Dagger.class, Dagger::new){{
+        eradicator = new UnitType("eradicator", Dagger::new){{
             maxVelocity = 0.68f;
             speed = 0.12f;
             drag = 0.4f;
@@ -239,12 +238,12 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        wraith = new UnitType("wraith", Wraith.class, Wraith::new){{
+        wraith = new UnitType("wraith", Wraith::new){{
             speed = 0.3f;
             maxVelocity = 1.9f;
             drag = 0.01f;
             mass = 1.5f;
-            isFlying = true;
+            flying = true;
             health = 75;
             engineOffset = 5.5f;
             range = 140f;
@@ -258,13 +257,13 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        ghoul = new UnitType("ghoul", Ghoul.class, Ghoul::new){{
+        ghoul = new UnitType("ghoul", Ghoul::new){{
             health = 220;
             speed = 0.2f;
             maxVelocity = 1.4f;
             mass = 3f;
             drag = 0.01f;
-            isFlying = true;
+            flying = true;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -282,7 +281,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        revenant = new UnitType("revenant", Revenant.class, Revenant::new){{
+        revenant = new UnitType("revenant", Revenant::new){{
             health = 1000;
             mass = 5f;
             hitsize = 20f;
@@ -291,7 +290,7 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             range = 80f;
             shootCone = 40f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 12f;
             engineSize = 3f;
@@ -313,7 +312,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        lich = new UnitType("lich", Revenant.class, Revenant::new){{
+        lich = new UnitType("lich", Revenant::new){{
             health = 6000;
             mass = 20f;
             hitsize = 40f;
@@ -322,7 +321,7 @@ public class UnitTypes implements ContentList{
             drag = 0.02f;
             range = 80f;
             shootCone = 20f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -346,7 +345,7 @@ public class UnitTypes implements ContentList{
             }};
         }};
 
-        reaper = new UnitType("reaper", Revenant.class, Revenant::new){{
+        reaper = new UnitType("reaper", Revenant::new){{
             health = 11000;
             mass = 30f;
             hitsize = 56f;
@@ -355,7 +354,7 @@ public class UnitTypes implements ContentList{
             drag = 0.02f;
             range = 80f;
             shootCone = 30f;
-            isFlying = true;
+            flying = true;
             rotateWeapon = true;
             engineOffset = 40;
             engineSize = 7.3f;

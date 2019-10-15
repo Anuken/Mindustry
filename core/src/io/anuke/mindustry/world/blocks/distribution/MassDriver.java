@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -12,7 +11,6 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -45,11 +43,17 @@ public class MassDriver extends Block{
         outlineIcon = true;
     }
 
+    /*
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void linkMassDriver(Player player, Tile tile, int position){
         if(!Units.canInteract(player, tile)) return;
         MassDriverEntity entity = tile.entity();
         entity.link = position;
+    }*/
+
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.<MassDriverEntity>entity().link = value;
     }
 
     @Override
@@ -192,10 +196,10 @@ public class MassDriver extends Block{
         MassDriverEntity entity = tile.entity();
 
         if(entity.link == other.pos()){
-            Call.linkMassDriver(null, tile, -1);
+            tile.configure(-1);
             return false;
         }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.getTeam() == tile.getTeam()){
-            Call.linkMassDriver(null, tile, other.pos());
+            tile.configure(other.pos());
             return false;
         }
 
@@ -228,8 +232,8 @@ public class MassDriver extends Block{
             int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
             data.items[i] = maxTransfer;
             totalUsed += maxTransfer;
+            entity.items.remove(content.item(i), maxTransfer);
         }
-        entity.items.clear();
 
         float angle = tile.angleTo(target);
 
@@ -308,6 +312,11 @@ public class MassDriver extends Block{
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
             ((MassDriver)block).handlePayload(this, bullet, data);
+        }
+
+        @Override
+        public int config(){
+            return link;
         }
 
         @Override

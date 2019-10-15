@@ -6,6 +6,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
@@ -32,7 +33,8 @@ public class Pathfinder implements Runnable{
     /** handles task scheduling on the update thread. */
     private TaskQueue queue = new TaskQueue();
     /** current pathfinding thread */
-    private @Nullable Thread thread;
+    private @Nullable
+    Thread thread;
 
     public Pathfinder(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -92,7 +94,11 @@ public class Pathfinder implements Runnable{
 
         int x = tile.x, y = tile.y;
 
-        tile.getLinkedTiles(t -> tiles[t.x][t.y] = packTile(t));
+        tile.getLinkedTiles(t -> {
+            if(Structs.inBounds(t.x, t.y, tiles)){
+                tiles[t.x][t.y] = packTile(t);
+            }
+        });
 
         //can't iterate through array so use the map, which should not lead to problems
         for(PathData[] arr : pathMap){

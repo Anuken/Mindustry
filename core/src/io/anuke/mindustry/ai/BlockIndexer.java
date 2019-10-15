@@ -164,6 +164,10 @@ public class BlockIndexer{
     }
 
     public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+        return findTile(team, x, y, range, pred, false);
+    }
+
+    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred, boolean usePriority){
         TileEntity closest = null;
         float dst = 0;
 
@@ -184,7 +188,7 @@ public class BlockIndexer{
                         TileEntity e = other.entity;
 
                         float ndst = Mathf.dst(x, y, e.x, e.y);
-                        if(ndst < range && (closest == null || ndst < dst)){
+                        if(ndst < range && (closest == null || ndst < dst || (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }

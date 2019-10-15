@@ -48,7 +48,7 @@ public class WaveSpawner{
         for(SpawnGroup group : state.rules.spawns){
             int spawned = group.getUnitsSpawned(state.wave - 1);
 
-            if(group.type.isFlying){
+            if(group.type.flying){
                 float spread = margin / 1.5f;
 
                 eachFlyerSpawn((spawnX, spawnY) -> {

@@ -1,27 +1,32 @@
 package io.anuke.mindustry.world.consumers;
 
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item.Icon;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.ui.ItemImage;
-import io.anuke.mindustry.ui.ReqImage;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
-import io.anuke.mindustry.world.meta.values.ItemListValue;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
-    public final ItemStack[] items;
+    public final @NonNull ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
     }
 
+    /** Mods.*/
+    protected ConsumeItems(){
+        this(new ItemStack[]{});
+    }
+
     @Override
-    public void applyItemFilter(boolean[] filter){
+    public void applyItemFilter(Bits filter){
         for(ItemStack stack : items){
-            filter[stack.item.id] = true;
+            filter.set(stack.item.id);
         }
     }
 
@@ -33,7 +38,7 @@ public class ConsumeItems extends Consume{
     @Override
     public void build(Tile tile, Table table){
         for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Icon.large), stack.amount), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(stack.item, stack.amount))).size(8 * 4).padRight(5);
         }
     }
 

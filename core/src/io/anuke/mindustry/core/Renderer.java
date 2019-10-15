@@ -18,12 +18,10 @@ import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.effect.GroundEffectEntity.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.entities.type.EffectEntity;
-import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import static io.anuke.arc.Core.*;
@@ -240,6 +238,8 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 
+        blocks.drawBroken();
+
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
         Draw.shader();
@@ -308,7 +308,7 @@ public class Renderer implements ApplicationListener{
             float fract = landTime / Fx.coreLand.lifetime;
             TileEntity entity = player.getClosestCore();
 
-            TextureRegion reg = entity.block.icon(Block.Icon.full);
+            TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
             float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
 

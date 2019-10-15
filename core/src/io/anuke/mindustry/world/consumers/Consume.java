@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.collection.*;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
@@ -17,7 +18,7 @@ public abstract class Consume{
      * Apply a filter to items accepted.
      * This should set all item IDs that are present in the filter to true.
      */
-    public void applyItemFilter(boolean[] filter){
+    public void applyItemFilter(Bits filter){
 
     }
 
@@ -25,7 +26,7 @@ public abstract class Consume{
      * Apply a filter to liquids accepted.
      * This should set all liquid IDs that are present in the filter to true.
      */
-    public void applyLiquidFilter(boolean[] filter){
+    public void applyLiquidFilter(Bits filter){
 
     }
 

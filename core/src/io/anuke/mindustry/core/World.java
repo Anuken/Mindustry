@@ -1,11 +1,11 @@
 package io.anuke.mindustry.core;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -82,7 +82,8 @@ public class World{
         return height()*tilesize;
     }
 
-    public @Nullable Tile tile(int pos){
+    public @Nullable
+    Tile tile(int pos){
         return tiles == null ? null : tile(Pos.x(pos), Pos.y(pos));
     }
 
@@ -271,6 +272,7 @@ public class World{
     }
 
     public void removeBlock(Tile tile){
+        if(tile == null) return;
         tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
     }
 

@@ -50,10 +50,14 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){
-        if(!tile.block().isMultiblock()) return tile;
-        int size = tile.block().size;
-        return world.tile(tile.x + Mathf.clamp(other.x - tile.x, -(size - 1) / 2, (size / 2)),
-        tile.y + Mathf.clamp(other.y - tile.y, -(size - 1) / 2, (size / 2)));
+        return getFacingEdge(tile.block, tile.x, tile.y, other);
+    }
+
+    public static Tile getFacingEdge(Block block, int tilex, int tiley, Tile other){
+        if(!block.isMultiblock()) return world.tile(tilex, tiley);
+        int size = block.size;
+        return world.tile(tilex + Mathf.clamp(other.x - tilex, -(size - 1) / 2, (size / 2)),
+         tiley + Mathf.clamp(other.y - tiley, -(size - 1) / 2, (size / 2)));
     }
 
     public static Vector2[] getPixelPolygon(float radius){

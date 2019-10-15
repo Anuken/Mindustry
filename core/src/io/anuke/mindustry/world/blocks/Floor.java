@@ -1,19 +1,17 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.math.geom.Point2;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.graphics.g2d.TextureAtlas.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.Effects.Effect;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -57,7 +55,7 @@ public class Floor extends Block{
     protected byte eq = 0;
     protected Array<Block> blenders = new Array<>();
     protected IntSet blended = new IntSet();
-    protected TextureRegion edgeRegion, edgierRegion;
+    protected TextureRegion edgeRegion;
 
     public Floor(String name){
         super(name);
@@ -85,7 +83,38 @@ public class Floor extends Block{
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
-        edgierRegion = Core.atlas.find("edgier");
+    }
+
+    @Override
+    public void createIcons(PixmapPacker out, PixmapPacker editor){
+        super.createIcons(out, editor);
+        editor.pack("editor-" + name, Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+
+        if(blendGroup != this){
+            return;
+        }
+
+        if(variants > 0){
+            for(int i = 0; i < variants; i++){
+                String rname = name + (i + 1);
+                editor.pack("editor-" + rname, Core.atlas.getPixmap(rname).crop());
+            }
+        }
+
+        Color color = new Color();
+        Color color2 = new Color();
+        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)generateIcons()[0]);
+        PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
+        Pixmap result = new Pixmap(edge.width, edge.height);
+
+        for(int x = 0; x < edge.width; x++){
+            for(int y = 0; y < edge.height; y++){
+                edge.getPixel(x, y, color);
+                result.draw(x, y, color.mul(color2.set(image.getPixel(x % image.width, y % image.height))));
+            }
+        }
+
+        out.pack(name + "-edge", result);
     }
 
     @Override
@@ -180,10 +209,6 @@ public class Floor extends Block{
 
     protected boolean edgeOnto(Floor other){
         return true;
-    }
-
-    boolean eq(int i){
-        return (eq & (1 << Mathf.mod(i, 8))) != 0;
     }
 
     TextureRegion edge(Floor block, int x, int y){
