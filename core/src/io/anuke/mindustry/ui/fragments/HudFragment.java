@@ -16,6 +16,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
@@ -249,9 +250,16 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-
-        //minimap
-        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+        
+        parent.fill(t -> {
+            //minimap
+            t.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+            t.row();
+            //position
+            t.label(() -> (int)player.x + "," + (int)player.y).visible(
+                () -> Core.settings.getBool("position") && !state.rules.tutorial);
+            t.top().right();
+        });
 
         //spawner warning
         parent.fill(t -> {
