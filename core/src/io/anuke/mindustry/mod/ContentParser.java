@@ -25,6 +25,7 @@ import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
+import io.anuke.mindustry.world.meta.*;
 
 import java.lang.reflect.*;
 
@@ -79,6 +80,12 @@ public class ContentParser{
     private Json parser = new Json(){
         @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+            T t = internalRead(type, elementType, jsonData, keyType);
+            if(t != null) checkNullFields(t);
+            return t;
+        }
+
+        private <T> T  internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             if(type != null){
                 if(classParsers.containsKey(type)){
                     try{
@@ -167,9 +174,9 @@ public class ContentParser{
                     TechTree.create(find(ContentType.block, value.get("research").asString()), block);
                 }
 
-                //make block visible
-                if(value.has("requirements")){
-                    block.buildVisibility = () -> true;
+                //make block visible by default if there are requirements and no visibility set
+                if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
+                    block.buildVisibility = BuildVisibility.shown;
                 }
             });
 
@@ -289,10 +296,12 @@ public class ContentParser{
         }
 
         currentMod = mod;
+        boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
-        c.sourceFile = file;
-        c.mod = mod;
-        checkNulls(c);
+        if(!exists){
+            c.sourceFile = file;
+            c.mod = mod;
+        }
         return c;
     }
 
@@ -348,35 +357,21 @@ public class ContentParser{
 
     private Object fieldOpt(Class<?> type, JsonValue value){
         try{
-            Object b = type.getField(value.asString()).get(null);
-            if(b == null) return null;
-            return b;
+            return type.getField(value.asString()).get(null);
         }catch(Exception e){
             return null;
         }
     }
 
-    /** Checks all @NonNull fields in this object, recursively.
-     * Throws an exception if any are null.*/
-    private void checkNulls(Object object){
-        checkNulls(object, new ObjectSet<>());
-    }
-
-    private void checkNulls(Object object, ObjectSet<Object> checked){
-        checked.add(object);
+    private void checkNullFields(Object object){
+        if(object instanceof Number || object instanceof String) return;
 
         parser.getFields(object.getClass()).values().toArray().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 
-                Object obj = field.field.get(object);
                 if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
-                    throw new RuntimeException("Field '" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
-                }
-
-                if(obj != null && !checked.contains(obj)){
-                    checkNulls(obj, checked);
-                    checked.add(obj);
+                    throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);

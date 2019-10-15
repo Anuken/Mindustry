@@ -9,7 +9,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
-import io.anuke.mindustry.entities.type.Bullet;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -28,8 +28,6 @@ import io.anuke.mindustry.world.blocks.units.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.modules.*;
-
-import static io.anuke.mindustry.Vars.*;
 
 public class Blocks implements ContentList{
     public static Block
@@ -58,7 +56,7 @@ public class Blocks implements ContentList{
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
-    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, router, overflowGate, massDriver,
+    conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -716,23 +714,23 @@ public class Blocks implements ContentList{
         //region sandbox
 
         powerVoid = new PowerVoid("power-void"){{
-            requirements(Category.power, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
         powerSource = new PowerSource("power-source"){{
-            requirements(Category.power, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
         itemSource = new ItemSource("item-source"){{
-            requirements(Category.distribution, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
         itemVoid = new ItemVoid("item-void"){{
-            requirements(Category.distribution, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
         liquidSource = new LiquidSource("liquid-source"){{
-            requirements(Category.liquid, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.liquid, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
         message = new MessageBlock("message"){{
@@ -745,27 +743,27 @@ public class Blocks implements ContentList{
         int wallHealthMultiplier = 4;
 
         scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
             health = 60 * wallHealthMultiplier;
             variants = 5;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
-            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
         }};
 
         scrapWallHuge = new Wall("scrap-wall-huge"){{
-            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
         }};
 
         scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
-            requirements(Category.defense, () -> state.rules.infiniteResources, ItemStack.with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -935,7 +933,11 @@ public class Blocks implements ContentList{
 
         sorter = new Sorter("sorter"){{
             requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+        }};
 
+        invertedSorter = new Sorter("inverted-sorter"){{
+            requirements(Category.distribution, ItemStack.with(Items.lead, 2, Items.copper, 2));
+            invert = true;
         }};
 
         router = new Router("router"){{
@@ -1083,11 +1085,12 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        differentialGenerator = new SingleTypeGenerator(true, false, "differential-generator"){{
+        differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, ItemStack.with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 16f;
             itemDuration = 120f;
             hasLiquids = true;
+            hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
@@ -1230,7 +1233,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 1000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000));
             alwaysUnlocked = true;
 
             health = 1100;
@@ -1239,7 +1242,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 1500, Items.silicon, 1000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 400, Items.silicon, 3000));
 
             health = 2000;
             itemCapacity = 9000;
@@ -1247,7 +1250,7 @@ public class Blocks implements ContentList{
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, () -> false, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000, Items.surgealloy, 1000));
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 4000, Items.silicon, 2000, Items.surgealloy, 3000));
 
             health = 4000;
             itemCapacity = 13000;
@@ -1272,7 +1275,7 @@ public class Blocks implements ContentList{
         }};
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.copper, 250, Items.silicon, 75, Items.lead, 100));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 250, Items.silicon, 75, Items.lead, 100));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 16;
@@ -1281,7 +1284,7 @@ public class Blocks implements ContentList{
         }};
 
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            requirements(Category.effect, () -> world.isZone(), ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 250;
             launchTime = 60f * 14;

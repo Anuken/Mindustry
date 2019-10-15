@@ -39,8 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;
 
-    private static final BooleanProvider invisible = () -> false;
-
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -83,6 +81,8 @@ public class Block extends BlockStorage{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
+    /** Targeting priority of this block, as seen by enemies.*/
+    public TargetPriority priority = TargetPriority.base;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
@@ -122,7 +122,9 @@ public class Block extends BlockStorage{
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
-    public BooleanProvider buildVisibility = invisible;
+    public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Multiplier for speed of building this block. */
+    public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -153,7 +155,7 @@ public class Block extends BlockStorage{
     }
 
     public boolean isBuildable(){
-        return buildVisibility != invisible;
+        return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 
     public boolean isStatic(){
@@ -386,6 +388,7 @@ public class Block extends BlockStorage{
         for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
+        buildCost *= buildCostMultiplier;
 
         if(consumes.has(ConsumeType.power)) hasPower = true;
         if(consumes.has(ConsumeType.item)) hasItems = true;
@@ -803,7 +806,7 @@ public class Block extends BlockStorage{
     }
 
     public boolean isVisible(){
-        return buildVisibility.get() && !isHidden();
+        return buildVisibility.visible() && !isHidden();
     }
 
     public boolean isFloor(){
@@ -820,7 +823,7 @@ public class Block extends BlockStorage{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.get();
+        return !buildVisibility.visible();
     }
 
     @Override
@@ -829,21 +832,21 @@ public class Block extends BlockStorage{
     }
 
     protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
     protected void requirements(Category cat, ItemStack[] stacks){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
+    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
 
-        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
+        Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
 }

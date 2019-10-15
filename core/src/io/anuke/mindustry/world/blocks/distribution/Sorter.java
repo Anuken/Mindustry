@@ -17,6 +17,7 @@ import static io.anuke.mindustry.Vars.content;
 
 public class Sorter extends Block{
     private static Item lastItem;
+    protected boolean invert;
 
     public Sorter(String name){
         super(name);
@@ -39,16 +40,6 @@ public class Sorter extends Block{
             Core.app.post(() -> tile.configure(lastItem.id));
         }
     }
-
-    /*
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void setSorterItem(Player player, Tile tile, Item item){
-        if(!Units.canInteract(player, tile)) return;
-        SorterEntity entity = tile.entity();
-        if(entity != null){
-            entity.sortItem = item;
-        }
-    }*/
 
     @Override
     public void configured(Tile tile, Player player, int value){
@@ -92,7 +83,7 @@ public class Sorter extends Block{
         if(dir == -1) return null;
         Tile to;
 
-        if(item == entity.sortItem){
+        if((item == entity.sortItem) != invert){
             //prevent 3-chains
             if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
                 return null;
@@ -115,12 +106,10 @@ public class Sorter extends Block{
             }else{
                 if(dest.rotation() == 0){
                     to = a;
-                    if(flip)
-                        dest.rotation((byte)1);
+                    if(flip) dest.rotation((byte)1);
                 }else{
                     to = b;
-                    if(flip)
-                        dest.rotation((byte)0);
+                    if(flip) dest.rotation((byte)0);
                 }
             }
         }
