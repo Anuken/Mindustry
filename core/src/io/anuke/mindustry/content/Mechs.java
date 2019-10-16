@@ -43,15 +43,17 @@ public class Mechs implements ContentList{
                     velocityRnd = 0.1f;
                     ejectEffect = Fx.none;
                     bullet = new HealBulletType(){{
-                        backColor = engineColor;
+                        healPercent = 3f;
+                        //TODO decide on color or remove healing properties
+                        //backColor = engineColor;
                         homingPower = 20f;
                         bulletHeight = 4f;
                         bulletWidth = 1.5f;
                         damage = 3f;
                         speed = 4f;
                         lifetime = 40f;
-                        shootEffect = Fx.shootHealYellow;
-                        smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
+                        //shootEffect = Fx.shootHealYellow;
+                        //smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
                     }};
                 }};
             }
@@ -63,36 +65,6 @@ public class Mechs implements ContentList{
         };
 
         alpha = new Mech("alpha-mech", false){
-            {
-                drillPower = 1;
-                mineSpeed = 1.5f;
-                mass = 1.2f;
-                speed = 0.5f;
-                itemCapacity = 40;
-                boostSpeed = 0.95f;
-                buildPower = 1.2f;
-                engineColor = Color.valueOf("ffd37f");
-                health = 250f;
-
-                weapon = new Weapon("blaster"){{
-                    length = 1.5f;
-                    reload = 14f;
-                    roundrobin = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardMechSmall;
-                }};
-            }
-
-            @Override
-            public void updateAlt(Player player){
-                player.healBy(Time.delta() * 0.09f);
-            }
-
-        };
-
-        delta = new Mech("delta-mech", false){
-            float cooldown = 120;
-
             {
                 drillPower = -1;
                 speed = 0.75f;
@@ -108,27 +80,41 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("shockgun"){{
                     shake = 2f;
                     length = 1f;
-                    reload = 55f;
-                    shotDelay = 3f;
+                    reload = 60f;
                     roundrobin = true;
-                    shots = 2;
-                    inaccuracy = 0f;
                     ejectEffect = Fx.none;
-                    bullet = Bullets.lightning;
+                    bullet = Bullets.lancerLaser;
                     shootSound = Sounds.spark;
                 }};
             }
 
-            //todo this is a useless ability
             @Override
-            public void onLand(Player player){
-                if(player.timer.get(Player.timerAbility, cooldown)){
-                    Effects.shake(1f, 1f, player);
-                    Effects.effect(Fx.landShock, player);
-                    for(int i = 0; i < 8; i++){
-                        Time.run(Mathf.random(8f), () -> Lightning.create(player.getTeam(), Pal.lancerLaser, 17f * Vars.state.rules.playerDamageMultiplier, player.x, player.y, Mathf.random(360f), 14));
-                    }
-                }
+            public void updateAlt(Player player){
+                player.healBy(Time.delta() * 0.09f);
+            }
+
+        };
+
+        delta = new Mech("delta-mech", false){
+            {
+                drillPower = 1;
+                mineSpeed = 1.5f;
+                mass = 1.2f;
+                speed = 0.5f;
+                itemCapacity = 40;
+                boostSpeed = 0.95f;
+                buildPower = 1.2f;
+                engineColor = Color.valueOf("ffd37f");
+                health = 250f;
+                weaponOffsetX = 4f;
+
+                weapon = new Weapon("flamethrower"){{
+                    length = 1.5f;
+                    reload = 10f;
+                    width = 4f;
+                    roundrobin = true;
+                    bullet = Bullets.basicFlame;
+                }};
             }
         };
 

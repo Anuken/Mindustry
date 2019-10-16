@@ -148,7 +148,7 @@ public class DeployDialog extends FloatingDialog{
                     }).color(Color.darkGray).grow()));
                 }
 
-                TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName()), Styles.squaret, () -> {
+                TextButton button = Elements.newButton(Core.bundle.format("resume", slot.getZone().localizedName), Styles.squaret, () -> {
                     control.saves.getZoneSlot().cautiousLoad(() -> {
                         hide();
                         ui.loadAnd(() -> {
@@ -225,7 +225,7 @@ public class DeployDialog extends FloatingDialog{
         });
 
         if(zone.unlocked() && !hidden(zone)){
-            button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
+            button.labelWrap(zone.localizedName).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
             Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
             flasher.accept(button.addImage(Icon.locked).get());

@@ -8,7 +8,7 @@ import io.anuke.mindustry.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
-    /** Localized, formal name. Never null. Set to block name if not found in bundle. */
+    /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description. May be null. */
     public String description;
@@ -39,11 +39,6 @@ public abstract class UnlockableContent extends MappableContent{
         }
         return cicons[icon.ordinal()];
     }
-
-    /** Returns the localized name of this content. */
-    public abstract String localizedName();
-
-    //public abstract TextureRegion getContentIcon();
 
     /** This should show all necessary info about this content in the specified table. */
     public abstract void displayInfo(Table table);

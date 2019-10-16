@@ -46,13 +46,8 @@ public class Liquid extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("liquid." + this.name + ".name");
-    }
-
-    @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 
     @Override

@@ -1681,6 +1681,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
+            maxSpawn = 2;
             consumes.power(1.2f);
             consumes.items(new ItemStack(Items.silicon, 15), new ItemStack(Items.titanium, 10));
         }};
@@ -1690,6 +1691,7 @@ public class Blocks implements ContentList{
             type = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
+            maxSpawn = 2;
             consumes.power(3f);
             consumes.items(new ItemStack(Items.silicon, 40), new ItemStack(Items.titanium, 30));
         }};

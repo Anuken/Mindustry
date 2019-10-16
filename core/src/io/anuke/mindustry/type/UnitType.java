@@ -64,11 +64,6 @@ public class UnitType extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("unit." + name + ".name");
-    }
-
-    @Override
     public void load(){
         weapon.load();
         region = Core.atlas.find(name);

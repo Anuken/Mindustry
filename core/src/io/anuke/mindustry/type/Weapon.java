@@ -113,11 +113,12 @@ public class Weapon{
         shooter.velocity().add(Tmp.v1);
 
         Tmp.v1.trns(rotation, 3f);
+        boolean parentize = ammo.keepVelocity;
 
         Effects.shake(weapon.shake, weapon.shake, x, y);
         Effects.effect(weapon.ejectEffect, x, y, rotation * -Mathf.sign(left));
-        Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
-        Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, shooter);
+        Effects.effect(ammo.shootEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
+        Effects.effect(ammo.smokeEffect, x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? shooter : null);
 
         //reset timer for remote players
         shooter.getTimer().get(shooter.getShootTimer(left), weapon.reload);
@@ -172,7 +173,6 @@ public class Weapon{
         if(owner == null) return;
 
         Tmp.v1.trns(angle, 3f);
-        Bullet.create(bullet,
-        owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
+        Bullet.create(bullet, owner, owner.getTeam(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd));
     }
 }

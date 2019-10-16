@@ -45,10 +45,6 @@ public class Mech extends UnlockableContent{
         this(name, false);
     }
 
-    public String localizedName(){
-        return Core.bundle.get("mech." + name + ".name");
-    }
-
     public void updateAlt(Player player){
     }
 
@@ -112,6 +108,6 @@ public class Mech extends UnlockableContent{
 
     @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 }

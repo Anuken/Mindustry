@@ -55,7 +55,7 @@ public class Mods implements Loadable{
     public void importMod(FileHandle file) throws IOException{
         FileHandle dest = modDirectory.child(file.name());
         if(dest.exists()){
-            throw new IOException("A mod with the same filename already exists!");
+            throw new IOException("A file with the same name already exists in the mod folder!");
         }
 
         file.copyTo(dest);

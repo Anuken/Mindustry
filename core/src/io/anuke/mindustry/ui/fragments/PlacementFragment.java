@@ -220,7 +220,7 @@ public class PlacementFragment extends Fragment{
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
-                                        line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
+                                        line.add(stack.item.localizedName).color(Color.lightGray).padLeft(2).left();
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";

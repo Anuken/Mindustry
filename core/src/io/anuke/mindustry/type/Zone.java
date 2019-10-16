@@ -201,11 +201,6 @@ public class Zone extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("zone." + name + ".name");
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.zone;
     }

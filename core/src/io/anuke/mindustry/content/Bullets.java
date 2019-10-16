@@ -460,6 +460,7 @@ public class Bullets implements ContentList{
                 hitEffect = Fx.hitFlameSmall;
                 despawnEffect = Fx.none;
                 status = StatusEffects.burning;
+                keepVelocity = false;
             }
 
             @Override
@@ -503,6 +504,7 @@ public class Bullets implements ContentList{
                 hitSize = 4;
                 lifetime = 16f;
                 pierce = true;
+                keepVelocity = false;
             }
 
             @Override

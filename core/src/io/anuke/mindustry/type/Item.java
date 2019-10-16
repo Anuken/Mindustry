@@ -52,13 +52,8 @@ public class Item extends UnlockableContent{
     }
 
     @Override
-    public String localizedName(){
-        return Core.bundle.get("item." + this.name + ".name");
-    }
-
-    @Override
     public String toString(){
-        return localizedName();
+        return localizedName;
     }
 
     @Override
