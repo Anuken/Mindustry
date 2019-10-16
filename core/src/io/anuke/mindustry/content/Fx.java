@@ -855,9 +855,9 @@ public class Fx implements ContentList{
         });
 
         lancerLaserShootSmoke = new Effect(26f, e -> {
-            Draw.color(Pal.lancerLaser);
+            Draw.color(Color.white);
 
-            Angles.randLenVectors(e.id, 7, 80f, e.rotation, 0f, (x, y) -> {
+            Angles.randLenVectors(e.id, 7, 70f, e.rotation, 0f, (x, y) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);
             });
 
@@ -874,7 +874,7 @@ public class Fx implements ContentList{
             Draw.reset();
         });
 
-        lancerLaserChargeBegin = new Effect(71f, e -> {
+        lancerLaserChargeBegin = new Effect(60f, e -> {
             Draw.color(Pal.lancerLaser);
             Fill.circle(e.x, e.y, e.fin() * 3f);
 

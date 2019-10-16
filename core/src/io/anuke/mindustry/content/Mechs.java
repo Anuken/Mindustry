@@ -73,7 +73,7 @@ public class Mechs implements ContentList{
                 mass = 0.9f;
                 health = 150f;
                 buildPower = 0.9f;
-                weaponOffsetX = -1;
+                weaponOffsetX = 1;
                 weaponOffsetY = -1;
                 engineColor = Color.valueOf("d3ddff");
 
@@ -82,9 +82,14 @@ public class Mechs implements ContentList{
                     length = 1f;
                     reload = 60f;
                     roundrobin = true;
-                    ejectEffect = Fx.none;
                     bullet = Bullets.lancerLaser;
                     shootSound = Sounds.spark;
+
+                    bullet = new LaserBulletType(20f){{
+                        recoil = 1f;
+                        sideAngle = 45f;
+                        colors = new Color[]{Pal.heal.cpy().mul(1, 1, 1, 0.4f), Pal.heal, Color.white};
+                    }};
                 }};
             }
 
