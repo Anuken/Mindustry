@@ -26,26 +26,32 @@ public class Mechs implements ContentList{
             {
                 drillPower = 1;
                 mineSpeed = 4f;
-                speed = 0.5f;
+                speed = 0.49f;
                 drag = 0.09f;
                 health = 200f;
                 weaponOffsetX = -1;
+                engineSize = 2.3f;
                 weaponOffsetY = -1;
                 engineColor = Pal.lightTrail;
                 cellTrnsY = 1f;
                 buildPower = 1.2f;
-                weapon = new Weapon("seeker"){{
+                weapon = new Weapon("vanguard-blaster"){{
                     length = 1.5f;
-                    reload = 20f;
+                    reload = 30f;
                     roundrobin = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = new BasicBulletType(){{
+                    inaccuracy = 6f;
+                    velocityRnd = 0.1f;
+                    ejectEffect = Fx.none;
+                    bullet = new HealBulletType(){{
+                        backColor = engineColor;
                         homingPower = 20f;
+                        bulletHeight = 4f;
+                        bulletWidth = 1.5f;
                         damage = 3f;
-                        speed = 3f;
-                        bulletWidth = 6f;
-                        bulletHeight = 6f;
-                        lifetime = 60f;
+                        speed = 4f;
+                        lifetime = 40f;
+                        shootEffect = Fx.shootHealYellow;
+                        smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
                     }};
                 }};
             }
