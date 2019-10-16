@@ -23,19 +23,19 @@ public class OreBlock extends OverlayFloor{
     /** For mod use only!*/
     public OreBlock(String name){
         super(name);
+        variants = 3;
     }
 
     public void setup(Item ore){
         this.localizedName = ore.localizedName();
         this.itemDrop = ore;
-        this.variants = 3;
         this.color.set(ore.color);
     }
 
     @Override
     @OverrideCallSuper
     public void createIcons(PixmapPacker out, PixmapPacker editor){
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < variants; i++){
             Pixmap image = new Pixmap(32, 32);
             PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
 

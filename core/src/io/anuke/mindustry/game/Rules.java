@@ -1,11 +1,11 @@
 package io.anuke.mindustry.game;
 
-import io.anuke.annotations.Annotations.Serialize;
-import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.io.JsonIO;
-import io.anuke.mindustry.type.ItemStack;
-import io.anuke.mindustry.type.Zone;
+import io.anuke.annotations.Annotations.*;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -69,6 +69,8 @@ public class Rules{
     public boolean tutorial = false;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
+    /** Blocks that cannot be placed. */
+    public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

@@ -19,15 +19,14 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Styles;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -51,6 +50,7 @@ public class HudFragment extends Fragment{
 
         //menu at top left
         parent.fill(cont -> {
+            cont.setName("overlaymarker");
             cont.top().left();
 
             if(mobile){
@@ -248,9 +248,16 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-
-        //minimap
-        parent.fill(t -> t.top().right().add(new Minimap()).visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+        
+        parent.fill(t -> {
+            //minimap
+            t.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+            t.row();
+            //position
+            t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))
+                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
+            t.top().right();
+        });
 
         //spawner warning
         parent.fill(t -> {

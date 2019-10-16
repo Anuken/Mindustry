@@ -25,9 +25,9 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
-        if(!input.isDrawing() || player.isDead()) return;
+        if(player.isDead()) return;
 
-        input.drawOutlined();
+        input.drawBottom();
     }
 
     public void drawTop(){

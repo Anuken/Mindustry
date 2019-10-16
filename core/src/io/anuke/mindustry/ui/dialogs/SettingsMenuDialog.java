@@ -14,6 +14,7 @@ import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -225,7 +226,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
-        if(steam){
+        game.checkPref("hints", true);
+
+        if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {
                 platform.updateLobby();
             });
@@ -252,6 +255,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         });
         graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -290,6 +294,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("effects", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
+        graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", false);
@@ -297,7 +302,6 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
         graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
-        graphics.checkPref("lasers", true);
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);

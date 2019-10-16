@@ -110,8 +110,8 @@ public class BuildBlock extends Block{
 
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
-            player.clearBuilding();
-            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock));
+            //player.clearBuilding();
+            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
         }
     }
 

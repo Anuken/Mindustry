@@ -238,7 +238,6 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
@@ -284,7 +283,7 @@ public class UI implements ApplicationListener, Loadable{
             new Dialog(titleText){{
                 cont.margin(30).add(dtext).padRight(6f);
                 TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.addField(def, t -> {}).size(170f, 50f).get();
+                TextField field = cont.addField(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.addButton("$ok", () -> {
@@ -339,6 +338,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMesage(exc);
 

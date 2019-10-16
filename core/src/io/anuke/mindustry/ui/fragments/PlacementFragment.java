@@ -10,6 +10,8 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -17,7 +19,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Styles;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -74,16 +76,20 @@ public class PlacementFragment extends Fragment{
 
     boolean gridUpdate(InputHandler input){
         if(Core.input.keyDown(Binding.pick)){ //mouse eyedropper select
-            Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Tile tile = world.ltileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block tryRecipe = tile == null ? null : tile.block();
 
-            if(tile != null){
-                tile = tile.link();
-                Block tryRecipe = tile.block();
-                if(tryRecipe.isVisible() && unlocked(tryRecipe)){
-                    input.block = tryRecipe;
-                    currentCategory = input.block.category;
-                    return true;
+            for(BuildRequest req : player.buildQueue()){
+                if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
+                    tryRecipe = req.block;
+                    break;
                 }
+            }
+
+            if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
+                input.block = tryRecipe;
+                currentCategory = input.block.category;
+                return true;
             }
         }
 
@@ -151,6 +157,10 @@ public class PlacementFragment extends Fragment{
                             Color color = state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources)) ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
+
+                            if(state.rules.bannedBlocks.contains(block)){
+                                button.forEach(elem -> elem.setColor(Color.darkGray));
+                            }
                         });
 
                         button.hovered(() -> hovered = block);
@@ -226,6 +236,15 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
+                            if(state.rules.bannedBlocks.contains(lastDisplay)){
+                                topTable.row();
+                                topTable.table(b -> {
+                                    b.addImage(Icon.cancelSmall).padRight(2).color(Color.scarlet);
+                                    b.add("$banned");
+                                    b.left();
+                                }).padTop(2).left();
+                            }
+
                         }else if(tileDisplayBlock() != null){ //show selected tile
                             lastDisplay = tileDisplayBlock();
                             topTable.table(t -> {
@@ -250,7 +269,7 @@ public class PlacementFragment extends Fragment{
                     blocksSelect.margin(4).marginTop(0);
                     blocksSelect.table(blocks -> blockTable = blocks).grow();
                     blocksSelect.row();
-                    blocksSelect.table(control.input::buildUI).name("inputTable").growX();
+                    blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
                 frame.table(categories -> {
                     categories.defaults().size(50f);
@@ -301,7 +320,11 @@ public class PlacementFragment extends Fragment{
                 returnArray.add(block);
             }
         }
-        returnArray.sort((b1, b2) -> -Boolean.compare(unlocked(b1), unlocked(b2)));
+        returnArray.sort((b1, b2) -> {
+            int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
+            if(locked != 0) return locked;
+            return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
+        });
         return returnArray;
     }
 
