@@ -88,6 +88,8 @@ public class Mechs implements ContentList{
                     bullet = new LaserBulletType(20f){{
                         recoil = 1f;
                         sideAngle = 45f;
+                        sideWidth = 1f;
+                        sideLength = 70f;
                         colors = new Color[]{Pal.heal.cpy().mul(1, 1, 1, 0.4f), Pal.heal, Color.white};
                     }};
                 }};
