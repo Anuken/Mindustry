@@ -34,12 +34,14 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
-        put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
         put(Loadout.class, (type, data) -> field(Loadouts.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
+            if(data.isString()){
+                return field(Bullets.class, data);
+            }
             Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);

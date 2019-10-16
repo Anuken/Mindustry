@@ -307,7 +307,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             float boostTrnsX = boostHeat * 3f;
             float boostAng = boostHeat * 40f;
 
+            float light = 0.2f;
+
             for(int i : Mathf.signs){
+                Draw.colorl(1f-light + Mathf.clamp(ft * i, 0, 1) *light);
                 Draw.rect(mech.legRegion,
                 x + Angles.trnsx(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
                 y + Angles.trnsy(baseRotation, ft * i + boostTrnsY, -boostTrnsX * i),
@@ -315,6 +318,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 (mech.legRegion.getHeight() - Mathf.clamp(ft * i, 0, 2)) * Draw.scl,
                 baseRotation - 90 + boostAng * i);
             }
+            Draw.color();
 
             Draw.rect(mech.baseRegion, x, y, baseRotation - 90);
         }

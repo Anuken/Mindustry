@@ -67,7 +67,7 @@ public class Mechs implements ContentList{
         alpha = new Mech("alpha-mech", false){
             {
                 drillPower = -1;
-                speed = 0.7f;
+                speed = 0.5f;
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
@@ -75,14 +75,15 @@ public class Mechs implements ContentList{
                 buildPower = 0.9f;
                 weaponOffsetX = 1;
                 weaponOffsetY = -1;
-                engineColor = Color.valueOf("d3ddff");
+                engineColor = Pal.heal;
 
                 weapon = new Weapon("shockgun"){{
                     shake = 2f;
                     length = 1f;
-                    reload = 60f;
+                    reload = 70f;
                     roundrobin = true;
                     bullet = Bullets.lancerLaser;
+                    recoil = 4f;
                     shootSound = Sounds.spark;
 
                     bullet = new LaserBulletType(20f){{
