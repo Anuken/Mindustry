@@ -48,6 +48,7 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        /*
         put(Music.class, (type, data) -> {
             if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
 
@@ -55,15 +56,16 @@ public class ContentParser{
             Core.assets.load(path, Music.class);
             Core.assets.finishLoadingAsset(path);
             return Core.assets.get(path);
-        });
+        });*/
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
 
             String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Sound.class);
-            Core.assets.finishLoadingAsset(path);
-            Log.info(Core.assets.get(path));
-            return Core.assets.get(path);
+            ProxySound sound = new ProxySound();
+            Core.assets.load(path, Sound.class).loaded = result -> {
+                sound.sound = (Sound)result;
+            };
+            return sound;
         });
         put(Objective.class, (type, data) -> {
             Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.Objectives") : ZoneWave.class;
