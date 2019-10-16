@@ -48,15 +48,6 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        /*
-        put(Music.class, (type, data) -> {
-            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
-
-            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Music.class);
-            Core.assets.finishLoadingAsset(path);
-            return Core.assets.get(path);
-        });*/
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
 
