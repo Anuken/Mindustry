@@ -67,7 +67,7 @@ public class Mechs implements ContentList{
         alpha = new Mech("alpha-mech", false){
             {
                 drillPower = -1;
-                speed = 0.75f;
+                speed = 0.7f;
                 boostSpeed = 0.95f;
                 itemCapacity = 15;
                 mass = 0.9f;
