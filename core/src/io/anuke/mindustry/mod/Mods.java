@@ -60,7 +60,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file, false));
+            loaded.add(loadMod(dest, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
