@@ -42,7 +42,7 @@ public class ContentParser{
             if(data.isString()){
                 return field(Bullets.class, data);
             }
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
+            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullet") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);
             readFields(result, data);
