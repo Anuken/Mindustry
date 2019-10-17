@@ -39,7 +39,7 @@ public class ContentParser{
         put(Loadout.class, (type, data) -> field(Loadouts.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
+            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullet") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);
             readFields(result, data);
