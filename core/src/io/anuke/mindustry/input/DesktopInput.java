@@ -244,7 +244,7 @@ public class DesktopInput extends InputHandler{
             lastLineY = cursorY;
         }
 
-        if(Core.input.keyTap(Binding.select)) {
+        if(Core.input.keyTap(Binding.move)) {
             if (clickStart == 0) {
                 clickStart = Time.millis();
                 clickTarget = null;
@@ -306,19 +306,11 @@ public class DesktopInput extends InputHandler{
             float clickDuration = Time.timeSinceMillis(clickStart);
             clickStart = 0;
 
-            ui.hudfrag.showDebug("click clickDuration:" + clickDuration + "ms");
-            int singleClickDuration = 200; // TODO make this a setting
-            int doubleClickDelay = 400; // TODO make this a setting
-            if (clickDuration < singleClickDuration) {
-                float lastClickDelay = Time.timeSinceMillis(lastClick);
-                ui.hudfrag.showDebug("double click speed:" + lastClickDelay + "ms");
-                if (lastClickDelay < doubleClickDelay && (lastClickTarget == tileAtMouse())){
-                    clickTarget = tileAtMouse();
-                    ui.hudfrag.showDebug("target:" + clickTarget.toString());
-                }
+            int singleClickDuration = 200;// TODO make this a setting?
 
-                lastClickTarget = tileAtMouse();
-                lastClick = Time.millis();
+            if (clickDuration < singleClickDuration) {
+                if (!isPlacing() && !isDroppingItem() && !isBreaking() && (player.getMineTile() == null || player.getMineTile() != tileAtMouse()))
+               clickTarget = tileAtMouse();
             }
         }
 
@@ -391,13 +383,11 @@ public class DesktopInput extends InputHandler{
             float camSpeed = (float) Core.settings.getInt("cameraspeed");
             if(!cameraMovement.isZero()){
 
-                ui.hudfrag.showDebug("camera movement");
                 cameraMovement.scl(Time.delta() * camSpeed);
                 clickTarget = null;
             } else if (clickTarget != null){
                 float clickTargetDst = Core.camera.position.dst(clickTarget);
 
-                ui.hudfrag.showDebug("target dist: "+ String.valueOf(clickTargetDst));
                 if(clickTargetDst > 0 ){
                     cameraMovement.set(Math.min(clickTargetDst, Time.delta()*camSpeed),0);
                     cameraMovement.setAngle(Core.camera.position.angleTo(clickTarget));
