@@ -22,8 +22,6 @@ import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.core.Control.controltype_camera;
-import static io.anuke.mindustry.core.Control.controltype_ship;
 import static io.anuke.mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
@@ -200,7 +198,9 @@ public class DesktopInput extends InputHandler{
 
         cursorType = SystemCursor.arrow;
 
-        updateCamera();
+        if(Core.settings.getBool("mousecontrol", false)) {
+            updateCamera();
+        }
     }
 
     @Override
@@ -243,13 +243,15 @@ public class DesktopInput extends InputHandler{
             lastLineY = cursorY;
         }
 
-        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+        if(Core.input.keyTap(Binding.select)) {
             if (clickStart == 0) {
                 clickStart = Time.millis();
                 clickTarget = null;
             }
-            boolean moveToCursor = false;
+        }
+
+        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            BuildRequest req = getRequest(cursorX, cursorY);
             if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -298,25 +300,25 @@ public class DesktopInput extends InputHandler{
         }else{
             overrideLineRotation = false;
         }
-        if(Core.input.keyRelease(Binding.select)){
+
+        if(Core.input.keyRelease(Binding.move)){
             float clickDuration = Time.timeSinceMillis(clickStart);
             clickStart = 0;
 
             ui.hudfrag.showDebug("click clickDuration:" + clickDuration + "ms");
             int singleClickDuration = 200; // TODO make this a setting
-            int doubleClickDelay = 200; // TODO make this a setting
+            int doubleClickDelay = 400; // TODO make this a setting
             if (clickDuration < singleClickDuration) {
                 float lastClickDelay = Time.timeSinceMillis(lastClick);
                 ui.hudfrag.showDebug("double click speed:" + lastClickDelay + "ms");
-                lastClickTarget = tileAtMouse();
-                if (lastClickDelay < doubleClickDelay && (lastClickTarget == clickTarget)){
+                if (lastClickDelay < doubleClickDelay && (lastClickTarget == tileAtMouse())){
                     clickTarget = tileAtMouse();
                     ui.hudfrag.showDebug("target:" + clickTarget.toString());
                 }
 
+                lastClickTarget = tileAtMouse();
                 lastClick = Time.millis();
             }
-
         }
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
@@ -376,7 +378,6 @@ public class DesktopInput extends InputHandler{
 
             Vector2 cameraMovement = new Vector2().setZero();
 
-            if(Core.settings.getInt("controltype", controltype_ship) == controltype_camera){
                 // Keyboard input
                 Vector2 keyboardCamera = new Vector2(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y));
                 cameraMovement.add(keyboardCamera);
@@ -385,7 +386,6 @@ public class DesktopInput extends InputHandler{
                 Vector2 mouseCamera = mouseCameraVector();
 
                 cameraMovement.add(mouseCamera);
-            }
 
             float camSpeed = (float) Core.settings.getInt("cameraspeed");
             if(!cameraMovement.isZero()){
@@ -405,7 +405,7 @@ public class DesktopInput extends InputHandler{
                 }
             } else {
 
-                ui.hudfrag.showDebug("no target");
+//                ui.hudfrag.showDebug("no target");
             }
 
 

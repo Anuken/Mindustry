@@ -21,10 +21,11 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.ui.*;
 
+import java.util.Iterator;
+
 import static io.anuke.arc.Core.bundle;
+import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
-import static io.anuke.mindustry.core.Control.controltype_ship;
-import static io.anuke.mindustry.core.Control.controltype_camera;
 
 public class SettingsMenuDialog extends SettingsDialog{
     private SettingsTable graphics;
@@ -231,8 +232,24 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("hints", true);
 
         if(!mobile){
-            game.sliderPref("controltype", controltype_ship, controltype_ship, controltype_camera, i -> (i == 0  ? Core.bundle.get("controltype.ship") : Core.bundle.get("controltype.camera")));
-            game.sliderPref("cameraspeed", 6, 3, 18, i -> (Strings.format("Camera speed: {0}", i)));
+            game.checkPref("mousecontrol", false);
+
+            // Ugly workaround for a conditional setting
+            game.pref(new Setting() {
+                @Override
+                public void add(SettingsTable table) {
+                    SettingsTable cameraspeedWrapper = new SettingsTable(t -> {
+                        SnapshotArray<Element> children = t.getChildren();
+                        Array<Setting> settings = t.getSettings();
+                    });
+                    cameraspeedWrapper.sliderPref("cameraspeed", 6, 3, 18, i -> (Strings.format("{0}", i)));
+                    cameraspeedWrapper.visible(() -> {
+                        return Core.settings.getBool("mousecontrol", false);
+                    });
+                    table.add(cameraspeedWrapper);
+                    table.row();
+                }
+            });
         }
 
         if(steam && !Version.modifier.contains("beta")){

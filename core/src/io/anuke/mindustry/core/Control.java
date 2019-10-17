@@ -48,9 +48,6 @@ public class Control implements ApplicationListener, Loadable{
     private boolean hiscore = false;
     private boolean wasPaused = false;
 
-    public static final int controltype_ship = 0;
-    public static final int controltype_camera = 1;
-
     public Control(){
         saves = new Saves();
         tutorial = new Tutorial();
