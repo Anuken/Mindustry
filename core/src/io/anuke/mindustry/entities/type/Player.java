@@ -710,7 +710,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             //autofire
             if(target == null){
                 isShooting = false;
-                if(Core.settings.getBool("autotarget")){
+                if(Core.settings.getBool("autotarget") || Core.settings.getBool("mousecontrol")){
                     target = Units.closestTarget(team, x, y, getWeapon().bullet.range(), u -> u.getTeam() != Team.derelict, u -> u.getTeam() != Team.derelict);
 
                     if(mech.canHeal && target == null){
