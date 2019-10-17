@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.Position;
 import io.anuke.arc.math.geom.Vector2;
@@ -421,19 +422,20 @@ public class DesktopInput extends InputHandler{
     protected Vector2 mouseCameraVector() {
         Vector2 directionVector = new Vector2().setZero();
 
-        if (!Core.scene.hasMouse() ||
-                getMouseX() <= 1f || getMouseY() <= 1f
-                || getMouseX() >= scene.getWidth() - 1f || getMouseY() >= scene.getHeight() - 1f
+        if (!Core.scene.hasMouse()
+//                ||
+//                getMouseX() <= 1f || getMouseY() <= 1f
+//                || getMouseX() >= scene.getWidth() - 1f || getMouseY() >= scene.getHeight() - 1f
         ) {
             float mouseXRatio = getMouseX() / scene.getWidth();
             float mouseYRatio = getMouseY() / scene.getHeight();
 
             directionVector.set(getMouseX() - scene.getWidth() / 2, getMouseY() - scene.getHeight() / 2);
 
-            float linearTresholdX = linearTreshold(mouseXRatio, 0.1f);
+            float linearTresholdX = linearTreshold(mouseXRatio, 0.2f);
             float accelerationX = accelerationCalc(linearTresholdX);
 
-            float linearTresholdY = linearTreshold(mouseYRatio, 0.1f);
+            float linearTresholdY = linearTreshold(mouseYRatio, 0.2f);
             float accelerationY = accelerationCalc(linearTresholdY);
 
             Vector2 accelerationVector = new Vector2(accelerationX, accelerationY);
@@ -503,6 +505,36 @@ public class DesktopInput extends InputHandler{
      */
     protected float accelerationCalcRound(float val, float threshold) {
         return (float) Math.round(Math.abs((2 * (1 - threshold) * val))) * val;
+    }
+
+
+    /**
+     * <pre>
+     *                         ‗‗‗‗
+     *  1    │                ‖
+     *       │                ‖
+     *       │                ‖
+     *  0 ___│____‗‗‗‗‗‗╷‗‗‗‗‗‖____╷
+     *       │   ‖
+     *       │   ‖
+     *       │   ‖
+     *  -1   │‗‗‗‖
+     *       │
+     *
+     *       0       0.5        1
+     * </pre>
+     * @param val       float [0,1]
+     * @param threshold float [0,0.5] (percentage)
+     * @return float [-1,1]
+     */
+    protected float accelerationCalcThreshold(float val, float threshold) {
+        if(val >= (1 - threshold)){
+            return 1;
+        } else if( val <= threshold){
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
 }
