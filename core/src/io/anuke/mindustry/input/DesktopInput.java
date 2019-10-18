@@ -10,6 +10,7 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -91,7 +92,7 @@ public class DesktopInput extends InputHandler{
                 drawRequest(lineRequests.get(i));
             }
         }else if(mode == breaking){
-            drawSelection(selectX, selectY, cursorX, cursorY);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY);
         }else if(isPlacing()){
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
@@ -126,10 +127,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyDown(Binding.schematic)){
-            Lines.stroke(2f);
-
-            Draw.color(Pal.accent);
-            Lines.rect(schemX * tilesize, schemY * tilesize, (cursorX - schemX) * tilesize, (cursorY - schemY) * tilesize);
+            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
         Draw.reset();
@@ -156,7 +154,7 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom things
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && Core.input.keyDown(Binding.zoom_hold)){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -193,10 +191,12 @@ public class DesktopInput extends InputHandler{
             sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
         }
 
-        if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
-            updateLine(selectX, selectY);
-        }else if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && !selectRequests.isEmpty()){
-            rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+        if(!Core.input.keyDown(Binding.zoom_hold) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+            if(isPlacing() && mode == placing){
+                updateLine(selectX, selectY);
+            }else if(!selectRequests.isEmpty()){
+                rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+            }
         }
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
@@ -285,6 +285,16 @@ public class DesktopInput extends InputHandler{
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){
                 lastSchematic = null;
+            }
+        }
+
+        if(!selectRequests.isEmpty()){
+            if(Core.input.keyTap(Binding.schematic_flip_x)){
+                flipRequests(selectRequests, true);
+            }
+
+            if(Core.input.keyTap(Binding.schematic_flip_y)){
+                flipRequests(selectRequests, false);
             }
         }
 

@@ -15,6 +15,8 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Schematic.*;
+import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -29,7 +31,6 @@ public class Schematics implements Loadable{
     private static final byte version = 0;
 
     private static final int padding = 2;
-    private static final int maxSize = 64;
 
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
@@ -63,7 +64,7 @@ public class Schematics implements Loadable{
         }
 
         Core.app.post(() -> {
-            shadowBuffer = new FrameBuffer(maxSize + padding, maxSize + padding);
+            shadowBuffer = new FrameBuffer(maxSchematicSize + padding, maxSchematicSize + padding);
         });
     }
 
@@ -145,7 +146,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y).configure(t.config));
+        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config));
     }
 
     /** Adds a schematic to the list, also copying it into the files.*/
@@ -160,17 +161,11 @@ public class Schematics implements Loadable{
 
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
-        if(x > x2){
-            int temp = x;
-            x = x2;
-            x2 = temp;
-        }
-
-        if(y > y2){
-            int temp = y;
-            y = y2;
-            y2 = temp;
-        }
+        NormalizeResult result = PlaceUtils.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
+        x = result.x;
+        y = result.y;
+        x2 = result.x2;
+        y2 = result.y2;
 
         Array<Stile> tiles = new Array<>();
 

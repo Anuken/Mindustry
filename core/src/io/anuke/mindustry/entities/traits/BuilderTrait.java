@@ -278,7 +278,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         /** Config int. Not used unless hasConfig is true.*/
         public int config;
         /** Original position, only used in schematics.*/
-        public int originalX, originalY;
+        public int originalX, originalY, originalWidth, originalHeight;
 
         /** Last progress.*/
         public float progress;
@@ -327,9 +327,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
             return copy;
         }
 
-        public BuildRequest original(int x, int y){
+        public BuildRequest original(int x, int y, int originalWidth, int originalHeight){
             originalX = x;
             originalY = y;
+            this.originalWidth = originalWidth;
+            this.originalHeight = originalHeight;
             return this;
         }
 

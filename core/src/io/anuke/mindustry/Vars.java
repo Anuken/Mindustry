@@ -33,6 +33,8 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Maximum number of broken blocks. TODO implement or remove.*/
     public static final int maxBrokenBlocks = 256;
+    /** Maximum schematic size.*/
+    public static final int maxSchematicSize = 32;
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */

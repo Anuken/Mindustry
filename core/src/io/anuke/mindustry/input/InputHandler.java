@@ -227,11 +227,25 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void rotateRequests(Array<BuildRequest> requests, int direction){
-        int ox = tileX(getMouseX()), oy = tileY(getMouseY());
+        int ox = rawTileX(), oy = rawTileY();
 
         requests.each(req -> {
-            //req.x -= ox;
-            //req.y -= oy;
+            //rotate config position
+            if(req.block.posConfig){
+                int cx = Pos.x(req.config) - req.originalX, cy = Pos.y(req.config) - req.originalY;
+                int lx = cx;
+
+                if(direction >= 0){
+                    cx = -cy;
+                    cy = lx;
+                }else{
+                    cx = cy;
+                    cy = -lx;
+                }
+                req.config = Pos.get(cx + req.originalX, cy + req.originalY);
+            }
+
+            //rotate actual request, centered on its multiblock position
             float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
             float x = wx;
             if(direction >= 0){
@@ -243,7 +257,38 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
             req.x = world.toTile(wx - req.block.offset()) + ox;
             req.y = world.toTile(wy - req.block.offset()) + oy;
-            req.rotation += direction;
+            req.rotation = Mathf.mod(req.rotation + direction, 4);
+        });
+    }
+
+    public void flipRequests(Array<BuildRequest> requests, boolean x){
+        int origin = x ? rawTileX() : rawTileY();
+
+        requests.each(req -> {
+            int value = -((x ? req.x : req.y) - origin) + origin;
+
+            if(x){
+                req.x = value;
+            }else{
+                req.y = value;
+            }
+
+            if(req.block.posConfig){
+                int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+                int nvalue = -((x ? Pos.x(req.config) : Pos.y(req.config)) - corigin) + corigin;
+                if(x){
+                    req.originalX = -(req.originalX - corigin) + corigin;
+                    req.config = Pos.get(nvalue, Pos.y(req.config));
+                }else{
+                    req.originalY = -(req.originalY - corigin) + corigin;
+                    req.config = Pos.get(Pos.x(req.config), nvalue);
+                }
+            }
+
+            //flip rotation
+            if(x == (req.rotation % 2 == 0)){
+                req.rotation = Mathf.mod(req.rotation + 2, 4);
+            }
         });
     }
 
@@ -287,7 +332,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    protected void drawSelection(int x1, int y1, int x2, int y2){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
         NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -332,6 +377,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.removeBack);
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.remove);
+        Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
+        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+
+        Lines.stroke(2f);
+
+        Draw.color(Pal.accentBack);
+        Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+        Draw.color(Pal.accent);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
@@ -480,14 +536,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
-        //clear when the player taps on something else
-        if(!consumed && !mobile && player.isBuilding() && block == null){
-            //player.clearBuilding();
-            block = null;
-            return true;
-        }*/
-
         if(!showedInventory){
             frag.inv.hide();
         }
@@ -529,6 +577,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
+    }
+
+    int rawTileX(){
+        return world.toTile(Core.input.mouseWorld().x);
+    }
+
+    int rawTileY(){
+        return world.toTile(Core.input.mouseWorld().y);
     }
 
     int tileX(float cursorX){

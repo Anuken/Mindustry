@@ -302,7 +302,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     drawRequest(lineRequests.get(i));
                 }
             }else if(mode == breaking){
-                drawSelection(lineStartX, lineStartY, tileX, tileY);
+                drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
         }
 
