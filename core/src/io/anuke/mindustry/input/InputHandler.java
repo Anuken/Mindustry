@@ -14,13 +14,14 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -52,6 +53,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean droppingItem;
     public Group uiGroup;
 
+    protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
     protected PlaceLine line = new PlaceLine();
     protected BuildRequest resultreq;
@@ -222,6 +224,27 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void useSchematic(Schematic schem){
         selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+    }
+
+    public void rotateRequests(Array<BuildRequest> requests, int direction){
+        int ox = tileX(getMouseX()), oy = tileY(getMouseY());
+
+        requests.each(req -> {
+            //req.x -= ox;
+            //req.y -= oy;
+            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float x = wx;
+            if(direction >= 0){
+                wx = -wy;
+                wy = x;
+            }else{
+                wx = wy;
+                wy = -x;
+            }
+            req.x = world.toTile(wx - req.block.offset()) + ox;
+            req.y = world.toTile(wy - req.block.offset()) + oy;
+            req.rotation += direction;
+        });
     }
 
     /** Returns the selection request that overlaps this position, or null. */

@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -42,13 +43,35 @@ public class DesktopInput extends InputHandler{
     public void buildUI(Group group){
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
-            t.visible(() -> Core.settings.getBool("hints"));
+            t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
             }).margin(10f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.touchable(Touchable.enabled);
+                b.defaults().left();
+                b.add(Core.bundle.format("schematic.flip",
+                Core.keybinds.get(Binding.schematic_flip_x).key.name(),
+                Core.keybinds.get(Binding.schematic_flip_y).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.table(a -> {
+                    a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
+                        ui.showTextInput("$schematic.add", "$name", "", text -> {
+                            lastSchematic.tags.put("name", text);
+                            schematics.add(lastSchematic);
+                            ui.showInfoFade("$schematic.saved");
+                        });
+                    }).colspan(2).size(250f, 50f);
+                });
+            }).margin(6f);
         });
     }
 
@@ -172,6 +195,8 @@ public class DesktopInput extends InputHandler{
 
         if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
             updateLine(selectX, selectY);
+        }else if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && !selectRequests.isEmpty()){
+            rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
         }
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
@@ -256,9 +281,11 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.schematic)){
-            Schematic schem = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-            schematics.add(schem);
-            useSchematic(schem);
+            lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+            useSchematic(lastSchematic);
+            if(selectRequests.isEmpty()){
+                lastSchematic = null;
+            }
         }
 
         //TODO remove

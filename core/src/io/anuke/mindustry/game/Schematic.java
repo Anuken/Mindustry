@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.world.*;
 
@@ -9,6 +10,7 @@ public class Schematic{
     public StringMap tags;
     public int width, height;
     public boolean workshop;
+    public @Nullable FileHandle file;
 
     public Schematic(Array<Stile> tiles, StringMap tags, int width, int height){
         this.tiles = tiles;

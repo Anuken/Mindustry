@@ -244,6 +244,7 @@ public class Schematics implements Loadable{
         if(!s.tags.containsKey("name")){
             s.tags.put("name", file.nameWithoutExtension());
         }
+        s.file = file;
         return s;
     }
 
