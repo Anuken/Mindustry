@@ -705,6 +705,10 @@ public class Block extends BlockStorage{
         Draw.color();
     }
 
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+
+    }
+
     @Override
     public void createIcons(PixmapPacker packer, PixmapPacker editor){
         super.createIcons(packer, editor);

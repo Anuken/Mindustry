@@ -8,19 +8,16 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
-
-import java.io.*;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
@@ -239,12 +236,7 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.schematic)){
             Schematic schem = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             __REMOVE__= schem;
-            Log.info(schematics.writeBase64(schem));
-            try{
-                Schematics.write(schem, Core.files.external("schematic.msch"));
-            }catch(IOException e){
-                throw new RuntimeException(e);
-            }
+            schematics.add(schem);
         }
 
         if(sreq != null){

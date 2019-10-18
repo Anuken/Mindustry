@@ -99,7 +99,7 @@ public class Schematics{
             Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
             for(int x = 0; x < schematic.width + padding; x++){
                 for(int y = 0; y < schematic.height + padding; y++){
-                    Draw.rect("dark-panel-4", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
+                    Draw.rect("metal-floor", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
                 }
             }
 
@@ -108,24 +108,21 @@ public class Schematics{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block){
-                @Override
-                public float drawx(){
-                    float offset = (t.block.size + 1) % 2 / 2f;
-                    return (t.x + 0.5f + padding/2f + offset) * resolution;
-                }
 
-                @Override
-                public float drawy(){
-                    float offset = (t.block.size + 1) % 2 / 2f;
-                    return (t.y + 0.5f + padding/2f + offset) * resolution;
-                }
-            }.configure(t.config));
+            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
+
+            Draw.flush();
+            Draw.trans().scale(4f, 4f).translate(tilesize*1.5f, tilesize*1.5f);
 
             requests.each(req -> {
-                req.animScale = 4f;
+                req.animScale = 1f;
                 req.block.drawRequestRegion(req, requests::each);
             });
+
+            requests.each(req -> req.block.drawRequestConfigTop(req, requests::each));
+
+            Draw.flush();
+            Draw.trans().idt();
 
             buffer.endDraw();
 
@@ -141,6 +138,16 @@ public class Schematics{
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).configure(t.config));
+    }
+
+    /** Adds a schematic to the list, also copying it into the files.*/
+    public void add(Schematic schematic){
+        all.add(schematic);
+        try{
+            write(schematic, schematicDirectory.child(Time.millis() + "." + schematicExtension));
+        }catch(IOException e){
+            Log.err(e);
+        }
     }
 
     /** Creates a schematic from a world selection. */
@@ -163,14 +170,15 @@ public class Schematics{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Tile tile = world.tile(cx, cy);
                 Tile linked = world.ltile(cx, cy);
 
                 if(linked != null && linked.entity != null){
-                    minx = Math.min(tile.x, minx);
-                    miny = Math.min(tile.y, miny);
-                    maxx = Math.max(tile.x, maxx);
-                    maxy = Math.max(tile.y, maxy);
+                    int top = linked.block().size/2;
+                    int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
+                    minx = Math.min(linked.x + bot, minx);
+                    miny = Math.min(linked.y + bot, miny);
+                    maxx = Math.max(linked.x + top, maxx);
+                    maxy = Math.max(linked.y + top, maxy);
                     found = true;
                 }
             }

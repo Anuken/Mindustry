@@ -3,11 +3,13 @@ package io.anuke.mindustry.world.blocks.distribution;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.IntSet.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -23,6 +25,7 @@ public class ItemBridge extends Block{
     protected int range;
     protected float transportTime = 2f;
     protected TextureRegion endRegion, bridgeRegion, arrowRegion;
+    protected BuildRequest otherReq;
 
     private static int lastPlaced = Pos.invalid;
 
@@ -63,6 +66,27 @@ public class ItemBridge extends Block{
         endRegion = Core.atlas.find(name + "-end");
         bridgeRegion = Core.atlas.find(name + "-bridge");
         arrowRegion = Core.atlas.find(name + "-arrow");
+    }
+
+    @Override
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+        otherReq = null;
+        list.each(other -> {
+            if(other.block == this && req.config == Pos.get(other.x, other.y)){
+                otherReq = other;
+            }
+        });
+
+        if(otherReq == null) return;
+
+        Lines.stroke(8f);
+        Lines.line(bridgeRegion,
+        req.drawx(),
+        req.drawy(),
+        otherReq.drawx(),
+        otherReq.drawy(), CapStyle.none, -tilesize / 2f);
+        Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
+            Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
     }
 
     @Override
