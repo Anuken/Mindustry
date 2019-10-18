@@ -81,6 +81,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         add(netClient = new NetClient());
 
         assets.load(mods);
+        assets.load(schematics);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> {
             content.init();

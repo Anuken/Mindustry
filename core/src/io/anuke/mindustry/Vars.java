@@ -262,9 +262,6 @@ public class Vars implements Loadable{
 
         mods.load();
         maps.load();
-        if(!headless){
-            schematics.load();
-        }
     }
 
     public static void loadSettings(){

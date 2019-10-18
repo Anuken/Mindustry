@@ -5,6 +5,7 @@ import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.ui.*;
@@ -109,7 +110,7 @@ public class DesktopInput extends InputHandler{
         Draw.reset();
 
         if(__REMOVE__ != null){
-            Texture tex = schematics.getPreview(__REMOVE__, PreviewRes.high);
+            Texture tex = schematics.getPreview(__REMOVE__, PreviewRes.low);
             Draw.blend(Blending.disabled);
             Draw.rect(Draw.wrap(tex), Core.camera.position.x, Core.camera.position.y, tex.getWidth() / 4f, tex.getHeight() / 4f);
             Draw.blend();
@@ -235,8 +236,13 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyRelease(Binding.schematic)){
             Schematic schem = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-            __REMOVE__= schem;
+            __REMOVE__ = schem;
             schematics.add(schem);
+        }
+
+        //TODO remove
+        if(Core.input.keyTap(KeyCode.T)){
+            ui.schematics.show();
         }
 
         if(sreq != null){

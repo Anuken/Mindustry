@@ -1,6 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.*;
+import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
@@ -23,7 +24,7 @@ import java.util.zip.*;
 import static io.anuke.mindustry.Vars.*;
 
 /** Handles schematics.*/
-public class Schematics{
+public class Schematics implements Loadable{
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 0;
 
@@ -41,6 +42,11 @@ public class Schematics{
             previews.clear();
             shadowBuffer.dispose();
         });
+    }
+
+    @Override
+    public void loadSync(){
+        load();
     }
 
     /** Load all schematics in the folder immediately.*/
@@ -69,13 +75,15 @@ public class Schematics{
         if(!previews.getOr(schematic, ObjectMap::new).containsKey(res)){
             int resolution = res.resolution;
             Draw.blend();
-            Draw.color();
+            Draw.reset();
             Time.mark();
-            FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
             Tmp.m1.set(Draw.proj());
+            Tmp.m2.set(Draw.trans());
+            FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
 
             shadowBuffer.beginDraw(Color.clear);
 
+            Draw.trans().idt();
             Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
 
             Draw.color();
@@ -108,11 +116,10 @@ public class Schematics{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-
             Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
 
             Draw.flush();
-            Draw.trans().scale(4f, 4f).translate(tilesize*1.5f, tilesize*1.5f);
+            Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
             requests.each(req -> {
                 req.animScale = 1f;
@@ -126,7 +133,8 @@ public class Schematics{
 
             buffer.endDraw();
 
-            Draw.proj(Tmp.m3);
+            Draw.proj(Tmp.m1);
+            Draw.trans(Tmp.m2);
 
             previews.getOr(schematic, ObjectMap::new).put(res, buffer);
             Log.info("Time taken: {0}", Time.elapsed());
@@ -172,7 +180,7 @@ public class Schematics{
             for(int cy = y; cy <= y2; cy++){
                 Tile linked = world.ltile(cx, cy);
 
-                if(linked != null && linked.entity != null){
+                if(linked != null && linked.entity != null && linked.entity.block.isVisible()){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
                     minx = Math.min(linked.x + bot, minx);
@@ -190,7 +198,7 @@ public class Schematics{
             x2 = maxx;
             y2 = maxy;
         }else{
-            return new Schematic(new Array<>(), 1, 1);
+            return new Schematic(new Array<>(), new StringMap(), 1, 1);
         }
 
         int width = x2 - x + 1, height = y2 - y + 1;
@@ -210,7 +218,7 @@ public class Schematics{
             }
         }
 
-        return new Schematic(tiles, width, height);
+        return new Schematic(tiles, new StringMap(), width, height);
     }
 
     /** Converts a schematic to base64. Note that the result of this will always start with 'bXNjaAB'.*/
@@ -243,20 +251,27 @@ public class Schematics{
         }
 
         int ver;
-        //version, currently discarded
         if((ver = input.read()) != version){
             throw new IOException("Unknown version: " + ver);
         }
 
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
-
             short width = stream.readShort(), height = stream.readShort();
+
+            StringMap map = new StringMap();
+            byte tags = stream.readByte();
+            for(int i = 0; i < tags; i++){
+                map.put(stream.readUTF(), stream.readUTF());
+            }
+
             IntMap<Block> blocks = new IntMap<>();
             byte length = stream.readByte();
             for(int i = 0; i < length; i++){
                 Block block = Vars.content.getByName(ContentType.block, stream.readUTF());
                 blocks.put(i, block == null ? Blocks.air : block);
             }
+
+            Log.info(blocks);
 
             int total = stream.readInt();
             Array<Stile> tiles = new Array<>(total);
@@ -266,11 +281,11 @@ public class Schematics{
                 int config = stream.readInt();
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
-                    tiles.add(new Stile(block, Pos.x(position), Pos.y(rotation), config, rotation));
+                    tiles.add(new Stile(block, Pos.x(position), Pos.y(position), config, rotation));
                 }
             }
 
-            return new Schematic(tiles, width, height);
+            return new Schematic(tiles, map, width, height);
         }
     }
 
@@ -286,6 +301,13 @@ public class Schematics{
 
             stream.writeShort(schematic.width);
             stream.writeShort(schematic.height);
+
+            stream.writeByte(schematic.tags.size);
+            for(ObjectMap.Entry<String, String> e : schematic.tags.entries()){
+                stream.writeUTF(e.key);
+                stream.writeUTF(e.value);
+            }
+
             OrderedSet<Block> blocks = new OrderedSet<>();
             schematic.tiles.each(t -> blocks.add(t.block));
 
@@ -309,7 +331,7 @@ public class Schematics{
     //endregion
 
     public enum PreviewRes{
-        low(8), high(32);
+        low(8), med(8), high(32);
 
         public final int resolution;
 

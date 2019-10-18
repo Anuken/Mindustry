@@ -6,12 +6,19 @@ import io.anuke.mindustry.world.*;
 
 public class Schematic{
     public final Array<Stile> tiles;
+    public StringMap tags;
     public int width, height;
+    public boolean workshop;
 
-    public Schematic(Array<Stile> tiles, int width, int height){
+    public Schematic(Array<Stile> tiles, StringMap tags, int width, int height){
         this.tiles = tiles;
+        this.tags = tags;
         this.width = width;
         this.height = height;
+    }
+
+    public String name(){
+        return tags.get("name", "unknown");
     }
 
     public static class Stile{
