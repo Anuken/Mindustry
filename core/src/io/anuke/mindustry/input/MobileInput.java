@@ -243,7 +243,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(tile == null) continue;
 
             request.animScale = Mathf.lerpDelta(request.animScale, 0f, 0.2f);
-            request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0f, 0.2f);
 
             if(request.breaking){
                 drawSelected(request.x, request.y, tile.block(), Pal.remove);
@@ -263,10 +262,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             if((!request.breaking && validPlace(tile.x, tile.y, request.block, request.rotation))
             || (request.breaking && validBreak(tile.x, tile.y))){
                 request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.2f);
-                request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0f, 0.2f);
             }else{
                 request.animScale = Mathf.lerpDelta(request.animScale, 0.6f, 0.1f);
-                request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0.9f, 0.2f);
             }
 
             Tmp.c1.set(Draw.getMixColor());

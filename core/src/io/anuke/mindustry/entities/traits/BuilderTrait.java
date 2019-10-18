@@ -104,7 +104,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(current.breaking){
             entity.deconstruct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier)){
+            if(entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
                     Call.onTileConfig(null, tile, current.config);
                 }
@@ -267,18 +267,26 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Class for storing build requests. Can be either a place or remove request. */
     class BuildRequest{
+        /** Position and rotation of this request. */
         public int x, y, rotation;
+        /** Block being placed. If null, this is a breaking request.*/
         public @Nullable Block block;
+        /** Whether this is a break request.*/
         public boolean breaking;
+        /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
         public boolean hasConfig;
+        /** Config int. Not used unless hasConfig is true.*/
         public int config;
+        /** Original position, only used in schematics.*/
+        public int originalX, originalY;
 
+        /** Last progress.*/
         public float progress;
+        /** Whether construction has started for this request.*/
         public boolean initialized;
 
-        //animation variables
+        /** Visual scale. Used only for rendering.*/
         public float animScale = 0f;
-        public float animInvalid;
 
         /** This creates a build request. */
         public BuildRequest(int x, int y, int rotation, Block block){
@@ -300,6 +308,29 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         public BuildRequest(){
 
+        }
+
+        public BuildRequest copy(){
+            BuildRequest copy = new BuildRequest();
+            copy.x = x;
+            copy.y = y;
+            copy.rotation = rotation;
+            copy.block = block;
+            copy.breaking = breaking;
+            copy.hasConfig = hasConfig;
+            copy.config = config;
+            copy.originalX = originalX;
+            copy.originalY = originalY;
+            copy.progress = progress;
+            copy.initialized = initialized;
+            copy.animScale = animScale;
+            return copy;
+        }
+
+        public BuildRequest original(int x, int y){
+            originalX = x;
+            originalY = y;
+            return this;
         }
 
         public Rectangle bounds(Rectangle rect){

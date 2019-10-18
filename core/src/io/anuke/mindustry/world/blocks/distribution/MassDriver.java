@@ -36,6 +36,7 @@ public class MassDriver extends Block{
         super(name);
         update = true;
         solid = true;
+        posConfig = true;
         configurable = true;
         hasItems = true;
         layer = Layer.turret;
@@ -317,11 +318,6 @@ public class MassDriver extends Block{
         @Override
         public int config(){
             return link;
-        }
-
-        @Override
-        public boolean posConfig(){
-            return true;
         }
 
         @Override

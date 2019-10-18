@@ -145,7 +145,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).configure(t.config));
+        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y).configure(t.config));
     }
 
     /** Adds a schematic to the list, also copying it into the files.*/
@@ -209,7 +209,7 @@ public class Schematics implements Loadable{
 
                 if(tile != null && tile.entity != null){
                     int config = tile.entity.config();
-                    if(tile.entity.posConfig()){
+                    if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
                     }
 
@@ -240,7 +240,11 @@ public class Schematics implements Loadable{
     //region IO methods
 
     public static Schematic read(FileHandle file) throws IOException{
-        return read(new DataInputStream(file.read(1024)));
+        Schematic s = read(new DataInputStream(file.read(1024)));
+        if(!s.tags.containsKey("name")){
+            s.tags.put("name", file.nameWithoutExtension());
+        }
+        return s;
     }
 
     public static Schematic read(InputStream input) throws IOException{
@@ -270,8 +274,6 @@ public class Schematics implements Loadable{
                 Block block = Vars.content.getByName(ContentType.block, stream.readUTF());
                 blocks.put(i, block == null ? Blocks.air : block);
             }
-
-            Log.info(blocks);
 
             int total = stream.readInt();
             Array<Stile> tiles = new Array<>(total);

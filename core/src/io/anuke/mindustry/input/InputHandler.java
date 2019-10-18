@@ -19,6 +19,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
@@ -219,6 +220,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         drawSelected(x, y, block, Pal.remove);
     }
 
+    public void useSchematic(Schematic schem){
+        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+    }
+
     /** Returns the selection request that overlaps this position, or null. */
     protected BuildRequest getRequest(int x, int y){
         return getRequest(x, y, 1, null);
@@ -310,7 +315,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                selectRequests.add(req);
+                selectRequests.add(req.copy());
             }
         }
     }
@@ -318,7 +323,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                player.addBuildRequest(req);
+                BuildRequest copy = req.copy();
+                if(copy.hasConfig && copy.block.posConfig){
+                    copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                }
+                player.addBuildRequest(copy);
             }
         }
     }

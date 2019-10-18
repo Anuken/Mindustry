@@ -87,6 +87,8 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
+    /** Whether the config is positional and needs to be shifted. */
+    public boolean posConfig;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.

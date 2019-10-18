@@ -37,6 +37,7 @@ public class ItemBridge extends Block{
         layer = Layer.power;
         expanded = true;
         itemCapacity = 10;
+        posConfig = true;
         configurable = true;
         hasItems = true;
         unloadable = false;
@@ -383,11 +384,6 @@ public class ItemBridge extends Block{
         @Override
         public int config(){
             return link;
-        }
-
-        @Override
-        public boolean posConfig(){
-            return true;
         }
 
         @Override

@@ -8,7 +8,7 @@ import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 
-import static io.anuke.mindustry.Vars.schematics;
+import static io.anuke.mindustry.Vars.*;
 
 public class SchematicsDialog extends FloatingDialog{
 
@@ -40,7 +40,8 @@ public class SchematicsDialog extends FloatingDialog{
                         }
                     }.setScaling(Scaling.fit).setName("border"));
                 }, () -> {
-
+                    control.input.useSchematic(s);
+                    hide();
                 }).size(200f, 230f).pad(2).style(Styles.clearPartiali).get();
 
                 BorderImage image = sel.find("border");

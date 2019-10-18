@@ -3,7 +3,6 @@ package io.anuke.mindustry.input;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
-import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
@@ -14,7 +13,6 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -30,7 +28,7 @@ public class DesktopInput extends InputHandler{
     /** Position where the player started dragging a line. */
     private int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
-    private int lastLineX, lastLineY;
+    private int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
     private PlaceMode mode;
     /** Animation scale for line. */
@@ -39,8 +37,6 @@ public class DesktopInput extends InputHandler{
     private @Nullable BuildRequest sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false;
-
-    private Schematic __REMOVE__;
 
     @Override
     public void buildUI(Group group){
@@ -89,6 +85,12 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        //draw schematic requests
+        for(BuildRequest request : selectRequests){
+            request.animScale = 1f;
+            drawRequest(request);
+        }
+
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
             if(sreq.block.rotate){
@@ -108,13 +110,6 @@ public class DesktopInput extends InputHandler{
         }
 
         Draw.reset();
-
-        if(__REMOVE__ != null){
-            Texture tex = schematics.getPreview(__REMOVE__, PreviewRes.low);
-            Draw.blend(Blending.disabled);
-            Draw.rect(Draw.wrap(tex), Core.camera.position.x, Core.camera.position.y, tex.getWidth() / 4f, tex.getHeight() / 4f);
-            Draw.blend();
-        }
     }
 
     @Override
@@ -154,6 +149,10 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
+        if(mode != none){
+            selectRequests.clear();
+        }
+
         if(player.isShooting && !canShoot()){
             player.isShooting = false;
         }
@@ -182,7 +181,7 @@ public class DesktopInput extends InputHandler{
 
             cursorType = cursor.block().getCursor(cursor);
 
-            if(isPlacing()){
+            if(isPlacing() || !selectRequests.isEmpty()){
                 cursorType = SystemCursor.hand;
             }
 
@@ -211,6 +210,16 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public void useSchematic(Schematic schem){
+        block = null;
+        schematicX = tileX(getMouseX());
+        schematicY = tileY(getMouseY());
+
+        selectRequests.addAll(schematics.toRequests(schem, schematicX, schematicY));
+        mode = none;
+    }
+
+    @Override
     public boolean isBreaking(){
         return mode == breaking;
     }
@@ -220,6 +229,18 @@ public class DesktopInput extends InputHandler{
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
         int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
+
+        if(!selectRequests.isEmpty()){
+            int shiftX = rawCursorX - schematicX, shiftY = rawCursorY - schematicY;
+
+            selectRequests.each(s -> {
+                s.x += shiftX;
+                s.y += shiftY;
+            });
+
+            schematicX += shiftX;
+            schematicY += shiftY;
+        }
 
         if(Core.input.keyTap(Binding.deselect)){
             player.setMineTile(null);
@@ -236,12 +257,12 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyRelease(Binding.schematic)){
             Schematic schem = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-            __REMOVE__ = schem;
             schematics.add(schem);
+            useSchematic(schem);
         }
 
         //TODO remove
-        if(Core.input.keyTap(KeyCode.T)){
+        if(Core.input.keyTap(KeyCode.V)){
             ui.schematics.show();
         }
 
@@ -270,7 +291,10 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
 
-            if(isPlacing()){
+            if(!selectRequests.isEmpty()){
+                flushRequests(selectRequests);
+                //selectRequests.clear();
+            }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
                 lastLineX = cursorX;
@@ -366,6 +390,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
             block = null;
             sreq = null;
+            selectRequests.clear();
         }
     }
 }
