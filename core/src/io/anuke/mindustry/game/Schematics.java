@@ -205,7 +205,7 @@ public class Schematics{
         return new Schematic(tiles, width, height);
     }
 
-    /** Converts a schematic to base64. */
+    /** Converts a schematic to base64. Note that the result of this will always start with 'bXNjaAB'.*/
     public String writeBase64(Schematic schematic){
         try{
             out.reset();
