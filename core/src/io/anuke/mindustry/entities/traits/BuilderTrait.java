@@ -193,10 +193,15 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Add another build requests to the queue, if it doesn't exist there yet. */
     default void addBuildRequest(BuildRequest place, boolean tail){
+        BuildRequest replace = null;
         for(BuildRequest request : buildQueue()){
             if(request.x == place.x && request.y == place.y){
-                return;
+                replace = request;
+                break;
             }
+        }
+        if(replace != null){
+            buildQueue().remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
         if(tile != null && tile.entity instanceof BuildEntity){
