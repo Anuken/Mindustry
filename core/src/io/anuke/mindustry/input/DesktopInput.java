@@ -14,6 +14,7 @@ import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -111,9 +112,9 @@ public class DesktopInput extends InputHandler{
         Draw.reset();
 
         if(__REMOVE__ != null){
-            Texture tex = schematics.getPreview(__REMOVE__);
+            Texture tex = schematics.getPreview(__REMOVE__, PreviewRes.high);
             Draw.blend(Blending.disabled);
-            Draw.rect(Draw.wrap(tex), Core.camera.position.x, Core.camera.position.y, tex.getWidth() / 8f, tex.getHeight() / 8f);
+            Draw.rect(Draw.wrap(tex), Core.camera.position.x, Core.camera.position.y, tex.getWidth() / 4f, tex.getHeight() / 4f);
             Draw.blend();
         }
     }

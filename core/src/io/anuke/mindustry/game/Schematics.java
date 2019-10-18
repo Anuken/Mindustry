@@ -27,18 +27,17 @@ public class Schematics{
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 0;
 
-    private static final int resolution = 64;
     private static final int padding = 2;
     private static final int maxSize = 64;
 
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
-    private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
+    private OrderedMap<Schematic, ObjectMap<PreviewRes, FrameBuffer>> previews = new OrderedMap<>();
     private FrameBuffer shadowBuffer;
 
     public Schematics(){
         Events.on(DisposeEvent.class, e -> {
-            previews.each((schem, buffer) -> buffer.dispose());
+            previews.each((schem, m) -> m.each((res, buffer) -> buffer.dispose()));
             previews.clear();
             shadowBuffer.dispose();
         });
@@ -62,8 +61,13 @@ public class Schematics{
         });
     }
 
-    public Texture getPreview(Schematic schematic){
-        if(!previews.containsKey(schematic)){
+    public Array<Schematic> all(){
+        return all;
+    }
+
+    public Texture getPreview(Schematic schematic, PreviewRes res){
+        if(!previews.getOr(schematic, ObjectMap::new).containsKey(res)){
+            int resolution = res.resolution;
             Draw.blend();
             Draw.color();
             Time.mark();
@@ -92,7 +96,7 @@ public class Schematics{
 
             buffer.beginDraw(Color.orange);
 
-            Draw.proj().setOrtho(0, 0, buffer.getWidth(), buffer.getHeight());
+            Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
             for(int x = 0; x < schematic.width + padding; x++){
                 for(int y = 0; y < schematic.height + padding; y++){
                     Draw.rect("dark-panel-4", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
@@ -101,28 +105,37 @@ public class Schematics{
 
             Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
             Draw.color(0f, 0f, 0f, 1f);
-            Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), buffer.getHeight());
+            Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
+            Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block){
+                @Override
+                public float drawx(){
+                    float offset = (t.block.size + 1) % 2 / 2f;
+                    return (t.x + 0.5f + padding/2f + offset) * resolution;
+                }
 
-            schematic.tiles.each(t -> {
-                float offset = (t.block.size + 1) % 2 / 2f;
-                Draw.rect(t.block.icon(Cicon.full),
-                    (t.x + 0.5f + padding/2f + offset) * resolution,
-                    buffer.getHeight() - 1 - (t.y + 0.5f + padding/2f + offset) * resolution,
-                    resolution * t.block.size, -resolution * t.block.size, t.block.rotate ? t.rotation * 90 : 0);
+                @Override
+                public float drawy(){
+                    float offset = (t.block.size + 1) % 2 / 2f;
+                    return (t.y + 0.5f + padding/2f + offset) * resolution;
+                }
+            }.configure(t.config));
+
+            requests.each(req -> {
+                req.animScale = 4f;
+                req.block.drawRequestRegion(req, requests::each);
             });
 
             buffer.endDraw();
 
             Draw.proj(Tmp.m3);
 
-            previews.put(schematic, buffer);
+            previews.getOr(schematic, ObjectMap::new).put(res, buffer);
             Log.info("Time taken: {0}", Time.elapsed());
         }
 
-        return previews.get(schematic).getTexture();
+        return previews.get(schematic).get(res).getTexture();
     }
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
@@ -145,6 +158,32 @@ public class Schematics{
         }
 
         Array<Stile> tiles = new Array<>();
+
+        int minx = x2, miny = y2, maxx = x, maxy = y;
+        boolean found = false;
+        for(int cx = x; cx <= x2; cx++){
+            for(int cy = y; cy <= y2; cy++){
+                Tile tile = world.tile(cx, cy);
+                Tile linked = world.ltile(cx, cy);
+
+                if(linked != null && linked.entity != null){
+                    minx = Math.min(tile.x, minx);
+                    miny = Math.min(tile.y, miny);
+                    maxx = Math.max(tile.x, maxx);
+                    maxy = Math.max(tile.y, maxy);
+                    found = true;
+                }
+            }
+        }
+
+        if(found){
+            x = minx;
+            y = miny;
+            x2 = maxx;
+            y2 = maxy;
+        }else{
+            return new Schematic(new Array<>(), 1, 1);
+        }
 
         int width = x2 - x + 1, height = y2 - y + 1;
         int offsetX = -x, offsetY = -y;
@@ -260,4 +299,14 @@ public class Schematics{
     }
 
     //endregion
+
+    public enum PreviewRes{
+        low(8), high(32);
+
+        public final int resolution;
+
+        PreviewRes(int resolution){
+            this.resolution = resolution;
+        }
+    }
 }

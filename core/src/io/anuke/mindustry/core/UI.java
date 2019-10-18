@@ -68,6 +68,7 @@ public class UI implements ApplicationListener, Loadable{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
+    public SchematicsDialog schematics;
     public ModsDialog mods;
 
     public Cursor drillCursor, unloadCursor;
@@ -225,6 +226,7 @@ public class UI implements ApplicationListener, Loadable{
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
         mods = new ModsDialog();
+        schematics = new SchematicsDialog();
 
         Group group = Core.scene.root;
 

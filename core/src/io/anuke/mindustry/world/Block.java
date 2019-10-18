@@ -681,8 +681,28 @@ public class Block extends BlockStorage{
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         TextureRegion reg = icon(Cicon.full);
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
-            reg.getWidth() * req.animScale * Draw.scl, reg.getHeight() * req.animScale * Draw.scl,
-                !rotate ? 0 : req.rotation * 90);
+            reg.getWidth() * req.animScale * Draw.scl,
+            reg.getHeight() * req.animScale * Draw.scl,
+            !rotate ? 0 : req.rotation * 90);
+
+        if(req.hasConfig){
+            drawRequestConfig(req, list);
+        }
+    }
+
+    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+
+    }
+
+    public void drawRequestConfigCenter(BuildRequest req, Content content, String region){
+        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+        if(color == null) return;
+
+        Draw.color(color);
+        Draw.scl *= req.animScale;
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.scl /= req.animScale;
+        Draw.color();
     }
 
     @Override
