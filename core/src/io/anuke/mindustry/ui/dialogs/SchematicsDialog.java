@@ -1,7 +1,11 @@
 package io.anuke.mindustry.ui.dialogs;
 
+import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.graphics.Texture.*;
+import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Schematics.*;
@@ -17,7 +21,11 @@ public class SchematicsDialog extends FloatingDialog{
 
     public SchematicsDialog(){
         super("$schematics");
+        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
+            ((Texture)t).setWrap(TextureWrap.Repeat);
+        };
 
+        shouldPause = true;
         addCloseButton();
         shown(this::setup);
     }
@@ -49,25 +57,34 @@ public class SchematicsDialog extends FloatingDialog{
                 for(Schematic s : schematics.all()){
                     if(!search.isEmpty() && !s.name().contains(search)) continue;
 
-                    Button sel = t.addButton(b -> {
-                        Texture tex = schematics.getPreview(s, PreviewRes.high);
-                        b.add(s.name()).center().color(Color.lightGray).fillY().get().setEllipsis(true);
+                    Button[] sel = {null};
+                    sel[0] = t.addButton(b -> {
+                        b.top();
+                        b.margin(4f);
+                        b.table(buttons -> {
+                            buttons.left();
+                            buttons.defaults().size(50f);
+                            buttons.addImageButton(Icon.pencilSmall, Styles.clearPartiali, () -> {
+
+                            });
+
+                            buttons.addImageButton(Icon.trash16Small, Styles.clearPartiali, () -> {
+
+                            });
+
+                        }).growX().height(50f);
                         b.row();
-                        b.add(new BorderImage(tex){
-                            @Override
-                            public void draw(){
-                                //Draw.blend(Blending.disabled);
-                                super.draw();
-                                //Draw.blend();
-                            }
-                        }.setScaling(Scaling.fit).setName("border"));
+                        b.add(s.name()).center().color(Color.lightGray).top().left().get().setEllipsis(true);
+                        b.row();
+                        b.add(new SchematicImage(s).setScaling(Scaling.fit).setName("border")).size(200f);
                     }, () -> {
+                        if(sel[0].childrenPressed()) return;
                         control.input.useSchematic(s);
                         hide();
-                    }).size(200f, 230f).pad(2).style(Styles.clearPartiali).get();
+                    }).pad(4).style(Styles.cleari).get();
 
-                    BorderImage image = sel.find("border");
-                    image.update(() -> image.borderColor = (sel.isOver() ? Pal.accent : Pal.gray));
+                    //BorderImage image = sel[0].find("border");
+                    //image.update(() -> image.borderColor = (sel[0].isOver() ? Pal.accent : Pal.gray));
 
                     if(++i % 4 == 0){
                         t.row();
@@ -81,6 +98,35 @@ public class SchematicsDialog extends FloatingDialog{
 
     public void showInfo(Schematic schematic){
         info.show(schematic);
+    }
+
+    public static class SchematicImage extends Image{
+        public float scaling = 16f;
+        public float thickness = 4f;
+        public Color borderColor = Pal.gray;
+
+        public SchematicImage(Schematic s){
+            super(schematics.getPreview(s, PreviewRes.high));
+        }
+
+        @Override
+        public void draw(){
+            Texture background = Core.assets.get("sprites/schematic-background.png", Texture.class);
+            TextureRegion region = Draw.wrap(background);
+            float xr = width / scaling;
+            float yr = height / scaling;
+            region.setU2(xr);
+            region.setV2(yr);
+            Draw.rect(region, x + width/2f, y + height/2f, width, height);
+
+            super.draw();
+
+            Draw.color(borderColor);
+            Draw.alpha(parentAlpha);
+            Lines.stroke(Scl.scl(thickness));
+            Lines.rect(x, y, width, height);
+            Draw.reset();
+        }
     }
 
     public static class SchematicInfoDialog extends FloatingDialog{

@@ -103,12 +103,12 @@ public class Schematics implements Loadable{
 
             shadowBuffer.endDraw();
 
-            buffer.beginDraw(Color.orange);
+            buffer.beginDraw(Color.clear);
 
             Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
             for(int x = 0; x < schematic.width + padding; x++){
                 for(int y = 0; y < schematic.height + padding; y++){
-                    Draw.rect("metal-floor", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
+                    //Draw.rect("metal-floor", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
                 }
             }
 
