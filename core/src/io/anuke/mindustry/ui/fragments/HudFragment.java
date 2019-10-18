@@ -250,8 +250,9 @@ public class HudFragment extends Fragment{
         });
         
         parent.fill(t -> {
+            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial);
             //minimap
-            t.add(new Minimap().visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial));
+            t.add(new Minimap());
             t.row();
             //position
             t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))

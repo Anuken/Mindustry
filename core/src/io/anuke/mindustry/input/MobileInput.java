@@ -208,7 +208,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //move all current requests to removal array so they fade out
-            removals.addAll(selectRequests.find(r -> !r.breaking));
+            removals.addAll(selectRequests.select(r -> !r.breaking));
             selectRequests.clear();
             selecting = false;
         }).visible(() -> !selectRequests.isEmpty()).name("confirmplace");

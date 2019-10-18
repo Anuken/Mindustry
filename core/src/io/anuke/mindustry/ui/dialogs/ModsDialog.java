@@ -41,11 +41,11 @@ public class ModsDialog extends FloatingDialog{
                                     mods.reloadContent();
                                     setup();
                                     ui.loadfrag.hide();
-                                }catch(Exception e){
+                                }catch(Throwable e){
                                     ui.showException(e);
                                 }
                             });
-                        }catch(Exception e){
+                        }catch(Throwable e){
                             ui.showException(e);
                         }
                     }, t -> Core.app.post(() -> ui.showException(t)));

@@ -34,34 +34,29 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
-        put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
         put(Loadout.class, (type, data) -> field(Loadouts.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
+            if(data.isString()){
+                return field(Bullets.class, data);
+            }
+            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullet") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);
             readFields(result, data);
             return result;
         });
-        put(Music.class, (type, data) -> {
-            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
-
-            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Music.class);
-            Core.assets.finishLoadingAsset(path);
-            return Core.assets.get(path);
-        });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
 
             String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Sound.class);
-            Core.assets.finishLoadingAsset(path);
-            Log.info(Core.assets.get(path));
-            return Core.assets.get(path);
+            ProxySound sound = new ProxySound();
+            Core.assets.load(path, Sound.class).loaded = result -> {
+                sound.sound = (Sound)result;
+            };
+            return sound;
         });
         put(Objective.class, (type, data) -> {
             Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.Objectives") : ZoneWave.class;
