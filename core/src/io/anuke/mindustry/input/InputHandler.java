@@ -210,7 +210,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
-            drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
+            drawSelected(request.x, request.y, request.block, Pal.remove);
         }
     }
 

@@ -50,6 +50,8 @@ public class DesktopInput extends InputHandler{
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic).key.name())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
@@ -69,6 +71,7 @@ public class DesktopInput extends InputHandler{
                             lastSchematic.tags.put("name", text);
                             schematics.add(lastSchematic);
                             ui.showInfoFade("$schematic.saved");
+                            ui.schematics.showInfo(lastSchematic);
                         });
                     }).colspan(2).size(250f, 50f);
                 });
