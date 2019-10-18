@@ -1,5 +1,7 @@
 package io.anuke.mindustry.type;
 
+import io.anuke.mindustry.world.Block;
+
 public enum Category{
     /** Offensive turrets. */
     turret,
@@ -23,4 +25,14 @@ public enum Category{
     effect;
 
     public static final Category[] all = values();
+
+    Block selectedBlock = null;
+
+    public void setSelectedBlock(Block block){
+        selectedBlock = block;
+    }
+
+    public Block getSelectedBlock() {
+        return selectedBlock;
+    }
 }
