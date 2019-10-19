@@ -351,7 +351,7 @@ public class PowerNode extends PowerBlock{
         Draw.color();
     }
 
-    protected boolean insulated(Tile tile, Tile other){
+    public boolean insulated(Tile tile, Tile other){
         Array<Point2>points = PlaceUtils.normalizeDiagonal(tile.x, tile.y, other.x, other.y);
 
         for(int i = 0; i < points.size; i++){
