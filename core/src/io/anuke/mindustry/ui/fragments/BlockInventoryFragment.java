@@ -196,11 +196,11 @@ public class BlockInventoryFragment extends Fragment{
         if(f >= 10000000){
             return (int)(f / 1000000f) + "[gray]mil[]";
         }else if(f >= 1000000){
-            return (Math.floor(f / 100000) / 10f) + "[gray]mil[]";
+            return Strings.fixed((float) Math.floor(f / 100000) / 10f, 1) + "[gray]mil[]";
         }else if(f >= 10000){
             return (int)(f / 1000) + "k";
         }else if(f >= 1000){
-            return (Math.floor(f / 100) / 10) + "k";
+            return Strings.fixed((float) Math.floor(f / 100) / 10f, 1) + "k";
         }else{
             return (int)f + "";
         }
