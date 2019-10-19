@@ -40,6 +40,10 @@ public class Tutorial{
         Events.on(BlockInfoEvent.class, event -> events.add("blockinfo"));
         Events.on(DepositEvent.class, event -> events.add("deposit"));
         Events.on(WithdrawEvent.class, event -> events.add("withdraw"));
+
+        for(TutorialStage stage : TutorialStage.values()){
+            stage.load();
+        }
     }
 
     /** update tutorial state, transition if needed */
@@ -204,11 +208,15 @@ public class Tutorial{
         /** displayed tutorial stage text.*/
         public String text(){
             if(sentences == null){
-               this.line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
-               this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
+               load();
             }
             String line = sentences.get(control.tutorial.sentence);
             return line.contains("{") ? text.get(line) : line;
+        }
+
+        void load(){
+            this.line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
+            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         /** called every frame when this stage is active.*/

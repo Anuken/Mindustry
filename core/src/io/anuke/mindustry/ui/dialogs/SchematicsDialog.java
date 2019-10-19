@@ -91,12 +91,16 @@ public class SchematicsDialog extends FloatingDialog{
                                 });
                             });
 
-                            buttons.addImageButton(Icon.trash16Small, style, () -> {
-                                ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
-                                    schematics.remove(s);
-                                    rebuildPane[0].run();
+                            if(s.hasSteamID()){
+                                buttons.addImageButton(Icon.linkSmall, style, () -> platform.viewListing(s));
+                            }else{
+                                buttons.addImageButton(Icon.trash16Small, style, () -> {
+                                    ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
+                                        schematics.remove(s);
+                                        rebuildPane[0].run();
+                                    });
                                 });
-                            });
+                            }
 
                         }).growX().height(50f);
                         b.row();
@@ -180,10 +184,9 @@ public class SchematicsDialog extends FloatingDialog{
            p.table(Tex.button, t -> {
                TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
-                if(steam){
-                    t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style, () -> {
-
-                    }).marginLeft(12f);
+                if(steam && !s.hasSteamID()){
+                    t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style,
+                        () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                 }
                 t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {

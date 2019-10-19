@@ -58,7 +58,7 @@ public class Schematics implements Loadable{
             loadFile(file);
         }
 
-        platform.getExternalSchematics().each(this::loadFile);
+        platform.getWorkshopContent(Schematic.class).each(this::loadFile);
 
         Core.app.post(() -> {
             shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 2, maxSchematicSize + padding + 2);
@@ -69,7 +69,13 @@ public class Schematics implements Loadable{
         if(!file.extension().equals(schematicExtension)) return;
 
         try{
-            all.add(read(file));
+            Schematic s = read(file);
+            all.add(s);
+
+            //external file from workshop
+            if(!s.file.parent().equals(schematicDirectory)){
+                s.tags.put("steamid", s.file.parent().name());
+            }
         }catch(IOException e){
             Log.err(e);
         }
@@ -79,7 +85,30 @@ public class Schematics implements Loadable{
         return all;
     }
 
+    public void saveChanges(Schematic s){
+        if(s.file != null){
+            try{
+                write(s, s.file);
+            }catch(Exception e){
+                ui.showException(e);
+            }
+        }
+    }
+
+    public void savePreview(Schematic schematic, PreviewRes res, FileHandle file){
+        FrameBuffer buffer = getBuffer(schematic, res);
+        Draw.flush();
+        buffer.begin();
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
+        file.writePNG(pixmap);
+        buffer.end();
+    }
+
     public Texture getPreview(Schematic schematic, PreviewRes res){
+        return getBuffer(schematic, res).getTexture();
+    }
+
+    public FrameBuffer getBuffer(Schematic schematic, PreviewRes res){
         if(!previews.getOr(schematic, ObjectMap::new).containsKey(res)){
             int resolution = res.resolution;
             Draw.blend();
@@ -113,11 +142,6 @@ public class Schematics implements Loadable{
             buffer.beginDraw(Color.clear);
 
             Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
-            for(int x = 0; x < schematic.width + padding; x++){
-                for(int y = 0; y < schematic.height + padding; y++){
-                    //Draw.rect("metal-floor", x * resolution + resolution/2f, y * resolution + resolution/2f, resolution, resolution);
-                }
-            }
 
             Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
             Draw.color(0f, 0f, 0f, 1f);
@@ -127,8 +151,10 @@ public class Schematics implements Loadable{
             Array<BuildRequest> requests = schematic.tiles.map(t -> new BuildRequest(t.x, t.y, t.rotation, t.block).configure(t.config));
 
             Draw.flush();
+            //scale each request to fit schematic
             Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
+            //draw requests
             requests.each(req -> {
                 req.animScale = 1f;
                 req.block.drawRequestRegion(req, requests::each);
@@ -148,7 +174,7 @@ public class Schematics implements Loadable{
             Log.info("Time taken: {0}", Time.elapsed());
         }
 
-        return previews.get(schematic).get(res).getTexture();
+        return previews.get(schematic).get(res);
     }
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */

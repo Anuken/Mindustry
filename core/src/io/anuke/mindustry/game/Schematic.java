@@ -5,10 +5,13 @@ import io.anuke.arc.collection.IntIntMap.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
-public class Schematic{
+import static io.anuke.mindustry.Vars.*;
+
+public class Schematic implements Publishable{
     public final Array<Stile> tiles;
     public StringMap tags;
     public int width, height;
@@ -41,8 +44,54 @@ public class Schematic{
         return tags.get("name", "unknown");
     }
 
-    public boolean isWorkshop(){
-        return tags.containsKey("workshop");
+    public void save(){
+        schematics.saveChanges(this);
+    }
+
+    @Override
+    public String getSteamID(){
+        return tags.get("steamid");
+    }
+
+    @Override
+    public void addSteamID(String id){
+        tags.put("steamid", id);
+        save();
+    }
+
+    @Override
+    public void removeSteamID(){
+        tags.remove("steamid");
+        save();
+    }
+
+    @Override
+    public String steamTitle(){
+        return name();
+    }
+
+    @Override
+    public String steamDescription(){
+        return null;
+    }
+
+    @Override
+    public String steamTag(){
+        return "schematic";
+    }
+
+    @Override
+    public FileHandle createSteamFolder(String id){
+        FileHandle directory = tmpDirectory.child("schematic_" + id).child("schematic." + schematicExtension);
+        file.copyTo(directory);
+        return directory;
+    }
+
+    @Override
+    public FileHandle createSteamPreview(String id){
+        FileHandle preview = tmpDirectory.child("schematic_preview_" + id + ".png");
+        schematics.savePreview(this, PreviewRes.high, preview);
+        return preview;
     }
 
     public static class Stile{

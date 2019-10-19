@@ -283,6 +283,11 @@ public class DesktopInput extends InputHandler{
             schemY = rawCursorY;
         }
 
+        if(Core.input.keyTap(Binding.clear_building)){
+            lastSchematic = null;
+            selectRequests.clear();
+        }
+
         if(Core.input.keyRelease(Binding.schematic)){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
