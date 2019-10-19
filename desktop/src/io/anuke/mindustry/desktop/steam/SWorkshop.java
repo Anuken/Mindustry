@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -20,11 +21,12 @@ import static io.anuke.mindustry.Vars.*;
 public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
-    private Map lastMap;
+    //private Map lastMap;
     private Array<FileHandle> mapFiles;
     private Array<FileHandle> modFiles;
     private Array<FileHandle> schematicFiles;
     private ObjectMap<SteamUGCQuery, BiConsumer<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Array<Consumer<SteamPublishedFileID>> itemHandlers = new Array<>();
 
     public SWorkshop(){
         int items = ugc.getNumSubscribedItems();
@@ -74,26 +76,36 @@ public class SWorkshop implements SteamUGCCallback{
         ui.editor.editor.getTags().put("author", map.tags.get("author"));
         ui.editor.save();
 
+        showPublish(id -> updateMap(map, id, "<Map Created>"));
+    }
+
+    public void publishSchematic(Schematic schematic){
+
+        showPublish(id -> {
+
+        });
+    }
+
+    public void publishMod(LoadedMod mod){
+
+    }
+
+    private void showPublish(Consumer<SteamPublishedFileID> published){
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
-        dialog.cont.add("$map.publish.confirm").width(600f).wrap();
+        dialog.cont.add("$publish.confirm").width(600f).wrap();
         dialog.addCloseButton();
         dialog.buttons.addImageTextButton("$eula", Icon.linkSmall, () -> {
             SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
         }).size(210f, 64f);
 
         dialog.buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
-            this.lastMap = map;
             ugc.createItem(SVars.steamID, WorkshopFileType.Community);
-            ui.loadfrag.show("$map.publishing");
-            Log.info("Publish map " + map.name());
+            ui.loadfrag.show("$publishing");
             dialog.hide();
+            itemHandlers.add(published);
         }).size(170f, 64f);
         dialog.show();
-    }
-
-    public void publishSchematic(Schematic schematic){
-
     }
 
     public void viewMapListingInfo(Map map){
@@ -104,10 +116,7 @@ public class SWorkshop implements SteamUGCCallback{
         Log.info("Requesting map listing view; id = " + id);
 
         ui.loadfrag.show();
-        SteamUGCQuery query = ugc.createQueryUGCDetailsRequest(fid);
-        Log.info("POST " + query);
-
-        detailHandlers.put(query, (detailsList, result) -> {
+        query(ugc.createQueryUGCDetailsRequest(fid), (detailsList, result) -> {
             ui.loadfrag.hide();
 
             Log.info("Map listing result: " + result + " " + detailsList);
@@ -136,8 +145,7 @@ public class SWorkshop implements SteamUGCCallback{
                                 field.setMaxLength(400);
                                 buttons.defaults().size(120, 54).pad(4);
                                 buttons.addButton("$ok", () -> {
-                                    ui.loadfrag.show("$map.publishing");
-                                    lastMap = map;
+                                    ui.loadfrag.show("publishing");
                                     updateMap(map, details.getPublishedFileID(), field.getText().replace("\r", "\n"));
                                     dialog.hide();
                                     hide();
@@ -167,7 +175,11 @@ public class SWorkshop implements SteamUGCCallback{
                 ui.showErrorMessage(Core.bundle.format("map.load.error", result.name()));
             }
         });
+    }
 
+    public void query(SteamUGCQuery query, BiConsumer<Array<SteamUGCDetails>, SteamResult> handler){
+        Log.info("POST " + query);
+        detailHandlers.put(query, handler);
         ugc.sendQueryUGCRequest(query);
     }
 
@@ -213,23 +225,15 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
-        if(lastMap == null){
-            Log.err("No map to publish?");
-            return;
+        if(!itemHandlers.isEmpty()){
+            if(result == SteamResult.OK){
+                itemHandlers.first().accept(publishedFileID);
+            }else{
+                ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
+            }
+
+            itemHandlers.remove(0);
         }
-
-        //SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.toString());
-
-        Map map = lastMap;
-        Log.info("Create item {0} result {1} {2}", SteamNativeHandle.getNativeHandle(publishedFileID), result, needsToAcceptWLA);
-
-        if(result == SteamResult.OK){
-            updateMap(map, publishedFileID, "<Map Created>");
-        }else{
-            ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
-        }
-
-        lastMap = null;
     }
 
     void updateMap(Map map, SteamPublishedFileID publishedFileID, String changelog){
@@ -237,7 +241,7 @@ public class SWorkshop implements SteamUGCCallback{
 
         Gamemode mode = Gamemode.attack.valid(map) ? Gamemode.attack : Gamemode.survival;
         FileHandle mapFile = tmpDirectory.child("map_" + publishedFileID.toString()).child("map.msav");
-        lastMap.file.copyTo(mapFile);
+        map.file.copyTo(mapFile);
 
         Log.info(mapFile.parent().absolutePath());
         Log.info(map.previewFile().absolutePath());
@@ -282,7 +286,7 @@ public class SWorkshop implements SteamUGCCallback{
             }
             Events.fire(new MapPublishEvent());
         }else{
-            ui.showErrorMessage(Core.bundle.format("map.publish.error ", result.name()));
+            ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
         }
 
     }
