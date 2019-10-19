@@ -259,6 +259,12 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public Array<FileHandle> getExternalSchematics(){
+        return !steam ? super.getExternalMods() : SVars.workshop.getSchematicFiles();
+    }
+
+
+    @Override
     public void viewMapListing(Map map){
         viewListing(map.file.parent().name());
     }

@@ -36,6 +36,11 @@ public interface Platform{
         return Array.with();
     }
 
+    /** Steam: Return external workshop schematics to be loaded.*/
+    default Array<FileHandle> getExternalSchematics(){
+        return Array.with();
+    }
+
     /** Steam: View a map listing on the workshop.*/
     default void viewMapListing(Map map){}
 

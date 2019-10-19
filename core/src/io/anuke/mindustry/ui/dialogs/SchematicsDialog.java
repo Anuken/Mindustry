@@ -1,16 +1,20 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.ImageButton.*;
+import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -39,7 +43,7 @@ public class SchematicsDialog extends FloatingDialog{
 
         cont.table(s -> {
             s.left();
-            s.addImage(Icon.zoom).color(Pal.gray);
+            s.addImage(Icon.zoom);
             s.addField(search, res -> {
                 search = res;
                 rebuildPane[0].run();
@@ -54,37 +58,64 @@ public class SchematicsDialog extends FloatingDialog{
             rebuildPane[0] = () -> {
                 t.clear();
                 int i = 0;
+
+                if(!schematics.all().contains(s -> search.isEmpty() || s.name().contains(search))){
+                    t.add("$none");
+                }
+
                 for(Schematic s : schematics.all()){
                     if(!search.isEmpty() && !s.name().contains(search)) continue;
 
                     Button[] sel = {null};
                     sel[0] = t.addButton(b -> {
                         b.top();
-                        b.margin(4f);
+                        b.margin(0f);
                         b.table(buttons -> {
                             buttons.left();
                             buttons.defaults().size(50f);
-                            buttons.addImageButton(Icon.pencilSmall, Styles.clearPartiali, () -> {
 
+                            ImageButtonStyle style = Styles.clearPartiali;
+
+                            buttons.addImageButton(Icon.infoSmall, style, () -> {
+                                showInfo(s);
                             });
 
-                            buttons.addImageButton(Icon.trash16Small, Styles.clearPartiali, () -> {
+                            //if(s.isWorkshop()){
+                            buttons.addImageButton(Icon.loadMapSmall, style, () -> {
+                                showExport(s);
+                            });
+                            //}
 
+                            buttons.addImageButton(Icon.pencilSmall, style, () -> {
+                                ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
+                                    s.tags.put("name", res);
+                                });
+                            });
+
+                            buttons.addImageButton(Icon.trash16Small, style, () -> {
+                                ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
+                                    schematics.remove(s);
+                                    rebuildPane[0].run();
+                                });
                             });
 
                         }).growX().height(50f);
                         b.row();
-                        b.add(s.name()).center().color(Color.lightGray).top().left().get().setEllipsis(true);
-                        b.row();
-                        b.add(new SchematicImage(s).setScaling(Scaling.fit).setName("border")).size(200f);
+                        b.stack(new SchematicImage(s).setScaling(Scaling.fit), new Table(n -> {
+                            n.top();
+                            n.table(Styles.black3, c -> {
+                                Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().get();
+                                label.setEllipsis(true);
+                                label.setAlignment(Align.center);
+                            }).growX().margin(1).pad(4).padBottom(0);
+                        })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
                         control.input.useSchematic(s);
                         hide();
                     }).pad(4).style(Styles.cleari).get();
 
-                    //BorderImage image = sel[0].find("border");
-                    //image.update(() -> image.borderColor = (sel[0].isOver() ? Pal.accent : Pal.gray));
+                    sel[0].getStyle().up = Tex.pane;
 
                     if(++i % 4 == 0){
                         t.row();
@@ -100,6 +131,38 @@ public class SchematicsDialog extends FloatingDialog{
         info.show(schematic);
     }
 
+    public void showExport(Schematic s){
+        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        dialog.cont.pane(p -> {
+           p.margin(10f);
+           p.table(Tex.button, t -> {
+               TextButtonStyle style = Styles.cleart;
+                t.defaults().size(280f, 60f).left();
+                t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style, () -> {
+
+                }).marginLeft(12f);
+                t.row();
+                t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
+                    dialog.hide();
+                    ui.showInfoFade("$copied");
+                    Core.app.setClipboardText(schematics.writeBase64(s));
+                }).marginLeft(12f);
+                t.row();
+                t.addImageTextButton("$schematic.exportfile", Icon.saveMapSmall, style, () -> platform.showFileChooser(false, schematicExtension, file -> {
+                    dialog.hide();
+                    try{
+                        Schematics.write(s, file);
+                    }catch(Exception e){
+                        ui.showException(e);
+                    }
+                })).marginLeft(12f);
+            });
+        });
+
+        dialog.addCloseButton();
+        dialog.show();
+    }
+
     public static class SchematicImage extends Image{
         public float scaling = 16f;
         public float thickness = 4f;
@@ -107,21 +170,27 @@ public class SchematicsDialog extends FloatingDialog{
 
         public SchematicImage(Schematic s){
             super(schematics.getPreview(s, PreviewRes.high));
+            setScaling(Scaling.fit);
         }
 
         @Override
         public void draw(){
+            boolean checked = getParent().getParent() instanceof Button
+                && ((Button)getParent().getParent()).isOver();
+
             Texture background = Core.assets.get("sprites/schematic-background.png", Texture.class);
             TextureRegion region = Draw.wrap(background);
             float xr = width / scaling;
             float yr = height / scaling;
             region.setU2(xr);
             region.setV2(yr);
+            Draw.color();
+            Draw.alpha(parentAlpha);
             Draw.rect(region, x + width/2f, y + height/2f, width, height);
 
             super.draw();
 
-            Draw.color(borderColor);
+            Draw.color(checked ? Pal.accent : borderColor);
             Draw.alpha(parentAlpha);
             Lines.stroke(Scl.scl(thickness));
             Lines.rect(x, y, width, height);
@@ -133,16 +202,31 @@ public class SchematicsDialog extends FloatingDialog{
 
         SchematicInfoDialog(){
             super("");
-            setFillParent(false);
+            setFillParent(true);
             addCloseButton();
         }
 
         public void show(Schematic schem){
             cont.clear();
-            title.setText(schem.name());
+            title.setText("[[" + Core.bundle.get("schematic") + "] " +schem.name());
 
-            cont.add(new BorderImage(schematics.getPreview(schem, PreviewRes.high))).maxSize(400f);
+            cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray);
             cont.row();
+            cont.add(new SchematicImage(schem)).maxSize(800f);
+            cont.row();
+
+            Array<ItemStack> arr = schem.requirements();
+            cont.table(r -> {
+                int i = 0;
+                for(ItemStack s : arr){
+                    r.addImage(s.item.icon(Cicon.small)).left();
+                    r.add(s.amount + "").padLeft(2).left().color(Color.lightGray).padRight(4);
+
+                    if(++i % 4 == 0){
+                        r.row();
+                    }
+                }
+            });
 
             show();
         }

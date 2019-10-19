@@ -23,6 +23,7 @@ public class SWorkshop implements SteamUGCCallback{
     private Map lastMap;
     private Array<FileHandle> mapFiles;
     private Array<FileHandle> modFiles;
+    private Array<FileHandle> schematicFiles;
     private ObjectMap<SteamUGCQuery, BiConsumer<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
 
     public SWorkshop(){
@@ -37,6 +38,7 @@ public class SWorkshop implements SteamUGCCallback{
         }).select(f -> f != null && f.list().length > 0);
 
         mapFiles = folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(mapExtension)).map(f -> f.list()[0]);
+        schematicFiles = folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(schematicExtension)).map(f -> f.list()[0]);
         modFiles = folders.select(f -> f.child("mod.json").exists());
 
         if(!mapFiles.isEmpty()){
@@ -53,6 +55,11 @@ public class SWorkshop implements SteamUGCCallback{
 
     public Array<FileHandle> getModFiles(){
         return modFiles;
+    }
+
+
+    public Array<FileHandle> getSchematicFiles(){
+        return schematicFiles;
     }
 
     public void publishMap(Map map){

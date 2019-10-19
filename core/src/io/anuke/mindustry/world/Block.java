@@ -118,7 +118,7 @@ public class Block extends BlockStorage{
     public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
-    public ItemStack[] requirements = new ItemStack[]{};
+    public ItemStack[] requirements = {};
     /** Category in place menu. */
     public Category category = Category.distribution;
     /** Cost of building this block; do not modify directly! */

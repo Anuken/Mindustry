@@ -305,7 +305,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
-        showTextInput(title, text, 24, def, confirmed);
+        showTextInput(title, text, 32, def, confirmed);
     }
 
     public void showTextInput(String titleText, String text, int textLength, String def, Consumer<String> confirmed){

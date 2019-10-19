@@ -53,19 +53,26 @@ public class Schematics implements Loadable{
     /** Load all schematics in the folder immediately.*/
     public void load(){
         all.clear();
-        for(FileHandle file : schematicDirectory.list()){
-            if(!file.extension().equals(schematicExtension)) continue;
 
-            try{
-                all.add(read(file));
-            }catch(IOException e){
-                e.printStackTrace();
-            }
+        for(FileHandle file : schematicDirectory.list()){
+            loadFile(file);
         }
 
+        platform.getExternalSchematics().each(this::loadFile);
+
         Core.app.post(() -> {
-            shadowBuffer = new FrameBuffer(maxSchematicSize + padding, maxSchematicSize + padding);
+            shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 2, maxSchematicSize + padding + 2);
         });
+    }
+
+    private void loadFile(FileHandle file){
+        if(!file.extension().equals(schematicExtension)) return;
+
+        try{
+            all.add(read(file));
+        }catch(IOException e){
+            Log.err(e);
+        }
     }
 
     public Array<Schematic> all(){
@@ -156,6 +163,13 @@ public class Schematics implements Loadable{
             write(schematic, schematicDirectory.child(Time.millis() + "." + schematicExtension));
         }catch(IOException e){
             Log.err(e);
+        }
+    }
+
+    public void remove(Schematic s){
+        all.remove(s);
+        if(s.file != null){
+            s.file.delete();
         }
     }
 
