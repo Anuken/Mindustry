@@ -92,6 +92,10 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.show();
     }
 
+    public void publishSchematic(Schematic schematic){
+
+    }
+
     public void viewMapListingInfo(Map map){
         String id = map.tags.get("steamid");
         long handle = Strings.parseLong(id, -1);

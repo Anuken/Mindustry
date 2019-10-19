@@ -71,7 +71,7 @@ public class DesktopInput extends InputHandler{
                             lastSchematic.tags.put("name", text);
                             schematics.add(lastSchematic);
                             ui.showInfoFade("$schematic.saved");
-                            //ui.schematics.showInfo(lastSchematic);
+                            ui.schematics.showInfo(lastSchematic);
                         });
                     }).colspan(2).size(250f, 50f);
                 });

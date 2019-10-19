@@ -31,6 +31,7 @@ public class SchematicsDialog extends FloatingDialog{
 
         shouldPause = true;
         addCloseButton();
+        buttons.addImageTextButton("$schematic.import", Icon.loadMapSmall, this::showImport);
         shown(this::setup);
     }
 
@@ -80,11 +81,9 @@ public class SchematicsDialog extends FloatingDialog{
                                 showInfo(s);
                             });
 
-                            //if(s.isWorkshop()){
                             buttons.addImageButton(Icon.loadMapSmall, style, () -> {
                                 showExport(s);
                             });
-                            //}
 
                             buttons.addImageButton(Icon.pencilSmall, style, () -> {
                                 ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
@@ -131,6 +130,49 @@ public class SchematicsDialog extends FloatingDialog{
         info.show(schematic);
     }
 
+    public void showImport(){
+        FloatingDialog dialog = new FloatingDialog("$editor.export");
+        dialog.cont.pane(p -> {
+            p.margin(10f);
+            p.table(Tex.button, t -> {
+                TextButtonStyle style = Styles.cleart;
+                t.defaults().size(280f, 60f).left();
+                t.row();
+                t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
+                    dialog.hide();
+                    try{
+                        schematics.add(schematics.readBase64(Core.app.getClipboardText()));
+                        ui.showInfoFade("$schematic.saved");
+                    }catch(Exception e){
+                        ui.showException(e);
+                    }
+                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("schematicBaseStart"));
+                t.row();
+                t.addImageTextButton("$schematic.importfile", Icon.saveMapSmall, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
+                    dialog.hide();
+
+                    try{
+                        Schematic s = Schematics.read(file);
+                        schematics.add(s);
+                        showInfo(s);
+                    }catch(Exception e){
+                        ui.showException(e);
+                    }
+                })).marginLeft(12f);
+                t.row();
+                if(steam){
+                    t.addImageTextButton("$schematic.browseworkshop", Icon.wikiSmall, style, () -> {
+                        dialog.hide();
+                        platform.openWorkshop();
+                    }).marginLeft(12f);
+                }
+            });
+        });
+
+        dialog.addCloseButton();
+        dialog.show();
+    }
+
     public void showExport(Schematic s){
         FloatingDialog dialog = new FloatingDialog("$editor.export");
         dialog.cont.pane(p -> {
@@ -138,10 +180,12 @@ public class SchematicsDialog extends FloatingDialog{
            p.table(Tex.button, t -> {
                TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
-                t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style, () -> {
+                if(steam){
+                    t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style, () -> {
 
-                }).marginLeft(12f);
-                t.row();
+                    }).marginLeft(12f);
+                    t.row();
+                }
                 t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
                     dialog.hide();
                     ui.showInfoFade("$copied");
