@@ -105,8 +105,18 @@ public class TechTreeDialog extends FloatingDialog{
         RadialTreeLayout layout = new RadialTreeLayout();
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
-        //bounds.y += nodeSize*1.5f;
+        float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
         copyInfo(node);
+
+        for(TechTreeNode n : nodes){
+            minx = Math.min(n.x - n.width/2f, minx);
+            maxx = Math.max(n.x + n.width/2f, maxx);
+            miny = Math.min(n.y - n.height/2f, miny);
+            maxy = Math.max(n.y + n.height/2f, maxy);
+        }
+        bounds = new Rectangle(minx, miny, maxx - minx, maxy - miny);
+        bounds.y += nodeSize*1.5f;
+        Log.info(bounds);
     }
 
     void copyInfo(LayoutNode node){
@@ -262,7 +272,7 @@ public class TechTreeDialog extends FloatingDialog{
             float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
             float rw = bounds.width, rh = bounds.height;
             rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
-            ry = Mathf.clamp(ry, pad, Core.graphics.getHeight() - rh - pad);
+            ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
         }

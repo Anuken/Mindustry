@@ -4,11 +4,11 @@ import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
@@ -252,6 +252,17 @@ public class DesktopInput extends InputHandler{
         return mode == breaking;
     }
 
+    @Override
+    public void buildPlacementUI(Table table){
+        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.row();
+        table.left().margin(0f).defaults().size(48f).left();
+
+        table.addImageButton(Icon.wikiSmall, Styles.clearPartiali, () -> {
+            ui.schematics.show();
+        });
+    }
+
     void pollInput(){
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
@@ -304,11 +315,6 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.schematic_flip_y)){
                 flipRequests(selectRequests, false);
             }
-        }
-
-        //TODO remove
-        if(Core.input.keyTap(KeyCode.V)){
-            ui.schematics.show();
         }
 
         if(sreq != null){

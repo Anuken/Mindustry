@@ -35,6 +35,11 @@ public class Fracker extends SolidPump{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void drawCracks(Tile tile){}
 
     @Override
