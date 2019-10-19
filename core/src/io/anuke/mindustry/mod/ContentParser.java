@@ -15,6 +15,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.content.TechTree.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
@@ -69,6 +70,7 @@ public class ContentParser{
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
     private Array<Runnable> reads = new Array<>();
+    private Array<Runnable> postreads = new Array<>();
     private LoadedMod currentMod;
     private Content currentContent;
 
@@ -138,6 +140,15 @@ public class ContentParser{
             }
 
             currentContent = block;
+
+            String[] research = {null};
+
+            //add research tech node
+            if(value.has("research")){
+                research[0] = value.get("research").asString();
+                value.remove("research");
+            }
+
             read(() -> {
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
@@ -165,8 +176,16 @@ public class ContentParser{
                 readFields(block, value, true);
 
                 //add research tech node
-                if(value.has("research")){
-                    TechTree.create(find(ContentType.block, value.get("research").asString()), block);
+                if(research[0] != null){
+                    Block parent = find(ContentType.block, research[0]);
+                    TechNode baseNode = TechTree.create(parent, block);
+
+                    postreads.add(() -> {
+                        TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(!parnode.children.contains(baseNode)){
+                            parnode.children.add(baseNode);
+                        }
+                    });
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -266,6 +285,7 @@ public class ContentParser{
     public void finishParsing(){
         try{
             reads.each(Runnable::run);
+            postreads.each(Runnable::run);
         }catch(Exception e){
             Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
@@ -386,9 +406,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    if(!child.name.equals("research")){
-                        Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
-                    }
+                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
