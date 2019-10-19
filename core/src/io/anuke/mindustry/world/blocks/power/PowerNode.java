@@ -8,11 +8,14 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.PlaceUtils;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -155,7 +158,9 @@ public class PowerNode extends PowerBlock{
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.test(other)){
-                tempTiles.add(other);
+                if (!insulated(tile, other)) {
+                    tempTiles.add(other);
+                }
             }
         });
 
@@ -346,4 +351,25 @@ public class PowerNode extends PowerBlock{
         Draw.color();
     }
 
+    protected boolean insulated(Tile tile, Tile other){
+        Array<Point2>points = PlaceUtils.normalizeDiagonal(tile.x, tile.y, other.x, other.y);
+
+        for(int i = 0; i < points.size; i++){
+            Point2 point = points.get(i);
+            Block block = world.tile(point.x, point.y).block();
+
+            if (block instanceof BlockPart){
+                block = world.tile(point.x, point.y).link().block();
+            }
+
+            if (block instanceof Wall){
+                Wall wall = (Wall) block;
+                if (wall.isInsulated()){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

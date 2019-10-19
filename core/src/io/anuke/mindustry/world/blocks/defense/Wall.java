@@ -10,6 +10,7 @@ import io.anuke.mindustry.world.meta.BlockGroup;
 
 public class Wall extends Block{
     protected int variants = 0;
+    protected boolean insulated;
 
     public Wall(String name){
         super(name);
@@ -52,4 +53,7 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health;
     }
 
+    public boolean isInsulated() {
+        return insulated;
+    }
 }

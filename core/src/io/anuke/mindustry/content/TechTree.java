@@ -179,6 +179,11 @@ public class TechTree implements ContentList{
                                     });
                                 });
                             });
+                            node(insulatorWall, () -> {
+                                node(insulatorWallLarge, () -> {
+
+                                });
+                            });
                         });
                     });
                 });
