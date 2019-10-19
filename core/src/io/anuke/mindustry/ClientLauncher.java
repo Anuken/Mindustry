@@ -9,6 +9,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -135,11 +136,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             long target = (1000 * 1000000) / targetfps; //target in nanos
             long elapsed = Time.timeSinceNanos(lastTime);
             if(elapsed < target){
-                try{
-                    Thread.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
-                }catch(InterruptedException ignored){
-                    //ignore
-                }
+                Threads.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
             }
         }
 
