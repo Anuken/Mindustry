@@ -109,6 +109,7 @@ public class TechTreeDialog extends FloatingDialog{
         copyInfo(node);
 
         for(TechTreeNode n : nodes){
+            if(!n.visible) continue;
             minx = Math.min(n.x - n.width/2f, minx);
             maxx = Math.max(n.x + n.width/2f, maxx);
             miny = Math.min(n.y - n.height/2f, miny);
