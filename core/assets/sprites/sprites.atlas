@@ -1334,6 +1334,13 @@ spore-press-top
   orig: 64, 64
   offset: 0, 0
   index: -1
+unloader-center
+  rotate: false
+  xy: 1701, 801
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 arc-heat
   rotate: false
   xy: 609, 1262
@@ -1784,7 +1791,7 @@ scorch4
   index: -1
 scorch5
   rotate: false
-  xy: 1765, 927
+  xy: 1735, 825
   size: 28, 100
   orig: 28, 100
   offset: 0, 0
@@ -4381,7 +4388,7 @@ item-lead-medium
   index: -1
 item-lead-small
   rotate: false
-  xy: 1701, 809
+  xy: 1765, 1003
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4416,7 +4423,7 @@ item-metaglass-medium
   index: -1
 item-metaglass-small
   rotate: false
-  xy: 1735, 901
+  xy: 1960, 1923
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4451,7 +4458,7 @@ item-phase-fabric-medium
   index: -1
 item-phase-fabric-small
   rotate: false
-  xy: 1960, 1923
+  xy: 449, 488
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4486,7 +4493,7 @@ item-plastanium-medium
   index: -1
 item-plastanium-small
   rotate: false
-  xy: 449, 488
+  xy: 245, 1162
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4521,7 +4528,7 @@ item-pyratite-medium
   index: -1
 item-pyratite-small
   rotate: false
-  xy: 245, 1162
+  xy: 809, 288
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4556,7 +4563,7 @@ item-sand-medium
   index: -1
 item-sand-small
   rotate: false
-  xy: 809, 288
+  xy: 1765, 977
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4591,14 +4598,14 @@ item-scrap-medium
   index: -1
 item-scrap-small
   rotate: false
-  xy: 1735, 875
+  xy: 1986, 1923
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-scrap-tiny
   rotate: false
-  xy: 1761, 831
+  xy: 173, 103
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4626,14 +4633,14 @@ item-silicon-medium
   index: -1
 item-silicon-small
   rotate: false
-  xy: 1761, 901
+  xy: 475, 488
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-silicon-tiny
   rotate: false
-  xy: 173, 103
+  xy: 215, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4661,14 +4668,14 @@ item-spore-pod-medium
   index: -1
 item-spore-pod-small
   rotate: false
-  xy: 1986, 1923
+  xy: 1765, 951
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-spore-pod-tiny
   rotate: false
-  xy: 215, 5
+  xy: 1021, 699
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4696,14 +4703,14 @@ item-surge-alloy-medium
   index: -1
 item-surge-alloy-small
   rotate: false
-  xy: 475, 488
+  xy: 1765, 925
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-surge-alloy-tiny
   rotate: false
-  xy: 1021, 699
+  xy: 1021, 681
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4731,14 +4738,14 @@ item-thorium-medium
   index: -1
 item-thorium-small
   rotate: false
-  xy: 1735, 849
+  xy: 1765, 899
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-thorium-tiny
   rotate: false
-  xy: 1021, 681
+  xy: 2027, 1235
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4766,14 +4773,14 @@ item-titanium-medium
   index: -1
 item-titanium-small
   rotate: false
-  xy: 1761, 875
+  xy: 1765, 873
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 item-titanium-tiny
   rotate: false
-  xy: 2027, 1235
+  xy: 1795, 1095
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4808,14 +4815,14 @@ liquid-cryofluid-medium
   index: -1
 liquid-cryofluid-small
   rotate: false
-  xy: 1761, 849
+  xy: 1765, 847
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-cryofluid-tiny
   rotate: false
-  xy: 1795, 1095
+  xy: 233, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4843,14 +4850,14 @@ liquid-oil-medium
   index: -1
 liquid-oil-small
   rotate: false
-  xy: 1701, 783
+  xy: 1735, 799
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-oil-tiny
   rotate: false
-  xy: 233, 5
+  xy: 2027, 1217
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4878,14 +4885,14 @@ liquid-slag-medium
   index: -1
 liquid-slag-small
   rotate: false
-  xy: 2012, 1923
+  xy: 1765, 821
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-slag-tiny
   rotate: false
-  xy: 2027, 1217
+  xy: 1795, 1077
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4913,14 +4920,14 @@ liquid-water-medium
   index: -1
 liquid-water-small
   rotate: false
-  xy: 1735, 823
+  xy: 2012, 1923
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 liquid-water-tiny
   rotate: false
-  xy: 1795, 1077
+  xy: 251, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -9090,6 +9097,96 @@ wraith-factory-icon-editor
   index: -1
 
 sprites4.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zone-craters
+  rotate: false
+  xy: 605, 767
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+zone-desertWastes
+  rotate: false
+  xy: 303, 461
+  size: 260, 260
+  orig: 260, 260
+  offset: 0, 0
+  index: -1
+zone-desolateRift
+  rotate: false
+  xy: 817, 163
+  size: 100, 350
+  orig: 100, 350
+  offset: 0, 0
+  index: -1
+zone-frozenForest
+  rotate: false
+  xy: 303, 1
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+zone-fungalPass
+  rotate: false
+  xy: 863, 773
+  size: 150, 250
+  orig: 150, 250
+  offset: 0, 0
+  index: -1
+zone-groundZero
+  rotate: false
+  xy: 303, 203
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+zone-nuclearComplex
+  rotate: false
+  xy: 605, 515
+  size: 250, 250
+  orig: 250, 250
+  offset: 0, 0
+  index: -1
+zone-overgrowth
+  rotate: false
+  xy: 1, 723
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+zone-ruinousShores
+  rotate: false
+  xy: 1, 421
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+zone-saltFlats
+  rotate: false
+  xy: 303, 723
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+zone-stainedMountains
+  rotate: false
+  xy: 1, 119
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+zone-tarFields
+  rotate: false
+  xy: 565, 263
+  size: 250, 250
+  orig: 250, 250
+  offset: 0, 0
+  index: -1
+
+sprites5.png
 size: 2048,1024
 format: RGBA8888
 filter: Nearest,Nearest
@@ -19105,95 +19202,5 @@ window-empty
   size: 27, 61
   split: 4, 4, 2, 2
   orig: 27, 61
-  offset: 0, 0
-  index: -1
-
-sprites5.png
-size: 1024,1024
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-zone-craters
-  rotate: false
-  xy: 605, 767
-  size: 256, 256
-  orig: 256, 256
-  offset: 0, 0
-  index: -1
-zone-desertWastes
-  rotate: false
-  xy: 303, 461
-  size: 260, 260
-  orig: 260, 260
-  offset: 0, 0
-  index: -1
-zone-desolateRift
-  rotate: false
-  xy: 817, 163
-  size: 100, 350
-  orig: 100, 350
-  offset: 0, 0
-  index: -1
-zone-frozenForest
-  rotate: false
-  xy: 303, 1
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-zone-fungalPass
-  rotate: false
-  xy: 863, 773
-  size: 150, 250
-  orig: 150, 250
-  offset: 0, 0
-  index: -1
-zone-groundZero
-  rotate: false
-  xy: 303, 203
-  size: 256, 256
-  orig: 256, 256
-  offset: 0, 0
-  index: -1
-zone-nuclearComplex
-  rotate: false
-  xy: 605, 515
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-zone-overgrowth
-  rotate: false
-  xy: 1, 723
-  size: 300, 300
-  orig: 300, 300
-  offset: 0, 0
-  index: -1
-zone-ruinousShores
-  rotate: false
-  xy: 1, 421
-  size: 300, 300
-  orig: 300, 300
-  offset: 0, 0
-  index: -1
-zone-saltFlats
-  rotate: false
-  xy: 303, 723
-  size: 300, 300
-  orig: 300, 300
-  offset: 0, 0
-  index: -1
-zone-stainedMountains
-  rotate: false
-  xy: 1, 119
-  size: 300, 300
-  orig: 300, 300
-  offset: 0, 0
-  index: -1
-zone-tarFields
-  rotate: false
-  xy: 565, 263
-  size: 250, 250
-  orig: 250, 250
   offset: 0, 0
   index: -1

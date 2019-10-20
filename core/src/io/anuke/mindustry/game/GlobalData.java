@@ -39,6 +39,9 @@ public class GlobalData{
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
+        files.addAll(screenshotDirectory.list());
+        files.addAll(modDirectory.list());
+        files.addAll(schematicDirectory.list());
         String base = Core.settings.getDataDirectory().path();
 
         try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){

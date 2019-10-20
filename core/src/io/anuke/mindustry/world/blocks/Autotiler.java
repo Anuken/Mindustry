@@ -33,20 +33,20 @@ public interface Autotiler{
             }
         });
 
-        return buildBlending(req.tile(), req.rotation, directionals);
+        return buildBlending(req.tile(), req.rotation, directionals, req.worldContext);
     }
 
-    default int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional){
+    default int[] buildBlending(Tile tile, int rotation, BuildRequest[] directional, boolean world){
         int[] blendresult = AutotilerHolder.blendresult;
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
         int num =
-        (blends(tile, rotation, directional, 2) && blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)) ? 0 :
-        (blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 3)) ? 1 :
-        (blends(tile, rotation, directional, 1) && blends(tile, rotation, directional, 2)) ? 2 :
-        (blends(tile, rotation, directional, 3) && blends(tile, rotation, directional, 2)) ? 3 :
-        blends(tile, rotation, directional, 1) ? 4 :
-        blends(tile, rotation, directional, 3) ? 5 :
+        (blends(tile, rotation, directional, 2, world) && blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 0 :
+        (blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 1 :
+        (blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 2, world)) ? 2 :
+        (blends(tile, rotation, directional, 3, world) && blends(tile, rotation, directional, 2, world)) ? 3 :
+        blends(tile, rotation, directional, 1, world) ? 4 :
+        blends(tile, rotation, directional, 3, world) ? 5 :
         -1;
         transformCase(num, blendresult);
         return blendresult;
@@ -70,7 +70,7 @@ public interface Autotiler{
         }
     }
 
-    default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction){
+    default boolean blends(Tile tile, int rotation, @Nullable BuildRequest[] directional, int direction, boolean checkWorld){
         int realDir = Mathf.mod(rotation - direction, 4);
         if(directional != null && directional[realDir] != null){
             BuildRequest req = directional[realDir];
@@ -78,7 +78,7 @@ public interface Autotiler{
                 return true;
             }
         }
-        return blends(tile, rotation, direction);
+        return checkWorld && blends(tile, rotation, direction);
     }
 
     default boolean blends(Tile tile, int rotation, int direction){

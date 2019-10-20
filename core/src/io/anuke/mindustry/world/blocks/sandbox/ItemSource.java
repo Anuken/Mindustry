@@ -1,8 +1,10 @@
 package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.arc.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -41,6 +43,11 @@ public class ItemSource extends Block{
     public void setBars(){
         super.setBars();
         bars.remove("items");
+    }
+
+    @Override
+    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+        drawRequestConfigCenter(req, content.item(req.config), "center");
     }
 
     @Override

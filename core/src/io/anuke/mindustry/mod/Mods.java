@@ -60,7 +60,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file, false));
+            loaded.add(loadMod(dest, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -180,7 +180,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(FileHandle file : platform.getExternalMods()){
+        for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
             try{
                 LoadedMod mod = loadMod(file, true);
                 if(mod.enabled()){
@@ -442,7 +442,7 @@ public class Mods implements Loadable{
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
-    public static class LoadedMod{
+    public static class LoadedMod implements Publishable{
         /** The location of this mod's zip file/folder on the disk. */
         public final FileHandle file;
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
@@ -453,8 +453,6 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
-        /** The ID of this mod in the workshop.*/
-        public @Nullable String workshopID;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
@@ -466,6 +464,63 @@ public class Mods implements Loadable{
 
         public boolean enabled(){
             return Core.settings.getBool(name + "-enabled", true);
+        }
+
+        @Override
+        public String getSteamID(){
+            return Core.settings.getString(name + "-steamid", null);
+        }
+
+        @Override
+        public void addSteamID(String id){
+            Core.settings.put(name + "-steamid", id);
+            Core.settings.save();
+        }
+
+        @Override
+        public void removeSteamID(){
+            Core.settings.remove(name + "-steamid");
+            Core.settings.save();
+        }
+
+        @Override
+        public String steamTitle(){
+            return meta.name;
+        }
+
+        @Override
+        public String steamDescription(){
+            return meta.description;
+        }
+
+        @Override
+        public String steamTag(){
+            return "mod";
+        }
+
+        @Override
+        public FileHandle createSteamFolder(String id){
+            return file;
+        }
+
+        @Override
+        public FileHandle createSteamPreview(String id){
+            return file.child("preview.png");
+        }
+
+        @Override
+        public boolean prePublish(){
+            if(!file.isDirectory()){
+                ui.showErrorMessage("$mod.folder.missing");
+                return false;
+            }
+
+            if(!file.child("preview.png").exists()){
+                ui.showErrorMessage("$mod.preview.missing");
+                return false;
+            }
+
+            return true;
         }
 
         @Override

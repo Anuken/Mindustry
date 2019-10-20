@@ -5,12 +5,18 @@ sourceSets.main.java.srcDirs = ["src/"]
 
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.*
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import com.badlogic.gdx.utils.IntArray
+import com.badlogic.gdx.utils.IntIntMap
+import com.badlogic.gdx.utils.IntMap
 
 import javax.imageio.ImageIO
-import java.awt.Graphics2D
+import java.awt.*
 import java.awt.image.BufferedImage
+import java.util.List
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
@@ -46,6 +52,7 @@ def antialias = { File file ->
     def color = new Color()
     def sum = new Color()
     def suma = new Color()
+    int[] p = new int[9]
 
     for(int x = 0; x < image.getWidth(); x++){
         for(int y = 0; y < image.getHeight(); y++){
@@ -59,20 +66,20 @@ def antialias = { File file ->
                 H = getRGB(x, y - 1),
                 I = getRGB(x + 1, y - 1)
 
-            int p1 = E, p2 = E, p3 = E, p4 = E, p5 = E, p6 = E, p7 = E, p8 = E, p9 = E
-            if(D == B && D != H && B != F) p1 = D
-            if((D == B && D != H && B != F && E != C) || (B == F && B != D && F != H && E != A)) p2 = B
-            if(B == F && B != D && F != H) p3 = F
-            if((H == D && H != F && D != B && E != A) || (D == B && D != H && B != F && E != G)) p4 = D
-            p5 = E
-            if((B == F && B != D && F != H && E != I) || (F == H && F != B && H != D && E != C)) p6 = F
-            if(H == D && H != F && D != B) p7 = D
-            if((F == H && F != B && H != D && E != G) || (H == D && H != F && D != B && E != I)) p8 = H
-            if(F == H && F != B && H != D) p9 = F
+            Arrays.fill(p, E);
+
+            if(D == B && D != H && B != F) p[0] = D
+            if((D == B && D != H && B != F && E != C) || (B == F && B != D && F != H && E != A)) p[1] = B
+            if(B == F && B != D && F != H) p[2] = F
+            if((H == D && H != F && D != B && E != A) || (D == B && D != H && B != F && E != G)) p[3] = D
+            if((B == F && B != D && F != H && E != I) || (F == H && F != B && H != D && E != C)) p[5] = F
+            if(H == D && H != F && D != B) p[6] = D
+            if((F == H && F != B && H != D && E != G) || (H == D && H != F && D != B && E != I)) p[7] = H
+            if(F == H && F != B && H != D) p[8] = F
 
             suma.set(0)
 
-            [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
+            for(int val : p){
                 Color.argb8888ToColor(color, val)
                 suma.r += color.r * color.a
                 suma.g += color.g * color.a
@@ -85,7 +92,7 @@ def antialias = { File file ->
             float total = 0
             sum.set(0)
 
-            [p1, p2, p3, p4, p5, p6, p7, p8, p9].each{ val ->
+            for(int val : p){
                 Color.argb8888ToColor(color, val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
@@ -318,11 +325,22 @@ task pack(dependsOn: classes){
             delete "../core/assets-raw/sprites_out/ui/icons"
         }
 
+        ExecutorService executor = Executors.newFixedThreadPool(16)
+
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
             if(file.isDirectory() || file.toString().replace("\\", "/").contains("zones/") || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
 
-            antialias(file.file)
+            executor.submit{
+                antialias(file.file)
+            }
+        }
+
+        executor.shutdown();
+        try{
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        }catch(InterruptedException e){
+            e.printStackTrace()
         }
 
         //pack normal sprites

@@ -41,11 +41,11 @@ public class ModsDialog extends FloatingDialog{
                                     mods.reloadContent();
                                     setup();
                                     ui.loadfrag.hide();
-                                }catch(Exception e){
+                                }catch(Throwable e){
                                     ui.showException(e);
                                 }
                             });
-                        }catch(Exception e){
+                        }catch(Throwable e){
                             ui.showException(e);
                         }
                     }, t -> Core.app.post(() -> ui.showException(t)));
@@ -101,14 +101,20 @@ public class ModsDialog extends FloatingDialog{
                                 setup();
                             }).height(50f).margin(8f).width(130f);
 
-                            title.addImageButton(mod.workshopID != null ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
-                                if(mod.workshopID == null){
+                            if(steam && !mod.hasSteamID()){
+                                title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
+                                    platform.publish(mod);
+                                }).size(50f);
+                            }
+
+                            title.addImageButton(mod.hasSteamID() ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
+                                if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);
                                         setup();
                                     });
                                 }else{
-                                    platform.viewListing(mod.workshopID);
+                                    platform.viewListing(mod);
                                 }
                             }).size(50f);
                         }).growX().left().padTop(-14f).padRight(-14f);
