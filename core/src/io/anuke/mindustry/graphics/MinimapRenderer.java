@@ -87,9 +87,9 @@ public class MinimapRenderer implements Disposable{
             float rx = (unit.x - rect.x) / rect.width * w;
             float ry = (unit.y - rect.y) / rect.width * h;
 
-            if (withLabels && unit instanceof Player) {
+            if(withLabels && unit instanceof Player){
                 Player pl = (Player) unit;
-                if (!pl.isLocal) {
+                if(!pl.isLocal){
                     // Only display names for other players.
                     drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
                 }
@@ -164,7 +164,7 @@ public class MinimapRenderer implements Disposable{
         }
     }
 
-    public void drawLabel(float x, float y, String text, Color color) {
+    public void drawLabel(float x, float y, String text, Color color){
         BitmapFont font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
