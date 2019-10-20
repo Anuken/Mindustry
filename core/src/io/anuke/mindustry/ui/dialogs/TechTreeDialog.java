@@ -42,6 +42,10 @@ public class TechTreeDialog extends FloatingDialog{
         margin(0f).marginBottom(8);
         cont.stack(view = new View(), items = new ItemsDisplay()).grow();
 
+        Events.on(ContentReloadEvent.class, e -> {
+            root = new TechTreeNode(TechTree.root, null);
+        });
+
         shown(() -> {
             checkNodes(root);
             treeLayout();
@@ -117,7 +121,6 @@ public class TechTreeDialog extends FloatingDialog{
         }
         bounds = new Rectangle(minx, miny, maxx - minx, maxy - miny);
         bounds.y += nodeSize*1.5f;
-        Log.info(bounds);
     }
 
     void copyInfo(LayoutNode node){

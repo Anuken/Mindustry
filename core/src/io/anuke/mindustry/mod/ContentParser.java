@@ -290,6 +290,7 @@ public class ContentParser{
             Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
+        postreads.clear();
     }
 
     /**
