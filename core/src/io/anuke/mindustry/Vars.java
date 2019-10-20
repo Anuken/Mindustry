@@ -33,6 +33,10 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Maximum number of broken blocks. TODO implement or remove.*/
     public static final int maxBrokenBlocks = 256;
+    /** Maximum schematic size.*/
+    public static final int maxSchematicSize = 32;
+    /** All schematic base64 starts with this string.*/
+    public static final String schematicBaseStart ="bXNjaAB";
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */
@@ -128,10 +132,14 @@ public class Vars implements Loadable{
     public static FileHandle saveDirectory;
     /** data subdirectory used for mods */
     public static FileHandle modDirectory;
+    /** data subdirectory used for schematics */
+    public static FileHandle schematicDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
+    /** schematic file extension */
+    public static final String schematicExtension = "msch";
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
@@ -146,6 +154,7 @@ public class Vars implements Loadable{
     public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
+    public static Schematics schematics = new Schematics();
 
     public static World world;
     public static Maps maps;
@@ -251,6 +260,7 @@ public class Vars implements Loadable{
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
+        schematicDirectory = dataDirectory.child("schematics/");
 
         modDirectory.mkdirs();
 

@@ -1334,6 +1334,13 @@ spore-press-top
   orig: 64, 64
   offset: 0, 0
   index: -1
+unloader-center
+  rotate: false
+  xy: 1667, 819
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 arc-heat
   rotate: false
   xy: 609, 1262
@@ -4444,7 +4451,7 @@ item-metaglass-medium
   index: -1
 item-metaglass-small
   rotate: false
-  xy: 1667, 827
+  xy: 1701, 861
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4479,7 +4486,7 @@ item-phase-fabric-medium
   index: -1
 item-phase-fabric-small
   rotate: false
-  xy: 1701, 861
+  xy: 1735, 895
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4514,7 +4521,7 @@ item-plastanium-medium
   index: -1
 item-plastanium-small
   rotate: false
-  xy: 1735, 895
+  xy: 1889, 999
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4549,7 +4556,7 @@ item-pyratite-medium
   index: -1
 item-pyratite-small
   rotate: false
-  xy: 1889, 999
+  xy: 1889, 973
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4584,7 +4591,7 @@ item-sand-medium
   index: -1
 item-sand-small
   rotate: false
-  xy: 1889, 973
+  xy: 1960, 1923
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4619,7 +4626,7 @@ item-scrap-medium
   index: -1
 item-scrap-small
   rotate: false
-  xy: 1960, 1923
+  xy: 449, 488
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4654,7 +4661,7 @@ item-silicon-medium
   index: -1
 item-silicon-small
   rotate: false
-  xy: 449, 488
+  xy: 245, 1162
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4689,7 +4696,7 @@ item-spore-pod-medium
   index: -1
 item-spore-pod-small
   rotate: false
-  xy: 245, 1162
+  xy: 809, 288
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4724,7 +4731,7 @@ item-surge-alloy-medium
   index: -1
 item-surge-alloy-small
   rotate: false
-  xy: 809, 288
+  xy: 1701, 835
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -4801,7 +4808,7 @@ item-titanium-small
   index: -1
 item-titanium-tiny
   rotate: false
-  xy: 1446, 665
+  xy: 1701, 817
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4843,7 +4850,7 @@ liquid-cryofluid-small
   index: -1
 liquid-cryofluid-tiny
   rotate: false
-  xy: 1464, 665
+  xy: 1446, 665
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4878,7 +4885,7 @@ liquid-oil-small
   index: -1
 liquid-oil-tiny
   rotate: false
-  xy: 1482, 665
+  xy: 1464, 665
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4913,7 +4920,7 @@ liquid-slag-small
   index: -1
 liquid-slag-tiny
   rotate: false
-  xy: 1500, 665
+  xy: 1482, 665
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4948,7 +4955,7 @@ liquid-water-small
   index: -1
 liquid-water-tiny
   rotate: false
-  xy: 1518, 665
+  xy: 1500, 665
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
