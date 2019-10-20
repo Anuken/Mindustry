@@ -31,15 +31,16 @@ public class Schematics implements Loadable{
     private static final byte version = 0;
 
     private static final int padding = 2;
+    private static final int resolution = 32;
 
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
-    private OrderedMap<Schematic, ObjectMap<PreviewRes, FrameBuffer>> previews = new OrderedMap<>();
+    private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
     private FrameBuffer shadowBuffer;
 
     public Schematics(){
         Events.on(DisposeEvent.class, e -> {
-            previews.each((schem, m) -> m.each((res, buffer) -> buffer.dispose()));
+            previews.each((schem, m) -> m.dispose());
             previews.clear();
             shadowBuffer.dispose();
         });
@@ -59,6 +60,8 @@ public class Schematics implements Loadable{
         }
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
+
+        all.sort();
 
         Core.app.post(() -> {
             shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 2, maxSchematicSize + padding + 2);
@@ -95,8 +98,8 @@ public class Schematics implements Loadable{
         }
     }
 
-    public void savePreview(Schematic schematic, PreviewRes res, FileHandle file){
-        FrameBuffer buffer = getBuffer(schematic, res);
+    public void savePreview(Schematic schematic, FileHandle file){
+        FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
         buffer.begin();
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
@@ -104,16 +107,18 @@ public class Schematics implements Loadable{
         buffer.end();
     }
 
-    public Texture getPreview(Schematic schematic, PreviewRes res){
-        return getBuffer(schematic, res).getTexture();
+    public Texture getPreview(Schematic schematic){
+        return getBuffer(schematic).getTexture();
     }
 
-    public FrameBuffer getBuffer(Schematic schematic, PreviewRes res){
-        if(!previews.getOr(schematic, ObjectMap::new).containsKey(res)){
-            int resolution = res.resolution;
+    public boolean hasPreview(Schematic schematic){
+        return previews.containsKey(schematic);
+    }
+
+    public FrameBuffer getBuffer(Schematic schematic){
+        if(!previews.containsKey(schematic)){
             Draw.blend();
             Draw.reset();
-            Time.mark();
             Tmp.m1.set(Draw.proj());
             Tmp.m2.set(Draw.trans());
             FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
@@ -170,11 +175,10 @@ public class Schematics implements Loadable{
             Draw.proj(Tmp.m1);
             Draw.trans(Tmp.m2);
 
-            previews.getOr(schematic, ObjectMap::new).put(res, buffer);
-            Log.info("Time taken: {0}", Time.elapsed());
+            previews.put(schematic, buffer);
         }
 
-        return previews.get(schematic).get(res);
+        return previews.get(schematic);
     }
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
@@ -196,6 +200,11 @@ public class Schematics implements Loadable{
         all.remove(s);
         if(s.file != null){
             s.file.delete();
+        }
+
+        if(previews.containsKey(s)){
+            previews.get(s).dispose();
+            previews.remove(s);
         }
     }
 
@@ -367,14 +376,4 @@ public class Schematics implements Loadable{
     }
 
     //endregion
-
-    public enum PreviewRes{
-        low(8), med(8), high(32);
-
-        public final int resolution;
-
-        PreviewRes(int resolution){
-            this.resolution = resolution;
-        }
-    }
 }

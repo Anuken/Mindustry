@@ -265,6 +265,8 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
+        if(scene.getKeyboardFocus() instanceof TextField) return;
+
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());

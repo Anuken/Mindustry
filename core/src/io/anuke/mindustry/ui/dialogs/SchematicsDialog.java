@@ -5,13 +5,13 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -109,10 +109,10 @@ public class SchematicsDialog extends FloatingDialog{
                         b.stack(new SchematicImage(s).setScaling(Scaling.fit), new Table(n -> {
                             n.top();
                             n.table(Styles.black3, c -> {
-                                Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().get();
+                                Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().maxWidth(200f - 8f).get();
                                 label.setEllipsis(true);
                                 label.setAlignment(Align.center);
-                            }).growX().margin(1).pad(4).padBottom(0);
+                            }).growX().margin(1).pad(4).maxWidth(200f - 8f).padBottom(0);
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
@@ -221,15 +221,30 @@ public class SchematicsDialog extends FloatingDialog{
         public float thickness = 4f;
         public Color borderColor = Pal.gray;
 
+        private Schematic schematic;
+        boolean set;
+
         public SchematicImage(Schematic s){
-            super(schematics.getPreview(s, PreviewRes.high));
+            super(Tex.clear);
             setScaling(Scaling.fit);
+            schematic = s;
+
+            if(schematics.hasPreview(s)){
+                setPreview();
+                set = true;
+            }
         }
 
         @Override
         public void draw(){
             boolean checked = getParent().getParent() instanceof Button
                 && ((Button)getParent().getParent()).isOver();
+
+            boolean wasSet = set;
+            if(!set){
+                Core.app.post(this::setPreview);
+                set = true;
+            }
 
             Texture background = Core.assets.get("sprites/schematic-background.png", Texture.class);
             TextureRegion region = Draw.wrap(background);
@@ -241,13 +256,23 @@ public class SchematicsDialog extends FloatingDialog{
             Draw.alpha(parentAlpha);
             Draw.rect(region, x + width/2f, y + height/2f, width, height);
 
-            super.draw();
+            if(wasSet){
+                super.draw();
+            }else{
+                Draw.rect(Icon.loading.getRegion(), x + width/2f, y + height/2f, width/4f, height/4f);
+            }
 
             Draw.color(checked ? Pal.accent : borderColor);
             Draw.alpha(parentAlpha);
             Lines.stroke(Scl.scl(thickness));
             Lines.rect(x, y, width, height);
             Draw.reset();
+        }
+
+        private void setPreview(){
+            TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(schematics.getPreview(schematic)));
+            setDrawable(draw);
+            setScaling(Scaling.fit);
         }
     }
 
