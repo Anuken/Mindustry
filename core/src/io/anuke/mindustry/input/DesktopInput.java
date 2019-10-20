@@ -361,12 +361,12 @@ public class DesktopInput extends InputHandler{
             lastLineY = cursorY;
         }
 
-        if(Core.input.keyTap(Binding.move)) {
-            if (clickStart == 0) {
-                clickStart = Time.millis();
-                clickTarget = null;
-            }
-        }
+//        if(Core.input.keyTap(Binding.move)) {
+//            if (clickStart == 0) {
+//                clickStart = Time.millis();
+//                clickTarget = null;
+//            }
+//        }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
@@ -423,15 +423,16 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.move)){
-            float clickDuration = Time.timeSinceMillis(clickStart);
-            clickStart = 0;
+//            float clickDuration = Time.timeSinceMillis(clickStart);
+//            clickStart = 0;
+//
+//            int singleClickDuration = 200;// TODO make this a setting?
 
-            int singleClickDuration = 200;// TODO make this a setting?
-
-            if (clickDuration < singleClickDuration) {
-                if (!isPlacing() && !isDroppingItem() && !isBreaking() && (player.getMineTile() == null || player.getMineTile() != tileAtMouse()))
-               clickTarget = tileAtMouse();
-            }
+//            if (clickDuration < singleClickDuration) {
+                if (!isPlacing() && !isDroppingItem() && !isBreaking() && (player.getMineTile() == null || player.getMineTile() != tileAtMouse())){
+                    clickTarget = tileAtMouse();
+                }
+//            }
         }
 
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
