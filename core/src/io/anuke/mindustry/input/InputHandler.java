@@ -708,7 +708,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
         for(BuildRequest req : player.buildQueue()){
-            if(req != ignore && !req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))){
+            if(req != ignore
+                    && !req.breaking
+                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))
+            ){
                 return false;
             }
         }
@@ -720,6 +724,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
+        BuildRequest req = getRequest(x, y);
+        if(req != null){
+            player.buildQueue().remove(req);
+        }
         player.addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 
