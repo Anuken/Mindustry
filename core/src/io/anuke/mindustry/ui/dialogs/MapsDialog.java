@@ -43,7 +43,7 @@ public class MapsDialog extends FloatingDialog{
     void setup(){
         buttons.clearChildren();
 
-        if(Core.graphics.isPortrait() && !ios){
+        if(Core.graphics.isPortrait()){
             buttons.addImageTextButton("$back", Icon.arrowLeft, this::hide).size(210f*2f, 64f).colspan(2);
             buttons.row();
         }else{
@@ -205,7 +205,7 @@ public class MapsDialog extends FloatingDialog{
 
         table.addImageTextButton(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.linkSmall : Icon.trash16Small, () -> {
             if(map.workshop && steam){
-                platform.viewMapListing(map);
+                platform.viewListing(map);
             }else{
                 ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
                     maps.removeMap(map);

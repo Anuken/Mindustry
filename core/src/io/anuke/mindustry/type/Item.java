@@ -3,7 +3,6 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
-import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.ui.*;
@@ -11,9 +10,8 @@ import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.content;
 
-public class Item extends UnlockableContent implements Comparable<Item>{
+public class Item extends UnlockableContent{
     public final Color color;
-    private TextureRegion[] regions;
 
     /** type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}. */
     public ItemType type = ItemType.resource;
@@ -39,17 +37,8 @@ public class Item extends UnlockableContent implements Comparable<Item>{
         this.description = Core.bundle.getOrNull("item." + this.name + ".description");
     }
 
-    @Override
-    public void load(){
-        regions = new TextureRegion[Icon.values().length];
-        for(int i = 0; i < regions.length; i++){
-            Icon icon = Icon.values()[i];
-            regions[i] = Core.atlas.find(icon == Icon.large ? "item-" + name : "item-" + name + "-" + icon.name());
-        }
-    }
-
-    public TextureRegion icon(Icon icon){
-        return regions[icon.ordinal()];
+    public Item(String name){
+        this(name, new Color(Color.black));
     }
 
     @Override
@@ -68,37 +57,13 @@ public class Item extends UnlockableContent implements Comparable<Item>{
     }
 
     @Override
-    public TextureRegion getContentIcon(){
-        return icon(Icon.large);
-    }
-
-    @Override
     public String toString(){
         return localizedName();
     }
 
     @Override
-    public int compareTo(Item item){
-        return Integer.compare(id, item.id);
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.item;
-    }
-
-    public enum Icon{
-        small(8 * 2),
-        medium(8 * 3),
-        large(8 * 4),
-        xlarge(8 * 5),
-        xxlarge(8 * 6);
-
-        public final int size;
-
-        Icon(int size){
-            this.size = size;
-        }
     }
 
     /** Allocates a new array containing all items that generate ores. */

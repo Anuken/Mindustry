@@ -9,6 +9,11 @@ public class LiquidStack{
         this.amount = amount;
     }
 
+    /** serialization only*/
+    protected LiquidStack(){
+
+    }
+
     @Override
     public String toString(){
         return "LiquidStack{" +

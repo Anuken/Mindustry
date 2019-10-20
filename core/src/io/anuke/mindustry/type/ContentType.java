@@ -13,5 +13,7 @@ public enum ContentType{
     effect,
     zone,
     loadout,
-    typeid
+    typeid;
+
+    public static final ContentType[] all = values();
 }

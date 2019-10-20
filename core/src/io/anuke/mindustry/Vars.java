@@ -18,19 +18,25 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
-import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;
 import java.util.*;
 
-import static io.anuke.arc.Core.settings;
+import static io.anuke.arc.Core.*;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
+    /** Maximum number of broken blocks. TODO implement or remove.*/
+    public static final int maxBrokenBlocks = 256;
+    /** Maximum schematic size.*/
+    public static final int maxSchematicSize = 32;
+    /** All schematic base64 starts with this string.*/
+    public static final String schematicBaseStart ="bXNjaAB";
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */
@@ -43,6 +49,10 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://mins.us.to/report";
+    /** URL the links to the wiki's modding guide.*/
+    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
+    /** URL the links to the wiki's modding guide.*/
+    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
     public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
     /** maximum distance between mine and core that supports automatic transferring */
@@ -120,16 +130,21 @@ public class Vars implements Loadable{
     public static FileHandle tmpDirectory;
     /** data subdirectory used for saves */
     public static FileHandle saveDirectory;
-    /** data subdirectory used for plugins */
-    public static FileHandle pluginDirectory;
+    /** data subdirectory used for mods */
+    public static FileHandle modDirectory;
+    /** data subdirectory used for schematics */
+    public static FileHandle schematicDirectory;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
+    /** schematic file extension */
+    public static final String schematicExtension = "msch";
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
 
+    public static FileTree tree;
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
@@ -138,7 +153,8 @@ public class Vars implements Loadable{
     public static DefaultWaves defaultWaves;
     public static LoopControl loops;
     public static Platform platform = new Platform(){};
-    public static Plugins plugins;
+    public static Mods mods;
+    public static Schematics schematics = new Schematics();
 
     public static World world;
     public static Maps maps;
@@ -193,6 +209,9 @@ public class Vars implements Loadable{
 
         Version.init();
 
+        if(tree == null) tree = new FileTree();
+        if(mods == null) mods = new Mods();
+
         content = new ContentLoader();
         loops = new LoopControl();
         defaultWaves = new DefaultWaves();
@@ -240,15 +259,19 @@ public class Vars implements Loadable{
         mapPreviewDirectory = dataDirectory.child("previews/");
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
-        pluginDirectory = dataDirectory.child("plugins/");
+        modDirectory = dataDirectory.child("mods/");
+        schematicDirectory = dataDirectory.child("schematics/");
 
+        modDirectory.mkdirs();
+
+        mods.load();
         maps.load();
     }
 
     public static void loadSettings(){
         Core.settings.setAppName(appName);
 
-        if(steam){
+        if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){
             Core.settings.setDataDirectory(Core.files.local("saves/"));
         }
 

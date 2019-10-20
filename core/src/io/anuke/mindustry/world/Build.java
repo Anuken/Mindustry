@@ -73,6 +73,10 @@ public class Build{
             return false;
         }
 
+        if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == waveTeam)){
+            return false;
+        }
+
         if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset() - type.size*tilesize/2f, y * tilesize + type.offset() - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
             return false;
         }

@@ -8,9 +8,9 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
-import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.dialogs.*;
 
 import static io.anuke.mindustry.Vars.mobile;
@@ -24,18 +24,18 @@ public interface Platform{
     default void inviteFriends(){}
 
     /** Steam: Share a map on the workshop.*/
-    default void publishMap(Map map){}
+    default void publish(Publishable pub){}
+
+    /** Steam: View a listing on the workshop.*/
+    default void viewListing(Publishable pub){}
+
+    /** Steam: View a listing on the workshop by an ID.*/
+    default void viewListingID(String mapid){}
 
     /** Steam: Return external workshop maps to be loaded.*/
-    default Array<FileHandle> getExternalMaps(){
-        return Array.with();
+    default Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+        return new Array<>(0);
     }
-
-    /** Steam: View a map listing on the workshop.*/
-    default void viewMapListing(Map map){}
-
-    /** Steam: View a map listing on the workshop.*/
-    default void viewMapListing(String mapid){}
 
     /** Steam: Open workshop for maps.*/
     default void openWorkshop(){}

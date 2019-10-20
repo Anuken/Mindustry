@@ -68,6 +68,8 @@ public class UI implements ApplicationListener, Loadable{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
+    public SchematicsDialog schematics;
+    public ModsDialog mods;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -108,6 +110,7 @@ public class UI implements ApplicationListener, Loadable{
         ClickListener.clicked = () -> Sounds.press.play();
 
         Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
         loadExtraCursors();
@@ -183,6 +186,13 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.act();
         Core.scene.draw();
 
+        if(Core.input.keyTap(KeyCode.MOUSE_LEFT) && Core.scene.getKeyboardFocus() instanceof TextField){
+            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            if(!(e instanceof TextField)){
+                Core.scene.setKeyboardFocus(null);
+            }
+        }
+
         //draw overlay for buttons
         if(state.rules.tutorial){
             control.tutorial.draw();
@@ -222,6 +232,8 @@ public class UI implements ApplicationListener, Loadable{
         deploy = new DeployDialog();
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
+        mods = new ModsDialog();
+        schematics = new SchematicsDialog();
 
         Group group = Core.scene.root;
 
@@ -235,7 +247,6 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
@@ -281,7 +292,7 @@ public class UI implements ApplicationListener, Loadable{
             new Dialog(titleText){{
                 cont.margin(30).add(dtext).padRight(6f);
                 TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.addField(def, t -> {}).size(170f, 50f).get();
+                TextField field = cont.addField(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.addButton("$ok", () -> {
@@ -294,7 +305,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
-        showTextInput(title, text, 24, def, confirmed);
+        showTextInput(title, text, 32, def, confirmed);
     }
 
     public void showTextInput(String titleText, String text, int textLength, String def, Consumer<String> confirmed){
@@ -305,7 +316,7 @@ public class UI implements ApplicationListener, Loadable{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.remove());
-        table.top().add(info).padTop(10);
+        table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }
 
@@ -336,6 +347,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMesage(exc);
 
@@ -358,11 +370,15 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showText(String titleText, String text){
+        showText(titleText, text, Align.center);
+    }
+
+    public void showText(String titleText, String text, int align){
         new Dialog(titleText){{
             cont.row();
             cont.addImage().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
             cont.row();
-            cont.add(text).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
             buttons.addButton("$ok", this::hide).size(90, 50).pad(4);
         }}.show();
@@ -407,6 +423,34 @@ public class UI implements ApplicationListener, Loadable{
         }
         dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
         dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.show();
+    }
+
+
+    public void showCustomConfirm(String title, String text, String yes, String no, Runnable confirmed){
+        FloatingDialog dialog = new FloatingDialog(title);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
+        dialog.buttons.addButton(no, dialog::hide);
+        dialog.buttons.addButton(yes, () -> {
+            dialog.hide();
+            confirmed.run();
+        });
+        dialog.keyDown(KeyCode.ESCAPE, dialog::hide);
+        dialog.keyDown(KeyCode.BACK, dialog::hide);
+        dialog.show();
+    }
+
+    public void showOkText(String title, String text, Runnable confirmed){
+        FloatingDialog dialog = new FloatingDialog(title);
+        dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.buttons.defaults().size(200f, 54f).pad(2f);
+        dialog.setFillParent(false);
+        dialog.buttons.addButton("$ok", () -> {
+            dialog.hide();
+            confirmed.run();
+        });
         dialog.show();
     }
 

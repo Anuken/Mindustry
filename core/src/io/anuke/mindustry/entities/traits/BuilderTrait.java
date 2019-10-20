@@ -1,12 +1,12 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
@@ -104,7 +104,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
         if(current.breaking){
             entity.deconstruct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier);
+            if(entity.construct(unit, core, 1f / entity.buildCost * Time.delta() * getBuildPower(tile) * state.rules.buildSpeedMultiplier, current.hasConfig)){
+                if(current.hasConfig){
+                    Call.onTileConfig(null, tile, current.config);
+                }
+            }
         }
 
         current.progress = entity.progress;
@@ -184,23 +188,38 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
     default void addBuildRequest(BuildRequest place){
+        addBuildRequest(place, true);
+    }
+
+    /** Add another build requests to the queue, if it doesn't exist there yet. */
+    default void addBuildRequest(BuildRequest place, boolean tail){
+        BuildRequest replace = null;
         for(BuildRequest request : buildQueue()){
             if(request.x == place.x && request.y == place.y){
-                return;
+                replace = request;
+                break;
             }
+        }
+        if(replace != null){
+            buildQueue().remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
         if(tile != null && tile.entity instanceof BuildEntity){
             place.progress = tile.<BuildEntity>entity().progress;
         }
-        buildQueue().addLast(place);
+        if(tail){
+            buildQueue().addLast(place);
+        }else{
+            buildQueue().addFirst(place);
+        }
     }
 
     /**
      * Return the build requests currently active, or the one at the top of the queue.
      * May return null.
      */
-    default @Nullable BuildRequest buildRequest(){
+    default @Nullable
+    BuildRequest buildRequest(){
         return buildQueue().size == 0 ? null : buildQueue().first();
     }
 
@@ -253,12 +272,26 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
     /** Class for storing build requests. Can be either a place or remove request. */
     class BuildRequest{
-        public final int x, y, rotation;
-        public final Block block;
-        public final boolean breaking;
+        /** Position and rotation of this request. */
+        public int x, y, rotation;
+        /** Block being placed. If null, this is a breaking request.*/
+        public @Nullable Block block;
+        /** Whether this is a break request.*/
+        public boolean breaking;
+        /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
+        public boolean hasConfig;
+        /** Config int. Not used unless hasConfig is true.*/
+        public int config;
+        /** Original position, only used in schematics.*/
+        public int originalX, originalY, originalWidth, originalHeight;
 
+        /** Last progress.*/
         public float progress;
-        public boolean initialized;
+        /** Whether construction has started for this request.*/
+        public boolean initialized, worldContext = true;
+
+        /** Visual scale. Used only for rendering.*/
+        public float animScale = 0f;
 
         /** This creates a build request. */
         public BuildRequest(int x, int y, int rotation, Block block){
@@ -278,7 +311,67 @@ public interface BuilderTrait extends Entity, TeamTrait{
             this.breaking = true;
         }
 
-        public Tile tile(){
+        public BuildRequest(){
+
+        }
+
+        public BuildRequest copy(){
+            BuildRequest copy = new BuildRequest();
+            copy.x = x;
+            copy.y = y;
+            copy.rotation = rotation;
+            copy.block = block;
+            copy.breaking = breaking;
+            copy.hasConfig = hasConfig;
+            copy.config = config;
+            copy.originalX = originalX;
+            copy.originalY = originalY;
+            copy.progress = progress;
+            copy.initialized = initialized;
+            copy.animScale = animScale;
+            return copy;
+        }
+
+        public BuildRequest original(int x, int y, int originalWidth, int originalHeight){
+            originalX = x;
+            originalY = y;
+            this.originalWidth = originalWidth;
+            this.originalHeight = originalHeight;
+            return this;
+        }
+
+        public Rectangle bounds(Rectangle rect){
+            if(breaking){
+                return rect.set(-100f, -100f, 0f, 0f);
+            }else{
+                return block.bounds(x, y, rect);
+            }
+        }
+
+        public BuildRequest set(int x, int y, int rotation, Block block){
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.block = block;
+            this.breaking = false;
+            return this;
+        }
+
+        public float drawx(){
+            return x*tilesize + block.offset();
+        }
+
+        public float drawy(){
+            return y*tilesize + block.offset();
+        }
+
+        public BuildRequest configure(int config){
+            this.config = config;
+            this.hasConfig = true;
+            return this;
+        }
+
+        public @Nullable Tile tile(){
             return world.tile(x, y);
         }
 

@@ -152,7 +152,7 @@ project(":desktop"){
         compile "com.code-disaster.steamworks4j:steamworks4j-server:$steamworksVersion"
 
         compile arcModule("backends:backend-sdl")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.2'
+        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 
@@ -195,12 +195,14 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
-        outputs.upToDateWhen{ false } 
+        outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
     }
 
     dependencies{
+        System.properties["corePath"] = file(".").toString()
+        
         if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{

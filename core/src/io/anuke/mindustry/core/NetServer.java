@@ -94,14 +94,26 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
-                con.kick(KickReason.banned);
-                return;
-            }
-
             if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
                 con.kick(KickReason.playerLimit);
                 return;
+            }
+
+            Array<String> extraMods = packet.mods.copy();
+            Array<String> missingMods = mods.getIncompatibility(extraMods);
+
+            if(!extraMods.isEmpty() || !missingMods.isEmpty()){
+                //can't easily be localized since kick reasons can't have formatted text with them
+                StringBuilder result = new StringBuilder("[accent]Incompatible mods![]\n\n");
+                if(!missingMods.isEmpty()){
+                    result.append("Missing:[lightgray]\n").append("> ").append(missingMods.toString("\n> "));
+                    result.append("[]\n");
+                }
+
+                if(!extraMods.isEmpty()){
+                    result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
+                }
+                con.kick(result.toString());
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
@@ -198,6 +210,11 @@ public class NetServer implements ApplicationListener{
         });
 
         registerCommands();
+    }
+
+    @Override
+    public void init(){
+        mods.each(mod -> mod.registerClientCommands(clientCommands));
     }
 
     private void registerCommands(){
@@ -335,6 +352,11 @@ public class NetServer implements ApplicationListener{
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
+                if(player.isLocal){
+                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    return;
+                }
+
                 //hosts can vote all they want
                 if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");

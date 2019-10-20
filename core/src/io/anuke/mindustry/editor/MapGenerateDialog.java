@@ -388,7 +388,7 @@ public class MapGenerateDialog extends FloatingDialog{
                             GenTile tile = buffer1[px][py];
                             color = MapIO.colorFor(content.block(tile.floor), content.block(tile.block), content.block(tile.ore), Team.derelict);
                         }
-                        pixmap.drawPixel(px, pixmap.getHeight() - 1 - py, color);
+                        pixmap.draw(px, pixmap.getHeight() - 1 - py, color);
                     }
                 }
 
