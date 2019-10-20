@@ -194,6 +194,7 @@ public class SchematicsDialog extends FloatingDialog{
                     t.addImageTextButton("$schematic.shareworkshop", Icon.wikiSmall, style,
                         () -> platform.publish(s)).marginLeft(12f);
                     t.row();
+                    dialog.hide();
                 }
                 t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
                     dialog.hide();

@@ -73,7 +73,7 @@ public class DesktopInput extends InputHandler{
                             ui.showInfoFade("$schematic.saved");
                             ui.schematics.showInfo(lastSchematic);
                         });
-                    }).colspan(2).size(250f, 50f);
+                    }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -175,6 +175,7 @@ public class DesktopInput extends InputHandler{
 
         if(mode != none){
             selectRequests.clear();
+            lastSchematic = null;
         }
 
         if(player.isShooting && !canShoot()){

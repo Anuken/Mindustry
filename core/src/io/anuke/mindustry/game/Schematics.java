@@ -64,7 +64,7 @@ public class Schematics implements Loadable{
         all.sort();
 
         Core.app.post(() -> {
-            shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 2, maxSchematicSize + padding + 2);
+            shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8);
         });
     }
 
@@ -162,6 +162,7 @@ public class Schematics implements Loadable{
             //draw requests
             requests.each(req -> {
                 req.animScale = 1f;
+                req.worldContext = false;
                 req.block.drawRequestRegion(req, requests::each);
             });
 
@@ -190,8 +191,11 @@ public class Schematics implements Loadable{
     public void add(Schematic schematic){
         all.add(schematic);
         try{
-            write(schematic, schematicDirectory.child(Time.millis() + "." + schematicExtension));
-        }catch(IOException e){
+            FileHandle file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
+            write(schematic, file);
+            schematic.file = file;
+        }catch(Exception e){
+            ui.showException(e);
             Log.err(e);
         }
     }
@@ -215,6 +219,8 @@ public class Schematics implements Loadable{
         y = result.y;
         x2 = result.x2;
         y2 = result.y2;
+
+        int ox = x, oy = y, ox2 = x2, oy2 = y2;
 
         Array<Stile> tiles = new Array<>();
 
@@ -247,17 +253,19 @@ public class Schematics implements Loadable{
 
         int width = x2 - x + 1, height = y2 - y + 1;
         int offsetX = -x, offsetY = -y;
-        for(int cx = x; cx <= x2; cx++){
-            for(int cy = y; cy <= y2; cy++){
-                Tile tile = world.tile(cx, cy);
+        IntSet counted = new IntSet();
+        for(int cx = ox; cx <= ox2; cx++){
+            for(int cy = oy; cy <= oy2; cy++){
+                Tile tile = world.ltile(cx, cy);
 
-                if(tile != null && tile.entity != null){
+                if(tile != null && tile.entity != null && !counted.contains(tile.pos())){
                     int config = tile.entity.config();
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);
                     }
 
-                    tiles.add(new Stile(tile.block(), cx + offsetX, cy + offsetY, config, tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.x + offsetX, tile.y + offsetY, config, tile.rotation()));
+                    counted.add(tile.pos());
                 }
             }
         }

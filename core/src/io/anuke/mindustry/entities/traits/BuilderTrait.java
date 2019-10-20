@@ -283,7 +283,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
         /** Last progress.*/
         public float progress;
         /** Whether construction has started for this request.*/
-        public boolean initialized;
+        public boolean initialized, worldContext = true;
 
         /** Visual scale. Used only for rendering.*/
         public float animScale = 0f;
