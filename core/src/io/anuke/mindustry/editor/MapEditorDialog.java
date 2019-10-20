@@ -149,15 +149,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(steam){
             menu.cont.addImageTextButton("$editor.publish.workshop", Icon.linkSmall, () -> {
                 Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
+
                 if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
-                    platform.viewListing(editor.getTags().get("steamid"));
+                    platform.viewListingID(editor.getTags().get("steamid"));
                     return;
                 }
 
                 Map map = save();
 
                 if(editor.getTags().containsKey("steamid") && map != null){
-                    platform.viewMapListingInfo(map);
+                    platform.viewListing(map);
                     return;
                 }
 
@@ -173,7 +174,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     return;
                 }
 
-                platform.publishMap(map);
+                platform.publish(map);
             }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
