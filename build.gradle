@@ -194,12 +194,14 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
-        outputs.upToDateWhen{ false } 
+        outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
     }
 
     dependencies{
+        System.properties["corePath"] = file(".").toString()
+        
         if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{
