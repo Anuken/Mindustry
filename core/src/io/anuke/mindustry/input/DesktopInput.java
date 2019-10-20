@@ -243,6 +243,7 @@ public class DesktopInput extends InputHandler{
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
+        selectRequests.clear();
         selectRequests.addAll(schematics.toRequests(schem, schematicX, schematicY));
         mode = none;
     }
