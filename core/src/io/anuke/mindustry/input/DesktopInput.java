@@ -51,7 +51,7 @@ public class DesktopInput extends InputHandler{
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic).key.name())).style(Styles.outlineLabel);
+                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.name())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
@@ -129,7 +129,7 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        if(Core.input.keyDown(Binding.schematic)){
+        if(Core.input.keyDown(Binding.schematic_select)){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -289,9 +289,13 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic)){
+        if(Core.input.keyTap(Binding.schematic_select)){
             schemX = rawCursorX;
             schemY = rawCursorY;
+        }
+
+        if(Core.input.keyTap(Binding.schematic_menu)){
+            ui.schematics.show();
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
@@ -299,7 +303,7 @@ public class DesktopInput extends InputHandler{
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic)){
+        if(Core.input.keyRelease(Binding.schematic_select)){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){

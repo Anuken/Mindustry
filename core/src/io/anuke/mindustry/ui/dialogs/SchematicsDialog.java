@@ -88,6 +88,8 @@ public class SchematicsDialog extends FloatingDialog{
                             buttons.addImageButton(Icon.pencilSmall, style, () -> {
                                 ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
                                     s.tags.put("name", res);
+                                    s.save();
+                                    rebuildPane[0].run();
                                 });
                             });
 
@@ -142,15 +144,18 @@ public class SchematicsDialog extends FloatingDialog{
                 TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.addImageTextButton("$schematic.copy", Icon.copySmall, style, () -> {
+                t.addImageTextButton("$schematic.copy.import", Icon.copySmall, style, () -> {
                     dialog.hide();
                     try{
-                        schematics.add(schematics.readBase64(Core.app.getClipboardText()));
+                        Schematic s = schematics.readBase64(Core.app.getClipboardText());
+                        schematics.add(s);
+                        setup();
                         ui.showInfoFade("$schematic.saved");
+                        showInfo(s);
                     }catch(Exception e){
                         ui.showException(e);
                     }
-                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("schematicBaseStart"));
+                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));
                 t.row();
                 t.addImageTextButton("$schematic.importfile", Icon.saveMapSmall, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
                     dialog.hide();
@@ -158,6 +163,7 @@ public class SchematicsDialog extends FloatingDialog{
                     try{
                         Schematic s = Schematics.read(file);
                         schematics.add(s);
+                        setup();
                         showInfo(s);
                     }catch(Exception e){
                         ui.showException(e);
