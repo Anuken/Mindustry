@@ -801,6 +801,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         textFadeTime = 0f;
         target = null;
         moveTarget = null;
+        isShooting = isBoosting = isTransferring = isTyping = false;
         spawner = lastSpawner = null;
         health = maxHealth();
         mining = null;

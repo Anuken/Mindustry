@@ -1348,6 +1348,13 @@ spore-press-top
   orig: 64, 64
   offset: 0, 0
   index: -1
+unloader-center
+  rotate: false
+  xy: 1735, 855
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 arc-heat
   rotate: false
   xy: 609, 1262
@@ -1770,14 +1777,14 @@ scale_marker
   index: -1
 scorch1
   rotate: false
-  xy: 1735, 787
+  xy: 1735, 753
   size: 28, 100
   orig: 28, 100
   offset: 0, 0
   index: -1
 scorch2
   rotate: false
-  xy: 1765, 787
+  xy: 1765, 753
   size: 28, 100
   orig: 28, 100
   offset: 0, 0
@@ -4332,7 +4339,7 @@ item-copper-small
   index: -1
 item-copper-tiny
   rotate: false
-  xy: 1735, 769
+  xy: 1017, 691
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4367,7 +4374,7 @@ item-graphite-small
   index: -1
 item-graphite-tiny
   rotate: false
-  xy: 1017, 691
+  xy: 1533, 777
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4402,7 +4409,7 @@ item-lead-small
   index: -1
 item-lead-tiny
   rotate: false
-  xy: 1533, 777
+  xy: 1769, 879
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4752,7 +4759,7 @@ item-thorium-small
   index: -1
 item-thorium-tiny
   rotate: false
-  xy: 1753, 769
+  xy: 1035, 683
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -4787,7 +4794,7 @@ item-titanium-small
   index: -1
 item-titanium-tiny
   rotate: false
-  xy: 1035, 683
+  xy: 1769, 861
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

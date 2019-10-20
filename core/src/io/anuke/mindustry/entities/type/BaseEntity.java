@@ -1,5 +1,6 @@
 package io.anuke.mindustry.entities.type;
 
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.entities.EntityGroup;
 import io.anuke.mindustry.entities.traits.Entity;
 
@@ -12,6 +13,14 @@ public abstract class BaseEntity implements Entity{
 
     public BaseEntity(){
         id = lastid++;
+    }
+
+    public int tileX(){
+        return Vars.world.toTile(x);
+    }
+
+    public int tileY(){
+        return Vars.world.toTile(y);
     }
 
     @Override

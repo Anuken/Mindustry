@@ -104,7 +104,7 @@ public class Maps{
         }
 
         //workshop
-        for(FileHandle file : platform.getExternalMaps()){
+        for(FileHandle file : platform.getWorkshopContent(Map.class)){
             try{
                 Map map = loadMap(file, false);
                 map.workshop = true;
