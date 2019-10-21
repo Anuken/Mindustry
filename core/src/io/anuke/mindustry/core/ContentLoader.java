@@ -109,8 +109,11 @@ public class ContentLoader{
 
         for(ContentType type : ContentType.values()){
             for(Content content : contentMap[type.ordinal()]){
-                //TODO catch error and display it per mod
-                callable.accept(content);
+                try{
+                    callable.accept(content);
+                }catch(Throwable e){
+                    mods.handleError(e, content.mod);
+                }
             }
         }
 

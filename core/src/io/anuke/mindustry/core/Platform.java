@@ -72,11 +72,6 @@ public interface Platform{
     default void updateRPC(){
     }
 
-    /** Whether donating is supported. */
-    default boolean canDonate(){
-        return false;
-    }
-
     /** Must be a base64 string 8 bytes in length. */
     default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");

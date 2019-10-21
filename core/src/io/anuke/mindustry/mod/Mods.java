@@ -322,7 +322,8 @@ public class Mods implements Loadable{
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave(mod.name + "-enabled", enabled);
+            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.save();
             requiresReload = true;
             if(!enabled){
                 loaded.remove(mod);
@@ -368,6 +369,8 @@ public class Mods implements Loadable{
                 break;
             }
         }
+
+        setEnabled(mod, false);
 
         if(content != null){
             throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
@@ -463,7 +466,7 @@ public class Mods implements Loadable{
         }
 
         public boolean enabled(){
-            return Core.settings.getBool(name + "-enabled", true);
+            return Core.settings.getBool("mod-" + name + "-enabled", true);
         }
 
         @Override

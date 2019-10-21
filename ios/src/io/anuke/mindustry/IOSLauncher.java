@@ -10,6 +10,7 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
@@ -34,7 +35,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        //IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
 
             @Override
@@ -118,7 +119,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, config);
+        }, new IOSApplicationConfiguration(){{
+           errorHandler = ModCrashHandler::handle;
+        }});
     }
 
     @Override
