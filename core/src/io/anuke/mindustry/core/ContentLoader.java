@@ -112,7 +112,11 @@ public class ContentLoader{
                 try{
                     callable.accept(content);
                 }catch(Throwable e){
-                    mods.handleError(e, content.mod);
+                    if(content.mod != null){
+                        mods.handleError(e, content.mod);
+                    }else{
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
