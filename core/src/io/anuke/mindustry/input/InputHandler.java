@@ -262,15 +262,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void flipRequests(Array<BuildRequest> requests, boolean x){
-        int origin = x ? rawTileX() : rawTileY();
+        int origin = (x ? rawTileX() : rawTileY()) * tilesize;
 
         requests.each(req -> {
-            int value = -((x ? req.x : req.y) - origin) + origin;
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
 
             if(x){
-                req.x = value;
+                req.x = (int)((value - req.block.offset()) / tilesize);
             }else{
-                req.y = value;
+                req.y = (int)((value - req.block.offset()) / tilesize);
             }
 
             if(req.block.posConfig){
