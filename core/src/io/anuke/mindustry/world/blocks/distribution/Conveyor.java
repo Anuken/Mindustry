@@ -225,7 +225,7 @@ public class Conveyor extends Block implements Autotiler{
             }else{
                 value = pos.pack();
 
-                if(pos.y < entity.minitem)
+                if(pos.y < entity.minitem && (next != null && tile.getTeam() != next.getTeam()))
                     entity.minitem = pos.y;
                 entity.convey.set(i, value);
             }
