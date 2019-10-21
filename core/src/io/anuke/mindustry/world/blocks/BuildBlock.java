@@ -64,17 +64,15 @@ public class BuildBlock extends Block{
             tile.entity.health = block.health * healthf;
         }
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-        Core.app.post(() -> tile.block().placed(tile));
+        tile.block().placed(tile);
 
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.id){
-            //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
-            //event first before they can recieve the placed() event modification results
             if(!skipConfig){
-                Core.app.post(() -> tile.block().playerPlaced(tile));
+                tile.block().playerPlaced(tile);
             }
         }
-        Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false)));
+        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
     }
 
