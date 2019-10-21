@@ -70,6 +70,13 @@ public abstract class Consume{
 
     public abstract void update(TileEntity entity);
 
+    /**
+     * Return true if the entity passed has a valid item to consume. 
+     * For example, if we can consume Coal, and entity has 1 coal return true.
+     * 
+     * @param entity Entity to check for items on
+     * @return True if valid, false otherwise
+     */
     public abstract boolean valid(TileEntity entity);
 
     public abstract void display(BlockStats stats);
