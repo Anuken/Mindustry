@@ -73,7 +73,7 @@ public class DesktopInput extends InputHandler{
                             ui.showInfoFade("$schematic.saved");
                             ui.schematics.showInfo(lastSchematic);
                         });
-                    }).colspan(2).size(250f, 50f);
+                    }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -175,6 +175,7 @@ public class DesktopInput extends InputHandler{
 
         if(mode != none){
             selectRequests.clear();
+            lastSchematic = null;
         }
 
         if(player.isShooting && !canShoot()){
@@ -243,6 +244,7 @@ public class DesktopInput extends InputHandler{
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
+        selectRequests.clear();
         selectRequests.addAll(schematics.toRequests(schem, schematicX, schematicY));
         mode = none;
     }
@@ -264,6 +266,8 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
+        if(scene.getKeyboardFocus() instanceof TextField) return;
+
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());

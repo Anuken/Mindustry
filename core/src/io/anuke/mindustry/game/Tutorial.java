@@ -41,9 +41,11 @@ public class Tutorial{
         Events.on(DepositEvent.class, event -> events.add("deposit"));
         Events.on(WithdrawEvent.class, event -> events.add("withdraw"));
 
-        for(TutorialStage stage : TutorialStage.values()){
-            stage.load();
-        }
+        Events.on(ClientLoadEvent.class, e -> {
+            for(TutorialStage stage : TutorialStage.values()){
+                stage.load();
+            }
+        });
     }
 
     /** update tutorial state, transition if needed */

@@ -9,10 +9,14 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.content.TypeIDs;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -68,7 +72,7 @@ public class MinimapRenderer implements Disposable{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h){
+    public void drawEntities(float x, float y, float w, float h, boolean withLabels){
         updateUnitArray();
 
         float sz = baseSize * zoom;
@@ -80,12 +84,26 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            float rx = (unit.x - rect.x) / rect.width * w, ry = (unit.y - rect.y) / rect.width * h;
+            float rx = (unit.x - rect.x) / rect.width * w;
+            float ry = (unit.y - rect.y) / rect.width * h;
+
+            if(withLabels && unit instanceof Player){
+                Player pl = (Player) unit;
+                if(!pl.isLocal){
+                    // Only display names for other players.
+                    drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
+                }
+            }
+
             Draw.color(unit.getTeam().color);
             Fill.rect(x + rx, y + ry, Scl.scl(baseSize / 2f), Scl.scl(baseSize / 2f));
         }
 
         Draw.color();
+    }
+
+    public void drawEntities(float x, float y, float w, float h){
+        drawEntities(x, y, w, h, true);
     }
 
     public TextureRegion getRegion(){
@@ -144,5 +162,28 @@ public class MinimapRenderer implements Disposable{
             texture = null;
             pixmap = null;
         }
+    }
+
+    public void drawLabel(float x, float y, String text, Color color){
+        BitmapFont font = Fonts.outline;
+        GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        font.getData().setScale(1 / 1.5f / Scl.scl(1f));
+        font.setUseIntegerPositions(false);
+
+        l.setText(font, text, color, 90f, Align.left, true);
+        float yOffset = 20f;
+        float margin = 3f;
+
+        Draw.color(0f, 0f, 0f, 0.2f);
+        Fill.rect(x, y + yOffset - l.height/2f, l.width + margin, l.height + margin);
+        Draw.color();
+        font.setColor(color);
+        font.draw(text, x - l.width/2f, y + yOffset, 90f, Align.left, true);
+        font.setUseIntegerPositions(ints);
+
+        font.getData().setScale(1f);
+
+        Pools.free(l);
     }
 }

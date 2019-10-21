@@ -98,6 +98,7 @@ public class MenuFragment extends Fragment{
             join = new MobileButton(Icon.add, "$joingame", ui.join::show),
             editor = new MobileButton(Icon.editor, "$editor", ui.maps::show),
             tools = new MobileButton(Icon.tools, "$settings", ui.settings::show),
+            mods = new MobileButton(Icon.wiki, "$mods", ui.mods::show),
             donate = new MobileButton(Icon.link, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
 
@@ -116,7 +117,8 @@ public class MenuFragment extends Fragment{
                 table.add(editor);
                 table.add(tools);
 
-                if(platform.canDonate()) table.add(donate);
+                table.add(mods);
+                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -134,7 +136,8 @@ public class MenuFragment extends Fragment{
             container.table(table -> {
                 table.defaults().set(container.defaults());
 
-                if(platform.canDonate()) table.add(donate);
+                table.add(mods);
+                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(2);
         }

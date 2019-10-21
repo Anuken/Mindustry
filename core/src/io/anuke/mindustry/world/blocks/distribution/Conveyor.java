@@ -94,7 +94,7 @@ public class Conveyor extends Block implements Autotiler{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        int[] bits = buildBlending(tile, tile.rotation(), null);
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];

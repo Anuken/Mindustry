@@ -23,8 +23,6 @@ public enum Binding implements KeyBind{
     schematic_flip_y(KeyCode.X),
     schematic_menu(KeyCode.T),
     dash(KeyCode.SHIFT_LEFT),
-    gridMode(KeyCode.BACKTICK),
-    gridModeShift(KeyCode.ALT_LEFT),
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),

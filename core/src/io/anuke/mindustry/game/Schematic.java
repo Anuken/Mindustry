@@ -5,13 +5,12 @@ import io.anuke.arc.collection.IntIntMap.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.game.Schematics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Schematic implements Publishable{
+public class Schematic implements Publishable, Comparable<Schematic>{
     public final Array<Stile> tiles;
     public StringMap tags;
     public int width, height;
@@ -90,8 +89,13 @@ public class Schematic implements Publishable{
     @Override
     public FileHandle createSteamPreview(String id){
         FileHandle preview = tmpDirectory.child("schematic_preview_" + id + ".png");
-        schematics.savePreview(this, PreviewRes.high, preview);
+        schematics.savePreview(this, preview);
         return preview;
+    }
+
+    @Override
+    public int compareTo(Schematic schematic){
+        return name().compareTo(schematic.name());
     }
 
     public static class Stile{
