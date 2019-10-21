@@ -91,11 +91,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
         return entity.generateTime > 0;
     }
 
+    // TODO: update this method
     @Override
-    public void update(Tile tile, float amountOfPowerUsed){
+    public void update(Tile tile){
+    	float amountOfPowerUsed = tile.entity.power.graph.getLastPowerConsumed();
+    	
     	// Should not update or do anything if we havn't consumed any power. This will leave the tower in a 'pause' state rather than consuming materials.
-    	if (amountOfPowerUsed <= 0f)
-    	{
+    	if (amountOfPowerUsed <= 0f){
     		return;
     	}
         ItemLiquidGeneratorEntity entity = tile.entity();

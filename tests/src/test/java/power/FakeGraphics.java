@@ -6,7 +6,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.glutils.GLVersion;
 
 public class FakeGraphics extends Graphics{
-    static int frame;
+    public static int frame;
 
     @Override
     public boolean isGL30Available(){
@@ -56,11 +56,6 @@ public class FakeGraphics extends Graphics{
     @Override
     public long getFrameId(){
         return frame++;
-    }
-    
-    public void setFrameId(int frameId)
-    {
-    	frame = frameId;
     }
 
     @Override

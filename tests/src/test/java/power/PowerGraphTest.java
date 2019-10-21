@@ -15,10 +15,10 @@ public class PowerGraphTest extends PowerTestFixture{
 	@Test
 	public void testUpdateFrameEqualsLastFrame() {
 		PowerGraph pg = new PowerGraph();
-		((FakeGraphics)Core.graphics).setFrameId(-1);
-		float result = pg.update();
+		FakeGraphics.frame = -1;
+		pg.update();
 		
-		assertEquals(0.0f, result);
+		assertEquals(0.0f, pg.getLastPowerConsumed());
 	}
 	
 	@Test
@@ -34,8 +34,8 @@ public class PowerGraphTest extends PowerTestFixture{
 		PowerGraph pg = new PowerGraph();
 		pg.add(testTile);
 		
-		float result = pg.update();
-		assertEquals(0.0f, result);
+		pg.update();
+		assertEquals(0.0f, pg.getLastPowerConsumed());
 		assertEquals(1f, testTile.entity.power.satisfaction);
 	}
 	
@@ -44,7 +44,7 @@ public class PowerGraphTest extends PowerTestFixture{
 	{
 		PowerGraph pg = new PowerGraph();
 		
-		float result = pg.update();
-		assertEquals(0.0f, result);
+		pg.update();
+		assertEquals(0.0f, pg.getLastPowerConsumed());
 	}
 }

@@ -310,14 +310,12 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         if(cons != null){
             cons.update();
         }
-
-        float amountOfPowerUsed = 0.0f;
         
         if(power != null){
-            amountOfPowerUsed = power.graph.update();
+        	power.graph.update();
         }
         
-    	block.update(tile, amountOfPowerUsed);
+    	block.update(tile);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class PowerGraph{
     private final ObjectSet<Tile> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded;
+    private float lastPowerProduced, lastPowerNeeded, lastPowerConsumed;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -44,6 +44,10 @@ public class PowerGraph{
 
     public float getLastPowerProduced(){
         return lastPowerProduced;
+    }
+    
+    public float getLastPowerConsumed() {
+    	return lastPowerConsumed;
     }
 
     public float getSatisfaction(){
@@ -143,6 +147,7 @@ public class PowerGraph{
         return Math.min(excess, capacity);
     }
 
+    // TODO: update
     private float distributePower(float needed, float produced){
     	float amountOfPowerUsed = 0.0f;
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
@@ -177,16 +182,19 @@ public class PowerGraph{
         return amountOfPowerUsed;
     }
 
-    public float update(){
+    // TODO: update this method
+    public void update(){
         if(Core.graphics.getFrameId() == lastFrameUpdated){
-            return 0.0f;
+            this.lastPowerConsumed =  0.0f;
+            return;
         }else if(!consumers.isEmpty() && consumers.first().isEnemyCheat()){
             //when cheating, just set satisfaction to 1
             for(Tile tile : consumers){
                 tile.entity.power.satisfaction = 1f;
             }
 
-            return 0.0f;
+            this.lastPowerConsumed =  0.0f;
+            return;
         }
 
         lastFrameUpdated = Core.graphics.getFrameId();
@@ -198,7 +206,8 @@ public class PowerGraph{
         lastPowerProduced = powerProduced;
 
         if(consumers.size == 0 && producers.size == 0 && batteries.size == 0){
-            return 0.0f;
+        	this.lastPowerConsumed =  0.0f;
+        	return;
         }
 
         if(!Mathf.isEqual(powerNeeded, powerProduced)){
@@ -208,16 +217,15 @@ public class PowerGraph{
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
-        if (Mathf.isZero(powerNeeded))
-        {
-        	return 0.0f;
+        if (Mathf.isZero(powerNeeded)){
+        	this.lastPowerConsumed =  0.0f;
+        	return;
         }
-        else
-        {
+        else{
         	float powerUsed = distributePower(powerNeeded, powerProduced);
             powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
             
-            return powerUsed;
+            this.lastPowerConsumed = powerUsed;
         }
     }
 

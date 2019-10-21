@@ -554,10 +554,6 @@ public class Block extends BlockStorage{
 
     public void update(Tile tile){
     }
-    
-    public void update(Tile tile, float amountOfPowerUsed){
-    	update(tile);
-    }
 
     public boolean isAccessible(){
         return (hasItems && itemCapacity > 0);
