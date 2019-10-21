@@ -56,7 +56,7 @@ public class BuildBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team){
+    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
         float healthf = tile.entity == null ? 1f : tile.entity.healthf();
         world.setBlock(tile, block, team, rotation);
@@ -70,7 +70,9 @@ public class BuildBlock extends Block{
         if(!headless && builderID == player.id){
             //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
             //event first before they can recieve the placed() event modification results
-            Core.app.post(() -> tile.block().playerPlaced(tile));
+            if(!skipConfig){
+                Core.app.post(() -> tile.block().playerPlaced(tile));
+            }
         }
         Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false)));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
@@ -185,7 +187,7 @@ public class BuildBlock extends Block{
         private float[] accumulator;
         private float[] totalAccumulator;
 
-        public boolean construct(Unit builder, @Nullable TileEntity core, float amount){
+        public boolean construct(Unit builder, @Nullable TileEntity core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -208,7 +210,7 @@ public class BuildBlock extends Block{
             }
 
             if(progress >= 1f || state.rules.infiniteResources){
-                Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam());
+                Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }
             return false;

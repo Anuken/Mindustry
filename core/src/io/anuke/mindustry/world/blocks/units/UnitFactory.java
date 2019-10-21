@@ -27,7 +27,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class UnitFactory extends Block{
-    protected UnitType type;
+    protected UnitType unitType;
     protected float produceTime = 1000f;
     protected float launchVelocity = 0f;
     protected TextureRegion topRegion;
@@ -57,7 +57,7 @@ public class UnitFactory extends Block{
         Effects.effect(Fx.producesmoke, tile.drawx(), tile.drawy());
 
         if(!net.client()){
-            BaseUnit unit = factory.type.create(tile.getTeam());
+            BaseUnit unit = factory.unitType.create(tile.getTeam());
             unit.setSpawner(tile);
             unit.set(tile.drawx() + Mathf.range(4), tile.drawy() + Mathf.range(4));
             unit.add();
@@ -122,7 +122,7 @@ public class UnitFactory extends Block{
     @Override
     public void draw(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        TextureRegion region = type.icon(Cicon.full);
+        TextureRegion region = unitType.icon(Cicon.full);
 
         Draw.rect(name, tile.drawx(), tile.drawy());
 
@@ -170,7 +170,7 @@ public class UnitFactory extends Block{
             entity.buildTime = 0f;
 
             Call.onUnitFactorySpawn(tile, entity.spawned + 1);
-            useContent(tile, type);
+            useContent(tile, unitType);
 
             entity.cons.trigger();
         }

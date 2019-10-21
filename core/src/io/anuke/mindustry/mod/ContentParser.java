@@ -15,6 +15,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.content.TechTree.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
@@ -34,34 +35,29 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
-        put(BulletType.class, (type, data) -> field(Bullets.class, data));
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
         put(Loadout.class, (type, data) -> field(Loadouts.class, data));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
+            if(data.isString()){
+                return field(Bullets.class, data);
+            }
+            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullet") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);
             readFields(result, data);
             return result;
         });
-        put(Music.class, (type, data) -> {
-            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
-
-            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Music.class);
-            Core.assets.finishLoadingAsset(path);
-            return Core.assets.get(path);
-        });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
 
             String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Sound.class);
-            Core.assets.finishLoadingAsset(path);
-            Log.info(Core.assets.get(path));
-            return Core.assets.get(path);
+            ProxySound sound = new ProxySound();
+            Core.assets.load(path, Sound.class).loaded = result -> {
+                sound.sound = (Sound)result;
+            };
+            return sound;
         });
         put(Objective.class, (type, data) -> {
             Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.Objectives") : ZoneWave.class;
@@ -74,6 +70,7 @@ public class ContentParser{
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
     private Array<Runnable> reads = new Array<>();
+    private Array<Runnable> postreads = new Array<>();
     private LoadedMod currentMod;
     private Content currentContent;
 
@@ -143,6 +140,15 @@ public class ContentParser{
             }
 
             currentContent = block;
+
+            String[] research = {null};
+
+            //add research tech node
+            if(value.has("research")){
+                research[0] = value.get("research").asString();
+                value.remove("research");
+            }
+
             read(() -> {
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
@@ -170,8 +176,16 @@ public class ContentParser{
                 readFields(block, value, true);
 
                 //add research tech node
-                if(value.has("research")){
-                    TechTree.create(find(ContentType.block, value.get("research").asString()), block);
+                if(research[0] != null){
+                    Block parent = find(ContentType.block, research[0]);
+                    TechNode baseNode = TechTree.create(parent, block);
+
+                    postreads.add(() -> {
+                        TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(!parnode.children.contains(baseNode)){
+                            parnode.children.add(baseNode);
+                        }
+                    });
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -271,10 +285,12 @@ public class ContentParser{
     public void finishParsing(){
         try{
             reads.each(Runnable::run);
+            postreads.each(Runnable::run);
         }catch(Exception e){
             Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
+        postreads.clear();
     }
 
     /**
@@ -391,9 +407,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    if(!child.name.equals("research")){
-                        Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
-                    }
+                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");

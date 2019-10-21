@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.IntSet;
 import io.anuke.arc.collection.IntSet.IntSetIterator;
 import io.anuke.arc.graphics.Color;
@@ -10,6 +10,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.graphics.IndexedRenderer;
 import io.anuke.mindustry.world.Block;
@@ -29,7 +30,11 @@ public class MapRenderer implements Disposable{
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
-        texture = Core.atlas.find("clear-editor").getTexture();
+        this.texture = Core.atlas.find("clear-editor").getTexture();
+
+        Events.on(ContentReloadEvent.class, e -> {
+            texture = Core.atlas.find("clear-editor").getTexture();
+        });
     }
 
     public void resize(int width, int height){

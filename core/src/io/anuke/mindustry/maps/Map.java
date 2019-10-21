@@ -4,14 +4,17 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.filters.*;
+import io.anuke.mindustry.type.*;
 
-import static io.anuke.mindustry.Vars.maps;
+import static io.anuke.mindustry.Vars.*;
 
-public class Map implements Comparable<Map>{
+public class Map implements Comparable<Map>, Publishable{
     /** Whether this is a custom map. */
     public final boolean custom;
     /** Metadata. Author description, display name, etc. */
@@ -129,6 +132,76 @@ public class Map implements Comparable<Map>{
 
     public boolean hasTag(String name){
         return tags.containsKey(name);
+    }
+
+    @Override
+    public String getSteamID(){
+        return tags.get("steamid");
+    }
+
+    @Override
+    public void addSteamID(String id){
+        tags.put("steamid", id);
+
+        ui.editor.editor.getTags().put("steamid", id);
+        try{
+            ui.editor.save();
+        }catch(Exception e){
+            Log.err(e);
+        }
+        Events.fire(new MapPublishEvent());
+    }
+
+    @Override
+    public void removeSteamID(){
+        tags.remove("steamid");
+
+        ui.editor.editor.getTags().remove("steamid");
+        try{
+            ui.editor.save();
+        }catch(Exception e){
+            Log.err(e);
+        }
+    }
+
+    @Override
+    public String steamTitle(){
+        return name();
+    }
+
+    @Override
+    public String steamDescription(){
+        return description();
+    }
+
+    @Override
+    public String steamTag(){
+        return "map";
+    }
+
+    @Override
+    public FileHandle createSteamFolder(String id){
+        return null;
+    }
+
+    @Override
+    public FileHandle createSteamPreview(String id){
+        return null;
+    }
+
+    @Override
+    public Array<String> extraTags(){
+        Gamemode mode = Gamemode.attack.valid(this) ? Gamemode.attack : Gamemode.survival;
+        return Array.with(mode.name());
+    }
+
+    @Override
+    public boolean prePublish(){
+        tags.put("author", player.name);
+        ui.editor.editor.getTags().put("author", tags.get("author"));
+        ui.editor.save();
+
+        return true;
     }
 
     @Override

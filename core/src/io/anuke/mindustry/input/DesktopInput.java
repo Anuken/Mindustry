@@ -6,11 +6,15 @@ import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -24,9 +28,9 @@ public class DesktopInput extends InputHandler{
     /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
-    private int selectX, selectY;
+    private int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
-    private int lastLineX, lastLineY;
+    private int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
     private PlaceMode mode;
     /** Animation scale for line. */
@@ -40,13 +44,38 @@ public class DesktopInput extends InputHandler{
     public void buildUI(Group group){
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
-            t.visible(() -> Core.settings.getBool("hints"));
+            t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.name())).style(Styles.outlineLabel);
             }).margin(10f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.touchable(Touchable.enabled);
+                b.defaults().left();
+                b.add(Core.bundle.format("schematic.flip",
+                Core.keybinds.get(Binding.schematic_flip_x).key.name(),
+                Core.keybinds.get(Binding.schematic_flip_y).key.name())).style(Styles.outlineLabel);
+                b.row();
+                b.table(a -> {
+                    a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
+                        ui.showTextInput("$schematic.add", "$name", "", text -> {
+                            lastSchematic.tags.put("name", text);
+                            schematics.add(lastSchematic);
+                            ui.showInfoFade("$schematic.saved");
+                            ui.schematics.showInfo(lastSchematic);
+                        });
+                    }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                });
+            }).margin(6f);
         });
     }
 
@@ -66,7 +95,7 @@ public class DesktopInput extends InputHandler{
                 drawRequest(lineRequests.get(i));
             }
         }else if(mode == breaking){
-            drawSelection(selectX, selectY, cursorX, cursorY);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY);
         }else if(isPlacing()){
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
@@ -83,6 +112,12 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        //draw schematic requests
+        for(BuildRequest request : selectRequests){
+            request.animScale = 1f;
+            drawRequest(request);
+        }
+
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
             if(sreq.block.rotate){
@@ -92,6 +127,10 @@ public class DesktopInput extends InputHandler{
             sreq.block.drawRequest(sreq, allRequests(), valid);
 
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
+        }
+
+        if(Core.input.keyDown(Binding.schematic_select)){
+            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
         Draw.reset();
@@ -118,7 +157,7 @@ public class DesktopInput extends InputHandler{
         if(state.is(State.menu) || Core.scene.hasDialog()) return;
 
         //zoom things
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && (Core.input.keyDown(Binding.zoom_hold))){
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && Core.input.keyDown(Binding.zoom_hold)){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -132,6 +171,11 @@ public class DesktopInput extends InputHandler{
         //deselect if not placing
         if(!isPlacing() && mode == placing){
             mode = none;
+        }
+
+        if(mode != none){
+            selectRequests.clear();
+            lastSchematic = null;
         }
 
         if(player.isShooting && !canShoot()){
@@ -151,8 +195,12 @@ public class DesktopInput extends InputHandler{
             sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
         }
 
-        if(Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0 && isPlacing() && mode == placing){
-            updateLine(selectX, selectY);
+        if(!Core.input.keyDown(Binding.zoom_hold) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+            if(isPlacing() && mode == placing){
+                updateLine(selectX, selectY);
+            }else if(!selectRequests.isEmpty()){
+                rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+            }
         }
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
@@ -162,7 +210,7 @@ public class DesktopInput extends InputHandler{
 
             cursorType = cursor.block().getCursor(cursor);
 
-            if(isPlacing()){
+            if(isPlacing() || !selectRequests.isEmpty()){
                 cursorType = SystemCursor.hand;
             }
 
@@ -191,14 +239,51 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public void useSchematic(Schematic schem){
+        block = null;
+        schematicX = tileX(getMouseX());
+        schematicY = tileY(getMouseY());
+
+        selectRequests.clear();
+        selectRequests.addAll(schematics.toRequests(schem, schematicX, schematicY));
+        mode = none;
+    }
+
+    @Override
     public boolean isBreaking(){
         return mode == breaking;
     }
 
+    @Override
+    public void buildPlacementUI(Table table){
+        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.row();
+        table.left().margin(0f).defaults().size(48f).left();
+
+        table.addImageButton(Icon.wikiSmall, Styles.clearPartiali, () -> {
+            ui.schematics.show();
+        });
+    }
+
     void pollInput(){
+        if(scene.getKeyboardFocus() instanceof TextField) return;
+
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
+        int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
+
+        if(!selectRequests.isEmpty()){
+            int shiftX = rawCursorX - schematicX, shiftY = rawCursorY - schematicY;
+
+            selectRequests.each(s -> {
+                s.x += shiftX;
+                s.y += shiftY;
+            });
+
+            schematicX += shiftX;
+            schematicY += shiftY;
+        }
 
         if(Core.input.keyTap(Binding.deselect)){
             player.setMineTile(null);
@@ -206,6 +291,38 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.clear_building)){
             player.clearBuilding();
+        }
+
+        if(Core.input.keyTap(Binding.schematic_select)){
+            schemX = rawCursorX;
+            schemY = rawCursorY;
+        }
+
+        if(Core.input.keyTap(Binding.schematic_menu)){
+            ui.schematics.show();
+        }
+
+        if(Core.input.keyTap(Binding.clear_building)){
+            lastSchematic = null;
+            selectRequests.clear();
+        }
+
+        if(Core.input.keyRelease(Binding.schematic_select)){
+            lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+            useSchematic(lastSchematic);
+            if(selectRequests.isEmpty()){
+                lastSchematic = null;
+            }
+        }
+
+        if(!selectRequests.isEmpty()){
+            if(Core.input.keyTap(Binding.schematic_flip_x)){
+                flipRequests(selectRequests, true);
+            }
+
+            if(Core.input.keyTap(Binding.schematic_flip_y)){
+                flipRequests(selectRequests, false);
+            }
         }
 
         if(sreq != null){
@@ -233,7 +350,10 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildRequest req = getRequest(cursorX, cursorY);
 
-            if(isPlacing()){
+            if(!selectRequests.isEmpty()){
+                flushRequests(selectRequests);
+                //selectRequests.clear();
+            }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
                 lastLineX = cursorX;
@@ -329,6 +449,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
             block = null;
             sreq = null;
+            selectRequests.clear();
         }
     }
 }
