@@ -217,16 +217,11 @@ public class PowerGraph{
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
-        if (Mathf.isZero(powerNeeded)){
-        	this.lastPowerConsumed =  0.0f;
-        	return;
-        }
-        else{
-        	float powerUsed = distributePower(powerNeeded, powerProduced);
-            powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
-            
-            this.lastPowerConsumed = powerUsed;
-        }
+        
+        float powerUsed = distributePower(powerNeeded, powerProduced);
+        powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
+        
+        this.lastPowerConsumed = powerUsed;
     }
 
     public void add(PowerGraph graph){
