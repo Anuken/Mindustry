@@ -352,6 +352,11 @@ public class NetServer implements ApplicationListener{
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
+                if(player.isLocal){
+                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    return;
+                }
+
                 //hosts can vote all they want
                 if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");

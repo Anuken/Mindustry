@@ -272,6 +272,7 @@ public class World{
     }
 
     public void removeBlock(Tile tile){
+        if(tile == null) return;
         tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
     }
 

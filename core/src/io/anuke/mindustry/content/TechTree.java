@@ -31,6 +31,7 @@ public class TechTree implements ContentList{
 
                         node(distributor);
                         node(sorter, () -> {
+                            node(invertedSorter);
                             node(message);
                             node(overflowGate);
                         });
@@ -316,9 +317,9 @@ public class TechTree implements ContentList{
         return node(block, () -> {});
     }
 
-    public static void create(Block parent, Block block){
+    public static TechNode create(Block parent, Block block){
         TechNode.context = all.find(t -> t.block == parent);
-        node(block, () -> {});
+        return node(block, () -> {});
     }
 
     public static class TechNode{

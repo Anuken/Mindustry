@@ -14,12 +14,14 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -51,6 +53,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean droppingItem;
     public Group uiGroup;
 
+    protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
     protected PlaceLine line = new PlaceLine();
     protected BuildRequest resultreq;
@@ -105,7 +108,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
-        Events.fire(new DepositEvent());
+        Core.app.post(() -> Events.fire(new DepositEvent(tile, player)));
 
         for(int i = 0; i < sent; i++){
             boolean end = i == sent - 1;
@@ -191,10 +194,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     }
 
-    public boolean isDrawing(){
-        return false;
-    }
-
     public void drawSelected(int x, int y, Block block, Color color){
         Draw.color(color);
         for(int i = 0; i < 4; i++){
@@ -221,6 +220,76 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Block block = tile.block();
 
         drawSelected(x, y, block, Pal.remove);
+    }
+
+    public void useSchematic(Schematic schem){
+        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+    }
+
+    public void rotateRequests(Array<BuildRequest> requests, int direction){
+        int ox = rawTileX(), oy = rawTileY();
+
+        requests.each(req -> {
+            //rotate config position
+            if(req.block.posConfig){
+                int cx = Pos.x(req.config) - req.originalX, cy = Pos.y(req.config) - req.originalY;
+                int lx = cx;
+
+                if(direction >= 0){
+                    cx = -cy;
+                    cy = lx;
+                }else{
+                    cx = cy;
+                    cy = -lx;
+                }
+                req.config = Pos.get(cx + req.originalX, cy + req.originalY);
+            }
+
+            //rotate actual request, centered on its multiblock position
+            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float x = wx;
+            if(direction >= 0){
+                wx = -wy;
+                wy = x;
+            }else{
+                wx = wy;
+                wy = -x;
+            }
+            req.x = world.toTile(wx - req.block.offset()) + ox;
+            req.y = world.toTile(wy - req.block.offset()) + oy;
+            req.rotation = Mathf.mod(req.rotation + direction, 4);
+        });
+    }
+
+    public void flipRequests(Array<BuildRequest> requests, boolean x){
+        int origin = (x ? rawTileX() : rawTileY()) * tilesize;
+
+        requests.each(req -> {
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
+
+            if(x){
+                req.x = (int)((value - req.block.offset()) / tilesize);
+            }else{
+                req.y = (int)((value - req.block.offset()) / tilesize);
+            }
+
+            if(req.block.posConfig){
+                int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+                int nvalue = -((x ? Pos.x(req.config) : Pos.y(req.config)) - corigin) + corigin;
+                if(x){
+                    req.originalX = -(req.originalX - corigin) + corigin;
+                    req.config = Pos.get(nvalue, Pos.y(req.config));
+                }else{
+                    req.originalY = -(req.originalY - corigin) + corigin;
+                    req.config = Pos.get(Pos.x(req.config), nvalue);
+                }
+            }
+
+            //flip rotation
+            if(x == (req.rotation % 2 == 0)){
+                req.rotation = Mathf.mod(req.rotation + 2, 4);
+            }
+        });
     }
 
     /** Returns the selection request that overlaps this position, or null. */
@@ -263,7 +332,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    protected void drawSelection(int x1, int y1, int x2, int y2){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
         NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -288,6 +357,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
+        /*
+        for(BuildRequest req : selectRequests){
+            if(req.breaking) continue;
+            if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                drawBreaking(req);
+            }
+        }*/
+
         for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
@@ -303,10 +380,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
+        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+
+        Lines.stroke(2f);
+
+        Draw.color(Pal.accentBack);
+        Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+        Draw.color(Pal.accent);
+        Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                selectRequests.add(req);
+                selectRequests.add(req.copy());
             }
         }
     }
@@ -314,7 +402,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                player.addBuildRequest(req);
+                BuildRequest copy = req.copy();
+                if(copy.hasConfig && copy.block.posConfig){
+                    copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                }
+                player.addBuildRequest(copy);
             }
         }
     }
@@ -326,6 +418,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Draws a placement icon for a specific block. */
     protected void drawRequest(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
+        brequest.animScale = 1f;
         block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
     }
 
@@ -342,16 +435,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
+                Tile tile = world.ltile(wx, wy);
+
+                if(tile == null) continue;
+
                 if(!flush){
                     tryBreakBlock(wx, wy);
-                }else{
-                    selectRequests.add(new BuildRequest(wx, wy));
+                }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile().link() == tile)){
+                    selectRequests.add(new BuildRequest(tile.x, tile.y));
                 }
             }
         }
 
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
         Iterator<BuildRequest> it = player.buildQueue().iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
@@ -359,6 +457,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 it.remove();
             }
         }
+
+        /*
+        it = selectRequests.iterator();
+        while(it.hasNext()){
+            BuildRequest req = it.next();
+            if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                it.remove();
+            }
+        }*/
 
         //remove blocks to rebuild
         Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
@@ -375,7 +482,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lineRequests.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            lineRequests.add(new BuildRequest(l.x, l.y, l.rotation, block));
+            BuildRequest req = new BuildRequest(l.x, l.y, l.rotation, block);
+            req.animScale = 1f;
+            lineRequests.add(req);
         });
     }
 
@@ -427,13 +536,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        //clear when the player taps on something else
-        if(!consumed && !mobile && player.isBuilding() && block == null){
-            //player.clearBuilding();
-            block = null;
-            return true;
-        }
-
         if(!showedInventory){
             frag.inv.hide();
         }
@@ -477,6 +579,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return world.tile(tileX(x), tileY(y));
     }
 
+    int rawTileX(){
+        return world.toTile(Core.input.mouseWorld().x);
+    }
+
+    int rawTileY(){
+        return world.toTile(Core.input.mouseWorld().y);
+    }
+
     int tileX(float cursorX){
         Vector2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
@@ -499,6 +609,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean isPlacing(){
         return block != null;
+    }
+
+    public boolean isBreaking(){
+        return false;
     }
 
     public float mouseAngle(float x, float y){
@@ -538,6 +652,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             uiGroup.setFillParent(true);
             ui.hudGroup.addChild(uiGroup);
             buildUI(uiGroup);
+
+            frag.add();
         }
 
         if(player != null){
@@ -592,7 +708,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
         for(BuildRequest req : player.buildQueue()){
-            if(req != ignore && !req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))){
+            if(req != ignore
+                    && !req.breaking
+                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))
+            ){
                 return false;
             }
         }
@@ -604,6 +724,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
+        BuildRequest req = getRequest(x, y);
+        if(req != null){
+            player.buildQueue().remove(req);
+        }
         player.addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 

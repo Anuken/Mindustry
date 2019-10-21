@@ -62,7 +62,7 @@ public class UnitTypes implements ContentList{
             range = 70f;
             itemCapacity = 70;
             health = 400;
-            buildPower = 1f;
+            buildPower = 0.4f;
             engineOffset = 6.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
             weapon = new Weapon("heal-blaster"){{

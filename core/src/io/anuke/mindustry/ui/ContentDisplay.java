@@ -49,7 +49,7 @@ public class ContentDisplay{
             for(BlockStat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ");
+                    inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ").left();
                     Array<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);

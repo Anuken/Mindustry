@@ -15,6 +15,7 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
@@ -47,8 +48,7 @@ public class Mods implements Loadable{
     }
 
     /** @return the loaded mod found by class, or null if not found. */
-    public @Nullable
-    LoadedMod getMod(Class<? extends Mod> type){
+    public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return loaded.find(l -> l.mod.getClass() == type);
     }
 
@@ -61,7 +61,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file, false));
+            loaded.add(loadMod(dest, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -155,6 +155,7 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
+        disabled.remove(mod);
         requiresReload = true;
     }
 
@@ -181,7 +182,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(FileHandle file : platform.getExternalMods()){
+        for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
             try{
                 LoadedMod mod = loadMod(file, true);
                 if(mod.enabled()){
@@ -203,11 +204,14 @@ public class Mods implements Loadable{
 
     private void buildFiles(){
         for(LoadedMod mod : loaded){
+            boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
+            String parentName = zipFolder ? mod.root.name() : null;
             for(FileHandle file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     //TODO calling child/parent on these files will give you gibberish; create wrapper class.
-                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) : f.path(), f));
+                    file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
+                        zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
             }
 
@@ -242,7 +246,9 @@ public class Mods implements Loadable{
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
     public void reloadContent(){
         //epic memory leak
+        //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+
         loaded.clear();
         disabled.clear();
         load();
@@ -261,35 +267,41 @@ public class Mods implements Loadable{
         content.loadColors();
         data.load();
         requiresReload = false;
+
+        Events.fire(new ContentReloadEvent());
     }
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
         for(LoadedMod mod : loaded){
-            if(mod.root.child("content").exists()){
-                FileHandle contentRoot = mod.root.child("content");
-                for(ContentType type : ContentType.all){
-                    FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
-                    if(folder.exists()){
-                        for(FileHandle file : folder.list()){
-                            if(file.extension().equals("json")){
-                                try{
-                                    //this binds the content but does not load it entirely
-                                    Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString(), type);
-                                    Log.info("[{0}] Loaded '{1}'.", mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
-                                }catch(Exception e){
-                                    throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
+            safeRun(mod, () -> {
+                if(mod.root.child("content").exists()){
+                    FileHandle contentRoot = mod.root.child("content");
+                    for(ContentType type : ContentType.all){
+                        FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
+                        if(folder.exists()){
+                            for(FileHandle file : folder.list()){
+                                if(file.extension().equals("json")){
+                                    try{
+                                        //this binds the content but does not load it entirely
+                                        Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
+                                        Log.info("[{0}] Loaded '{1}'.", mod.meta.name,
+                                        (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                                    }catch(Exception e){
+                                        throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
+            });
         }
 
         //this finishes parsing content fields
         parser.finishParsing();
 
+        //load content for code mods
         each(Mod::loadContent);
     }
 
@@ -316,7 +328,8 @@ public class Mods implements Loadable{
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave(mod.name + "-enabled", enabled);
+            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.save();
             requiresReload = true;
             if(!enabled){
                 loaded.remove(mod);
@@ -343,7 +356,42 @@ public class Mods implements Loadable{
 
     /** Iterates through each mod with a main class.*/
     public void each(Consumer<Mod> cons){
-        loaded.each(p -> p.mod != null, p -> cons.accept(p.mod));
+        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.accept(p.mod)));
+    }
+
+    public void handleError(Throwable t, LoadedMod mod){
+        Array<Throwable> causes = Strings.getCauses(t);
+        Content content = null;
+        for(Throwable e : causes){
+            if(e instanceof ModLoadException && ((ModLoadException) e).content != null){
+                content = ((ModLoadException) e).content;
+            }
+        }
+
+        String realCause = "<???>";
+        for(int i = causes.size -1 ; i >= 0; i--){
+            if(causes.get(i).getMessage() != null){
+                realCause = causes.get(i).getMessage();
+                break;
+            }
+        }
+
+        setEnabled(mod, false);
+
+        if(content != null){
+            throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
+                content, mod.meta.name, content.sourceFile.name(), realCause), content, t);
+        }else{
+            throw new ModLoadException("Error loading mod " + mod.meta.name, t);
+        }
+    }
+
+    public void safeRun(LoadedMod mod, Runnable run){
+        try{
+            run.run();
+        }catch(Throwable t){
+            handleError(t, mod);
+        }
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
@@ -403,7 +451,7 @@ public class Mods implements Loadable{
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
-    public static class LoadedMod{
+    public static class LoadedMod implements Publishable{
         /** The location of this mod's zip file/folder on the disk. */
         public final FileHandle file;
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
@@ -414,8 +462,6 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
-        /** The ID of this mod in the workshop.*/
-        public @Nullable String workshopID;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
@@ -426,7 +472,73 @@ public class Mods implements Loadable{
         }
 
         public boolean enabled(){
-            return Core.settings.getBool(name + "-enabled", true);
+            return Core.settings.getBool("mod-" + name + "-enabled", true);
+        }
+
+        @Override
+        public String getSteamID(){
+            return Core.settings.getString(name + "-steamid", null);
+        }
+
+        @Override
+        public void addSteamID(String id){
+            Core.settings.put(name + "-steamid", id);
+            Core.settings.save();
+        }
+
+        @Override
+        public void removeSteamID(){
+            Core.settings.remove(name + "-steamid");
+            Core.settings.save();
+        }
+
+        @Override
+        public String steamTitle(){
+            return meta.name;
+        }
+
+        @Override
+        public String steamDescription(){
+            return meta.description;
+        }
+
+        @Override
+        public String steamTag(){
+            return "mod";
+        }
+
+        @Override
+        public FileHandle createSteamFolder(String id){
+            return file;
+        }
+
+        @Override
+        public FileHandle createSteamPreview(String id){
+            return file.child("preview.png");
+        }
+
+        @Override
+        public boolean prePublish(){
+            if(!file.isDirectory()){
+                ui.showErrorMessage("$mod.folder.missing");
+                return false;
+            }
+
+            if(!file.child("preview.png").exists()){
+                ui.showErrorMessage("$mod.preview.missing");
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String toString(){
+            return "LoadedMod{" +
+            "file=" + file +
+            ", root=" + root +
+            ", name='" + name + '\'' +
+            '}';
         }
     }
 
@@ -436,5 +548,23 @@ public class Mods implements Loadable{
         public String[] dependencies = {}; //TODO implement
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
+    }
+
+    /** Thrown when an error occurs while loading a mod.*/
+    public static class ModLoadException extends RuntimeException{
+        public Content content;
+        public LoadedMod mod;
+
+        public ModLoadException(String message, Throwable cause){
+            super(message, cause);
+        }
+
+        public ModLoadException(String message, @Nullable Content content, Throwable cause){
+            super(message, cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
     }
 }

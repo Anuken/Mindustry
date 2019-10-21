@@ -4,7 +4,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.mod.Mods.*;
@@ -24,9 +23,35 @@ public class ModsDialog extends FloatingDialog{
         () -> Core.net.openURI(reportIssueURL))
         .size(250f, 64f);
 
+        buttons.row();
+
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(280f, 64f);
+        .size(210f, 64f);
+
+        buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
+            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                ui.loadfrag.show();
+                Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                        try{
+                            Streams.copyStream(result.getResultAsStream(), modDirectory.child(text.replace("/", "") + ".zip").write(false));
+                            Core.app.post(() -> {
+                                try{
+                                    mods.reloadContent();
+                                    setup();
+                                    ui.loadfrag.hide();
+                                }catch(Throwable e){
+                                    ui.showException(e);
+                                }
+                            });
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
+                    }, t -> Core.app.post(() -> ui.showException(t)));
+                }, t -> Core.app.post(() -> ui.showException(t)));
+            });
+        }).size(250f, 64f);
 
         shown(this::setup);
 
@@ -76,14 +101,20 @@ public class ModsDialog extends FloatingDialog{
                                 setup();
                             }).height(50f).margin(8f).width(130f);
 
-                            title.addImageButton(mod.workshopID != null ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
-                                if(mod.workshopID == null){
+                            if(steam && !mod.hasSteamID()){
+                                title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
+                                    platform.publish(mod);
+                                }).size(50f);
+                            }
+
+                            title.addImageButton(mod.hasSteamID() ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
+                                if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);
                                         setup();
                                     });
                                 }else{
-                                    platform.viewListing(mod.workshopID);
+                                    platform.viewListing(mod);
                                 }
                             }).size(50f);
                         }).growX().left().padTop(-14f).padRight(-14f);
@@ -120,27 +151,5 @@ public class ModsDialog extends FloatingDialog{
                 }
             });
         }).margin(12f).width(500f);
-
-        //not well tested currently
-        if(Version.build == -1){
-            cont.row();
-
-            cont.addImageTextButton("$mod.import.github", Icon.github, () -> {
-                ui.showTextInput("$mod.import.github", "", "Anuken/ExampleMod", text -> {
-                    Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                        Core.net.httpGet(loc.getHeader("Location"), result -> {
-                            try{
-                                Streams.copyStream(result.getResultAsStream(), modDirectory.child(text.replace("/", "") + ".zip").write(false));
-                                ui.loadAnd(() -> {
-                                    mods.reloadContent();
-                                });
-                            }catch(Exception e){
-                                ui.showException(e);
-                            }
-                        }, ui::showException);
-                    }, ui::showException);
-                });
-            }).margin(12f).width(500f);
-        }
     }
 }

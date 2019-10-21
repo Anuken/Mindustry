@@ -39,8 +39,6 @@ import static io.anuke.mindustry.Vars.*;
 public class Block extends BlockStorage{
     public static final int crackRegions = 8, maxCrackSize = 5;
 
-    private static final BooleanProvider invisible = () -> false;
-
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
@@ -83,10 +81,14 @@ public class Block extends BlockStorage{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
+    /** Targeting priority of this block, as seen by enemies.*/
+    public TargetPriority priority = TargetPriority.base;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
+    /** Whether the config is positional and needs to be shifted. */
+    public boolean posConfig;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
@@ -116,13 +118,15 @@ public class Block extends BlockStorage{
     public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
-    public ItemStack[] requirements = new ItemStack[]{};
+    public ItemStack[] requirements = {};
     /** Category in place menu. */
     public Category category = Category.distribution;
     /** Cost of building this block; do not modify directly! */
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
-    public BooleanProvider buildVisibility = invisible;
+    public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    /** Multiplier for speed of building this block. */
+    public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     public boolean alwaysUnlocked = false;
@@ -153,7 +157,7 @@ public class Block extends BlockStorage{
     }
 
     public boolean isBuildable(){
-        return buildVisibility != invisible;
+        return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 
     public boolean isStatic(){
@@ -386,6 +390,7 @@ public class Block extends BlockStorage{
         for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
         }
+        buildCost *= buildCostMultiplier;
 
         if(consumes.has(ConsumeType.power)) hasPower = true;
         if(consumes.has(ConsumeType.item)) hasItems = true;
@@ -676,7 +681,34 @@ public class Block extends BlockStorage{
     }
 
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
-        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+        TextureRegion reg = icon(Cicon.full);
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
+            reg.getWidth() * req.animScale * Draw.scl,
+            reg.getHeight() * req.animScale * Draw.scl,
+            !rotate ? 0 : req.rotation * 90);
+
+        if(req.hasConfig){
+            drawRequestConfig(req, list);
+        }
+    }
+
+    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+
+    }
+
+    public void drawRequestConfigCenter(BuildRequest req, Content content, String region){
+        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+        if(color == null) return;
+
+        Draw.color(color);
+        Draw.scl *= req.animScale;
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.scl /= req.animScale;
+        Draw.color();
+    }
+
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+
     }
 
     @Override
@@ -800,7 +832,7 @@ public class Block extends BlockStorage{
     }
 
     public boolean isVisible(){
-        return buildVisibility.get() && !isHidden();
+        return buildVisibility.visible() && !isHidden();
     }
 
     public boolean isFloor(){
@@ -817,7 +849,7 @@ public class Block extends BlockStorage{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.get();
+        return !buildVisibility.visible();
     }
 
     @Override
@@ -826,21 +858,21 @@ public class Block extends BlockStorage{
     }
 
     protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
     protected void requirements(Category cat, ItemStack[] stacks){
-        requirements(cat, () -> true, stacks);
+        requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BooleanProvider visible, ItemStack[] stacks){
+    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
 
-        Arrays.sort(requirements, (a, b) -> Integer.compare(a.item.id, b.item.id));
+        Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
 }

@@ -11,6 +11,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
 import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -31,9 +32,7 @@ public class CooledTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-        stats.add(BlockStat.boostEffect, 1f + maxUsed * coolantMultiplier, StatUnit.timesSpeed);
+        stats.add(BlockStat.booster, new BoosterListValue(reload, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
     }
 
     @Override

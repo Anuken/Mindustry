@@ -36,6 +36,7 @@ public class MassDriver extends Block{
         super(name);
         update = true;
         solid = true;
+        posConfig = true;
         configurable = true;
         hasItems = true;
         layer = Layer.turret;
@@ -232,8 +233,8 @@ public class MassDriver extends Block{
             int maxTransfer = Math.min(entity.items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
             data.items[i] = maxTransfer;
             totalUsed += maxTransfer;
+            entity.items.remove(content.item(i), maxTransfer);
         }
-        entity.items.clear();
 
         float angle = tile.angleTo(target);
 

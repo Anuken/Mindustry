@@ -208,7 +208,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //move all current requests to removal array so they fade out
-            removals.addAll(selectRequests);
+            removals.addAll(selectRequests.select(r -> !r.breaking));
             selectRequests.clear();
             selecting = false;
         }).visible(() -> !selectRequests.isEmpty()).name("confirmplace");
@@ -217,9 +217,10 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking) && !state.is(State.menu));
+            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !state.is(State.menu));
             t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                 player.clearBuilding();
+                selectRequests.clear();
                 mode = none;
                 block = null;
             }).width(155f);
@@ -242,8 +243,12 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(tile == null) continue;
 
             request.animScale = Mathf.lerpDelta(request.animScale, 0f, 0.2f);
-            request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0f, 0.2f);
 
+            if(request.breaking){
+                drawSelected(request.x, request.y, tile.block(), Pal.remove);
+            }else{
+                request.block.drawRequest(request, allRequests(), true);
+            }
             //TODO
             //drawRequest(request);
         }
@@ -257,10 +262,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             if((!request.breaking && validPlace(tile.x, tile.y, request.block, request.rotation))
             || (request.breaking && validBreak(tile.x, tile.y))){
                 request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.2f);
-                request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0f, 0.2f);
             }else{
                 request.animScale = Mathf.lerpDelta(request.animScale, 0.6f, 0.1f);
-                request.animInvalid = Mathf.lerpDelta(request.animInvalid, 0.9f, 0.2f);
             }
 
             Tmp.c1.set(Draw.getMixColor());
@@ -270,7 +273,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
             }
 
-            Draw.mixcol(Tmp.c1, 1f);
+            //Draw.mixcol(Tmp.c1, 1f);
+            Draw.reset();
             drawRequest(request);
 
             //draw last placed request
@@ -298,7 +302,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     drawRequest(lineRequests.get(i));
                 }
             }else if(mode == breaking){
-                drawSelection(lineStartX, lineStartY, tileX, tileY);
+                drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
         }
 
@@ -327,14 +331,24 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     protected void drawRequest(BuildRequest request){
-        drawRequest(request.x, request.y, request.block, request.rotation);
-        if(!request.breaking){
+        if(request.tile() == null) return;
+        brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
+
+        if(request.breaking){
+            drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
+        }else{
+            request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
             drawSelected(request.x, request.y, request.block, Pal.accent);
         }
     }
 
     //endregion
     //region input events
+
+    @Override
+    public boolean isBreaking(){
+        return mode == breaking;
+    }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
@@ -456,9 +470,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
-        if(state.is(State.menu) || player.isDead()){
+        if(state.is(State.menu) ){
             selectRequests.clear();
             removals.clear();
+            mode = none;
+        }
+
+        if(player.isDead()){
             mode = none;
         }
 
@@ -487,8 +505,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == none){
             selecting = false;
             lineMode = false;
-            removals.addAll(selectRequests);
-            selectRequests.clear();
         }
 
         if(lineMode && mode == placing && block == null){

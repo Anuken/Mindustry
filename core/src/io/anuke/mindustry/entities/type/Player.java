@@ -433,6 +433,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         for(BuildRequest request : buildQueue()){
             if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
+            request.animScale = 1f;
             if(request.breaking){
                 control.input.drawBreaking(request);
             }else{
@@ -584,7 +585,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -796,6 +797,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         textFadeTime = 0f;
         target = null;
         moveTarget = null;
+        isShooting = isBoosting = isTransferring = isTyping = false;
         spawner = lastSpawner = null;
         health = maxHealth();
         mining = null;

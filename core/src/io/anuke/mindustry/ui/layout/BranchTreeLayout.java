@@ -1,4 +1,4 @@
-package io.anuke.mindustry.ui;
+package io.anuke.mindustry.ui.layout;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.geom.*;
@@ -6,7 +6,7 @@ import io.anuke.arc.math.geom.*;
 /**
  * Algorithm taken from <a href="https://github.com/abego/treelayout">TreeLayout</a>.
  */
-public class TreeLayout{
+public class BranchTreeLayout implements TreeLayout{
     public TreeLocation rootLocation = TreeLocation.top;
     public TreeAlignment alignment = TreeAlignment.awayFromRoot;
     public float gapBetweenLevels = 10;
@@ -18,6 +18,7 @@ public class TreeLayout{
     private float boundsTop = Float.MAX_VALUE;
     private float boundsBottom = Float.MIN_VALUE;
 
+    @Override
     public void layout(TreeNode root){
         firstWalk(root, null);
         calcSizeOfLevels(root, 0);
@@ -287,21 +288,5 @@ public class TreeLayout{
 
     public enum TreeAlignment{
         center, towardsRoot, awayFromRoot
-    }
-
-    public static class TreeNode<T extends TreeNode>{
-        public float width, height, x, y;
-
-        //should be initialized by user
-        public T[] children;
-        public T parent;
-
-        private float mode, prelim, change, shift;
-        private int number = -1;
-        private TreeNode thread, ancestor;
-
-        boolean isLeaf(){
-            return children == null || children.length == 0;
-        }
     }
 }

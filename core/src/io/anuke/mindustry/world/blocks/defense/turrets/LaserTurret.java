@@ -1,17 +1,15 @@
 package io.anuke.mindustry.world.blocks.defense.turrets;
 
-import io.anuke.arc.math.Angles;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.Bullet;
-import io.anuke.mindustry.entities.bullet.BulletType;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.StatUnit;
+import io.anuke.mindustry.world.meta.*;
+import io.anuke.mindustry.world.meta.values.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
 
@@ -24,13 +22,15 @@ public class LaserTurret extends PowerTurret{
         canOverdrive = false;
 
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
+        coolantMultiplier = 1f;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.boostEffect);
+        stats.remove(BlockStat.booster);
+        stats.add(BlockStat.input, new BoosterListValue(reload, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
         stats.remove(BlockStat.damage);
         //damages every 5 ticks, at least in meltdown's case
         stats.add(BlockStat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
@@ -74,7 +74,7 @@ public class LaserTurret extends PowerTurret{
             Liquid liquid = entity.liquids.current();
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta()));
+            float used = baseReloadSpeed(tile) * (tile.isEnemyCheat() ? maxUsed : Math.min(entity.liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
             entity.reload += used;
             entity.liquids.remove(liquid, used);
 

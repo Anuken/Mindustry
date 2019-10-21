@@ -68,6 +68,7 @@ public class UI implements ApplicationListener, Loadable{
     public DeployDialog deploy;
     public TechTreeDialog tech;
     public MinimapDialog minimap;
+    public SchematicsDialog schematics;
     public ModsDialog mods;
 
     public Cursor drillCursor, unloadCursor;
@@ -185,6 +186,13 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.act();
         Core.scene.draw();
 
+        if(Core.input.keyTap(KeyCode.MOUSE_LEFT) && Core.scene.getKeyboardFocus() instanceof TextField){
+            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            if(!(e instanceof TextField)){
+                Core.scene.setKeyboardFocus(null);
+            }
+        }
+
         //draw overlay for buttons
         if(state.rules.tutorial){
             control.tutorial.draw();
@@ -225,6 +233,7 @@ public class UI implements ApplicationListener, Loadable{
         tech = new TechTreeDialog();
         minimap = new MinimapDialog();
         mods = new ModsDialog();
+        schematics = new SchematicsDialog();
 
         Group group = Core.scene.root;
 
@@ -238,7 +247,6 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
 
-        control.input.getFrag().build(hudGroup);
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
         chatfrag.container().build(hudGroup);
@@ -297,7 +305,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
-        showTextInput(title, text, 24, def, confirmed);
+        showTextInput(title, text, 32, def, confirmed);
     }
 
     public void showTextInput(String titleText, String text, int textLength, String def, Consumer<String> confirmed){
@@ -308,7 +316,7 @@ public class UI implements ApplicationListener, Loadable{
         Table table = new Table();
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interpolation.fade), Actions.remove());
-        table.top().add(info).padTop(10);
+        table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }
 
@@ -339,6 +347,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMesage(exc);
 
