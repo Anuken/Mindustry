@@ -15,6 +15,7 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
@@ -154,6 +155,7 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
+        disabled.remove(mod);
         requiresReload = true;
     }
 
@@ -244,7 +246,9 @@ public class Mods implements Loadable{
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
     public void reloadContent(){
         //epic memory leak
+        //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+
         loaded.clear();
         disabled.clear();
         load();
@@ -263,6 +267,8 @@ public class Mods implements Loadable{
         content.loadColors();
         data.load();
         requiresReload = false;
+
+        Events.fire(new ContentReloadEvent());
     }
 
     /** Creates all the content found in mod files. */
