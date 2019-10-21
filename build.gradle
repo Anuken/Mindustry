@@ -201,8 +201,6 @@ project(":core"){
     }
 
     dependencies{
-        System.properties["corePath"] = file(".").toString()
-        
         if(System.properties["user.name"] == "anuke"){
             task cleanGen{
                 doFirst{
