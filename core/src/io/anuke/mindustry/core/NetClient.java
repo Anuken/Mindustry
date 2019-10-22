@@ -9,6 +9,7 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.scene.actions.Actions;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
@@ -198,6 +199,16 @@ public class NetClient implements ApplicationListener{
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 
+    @Remote(called = Loc.client, variants = Variant.one)
+    public static void onConnect(String ip, int port){
+        netClient.disconnectQuietly();
+        state.set(State.menu);
+        logic.reset();
+
+        Vars.netClient.beginConnecting();
+        net.connect(ip, port, Actions::hide);
+    }
+    
     @Remote(targets = Loc.client)
     public static void onPing(Player player, long time){
         Call.onPingResponse(player.con, time);
