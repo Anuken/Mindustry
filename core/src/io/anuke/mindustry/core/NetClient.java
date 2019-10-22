@@ -9,7 +9,6 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
-import io.anuke.arc.scene.actions.Actions;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
@@ -206,7 +205,7 @@ public class NetClient implements ApplicationListener{
         logic.reset();
 
         Vars.netClient.beginConnecting();
-        net.connect(ip, port, Actions::new);
+        net.connect(ip, port, () -> {});
     }
     
     @Remote(targets = Loc.client)
