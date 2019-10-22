@@ -198,6 +198,16 @@ public class NetClient implements ApplicationListener{
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 
+    @Remote(called = Loc.client, variants = Variant.one)
+    public static void onConnect(String ip, int port){
+        netClient.disconnectQuietly();
+        state.set(State.menu);
+        logic.reset();
+
+        Vars.netClient.beginConnecting();
+        net.connect(ip, port, () -> {});
+    }
+    
     @Remote(targets = Loc.client)
     public static void onPing(Player player, long time){
         Call.onPingResponse(player.con, time);
