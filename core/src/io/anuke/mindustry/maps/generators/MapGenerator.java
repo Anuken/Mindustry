@@ -40,7 +40,7 @@ public class MapGenerator extends Generator{
         return this;
     }
     public void removePrefix(String name){
-        this.mapName = name.substring(name.length() + 1);
+        this.mapName = this.mapName.substring(name.length() + 1);
     }
 
     {
