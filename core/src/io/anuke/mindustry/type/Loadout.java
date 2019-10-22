@@ -2,7 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.arc.collection.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.Content;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.storage.*;
 

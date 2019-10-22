@@ -21,7 +21,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;

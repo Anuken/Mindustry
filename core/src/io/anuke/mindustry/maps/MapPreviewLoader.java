@@ -8,7 +8,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.Content;
 
 public class MapPreviewLoader extends TextureLoader{
 

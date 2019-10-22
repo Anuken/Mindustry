@@ -17,6 +17,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -90,7 +91,7 @@ public class BuildBlock extends Block{
     @Override
     public TextureRegion getDisplayIcon(Tile tile){
         BuildEntity entity = tile.entity();
-        return (entity.cblock == null ? entity.previous : entity.cblock).icon(Cicon.full);
+        return (entity.cblock == null ? entity.previous : entity.cblock).icon(io.anuke.mindustry.ui.Cicon.full);
     }
 
     @Override
@@ -135,7 +136,7 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
+        if(Core.atlas.isFound(entity.previous.icon(io.anuke.mindustry.ui.Cicon.full))){
             Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }

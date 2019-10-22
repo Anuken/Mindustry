@@ -10,7 +10,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.ArcNetImpl.*;
 import io.anuke.mindustry.net.*;

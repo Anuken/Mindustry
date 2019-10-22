@@ -16,6 +16,7 @@ import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
@@ -72,7 +73,7 @@ public class ContentParser{
     private Array<Runnable> reads = new Array<>();
     private Array<Runnable> postreads = new Array<>();
     private LoadedMod currentMod;
-    private Content currentContent;
+    private io.anuke.mindustry.ctype.Content currentContent;
 
     private Json parser = new Json(){
         @Override
@@ -92,7 +93,7 @@ public class ContentParser{
                     }
                 }
 
-                if(Content.class.isAssignableFrom(type)){
+                if(io.anuke.mindustry.ctype.Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";
                     T one = (T)Vars.content.getByName(ctype, prefix + jsonData.asString());
@@ -212,14 +213,14 @@ public class ContentParser{
         ContentType.zone, parser(ContentType.zone, Zone::new)
     );
 
-    private <T extends Content> T find(ContentType type, String name){
-        Content c = Vars.content.getByName(type, name);
+    private <T extends io.anuke.mindustry.ctype.Content> T find(ContentType type, String name){
+        io.anuke.mindustry.ctype.Content c = Vars.content.getByName(type, name);
         if(c == null) c = Vars.content.getByName(type, currentMod.name + "-" + name);
         if(c == null) throw new IllegalArgumentException("No " + type + " found with name '" + name + "'");
         return (T)c;
     }
 
-    private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
+    private <T extends io.anuke.mindustry.ctype.Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
         return (mod, name, value) -> {
             T item;
             if(Vars.content.getByName(type, name) != null){
@@ -236,7 +237,7 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = Vars.content.getByName(type, name) instanceof UnlockableContent ?
+        io.anuke.mindustry.ctype.UnlockableContent cont = Vars.content.getByName(type, name) instanceof io.anuke.mindustry.ctype.UnlockableContent ?
                                 Vars.content.getByName(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
@@ -258,7 +259,7 @@ public class ContentParser{
 
     /** Call to read a content's extra info later.*/
     private void read(Runnable run){
-        Content cont = currentContent;
+        io.anuke.mindustry.ctype.Content cont = currentContent;
         LoadedMod mod = currentMod;
         reads.add(() -> {
             this.currentMod = mod;
@@ -269,11 +270,11 @@ public class ContentParser{
 
     private void init(){
         for(ContentType type : ContentType.all){
-            Array<Content> arr = Vars.content.getBy(type);
+            Array<io.anuke.mindustry.ctype.Content> arr = Vars.content.getBy(type);
             if(!arr.isEmpty()){
                 Class<?> c = arr.first().getClass();
                 //get base content class, skipping intermediates
-                while(!(c.getSuperclass() == Content.class || c.getSuperclass() == UnlockableContent.class || Modifier.isAbstract(c.getSuperclass().getModifiers()))){
+                while(!(c.getSuperclass() == io.anuke.mindustry.ctype.Content.class || c.getSuperclass() == UnlockableContent.class || Modifier.isAbstract(c.getSuperclass().getModifiers()))){
                     c = c.getSuperclass();
                 }
 
@@ -301,7 +302,7 @@ public class ContentParser{
      * @param file file that this content is being parsed from
      * @return the content that was parsed
      */
-    public Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
+    public io.anuke.mindustry.ctype.Content parse(LoadedMod mod, String name, String json, FileHandle file, ContentType type) throws Exception{
         if(contentTypes.isEmpty()){
             init();
         }
@@ -313,7 +314,7 @@ public class ContentParser{
 
         currentMod = mod;
         boolean exists = Vars.content.getByName(type, name) != null;
-        Content c = parsers.get(type).parse(mod.name, name, value);
+        io.anuke.mindustry.ctype.Content c = parsers.get(type).parse(mod.name, name, value);
         if(!exists){
             c.sourceFile = file;
             c.mod = mod;
@@ -453,7 +454,7 @@ public class ContentParser{
         Object parse(Class<?> type, JsonValue value) throws Exception;
     }
 
-    private interface TypeParser<T extends Content>{
+    private interface TypeParser<T extends io.anuke.mindustry.ctype.Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
     }
 

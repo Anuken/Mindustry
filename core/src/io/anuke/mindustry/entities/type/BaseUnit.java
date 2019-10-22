@@ -16,6 +16,8 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.TypeID;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;

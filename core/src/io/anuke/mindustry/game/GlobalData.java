@@ -6,6 +6,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 
@@ -131,7 +132,7 @@ public class GlobalData{
     }
 
     /** Returns whether or not this piece of content is unlocked yet. */
-    public boolean isUnlocked(UnlockableContent content){
+    public boolean isUnlocked(io.anuke.mindustry.ctype.UnlockableContent content){
         return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
     }
 

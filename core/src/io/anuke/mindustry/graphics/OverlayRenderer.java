@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;

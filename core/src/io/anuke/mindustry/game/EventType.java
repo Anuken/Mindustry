@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
@@ -173,15 +174,15 @@ public class EventType{
     }
 
     public static class UnlockEvent{
-        public final UnlockableContent content;
+        public final io.anuke.mindustry.ctype.UnlockableContent content;
 
-        public UnlockEvent(UnlockableContent content){
+        public UnlockEvent(io.anuke.mindustry.ctype.UnlockableContent content){
             this.content = content;
         }
     }
 
     public static class ResearchEvent{
-        public final UnlockableContent content;
+        public final io.anuke.mindustry.ctype.UnlockableContent content;
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;

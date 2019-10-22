@@ -3,7 +3,7 @@ package io.anuke.mindustry.net;
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.game.Version;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.io.TypeIO;
 
 import java.nio.ByteBuffer;

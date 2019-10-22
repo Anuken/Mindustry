@@ -1,11 +1,11 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.collection.*;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 

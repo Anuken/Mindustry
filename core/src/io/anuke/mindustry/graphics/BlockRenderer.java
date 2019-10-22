@@ -12,6 +12,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;

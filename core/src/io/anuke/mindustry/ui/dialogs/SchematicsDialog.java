@@ -16,6 +16,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 

@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.ContentDisplay;
 

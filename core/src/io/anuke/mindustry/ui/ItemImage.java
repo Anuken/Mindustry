@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 
 public class ItemImage extends Stack{

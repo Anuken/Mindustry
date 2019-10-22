@@ -16,13 +16,13 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 

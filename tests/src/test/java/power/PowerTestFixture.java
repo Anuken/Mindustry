@@ -5,7 +5,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.power.*;

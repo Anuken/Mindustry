@@ -22,6 +22,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 

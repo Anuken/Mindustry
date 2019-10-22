@@ -17,10 +17,10 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;

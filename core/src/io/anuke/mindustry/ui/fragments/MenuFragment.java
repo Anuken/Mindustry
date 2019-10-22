@@ -11,8 +11,8 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -65,7 +65,7 @@ public class MenuFragment extends Fragment{
             parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
+        String versionText = "[#ffffffba]" + ((io.anuke.mindustry.core.Version.build == -1) ? "[#fc8140aa]custom build" : (io.anuke.mindustry.core.Version.type.equals("official") ? io.anuke.mindustry.core.Version.modifier : io.anuke.mindustry.core.Version.type) + " build " + io.anuke.mindustry.core.Version.build + (io.anuke.mindustry.core.Version.revision == 0 ? "" : "." + Version.revision));
 
         parent.fill((x, y, w, h) -> {
             Texture logo = Core.assets.get("sprites/logo.png");

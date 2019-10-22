@@ -10,11 +10,11 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 

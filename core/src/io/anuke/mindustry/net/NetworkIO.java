@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
@@ -67,7 +68,7 @@ public class NetworkIO{
 
         buffer.putInt(playerGroup.size());
         buffer.putInt(state.wave);
-        buffer.putInt(Version.build);
+        buffer.putInt(io.anuke.mindustry.core.Version.build);
         writeString(buffer, Version.type);
 
         buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
