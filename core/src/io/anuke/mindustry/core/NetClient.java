@@ -206,7 +206,7 @@ public class NetClient implements ApplicationListener{
         logic.reset();
 
         Vars.netClient.beginConnecting();
-        net.connect(ip, port, Actions::hide);
+        net.connect(ip, port, Actions::new);
     }
     
     @Remote(targets = Loc.client)
