@@ -172,6 +172,10 @@ public class Zone extends UnlockableContent{
 
     @Override
     public void init(){
+        if(generator instanceof MapGenerator && mod != null){
+            ((MapGenerator)generator).removePrefix(mod.name);
+        }
+
         generator.init(loadout);
         resources.sort();
 

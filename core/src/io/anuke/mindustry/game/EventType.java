@@ -174,15 +174,15 @@ public class EventType{
     }
 
     public static class UnlockEvent{
-        public final io.anuke.mindustry.ctype.UnlockableContent content;
+        public final UnlockableContent content;
 
-        public UnlockEvent(io.anuke.mindustry.ctype.UnlockableContent content){
+        public UnlockEvent(UnlockableContent content){
             this.content = content;
         }
     }
 
     public static class ResearchEvent{
-        public final io.anuke.mindustry.ctype.UnlockableContent content;
+        public final UnlockableContent content;
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;

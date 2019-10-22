@@ -20,7 +20,7 @@ import io.anuke.mindustry.gen.*;
 import static io.anuke.mindustry.Vars.net;
 
 public class Weapon{
-    public final String name;
+    public String name;
 
     /** minimum cursor distance from player, fixes 'cross-eyed' shooting. */
     protected static float minPlayerDist = 20f;
@@ -64,7 +64,7 @@ public class Weapon{
         this.name = name;
     }
 
-    protected Weapon(){
+    public Weapon(){
         //no region
         this.name = "";
     }

@@ -1,20 +1,19 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.scene.event.ClickListener;
-import io.anuke.arc.scene.event.HandCursorListener;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState.State;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.type.ContentType;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 
 public class DatabaseDialog extends FloatingDialog{
 
@@ -34,12 +33,12 @@ public class DatabaseDialog extends FloatingDialog{
         table.margin(20);
         ScrollPane pane = new ScrollPane(table);
 
-        Array<io.anuke.mindustry.ctype.Content>[] allContent = Vars.content.getContentMap();
+        Array<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.values()[j];
 
-            Array<io.anuke.mindustry.ctype.Content> array = allContent[j].select(c -> c instanceof io.anuke.mindustry.ctype.UnlockableContent && !((io.anuke.mindustry.ctype.UnlockableContent)c).isHidden());
+            Array<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
             if(array.size == 0) continue;
 
             table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
@@ -54,7 +53,7 @@ public class DatabaseDialog extends FloatingDialog{
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
-                    io.anuke.mindustry.ctype.UnlockableContent unlock = (io.anuke.mindustry.ctype.UnlockableContent)array.get(i);
+                    UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.icon(Cicon.medium)) : new Image(Icon.lockedSmall, Pal.gray);
                     list.add(image).size(8*4).pad(3);

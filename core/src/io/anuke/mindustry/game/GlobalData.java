@@ -132,7 +132,7 @@ public class GlobalData{
     }
 
     /** Returns whether or not this piece of content is unlocked yet. */
-    public boolean isUnlocked(io.anuke.mindustry.ctype.UnlockableContent content){
+    public boolean isUnlocked(UnlockableContent content){
         return content.alwaysUnlocked() || unlocked.getOr(content.getContentType(), ObjectSet::new).contains(content.name);
     }
 

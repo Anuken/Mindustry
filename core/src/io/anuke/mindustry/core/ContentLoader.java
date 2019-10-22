@@ -5,7 +5,7 @@ import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.MappableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -20,11 +20,11 @@ import static io.anuke.mindustry.Vars.mods;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private boolean loaded = false;
-    private ObjectMap<String, io.anuke.mindustry.ctype.MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
-    private Array<io.anuke.mindustry.ctype.Content>[] contentMap = new Array[ContentType.values().length];
-    private io.anuke.mindustry.ctype.MappableContent[][] temporaryMapper;
-    private ObjectSet<Consumer<io.anuke.mindustry.ctype.Content>> initialization = new ObjectSet<>();
-    private io.anuke.mindustry.ctype.ContentList[] content = {
+    private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
+    private Array<Content>[] contentMap = new Array[ContentType.values().length];
+    private MappableContent[][] temporaryMapper;
+    private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
+    private ContentList[] content = {
         new Fx(),
         new Items(),
         new StatusEffects(),
@@ -62,7 +62,7 @@ public class ContentLoader{
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
 
-        for(io.anuke.mindustry.ctype.ContentList list : content){
+        for(ContentList list : content){
             list.load();
         }
 
@@ -71,7 +71,7 @@ public class ContentLoader{
         }
 
         //check up ID mapping, make sure it's linear
-        for(Array<io.anuke.mindustry.ctype.Content> arr : contentMap){
+        for(Array<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
                 if(id != i){
@@ -95,20 +95,20 @@ public class ContentLoader{
 
     /** Calls Content#init() on everything. Use only after all modules have been created.*/
     public void init(){
-        initialize(io.anuke.mindustry.ctype.Content::init);
+        initialize(Content::init);
     }
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
     public void load(){
-        initialize(io.anuke.mindustry.ctype.Content::load);
+        initialize(Content::load);
     }
 
     /** Initializes all content with the specified function. */
-    private void initialize(Consumer<io.anuke.mindustry.ctype.Content> callable){
+    private void initialize(Consumer<Content> callable){
         if(initialization.contains(callable)) return;
 
         for(ContentType type : ContentType.values()){
-            for(io.anuke.mindustry.ctype.Content content : contentMap[type.ordinal()]){
+            for(Content content : contentMap[type.ordinal()]){
                 try{
                     callable.accept(content);
                 }catch(Throwable e){
@@ -144,23 +144,23 @@ public class ContentLoader{
         //clear all content, currently not used
     }
 
-    public void handleContent(io.anuke.mindustry.ctype.Content content){
+    public void handleContent(Content content){
         contentMap[content.getContentType().ordinal()].add(content);
 
     }
 
-    public void handleMappableContent(io.anuke.mindustry.ctype.MappableContent content){
+    public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
     }
 
-    public void setTemporaryMapper(io.anuke.mindustry.ctype.MappableContent[][] temporaryMapper){
+    public void setTemporaryMapper(MappableContent[][] temporaryMapper){
         this.temporaryMapper = temporaryMapper;
     }
 
-    public Array<io.anuke.mindustry.ctype.Content>[] getContentMap(){
+    public Array<Content>[] getContentMap(){
         return contentMap;
     }
 
@@ -171,7 +171,7 @@ public class ContentLoader{
         return (T)contentNameMap[type.ordinal()].get(name);
     }
 
-    public <T extends io.anuke.mindustry.ctype.Content> T getByID(ContentType type, int id){
+    public <T extends Content> T getByID(ContentType type, int id){
 
         if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
             //-1 = invalid content
@@ -190,7 +190,7 @@ public class ContentLoader{
         return (T)contentMap[type.ordinal()].get(id);
     }
 
-    public <T extends io.anuke.mindustry.ctype.Content> Array<T> getBy(ContentType type){
+    public <T extends Content> Array<T> getBy(ContentType type){
         return (Array<T>)contentMap[type.ordinal()];
     }
 

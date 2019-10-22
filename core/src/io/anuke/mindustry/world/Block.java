@@ -17,7 +17,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
@@ -26,7 +26,6 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.consumers.*;
@@ -697,7 +696,7 @@ public class Block extends BlockStorage{
 
     }
 
-    public void drawRequestConfigCenter(BuildRequest req, io.anuke.mindustry.ctype.Content content, String region){
+    public void drawRequestConfigCenter(BuildRequest req, Content content, String region){
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 

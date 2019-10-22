@@ -14,8 +14,8 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
-import io.anuke.mindustry.core.Version;
-import io.anuke.mindustry.ctype.UnlockableContent;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
@@ -130,10 +130,10 @@ public class Mods implements Loadable{
 
             packer.updateTextureAtlas(Core.atlas, filter, filter, false);
             //generate new icons
-            for(Array<io.anuke.mindustry.ctype.Content> arr : content.getContentMap()){
+            for(Array<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof io.anuke.mindustry.ctype.UnlockableContent && c.mod != null){
-                        io.anuke.mindustry.ctype.UnlockableContent u = (io.anuke.mindustry.ctype.UnlockableContent)c;
+                    if(c instanceof UnlockableContent && c.mod != null){
+                        UnlockableContent u = (UnlockableContent)c;
                         u.createIcons(packer, editorPacker);
                     }
                 });
@@ -285,9 +285,9 @@ public class Mods implements Loadable{
                                 if(file.extension().equals("json")){
                                     try{
                                         //this binds the content but does not load it entirely
-                                        io.anuke.mindustry.ctype.Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
+                                        Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
                                         Log.info("[{0}] Loaded '{1}'.", mod.meta.name,
-                                        (loaded instanceof io.anuke.mindustry.ctype.UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                                        (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                     }catch(Exception e){
                                         throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
                                     }
@@ -362,7 +362,7 @@ public class Mods implements Loadable{
 
     public void handleError(Throwable t, LoadedMod mod){
         Array<Throwable> causes = Strings.getCauses(t);
-        io.anuke.mindustry.ctype.Content content = null;
+        Content content = null;
         for(Throwable e : causes){
             if(e instanceof ModLoadException && ((ModLoadException) e).content != null){
                 content = ((ModLoadException) e).content;
@@ -553,14 +553,14 @@ public class Mods implements Loadable{
 
     /** Thrown when an error occurs while loading a mod.*/
     public static class ModLoadException extends RuntimeException{
-        public io.anuke.mindustry.ctype.Content content;
+        public Content content;
         public LoadedMod mod;
 
         public ModLoadException(String message, Throwable cause){
             super(message, cause);
         }
 
-        public ModLoadException(String message, @Nullable io.anuke.mindustry.ctype.Content content, Throwable cause){
+        public ModLoadException(String message, @Nullable Content content, Throwable cause){
             super(message, cause);
             this.content = content;
             if(content != null){
