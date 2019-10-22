@@ -817,6 +817,10 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
                 }
+                if(p.getClosestCore() != null){
+                    p.setDead(false);
+                    p.setNet(p.getClosestCore().x, p.getClosestCore().y);
+                }
                 netServer.sendWorldData(p);
             }
             inExtraRound = false;
