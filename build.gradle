@@ -5,12 +5,13 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
+        maven{ url 'https://jitpack.io' }
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8-SNAPSHOT'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.7'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
-        classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
+        classpath "com.github.anuken:packr:-SNAPSHOT"
     }
 }
 
@@ -25,7 +26,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8-SNAPSHOT'
+        roboVMVersion = '2.3.7'
         steamworksVersion = '1.8.0'
         arcHash = null
 
