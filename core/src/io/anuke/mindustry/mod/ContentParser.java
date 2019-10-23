@@ -78,6 +78,7 @@ public class ContentParser{
      * This is done to accomodate binding of content names first.*/
     private Array<Runnable> reads = new Array<>();
     private Array<Runnable> postreads = new Array<>();
+    private ObjectSet<Object> toBeParsed = new ObjectSet<>();
     private LoadedMod currentMod;
     private Content currentContent;
 
@@ -298,6 +299,7 @@ public class ContentParser{
         }
         reads.clear();
         postreads.clear();
+        toBeParsed.clear();
     }
 
     /**
@@ -321,6 +323,7 @@ public class ContentParser{
         currentMod = mod;
         boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        toBeParsed.add(c);
         if(!exists){
             c.sourceFile = file;
             c.mod = mod;
@@ -387,7 +390,7 @@ public class ContentParser{
     }
 
     private void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String) return;
+        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
         parser.getFields(object.getClass()).values().toArray().each(field -> {
             try{
@@ -408,6 +411,7 @@ public class ContentParser{
     }
 
     private void readFields(Object object, JsonValue jsonMap){
+        toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
         for(JsonValue child = jsonMap.child; child != null; child = child.next){
