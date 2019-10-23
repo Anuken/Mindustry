@@ -45,6 +45,7 @@ public class DesktopInput extends InputHandler{
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
             t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
+            t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
@@ -59,7 +60,7 @@ public class DesktopInput extends InputHandler{
             t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
-                b.touchable(Touchable.enabled);
+                //b.touchable(Touchable.enabled);
                 b.defaults().left();
                 b.add(Core.bundle.format("schematic.flip",
                 Core.keybinds.get(Binding.schematic_flip_x).key.name(),
