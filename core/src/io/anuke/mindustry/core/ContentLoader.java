@@ -7,6 +7,7 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -113,7 +114,7 @@ public class ContentLoader{
                     callable.accept(content);
                 }catch(Throwable e){
                     if(content.mod != null){
-                        mods.handleError(e, content.mod);
+                        mods.handleError(new ModLoadException(content, e), content.mod);
                     }else{
                         throw new RuntimeException(e);
                     }

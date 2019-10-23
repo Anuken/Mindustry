@@ -567,5 +567,13 @@ public class Mods implements Loadable{
                 this.mod = content.mod;
             }
         }
+
+        public ModLoadException(@Nullable Content content, Throwable cause){
+            super(cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
     }
 }

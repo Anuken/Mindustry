@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -23,7 +24,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
-    protected Mech mech;
+    protected @NonNull Mech mech;
     protected float buildTime = 60 * 5;
 
     public MechPad(String name){

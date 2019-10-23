@@ -440,7 +440,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation));
+                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
             }
         }
 
