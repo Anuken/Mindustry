@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.scene.ui.layout.Table;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.Player;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.graphics.Pal;
@@ -31,7 +32,7 @@ public class Mech extends UnlockableContent{
     public float compoundSpeed, compoundSpeedBoost;
 
     public float weaponOffsetX, weaponOffsetY, engineOffset = 5f, engineSize = 2.5f;
-    public Weapon weapon;
+    public @NonNull Weapon weapon;
 
     public TextureRegion baseRegion, legRegion, region;
 
