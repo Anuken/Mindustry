@@ -10,7 +10,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.effect.Puddle;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.game.UnlockableContent;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.consumers.Consumers;

@@ -16,13 +16,13 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Net.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -198,6 +198,16 @@ public class NetClient implements ApplicationListener{
         return "[#" + player.color.toString().toUpperCase() + "]" + name;
     }
 
+    @Remote(called = Loc.client, variants = Variant.one)
+    public static void onConnect(String ip, int port){
+        netClient.disconnectQuietly();
+        state.set(State.menu);
+        logic.reset();
+
+        Vars.netClient.beginConnecting();
+        net.connect(ip, port, () -> {});
+    }
+    
     @Remote(targets = Loc.client)
     public static void onPing(Player player, long time){
         Call.onPingResponse(player.con, time);

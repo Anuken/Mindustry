@@ -1,6 +1,6 @@
 package io.anuke.mindustry.type;
 
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.ctype.Content;
 
 //currently unimplemented, see trello for implementation plans
 public class WeatherEvent extends Content{

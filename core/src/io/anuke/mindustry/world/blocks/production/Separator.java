@@ -4,6 +4,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.Lines;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemStack;
@@ -20,7 +21,7 @@ import io.anuke.mindustry.world.meta.values.ItemFilterValue;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
-    protected ItemStack[] results;
+    protected @NonNull ItemStack[] results;
     protected float craftTime;
     protected float spinnerRadius = 2.5f;
     protected float spinnerLength = 1f;

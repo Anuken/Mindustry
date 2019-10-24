@@ -1,11 +1,11 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.collection.*;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.type.base.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 
@@ -41,11 +41,11 @@ public class UnitTypes implements ContentList{
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            weapon = new Weapon("heal-blaster"){{
+            weapon = new Weapon(){{
                 length = 1.5f;
                 reload = 40f;
                 width = 0.5f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
@@ -65,11 +65,11 @@ public class UnitTypes implements ContentList{
             buildPower = 0.4f;
             engineOffset = 6.5f;
             toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium);
-            weapon = new Weapon("heal-blaster"){{
+            weapon = new Weapon(){{
                 length = 1.5f;
                 reload = 20f;
                 width = 0.5f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBullet;
@@ -86,7 +86,7 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("chain-blaster"){{
                 length = 1.5f;
                 reload = 28f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }};
@@ -99,7 +99,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
             mass = 1.75f;
             health = 120;
-            weapon = new Weapon("bomber"){{
+            weapon = new Weapon(){{
                 reload = 12f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
@@ -138,7 +138,7 @@ public class UnitTypes implements ContentList{
                 length = 1f;
                 reload = 14f;
                 range = 30f;
-                roundrobin = true;
+                alternate = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
@@ -158,7 +158,7 @@ public class UnitTypes implements ContentList{
                 length = 1f;
                 reload = 60f;
                 width = 10f;
-                roundrobin = true;
+                alternate = true;
                 recoil = 4f;
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
@@ -180,7 +180,7 @@ public class UnitTypes implements ContentList{
             weapon = new Weapon("eruption"){{
                 length = 3f;
                 reload = 10f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 bullet = Bullets.eruptorShot;
                 recoil = 1f;
@@ -201,7 +201,7 @@ public class UnitTypes implements ContentList{
                 length = 8f;
                 reload = 50f;
                 width = 17f;
-                roundrobin = true;
+                alternate = true;
                 recoil = 3f;
                 shake = 2f;
                 shots = 4;
@@ -225,7 +225,7 @@ public class UnitTypes implements ContentList{
                 length = 13f;
                 reload = 30f;
                 width = 22f;
-                roundrobin = true;
+                alternate = true;
                 recoil = 3f;
                 shake = 2f;
                 inaccuracy = 3f;
@@ -247,10 +247,10 @@ public class UnitTypes implements ContentList{
             health = 75;
             engineOffset = 5.5f;
             range = 140f;
-            weapon = new Weapon("chain-blaster"){{
+            weapon = new Weapon(){{
                 length = 1.5f;
                 reload = 28f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
@@ -267,11 +267,11 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
-            weapon = new Weapon("bomber"){{
+            weapon = new Weapon(){{
                 length = 0f;
                 width = 2f;
                 reload = 12f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 velocityRnd = 1f;
                 inaccuracy = 40f;
@@ -303,7 +303,7 @@ public class UnitTypes implements ContentList{
                 width = 10f;
                 shots = 2;
                 inaccuracy = 2f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 velocityRnd = 0.2f;
                 spacing = 1f;
@@ -336,7 +336,7 @@ public class UnitTypes implements ContentList{
                 shootCone = 100f;
                 shotDelay = 2;
                 inaccuracy = 10f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 velocityRnd = 0.2f;
                 spacing = 1f;
@@ -369,7 +369,7 @@ public class UnitTypes implements ContentList{
 
                 shake = 1f;
                 inaccuracy = 3f;
-                roundrobin = true;
+                alternate = true;
                 ejectEffect = Fx.none;
                 bullet = new BasicBulletType(7f, 42, "bullet"){
                     {

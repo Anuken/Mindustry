@@ -11,7 +11,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.JsonValue.*;
 import io.anuke.arc.util.serialization.JsonWriter.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.core.*;
 
 import java.io.*;
 import java.text.*;

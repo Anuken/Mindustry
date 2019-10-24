@@ -40,7 +40,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         super.onProximityUpdate(tile);
 
         ConduitEntity entity = tile.entity();
-        int[] bits = buildBlending(tile, tile.rotation(), null);
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
     }
 

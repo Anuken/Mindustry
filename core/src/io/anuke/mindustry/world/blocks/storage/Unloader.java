@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -49,7 +48,7 @@ public class Unloader extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem.id));
+            tile.configure(lastItem.id);
         }
     }
 

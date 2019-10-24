@@ -11,7 +11,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.Content;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;

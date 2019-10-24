@@ -1,8 +1,8 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.type;
 
-import io.anuke.arc.function.Supplier;
-import io.anuke.mindustry.entities.traits.TypeTrait;
-import io.anuke.mindustry.type.ContentType;
+import io.anuke.arc.function.*;
+import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.entities.traits.*;
 
 public class TypeID extends MappableContent{
     public final Supplier<? extends TypeTrait> constructor;

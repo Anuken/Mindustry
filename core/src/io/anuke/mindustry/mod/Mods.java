@@ -14,7 +14,9 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
@@ -154,6 +156,7 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
+        disabled.remove(mod);
         requiresReload = true;
     }
 
@@ -244,7 +247,9 @@ public class Mods implements Loadable{
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
     public void reloadContent(){
         //epic memory leak
+        //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+
         loaded.clear();
         disabled.clear();
         load();
@@ -263,6 +268,8 @@ public class Mods implements Loadable{
         content.loadColors();
         data.load();
         requiresReload = false;
+
+        Events.fire(new ContentReloadEvent());
     }
 
     /** Creates all the content found in mod files. */
@@ -322,7 +329,8 @@ public class Mods implements Loadable{
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave(mod.name + "-enabled", enabled);
+            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.save();
             requiresReload = true;
             if(!enabled){
                 loaded.remove(mod);
@@ -368,6 +376,8 @@ public class Mods implements Loadable{
                 break;
             }
         }
+
+        setEnabled(mod, false);
 
         if(content != null){
             throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
@@ -463,7 +473,7 @@ public class Mods implements Loadable{
         }
 
         public boolean enabled(){
-            return Core.settings.getBool(name + "-enabled", true);
+            return Core.settings.getBool("mod-" + name + "-enabled", true);
         }
 
         @Override
@@ -552,6 +562,14 @@ public class Mods implements Loadable{
 
         public ModLoadException(String message, @Nullable Content content, Throwable cause){
             super(message, cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
+
+        public ModLoadException(@Nullable Content content, Throwable cause){
+            super(cause);
             this.content = content;
             if(content != null){
                 this.mod = content.mod;

@@ -5,7 +5,7 @@ import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 
-public class ProxySound implements Sound{
+public class ModLoadingSound implements Sound{
     public @NonNull Sound sound = new MockSound();
 
     @Override

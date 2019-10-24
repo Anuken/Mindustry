@@ -1,12 +1,12 @@
 package io.anuke.mindustry.net;
 
-import io.anuke.arc.Core;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.util.serialization.Base64Coder;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.io.TypeIO;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.io.*;
 
-import java.nio.ByteBuffer;
+import java.nio.*;
 
 /**
  * Class for storing all packets.

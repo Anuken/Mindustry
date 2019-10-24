@@ -10,7 +10,9 @@ import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
+import org.robovm.apple.dispatch.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -34,7 +36,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        //IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
 
             @Override
@@ -88,9 +90,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 }
 
                 cont.setDelegate(new ChooserDelegate());
-                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
 
-                });
+               // DispatchQueue.getMainQueue().sync(() -> {
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
+               // });
             }
 
             @Override
@@ -101,10 +104,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 NSURL url = new NSURL(to.file());
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
+                //p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
+                //DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> io.anuke.arc.util.Log.info("Success! Presented {0}", to));
+                .presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                //});
             }
 
             @Override
@@ -118,7 +123,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, config);
+        }, new IOSApplicationConfiguration(){{
+           errorHandler = ModCrashHandler::handle;
+        }});
     }
 
     @Override

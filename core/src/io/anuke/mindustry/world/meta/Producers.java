@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.ctype.Content;
 
 public class Producers{
     private Content output;

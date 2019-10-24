@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;

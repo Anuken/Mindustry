@@ -1,5 +1,6 @@
 package io.anuke.mindustry.content;
 
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Objectives.*;
 import io.anuke.mindustry.maps.generators.*;

@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.world.*;

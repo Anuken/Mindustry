@@ -9,10 +9,10 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -94,7 +94,7 @@ public class Conveyor extends Block implements Autotiler{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        int[] bits = buildBlending(tile, tile.rotation(), null);
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];

@@ -6,6 +6,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 

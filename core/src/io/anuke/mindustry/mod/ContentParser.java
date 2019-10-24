@@ -16,6 +16,7 @@ import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
@@ -53,7 +54,7 @@ public class ContentParser{
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
 
             String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            ProxySound sound = new ProxySound();
+            ModLoadingSound sound = new ModLoadingSound();
             Core.assets.load(path, Sound.class).loaded = result -> {
                 sound.sound = (Sound)result;
             };
@@ -66,11 +67,18 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
+        put(Weapon.class, (type, data) -> {
+            Weapon weapon = new Weapon();
+            readFields(weapon, data);
+            weapon.name = currentMod.name + "-" + weapon.name;
+            return weapon;
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
     private Array<Runnable> reads = new Array<>();
     private Array<Runnable> postreads = new Array<>();
+    private ObjectSet<Object> toBeParsed = new ObjectSet<>();
     private LoadedMod currentMod;
     private Content currentContent;
 
@@ -290,6 +298,8 @@ public class ContentParser{
             Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
+        postreads.clear();
+        toBeParsed.clear();
     }
 
     /**
@@ -313,6 +323,7 @@ public class ContentParser{
         currentMod = mod;
         boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        toBeParsed.add(c);
         if(!exists){
             c.sourceFile = file;
             c.mod = mod;
@@ -379,7 +390,7 @@ public class ContentParser{
     }
 
     private void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String) return;
+        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
         parser.getFields(object.getClass()).values().toArray().each(field -> {
             try{
@@ -400,6 +411,7 @@ public class ContentParser{
     }
 
     private void readFields(Object object, JsonValue jsonMap){
+        toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
         for(JsonValue child = jsonMap.child; child != null; child = child.next){

@@ -2,8 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.annotations.Annotations.Struct;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.GridBits;
-import io.anuke.arc.collection.IntQueue;
+import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
@@ -32,6 +31,7 @@ public class Damage{
     private static Vector2 tr = new Vector2();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
+    private static IntSet collidedBlocks = new IntSet();
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
@@ -88,11 +88,13 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+        collidedBlocks.clear();
         tr.trns(angle, length);
         IntPositionConsumer collider = (cx, cy) -> {
             Tile tile = world.ltile(cx, cy);
-            if(tile != null && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
+                collidedBlocks.add(tile.pos());
                 hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
             }
         };
