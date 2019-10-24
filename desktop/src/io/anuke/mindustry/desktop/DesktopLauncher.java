@@ -142,7 +142,7 @@ public class DesktopLauncher extends ClientLauncher{
                 try{
                     SteamAPI.loadLibraries();
                 }catch(Throwable t){
-                    Log.err(t);
+                    logSteamError(t);
                     fallbackSteam();
                 }
 
@@ -155,8 +155,18 @@ public class DesktopLauncher extends ClientLauncher{
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                Log.err(e);
+                logSteamError(e);
             }
+        }
+    }
+
+    void logSteamError(Throwable e){
+        Log.err(e);
+        try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
+            String log = Strings.parseException(e, true);
+            s.write(log.getBytes());
+        }catch(Exception e2){
+            Log.err(e2);
         }
     }
 
@@ -169,7 +179,7 @@ public class DesktopLauncher extends ClientLauncher{
             Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
             System.loadLibrary(new File(name).getAbsolutePath());
         }catch(Throwable e){
-            Log.err(e);
+            logSteamError(e);
         }
     }
 
