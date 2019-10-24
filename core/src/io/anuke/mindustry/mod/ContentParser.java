@@ -2,6 +2,7 @@ package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
+import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -52,6 +53,7 @@ public class ContentParser{
         });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
+            if(Vars.headless) return new MockSound();
 
             String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
             ModLoadingSound sound = new ModLoadingSound();

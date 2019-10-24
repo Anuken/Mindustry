@@ -169,9 +169,11 @@ public class Mods implements Loadable{
         for(FileHandle file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
+
+            Log.debug("[Mods] Loading mod {0}", file);
             try{
                 LoadedMod mod = loadMod(file, false);
-                if(mod.enabled()){
+                if(mod.enabled() || headless){
                     loaded.add(mod);
                 }else{
                     disabled.add(mod);
@@ -286,7 +288,7 @@ public class Mods implements Loadable{
                                     try{
                                         //this binds the content but does not load it entirely
                                         Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
-                                        Log.info("[{0}] Loaded '{1}'.", mod.meta.name,
+                                        Log.debug("[{0}] Loaded '{1}'.", mod.meta.name,
                                         (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                     }catch(Exception e){
                                         throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);

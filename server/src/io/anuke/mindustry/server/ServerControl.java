@@ -751,8 +751,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.each(p -> p.registerServerCommands(handler));
-        //TODO
-        //plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
+        mods.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){

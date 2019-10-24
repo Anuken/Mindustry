@@ -60,7 +60,6 @@ public class DesktopInput extends InputHandler{
             t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
-                //b.touchable(Touchable.enabled);
                 b.defaults().left();
                 b.add(Core.bundle.format("schematic.flip",
                 Core.keybinds.get(Binding.schematic_flip_x).key.name(),
@@ -69,10 +68,19 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
                         ui.showTextInput("$schematic.add", "$name", "", text -> {
-                            lastSchematic.tags.put("name", text);
-                            schematics.add(lastSchematic);
-                            ui.showInfoFade("$schematic.saved");
-                            ui.schematics.showInfo(lastSchematic);
+                            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
+                            if(replacement != null){
+                                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                                    schematics.overwrite(replacement, lastSchematic);
+                                    ui.showInfoFade("$schematic.saved");
+                                    ui.schematics.showInfo(replacement);
+                                });
+                            }else{
+                                lastSchematic.tags.put("name", text);
+                                schematics.add(lastSchematic);
+                                ui.showInfoFade("$schematic.saved");
+                                ui.schematics.showInfo(lastSchematic);
+                            }
                         });
                     }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
