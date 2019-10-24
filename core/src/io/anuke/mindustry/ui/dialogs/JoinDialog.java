@@ -10,7 +10,7 @@ import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
-import io.anuke.mindustry.core.Version;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -105,9 +105,8 @@ public class JoinDialog extends FloatingDialog{
 
             TextButton button = buttons[0] = remote.addButton("[accent]" + server.displayIP(), Styles.cleart, () -> {
                 if(!buttons[0].childrenPressed()){
-                    if(server.lastHost != null && server.lastHost.version != io.anuke.mindustry.core.Version.build && io.anuke.mindustry.core.Version.build != -1 && server.lastHost.version != -1){
-                        ui.showInfo("[scarlet]" + (server.lastHost.version > io.anuke.mindustry.core.Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
-                                Core.bundle.format("server.versions", io.anuke.mindustry.core.Version.build, server.lastHost.version));
+                    if(server.lastHost != null){
+                        safeConnect(server.ip, server.port, server.lastHost.version);
                     }else{
                         connect(server.ip, server.port);
                     }
@@ -196,13 +195,13 @@ public class JoinDialog extends FloatingDialog{
             versionString = Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
         }else if(host.version == 0){
             versionString = Core.bundle.get("server.outdated");
-        }else if(host.version < io.anuke.mindustry.core.Version.build && io.anuke.mindustry.core.Version.build != -1){
+        }else if(host.version < Version.build && Version.build != -1){
             versionString = Core.bundle.get("server.outdated") + "\n" +
             Core.bundle.format("server.version", host.version, "");
-        }else if(host.version > io.anuke.mindustry.core.Version.build && io.anuke.mindustry.core.Version.build != -1){
+        }else if(host.version > Version.build && Version.build != -1){
             versionString = Core.bundle.get("server.outdated.client") + "\n" +
             Core.bundle.format("server.version", host.version, "");
-        }else if(host.version == io.anuke.mindustry.core.Version.build && Version.type.equals(host.versionType)){
+        }else if(host.version == Version.build && Version.type.equals(host.versionType)){
             //not important
             versionString = "";
         }else{
@@ -314,7 +313,7 @@ public class JoinDialog extends FloatingDialog{
 
         local.row();
 
-        TextButton button = local.addButton("", Styles.cleart, () -> connect(host.address, port))
+        TextButton button = local.addButton("", Styles.cleart, () -> safeConnect(host.address, port, host.version))
         .width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
@@ -342,6 +341,15 @@ public class JoinDialog extends FloatingDialog{
                 add.hide();
             });
         });
+    }
+
+    void safeConnect(String ip, int port, int version){
+        if(version != Version.build && Version.build != -1 && version != -1){
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+            Core.bundle.format("server.versions", Version.build, version));
+        }else{
+            connect(ip, port);
+        }
     }
 
     float targetWidth(){

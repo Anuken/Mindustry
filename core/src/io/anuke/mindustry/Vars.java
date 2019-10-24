@@ -10,7 +10,6 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.ai.*;
 import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;

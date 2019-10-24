@@ -10,7 +10,7 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.core.Version;
+import Version;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
@@ -134,7 +134,7 @@ public class ServerControl implements ApplicationListener{
         thread.setDaemon(true);
         thread.start();
 
-        if(io.anuke.mindustry.core.Version.build == -1){
+        if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
@@ -194,7 +194,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("version", "Displays server version info.", arg -> {
-            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", io.anuke.mindustry.core.Version.number, io.anuke.mindustry.core.Version.modifier, io.anuke.mindustry.core.Version.type, Version.build);
+            info("&lmVersion: &lyMindustry {0}-{1} {2} / build {3}", Version.number, Version.modifier, Version.type, Version.build);
             info("&lmJava Version: &ly{0}", System.getProperty("java.version"));
         });
 
