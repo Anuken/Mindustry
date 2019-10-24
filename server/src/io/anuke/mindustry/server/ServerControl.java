@@ -10,7 +10,7 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import Version;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
