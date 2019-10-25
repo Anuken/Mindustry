@@ -308,7 +308,11 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
-            ui.schematics.show();
+            if(ui.schematics.isShown()){
+                ui.schematics.hide();
+            }else{
+                ui.schematics.show();
+            }
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
