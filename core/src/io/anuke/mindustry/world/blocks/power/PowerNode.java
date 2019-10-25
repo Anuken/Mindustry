@@ -315,11 +315,8 @@ public class PowerNode extends PowerBlock{
                 block = world.tile(point.x, point.y).link().block();
             }
 
-            if (block instanceof Wall){
-                Wall wall = (Wall) block;
-                if (wall.isInsulated()){
-                    return true;
-                }
+            if (block.insulated) {
+                return true;
             }
         }
 

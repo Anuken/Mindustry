@@ -55,6 +55,8 @@ public class Block extends BlockStorage{
     public boolean breakable;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
+    /** whether this block has insulating properties. */
+    public boolean insulated = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
