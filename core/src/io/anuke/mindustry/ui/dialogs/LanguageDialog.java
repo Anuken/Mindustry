@@ -17,7 +17,8 @@ public class LanguageDialog extends FloatingDialog{
     private Locale lastLocale;
     private ObjectMap<Locale, String> displayNames = ObjectMap.of(
         Locale.TRADITIONAL_CHINESE, "正體中文",
-        Locale.SIMPLIFIED_CHINESE, "简体中文"
+        Locale.SIMPLIFIED_CHINESE, "简体中文",
+        new Locale("oh", "NO"), "[scarlet]oh no[]"
     );
 
     public LanguageDialog(){
