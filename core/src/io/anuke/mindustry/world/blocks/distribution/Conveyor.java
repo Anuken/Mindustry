@@ -413,12 +413,12 @@ public class Conveyor extends Block implements Autotiler{
         static long toLong(int value){
             byte[] values = Pack.bytes(value, writeByte);
 
-            byte itemid = values[0];
+            short itemid = content.item(values[0]).id;
             float x = values[1] / 127f;
             float y = ((int)values[2] + 128) / 255f;
 
             short[] shorts = writeShort;
-            shorts[0] = (short)itemid;
+            shorts[0] = itemid;
             shorts[1] = (short)(x * Short.MAX_VALUE);
             shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);

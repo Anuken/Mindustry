@@ -277,6 +277,7 @@ public class Mods implements Loadable{
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
+
         for(LoadedMod mod : loaded){
             safeRun(mod, () -> {
                 if(mod.root.child("content").exists()){
