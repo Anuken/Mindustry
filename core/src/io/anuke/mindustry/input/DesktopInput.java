@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode != none){
+        if(mode != none || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
