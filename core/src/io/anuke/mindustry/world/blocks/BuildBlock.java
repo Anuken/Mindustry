@@ -12,12 +12,12 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -64,15 +64,19 @@ public class BuildBlock extends Block{
         if(tile.entity != null){
             tile.entity.health = block.health * healthf;
         }
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-        tile.block().placed(tile);
-
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.id){
             if(!skipConfig){
                 tile.block().playerPlaced(tile);
             }
         }
+        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+    }
+
+    public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+        Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
+        tile.block().placed(tile);
+
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
     }
@@ -209,7 +213,7 @@ public class BuildBlock extends Block{
             }
 
             if(progress >= 1f || state.rules.infiniteResources){
-                Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }
             return false;

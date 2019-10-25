@@ -10,7 +10,7 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
-import Version;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
@@ -751,8 +751,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.each(p -> p.registerServerCommands(handler));
-        //TODO
-        //plugins.each(p -> p.registerClientCommands(netServer.clientCommands));
+        mods.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
     private void readCommands(){
@@ -816,10 +815,6 @@ public class ServerControl implements ApplicationListener{
                 p.reset();
                 if(state.rules.pvp){
                     p.setTeam(netServer.assignTeam(p, new ArrayIterable<>(players)));
-                }
-                if(p.getClosestCore() != null){
-                    p.setDead(false);
-                    p.setNet(p.getClosestCore().x, p.getClosestCore().y);
                 }
                 netServer.sendWorldData(p);
             }

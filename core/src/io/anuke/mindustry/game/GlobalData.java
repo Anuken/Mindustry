@@ -47,6 +47,7 @@ public class GlobalData{
 
         try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
             for(FileHandle add : files){
+                if(add.isDirectory()) continue;
                 zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
                 Streams.copyStream(add.read(), zos);
                 zos.closeEntry();

@@ -28,10 +28,8 @@ public class MusicControl{
     private boolean silenced;
 
     public MusicControl(){
-        Events.on(ClientLoadEvent.class, e -> {
-            ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
-            darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
-        });
+        Events.on(ClientLoadEvent.class, e -> reload());
+        Events.on(ContentReloadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
@@ -39,6 +37,13 @@ public class MusicControl{
                 playRandom();
             }
         }));
+    }
+
+    private void reload(){
+        current = null;
+        fade = 0f;
+        ambientMusic = Array.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
+        darkMusic = Array.with(Musics.game2, Musics.game5, Musics.game7);
     }
 
     /** Update and play the right music track.*/

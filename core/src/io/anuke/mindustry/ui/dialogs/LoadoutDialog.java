@@ -14,12 +14,10 @@ import static io.anuke.mindustry.Vars.*;
 
 public class LoadoutDialog extends FloatingDialog{
     private Runnable hider;
-    //private Supplier<Array<ItemStack>> supplier;
     private Runnable resetter;
     private Runnable updater;
     private Array<ItemStack> stacks = new Array<>();
     private Array<ItemStack> originalStacks = new Array<>();
-    //private Predicate<Item> filter;
     private Table items;
     private int capacity;
 

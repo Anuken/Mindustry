@@ -68,6 +68,25 @@ public class Schematics implements Loadable{
         });
     }
 
+    public void overwrite(Schematic target, Schematic newSchematic){
+        if(previews.containsKey(target)){
+            previews.get(target).dispose();
+            previews.remove(target);
+        }
+
+        target.tiles.clear();
+        target.tiles.addAll(newSchematic.tiles);
+        newSchematic.tags.putAll(target.tags);
+        newSchematic.file = target.file;
+
+        try{
+            write(newSchematic, target.file);
+        }catch(Exception e){
+            Log.err(e);
+            ui.showException(e);
+        }
+    }
+
     private void loadFile(FileHandle file){
         if(!file.extension().equals(schematicExtension)) return;
 

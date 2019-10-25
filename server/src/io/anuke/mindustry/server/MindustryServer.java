@@ -1,6 +1,8 @@
 package io.anuke.mindustry.server;
 
 import io.anuke.arc.*;
+import io.anuke.arc.files.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.mod.*;
@@ -19,6 +21,15 @@ public class MindustryServer implements ApplicationListener{
         Core.settings.setDataDirectory(Core.files.local("config"));
         loadLocales = false;
         headless = true;
+
+        FileHandle plugins = Core.settings.getDataDirectory().child("plugins");
+        if(plugins.isDirectory() && plugins.list().length > 0 && !plugins.sibling("mods").exists()){
+            Log.warn("[IMPORTANT NOTICE] &lrPlugins have been detected.&ly Automatically moving all contents of the plugin folder into the 'mods' folder. The original folder will not be removed; please do so manually.");
+            plugins.sibling("mods").mkdirs();
+            for(FileHandle file : plugins.list()){
+                file.copyTo(plugins.sibling("mods"));
+            }
+        }
 
         Vars.loadSettings();
         Vars.init();
