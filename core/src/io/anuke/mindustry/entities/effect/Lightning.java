@@ -20,8 +20,11 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.world;
 
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
@@ -83,6 +86,11 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
                 y = furthest.y;
             }else{
                 rotation += random.range(20f);
+
+                if (hitsInsulator(l)) {
+                    rotation += 180;
+                }
+
                 x += Angles.trnsx(rotation, hitRange / 2f);
                 y += Angles.trnsy(rotation, hitRange / 2f);
             }
@@ -130,5 +138,20 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     @Override
     public EntityGroup targetGroup(){
         return bulletGroup;
+    }
+
+    protected static boolean hitsInsulator(Lightning l){
+        if (l.lines.size > 1){
+            Position from = l.lines.get(l.lines.size - 2);
+            Vector2 to = (Vector2) l.lines.get(l.lines.size - 1);
+
+            Tile a = world.tileWorld(from.getX(), from.getY());
+            Tile b = world.tileWorld(to.getX(), to.getY());
+
+            if (PowerNode.insulated(a, b)){
+                return true;
+            }
+        }
+        return false;
     }
 }
