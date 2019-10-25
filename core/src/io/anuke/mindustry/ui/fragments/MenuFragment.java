@@ -107,6 +107,7 @@ public class MenuFragment extends Fragment{
             container.add(join);
             container.add(custom);
             container.add(maps);
+            container.row();
 
             container.table(table -> {
                 table.defaults().set(container.defaults());
