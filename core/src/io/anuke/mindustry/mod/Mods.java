@@ -62,7 +62,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(dest, false));
+            loaded.add(loadMod(dest));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -172,7 +172,7 @@ public class Mods implements Loadable{
 
             Log.debug("[Mods] Loading mod {0}", file);
             try{
-                LoadedMod mod = loadMod(file, false);
+                LoadedMod mod = loadMod(file);
                 if(mod.enabled() || headless){
                     loaded.add(mod);
                 }else{
@@ -187,12 +187,13 @@ public class Mods implements Loadable{
         //load workshop mods now
         for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
             try{
-                LoadedMod mod = loadMod(file, true);
+                LoadedMod mod = loadMod(file);
                 if(mod.enabled()){
                     loaded.add(mod);
                 }else{
                     disabled.add(mod);
                 }
+                mod.addSteamID(file.parent().name());
             }catch(Exception e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
@@ -399,7 +400,7 @@ public class Mods implements Loadable{
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
-    private LoadedMod loadMod(FileHandle sourceFile, boolean workshop) throws Exception{
+    private LoadedMod loadMod(FileHandle sourceFile) throws Exception{
         FileHandle zip = sourceFile.isDirectory() ? sourceFile : new ZipFileHandle(sourceFile);
         if(zip.list().length == 1 && zip.list()[0].isDirectory()){
             zip = zip.list()[0];

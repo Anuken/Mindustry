@@ -113,7 +113,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<LiquidSourceEntity>entity().source = content.liquid(value);
+        tile.<LiquidSourceEntity>entity().source = value == -1 ? null : content.liquid(value);
     }
 
     class LiquidSourceEntity extends TileEntity{

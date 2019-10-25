@@ -302,12 +302,12 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select)){
+        if(Core.input.keyTap(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu)){
+        if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
             ui.schematics.show();
         }
 

@@ -126,6 +126,8 @@ public class TypeIO{
             if(!request.breaking){
                 buffer.putShort(request.block.id);
                 buffer.put((byte)request.rotation);
+                buffer.put(request.hasConfig ? (byte)1 : 0);
+                buffer.putInt(request.config);
             }
         }
     }
@@ -148,7 +150,12 @@ public class TypeIO{
             }else{ //place
                 short block = buffer.getShort();
                 byte rotation = buffer.get();
+                boolean hasConfig = buffer.get() == 1;
+                int config = buffer.getInt();
                 currentRequest = new BuildRequest(Pos.x(position), Pos.y(position), rotation, content.block(block));
+                if(hasConfig){
+                    currentRequest.configure(config);
+                }
             }
 
             reqs[i] = (currentRequest);
