@@ -68,6 +68,11 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
             Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
             l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
+            if (hitsInsulator(l)) {
+                l.lines.remove(l.lines.size -1);
+                break;
+            }
+
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
             if(hit.size < maxChain){
@@ -86,10 +91,6 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
                 y = furthest.y;
             }else{
                 rotation += random.range(20f);
-
-                if (hitsInsulator(l)) {
-                    rotation += 180;
-                }
 
                 x += Angles.trnsx(rotation, hitRange / 2f);
                 y += Angles.trnsy(rotation, hitRange / 2f);
