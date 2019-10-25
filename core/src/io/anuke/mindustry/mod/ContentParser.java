@@ -55,7 +55,8 @@ public class ContentParser{
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
             if(Vars.headless) return new MockSound();
 
-            String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
+            String name = "sounds/" + data.asString();
+            String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
             ModLoadingSound sound = new ModLoadingSound();
             Core.assets.load(path, Sound.class).loaded = result -> {
                 sound.sound = (Sound)result;
