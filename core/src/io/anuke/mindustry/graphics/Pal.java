@@ -75,6 +75,8 @@ public class Pal{
 
     surge = Color.valueOf("f3e979"),
 
+    plastanium = Color.valueOf("a1b46e"),
+
     redSpark = Color.valueOf("fbb97f"),
     orangeSpark = Color.valueOf("d2b29c"),
 

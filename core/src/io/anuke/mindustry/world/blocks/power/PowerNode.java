@@ -207,7 +207,7 @@ public class PowerNode extends PowerBlock{
                     boolean linked = linked(tile, link);
 
                     if(linked){
-                        Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 1f, Pal.place);
+                        Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 1f, insulated(tile, link) ? Pal.plastanium : Pal.place);
                     }
                 }
             }
@@ -226,7 +226,9 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place));
+        getPotentialLinks(tile, other -> {
+            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, insulated(tile, other) ? Pal.plastanium : Pal.place);
+        });
 
         Draw.reset();
     }
