@@ -207,7 +207,7 @@ public class PowerNode extends PowerBlock{
                     boolean linked = linked(tile, link);
 
                     if(linked){
-                        Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 1f, insulated(tile, link) ? Pal.plastanium : Pal.place);
+                        Drawf.square(link.drawx(), link.drawy(), link.block().size * tilesize / 2f + 1f, Pal.place);
                     }
                 }
             }
@@ -227,7 +227,18 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
-            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, insulated(tile, other) ? Pal.plastanium : Pal.place);
+            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
+
+            insulators(tile, other).each(cause -> {
+
+                Block block = world.tileWorld(cause.drawx(), cause.drawy()).block();
+
+                if (block instanceof BlockPart){
+                    cause = world.tileWorld(cause.drawx(), cause.drawy()).link();
+                }
+
+                Drawf.square(cause.drawx(), cause.drawy(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+            });
         });
 
         Draw.reset();
@@ -307,6 +318,11 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(Tile tile, Tile other){
+        return insulators(tile, other).size > 0;
+    }
+
+    public static Array<Tile> insulators(Tile tile, Tile other) {
+        Array<Tile> tiles = new Array<Tile>();
         Array<Point2>points = PlaceUtils.normalizeDiagonal(tile.x, tile.y, other.x, other.y);
 
         for(int i = 0; i < points.size; i++){
@@ -318,10 +334,10 @@ public class PowerNode extends PowerBlock{
             }
 
             if (block.insulated) {
-                return true;
+                tiles.add(world.tile(point.x, point.y));
             }
         }
 
-        return false;
+        return tiles;
     }
 }
