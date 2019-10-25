@@ -1,7 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.gen.*;
@@ -34,19 +36,27 @@ public class ModsDialog extends FloatingDialog{
                 ui.loadfrag.show();
                 Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                     Core.net.httpGet(loc.getHeader("Location"), result -> {
-                        try{
-                            Streams.copyStream(result.getResultAsStream(), modDirectory.child(text.replace("/", "") + ".zip").write(false));
-                            Core.app.post(() -> {
-                                try{
-                                    mods.reloadContent();
-                                    setup();
-                                    ui.loadfrag.hide();
-                                }catch(Throwable e){
-                                    ui.showException(e);
-                                }
-                            });
-                        }catch(Throwable e){
-                            ui.showException(e);
+                        if(result.getStatus() != HttpStatus.OK){
+                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                            ui.loadfrag.hide();
+                        }else{
+                            try{
+                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                mods.importMod(file);
+                                file.delete();
+                                Core.app.post(() -> {
+                                    try{
+                                        mods.reloadContent();
+                                        setup();
+                                        ui.loadfrag.hide();
+                                    }catch(Throwable e){
+                                        ui.showException(e);
+                                    }
+                                });
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
                         }
                     }, t -> Core.app.post(() -> ui.showException(t)));
                 }, t -> Core.app.post(() -> ui.showException(t)));
@@ -150,6 +160,6 @@ public class ModsDialog extends FloatingDialog{
                     e.printStackTrace();
                 }
             });
-        }).margin(12f).width(500f);
+        }).margin(12f).width(400f);
     }
 }

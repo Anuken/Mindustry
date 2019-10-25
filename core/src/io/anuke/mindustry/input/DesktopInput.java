@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode != none){
+        if(mode != none || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -302,13 +302,17 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select)){
+        if(Core.input.keyTap(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu)){
-            ui.schematics.show();
+        if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
+            if(ui.schematics.isShown()){
+                ui.schematics.hide();
+            }else{
+                ui.schematics.show();
+            }
         }
 
         if(Core.input.keyTap(Binding.clear_building)){

@@ -450,7 +450,7 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean chatting,
+        boolean boosting, boolean shooting, boolean chatting, boolean building,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -477,6 +477,7 @@ public class NetServer implements ApplicationListener{
         player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;
+        player.isBuilding = building;
         player.buildQueue().clear();
         for(BuildRequest req : requests){
             if(req == null) continue;

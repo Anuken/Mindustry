@@ -76,6 +76,8 @@ public class Schematics implements Loadable{
 
         target.tiles.clear();
         target.tiles.addAll(newSchematic.tiles);
+        target.width = newSchematic.width;
+        target.height = newSchematic.height;
         newSchematic.tags.putAll(target.tags);
         newSchematic.file = target.file;
 

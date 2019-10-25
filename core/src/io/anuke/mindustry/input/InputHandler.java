@@ -401,6 +401,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
+                BuildRequest other = getRequest(req.x, req.y);
+                if(other != null){
+                    selectRequests.remove(other);
+                }
+
                 selectRequests.add(req.copy());
             }
         }

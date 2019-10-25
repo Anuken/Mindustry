@@ -137,13 +137,15 @@ public class ZoneInfoDialog extends FloatingDialog{
                 });
 
                 cont.row();
-
-                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
-                () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
-                ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
             cont.marginRight(12f);
         });
+        cont.row();
+
+        cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
+        () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
+        ).fillX().pad(3).disabled(b -> !zone.canConfigure());
+
         cont.row();
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {
