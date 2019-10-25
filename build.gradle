@@ -5,12 +5,13 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
+        maven{ url 'https://jitpack.io' }
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.7'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8-SNAPSHOT'
         classpath "com.badlogicgames.gdx:gdx-tools:1.9.10"
-        classpath "com.badlogicgames.packr:packr:2.1-SNAPSHOT"
+        classpath "com.github.anuken:packr:-SNAPSHOT"
     }
 }
 
@@ -20,12 +21,12 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '4'
+        versionNumber = '5'
         if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.7'
+        roboVMVersion = '2.3.8-SNAPSHOT'
         steamworksVersion = '1.8.0'
         arcHash = null
 
@@ -166,13 +167,14 @@ project(":ios"){
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
+        }else{
+            props['app.id'] = 'io.anuke.mindustry'
+            props['app.version'] = '5.0'
+            props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
+            props['app.executable'] = 'IOSLauncher'
+            props['app.name'] = 'Mindustry'
         }
-
-        props['app.id'] = 'io.anuke.mindustry'
-        props['app.version'] = '4.2.1'
-        props['app.mainclass'] = 'io.anuke.mindustry.IOSLauncher'
-        props['app.executable'] = 'IOSLauncher'
-        props['app.name'] = 'Mindustry'
+        
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
         props.store(vfile.newWriter(), null)
     }
@@ -194,7 +196,7 @@ project(":core"){
     apply plugin: "java"
 
     task preGen{
-        outputs.upToDateWhen{ false } 
+        outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
     }

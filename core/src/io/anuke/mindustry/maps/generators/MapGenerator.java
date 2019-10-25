@@ -39,6 +39,9 @@ public class MapGenerator extends Generator{
         this.decorations.addAll(decor);
         return this;
     }
+    public void removePrefix(String name){
+        this.mapName = this.mapName.substring(name.length() + 1);
+    }
 
     {
         decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01), new Decoration(Blocks.ignarock, Blocks.pebbles, 0.03f));

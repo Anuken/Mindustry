@@ -16,12 +16,12 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.ui.layout.*;
 import io.anuke.mindustry.ui.layout.TreeLayout.*;
 
@@ -40,7 +40,16 @@ public class TechTreeDialog extends FloatingDialog{
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        cont.stack(view = new View(), items = new ItemsDisplay()).grow();
+        Stack stack = cont.stack(view = new View(), items = new ItemsDisplay()).grow().get();
+
+        Events.on(ContentReloadEvent.class, e -> {
+            nodes.clear();
+            root = new TechTreeNode(TechTree.root, null);
+            checkNodes(root);
+            treeLayout();
+            stack.getChildren().get(0).remove();
+            stack.addChildAt(0, view = new View());
+        });
 
         shown(() -> {
             checkNodes(root);
@@ -105,8 +114,18 @@ public class TechTreeDialog extends FloatingDialog{
         RadialTreeLayout layout = new RadialTreeLayout();
         LayoutNode node = new LayoutNode(root, null);
         layout.layout(node);
-        //bounds.y += nodeSize*1.5f;
+        float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
         copyInfo(node);
+
+        for(TechTreeNode n : nodes){
+            if(!n.visible) continue;
+            minx = Math.min(n.x - n.width/2f, minx);
+            maxx = Math.max(n.x + n.width/2f, maxx);
+            miny = Math.min(n.y - n.height/2f, miny);
+            maxy = Math.max(n.y + n.height/2f, maxy);
+        }
+        bounds = new Rectangle(minx, miny, maxx - minx, maxy - miny);
+        bounds.y += nodeSize*1.5f;
     }
 
     void copyInfo(LayoutNode node){
@@ -262,7 +281,7 @@ public class TechTreeDialog extends FloatingDialog{
             float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
             float rw = bounds.width, rh = bounds.height;
             rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
-            ry = Mathf.clamp(ry, pad, Core.graphics.getHeight() - rh - pad);
+            ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
         }
@@ -342,7 +361,6 @@ public class TechTreeDialog extends FloatingDialog{
             if(node.block.description != null){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.block.description).color(Color.lightGray).growX()).fillX();
             }
-
 
             addChild(infoTable);
             infoTable.pack();

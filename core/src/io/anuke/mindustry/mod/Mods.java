@@ -14,7 +14,9 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.plugin.*;
 import io.anuke.mindustry.type.*;
@@ -60,7 +62,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            loaded.add(loadMod(file, false));
+            loaded.add(loadMod(dest, false));
             requiresReload = true;
         }catch(IOException e){
             dest.delete();
@@ -154,6 +156,7 @@ public class Mods implements Loadable{
             mod.file.delete();
         }
         loaded.remove(mod);
+        disabled.remove(mod);
         requiresReload = true;
     }
 
@@ -166,9 +169,11 @@ public class Mods implements Loadable{
         for(FileHandle file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
 
+
+            Log.debug("[Mods] Loading mod {0}", file);
             try{
                 LoadedMod mod = loadMod(file, false);
-                if(mod.enabled()){
+                if(mod.enabled() || headless){
                     loaded.add(mod);
                 }else{
                     disabled.add(mod);
@@ -180,7 +185,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(FileHandle file : platform.getExternalMods()){
+        for(FileHandle file : platform.getWorkshopContent(LoadedMod.class)){
             try{
                 LoadedMod mod = loadMod(file, true);
                 if(mod.enabled()){
@@ -244,7 +249,9 @@ public class Mods implements Loadable{
     /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
     public void reloadContent(){
         //epic memory leak
+        //TODO make it less epic
         Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
+
         loaded.clear();
         disabled.clear();
         load();
@@ -263,6 +270,8 @@ public class Mods implements Loadable{
         content.loadColors();
         data.load();
         requiresReload = false;
+
+        Events.fire(new ContentReloadEvent());
     }
 
     /** Creates all the content found in mod files. */
@@ -279,7 +288,7 @@ public class Mods implements Loadable{
                                     try{
                                         //this binds the content but does not load it entirely
                                         Content loaded = parser.parse(mod, file.nameWithoutExtension(), file.readString("UTF-8"), file, type);
-                                        Log.info("[{0}] Loaded '{1}'.", mod.meta.name,
+                                        Log.debug("[{0}] Loaded '{1}'.", mod.meta.name,
                                         (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
                                     }catch(Exception e){
                                         throw new RuntimeException("Failed to parse content file '" + file + "' for mod '" + mod.meta.name + "'.", e);
@@ -322,7 +331,8 @@ public class Mods implements Loadable{
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave(mod.name + "-enabled", enabled);
+            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.save();
             requiresReload = true;
             if(!enabled){
                 loaded.remove(mod);
@@ -368,6 +378,8 @@ public class Mods implements Loadable{
                 break;
             }
         }
+
+        setEnabled(mod, false);
 
         if(content != null){
             throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
@@ -442,7 +454,7 @@ public class Mods implements Loadable{
     }
 
     /** Represents a plugin that has been loaded from a jar file.*/
-    public static class LoadedMod{
+    public static class LoadedMod implements Publishable{
         /** The location of this mod's zip file/folder on the disk. */
         public final FileHandle file;
         /** The root zip file; points to the contents of this mod. In the case of folders, this is the same as the mod's file. */
@@ -453,8 +465,6 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
-        /** The ID of this mod in the workshop.*/
-        public @Nullable String workshopID;
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
@@ -465,7 +475,64 @@ public class Mods implements Loadable{
         }
 
         public boolean enabled(){
-            return Core.settings.getBool(name + "-enabled", true);
+            return Core.settings.getBool("mod-" + name + "-enabled", true);
+        }
+
+        @Override
+        public String getSteamID(){
+            return Core.settings.getString(name + "-steamid", null);
+        }
+
+        @Override
+        public void addSteamID(String id){
+            Core.settings.put(name + "-steamid", id);
+            Core.settings.save();
+        }
+
+        @Override
+        public void removeSteamID(){
+            Core.settings.remove(name + "-steamid");
+            Core.settings.save();
+        }
+
+        @Override
+        public String steamTitle(){
+            return meta.name;
+        }
+
+        @Override
+        public String steamDescription(){
+            return meta.description;
+        }
+
+        @Override
+        public String steamTag(){
+            return "mod";
+        }
+
+        @Override
+        public FileHandle createSteamFolder(String id){
+            return file;
+        }
+
+        @Override
+        public FileHandle createSteamPreview(String id){
+            return file.child("preview.png");
+        }
+
+        @Override
+        public boolean prePublish(){
+            if(!file.isDirectory()){
+                ui.showErrorMessage("$mod.folder.missing");
+                return false;
+            }
+
+            if(!file.child("preview.png").exists()){
+                ui.showErrorMessage("$mod.preview.missing");
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -497,6 +564,14 @@ public class Mods implements Loadable{
 
         public ModLoadException(String message, @Nullable Content content, Throwable cause){
             super(message, cause);
+            this.content = content;
+            if(content != null){
+                this.mod = content.mod;
+            }
+        }
+
+        public ModLoadException(@Nullable Content content, Throwable cause){
+            super(cause);
             this.content = content;
             if(content != null){
                 this.mod = content.mod;

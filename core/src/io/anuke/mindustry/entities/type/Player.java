@@ -24,7 +24,9 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -438,7 +440,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation));
+                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -585,7 +587,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -797,6 +799,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         textFadeTime = 0f;
         target = null;
         moveTarget = null;
+        isShooting = isBoosting = isTransferring = isTyping = false;
         spawner = lastSpawner = null;
         health = maxHealth();
         mining = null;

@@ -19,13 +19,13 @@ import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 
 import java.io.*;
@@ -142,7 +142,7 @@ public class DesktopLauncher extends ClientLauncher{
                 try{
                     SteamAPI.loadLibraries();
                 }catch(Throwable t){
-                    Log.err(t);
+                    logSteamError(t);
                     fallbackSteam();
                 }
 
@@ -155,8 +155,18 @@ public class DesktopLauncher extends ClientLauncher{
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                Log.err(e);
+                logSteamError(e);
             }
+        }
+    }
+
+    void logSteamError(Throwable e){
+        Log.err(e);
+        try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
+            String log = Strings.parseException(e, true);
+            s.write(log.getBytes());
+        }catch(Exception e2){
+            Log.err(e2);
         }
     }
 
@@ -169,7 +179,7 @@ public class DesktopLauncher extends ClientLauncher{
             Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
             System.loadLibrary(new File(name).getAbsolutePath());
         }catch(Throwable e){
-            Log.err(e);
+            logSteamError(e);
         }
     }
 
@@ -249,28 +259,18 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public Array<FileHandle> getExternalMaps(){
-        return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
+    public Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+        return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 
     @Override
-    public Array<FileHandle> getExternalMods(){
-        return !steam ? super.getExternalMods() : SVars.workshop.getModFiles();
+    public void viewListing(Publishable pub){
+        SVars.workshop.viewListing(pub);
     }
 
     @Override
-    public void viewMapListing(Map map){
-        viewListing(map.file.parent().name());
-    }
-
-    @Override
-    public void viewListing(String mapid){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
-    }
-
-    @Override
-    public void viewMapListingInfo(Map map){
-        SVars.workshop.viewMapListingInfo(map);
+    public void viewListingID(String id){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + id);
     }
 
     @Override
@@ -284,8 +284,8 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void publishMap(Map map){
-        SVars.workshop.publishMap(map);
+    public void publish(Publishable pub){
+        SVars.workshop.publish(pub);
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ModsDialog extends FloatingDialog{
         .size(210f, 64f);
 
         buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-            ui.showTextInput("$mod.import.github", "", "Anuken/ExampleMod", text -> {
+            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
                 ui.loadfrag.show();
                 Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                     Core.net.httpGet(loc.getHeader("Location"), result -> {
@@ -41,11 +41,11 @@ public class ModsDialog extends FloatingDialog{
                                     mods.reloadContent();
                                     setup();
                                     ui.loadfrag.hide();
-                                }catch(Exception e){
+                                }catch(Throwable e){
                                     ui.showException(e);
                                 }
                             });
-                        }catch(Exception e){
+                        }catch(Throwable e){
                             ui.showException(e);
                         }
                     }, t -> Core.app.post(() -> ui.showException(t)));
@@ -93,7 +93,7 @@ public class ModsDialog extends FloatingDialog{
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled")));
+                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled"))).width(270f).wrap();
                             title.add().growX();
 
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
@@ -101,14 +101,20 @@ public class ModsDialog extends FloatingDialog{
                                 setup();
                             }).height(50f).margin(8f).width(130f);
 
-                            title.addImageButton(mod.workshopID != null ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
-                                if(mod.workshopID == null){
+                            if(steam && !mod.hasSteamID()){
+                                title.addImageButton(Icon.loadMapSmall, Styles.cleari, () -> {
+                                    platform.publish(mod);
+                                }).size(50f);
+                            }
+
+                            title.addImageButton(mod.hasSteamID() ? Icon.linkSmall : Icon.trash16Small, Styles.cleari, () -> {
+                                if(!mod.hasSteamID()){
                                     ui.showConfirm("$confirm", "$mod.remove.confirm", () -> {
                                         mods.removeMod(mod);
                                         setup();
                                     });
                                 }else{
-                                    platform.viewListing(mod.workshopID);
+                                    platform.viewListing(mod);
                                 }
                             }).size(50f);
                         }).growX().left().padTop(-14f).padRight(-14f);

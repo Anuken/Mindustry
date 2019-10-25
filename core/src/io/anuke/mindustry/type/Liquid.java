@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{

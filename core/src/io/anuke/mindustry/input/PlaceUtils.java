@@ -95,14 +95,14 @@ public class PlaceUtils{
             }else{
                 endx = tilex;
             }
+        }
 
-            if(Math.abs(endx - tilex) > maxLength){
-                endx = Mathf.sign(endx - tilex) * maxLength + tilex;
-            }
+        if(Math.abs(endx - tilex) > maxLength){
+            endx = Mathf.sign(endx - tilex) * maxLength + tilex;
+        }
 
-            if(Math.abs(endy - tiley) > maxLength){
-                endy = Mathf.sign(endy - tiley) * maxLength + tiley;
-            }
+        if(Math.abs(endy - tiley) > maxLength){
+            endy = Mathf.sign(endy - tiley) * maxLength + tiley;
         }
 
         int dx = endx - tilex, dy = endy - tiley;
@@ -141,12 +141,12 @@ public class PlaceUtils{
         return result;
     }
 
-    static class NormalizeDrawResult{
+    public static class NormalizeDrawResult{
         float x, y, x2, y2;
     }
 
-    static class NormalizeResult{
-        int x, y, x2, y2, rotation;
+    public static class NormalizeResult{
+        public int x, y, x2, y2, rotation;
 
         boolean isX(){
             return Math.abs(x2 - x) > Math.abs(y2 - y);

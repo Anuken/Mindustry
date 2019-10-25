@@ -3,6 +3,7 @@ package io.anuke.mindustry.game;
 import io.anuke.arc.util.serialization.Json;
 import io.anuke.arc.util.serialization.Json.Serializable;
 import io.anuke.arc.util.serialization.JsonValue;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.type.BaseUnit;
 import io.anuke.mindustry.type.*;
 
@@ -84,6 +85,7 @@ public class SpawnGroup implements Serializable{
     @Override
     public void read(Json json, JsonValue data){
         type = content.getByName(ContentType.unit, data.getString("type", "dagger"));
+        if(type == null) type = UnitTypes.dagger;
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
         spacing = data.getInt("spacing", 1);

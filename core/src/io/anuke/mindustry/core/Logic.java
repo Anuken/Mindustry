@@ -5,6 +5,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -82,7 +83,8 @@ public class Logic implements ApplicationListener{
                 //painful O(n) iteration + copy
                 for(int i = 0; i < data.brokenBlocks.size; i++){
                     BrokenBlock b = data.brokenBlocks.get(i);
-                    if(b.x == event.tile.x && b.y == event.tile.y){
+                    Block block = content.block(b.block);
+                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
                         data.brokenBlocks.removeIndex(i);
                         break;
                     }

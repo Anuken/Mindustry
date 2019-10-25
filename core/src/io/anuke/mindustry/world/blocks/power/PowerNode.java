@@ -33,53 +33,6 @@ public class PowerNode extends PowerBlock{
         consumesPower = false;
         outputsPower = false;
     }
-/*
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void linkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity == null || other == null || tile.entity.power == null || !((PowerNode)tile.block()).linkValid(tile, other)
-        || tile.entity.power.links.size >= ((PowerNode)tile.block()).maxNodes) return;
-        if(!Units.canInteract(player, tile)) return;
-
-        TileEntity entity = tile.entity();
-
-        if(!entity.power.links.contains(other.pos())){
-            entity.power.links.add(other.pos());
-        }
-
-        if(other.getTeamID() == tile.getTeamID()){
-
-            if(!other.entity.power.links.contains(tile.pos())){
-                other.entity.power.links.add(tile.pos());
-            }
-        }
-
-        entity.power.graph.add(other.entity.power.graph);
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void unlinkPowerNodes(Player player, Tile tile, Tile other){
-        if(tile.entity.power == null || other.entity == null || other.entity.power == null) return;
-        if(!Units.canInteract(player, tile)) return;
-
-        TileEntity entity = tile.entity();
-
-        entity.power.links.removeValue(other.pos());
-        other.entity.power.links.removeValue(tile.pos());
-
-        PowerGraph newgraph = new PowerGraph();
-
-        //reflow from this point, covering all tiles on this side
-        newgraph.reflow(tile);
-
-        if(other.entity.power.graph != newgraph){
-            //create new graph for other end
-            PowerGraph og = new PowerGraph();
-            //reflow from other end
-            og.reflow(other);
-        }
-    }
-
- */
 
     @Override
     public void configured(Tile tile, Player player, int value){

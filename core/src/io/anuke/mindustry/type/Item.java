@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.blocks.*;
 

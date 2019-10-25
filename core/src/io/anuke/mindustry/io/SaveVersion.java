@@ -3,6 +3,8 @@ package io.anuke.mindustry.io;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;

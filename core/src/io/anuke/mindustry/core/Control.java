@@ -29,8 +29,8 @@ import java.text.*;
 import java.util.*;
 
 import static io.anuke.arc.Core.*;
-import static io.anuke.mindustry.Vars.*;
 import static io.anuke.mindustry.Vars.net;
+import static io.anuke.mindustry.Vars.*;
 
 /**
  * Control module.

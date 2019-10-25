@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 
@@ -317,9 +317,9 @@ public class TechTree implements ContentList{
         return node(block, () -> {});
     }
 
-    public static void create(Block parent, Block block){
+    public static TechNode create(Block parent, Block block){
         TechNode.context = all.find(t -> t.block == parent);
-        node(block, () -> {});
+        return node(block, () -> {});
     }
 
     public static class TechNode{

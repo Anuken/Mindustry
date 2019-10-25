@@ -22,7 +22,6 @@ public class LoadingFragment extends Fragment{
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(133f).row();
-
             t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
             t.add("$loading").name("namelabel").pad(10f);

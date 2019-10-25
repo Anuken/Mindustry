@@ -9,10 +9,10 @@ import io.anuke.arc.graphics.glutils.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.type.base.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;
@@ -29,6 +29,7 @@ public class BlockRenderer implements Disposable{
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private int requestidx = 0;
     private int iterateidx = 0;
+    private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer(2, 2);
     private FrameBuffer fog = new FrameBuffer(2, 2);
     private Array<Tile> outArray = new Array<>();
@@ -124,12 +125,18 @@ public class BlockRenderer implements Disposable{
     }
 
     public void drawBroken(){
-        if(unitGroups[player.getTeam().ordinal()].all().contains(p -> p instanceof BuilderDrone)){
+        if(control.input.isPlacing() || control.input.isBreaking()){
+            brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
+        }else{
+            brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);
+        }
+
+        if(brokenFade > 0.001f){
             for(BrokenBlock block : state.teams.get(player.getTeam()).brokenBlocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
 
-                Draw.alpha(0.5f);
+                Draw.alpha(0.53f * brokenFade);
                 Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime(), 6f, 0.2f));
                 Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
             }
