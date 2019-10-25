@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help fix an issue.
 ---
 
-**Platform**: *ndroid/iOS/Mac/Windows/Linux*
+**Platform**: *Android/iOS/Mac/Windows/Linux*
 
 **Build**: *The build number under the title in the main menu. Required.*
 
