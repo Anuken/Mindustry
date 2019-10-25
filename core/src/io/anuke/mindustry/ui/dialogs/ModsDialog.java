@@ -96,6 +96,7 @@ public class ModsDialog extends FloatingDialog{
                         anyDisabled = true;
                         table.row();
                         table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
+                        table.row();
                     }
 
                     table.table(Styles.black6, t -> {
