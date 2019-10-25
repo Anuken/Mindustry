@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.net.Administration.*;
@@ -253,6 +254,11 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void onInfoMessage(String message){
         ui.showText("", message);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void onSetRules(Rules rules){
+        state.rules = rules;
     }
 
     @Remote(variants = Variant.both)

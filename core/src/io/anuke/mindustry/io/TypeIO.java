@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.BuildRequest;
 import io.anuke.mindustry.entities.traits.ShooterTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
-import io.anuke.mindustry.game.Team;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.Administration.TraceInfo;
 import io.anuke.mindustry.net.Packets.AdminAction;
 import io.anuke.mindustry.net.Packets.KickReason;
@@ -165,6 +165,25 @@ public class TypeIO{
     @ReadClass(KickReason.class)
     public static KickReason readKick(ByteBuffer buffer){
         return KickReason.values()[buffer.get()];
+    }
+
+    @WriteClass(Rules.class)
+    public static void writeRules(ByteBuffer buffer, Rules rules){
+        String string = JsonIO.write(rules);
+        byte[] bytes = string.getBytes(charset);
+        buffer.putInt(bytes.length);
+        buffer.put(bytes);
+
+        writeString(buffer, JsonIO.write(rules));
+    }
+
+    @ReadClass(Rules.class)
+    public static Rules readRules(ByteBuffer buffer){
+        int length = buffer.getInt();
+        byte[] bytes = new byte[length];
+        buffer.get(length);
+        String string = new String(bytes, charset);
+        return JsonIO.read(Rules.class, string);
     }
 
     @WriteClass(Team.class)
