@@ -160,6 +160,6 @@ public class ModsDialog extends FloatingDialog{
                     e.printStackTrace();
                 }
             });
-        }).margin(12f).width(500f);
+        }).margin(12f).width(400f);
     }
 }
