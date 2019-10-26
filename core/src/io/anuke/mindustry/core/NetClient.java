@@ -24,7 +24,6 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.TypeID;
-import io.anuke.mindustry.ui.dialogs.JoinDialog;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -206,8 +205,7 @@ public class NetClient implements ApplicationListener{
         state.set(State.menu);
         logic.reset();
 
-        JoinDialog jd = new JoinDialog();
-        jd.connect(ip, port);
+        ui.join.connect(ip, port);
     }
     
     @Remote(targets = Loc.client)
