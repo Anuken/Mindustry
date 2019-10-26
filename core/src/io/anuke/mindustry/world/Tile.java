@@ -93,6 +93,10 @@ public class Tile implements Position, TargetTrait{
         Call.onTileConfig(player, this, value);
     }
 
+    public void configureAny(int value){
+        Call.onTileConfig(null, this, value);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends TileEntity> T entity(){
         return (T)entity;
