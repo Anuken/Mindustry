@@ -689,7 +689,7 @@ public class NetServer implements ApplicationListener{
 
         StringBuilder result = new StringBuilder();
         int curChar = 0;
-        while(curChar < name.length() && result.toString().getBytes().length < maxNameLength){
+        while(curChar < name.length() && result.toString().getBytes().length < (maxNameLength + name.length() - name.replaceAll("(\\[.*?\\])", "").length())){
             result.append(name.charAt(curChar++));
         }
         return result.toString();
