@@ -205,8 +205,7 @@ public class NetClient implements ApplicationListener{
         state.set(State.menu);
         logic.reset();
 
-        Vars.netClient.beginConnecting();
-        net.connect(ip, port, () -> {});
+        ui.join.connect(ip, port);
     }
     
     @Remote(targets = Loc.client)
