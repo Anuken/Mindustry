@@ -24,6 +24,7 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Packets.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.type.TypeID;
+import io.anuke.mindustry.ui.dialogs.JoinDialog;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
