@@ -20,8 +20,9 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.world.Tile;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
+import static io.anuke.mindustry.Vars.*;
 
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
@@ -34,7 +35,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     private static final float hitRange = 30f;
     private static int lastSeed = 0;
 
-    private Array<Position> lines = new Array<>();
+    private Array<Vector2> lines = new Array<>();
     private Color color = Pal.lancerLaser;
 
     /** For pooling use only. Do not call directly! */
@@ -61,9 +62,29 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
         random.setSeed(seed);
         hit.clear();
 
+        boolean[] bhit = {false};
+
         for(int i = 0; i < length / 2; i++){
             Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
             l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
+
+            if(l.lines.size > 1){
+                bhit[0] = false;
+                Position from = l.lines.get(l.lines.size - 2);
+                Position to   = l.lines.get(l.lines.size - 1);
+                world.raycastEach(world.toTile(from.getX()), world.toTile(from.getY()), world.toTile(to.getX()), world.toTile(to.getY()), (wx, wy) -> {
+
+                    Tile tile = world.ltile(wx, wy);
+                    if(tile != null && tile.block().insulated){
+                        bhit[0] = true;
+                        //snap it instead of removing
+                        l.lines.get(l.lines.size -1).set(wx * tilesize, wy * tilesize);
+                        return true;
+                    }
+                    return false;
+                });
+                if(bhit[0]) break;
+            }
 
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
@@ -83,6 +104,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
                 y = furthest.y;
             }else{
                 rotation += random.range(20f);
+
                 x += Angles.trnsx(rotation, hitRange / 2f);
                 y += Angles.trnsy(rotation, hitRange / 2f);
             }

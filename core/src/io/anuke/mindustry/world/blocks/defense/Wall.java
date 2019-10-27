@@ -51,5 +51,4 @@ public class Wall extends Block{
     public boolean canReplace(Block other){
         return super.canReplace(other) && health > other.health;
     }
-
 }
