@@ -20,11 +20,9 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.power.PowerNode;
 
-import static io.anuke.mindustry.Vars.bulletGroup;
-import static io.anuke.mindustry.Vars.world;
+import static io.anuke.mindustry.Vars.*;
 
 public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     public static final float lifetime = 10f;
@@ -143,13 +141,10 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
 
     protected static boolean hitsInsulator(Lightning l){
         if (l.lines.size > 1){
-            Position from = l.lines.get(l.lines.size - 2);
-            Vector2 to = (Vector2) l.lines.get(l.lines.size - 1);
+            Vector2 from = (Vector2) l.lines.get(l.lines.size - 2);
+            Vector2 to   = (Vector2) l.lines.get(l.lines.size - 1);
 
-            Tile a = world.tileWorld(from.getX(), from.getY());
-            Tile b = world.tileWorld(to.getX(), to.getY());
-
-            if (PowerNode.insulated(a, b)){
+            if (PowerNode.insulated(Math.round(from.getX() / tilesize), Math.round(from.getY() / tilesize), Math.round(to.getX() / tilesize), Math.round(from.getX() / tilesize))){
                 return true;
             }
         }

@@ -8,15 +8,13 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.defense.Wall;
 import io.anuke.mindustry.world.meta.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -229,14 +227,7 @@ public class PowerNode extends PowerBlock{
         getPotentialLinks(tile, other -> {
             Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
 
-            insulators(tile, other).each(cause -> {
-
-                Block block = world.tileWorld(cause.drawx(), cause.drawy()).block();
-
-                if (block instanceof BlockPart){
-                    cause = world.tileWorld(cause.drawx(), cause.drawy()).link();
-                }
-
+            insulators(tile.x, tile.y, other.x, other.y, cause -> {
                 Drawf.square(cause.drawx(), cause.drawy(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
             });
         });
@@ -318,26 +309,26 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(Tile tile, Tile other){
-        return insulators(tile, other).size > 0;
+        return insulated(tile.x, tile.y, other.x, other.y);
     }
 
-    public static Array<Tile> insulators(Tile tile, Tile other) {
-        Array<Tile> tiles = new Array<Tile>();
-        Array<Point2>points = PlaceUtils.normalizeDiagonal(tile.x, tile.y, other.x, other.y);
+    public static boolean insulated(int x, int y, int x2, int y2){
+        AtomicBoolean ref = new AtomicBoolean(false);
+        insulators(x, y, x2, y2, cause -> {
+            ref.set(true);
+        });
+        return ref.get();
+    }
 
-        for(int i = 0; i < points.size; i++){
-            Point2 point = points.get(i);
-            Block block = world.tile(point.x, point.y).block();
+    public static void insulators(int x, int y, int x2, int y2, Consumer<Tile> iterator){
+        world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
-            if (block instanceof BlockPart){
-                block = world.tile(point.x, point.y).link().block();
+            Tile tile = world.ltile(wx, wy);
+            if (tile.block() != null && tile.block().insulated){
+                iterator.accept(tile);
             }
 
-            if (block.insulated) {
-                tiles.add(world.tile(point.x, point.y));
-            }
-        }
-
-        return tiles;
+            return false;
+        });
     }
 }
