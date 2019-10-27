@@ -29,7 +29,6 @@ public class MusicControl{
 
     public MusicControl(){
         Events.on(ClientLoadEvent.class, e -> reload());
-        Events.on(ContentReloadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
