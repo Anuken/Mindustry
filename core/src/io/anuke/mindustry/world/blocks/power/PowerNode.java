@@ -14,7 +14,6 @@ import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -313,18 +312,18 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        AtomicBoolean ref = new AtomicBoolean(false);
+        final Boolean[] bool = {false};
         insulators(x, y, x2, y2, cause -> {
-            ref.set(true);
+            bool[0] = true;
         });
-        return ref.get();
+        return bool[0];
     }
 
     public static void insulators(int x, int y, int x2, int y2, Consumer<Tile> iterator){
         world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
             Tile tile = world.ltile(wx, wy);
-            if (tile.block() != null && tile.block().insulated){
+            if (tile != null && tile.block() != null && tile.block().insulated){
                 iterator.accept(tile);
             }
 

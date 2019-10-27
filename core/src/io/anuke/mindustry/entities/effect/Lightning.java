@@ -140,11 +140,11 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
     }
 
     protected static boolean hitsInsulator(Lightning l){
-        if (l.lines.size > 1){
-            Vector2 from = (Vector2) l.lines.get(l.lines.size - 2);
-            Vector2 to   = (Vector2) l.lines.get(l.lines.size - 1);
+        if(l.lines.size > 1){
+            Position from = l.lines.get(l.lines.size - 2);
+            Position to   = l.lines.get(l.lines.size - 1);
 
-            if (PowerNode.insulated(Math.round(from.getX() / tilesize), Math.round(from.getY() / tilesize), Math.round(to.getX() / tilesize), Math.round(from.getX() / tilesize))){
+            if (PowerNode.insulated(world.toTile(from.getX()), world.toTile(from.getY()), world.toTile(to.getX()), world.toTile(to.getY()))){
                 return true;
             }
         }
