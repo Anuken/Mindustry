@@ -22,13 +22,12 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class Saves{
-    private int nextSlot;
     private Array<SaveSlot> saves = new Array<>();
-    private IntMap<SaveSlot> saveMap = new IntMap<>();
     private SaveSlot current;
     private AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
+    private FileHandle zoneFile;
 
     private long totalPlaytime;
     private long lastTimestamp;
@@ -47,16 +46,13 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        IntArray slots = Core.settings.getObject("save-slots", IntArray.class, IntArray::new);
+        zoneFile = saveDirectory.child("-1.msav");
 
-        for(int i = 0; i < slots.size; i++){
-            int index = slots.get(i);
-            if(SaveIO.isSaveValid(index)){
-                SaveSlot slot = new SaveSlot(index);
+        for(FileHandle file : saveDirectory.list()){
+            if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
+                SaveSlot slot = new SaveSlot(file);
                 saves.add(slot);
-                saveMap.put(slot.index, slot);
-                slot.meta = SaveIO.getMeta(index);
-                nextSlot = Math.max(index + 1, nextSlot);
+                slot.meta = SaveIO.getMeta(file);
             }
         }
     }
@@ -110,73 +106,63 @@ public class Saves{
     }
 
     public void zoneSave(){
-        SaveSlot slot = new SaveSlot(-1);
+        SaveSlot slot = new SaveSlot(zoneFile);
         slot.setName("zone");
-        saves.remove(s -> s.index == -1);
+        saves.remove(s -> s.file.equals(zoneFile));
         saves.add(slot);
-        saveMap.put(slot.index, slot);
         slot.save();
-        saveSlots();
     }
 
     public SaveSlot addSave(String name){
-        SaveSlot slot = new SaveSlot(nextSlot);
-        nextSlot++;
+        SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.setName(name);
         saves.add(slot);
-        saveMap.put(slot.index, slot);
         slot.save();
-        saveSlots();
         return slot;
     }
 
     public SaveSlot importSave(FileHandle file) throws IOException{
-        SaveSlot slot = new SaveSlot(nextSlot);
+        SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.importFile(file);
-        nextSlot++;
         slot.setName(file.nameWithoutExtension());
         saves.add(slot);
-        saveMap.put(slot.index, slot);
-        slot.meta = SaveIO.getMeta(slot.index);
+        slot.meta = SaveIO.getMeta(slot.file);
         current = slot;
-        saveSlots();
         return slot;
     }
 
     public SaveSlot getZoneSlot(){
-        SaveSlot slot = getByID(-1);
+        SaveSlot slot = getSaveSlots().find(s -> s.file.equals(zoneFile));
         return slot == null || slot.getZone() == null ? null : slot;
     }
 
-    public SaveSlot getByID(int id){
-        return saveMap.get(id);
+    public FileHandle getNextSlotFile(){
+        int i = 0;
+        FileHandle file;
+        while((file = saveDirectory.child(i + "." + saveExtension)).exists()){
+            i ++;
+        }
+        return file;
     }
 
     public Array<SaveSlot> getSaveSlots(){
         return saves;
     }
 
-    private void saveSlots(){
-        IntArray result = new IntArray(saves.size);
-        for(int i = 0; i < saves.size; i++) result.add(saves.get(i).index);
-
-        Core.settings.putObject("save-slots", result);
-        Core.settings.save();
-    }
-
     public class SaveSlot{
-        public final int index;
+        //public final int index;
+        public final FileHandle file;
         boolean requestedPreview;
         SaveMeta meta;
 
-        public SaveSlot(int index){
-            this.index = index;
+        public SaveSlot(FileHandle file){
+            this.file = file;
         }
 
         public void load() throws SaveException{
             try{
-                SaveIO.loadFromSlot(index);
-                meta = SaveIO.getMeta(index);
+                SaveIO.load(file);
+                meta = SaveIO.getMeta(file);
                 current = this;
                 totalPlaytime = meta.timePlayed;
                 savePreview();
@@ -190,8 +176,8 @@ public class Saves{
             long prev = totalPlaytime;
             totalPlaytime = time;
 
-            SaveIO.saveToSlot(index);
-            meta = SaveIO.getMeta(index);
+            SaveIO.save(file);
+            meta = SaveIO.getMeta(file);
             if(!state.is(State.menu)){
                 current = this;
             }
@@ -226,8 +212,12 @@ public class Saves{
             return null;
         }
 
+        private String index(){
+            return file.nameWithoutExtension();
+        }
+
         private FileHandle previewFile(){
-            return mapPreviewDirectory.child("save_slot_" + index + ".png");
+            return mapPreviewDirectory.child("save_slot_" + index() + ".png");
         }
 
         private FileHandle loadPreviewFile(){
@@ -266,11 +256,11 @@ public class Saves{
         }
 
         public String getName(){
-            return Core.settings.getString("save-" + index + "-name", "untitled");
+            return Core.settings.getString("save-" + index() + "-name", "untitled");
         }
 
         public void setName(String name){
-            Core.settings.put("save-" + index + "-name", name);
+            Core.settings.put("save-" + index() + "-name", name);
             Core.settings.save();
         }
 
@@ -295,34 +285,33 @@ public class Saves{
         }
 
         public boolean isAutosave(){
-            return Core.settings.getBool("save-" + index + "-autosave", true);
+            return Core.settings.getBool("save-" + index() + "-autosave", true);
         }
 
         public void setAutosave(boolean save){
-            Core.settings.put("save-" + index + "-autosave", save);
+            Core.settings.put("save-" + index() + "-autosave", save);
             Core.settings.save();
         }
 
-        public void importFile(FileHandle file) throws IOException{
+        public void importFile(FileHandle from) throws IOException{
             try{
-                file.copyTo(SaveIO.fileFor(index));
+                from.copyTo(file);
             }catch(Exception e){
                 throw new IOException(e);
             }
         }
 
-        public void exportFile(FileHandle file) throws IOException{
+        public void exportFile(FileHandle to) throws IOException{
             try{
-                SaveIO.fileFor(index).copyTo(file);
+                file.copyTo(to);
             }catch(Exception e){
                 throw new IOException(e);
             }
         }
 
         public void delete(){
-            SaveIO.fileFor(index).delete();
+            file.delete();
             saves.removeValue(this, true);
-            saveMap.remove(index);
             if(this == current){
                 current = null;
             }
@@ -330,8 +319,6 @@ public class Saves{
             if(Core.assets.isLoaded(loadPreviewFile().path())){
                 Core.assets.unload(loadPreviewFile().path());
             }
-
-            saveSlots();
         }
     }
 }
