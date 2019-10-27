@@ -65,7 +65,7 @@ public class OverlayRenderer{
                     for(int y = 0; y < world.height(); y++){
                         Tile tile = world.tile(x, y);
 
-                        if(tile.block() != null && tile.block().category == Category.upgrade){
+                        if(tile.block() != null && tile.getTeam() == player.getTeam() && tile.block().category == Category.upgrade){
                             if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(tile.x, tile.y)){
 
