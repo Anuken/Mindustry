@@ -120,7 +120,7 @@ public class PowerNode extends PowerBlock{
         tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
         tempTiles.each(valid, other -> {
             if(!tile.entity.power.links.contains(other.pos())){
-                tile.configure(other.pos());
+                tile.configureAny(other.pos());
             }
         });
 

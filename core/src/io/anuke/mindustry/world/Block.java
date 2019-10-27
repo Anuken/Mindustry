@@ -324,7 +324,7 @@ public class Block extends BlockStorage{
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
                 if(!toLink.entity.power.links.contains(tile.pos())){
-                    toLink.configure(tile.pos());
+                    toLink.configureAny(tile.pos());
                 }
             }
         }

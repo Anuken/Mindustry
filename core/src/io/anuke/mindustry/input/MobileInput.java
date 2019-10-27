@@ -153,7 +153,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     void removeRequest(BuildRequest request){
         selectRequests.removeValue(request, true);
-        removals.add(request);
+        if(!request.breaking){
+            removals.add(request);
+        }
     }
 
     boolean isLinePlacing(){
