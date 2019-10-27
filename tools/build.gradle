@@ -344,7 +344,7 @@ task pack(dependsOn: classes){
         }
 
         //pack normal sprites
-        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+        TexturePacker.process("../core/assets-raw/sprites_out/", "../core/assets/sprites/", "sprites.atlas")
     }
 }
 
