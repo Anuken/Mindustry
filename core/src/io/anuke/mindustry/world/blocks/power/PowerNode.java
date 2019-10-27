@@ -176,6 +176,7 @@ public class PowerNode extends PowerBlock{
                     tile.configure(entity.power.links.get(0));
                 }
             }
+            return false;
         }
 
         return true;
