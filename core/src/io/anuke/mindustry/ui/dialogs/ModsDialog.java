@@ -29,39 +29,41 @@ public class ModsDialog extends FloatingDialog{
 
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(210f, 64f);
+        .size(android ? 210f + 250f + 10f : 210, 64f).colspan(android ? 2 : 1);
 
-        buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
-                ui.loadfrag.show();
-                Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                    Core.net.httpGet(loc.getHeader("Location"), result -> {
-                        if(result.getStatus() != HttpStatus.OK){
-                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                            ui.loadfrag.hide();
-                        }else{
-                            try{
-                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                Streams.copyStream(result.getResultAsStream(), file.write(false));
-                                mods.importMod(file);
-                                file.delete();
-                                Core.app.post(() -> {
-                                    try{
-                                        mods.reloadContent();
-                                        setup();
-                                        ui.loadfrag.hide();
-                                    }catch(Throwable e){
-                                        ui.showException(e);
-                                    }
-                                });
-                            }catch(Throwable e){
-                                ui.showException(e);
+        if(!android){
+            buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
+                ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                    ui.loadfrag.show();
+                    Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                        Core.net.httpGet(loc.getHeader("Location"), result -> {
+                            if(result.getStatus() != HttpStatus.OK){
+                                ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                                ui.loadfrag.hide();
+                            }else{
+                                try{
+                                    FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                    Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                    mods.importMod(file);
+                                    file.delete();
+                                    Core.app.post(() -> {
+                                        try{
+                                            mods.reloadContent();
+                                            setup();
+                                            ui.loadfrag.hide();
+                                        }catch(Throwable e){
+                                            ui.showException(e);
+                                        }
+                                    });
+                                }catch(Throwable e){
+                                    ui.showException(e);
+                                }
                             }
-                        }
+                        }, t -> Core.app.post(() -> ui.showException(t)));
                     }, t -> Core.app.post(() -> ui.showException(t)));
-                }, t -> Core.app.post(() -> ui.showException(t)));
-            });
-        }).size(250f, 64f);
+                });
+            }).size(250f, 64f);
+        }
 
         shown(this::setup);
 

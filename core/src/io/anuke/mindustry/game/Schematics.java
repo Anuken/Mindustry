@@ -19,6 +19,7 @@ import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.input.PlaceUtils.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -205,7 +206,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config)).removeAll(s -> !s.block.isVisible());
+        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config)).removeAll(s -> !s.block.isVisible() || !s.block.unlocked());
     }
 
     /** Adds a schematic to the list, also copying it into the files.*/
@@ -251,7 +252,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Tile linked = world.ltile(cx, cy);
 
-                if(linked != null && linked.entity != null && linked.entity.block.isVisible()){
+                if(linked != null && linked.entity != null && linked.entity.block.isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
                     minx = Math.min(linked.x + bot, minx);
@@ -279,7 +280,7 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Tile tile = world.ltile(cx, cy);
 
-                if(tile != null && tile.entity != null && !counted.contains(tile.pos())){
+                if(tile != null && tile.entity != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock) && tile.entity.block.isVisible()){
                     int config = tile.entity.config();
                     if(tile.block().posConfig){
                         config = Pos.get(Pos.x(config) + offsetX, Pos.y(config) + offsetY);

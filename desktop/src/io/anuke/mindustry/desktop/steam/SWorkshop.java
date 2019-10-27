@@ -162,6 +162,10 @@ public class SWorkshop implements SteamUGCCallback{
                 ugc.setItemVisibility(h, PublishedFileVisibility.Private);
             }
             ugc.submitItemUpdate(h, changelog == null ? "<Created>" : changelog);
+
+            if(p instanceof Map){
+                SAchievement.publishMap.complete();
+            }
         }, () -> p.addSteamID(sid));
     }
 

@@ -257,9 +257,7 @@ public class Mods implements Loadable{
         disabled.clear();
         load();
         buildFiles();
-        Musics.dispose();
         Sounds.dispose();
-        Musics.load();
         Sounds.load();
         Core.assets.finishLoading();
         content.clear();

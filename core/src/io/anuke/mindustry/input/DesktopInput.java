@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode != none || isPlacing()){
+        if(mode == placing || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -379,7 +379,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }
