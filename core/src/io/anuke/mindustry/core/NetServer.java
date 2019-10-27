@@ -331,6 +331,8 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
                     }else if(found.isLocal){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
+                    }else if(found.getTeam() != player.getTeam()){
+                        player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
