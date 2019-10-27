@@ -19199,6 +19199,13 @@ scroll-knob-vertical-black
   orig: 24, 40
   offset: 0, 0
   index: -1
+scroll-knob-vertical-thin
+  rotate: false
+  xy: 2033, 361
+  size: 12, 40
+  orig: 12, 40
+  offset: 0, 0
+  index: -1
 selection
   rotate: false
   xy: 309, 975
