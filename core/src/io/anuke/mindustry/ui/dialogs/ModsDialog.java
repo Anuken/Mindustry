@@ -70,6 +70,11 @@ public class ModsDialog extends FloatingDialog{
         hidden(() -> {
             if(mods.requiresReload()){
                 ui.loadAnd("$reloading", () -> {
+                    mods.all().each(mod -> {
+                        if(mod.hasUnmetDependencies()){
+                            ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
+                        }
+                    });
                     mods.reloadContent();
                 });
             }
@@ -141,7 +146,10 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap("[lightgray]" + mod.meta.description).growX();
                             t.row();
                         }
-
+                        if(mod.hasUnmetDependencies()){
+                            t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
+                            t.row();
+                        }
                     }).width(500f);
                     table.row();
                 }

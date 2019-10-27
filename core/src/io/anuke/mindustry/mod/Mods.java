@@ -200,14 +200,61 @@ public class Mods implements Loadable{
             }
         }
 
+        resolveDependencies();
         //sort mods to make sure servers handle them properly.
         loaded.sort(Structs.comparing(m -> m.name));
 
         buildFiles();
     }
 
-    private void buildFiles(){
+    private void resolveDependencies(){
+        for(LoadedMod mod : Array.<LoadedMod>withArrays(loaded, disabled)){
+            updateDependencies(mod);
+        }
+
+        disabled.addAll(loaded.select(LoadedMod::hasUnmetDependencies));
+        loaded.removeAll(LoadedMod::hasUnmetDependencies);
+        disabled.each(mod -> setEnabled(mod, false));
+        disabled.distinct();
+        loaded.distinct();
+    }
+
+    private void updateDependencies(LoadedMod mod){
+        mod.dependencies.clear();
+        mod.missingDependencies.clear();
+        mod.dependencies = mod.meta.dependencies.map(this::locateMod);
+
+        for(int i = 0; i < mod.dependencies.size; i++){
+            if(mod.dependencies.get(i) == null){
+                mod.missingDependencies.add(mod.meta.dependencies.get(i));
+            }
+        }
+    }
+
+    private void topoSort(LoadedMod mod, Array<LoadedMod> stack, ObjectSet<LoadedMod> visited){
+        visited.add(mod);
+        mod.dependencies.each(m -> !visited.contains(m), m -> topoSort(m, stack, visited));
+        stack.add(mod);
+    }
+
+    /** @return mods ordered in the correct way needed for dependencies. */
+    private Array<LoadedMod> orderedMods(){
+        ObjectSet<LoadedMod> visited = new ObjectSet<>();
+        Array<LoadedMod> result = new Array<>();
         for(LoadedMod mod : loaded){
+            if(!visited.contains(mod)){
+                topoSort(mod, result, visited);
+            }
+        }
+        return result;
+    }
+
+    private LoadedMod locateMod(String name){
+        return loaded.find(mod -> mod.name.equals(name));
+    }
+
+    private void buildFiles(){
+        for(LoadedMod mod : orderedMods()){
             boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
             String parentName = zipFolder ? mod.root.name() : null;
             for(FileHandle file : mod.root.list()){
@@ -256,7 +303,6 @@ public class Mods implements Loadable{
         loaded.clear();
         disabled.clear();
         load();
-        buildFiles();
         Sounds.dispose();
         Sounds.load();
         Core.assets.finishLoading();
@@ -275,8 +321,7 @@ public class Mods implements Loadable{
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
-
-        for(LoadedMod mod : loaded){
+        for(LoadedMod mod : orderedMods()){
             safeRun(mod, () -> {
                 if(mod.root.child("content").exists()){
                     FileHandle contentRoot = mod.root.child("content");
@@ -336,11 +381,13 @@ public class Mods implements Loadable{
             requiresReload = true;
             if(!enabled){
                 loaded.remove(mod);
-                disabled.add(mod);
+                if(!disabled.contains(mod)) disabled.add(mod);
             }else{
-                loaded.add(mod);
+                if(!loaded.contains(mod)) loaded.add(mod);
                 disabled.remove(mod);
             }
+            loaded.each(this::updateDependencies);
+            disabled.each(this::updateDependencies);
         }
     }
 
@@ -465,6 +512,10 @@ public class Mods implements Loadable{
         public final String name;
         /** This mod's metadata. */
         public final ModMeta meta;
+        /** This mod's dependencies as already-loaded mods. */
+        public Array<LoadedMod> dependencies = new Array<>();
+        /** All missing dependencies of this mod as strings. */
+        public Array<String> missingDependencies = new Array<>();
 
         public LoadedMod(FileHandle file, FileHandle root, Mod mod, ModMeta meta){
             this.root = root;
@@ -476,6 +527,10 @@ public class Mods implements Loadable{
 
         public boolean enabled(){
             return Core.settings.getBool("mod-" + name + "-enabled", true);
+        }
+
+        public boolean hasUnmetDependencies(){
+            return !missingDependencies.isEmpty();
         }
 
         @Override
@@ -548,7 +603,7 @@ public class Mods implements Loadable{
     /** Plugin metadata information.*/
     public static class ModMeta{
         public String name, author, description, version, main;
-        public String[] dependencies = {}; //TODO implement
+        public Array<String> dependencies = Array.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
     }
