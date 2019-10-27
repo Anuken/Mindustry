@@ -108,7 +108,7 @@ public class PowerNode extends PowerBlock{
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.test(other)){
-                if (!insulated(tile, other)) {
+                if(!insulated(tile, other)) {
                     tempTiles.add(other);
                 }
             }
@@ -323,7 +323,7 @@ public class PowerNode extends PowerBlock{
         world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
             Tile tile = world.ltile(wx, wy);
-            if (tile != null && tile.block() != null && tile.block().insulated){
+            if(tile != null && tile.block() != null && tile.block().insulated){
                 iterator.accept(tile);
             }
 

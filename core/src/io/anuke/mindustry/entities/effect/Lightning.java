@@ -66,7 +66,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
             Bullet.create(Bullets.damageLightning, l, team, x, y, 0f, 1f, 1f, dmg);
             l.lines.add(new Vector2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
-            if (hitsInsulator(l)) {
+            if(hitsInsulator(l)) {
                 l.lines.remove(l.lines.size -1);
                 break;
             }
@@ -144,7 +144,7 @@ public class Lightning extends TimedEntity implements DrawTrait, TimeTrait{
             Position from = l.lines.get(l.lines.size - 2);
             Position to   = l.lines.get(l.lines.size - 1);
 
-            if (PowerNode.insulated(world.toTile(from.getX()), world.toTile(from.getY()), world.toTile(to.getX()), world.toTile(to.getY()))){
+            if(PowerNode.insulated(world.toTile(from.getX()), world.toTile(from.getY()), world.toTile(to.getX()), world.toTile(to.getY()))){
                 return true;
             }
         }
