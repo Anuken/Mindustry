@@ -164,7 +164,7 @@ public class Mods implements Loadable{
         return requiresReload;
     }
 
-    /** Loads all mods from the folder, but does call any methods on them.*/
+    /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
         for(FileHandle file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
