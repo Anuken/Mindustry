@@ -55,6 +55,8 @@ public class Block extends BlockStorage{
     public boolean breakable;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
+    /** whether this block has insulating properties. */
+    public boolean insulated = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -313,7 +315,7 @@ public class Block extends BlockStorage{
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !PowerNode.insulated(other, tile) && !other.entity.proximity().contains(tile) &&
                 !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
                     tempTiles.add(other);
                 }

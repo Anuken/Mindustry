@@ -108,7 +108,9 @@ public class PowerNode extends PowerBlock{
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.test(other)){
-                tempTiles.add(other);
+                if(!insulated(tile, other)) {
+                    tempTiles.add(other);
+                }
             }
         });
 
@@ -233,7 +235,13 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place));
+        getPotentialLinks(tile, other -> {
+            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
+
+            insulators(tile.x, tile.y, other.x, other.y, cause -> {
+                Drawf.square(cause.drawx(), cause.drawy(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+            });
+        });
 
         Draw.reset();
     }
@@ -311,4 +319,27 @@ public class PowerNode extends PowerBlock{
         Draw.color();
     }
 
+    public static boolean insulated(Tile tile, Tile other){
+        return insulated(tile.x, tile.y, other.x, other.y);
+    }
+
+    public static boolean insulated(int x, int y, int x2, int y2){
+        final Boolean[] bool = {false};
+        insulators(x, y, x2, y2, cause -> {
+            bool[0] = true;
+        });
+        return bool[0];
+    }
+
+    public static void insulators(int x, int y, int x2, int y2, Consumer<Tile> iterator){
+        world.raycastEach(x, y, x2, y2, (wx, wy) -> {
+
+            Tile tile = world.ltile(wx, wy);
+            if(tile != null && tile.block() != null && tile.block().insulated){
+                iterator.accept(tile);
+            }
+
+            return false;
+        });
+    }
 }
