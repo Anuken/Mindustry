@@ -24,7 +24,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
-    protected @NonNull Mech mech;
+    public @NonNull Mech mech;
     protected float buildTime = 60 * 5;
 
     public MechPad(String name){

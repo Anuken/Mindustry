@@ -29,7 +29,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    Category currentCategory = Category.distribution;
+    public Category currentCategory = Category.distribution;
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;

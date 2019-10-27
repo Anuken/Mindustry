@@ -12,8 +12,10 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.units.MechPad;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -57,6 +59,26 @@ public class OverlayRenderer{
                     Draw.reset();
                 }
             });
+
+            if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
+                for(int x = 0; x < world.width(); x++){
+                    for(int y = 0; y < world.height(); y++){
+                        Tile tile = world.tile(x, y);
+
+                        if(tile.block() != null && tile.block().category == Category.upgrade){
+                            if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
+                                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(tile.x, tile.y)){
+
+                                Tmp.v1.set(tile.x * tilesize, tile.y * tilesize).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+
+                                Lines.stroke(2f, ((MechPad) tile.block()).mech.engineColor);
+                                Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                                Draw.reset();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if(player.isDead()) return; //dead players don't draw
