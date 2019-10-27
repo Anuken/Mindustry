@@ -167,6 +167,17 @@ public class PowerNode extends PowerBlock{
             tile.configure(other.pos());
             return false;
         }
+
+        if(tile == other){
+            if (other.entity.power.links.size == 0){
+                getPotentialLinks(tile, link -> tile.configure(link.pos()));
+            } else {
+                while (entity.power.links.size > 0){
+                    tile.configure(entity.power.links.get(0));
+                }
+            }
+        }
+
         return true;
     }
 
