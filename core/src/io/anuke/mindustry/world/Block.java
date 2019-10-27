@@ -241,7 +241,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawCracks(Tile tile){
-        if(!tile.entity.damaged()) return;
+        if(!tile.entity.damaged() || size > maxCrackSize) return;
         int id = tile.pos();
         TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
         Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
