@@ -62,9 +62,6 @@ public class OverlayRenderer{
             });
 
             if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
-
-                Log.info(indexer.getAllied(player.getTeam(), BlockFlag.mechPad));
-
                 for(Tile mechpad: indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                             .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.x, mechpad.y)){
@@ -72,7 +69,7 @@ public class OverlayRenderer{
                         Tmp.v1.set(mechpad.x * tilesize, mechpad.y * tilesize).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
                         Lines.stroke(2f, ((MechPad) mechpad.block()).mech.engineColor);
-                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 0.5f);
                         Draw.reset();
                     }
                 }
