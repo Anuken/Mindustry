@@ -45,6 +45,12 @@ public class Schematics implements Loadable{
             previews.clear();
             shadowBuffer.dispose();
         });
+
+        Events.on(ContentReloadEvent.class, event -> {
+            previews.each((schem, m) -> m.dispose());
+            previews.clear();
+            load();
+        });
     }
 
     @Override
@@ -64,9 +70,9 @@ public class Schematics implements Loadable{
 
         all.sort();
 
-        Core.app.post(() -> {
-            shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8);
-        });
+        if(shadowBuffer == null){
+            Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
+        }
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
