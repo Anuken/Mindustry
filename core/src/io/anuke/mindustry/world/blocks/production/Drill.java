@@ -194,7 +194,9 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        stats.add(BlockStat.boostEffect, liquidBoostIntensity, StatUnit.timesSpeed);
+        if(liquidBoostIntensity > 0){
+            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
+        }
     }
 
     void countOre(Tile tile){
