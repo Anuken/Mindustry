@@ -108,7 +108,7 @@ public class PowerNode extends PowerBlock{
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
             if(valid.test(other)){
-                if(!insulated(tile, other)) {
+                if(!insulated(tile, other)){
                     tempTiles.add(other);
                 }
             }
@@ -127,14 +127,14 @@ public class PowerNode extends PowerBlock{
     private void getPotentialLinks(Tile tile, Consumer<Tile> others){
         Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
-        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
+        overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
         && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
 
         tempTiles.clear();
         graphs.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(valid.test(other)){
+            if(valid.test(other) && !tempTiles.contains(other)){
                 tempTiles.add(other);
             }
         });
@@ -163,18 +163,18 @@ public class PowerNode extends PowerBlock{
         TileEntity entity = tile.entity();
         other = other.link();
 
-        Tile result = other;
-
         if(linkValid(tile, other)){
             tile.configure(other.pos());
             return false;
         }
 
         if(tile == other){
-            if (other.entity.power.links.size == 0){
-                getPotentialLinks(tile, link -> tile.configure(link.pos()));
-            } else {
-                while (entity.power.links.size > 0){
+            if(other.entity.power.links.size == 0){
+                getPotentialLinks(tile, link -> {
+                    tile.configure(link.pos());
+                });
+            }else{
+                while(entity.power.links.size > 0){
                     tile.configure(entity.power.links.get(0));
                 }
             }
@@ -311,9 +311,9 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        float fract = 1f-tile.entity.power.graph.getSatisfaction();
+        float fract = 1f - tile.entity.power.graph.getSatisfaction();
 
-        Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
