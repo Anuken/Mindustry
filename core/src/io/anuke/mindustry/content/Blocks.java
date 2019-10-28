@@ -452,15 +452,15 @@ public class Blocks implements ContentList{
         siliconFurnace = new HeatedSmelter("silicon-furnace"){{
             requirements(Category.crafting, ItemStack.with(Items.titanium, 100, Items.lead, 50, Items.graphite, 25));
             craftEffect = Fx.smeltsmoke;
-            outputItem = new ItemStack(Items.silicon, 10);
+            outputItem = new ItemStack(Items.silicon, 20);
             craftTime = 100f;
             size = 3;
             hasPower = true;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
-            itemCapacity = 40;
+            itemCapacity = 80;
 
-            consumes.items(new ItemStack(Items.coal, 10), new ItemStack(Items.sand, 20));
+            consumes.items(new ItemStack(Items.coal, 20), new ItemStack(Items.sand, 40));
             consumes.power(1f);
         }};
 
