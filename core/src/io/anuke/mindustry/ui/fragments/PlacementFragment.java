@@ -30,6 +30,7 @@ public class PlacementFragment extends Fragment{
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
     Category currentCategory = Category.distribution;
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
@@ -48,6 +49,10 @@ public class PlacementFragment extends Fragment{
             if(event.content instanceof Block){
                 rebuild();
             }
+        });
+
+        Events.on(ResetEvent.class, event -> {
+            selectedBlocks.clear();
         });
     }
 
@@ -112,7 +117,7 @@ public class PlacementFragment extends Fragment{
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
-                                currentCategory.setSelectedBlock(control.input.block);
+                                selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
@@ -268,10 +273,10 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
-                                if(currentCategory.getSelectedBlock() == null){
+                                if(selectedBlocks.get(currentCategory) == null){
                                     selectFirstBlock(currentCategory);
                                 }
-                                control.input.block = currentCategory.getSelectedBlock();
+                                control.input.block = selectedBlocks.get(currentCategory);
                             }
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
@@ -311,7 +316,7 @@ public class PlacementFragment extends Fragment{
     Block selectFirstBlock(Category cat) {
         for(Block block : getByCategory(currentCategory)){
             if(unlocked(block)){
-                cat.setSelectedBlock(block);
+                selectedBlocks.put(currentCategory, block);
                 return block;
             }
         }
