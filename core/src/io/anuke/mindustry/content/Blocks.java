@@ -796,7 +796,7 @@ public class Blocks implements ContentList{
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
+            requirements(Category.defense, ItemStack.with(Items.plastanium, 6));
             health = 190 * wallHealthMultiplier;
             insulated = true;
         }};
