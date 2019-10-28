@@ -449,8 +449,8 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
-        siliconFurnace = new GenericSmelter("silicon-furnace"){{
-            requirements(Category.crafting, ItemStack.with(Items.copper, 30, Items.lead, 25));
+        siliconFurnace = new HeatedSmelter("silicon-furnace"){{
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 100, Items.lead, 50, Items.graphite, 25));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.silicon, 10);
             craftTime = 100f;
@@ -458,7 +458,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
-            itemCapacity = 30;
+            itemCapacity = 40;
 
             consumes.items(new ItemStack(Items.coal, 10), new ItemStack(Items.sand, 20));
             consumes.power(1f);
