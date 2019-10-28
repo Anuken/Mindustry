@@ -27,7 +27,7 @@ public class HeatedSmelter extends GenericSmelter {
 
         entity.reactors.clear();
         entity.proximity().each(t -> {
-            if t.block() != null && t.block() instanceof NuclearReactor){
+            if(t.block() != null && t.block() instanceof NuclearReactor){
                 entity.reactors.add(t);
             }
         });
