@@ -18,6 +18,11 @@ public class HeatedSmelter extends GenericSmelter {
     }
 
     @Override
+    protected float getProgressIncrease(TileEntity entity, float baseTime) {
+        return super.getProgressIncrease(entity, baseTime) * ((HeatedSmelterEntity)entity).GroundHeat;
+    }
+
+    @Override
     public void placed(Tile tile) {
         super.placed(tile);
 
