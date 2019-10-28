@@ -33,8 +33,8 @@ public class HeatedSmelter extends GenericSmelter{
     }
 
     @Override
-    protected float getProgressIncrease(TileEntity entity, float baseTime){ // idk it just works     v
-        return super.getProgressIncrease(entity, baseTime) + ((HeatedSmelterEntity) entity).heat() / 4;
+    protected float getProgressIncrease(TileEntity entity, float baseTime){
+        return super.getProgressIncrease(entity, baseTime) + (((HeatedSmelterEntity) entity).heat()) / 20;
     }
 
     @Override
