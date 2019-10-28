@@ -1,61 +1,40 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
 import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.content.Items;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.NuclearReactor;
 import io.anuke.mindustry.world.meta.Attribute;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class HeatedSmelter extends GenericSmelter {
+public class HeatedSmelter extends GenericSmelter{
+
+    protected float pyratiteHeatBoost = 0.5f;
 
     public HeatedSmelter(String name){
         super(name);
     }
 
     @Override
-    public void onProximityUpdate(Tile tile){
-        HeatedSmelterEntity entity = (HeatedSmelterEntity) tile.entity;
-        super.onProximityUpdate(tile);
-
-        entity.reactors.clear();
-        entity.proximity().each(t -> {
-            if(t.block() != null && t.block() instanceof NuclearReactor){
-                entity.reactors.add(t);
-            }
-        });
-
-    }
-
-    @Override
     public void update(Tile tile){
+        HeatedSmelterEntity entity = (HeatedSmelterEntity) tile.entity;
+
+        entity.BoostHeat = entity.items.has(Items.pyratite) ? pyratiteHeatBoost : 00f;
+
         super.update(tile);
-
-        HeatedSmelterEntity entity = ((HeatedSmelterEntity) tile.entity);
-        for(Tile reactor: ((HeatedSmelterEntity) tile.entity).reactors){
-            NuclearReactor.NuclearReactorEntity e = (NuclearReactor.NuclearReactorEntity) reactor.entity;
-
-            if(e.heat > entity.heat()){
-                e.heat -= 0.01f;
-                entity.AmbientHeat += 0.01f;
-            }
-        }
-
-        if(entity.AmbientHeat > 0f){
-            entity.AmbientHeat -= 0.001f;
-        }
     }
 
     @Override
-    protected float getProgressIncrease(TileEntity entity, float baseTime){
-        return super.getProgressIncrease(entity, baseTime) * ((HeatedSmelterEntity)entity).heat();
+    protected float getProgressIncrease(TileEntity entity, float baseTime){ // idk it just works     v
+        return super.getProgressIncrease(entity, baseTime) + ((HeatedSmelterEntity) entity).heat() / 4;
     }
 
     @Override
@@ -63,7 +42,7 @@ public class HeatedSmelter extends GenericSmelter {
         super.placed(tile);
 
         HeatedSmelterEntity entity = tile.entity();
-        entity.GroundHeat = sumAttribute(Attribute.heat, tile.x, tile.y) / 10;
+        entity.TileHeat = sumAttribute(Attribute.heat, tile.x, tile.y) / 10;
     }
 
     @Override
@@ -78,31 +57,37 @@ public class HeatedSmelter extends GenericSmelter {
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.boostEffect, pyratiteHeatBoost * 100, StatUnit.heat);
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new HeatedSmelterEntity();
     }
 
     public static class HeatedSmelterEntity extends GenericCrafterEntity{
-        public float GroundHeat = 0.0f;
-        public float AmbientHeat = 0.0f;
-        public Array<Tile> reactors = new Array<Tile>();
+        public float TileHeat = 0.0f;
+        public float BoostHeat = 0.0f;
 
         public float heat(){
-            return Mathf.clamp(GroundHeat + AmbientHeat);
+            return Mathf.clamp(TileHeat + BoostHeat);
         }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeFloat(GroundHeat);
-            stream.writeFloat(AmbientHeat);
+            stream.writeFloat(TileHeat);
+            stream.writeFloat(BoostHeat);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            GroundHeat = stream.readFloat();
-            AmbientHeat = stream.readFloat();
+            TileHeat = stream.readFloat();
+            BoostHeat = stream.readFloat();
         }
     }
 }

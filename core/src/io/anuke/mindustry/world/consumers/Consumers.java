@@ -72,6 +72,14 @@ public class Consumers{
         return add(new ConsumeItems(items));
     }
 
+    public ConsumeItems boost(Item item){
+        return boost(item, 1);
+    }
+
+    public ConsumeItems boost(Item item, int amount){
+        return add(new ConsumeBoost(new ItemStack[]{new ItemStack(item, amount)}));
+    }
+
     public <T extends Consume> T add(T consume){
         map[consume.type().ordinal()] = consume;
         return consume;
