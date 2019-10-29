@@ -27,14 +27,14 @@ public class HeatedSmelter extends GenericSmelter{
     public void update(Tile tile){
         HeatedSmelterEntity entity = (HeatedSmelterEntity) tile.entity;
 
-        entity.BoostHeat = entity.items.has(Items.pyratite) ? pyratiteHeatBoost : 00f;
+        entity.pyratite = entity.items.has(Items.pyratite) ? pyratiteHeatBoost : 00f;
 
         super.update(tile);
     }
 
     @Override
     protected float getProgressIncrease(TileEntity entity, float baseTime){
-        return super.getProgressIncrease(entity, baseTime) + (((HeatedSmelterEntity) entity).heat()) / 20;
+        return super.getProgressIncrease(entity, baseTime) * ( (((HeatedSmelterEntity) entity).boost()) * 10 + 1 );
     }
 
     @Override
@@ -42,18 +42,18 @@ public class HeatedSmelter extends GenericSmelter{
         super.placed(tile);
 
         HeatedSmelterEntity entity = tile.entity();
-        entity.TileHeat = sumAttribute(Attribute.heat, tile.x, tile.y) / 10;
+        entity.heat = sumAttribute(Attribute.heat, tile.x, tile.y);
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) / 6.75f * 800 + 100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 10 + 100, 1), x, y, valid);
     }
 
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", entity -> new Bar("bar.heat", Pal.lightOrange, ((HeatedSmelterEntity) entity)::heat));
+        bars.add("heat", entity -> new Bar("bar.heat", Pal.lightOrange, ((HeatedSmelterEntity) entity)::boost));
     }
 
     @Override
@@ -69,25 +69,25 @@ public class HeatedSmelter extends GenericSmelter{
     }
 
     public static class HeatedSmelterEntity extends GenericCrafterEntity{
-        public float TileHeat = 0.0f;
-        public float BoostHeat = 0.0f;
+        public float heat = 0.0f;
+        public float pyratite = 0.0f;
 
-        public float heat(){
-            return Mathf.clamp((TileHeat / 6.75f * 5) + BoostHeat);
+        public float boost(){
+            return Mathf.clamp(heat / 10 + pyratite);
         }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeFloat(TileHeat);
-            stream.writeFloat(BoostHeat);
+            stream.writeFloat(heat);
+            stream.writeFloat(pyratite);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            TileHeat = stream.readFloat();
-            BoostHeat = stream.readFloat();
+            heat = stream.readFloat();
+            pyratite = stream.readFloat();
         }
     }
 }
