@@ -12,7 +12,7 @@ import io.anuke.mindustry.world.meta.*;
 import io.anuke.mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
-    public @NonNull ItemStack[] items;
+    final @NonNull ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
