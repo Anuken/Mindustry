@@ -461,7 +461,6 @@ public class Blocks implements ContentList{
             itemCapacity = 20;
 
             consumes.items(new ItemStack(Items.coal, 5), new ItemStack(Items.sand, 10));
-            consumes.boost(Items.pyratite);
             consumes.power(1f);
         }};
 

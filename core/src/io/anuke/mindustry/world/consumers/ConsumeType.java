@@ -4,5 +4,4 @@ public enum ConsumeType{
     item,
     power,
     liquid,
-    boost,
 }
