@@ -450,7 +450,7 @@ public class Blocks implements ContentList{
         }};
 
         siliconFurnace = new HeatedSmelter("silicon-furnace"){{
-            requirements(Category.crafting, ItemStack.with(Items.titanium, 100, Items.lead, 50, Items.graphite, 25));
+            requirements(Category.crafting, ItemStack.with(Items.titanium, 100, Items.metaglass, 50, Items.surgealloy, 25));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.silicon, 5);
             craftTime = 300f;
