@@ -3,7 +3,7 @@ package io.anuke.mindustry.content;
 import io.anuke.arc.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.StatusEffect;
 

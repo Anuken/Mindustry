@@ -45,6 +45,7 @@ public class DesktopInput extends InputHandler{
         group.fill(t -> {
             t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
             t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
+            t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
@@ -59,7 +60,6 @@ public class DesktopInput extends InputHandler{
             t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
-                b.touchable(Touchable.enabled);
                 b.defaults().left();
                 b.add(Core.bundle.format("schematic.flip",
                 Core.keybinds.get(Binding.schematic_flip_x).key.name(),
@@ -68,10 +68,19 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
                         ui.showTextInput("$schematic.add", "$name", "", text -> {
-                            lastSchematic.tags.put("name", text);
-                            schematics.add(lastSchematic);
-                            ui.showInfoFade("$schematic.saved");
-                            ui.schematics.showInfo(lastSchematic);
+                            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
+                            if(replacement != null){
+                                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                                    schematics.overwrite(replacement, lastSchematic);
+                                    ui.showInfoFade("$schematic.saved");
+                                    ui.schematics.showInfo(replacement);
+                                });
+                            }else{
+                                lastSchematic.tags.put("name", text);
+                                schematics.add(lastSchematic);
+                                ui.showInfoFade("$schematic.saved");
+                                ui.schematics.showInfo(lastSchematic);
+                            }
                         });
                     }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
@@ -173,7 +182,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode != none){
+        if(mode == placing || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -293,13 +302,17 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select)){
+        if(Core.input.keyTap(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu)){
-            ui.schematics.show();
+        if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
+            if(ui.schematics.isShown()){
+                ui.schematics.hide();
+            }else{
+                ui.schematics.show();
+            }
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
@@ -366,7 +379,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }

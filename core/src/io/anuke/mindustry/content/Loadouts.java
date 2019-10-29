@@ -1,6 +1,6 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.type.Loadout;
 
 public class Loadouts implements ContentList{

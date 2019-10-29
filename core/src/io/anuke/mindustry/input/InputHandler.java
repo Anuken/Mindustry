@@ -30,6 +30,8 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.BuildBlock.*;
 
 import java.util.*;
 
@@ -214,6 +216,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    public boolean requestMatches(BuildRequest request){
+        Tile tile = world.tile(request.x, request.y);
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>entity().cblock == request.block;
+    }
+
     public void drawBreaking(int x, int y){
         Tile tile = world.ltile(x, y);
         if(tile == null) return;
@@ -394,6 +401,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
+                BuildRequest other = getRequest(req.x, req.y);
+                if(other != null){
+                    selectRequests.remove(other);
+                }
+
                 selectRequests.add(req.copy());
             }
         }

@@ -12,8 +12,8 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.type.TimedEntity;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;

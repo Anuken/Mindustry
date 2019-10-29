@@ -9,8 +9,9 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Version;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.net.ArcNetImpl.*;
 import io.anuke.mindustry.net.*;
@@ -243,6 +244,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             ui.loadfrag.hide();
             ui.showErrorMessage(Core.bundle.format("cantconnect", response.toString()));
             return;
+        }
+
+        if(net.active()){
+            net.disconnect();
+            net.closeServer();
+            logic.reset();
+            state.set(State.menu);
         }
 
         currentLobby = steamIDLobby;

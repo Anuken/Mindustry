@@ -16,7 +16,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.SolidEntity;
 import io.anuke.mindustry.entities.traits.*;
-import io.anuke.mindustry.game.TypeID;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.Tile;

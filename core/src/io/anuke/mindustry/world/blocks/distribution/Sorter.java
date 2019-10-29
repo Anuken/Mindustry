@@ -1,6 +1,5 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -39,7 +38,7 @@ public class Sorter extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem.id));
+            tile.configure(lastItem.id);
         }
     }
 
@@ -80,7 +79,7 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() == this && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
+        return other != null && other.block() instanceof Sorter && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){

@@ -12,11 +12,12 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.modules.*;
 
@@ -63,18 +64,20 @@ public class BuildBlock extends Block{
         if(tile.entity != null){
             tile.entity.health = block.health * healthf;
         }
-        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
-        Core.app.post(() -> tile.block().placed(tile));
-
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.id){
-            //this is run delayed, since if this is called on the server, all clients need to recieve the onBuildFinish()
-            //event first before they can recieve the placed() event modification results
             if(!skipConfig){
-                Core.app.post(() -> tile.block().playerPlaced(tile));
+                tile.block().playerPlaced(tile);
             }
         }
-        Core.app.post(() -> Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false)));
+        Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
+    }
+
+    public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+        Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
+        tile.block().placed(tile);
+
+        Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
         Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
     }
 
@@ -92,7 +95,7 @@ public class BuildBlock extends Block{
     @Override
     public TextureRegion getDisplayIcon(Tile tile){
         BuildEntity entity = tile.entity();
-        return (entity.cblock == null ? entity.previous : entity.cblock).icon(Cicon.full);
+        return (entity.cblock == null ? entity.previous : entity.cblock).icon(io.anuke.mindustry.ui.Cicon.full);
     }
 
     @Override
@@ -137,7 +140,7 @@ public class BuildBlock extends Block{
 
         if(entity.previous == null) return;
 
-        if(Core.atlas.isFound(entity.previous.icon(Cicon.full))){
+        if(Core.atlas.isFound(entity.previous.icon(io.anuke.mindustry.ui.Cicon.full))){
             Draw.rect(entity.previous.icon(Cicon.full), tile.drawx(), tile.drawy(), entity.previous.rotate ? tile.rotation() * 90 : 0);
         }
     }
@@ -210,7 +213,7 @@ public class BuildBlock extends Block{
             }
 
             if(progress >= 1f || state.rules.infiniteResources){
-                Call.onConstructFinish(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
                 return true;
             }
             return false;

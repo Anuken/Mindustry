@@ -4,6 +4,7 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
@@ -93,6 +94,10 @@ public class Tile implements Position, TargetTrait{
         Call.onTileConfig(player, this, value);
     }
 
+    public void configureAny(int value){
+        Call.onTileConfig(null, this, value);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends TileEntity> T entity(){
         return (T)entity;
@@ -148,7 +153,7 @@ public class Tile implements Position, TargetTrait{
         return team;
     }
 
-    public void setBlock(Block type, Team team, int rotation){
+    public void setBlock(@NonNull Block type, Team team, int rotation){
         preChanged();
         this.block = type;
         this.team = (byte)team.ordinal();
@@ -156,11 +161,12 @@ public class Tile implements Position, TargetTrait{
         changed();
     }
 
-    public void setBlock(Block type, Team team){
+    public void setBlock(@NonNull Block type, Team team){
         setBlock(type, team, 0);
     }
 
-    public void setBlock(Block type){
+    public void setBlock(@NonNull Block type){
+        if(type == null) throw new IllegalArgumentException("Block cannot be null.");
         preChanged();
         this.block = type;
         this.rotation = 0;
@@ -168,13 +174,13 @@ public class Tile implements Position, TargetTrait{
     }
 
     /**This resets the overlay!*/
-    public void setFloor(Floor type){
+    public void setFloor(@NonNull Floor type){
         this.floor = type;
         this.overlay = (Floor)Blocks.air;
     }
 
     /** Sets the floor, preserving overlay.*/
-    public void setFloorUnder(Floor floor){
+    public void setFloorUnder(@NonNull Floor floor){
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);

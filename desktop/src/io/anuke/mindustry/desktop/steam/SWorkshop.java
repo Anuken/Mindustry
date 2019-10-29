@@ -130,7 +130,7 @@ public class SWorkshop implements SteamUGCCallback{
                     p.removeSteamID();
                     ui.showErrorMessage("$missing");
                 }else{
-                    ui.showErrorMessage(Core.bundle.format("workshop.error", result.name()));
+                    ui.showErrorMessage(Core.bundle.format("workshop.error", details.getResult().name()));
                 }
             }else{
                 ui.showErrorMessage(Core.bundle.format("workshop.error", result.name()));
@@ -162,6 +162,10 @@ public class SWorkshop implements SteamUGCCallback{
                 ugc.setItemVisibility(h, PublishedFileVisibility.Private);
             }
             ugc.submitItemUpdate(h, changelog == null ? "<Created>" : changelog);
+
+            if(p instanceof Map){
+                SAchievement.publishMap.complete();
+            }
         }, () -> p.addSteamID(sid));
     }
 

@@ -11,12 +11,11 @@ import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Styles;
 
 import static io.anuke.arc.Core.assets;
 import static io.anuke.mindustry.Vars.*;
@@ -107,9 +106,8 @@ public class MenuFragment extends Fragment{
             container.add(play);
             container.add(join);
             container.add(custom);
-            if(ios) container.row();
             container.add(maps);
-            if(!ios) container.row();
+            container.row();
 
             container.table(table -> {
                 table.defaults().set(container.defaults());

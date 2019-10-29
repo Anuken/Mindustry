@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;

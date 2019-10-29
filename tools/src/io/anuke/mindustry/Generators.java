@@ -7,8 +7,9 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
 import io.anuke.mindustry.ImagePacker.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 

@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.Block;
 
@@ -103,6 +103,11 @@ public class TechTree implements ContentList{
                     node(titaniumWall, () -> {
                         node(door, () -> {
                             node(doorLarge);
+                        });
+                        node(plastaniumWall, () -> {
+                            node(plastaniumWallLarge, () -> {
+
+                            });
                         });
                         node(titaniumWallLarge);
                         node(thoriumWall, () -> {

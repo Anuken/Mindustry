@@ -1,4 +1,4 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.ctype;
 
 import io.anuke.mindustry.*;
 

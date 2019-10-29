@@ -69,7 +69,7 @@ public class Build{
 
     /** Returns whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        if(!type.isVisible() || type.isHidden()){
+        if(type == null || !type.isVisible() || type.isHidden()){
             return false;
         }
 

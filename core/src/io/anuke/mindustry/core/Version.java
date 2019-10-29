@@ -1,4 +1,4 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.Files.*;

@@ -181,12 +181,14 @@ public class Map implements Comparable<Map>, Publishable{
 
     @Override
     public FileHandle createSteamFolder(String id){
-        return null;
+        FileHandle mapFile = tmpDirectory.child("map_" + id).child("map.msav");
+        file.copyTo(mapFile);
+        return mapFile.parent();
     }
 
     @Override
     public FileHandle createSteamPreview(String id){
-        return null;
+        return previewFile();
     }
 
     @Override
