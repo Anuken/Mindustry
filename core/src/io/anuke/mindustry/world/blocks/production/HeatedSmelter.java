@@ -85,6 +85,9 @@ public class HeatedSmelter extends GenericSmelter{
     public void setStats(){
         super.setStats();
 
+        stats.add(BlockStat.productionTime, 0f, StatUnit.heat);
+        stats.add(BlockStat.productionTime, 0.5f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, 100f, StatUnit.heat);
         stats.add(BlockStat.booster, Items.pyratite);
         stats.add(BlockStat.boostEffect, pyratiteHeatBoost * 100, StatUnit.heat);
     }
