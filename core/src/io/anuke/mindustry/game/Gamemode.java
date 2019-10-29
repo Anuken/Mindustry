@@ -2,7 +2,6 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.mindustry.maps.*;
 
 import static io.anuke.mindustry.Vars.waveTeam;

@@ -1,7 +1,6 @@
 package io.anuke.mindustry.maps.filters;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;

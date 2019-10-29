@@ -3,7 +3,6 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
 import io.anuke.arc.math.*;

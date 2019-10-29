@@ -2,7 +2,6 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.IntArray;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Bresenham2;
 import io.anuke.arc.util.Structs;

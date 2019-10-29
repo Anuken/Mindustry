@@ -2,7 +2,6 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;

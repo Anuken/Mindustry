@@ -1,7 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.mindustry.entities.traits.*;
 
 import java.io.*;

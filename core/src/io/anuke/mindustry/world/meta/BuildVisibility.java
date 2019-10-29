@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.mindustry.*;
 
 public enum BuildVisibility{

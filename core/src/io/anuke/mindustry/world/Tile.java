@@ -2,7 +2,6 @@ package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.ArcAnnotate.*;

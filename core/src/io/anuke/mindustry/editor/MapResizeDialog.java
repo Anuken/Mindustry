@@ -1,7 +1,6 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.gen.*;

@@ -13,7 +13,6 @@ import io.anuke.arc.freetype.*;
 import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
 import io.anuke.arc.freetype.FreetypeFontLoader.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;

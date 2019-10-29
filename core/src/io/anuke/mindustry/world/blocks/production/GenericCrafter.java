@@ -1,7 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;

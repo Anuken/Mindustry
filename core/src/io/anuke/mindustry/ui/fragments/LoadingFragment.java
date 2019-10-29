@@ -1,7 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.*;

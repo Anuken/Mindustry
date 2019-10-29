@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.arc.*;
 import io.anuke.arc.func.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.gen.*;
