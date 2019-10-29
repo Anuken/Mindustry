@@ -72,7 +72,7 @@ public class HeatedSmelter extends GenericSmelter{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 10 + 100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(Attribute.heat, x, y) * 100 + 100, 1), x, y, valid);
     }
 
     @Override
