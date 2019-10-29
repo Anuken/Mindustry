@@ -26,10 +26,10 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
+    public Category currentCategory = Category.distribution;
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    Category currentCategory = Category.distribution;
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
     Block hovered, lastDisplay;
     Tile lastHover;
