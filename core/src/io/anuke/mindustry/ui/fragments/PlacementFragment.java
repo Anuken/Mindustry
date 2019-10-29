@@ -26,10 +26,11 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
+    public Category currentCategory = Category.distribution;
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    Category currentCategory = Category.distribution;
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
@@ -48,6 +49,10 @@ public class PlacementFragment extends Fragment{
             if(event.content instanceof Block){
                 rebuild();
             }
+        });
+
+        Events.on(ResetEvent.class, event -> {
+            selectedBlocks.clear();
         });
     }
 
@@ -112,6 +117,7 @@ public class PlacementFragment extends Fragment{
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
+                                selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
@@ -266,6 +272,12 @@ public class PlacementFragment extends Fragment{
 
                         categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
+                            if(control.input.block != null){
+                                if(selectedBlocks.get(currentCategory) == null){
+                                    selectFirstBlock(currentCategory);
+                                }
+                                control.input.block = selectedBlocks.get(currentCategory);
+                            }
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
                     }
@@ -299,6 +311,16 @@ public class PlacementFragment extends Fragment{
             return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
         });
         return returnArray;
+    }
+
+    Block selectFirstBlock(Category cat) {
+        for(Block block : getByCategory(currentCategory)){
+            if(unlocked(block)){
+                selectedBlocks.put(currentCategory, block);
+                return block;
+            }
+        }
+        return null;
     }
 
     boolean unlocked(Block block){
