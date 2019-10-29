@@ -3,6 +3,7 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -16,7 +17,8 @@ import io.anuke.mindustry.ui.*;
 
 public class UnitType extends UnlockableContent{
     public @NonNull TypeID typeID;
-    public @NonNull Supplier<? extends BaseUnit> constructor;
+    public @NonNull
+    Prov<? extends BaseUnit> constructor;
 
     public float health = 60;
     public float hitsize = 7f;
@@ -43,7 +45,7 @@ public class UnitType extends UnlockableContent{
 
     public TextureRegion legRegion, baseRegion, region;
 
-    public <T extends BaseUnit> UnitType(String name, Supplier<T> mainConstructor){
+    public <T extends BaseUnit> UnitType(String name, Prov<T> mainConstructor){
         this(name);
         create(mainConstructor);
     }
@@ -53,7 +55,7 @@ public class UnitType extends UnlockableContent{
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
     }
 
-    public <T extends BaseUnit> void create(Supplier<T> mainConstructor){
+    public <T extends BaseUnit> void create(Prov<T> mainConstructor){
         this.constructor = mainConstructor;
         this.description = Core.bundle.getOrNull("unit." + name + ".description");
         this.typeID = new TypeID(name, mainConstructor);

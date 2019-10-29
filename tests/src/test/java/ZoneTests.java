@@ -42,7 +42,7 @@ public class ZoneTests{
                     e.printStackTrace();
                     return;
                 }
-                zone.rules.accept(state.rules);
+                zone.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 

@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Consumer;
+import io.anuke.arc.func.Cons;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Position;
@@ -142,11 +142,11 @@ public class Effects{
             this.data = data;
         }
 
-        public void scaled(float lifetime, Consumer<EffectContainer> cons){
+        public void scaled(float lifetime, Cons<EffectContainer> cons){
             if(innerContainer == null) innerContainer = new EffectContainer();
             if(time <= lifetime){
                 innerContainer.set(id, color, time, lifetime, rotation, x, y, data);
-                cons.accept(innerContainer);
+                cons.get(innerContainer);
             }
         }
 

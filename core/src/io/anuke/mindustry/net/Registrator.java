@@ -1,7 +1,7 @@
 package io.anuke.mindustry.net;
 
 import io.anuke.arc.collection.ObjectIntMap;
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.func.Prov;
 import io.anuke.mindustry.net.Packets.*;
 
 public class Registrator{
@@ -35,9 +35,9 @@ public class Registrator{
 
     public static class ClassEntry{
         public final Class<?> type;
-        public final Supplier<?> constructor;
+        public final Prov<?> constructor;
 
-        public <T extends Packet> ClassEntry(Class<T> type, Supplier<T> constructor){
+        public <T extends Packet> ClassEntry(Class<T> type, Prov<T> constructor){
             this.type = type;
             this.constructor = constructor;
         }

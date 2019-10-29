@@ -3,6 +3,7 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -154,9 +155,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
-            for(BuildRequest request : player.buildQueue()) cons.accept(request);
-            for(BuildRequest request : selectRequests) cons.accept(request);
-            for(BuildRequest request : lineRequests) cons.accept(request);
+            for(BuildRequest request : player.buildQueue()) cons.get(request);
+            for(BuildRequest request : selectRequests) cons.get(request);
+            for(BuildRequest request : lineRequests) cons.get(request);
         };
     }
 
@@ -311,7 +312,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         r2.setCenter(x * tilesize + offset, y * tilesize + offset);
         resultreq = null;
 
-        Predicate<BuildRequest> test = req -> {
+        Boolf<BuildRequest> test = req -> {
             if(req == skip) return false;
             Tile other = req.tile();
 
@@ -329,11 +330,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         };
 
         for(BuildRequest req : player.buildQueue()){
-            if(test.test(req)) return req;
+            if(test.get(req)) return req;
         }
 
         for(BuildRequest req : selectRequests){
-            if(test.test(req)) return req;
+            if(test.get(req)) return req;
         }
 
         return null;
@@ -768,7 +769,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
     }
 
-    void iterateLine(int startX, int startY, int endX, int endY, Consumer<PlaceLine> cons){
+    void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
         if(Core.settings.getBool("swapdiagonal")){
@@ -805,7 +806,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 line.rotation = rotation;
             }
             line.last = next == null;
-            cons.accept(line);
+            cons.get(line);
 
             Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
         }

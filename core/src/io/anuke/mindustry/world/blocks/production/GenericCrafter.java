@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -25,8 +26,8 @@ public class GenericCrafter extends Block{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 
-    protected Consumer<Tile> drawer = null;
-    protected Supplier<TextureRegion[]> drawIcons = null;
+    protected Cons<Tile> drawer = null;
+    protected Prov<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -73,7 +74,7 @@ public class GenericCrafter extends Block{
         if(drawer == null){
             super.draw(tile);
         }else{
-            drawer.accept(tile);
+            drawer.get(tile);
         }
     }
 

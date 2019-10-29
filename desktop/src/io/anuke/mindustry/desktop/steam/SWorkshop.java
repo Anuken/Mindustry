@@ -6,6 +6,7 @@ import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
@@ -22,8 +23,8 @@ public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
     private ObjectMap<Class<? extends Publishable>, Array<FileHandle>> workshopFiles = new ObjectMap<>();
-    private ObjectMap<SteamUGCQuery, BiConsumer<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
-    private Array<Consumer<SteamPublishedFileID>> itemHandlers = new Array<>();
+    private ObjectMap<SteamUGCQuery, Cons2<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Array<Cons<SteamPublishedFileID>> itemHandlers = new Array<>();
     private ObjectMap<SteamPublishedFileID, Runnable> updatedHandlers = new ObjectMap<>();
 
     public SWorkshop(){
@@ -169,7 +170,7 @@ public class SWorkshop implements SteamUGCCallback{
         }, () -> p.addSteamID(sid));
     }
 
-    void showPublish(Consumer<SteamPublishedFileID> published){
+    void showPublish(Cons<SteamPublishedFileID> published){
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
@@ -188,18 +189,18 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.show();
     }
 
-    void query(SteamUGCQuery query, BiConsumer<Array<SteamUGCDetails>, SteamResult> handler){
+    void query(SteamUGCQuery query, Cons2<Array<SteamUGCDetails>, SteamResult> handler){
         Log.info("POST QUERY " + query);
         detailHandlers.put(query, handler);
         ugc.sendQueryUGCRequest(query);
     }
 
-    void updateItem(SteamPublishedFileID publishedFileID, Consumer<SteamUGCUpdateHandle> tagger, Runnable updated){
+    void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
         try{
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
             Log.info("begin updateItem({0})", publishedFileID.toString());
 
-            tagger.accept(h);
+            tagger.get(h);
             Log.info("Tagged.");
 
             ItemUpdateInfo info = new ItemUpdateInfo();
@@ -239,10 +240,10 @@ public class SWorkshop implements SteamUGCCallback{
                     details.add(new SteamUGCDetails());
                     ugc.getQueryUGCResult(query, i, details.get(i));
                 }
-                detailHandlers.get(query).accept(details, result);
+                detailHandlers.get(query).get(details, result);
             }else{
                 Log.info("Nothing found.");
-                detailHandlers.get(query).accept(new Array<>(), SteamResult.FileNotFound);
+                detailHandlers.get(query).get(new Array<>(), SteamResult.FileNotFound);
             }
 
             detailHandlers.remove(query);
@@ -272,7 +273,7 @@ public class SWorkshop implements SteamUGCCallback{
         if(!itemHandlers.isEmpty()){
             if(result == SteamResult.OK){
                 Log.info("Passing to first handler.");
-                itemHandlers.first().accept(publishedFileID);
+                itemHandlers.first().get(publishedFileID);
             }else{
                 ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
             }

@@ -29,41 +29,40 @@ public class ModsDialog extends FloatingDialog{
 
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(android ? 210f + 250f + 10f : 210, 64f).colspan(android ? 2 : 1);
+        .size(210, 64f).colspan(android ? 2 : 1);
 
-        if(!android){
-            buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-                ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
-                    ui.loadfrag.show();
-                    Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                        Core.net.httpGet(loc.getHeader("Location"), result -> {
-                            if(result.getStatus() != HttpStatus.OK){
-                                ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                ui.loadfrag.hide();
-                            }else{
-                                try{
-                                    FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                    Streams.copyStream(result.getResultAsStream(), file.write(false));
-                                    mods.importMod(file);
-                                    file.delete();
-                                    Core.app.post(() -> {
-                                        try{
-                                            mods.reloadContent();
-                                            setup();
-                                            ui.loadfrag.hide();
-                                        }catch(Throwable e){
-                                            ui.showException(e);
-                                        }
-                                    });
-                                }catch(Throwable e){
-                                    ui.showException(e);
-                                }
+        buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
+            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                ui.loadfrag.show();
+                Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                        if(result.getStatus() != HttpStatus.OK){
+                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                            ui.loadfrag.hide();
+                        }else{
+                            try{
+                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                mods.importMod(file);
+                                file.delete();
+                                Core.app.post(() -> {
+                                    try{
+                                        mods.reloadContent();
+                                        setup();
+                                        ui.loadfrag.hide();
+                                    }catch(Throwable e){
+                                        ui.showException(e);
+                                    }
+                                });
+                            }catch(Throwable e){
+                                modError(e);
                             }
-                        }, t -> Core.app.post(() -> ui.showException(t)));
-                    }, t -> Core.app.post(() -> ui.showException(t)));
-                });
-            }).size(250f, 64f);
-        }
+                        }
+                    }, t -> Core.app.post(() -> modError(t)));
+                }, t -> Core.app.post(() -> modError(t)));
+            });
+        }).size(250f, 64f);
+
 
         shown(this::setup);
 
@@ -85,6 +84,16 @@ public class ModsDialog extends FloatingDialog{
                 ui.showText("$mods", "$mods.alphainfo");
             });
         }));
+    }
+
+    void modError(Throwable error){
+        ui.loadfrag.hide();
+
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && t.getMessage().contains("SSL"))){
+            ui.showErrorMessage("$feature.unsupported");
+        }else{
+            ui.showException(error);
+        }
     }
 
     void setup(){

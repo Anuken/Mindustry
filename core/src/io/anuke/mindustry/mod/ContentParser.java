@@ -6,6 +6,7 @@ import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -242,7 +243,7 @@ public class ContentParser{
         return (T)c;
     }
 
-    private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
+    private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
             if(Vars.content.getByName(type, name) != null){
@@ -366,7 +367,7 @@ public class ContentParser{
         }
     }
 
-    private <T> Supplier<T> supply(Class<T> type){
+    private <T> Prov<T> supply(Class<T> type){
         try{
             java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
             return () -> {

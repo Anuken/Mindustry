@@ -2,6 +2,7 @@ package io.anuke.mindustry.type;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -22,7 +23,7 @@ public class Zone extends UnlockableContent{
     //TODO autogenerate
     public Array<Item> resources = new Array<>();
 
-    public Consumer<Rules> rules = rules -> {};
+    public Cons<Rules> rules = rules -> {};
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
@@ -54,7 +55,7 @@ public class Zone extends UnlockableContent{
             return ((MapGenerator)generator).getMap().rules();
         }else{
             Rules rules = new Rules();
-            this.rules.accept(rules);
+            this.rules.get(rules);
             return rules;
         }
     }
@@ -137,7 +138,7 @@ public class Zone extends UnlockableContent{
     public void updateLaunchCost(){
         Array<ItemStack> stacks = new Array<>();
 
-        Consumer<ItemStack> adder = stack -> {
+        Cons<ItemStack> adder = stack -> {
             for(ItemStack other : stacks){
                 if(other.item == stack.item){
                     other.amount += stack.amount;
@@ -147,8 +148,8 @@ public class Zone extends UnlockableContent{
             stacks.add(new ItemStack(stack.item, stack.amount));
         };
 
-        for(ItemStack stack : baseLaunchCost) adder.accept(stack);
-        for(ItemStack stack : startingItems) adder.accept(stack);
+        for(ItemStack stack : baseLaunchCost) adder.get(stack);
+        for(ItemStack stack : startingItems) adder.get(stack);
 
         for(ItemStack stack : stacks){
             if(stack.amount < 0) stack.amount = 0;

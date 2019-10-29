@@ -2,7 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.net.*;
 import io.anuke.arc.net.FrameworkMessage.*;
 import io.anuke.arc.util.*;
@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class ArcNetImpl implements NetProvider{
     final Client client;
-    final Supplier<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
+    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -183,7 +183,7 @@ public class ArcNetImpl implements NetProvider{
     }
 
     @Override
-    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> invalid){
+    public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
@@ -196,15 +196,15 @@ public class ArcNetImpl implements NetProvider{
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
 
-                Core.app.post(() -> valid.accept(host));
+                Core.app.post(() -> valid.get(host));
             }catch(Exception e){
-                Core.app.post(() -> invalid.accept(e));
+                Core.app.post(() -> invalid.get(e));
             }
         });
     }
 
     @Override
-    public void discoverServers(Consumer<Host> callback, Runnable done){
+    public void discoverServers(Cons<Host> callback, Runnable done){
         Array<InetAddress> foundAddresses = new Array<>();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
@@ -214,7 +214,7 @@ public class ArcNetImpl implements NetProvider{
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
-                    callback.accept(host);
+                    callback.get(host);
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
                     //don't crash when there's an error pinging a a server or parsing data
@@ -369,7 +369,7 @@ public class ArcNetImpl implements NetProvider{
             if(id == -2){
                 return readFramework(byteBuffer);
             }else{
-                Packet packet = Pools.obtain((Class<Packet>)Registrator.getByID(id).type, (Supplier<Packet>)Registrator.getByID(id).constructor);
+                Packet packet = Pools.obtain((Class<Packet>)Registrator.getByID(id).type, (Prov<Packet>)Registrator.getByID(id).constructor);
                 packet.read(byteBuffer);
                 return packet;
             }

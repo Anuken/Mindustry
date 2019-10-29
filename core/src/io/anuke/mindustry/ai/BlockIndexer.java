@@ -2,6 +2,7 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -163,11 +164,11 @@ public class BlockIndexer{
         set.add(entity.tile);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred, boolean usePriority){
+    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         TileEntity closest = null;
         float dst = 0;
 
@@ -182,7 +183,7 @@ public class BlockIndexer{
 
                         if(other == null) continue;
 
-                        if(other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable)
+                        if(other.entity == null || other.getTeam() != team || !pred.get(other) || !other.block().targetable)
                             continue;
 
                         TileEntity e = other.entity;

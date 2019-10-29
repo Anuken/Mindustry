@@ -2,6 +2,7 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
@@ -27,7 +28,7 @@ import static io.anuke.mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends FloatingDialog{
-    private final Supplier<GenerateFilter>[] filterTypes = new Supplier[]{
+    private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
         BlendFilter::new, MirrorFilter::new, ClearFilter::new
@@ -48,7 +49,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
-    private Consumer<Array<GenerateFilter>> applier;
+    private Cons<Array<GenerateFilter>> applier;
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
@@ -95,13 +96,13 @@ public class MapGenerateDialog extends FloatingDialog{
         onResize(this::rebuildFilters);
     }
 
-    public void show(Array<GenerateFilter> filters, Consumer<Array<GenerateFilter>> applier){
+    public void show(Array<GenerateFilter> filters, Cons<Array<GenerateFilter>> applier){
         this.filters = filters;
         this.applier = applier;
         show();
     }
 
-    public void show(Consumer<Array<GenerateFilter>> applier){
+    public void show(Cons<Array<GenerateFilter>> applier){
         show(this.filters, applier);
     }
 
@@ -289,7 +290,7 @@ public class MapGenerateDialog extends FloatingDialog{
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
         int i = 0;
-        for(Supplier<GenerateFilter> gen : filterTypes){
+        for(Prov<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
 
             if(!applied && filter.buffered) continue;
@@ -334,7 +335,7 @@ public class MapGenerateDialog extends FloatingDialog{
             texture = null;
         }
 
-        applier.accept(filters);
+        applier.get(filters);
     }
 
     void update(){

@@ -6,6 +6,7 @@ import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
@@ -39,7 +40,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
 
     SteamID currentLobby, currentServer;
-    Consumer<Host> lobbyCallback;
+    Cons<Host> lobbyCallback;
     Runnable lobbyDoneCallback, joinCallback;
 
     public SNet(NetProvider provider){
@@ -164,7 +165,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     }
 
     @Override
-    public void discoverServers(Consumer<Host> callback, Runnable done){
+    public void discoverServers(Cons<Host> callback, Runnable done){
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
@@ -172,7 +173,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     }
 
     @Override
-    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
+    public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
         provider.pingHost(address, port, valid, failed);
     }
 

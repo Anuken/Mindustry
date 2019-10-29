@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.assets.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Pixmap.*;
@@ -405,8 +406,8 @@ public class Mods implements Loadable{
     }
 
     /** Iterates through each mod with a main class.*/
-    public void each(Consumer<Mod> cons){
-        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.accept(p.mod)));
+    public void each(Cons<Mod> cons){
+        loaded.each(p -> p.mod != null, p -> safeRun(p, () -> cons.get(p.mod)));
     }
 
     public void handleError(Throwable t, LoadedMod mod){

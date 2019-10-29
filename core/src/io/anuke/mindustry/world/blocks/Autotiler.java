@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks;
 
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;

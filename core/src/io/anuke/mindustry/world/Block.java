@@ -7,6 +7,7 @@ import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -514,7 +515,7 @@ public class Block extends BlockStorage{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Function<TileEntity, Liquid> current;
+            Func<TileEntity, Liquid> current;
             if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
@@ -668,7 +669,7 @@ public class Block extends BlockStorage{
     }
 
     public void displayBars(Tile tile, Table table){
-        for(Function<TileEntity, Bar> bar : bars.list()){
+        for(Func<TileEntity, Bar> bar : bars.list()){
             table.add(bar.get(tile.entity)).growX();
             table.row();
         }

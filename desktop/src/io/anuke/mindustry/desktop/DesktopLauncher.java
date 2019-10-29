@@ -8,7 +8,7 @@ import io.anuke.arc.backends.sdl.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.event.*;
@@ -232,12 +232,12 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = Runnable::run;
+        Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
 
-            dialog.accept(() -> message(
+            dialog.get(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
                             "Your graphics card does not support OpenGL 2.0!\n" +
                                     "Try to update your graphics drivers.\n\n" +
@@ -253,7 +253,7 @@ public class DesktopLauncher extends ClientLauncher{
             if(fc == null) fc = Strings.getFinalCause(e);
             Throwable cause = fc;
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
+                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
         });
     }

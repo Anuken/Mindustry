@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
@@ -27,11 +27,11 @@ public class FileChooser extends FloatingDialog{
     private TextField navigation, filefield;
     private TextButton ok;
     private FileHistory stack = new FileHistory();
-    private Predicate<FileHandle> filter;
-    private Consumer<FileHandle> selectListener;
+    private Boolf<FileHandle> filter;
+    private Cons<FileHandle> selectListener;
     private boolean open;
 
-    public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
+    public FileChooser(String title, Boolf<FileHandle> filter, boolean open, Cons<FileHandle> result){
         super(title);
         setFillParent(true);
         this.open = open;
@@ -64,7 +64,7 @@ public class FileChooser extends FloatingDialog{
         ok.clicked(() -> {
             if(ok.isDisabled()) return;
             if(selectListener != null)
-                selectListener.accept(directory.child(filefield.getText()));
+                selectListener.get(directory.child(filefield.getText()));
             hide();
         });
 
@@ -212,7 +212,7 @@ public class FileChooser extends FloatingDialog{
         group.setMinCheckCount(0);
 
         for(FileHandle file : names){
-            if(!file.isDirectory() && !filter.test(file)) continue; //skip non-filtered files
+            if(!file.isDirectory() && !filter.get(file)) continue; //skip non-filtered files
 
             String filename = file.name();
 
