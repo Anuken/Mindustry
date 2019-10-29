@@ -297,11 +297,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", false);
+        graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
-        graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
+        graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);

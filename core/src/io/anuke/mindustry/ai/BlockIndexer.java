@@ -27,7 +27,7 @@ public class BlockIndexer{
     private final ObjectSet<Item> scanOres = new ObjectSet<>();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
-    private ObjectMap<Item, ObjectSet<Tile>> ores;
+    private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
     /** Tags all quadrants. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */

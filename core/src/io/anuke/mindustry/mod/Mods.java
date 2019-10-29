@@ -430,7 +430,7 @@ public class Mods implements Loadable{
 
         if(content != null){
             throw new ModLoadException(Strings.format("Error loading '{0}' from mod '{1}' ({2}):\n{3}",
-                content, mod.meta.name, content.sourceFile.name(), realCause), content, t);
+                content, mod.meta.name, content.sourceFile == null ? "<unknown file>" : content.sourceFile.name(), realCause), content, t);
         }else{
             throw new ModLoadException("Error loading mod " + mod.meta.name, t);
         }
