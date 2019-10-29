@@ -201,6 +201,7 @@ public class ServerControl implements ApplicationListener{
         handler.register("exit", "Exit the server application.", arg -> {
             info("Shutting down server.");
             net.dispose();
+            Events.fire(new DisposeEvent());
             Core.app.exit();
         });
 
