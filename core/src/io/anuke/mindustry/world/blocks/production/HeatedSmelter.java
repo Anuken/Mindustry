@@ -20,7 +20,7 @@ public class HeatedSmelter extends GenericSmelter{
 
     protected float pyratiteHeatBoost = 0.1f;
     protected float pyratiteHeatDecay = 0.001f;
-    protected float heatBoost = 5f; // production speed increase when at 100% magma
+    protected float heatBoost = 5f; // X times the production speed increase when at 100% heat
 
     public HeatedSmelter(String name){
         super(name);
