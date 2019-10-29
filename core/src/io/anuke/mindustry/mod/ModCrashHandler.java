@@ -16,6 +16,7 @@ public class ModCrashHandler{
     public static void handle(Throwable t){
         Array<Throwable> list = Strings.getCauses(t);
         Throwable modCause = list.find(e -> e instanceof ModLoadException);
+
         if(modCause != null && Fonts.outline != null){
             String text = "[scarlet][[A fatal crash has occured while loading a mod!][]\n\nReason:[accent] " + modCause.getMessage();
             String bottom = "[scarlet]The associated mod has been disabled. Swipe out of the app and launch it again.";
