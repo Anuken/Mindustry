@@ -22,8 +22,7 @@ public class MusicControl{
     public Array<Music> darkMusic = Array.with();
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
-    private @Nullable
-    Music current;
+    private @Nullable Music current;
     private float fade;
     private boolean silenced;
 
