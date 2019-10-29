@@ -223,7 +223,7 @@ public class Maps{
 
     /** Attempts to run the following code;
      * catches any errors and attempts to display them in a readable way.*/
-    public void tryCatchMapError(Urun run){
+    public void tryCatchMapError(UnsafeRunnable run){
         try{
             run.run();
         }catch(Throwable e){

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.world.*;

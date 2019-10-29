@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
