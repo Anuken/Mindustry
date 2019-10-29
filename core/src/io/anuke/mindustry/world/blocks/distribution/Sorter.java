@@ -82,6 +82,10 @@ public class Sorter extends Block{
         return other != null && other.block() instanceof Sorter && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
     }
 
+    boolean isInvertedSorter(Tile other){
+        return other != null && other.block() instanceof Sorter && ((Sorter) other.block()).invert;
+    }
+
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){
         SorterEntity entity = dest.entity();
 
@@ -90,10 +94,16 @@ public class Sorter extends Block{
         Tile to;
 
         if((item == entity.sortItem) != invert){
-            //prevent 3-chains
+            //prevent normal 3-chains
             if(isSame(dest, source) && isSame(dest, dest.getNearby(dir))){
                 return null;
             }
+
+            //prevent invert 3-chains
+            if (isInvertedSorter(source) && isInvertedSorter(dest.getNearby(dir))){
+                return null;
+            }
+
             to = dest.getNearby(dir);
         }else{
             Tile a = dest.getNearby(Mathf.mod(dir - 1, 4));
