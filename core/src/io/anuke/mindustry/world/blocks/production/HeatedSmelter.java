@@ -20,6 +20,7 @@ public class HeatedSmelter extends GenericSmelter{
 
     protected float pyratiteHeatBoost = 0.1f;
     protected float pyratiteHeatDecay = 0.001f;
+    protected float heatBoost = 5f; // production speed increase when at 100% magma
 
     public HeatedSmelter(String name){
         super(name);
@@ -28,7 +29,7 @@ public class HeatedSmelter extends GenericSmelter{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
 
-        if(item == Items.pyratite && ((HeatedSmelterEntity) tile.entity).boost() < 1f){
+        if(item == Items.pyratite && ((HeatedSmelterEntity) tile.entity).heat() < 1f){
             return true;
         }
 
@@ -51,7 +52,7 @@ public class HeatedSmelter extends GenericSmelter{
         HeatedSmelterEntity entity = (HeatedSmelterEntity) tile.entity;
 
         if(entity.pyratite > 0f){
-            entity.pyratite = Mathf.clamp(entity.pyratite - pyratiteHeatDecay, 0f, 2f);
+           entity.pyratite = Mathf.clamp(entity.pyratite - pyratiteHeatDecay, 0f, 1f + pyratiteHeatBoost);
         }
 
         super.update(tile);
@@ -59,7 +60,7 @@ public class HeatedSmelter extends GenericSmelter{
 
     @Override
     protected float getProgressIncrease(TileEntity entity, float baseTime){
-        return super.getProgressIncrease(entity, baseTime) + ((((HeatedSmelterEntity) entity).boost()) * 10);
+        return super.getProgressIncrease(entity, baseTime) * (((HeatedSmelterEntity) entity).heat() * heatBoost + 1);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class HeatedSmelter extends GenericSmelter{
         super.placed(tile);
 
         HeatedSmelterEntity entity = tile.entity();
-        entity.heat = sumAttribute(Attribute.heat, tile.x, tile.y);
+        entity.magma = sumAttribute(Attribute.heat, tile.x, tile.y);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class HeatedSmelter extends GenericSmelter{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", entity -> new Bar("bar.heat", Pal.lightOrange, ((HeatedSmelterEntity) entity)::boost));
+        bars.add("magma", entity -> new Bar("bar.heat", Pal.lightOrange, ((HeatedSmelterEntity) entity)::heat));
     }
 
     @Override
@@ -86,8 +87,9 @@ public class HeatedSmelter extends GenericSmelter{
         super.setStats();
 
         stats.add(BlockStat.productionTime, 0f, StatUnit.heat);
-        stats.add(BlockStat.productionTime, 0.5f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, craftTime / 60f / heatBoost, StatUnit.seconds);
         stats.add(BlockStat.productionTime, 100f, StatUnit.heat);
+
         stats.add(BlockStat.booster, Items.pyratite);
         stats.add(BlockStat.boostEffect, pyratiteHeatBoost * 100, StatUnit.heat);
     }
@@ -98,24 +100,24 @@ public class HeatedSmelter extends GenericSmelter{
     }
 
     public static class HeatedSmelterEntity extends GenericCrafterEntity{
-        public float heat = 0.0f;
+        public float magma = 0.0f;
         public float pyratite = 0.0f;
 
-        public float boost(){
-            return Mathf.clamp(heat / 10 + pyratite);
+        public float heat(){
+            return Mathf.clamp(magma / 10 + pyratite);
         }
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.writeFloat(heat);
+            stream.writeFloat(magma);
             stream.writeFloat(pyratite);
         }
 
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            heat = stream.readFloat();
+            magma = stream.readFloat();
             pyratite = stream.readFloat();
         }
     }

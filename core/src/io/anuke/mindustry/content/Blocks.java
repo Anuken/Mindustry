@@ -462,6 +462,7 @@ public class Blocks implements ContentList{
 
             consumes.items(new ItemStack(Items.coal, 5), new ItemStack(Items.sand, 10));
             consumes.power(1f);
+            heatBoost = 5f;
         }};
 
         kiln = new GenericSmelter("kiln"){{
