@@ -2,6 +2,7 @@ package io.anuke.mindustry.mod;
 
 import io.anuke.arc.*;
 import io.anuke.arc.audio.*;
+import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
@@ -15,6 +16,8 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.content.TechTree.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
@@ -42,28 +45,23 @@ public class ContentParser{
             if(data.isString()){
                 return field(Bullets.class, data);
             }
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullets") : BasicBulletType.class;
+            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.entities.bullet") : BasicBulletType.class;
             data.remove("type");
             BulletType result = make(bc);
             readFields(result, data);
             return result;
         });
-        put(Music.class, (type, data) -> {
-            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
-
-            String path = "music/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Music.class);
-            Core.assets.finishLoadingAsset(path);
-            return Core.assets.get(path);
-        });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
+            if(Vars.headless) return new MockSound();
 
-            String path = "sounds/" + data.asString() + (Vars.ios ? ".mp3" : ".ogg");
-            Core.assets.load(path, Sound.class);
-            Core.assets.finishLoadingAsset(path);
-            Log.info(Core.assets.get(path));
-            return Core.assets.get(path);
+            String name = "sounds/" + data.asString();
+            String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+            ModLoadingSound sound = new ModLoadingSound();
+            Core.assets.load(path, Sound.class).loaded = result -> {
+                sound.sound = (Sound)result;
+            };
+            return sound;
         });
         put(Objective.class, (type, data) -> {
             Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "io.anuke.mindustry.game.Objectives") : ZoneWave.class;
@@ -72,10 +70,18 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
+        put(Weapon.class, (type, data) -> {
+            Weapon weapon = new Weapon();
+            readFields(weapon, data);
+            weapon.name = currentMod.name + "-" + weapon.name;
+            return weapon;
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
     private Array<Runnable> reads = new Array<>();
+    private Array<Runnable> postreads = new Array<>();
+    private ObjectSet<Object> toBeParsed = new ObjectSet<>();
     private LoadedMod currentMod;
     private Content currentContent;
 
@@ -123,11 +129,11 @@ public class ContentParser{
                 block = Vars.content.getByName(ContentType.block, name);
 
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declared its type. The original type will be used. Block: " + name);
+                    throw new IllegalArgumentException("When overwriting an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
                 }
             }else{
                 //TODO generate dynamically instead of doing.. this
-                Class<? extends Block> type = resolve(value.getString("type"),
+                Class<? extends Block> type = resolve(getType(value),
                 "io.anuke.mindustry.world",
                 "io.anuke.mindustry.world.blocks",
                 "io.anuke.mindustry.world.blocks.defense",
@@ -145,6 +151,15 @@ public class ContentParser{
             }
 
             currentContent = block;
+
+            String[] research = {null};
+
+            //add research tech node
+            if(value.has("research")){
+                research[0] = value.get("research").asString();
+                value.remove("research");
+            }
+
             read(() -> {
                 if(value.has("consumes")){
                     for(JsonValue child : value.get("consumes")){
@@ -172,8 +187,16 @@ public class ContentParser{
                 readFields(block, value, true);
 
                 //add research tech node
-                if(value.has("research")){
-                    TechTree.create(find(ContentType.block, value.get("research").asString()), block);
+                if(research[0] != null){
+                    Block parent = find(ContentType.block, research[0]);
+                    TechNode baseNode = TechTree.create(parent, block);
+
+                    postreads.add(() -> {
+                        TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(!parnode.children.contains(baseNode)){
+                            parnode.children.add(baseNode);
+                        }
+                    });
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -187,7 +210,7 @@ public class ContentParser{
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
-            Class<BaseUnit> type = resolve(value.getString("type"), "io.anuke.mindustry.entities.type.base");
+            Class<BaseUnit> type = resolve(getType(value), "io.anuke.mindustry.entities.type.base");
             UnitType unit = new UnitType(mod + "-" + name, supply(type));
             currentContent = unit;
             read(() -> readFields(unit, value, true));
@@ -199,6 +222,18 @@ public class ContentParser{
         ContentType.mech, parser(ContentType.mech, Mech::new),
         ContentType.zone, parser(ContentType.zone, Zone::new)
     );
+
+    private String getString(JsonValue value, String key){
+        if(value.has(key)){
+            return value.getString(key);
+        }else{
+            throw new IllegalArgumentException((currentContent == null ? "" : currentContent.sourceFile + ": ") + "You are missing a \"" + key + "\". It must be added before the file can be parsed.");
+        }
+    }
+
+    private String getType(JsonValue value){
+        return getString(value, "type");
+    }
 
     private <T extends Content> T find(ContentType type, String name){
         Content c = Vars.content.getByName(type, name);
@@ -273,10 +308,13 @@ public class ContentParser{
     public void finishParsing(){
         try{
             reads.each(Runnable::run);
+            postreads.each(Runnable::run);
         }catch(Exception e){
             Vars.mods.handleError(new ModLoadException("Error occurred parsing content: " + currentContent, currentContent, e), currentMod);
         }
         reads.clear();
+        postreads.clear();
+        toBeParsed.clear();
     }
 
     /**
@@ -300,6 +338,7 @@ public class ContentParser{
         currentMod = mod;
         boolean exists = Vars.content.getByName(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
+        toBeParsed.add(c);
         if(!exists){
             c.sourceFile = file;
             c.mod = mod;
@@ -366,7 +405,7 @@ public class ContentParser{
     }
 
     private void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String) return;
+        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
         parser.getFields(object.getClass()).values().toArray().each(field -> {
             try{
@@ -387,15 +426,14 @@ public class ContentParser{
     }
 
     private void readFields(Object object, JsonValue jsonMap){
+        toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
         for(JsonValue child = jsonMap.child; child != null; child = child.next){
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    if(!child.name.equals("research")){
-                        Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
-                    }
+                    Log.err("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");

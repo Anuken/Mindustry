@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{

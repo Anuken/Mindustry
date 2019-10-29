@@ -185,6 +185,10 @@ public class World{
         Events.fire(new WorldLoadEvent());
     }
 
+    public void setGenerating(boolean gen){
+        this.generating = gen;
+    }
+
     public boolean isGenerating(){
         return generating;
     }

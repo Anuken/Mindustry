@@ -17,6 +17,7 @@ import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -38,14 +39,8 @@ public class DeployDialog extends FloatingDialog{
     public DeployDialog(){
         super("", Styles.fullDialog);
 
-        ZoneNode root = new ZoneNode(Zones.groundZero, null);
-
-        BranchTreeLayout layout = new BranchTreeLayout();
-        layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
-        layout.gapBetweenNodes = Scl.scl(120f);
-        layout.layout(root);
-        bounds.set(layout.getBounds());
-        bounds.y += nodeSize*0.4f;
+        treeLayout();
+        Events.on(ContentReloadEvent.class, e -> treeLayout());
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
@@ -96,6 +91,18 @@ public class DeployDialog extends FloatingDialog{
             }
         });
 
+    }
+
+    void treeLayout(){
+        nodes.clear();
+        ZoneNode root = new ZoneNode(Zones.groundZero, null);
+
+        BranchTreeLayout layout = new BranchTreeLayout();
+        layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
+        layout.gapBetweenNodes = Scl.scl(120f);
+        layout.layout(root);
+        bounds.set(layout.getBounds());
+        bounds.y += nodeSize*0.4f;
     }
 
     public void setup(){

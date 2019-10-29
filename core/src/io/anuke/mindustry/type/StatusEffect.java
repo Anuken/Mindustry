@@ -11,7 +11,7 @@ import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.Effects.Effect;
 import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.entities.units.Statuses.StatusEntry;
-import io.anuke.mindustry.game.Content;
+import io.anuke.mindustry.ctype.Content;
 
 public class StatusEffect extends Content{
     public float damageMultiplier = 1f; //damage dealt

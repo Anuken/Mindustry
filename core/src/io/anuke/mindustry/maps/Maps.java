@@ -13,6 +13,7 @@ import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.Content;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
@@ -104,7 +105,7 @@ public class Maps{
         }
 
         //workshop
-        for(FileHandle file : platform.getExternalMaps()){
+        for(FileHandle file : platform.getWorkshopContent(Map.class)){
             try{
                 Map map = loadMap(file, false);
                 map.workshop = true;

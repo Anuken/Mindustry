@@ -1,9 +1,10 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.*;
+import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -29,6 +30,11 @@ public class Unloader extends Block{
     }
 
     @Override
+    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+        drawRequestConfigCenter(req, content.item(req.config), "unloader-center");
+    }
+
+    @Override
     public boolean canDump(Tile tile, Tile to, Item item){
         return !(to.block() instanceof StorageBlock);
     }
@@ -42,7 +48,7 @@ public class Unloader extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem.id));
+            tile.configure(lastItem.id);
         }
     }
 
@@ -109,7 +115,7 @@ public class Unloader extends Block{
         UnloaderEntity entity = tile.entity();
 
         Draw.color(entity.sortItem == null ? Color.clear : entity.sortItem.color);
-        Fill.square(tile.worldx(), tile.worldy(), 1f);
+        Draw.rect("unloader-center", tile.worldx(), tile.worldy());
         Draw.color();
     }
 

@@ -17,11 +17,11 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -55,6 +55,8 @@ public class Block extends BlockStorage{
     public boolean breakable;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
+    /** whether this block has insulating properties. */
+    public boolean insulated = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -87,6 +89,8 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
+    /** Whether the config is positional and needs to be shifted. */
+    public boolean posConfig;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
@@ -116,7 +120,7 @@ public class Block extends BlockStorage{
     public float idleSoundVolume = 0.5f;
 
     /** Cost of constructing this block. */
-    public ItemStack[] requirements = new ItemStack[]{};
+    public ItemStack[] requirements = {};
     /** Category in place menu. */
     public Category category = Category.distribution;
     /** Cost of building this block; do not modify directly! */
@@ -239,7 +243,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawCracks(Tile tile){
-        if(!tile.entity.damaged()) return;
+        if(!tile.entity.damaged() || size > maxCrackSize) return;
         int id = tile.pos();
         TextureRegion region = cracks[size - 1][Mathf.clamp((int)((1f - tile.entity.healthf()) * crackRegions), 0, crackRegions-1)];
         Draw.colorl(0.2f, 0.1f + (1f - tile.entity.healthf())* 0.6f);
@@ -311,7 +315,7 @@ public class Block extends BlockStorage{
             tempTiles.clear();
             Geometry.circle(tile.x, tile.y, range, (x, y) -> {
                 Tile other = world.ltile(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !other.entity.proximity().contains(tile) &&
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, tile) && !PowerNode.insulated(other, tile) && !other.entity.proximity().contains(tile) &&
                 !(outputsPower && tile.entity.proximity().contains(p -> p.entity != null && p.entity.power != null && p.entity.power.graph == other.entity.power.graph))){
                     tempTiles.add(other);
                 }
@@ -320,7 +324,7 @@ public class Block extends BlockStorage{
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
                 if(!toLink.entity.power.links.contains(tile.pos())){
-                    toLink.configure(tile.pos());
+                    toLink.configureAny(tile.pos());
                 }
             }
         }
@@ -681,8 +685,32 @@ public class Block extends BlockStorage{
     public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
         TextureRegion reg = icon(Cicon.full);
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
-            reg.getWidth() * req.animScale * Draw.scl, reg.getHeight() * req.animScale * Draw.scl,
-                !rotate ? 0 : req.rotation * 90);
+            reg.getWidth() * req.animScale * Draw.scl,
+            reg.getHeight() * req.animScale * Draw.scl,
+            !rotate ? 0 : req.rotation * 90);
+
+        if(req.hasConfig){
+            drawRequestConfig(req, list);
+        }
+    }
+
+    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+
+    }
+
+    public void drawRequestConfigCenter(BuildRequest req, Content content, String region){
+        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+        if(color == null) return;
+
+        Draw.color(color);
+        Draw.scl *= req.animScale;
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.scl /= req.animScale;
+        Draw.color();
+    }
+
+    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+
     }
 
     @Override

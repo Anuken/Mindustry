@@ -10,6 +10,7 @@ import io.anuke.mindustry.game.Objectives.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -44,7 +45,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                 if(i++ % 2 == 0){
                     iteminfo.row();
                 }
-                iteminfo.addImage(stack.item.icon(Cicon.small)).size(8 * 3).padRight(1);
+                iteminfo.addImage(stack.item.icon(io.anuke.mindustry.ui.Cicon.small)).size(8 * 3).padRight(1);
                 iteminfo.add(stack.amount + "").color(Color.lightGray).padRight(5);
             }
         };
@@ -84,7 +85,7 @@ public class ZoneInfoDialog extends FloatingDialog{
                             r.add("$research.list").colspan(2).left();
                             r.row();
                             for(Unlock blocko : blocks){
-                                r.addImage(blocko.block.icon(Cicon.small)).size(8 * 3).padRight(5);
+                                r.addImage(blocko.block.icon(io.anuke.mindustry.ui.Cicon.small)).size(8 * 3).padRight(5);
                                 r.add(blocko.block.localizedName).color(Color.lightGray).left();
                                 r.addImage(blocko.block.unlocked() ? Icon.checkSmall : Icon.cancelSmall, blocko.block.unlocked() ? Color.lightGray : Color.scarlet).padLeft(3);
                                 r.row();
@@ -136,13 +137,15 @@ public class ZoneInfoDialog extends FloatingDialog{
                 });
 
                 cont.row();
-
-                cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
-                () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
-                ).fillX().pad(3).disabled(b -> !zone.canConfigure());
             }
             cont.marginRight(12f);
         });
+        cont.row();
+
+        cont.addButton(zone.canConfigure() ? "$configure" : Core.bundle.format("configure.locked", zone.configureObjective.display()),
+        () -> loadout.show(zone.loadout.core().itemCapacity, zone.getStartingItems(), zone::resetStartingItems, zone::updateLaunchCost, rebuildItems)
+        ).fillX().pad(3).disabled(b -> !zone.canConfigure());
+
         cont.row();
 
         Button button = cont.addButton(zone.locked() ? "$uncover" : "$launch", () -> {

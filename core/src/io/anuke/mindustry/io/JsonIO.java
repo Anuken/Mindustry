@@ -4,6 +4,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.MappableContent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -18,7 +19,7 @@ public class JsonIO{
 
         @Override
         public void writeValue(Object value, Class knownType, Class elementType){
-            if(value instanceof MappableContent){
+            if(value instanceof io.anuke.mindustry.ctype.MappableContent){
                 try{
                     getWriter().value(((MappableContent)value).name);
                 }catch(IOException e){

@@ -1,10 +1,11 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.ctype;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ui.Cicon;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
@@ -13,7 +14,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Localized description. May be null. */
     public String description;
     /** Icons by Cicon ID.*/
-    protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
+    protected TextureRegion[] cicons = new TextureRegion[io.anuke.mindustry.ui.Cicon.all.length];
 
     public UnlockableContent(String name){
         super(name);

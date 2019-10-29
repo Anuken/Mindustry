@@ -6,6 +6,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.type.*;
 
@@ -39,10 +40,14 @@ public class GlobalData{
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
+        files.addAll(screenshotDirectory.list());
+        files.addAll(modDirectory.list());
+        files.addAll(schematicDirectory.list());
         String base = Core.settings.getDataDirectory().path();
 
         try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
             for(FileHandle add : files){
+                if(add.isDirectory()) continue;
                 zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
                 Streams.copyStream(add.read(), zos);
                 zos.closeEntry();
@@ -61,14 +66,8 @@ public class GlobalData{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
-        //purge existing data
-        for(FileHandle f : base.list()){
-            if(f.isDirectory()){
-                f.deleteDirectory();
-            }else if(!f.name().equals("zipdata.zip")){
-                f.delete();
-            }
-        }
+        //purge existing tmp data, keep everything else
+        tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();

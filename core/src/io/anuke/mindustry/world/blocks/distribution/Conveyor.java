@@ -9,10 +9,10 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -94,7 +94,7 @@ public class Conveyor extends Block implements Autotiler{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        int[] bits = buildBlending(tile, tile.rotation(), null);
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
         entity.blendbits = bits[0];
         entity.blendsclx = bits[1];
         entity.blendscly = bits[2];
@@ -107,7 +107,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
     }
 
     @Override
@@ -413,12 +413,12 @@ public class Conveyor extends Block implements Autotiler{
         static long toLong(int value){
             byte[] values = Pack.bytes(value, writeByte);
 
-            byte itemid = values[0];
+            short itemid = content.item(values[0]).id;
             float x = values[1] / 127f;
             float y = ((int)values[2] + 128) / 255f;
 
             short[] shorts = writeShort;
-            shorts[0] = (short)itemid;
+            shorts[0] = itemid;
             shorts[1] = (short)(x * Short.MAX_VALUE);
             shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);

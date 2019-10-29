@@ -14,12 +14,14 @@ import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -28,6 +30,8 @@ import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.BuildBlock.*;
 
 import java.util.*;
 
@@ -51,6 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean droppingItem;
     public Group uiGroup;
 
+    protected @Nullable Schematic lastSchematic;
     protected GestureDetector detector;
     protected PlaceLine line = new PlaceLine();
     protected BuildRequest resultreq;
@@ -207,8 +212,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
-            drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
+            drawSelected(request.x, request.y, request.block, Pal.remove);
         }
+    }
+
+    public boolean requestMatches(BuildRequest request){
+        Tile tile = world.tile(request.x, request.y);
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>entity().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -217,6 +227,76 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Block block = tile.block();
 
         drawSelected(x, y, block, Pal.remove);
+    }
+
+    public void useSchematic(Schematic schem){
+        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+    }
+
+    public void rotateRequests(Array<BuildRequest> requests, int direction){
+        int ox = rawTileX(), oy = rawTileY();
+
+        requests.each(req -> {
+            //rotate config position
+            if(req.block.posConfig){
+                int cx = Pos.x(req.config) - req.originalX, cy = Pos.y(req.config) - req.originalY;
+                int lx = cx;
+
+                if(direction >= 0){
+                    cx = -cy;
+                    cy = lx;
+                }else{
+                    cx = cy;
+                    cy = -lx;
+                }
+                req.config = Pos.get(cx + req.originalX, cy + req.originalY);
+            }
+
+            //rotate actual request, centered on its multiblock position
+            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float x = wx;
+            if(direction >= 0){
+                wx = -wy;
+                wy = x;
+            }else{
+                wx = wy;
+                wy = -x;
+            }
+            req.x = world.toTile(wx - req.block.offset()) + ox;
+            req.y = world.toTile(wy - req.block.offset()) + oy;
+            req.rotation = Mathf.mod(req.rotation + direction, 4);
+        });
+    }
+
+    public void flipRequests(Array<BuildRequest> requests, boolean x){
+        int origin = (x ? rawTileX() : rawTileY()) * tilesize;
+
+        requests.each(req -> {
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
+
+            if(x){
+                req.x = (int)((value - req.block.offset()) / tilesize);
+            }else{
+                req.y = (int)((value - req.block.offset()) / tilesize);
+            }
+
+            if(req.block.posConfig){
+                int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+                int nvalue = -((x ? Pos.x(req.config) : Pos.y(req.config)) - corigin) + corigin;
+                if(x){
+                    req.originalX = -(req.originalX - corigin) + corigin;
+                    req.config = Pos.get(nvalue, Pos.y(req.config));
+                }else{
+                    req.originalY = -(req.originalY - corigin) + corigin;
+                    req.config = Pos.get(Pos.x(req.config), nvalue);
+                }
+            }
+
+            //flip rotation
+            if(x == (req.rotation % 2 == 0)){
+                req.rotation = Mathf.mod(req.rotation + 2, 4);
+            }
+        });
     }
 
     /** Returns the selection request that overlaps this position, or null. */
@@ -259,7 +339,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    protected void drawSelection(int x1, int y1, int x2, int y2){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
         NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -307,10 +387,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
+        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+
+        Lines.stroke(2f);
+
+        Draw.color(Pal.accentBack);
+        Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
+        Draw.color(Pal.accent);
+        Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                selectRequests.add(req);
+                BuildRequest other = getRequest(req.x, req.y);
+                if(other != null){
+                    selectRequests.remove(other);
+                }
+
+                selectRequests.add(req.copy());
             }
         }
     }
@@ -318,7 +414,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                player.addBuildRequest(req);
+                BuildRequest copy = req.copy();
+                if(copy.hasConfig && copy.block.posConfig){
+                    copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                }
+                player.addBuildRequest(copy);
             }
         }
     }
@@ -448,14 +548,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
-        //clear when the player taps on something else
-        if(!consumed && !mobile && player.isBuilding() && block == null){
-            //player.clearBuilding();
-            block = null;
-            return true;
-        }*/
-
         if(!showedInventory){
             frag.inv.hide();
         }
@@ -497,6 +589,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
+    }
+
+    int rawTileX(){
+        return world.toTile(Core.input.mouseWorld().x);
+    }
+
+    int rawTileY(){
+        return world.toTile(Core.input.mouseWorld().y);
     }
 
     int tileX(float cursorX){
@@ -620,7 +720,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
         for(BuildRequest req : player.buildQueue()){
-            if(req != ignore && !req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))){
+            if(req != ignore
+                    && !req.breaking
+                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))
+            ){
                 return false;
             }
         }
@@ -632,6 +736,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
+        BuildRequest req = getRequest(x, y);
+        if(req != null){
+            player.buildQueue().remove(req);
+        }
         player.addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 
