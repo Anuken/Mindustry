@@ -2,12 +2,14 @@
 
 [![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry) 
 [![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)  
-[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
 
 A sandbox tower defense game written in Java.
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](https://mindustrygame.github.io/wiki)_ 
+
+### Suggestions & Requests
+[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
 
 ### Building
 
