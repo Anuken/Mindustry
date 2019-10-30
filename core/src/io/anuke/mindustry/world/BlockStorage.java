@@ -13,6 +13,7 @@ import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.world.blocks.distribution.Conduit;
 import io.anuke.mindustry.world.consumers.Consumers;
 import io.anuke.mindustry.world.meta.BlockBars;
 import io.anuke.mindustry.world.meta.BlockStats;
@@ -143,7 +144,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
-                float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
+                float fract = tile.entity.liquids.get(liquid) / liquidCapacity * (tile.block() instanceof Conduit ? ((Conduit) tile.block()).bar : 1f);
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f);
 

@@ -17,6 +17,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     protected TextureRegion[] topRegions = new TextureRegion[7];
     protected TextureRegion[] botRegions = new TextureRegion[7];
 
+    public float bar;
+
     public Conduit(String name){
         super(name);
         rotate = true;
