@@ -257,9 +257,17 @@ public class HudFragment extends Fragment{
             t.add(new Minimap());
             t.row();
             //position
+            t.top().right();
             t.label(() -> world.toTile(player.x) + "," + world.toTile(player.y))
                 .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
-            t.top().right();
+        });
+
+        // resources
+        parent.fill(t -> {
+            t.visible(() -> Core.settings.getBool("resources") && !state.rules.tutorial);
+            t.add(new ItemsDisplay(false));
+            t.row();
+            t.bottom().left();
         });
 
         //spawner warning

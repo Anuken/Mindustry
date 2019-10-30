@@ -295,6 +295,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
+        graphics.checkPref("resources", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", !mobile);
