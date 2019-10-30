@@ -432,11 +432,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(over.block() != null){
             if(over.block() instanceof Conveyor){
-                if ((over.rotation() + rotation) % 2 != 0){
+                if((over.rotation() + rotation) % 2 != 0){
 
                     Tile behind = over.getNearby((rotation + 2) % 4);
+                    Block previous = behind.block();
 
-                    if (behind.block() != null && behind.block() instanceof Conveyor){
+                    for(int i = 0; i < lineRequests.size; i++){
+                        BuildRequest req = lineRequests.get(i);
+
+                        if(behind.x == req.x && behind.y == req.y){
+                            previous = req.block;
+                            break;
+                        }
+                    }
+
+                    if(previous != null && previous instanceof Conveyor){
                         block = Blocks.junction;
                     }
                 }
