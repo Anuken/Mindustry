@@ -98,7 +98,7 @@ public class ModsDialog extends FloatingDialog{
 
     void setup(){
         cont.clear();
-        cont.defaults().width(mobile ? 500 : 520f).pad(4);
+        cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
         if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){

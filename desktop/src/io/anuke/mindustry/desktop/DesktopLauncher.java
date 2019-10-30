@@ -39,7 +39,7 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+    boolean useDiscord = OS.is64Bit, loadError = false;
 
     static{
         if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
@@ -91,66 +91,68 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             }
 
-            if(showConsole){
-                StringBuilder base = new StringBuilder();
-                Log.setLogger(new LogHandler(){
-                      @Override
-                      public void print(String text, Object... args){
-                          String out = Log.format(text, false, args);
+            StringBuilder base = new StringBuilder();
+            Log.setLogger(new LogHandler(){
+                  @Override
+                  public void print(String text, Object... args){
+                      String out = Log.format(text, false, args);
 
-                          base.append(out).append("\n");
-                      }
-                });
+                      base.append(out).append("\n");
+                  }
+            });
 
-                Events.on(ClientLoadEvent.class, event -> {
-                    Label[] label = {null};
-                    boolean[] visible = {false};
-                    Core.scene.table(t -> {
-                        t.touchable(Touchable.disabled);
-                        t.top().left();
-                        t.update(() -> {
-                            if(Core.input.keyTap(KeyCode.BACKTICK)){
-                                visible[0] = !visible[0];
-                            }
-
-                            t.toFront();
-                        });
-                        t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
-                        label[0].getText().append(base);
-                    });
-
-                    Log.setLogger(new LogHandler(){
-                        @Override
-                        public void print(String text, Object... args){
-                            super.print(text, args);
-                            String out = Log.format(text, false, args);
-
-                            int maxlen = 2048;
-
-                            if(label[0].getText().length() > maxlen){
-                                label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
-                            }
-
-                            label[0].getText().append(out).append("\n");
-                            label[0].invalidateHierarchy();
+            Events.on(ClientLoadEvent.class, event -> {
+                Label[] label = {null};
+                boolean[] visible = {false};
+                Core.scene.table(t -> {
+                    t.touchable(Touchable.disabled);
+                    t.top().left();
+                    t.update(() -> {
+                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke"))){
+                            visible[0] = !visible[0];
                         }
+
+                        t.toFront();
                     });
+                    t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                    label[0].getText().append(base);
                 });
-            }
+
+                Log.setLogger(new LogHandler(){
+                    @Override
+                    public void print(String text, Object... args){
+                        super.print(text, args);
+                        String out = Log.format(text, false, args);
+
+                        int maxlen = 2048;
+
+                        if(label[0].getText().length() > maxlen){
+                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
+                        }
+
+                        label[0].getText().append(out).append("\n");
+                        label[0].invalidateHierarchy();
+                    }
+                });
+            });
 
             try{
                 try{
                     SteamAPI.loadLibraries();
                 }catch(Throwable t){
                     logSteamError(t);
-                    fallbackSteam();
                 }
 
                 if(!SteamAPI.init()){
+                    loadError = true;
                     Log.err("Steam client not running.");
                 }else{
                     initSteam(args);
                     Vars.steam = true;
+                }
+
+                if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
+                    System.exit(0);
                 }
             }catch(Throwable e){
                 steam = false;
@@ -161,6 +163,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     void logSteamError(Throwable e){
+        loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
             String log = Strings.parseException(e, true);
