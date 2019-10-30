@@ -29,7 +29,7 @@ public class ModsDialog extends FloatingDialog{
 
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(210, 64f).colspan(android ? 2 : 1);
+        .size(210, 64f);
 
         buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
             ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
@@ -98,7 +98,7 @@ public class ModsDialog extends FloatingDialog{
 
     void setup(){
         cont.clear();
-        cont.defaults().width(520f).pad(4);
+        cont.defaults().width(mobile ? 500 : 520f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
         if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
