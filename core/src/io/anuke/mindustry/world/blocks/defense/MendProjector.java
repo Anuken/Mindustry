@@ -161,7 +161,7 @@ public class MendProjector extends Block{
         }
         
         float realRadius(){
-            return range * rangeProg;
+            return (range + phaseHeat * phaseRangeBoost) * rangeProg;
         }
         
         @Override public void drawOver(){
