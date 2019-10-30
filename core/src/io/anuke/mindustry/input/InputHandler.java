@@ -433,7 +433,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(over.block() != null){
             if(over.block() instanceof Conveyor){
                 if ((over.rotation() + rotation) % 2 != 0){
-                    block = Blocks.junction;
+
+                    Tile behind = over.getNearby((rotation + 2) % 4);
+
+                    if (behind.block() != null && behind.block() instanceof Conveyor){
+                        block = Blocks.junction;
+                    }
                 }
             }
         }
