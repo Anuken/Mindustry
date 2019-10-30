@@ -8,6 +8,8 @@ import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.entities.Effects;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.ProjectorTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
@@ -137,7 +139,7 @@ public class MendProjector extends Block{
         return new MendEntity();
     }
 
-    class MendEntity extends TileEntity{
+    class MendEntity extends TileEntity implements ProjectorTrait{
         float heat;
         float charge;
         float phaseHeat;
@@ -154,6 +156,44 @@ public class MendProjector extends Block{
             super.read(stream, revision);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
+        }
+    
+        @Override public void drawOver(){
+            Draw.color(Color.white);
+            Draw.alpha(0f);
+            Fill.circle(x, y, range);
+            Draw.color();
+        }
+    
+        @Override public void drawSimple(){
+            float rad = range;
+            // power.satisfaction
+            Draw.color(color);
+            Lines.stroke(1.5f);
+            Draw.alpha(0.17f);
+            Fill.circle(x, y, rad);
+            Draw.alpha(1f);
+            Lines.circle(x, y, rad);
+            Draw.reset();
+        }
+    
+        @Override public Color accent(){
+            return color;
+        }
+    
+        @Override public String projectorSet(){
+            return "MenderSet";
+        }
+    
+        @Override public void draw(){
+            Draw.color(color);
+            Fill.circle(x, y, range);
+            Draw.color();
+        }
+    
+        @Override
+        public EntityGroup targetGroup(){
+            return projectorGroup;
         }
     }
 }

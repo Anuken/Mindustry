@@ -23,7 +23,8 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.ui.Cicon;
-import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
+
+import java.util.List;
 
 import static io.anuke.arc.Core.*;
 import static io.anuke.mindustry.Vars.*;
@@ -275,22 +276,24 @@ public class Renderer implements ApplicationListener{
         overlays.drawBottom();
         playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
 
-        if(shieldGroup.countInBounds() > 0){
+        if(projectorGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
-                Draw.flush();
+               /* Draw.flush();
                 shieldBuffer.begin();
                 graphics.clear(Color.clear);
-                shieldGroup.draw();
-                shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
+                projectorGroup.draw();
+                projectorGroup.draw(shield -> true, ProjectorTrait::drawOver);
                 Draw.flush();
                 shieldBuffer.end();
                 Draw.shader(Shaders.shield);
                 Draw.color(Pal.accent);
                 Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
                 Draw.color();
-                Draw.shader();
+                Draw.shader();*/
+                
+                ProjectorTrait.projectorSets.forEach((x, y) -> drawProjectorSet(y));
             }else{
-                shieldGroup.draw(shield -> true, ShieldEntity::drawSimple);
+                projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
             }
         }
 
@@ -303,7 +306,24 @@ public class Renderer implements ApplicationListener{
         Draw.color();
         Draw.flush();
     }
-
+    
+    private void drawProjectorSet(List<ProjectorTrait> projectors){
+        if(projectors.isEmpty())
+            return;
+        Draw.flush();
+        shieldBuffer.begin();
+        graphics.clear(Color.clear);
+        projectors.forEach(DrawTrait::draw);//projectorGroup.draw();
+        projectors.forEach(ProjectorTrait::drawOver);
+        Draw.flush();
+        shieldBuffer.end();
+        Draw.shader(Shaders.shield);
+        Draw.color(projectors.get(0).accent());
+        Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
+        Draw.color();
+        Draw.shader();
+    }
+    
     private void drawLanding(){
         if(landTime > 0 && player.getClosestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;

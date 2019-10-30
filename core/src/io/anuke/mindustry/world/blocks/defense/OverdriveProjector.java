@@ -6,6 +6,8 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.entities.EntityGroup;
+import io.anuke.mindustry.entities.traits.ProjectorTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
@@ -137,7 +139,7 @@ public class OverdriveProjector extends Block{
         return new OverdriveEntity();
     }
 
-    class OverdriveEntity extends TileEntity{
+    class OverdriveEntity extends TileEntity implements ProjectorTrait{
         float heat;
         float charge;
         float phaseHeat;
@@ -154,6 +156,45 @@ public class OverdriveProjector extends Block{
             super.read(stream, revision);
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
+        }
+    
+        @Override
+        public void draw(){
+            Draw.color(color);
+            Fill.circle(x, y, range);
+            Draw.color();
+        }
+    
+        public void drawOver(){
+            Draw.color(Color.white);
+            Draw.alpha(0f);
+            Fill.circle(x, y, range);
+            Draw.color();
+        }
+    
+        public void drawSimple(){
+            float rad = range;
+        
+            Draw.color(color);
+            Lines.stroke(1.5f);
+            Draw.alpha(0.17f);
+            Fill.circle(x, y, rad);
+            Draw.alpha(1f);
+            Lines.circle(x, y, rad);
+            Draw.reset();
+        }
+    
+        @Override public Color accent(){
+            return color;
+        }
+    
+        @Override public String projectorSet(){
+            return "OverdriveSet";
+        }
+    
+        @Override
+        public EntityGroup targetGroup(){
+            return projectorGroup;
         }
     }
 }

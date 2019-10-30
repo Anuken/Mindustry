@@ -217,7 +217,7 @@ public class ForceProjector extends Block{
         }
     }
 
-    public class ShieldEntity extends BaseEntity implements DrawTrait{
+    public class ShieldEntity extends BaseEntity implements ProjectorTrait{
         final ForceEntity entity;
 
         public ShieldEntity(Tile tile){
@@ -266,10 +266,18 @@ public class ForceProjector extends Block{
             Lines.poly(x, y, 6, rad);
             Draw.reset();
         }
-
+    
+        @Override public Color accent(){
+            return Pal.accent;
+        }
+    
+        @Override public String projectorSet(){
+            return "ForcefieldSet";
+        }
+    
         @Override
         public EntityGroup targetGroup(){
-            return shieldGroup;
+            return projectorGroup;
         }
     }
 }

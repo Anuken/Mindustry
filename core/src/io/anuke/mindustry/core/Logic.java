@@ -236,7 +236,7 @@ public class Logic implements ApplicationListener{
                     }
 
                     puddleGroup.update();
-                    shieldGroup.update();
+                    projectorGroup.update();
                     bulletGroup.update();
                     tileGroup.update();
                     fireGroup.update();
