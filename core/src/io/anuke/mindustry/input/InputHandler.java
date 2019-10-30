@@ -32,6 +32,7 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.distribution.Conveyor;
 
 import java.util.*;
 
@@ -418,9 +419,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(copy.hasConfig && copy.block.posConfig){
                     copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
                 }
+
+                copy.block = didyoumean(req.x, req.y, req.block, req.rotation);
+
                 player.addBuildRequest(copy);
             }
         }
+    }
+
+    protected Block didyoumean(int x, int y, Block block, int rotation){
+        Tile over = world.ltile(x, y);
+
+        if(over.block() != null){
+            if(over.block() instanceof Conveyor){
+                if ((over.rotation() + rotation) % 2 != 0){
+                    block = Blocks.junction;
+                }
+            }
+        }
+
+        return block;
     }
 
     protected void drawRequest(BuildRequest request){
@@ -429,6 +447,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Draws a placement icon for a specific block. */
     protected void drawRequest(int x, int y, Block block, int rotation){
+        block = didyoumean(x, y, block, rotation);
         brequest.set(x, y, rotation, block);
         brequest.animScale = 1f;
         block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
