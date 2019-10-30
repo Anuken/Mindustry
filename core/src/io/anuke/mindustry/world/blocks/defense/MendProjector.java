@@ -166,7 +166,7 @@ public class MendProjector extends Block{
         
         @Override public void drawOver(){
             Draw.color(Color.white);
-            Draw.alpha(1f - realRadius());
+            Draw.alpha(1f - power.satisfaction);
             Fill.circle(x, y, realRadius());
             Draw.color();
         }
