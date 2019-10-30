@@ -69,6 +69,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
+        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.satisfaction > 0 ? 1f : 0f, 0.05f);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
@@ -143,6 +144,7 @@ public class MendProjector extends Block{
         float heat;
         float charge;
         float phaseHeat;
+        float rangeProg;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -157,16 +159,20 @@ public class MendProjector extends Block{
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }
-    
+        
+        float realRadius(){
+            return range * rangeProg;
+        }
+        
         @Override public void drawOver(){
             Draw.color(Color.white);
-            Draw.alpha(0f);
-            Fill.circle(x, y, range);
+            Draw.alpha(1f - realRadius());
+            Fill.circle(x, y, realRadius());
             Draw.color();
         }
     
         @Override public void drawSimple(){
-            float rad = range;
+            float rad = realRadius();
             // power.satisfaction
             Draw.color(color);
             Lines.stroke(1.5f);
@@ -187,7 +193,7 @@ public class MendProjector extends Block{
     
         @Override public void draw(){
             Draw.color(color);
-            Fill.circle(x, y, range);
+            Fill.circle(x, y, realRadius());
             Draw.color();
         }
     
