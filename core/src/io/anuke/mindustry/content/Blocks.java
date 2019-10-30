@@ -1010,6 +1010,7 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
+            liquidPressure = 1.025f;
             health = 90;
         }};
 
