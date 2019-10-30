@@ -27,7 +27,7 @@ allprojects{
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8-SNAPSHOT'
-        steamworksVersion = 'f9ed19bbddd71f07999ca8f0ef354c04938aca41'
+        steamworksVersion = 'ea1cd5096e4acd18564eb0d946e0cc0c0722b481'
         arcHash = null
 
         debugged = {
