@@ -59,7 +59,7 @@ public class Blocks implements ContentList{
     conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, pressureConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -1005,21 +1005,12 @@ public class Blocks implements ContentList{
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.metaglass, 1));
             health = 45;
-            bar = 1f;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
             health = 90;
-            bar = 1f;
-        }};
-
-        pressureConduit = new Conduit("pressure-conduit"){{
-            requirements(Category.liquid, ItemStack.with(Items.surgealloy, 2, Items.metaglass, 1));
-            liquidCapacity = 20f;
-            health = 70;
-            bar = 1.025f;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
