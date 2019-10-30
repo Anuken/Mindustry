@@ -76,8 +76,7 @@ public class SWorkshop implements SteamUGCCallback{
     public void updateItem(Publishable p, String changelog){
         String id = p.getSteamID();
         long handle = Strings.parseLong(id, -1);
-        SteamPublishedFileID fid = new SteamPublishedFileID(handle);
-        update(p, fid, changelog);
+        update(p, new SteamPublishedFileID(handle), changelog);
     }
 
     /** Fetches info for an item, checking to make sure that it exists.*/
@@ -113,6 +112,11 @@ public class SWorkshop implements SteamUGCCallback{
                                 field.setMaxLength(400);
                                 buttons.defaults().size(120, 54).pad(4);
                                 buttons.addButton("$ok", () -> {
+                                    if(!p.prePublish()){
+                                        Log.info("Rejecting due to pre-publish.");
+                                        return;
+                                    }
+
                                     ui.loadfrag.show("$publishing");
                                     updateItem(p, field.getText().replace("\r", "\n"));
                                     dialog.hide();
@@ -143,7 +147,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void update(Publishable p, SteamPublishedFileID id, String changelog){
-        Log.info("Calling update({0})", p.steamTitle());
+        Log.info("Calling update({0}) {1}", p.steamTitle(), SteamNativeHandle.getNativeHandle(id));
         String sid = SteamNativeHandle.getNativeHandle(id) + "";
 
         updateItem(id, h -> {
@@ -197,7 +201,7 @@ public class SWorkshop implements SteamUGCCallback{
     void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
         try{
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
-            Log.info("begin updateItem({0})", publishedFileID.toString());
+            Log.info("begin updateItem({0})", SteamNativeHandle.getNativeHandle(publishedFileID));
 
             tagger.get(h);
             Log.info("Tagged.");
@@ -274,7 +278,7 @@ public class SWorkshop implements SteamUGCCallback{
                 Log.info("Passing to first handler.");
                 itemHandlers.first().get(publishedFileID);
             }else{
-                ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
+                ui.showErrorMessage(Core.bundle.format("publish.error", result.name()));
             }
 
             itemHandlers.remove(0);
@@ -286,7 +290,7 @@ public class SWorkshop implements SteamUGCCallback{
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         ui.loadfrag.hide();
-        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID, needsToAcceptWLA, result);
+        Log.info("onsubmititemupdate {0} {1} {2}", SteamNativeHandle.getNativeHandle(publishedFileID), needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
@@ -298,9 +302,8 @@ public class SWorkshop implements SteamUGCCallback{
                 updatedHandlers.get(publishedFileID).run();
             }
         }else{
-            ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
+            ui.showErrorMessage(Core.bundle.format("publish.error", result.name()));
         }
-
     }
 
     @Override
