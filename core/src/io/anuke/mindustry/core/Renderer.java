@@ -278,19 +278,6 @@ public class Renderer implements ApplicationListener{
 
         if(projectorGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
-               /* Draw.flush();
-                shieldBuffer.begin();
-                graphics.clear(Color.clear);
-                projectorGroup.draw();
-                projectorGroup.draw(shield -> true, ProjectorTrait::drawOver);
-                Draw.flush();
-                shieldBuffer.end();
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-                Draw.color();
-                Draw.shader();*/
-                
                 ProjectorTrait.projectorSets.forEach((x, y) -> drawProjectorSet(y));
             }else{
                 projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
