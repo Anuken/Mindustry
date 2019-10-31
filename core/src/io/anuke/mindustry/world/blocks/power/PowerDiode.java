@@ -1,5 +1,8 @@
 package io.anuke.mindustry.world.blocks.power;
 
+import io.anuke.arc.Core;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
@@ -7,7 +10,10 @@ import io.anuke.mindustry.world.Tile;
 import static io.anuke.mindustry.Vars.world;
 
 public class PowerDiode extends Block {
-    public PowerDiode(String name) {
+
+    protected TextureRegion arrow;
+
+    public PowerDiode(String name){
         super(name);
         rotate = true;
         update = true;
@@ -16,7 +22,7 @@ public class PowerDiode extends Block {
     }
 
     @Override
-    public void update(Tile tile) {
+    public void update(Tile tile){
         super.update(tile);
 
         Tile back = getNearby(tile, (tile.rotation() + 2) % 4);
@@ -38,14 +44,26 @@ public class PowerDiode extends Block {
                 front.entity.power.satisfaction += send / frontCapacity;
             }
             tile.entity.noSleep();
-        } else {
+        }else{
             tile.entity.sleep();
         }
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
-        super.drawPlace(x, y, rotation, valid);
+    public void load(){
+        super.load();
+        arrow = Core.atlas.find(name + "-arrow");
+    }
+
+    @Override
+    public void draw(Tile tile){
+        Draw.rect(region, tile.drawx(), tile.drawy(), 0);
+        Draw.rect(arrow, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
+    }
+
+    @Override
+    public TextureRegion[] generateIcons(){
+        return new TextureRegion[]{Core.atlas.find(name + "-arrow"), Core.atlas.find(name)};
     }
 
     public Tile getNearby(Tile tile, int rotation){
