@@ -182,7 +182,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode == placing || isPlacing()){
+        if(mode != none || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -365,7 +365,6 @@ public class DesktopInput extends InputHandler{
 
             if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
-                //selectRequests.clear();
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;

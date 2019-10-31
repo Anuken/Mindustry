@@ -123,15 +123,15 @@ public class Tile implements Position, TargetTrait{
         return block().solid && !block().synthetic() && block().fillsTile;
     }
 
-    public Floor floor(){
+    public @NonNull Floor floor(){
         return floor;
     }
 
-    public Block block(){
+    public @NonNull Block block(){
         return block;
     }
 
-    public Floor overlay(){
+    public @NonNull Floor overlay(){
         return overlay;
     }
 
