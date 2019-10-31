@@ -27,7 +27,6 @@ public class PowerDiode extends Block{
 
         Tile back = getNearby(tile, (tile.rotation() + 2) % 4);
         Tile front = getNearby(tile, tile.rotation());
-        if(back.block() == null || front.block() == null) return;
 
         if(!back.block().hasPower || !front.block().hasPower) return;
         PowerGraph backGraph = back.entity.power.graph;
