@@ -3,6 +3,7 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
@@ -26,20 +27,30 @@ public class PowerDiode extends Block{
 
         Tile back = getNearby(tile, (tile.rotation() + 2) % 4);
         Tile front = getNearby(tile, tile.rotation());
-
         if(back.block() == null || front.block() == null) return;
-        if(!back.block().hasPower || !front.block().hasPower) return;
 
+        if(!back.block().hasPower || !front.block().hasPower) return;
         PowerGraph backGraph = back.entity.power.graph;
         PowerGraph frontGraph = front.entity.power.graph;
         if(backGraph == frontGraph) return;
 
-        if(backGraph.getBatteryStored() > 0f && backGraph.getBatteryStored() > frontGraph.getBatteryStored()){
-            float send = (backGraph.getBatteryStored() - frontGraph.getBatteryStored()) / 2;
+        // skip if the receiving graph is already full
+        if(frontGraph.getBatteryStored() == frontGraph.getTotalBatteryCapacity()) return;
 
-            backGraph.useBatteries(send);
-            frontGraph.chargeBatteries(send);
+        // half the difference
+        float send = Mathf.clamp((backGraph.getBatteryStored() - frontGraph.getBatteryStored()) / 2, 0f, Integer.MAX_VALUE);
+
+        // send all overflow if all batteries of the sending graph are full
+        if(backGraph.getBatteryStored() == backGraph.getTotalBatteryCapacity()){
+            send += backGraph.getLastPowerProduced() - backGraph.getPowerNeeded();
         }
+
+        // limit offering to space available
+        send = Mathf.clamp(send, 0f, frontGraph.getTotalBatteryCapacity() - frontGraph.getBatteryStored());
+
+        if (send == 0f) return;
+        backGraph.useBatteries(send);
+        frontGraph.chargeBatteries(send);
     }
 
     @Override
