@@ -247,7 +247,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 400, 5, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
