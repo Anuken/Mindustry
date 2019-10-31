@@ -38,15 +38,24 @@ public class ItemsDisplay extends Table{
             int i = 0;
             for(Item item : content.items()){
                 if(item.type == ItemType.material && data.isUnlocked(item)){
-                    t.label(() -> format(item)).left().minWidth(50);
-                    t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                     if(campaign){
+                        t.label(() -> format(item)).left().minWidth(50);
+                        t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                         t.add(item.localizedName()).color(Color.lightGray).left();
                         t.row();
-                    } else {
+                    }else if(mobile){
                         if (++i % 2 == 0){
+                            t.label(() -> format(item)).left().minWidth(50);
+                            t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                             t.row();
+                        }else{
+                            t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                            t.label(() -> format(item)).left().minWidth(50);
                         }
+                    }else{
+                        t.label(() -> format(item)).left().minWidth(50);
+                        t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                        t.row();
                     }
                 }
             }
