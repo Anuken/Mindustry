@@ -47,6 +47,9 @@ public class PowerDiode extends Block{
         // limit offering to space available
         send = Mathf.clamp(send, 0f, frontGraph.getTotalBatteryCapacity() - frontGraph.getBatteryStored());
 
+        // limit to sendable power
+        send = Mathf.clamp(send, 0f, backGraph.getBatteryStored());
+
         if (send == 0f) return;
         backGraph.useBatteries(send);
         frontGraph.chargeBatteries(send);
