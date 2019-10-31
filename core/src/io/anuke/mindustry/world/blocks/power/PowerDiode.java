@@ -3,13 +3,12 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.world;
 
-public class PowerDiode extends Block {
+public class PowerDiode extends Block{
 
     protected TextureRegion arrow;
 
@@ -28,24 +27,18 @@ public class PowerDiode extends Block {
         Tile back = getNearby(tile, (tile.rotation() + 2) % 4);
         Tile front = getNearby(tile, tile.rotation());
 
-        if(back.block() != null && back.block() instanceof Battery &&
-          front.block() != null && front.block() instanceof Battery){
+        if(back.block() == null || front.block() == null) return;
+        if(!back.block().hasPower || !front.block().hasPower) return;
 
-            float backCapacity = back.block().consumes.getPower().capacity;
-            float frontCapacity = front.block().consumes.getPower().capacity;
+        PowerGraph backGraph = back.entity.power.graph;
+        PowerGraph frontGraph = front.entity.power.graph;
+        if(backGraph == frontGraph) return;
 
-            float backPower = backCapacity * back.entity.power.satisfaction;
-            float frontPower = frontCapacity * front.entity.power.satisfaction;
+        if(backGraph.getBatteryStored() > 0f && backGraph.getBatteryStored() > frontGraph.getBatteryStored()){
+            float send = (backGraph.getBatteryStored() - frontGraph.getBatteryStored()) / 2;
 
-            if(backPower > frontPower && front.entity.power.satisfaction < 1f){
-                float send = Mathf.clamp((backPower - frontPower) / 2, 0f, frontCapacity);
-
-                back.entity.power.satisfaction -= send / backCapacity;
-                front.entity.power.satisfaction += send / frontCapacity;
-            }
-            tile.entity.noSleep();
-        }else{
-            tile.entity.sleep();
+            backGraph.useBatteries(send);
+            frontGraph.chargeBatteries(send);
         }
     }
 
