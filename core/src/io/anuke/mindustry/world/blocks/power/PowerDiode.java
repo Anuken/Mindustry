@@ -31,28 +31,30 @@ public class PowerDiode extends Block{
         if(!back.block().hasPower || !front.block().hasPower) return;
         PowerGraph backGraph = back.entity.power.graph;
         PowerGraph frontGraph = front.entity.power.graph;
-        if(backGraph == frontGraph) return;
 
-        // skip if the receiving graph is already full
-        if(frontGraph.getBatteryStored() == frontGraph.getTotalBatteryCapacity()) return;
-
-        // half the difference
-        float send = Mathf.clamp((backGraph.getBatteryStored() - frontGraph.getBatteryStored()) / 2, 0f, Integer.MAX_VALUE);
-
-        // send all overflow if all batteries of the sending graph are full
-        if(backGraph.getBatteryStored() == backGraph.getTotalBatteryCapacity()){
-            send += backGraph.getLastPowerProduced() - backGraph.getPowerNeeded();
-        }
-
-        // limit offering to space available
-        send = Mathf.clamp(send, 0f, frontGraph.getTotalBatteryCapacity() - frontGraph.getBatteryStored());
-
-        // limit to sendable power
-        send = Mathf.clamp(send, 0f, backGraph.getBatteryStored());
-
-        if (send == 0f) return;
-        backGraph.useBatteries(send);
-        frontGraph.chargeBatteries(send);
+//        backGraph
+//        if(backGraph == frontGraph) return;
+//
+//        // skip if the receiving graph is already full
+//        if(frontGraph.getBatteryStored() == frontGraph.getTotalBatteryCapacity()) return;
+//
+//        // half the difference
+//        float send = Mathf.clamp((backGraph.getBatteryStored() - frontGraph.getBatteryStored()) / 2, 0f, Integer.MAX_VALUE);
+//
+//        // send all overflow if all batteries of the sending graph are full
+//        if(backGraph.getBatteryStored() == backGraph.getTotalBatteryCapacity()){
+//            send += backGraph.getLastPowerProduced() - backGraph.getPowerNeeded();
+//        }
+//
+//        // limit offering to space available
+//        send = Mathf.clamp(send, 0f, frontGraph.getTotalBatteryCapacity() - frontGraph.getBatteryStored());
+//
+//        // limit to sendable power
+//        send = Mathf.clamp(send, 0f, backGraph.getBatteryStored());
+//
+//        if (send == 0f) return;
+//        backGraph.useBatteries(send);
+//        frontGraph.chargeBatteries(send);
     }
 
     @Override
@@ -82,4 +84,6 @@ public class PowerDiode extends Block{
         if(rotation == 3) return world.ltile(x, y - 1);
         return null;
     }
+
+
 }

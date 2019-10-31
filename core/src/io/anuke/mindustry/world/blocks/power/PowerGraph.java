@@ -26,6 +26,9 @@ public class PowerGraph{
     private final int graphID;
     private static int lastGraphID;
 
+    public float diodeTo = 0f;
+    public float diodeFrom = 0f;
+
     {
         graphID = lastGraphID++;
     }
@@ -56,7 +59,7 @@ public class PowerGraph{
     }
 
     public float getPowerProduced(){
-        float powerProduced = 0f;
+        float powerProduced = diodeTo;
         for(Tile producer : producers){
             if(producer.entity == null) continue;
             powerProduced += producer.block().getPowerProduction(producer) * producer.entity.delta();
@@ -65,7 +68,7 @@ public class PowerGraph{
     }
 
     public float getPowerNeeded(){
-        float powerNeeded = 0f;
+        float powerNeeded = diodeFrom;
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.hasPower()){
