@@ -44,13 +44,10 @@ public class ItemsDisplay extends Table{
                         t.add(item.localizedName()).color(Color.lightGray).left();
                         t.row();
                     }else if(mobile){
+                        t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                        t.label(() -> format(item)).left().minWidth(50);
                         if (++i % 2 == 0){
-                            t.label(() -> format(item)).left().minWidth(50);
-                            t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                             t.row();
-                        }else{
-                            t.addImage(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
-                            t.label(() -> format(item)).left().minWidth(50);
                         }
                     }else{
                         t.label(() -> format(item)).left().minWidth(50);
