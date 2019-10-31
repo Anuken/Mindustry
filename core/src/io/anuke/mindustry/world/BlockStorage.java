@@ -144,7 +144,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
-                float fract = tile.entity.liquids.get(liquid) / liquidCapacity * tile.block().liquidPressure;
+                float fract = tile.entity.liquids.get(liquid) / liquidCapacity * liquidPressure;
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f);
 
