@@ -411,12 +411,12 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, ItemStack.with(Items.copper, 75, Items.lead, 30));
 
             craftEffect = Fx.pulverizeMedium;
-            outputItem = new ItemStack(Items.graphite, 1);
-            craftTime = 90f;
-            size = 2;
+            outputItem = new ItemStack(Items.graphite, 100);
+            craftTime = 10f;
+            size = 4;
             hasItems = true;
 
-            consumes.item(Items.coal, 2);
+            consumes.item(Items.coal, 1);
         }};
 
         multiPress = new GenericCrafter("multi-press"){{
@@ -438,14 +438,14 @@ public class Blocks implements ContentList{
         siliconSmelter = new GenericSmelter("silicon-smelter"){{
             requirements(Category.crafting, ItemStack.with(Items.copper, 30, Items.lead, 25));
             craftEffect = Fx.smeltsmoke;
-            outputItem = new ItemStack(Items.silicon, 1);
-            craftTime = 40f;
+            outputItem = new ItemStack(Items.silicon, 10);
+            craftTime = 20f;
             size = 2;
             hasPower = true;
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 1));
             consumes.power(0.50f);
         }};
 
@@ -914,13 +914,13 @@ public class Blocks implements ContentList{
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.08f;
+            speed = 0.08 f;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.metaglass, 1, Items.thorium, 1));
             health = 180;
-            speed = 0.08f;
+            speed = 9999f;
         }};
 
         junction = new Junction("junction"){{
@@ -1143,7 +1143,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.lead, 500, Items.silicon, 300, Items.graphite, 400, Items.thorium, 100, Items.surgealloy, 250, Items.metaglass, 250));
             size = 4;
             health = 900;
-            powerProduction = 130f;
+            powerProduction = 99999999f;
             itemDuration = 140f;
             consumes.power(25f);
             consumes.item(Items.blastCompound);
@@ -1480,15 +1480,15 @@ public class Blocks implements ContentList{
             );
 
             size = 2;
-            range = 150f;
+            range = 1500000f;
             reload = 38f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
-            recoil = 3f;
+            recoil = 0f;
             shootShake = 2f;
             burstSpacing = 3f;
-            shots = 4;
+            shots = 100;
             ammoUseEffect = Fx.shellEjectBig;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
@@ -1628,7 +1628,7 @@ public class Blocks implements ContentList{
             recoil = 4f;
             size = 4;
             shootShake = 2f;
-            range = 190f;
+            range = 1900000000f;
             reload = 80f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
