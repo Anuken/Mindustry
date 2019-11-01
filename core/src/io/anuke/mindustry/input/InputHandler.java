@@ -13,8 +13,8 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -527,7 +527,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             lineRequests.add(req);
         });
 
-        lineRequests.each(req -> req.block = req.block.getReplacement(req, lineRequests));
+        lineRequests.each(req -> {
+            Block replace = req.block.getReplacement(req, lineRequests);
+            if(replace.unlockedCur()){
+                req.block = replace;
+            }
+        });
     }
 
     protected void updateLine(int x1, int y1){
