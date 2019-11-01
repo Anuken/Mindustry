@@ -1,5 +1,7 @@
 package io.anuke.mindustry.entities.traits;
 
+import io.anuke.arc.collection.Array;
+import io.anuke.arc.collection.ArrayMap;
 import io.anuke.arc.graphics.Color;
 
 import java.util.ArrayList;
@@ -13,15 +15,20 @@ import java.util.Map;
  */
 public interface ProjectorTrait extends Entity, DrawTrait{
 	
-	Map<String, List<ProjectorTrait>> projectorSets = new HashMap<>();
+	ArrayMap<String, Array<ProjectorTrait>> projectorSets = new ArrayMap<>();
 	
 	static void onAddProjector(ProjectorTrait entity){
-		projectorSets.computeIfAbsent(entity.projectorSet(), key -> new ArrayList<>());
+		//projectorSets.computeIfAbsent(entity.projectorSet(), key -> new ArrayList<>());
+		if(!projectorSets.containsKey(entity.projectorSet()))
+			projectorSets.put(entity.projectorSet(), new Array<>());
 		projectorSets.get(entity.projectorSet()).add(entity);
 	}
 	
 	static void onRemoveProjector(ProjectorTrait entity){
-		projectorSets.get(entity.projectorSet()).remove(entity);
+		Array<ProjectorTrait> set = projectorSets.get(entity.projectorSet());
+		set.remove(entity);
+		if(set.isEmpty())
+			projectorSets.removeKey(entity.projectorSet());
 	}
 	
 	/**

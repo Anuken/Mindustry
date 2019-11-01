@@ -165,22 +165,26 @@ public class MendProjector extends Block{
         }
         
         @Override public void drawOver(){
-            Draw.color(Color.white);
-            Draw.alpha(1f - power.satisfaction);
-            Fill.circle(x, y, realRadius());
-            Draw.color();
+            if(Core.settings.getBool("mendprojection")){
+                Draw.color(Color.white);
+                Draw.alpha(1f - power.satisfaction);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
         }
     
         @Override public void drawSimple(){
-            float rad = realRadius();
-            // power.satisfaction
-            Draw.color(color);
-            Lines.stroke(1.5f);
-            Draw.alpha(0.17f);
-            Fill.circle(x, y, rad);
-            Draw.alpha(1f);
-            Lines.circle(x, y, rad);
-            Draw.reset();
+            if(Core.settings.getBool("mendprojection")){
+                float rad = realRadius();
+                // power.satisfaction
+                Draw.color(color);
+                Lines.stroke(1.5f);
+                Draw.alpha(0.17f);
+                Fill.circle(x, y, rad);
+                Draw.alpha(1f);
+                Lines.circle(x, y, rad);
+                Draw.reset();
+            }
         }
     
         @Override public Color accent(){
@@ -192,9 +196,11 @@ public class MendProjector extends Block{
         }
     
         @Override public void draw(){
-            Draw.color(color);
-            Fill.circle(x, y, realRadius());
-            Draw.color();
+            if(Core.settings.getBool("mendprojection")){
+                Draw.color(color);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
         }
     
         @Override

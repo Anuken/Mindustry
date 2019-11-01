@@ -301,6 +301,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
+        graphics.checkPref("mendprojection", true);
+        graphics.checkPref("overdriveprojection", true);
         graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
         graphics.checkPref("pixelate", false, val -> {
             if(val){

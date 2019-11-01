@@ -1,6 +1,7 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.Array;
 import io.anuke.arc.files.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
@@ -278,7 +279,7 @@ public class Renderer implements ApplicationListener{
 
         if(projectorGroup.countInBounds() > 0){
             if(settings.getBool("animatedshields") && Shaders.shield != null){
-                ProjectorTrait.projectorSets.forEach((x, y) -> drawProjectorSet(y));
+                ProjectorTrait.projectorSets.forEach((x) -> drawProjectorSet(x.value));
             }else{
                 projectorGroup.draw(shield -> true, ProjectorTrait::drawSimple);
             }
@@ -294,7 +295,7 @@ public class Renderer implements ApplicationListener{
         Draw.flush();
     }
     
-    private void drawProjectorSet(List<ProjectorTrait> projectors){
+    private void drawProjectorSet(Array<ProjectorTrait> projectors){
         if(projectors.isEmpty())
             return;
         Draw.flush();

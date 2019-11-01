@@ -166,28 +166,34 @@ public class OverdriveProjector extends Block{
         
         @Override
         public void draw(){
-            Draw.color(color);
-            Fill.circle(x, y, realRadius());
-            Draw.color();
+            if(Core.settings.getBool("overdriveprojection")){
+                Draw.color(color);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
         }
     
         public void drawOver(){
-            Draw.color(Color.white);
-            Draw.alpha(1f - power.satisfaction);
-            Fill.circle(x, y, realRadius());
-            Draw.color();
+            if(Core.settings.getBool("overdriveprojection")){
+                Draw.color(Color.white);
+                Draw.alpha(1f - power.satisfaction);
+                Fill.circle(x, y, realRadius());
+                Draw.color();
+            }
         }
     
         public void drawSimple(){
-            float rad = realRadius();
-        
-            Draw.color(color);
-            Lines.stroke(1.5f);
-            Draw.alpha(0.17f);
-            Fill.circle(x, y, rad);
-            Draw.alpha(1f);
-            Lines.circle(x, y, rad);
-            Draw.reset();
+            if(Core.settings.getBool("overdriveprojection")){
+                float rad = realRadius();
+    
+                Draw.color(color);
+                Lines.stroke(1.5f);
+                Draw.alpha(0.17f);
+                Fill.circle(x, y, rad);
+                Draw.alpha(1f);
+                Lines.circle(x, y, rad);
+                Draw.reset();
+            }
         }
     
         @Override public Color accent(){
