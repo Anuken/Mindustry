@@ -551,6 +551,11 @@ public class Block extends BlockStorage{
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
     }
 
+    /** @return a possible replacement for this block when placed in a line by the player. */
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        return this;
+    }
+
     public float handleDamage(Tile tile, float amount){
         return amount;
     }

@@ -526,6 +526,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             req.animScale = 1f;
             lineRequests.add(req);
         });
+
+        lineRequests.each(req -> req.block = req.block.getReplacement(req, lineRequests));
     }
 
     protected void updateLine(int x1, int y1){
