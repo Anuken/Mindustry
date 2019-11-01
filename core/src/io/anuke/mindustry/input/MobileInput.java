@@ -2,14 +2,17 @@ package io.anuke.mindustry.input;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.GestureDetector.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
+import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.entities.*;
@@ -51,7 +54,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
     /** Whether the player is currently in line-place mode. */
-    private boolean lineMode;
+    private boolean lineMode, schematicMode;
     /** Current place mode. */
     private PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -187,8 +190,23 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton(Icon.arrowSmall, Styles.clearPartiali,() -> rotation = Mathf.mod(rotation + 1, 4))
-        .update(i -> i.getImage().setRotationOrigin(rotation * 90, Align.center)).visible(() -> block != null && block.rotate);
+        table.addImageButton(Icon.arrowSmall, Styles.clearTogglePartiali, () -> {
+            if(block != null && block.rotate){
+                rotation = Mathf.mod(rotation + 1, 4);
+            }else{
+                schematicMode = !schematicMode;
+                if(schematicMode){
+                    block = null;
+                    mode = none;
+                }
+            }
+        }).update(i -> {
+            boolean arrow = block != null && block.rotate;
+
+            i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
+            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.wikiSmall;
+            i.setChecked(!arrow && schematicMode);
+        });
 
         //confirm button
         table.addImageButton(Icon.checkSmall, Styles.clearPartiali, () -> {
@@ -218,8 +236,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildUI(Group group){
+        Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
+
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !state.is(State.menu));
+            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.addImageTextButton("$cancel", Icon.cancelSmall, () -> {
                 player.clearBuilding();
                 selectRequests.clear();
@@ -227,6 +247,41 @@ public class MobileInput extends InputHandler implements GestureListener{
                 block = null;
             }).width(155f);
         });
+
+        group.fill(t -> {
+            t.visible(schem);
+            t.bottom().left();
+            t.table(Tex.pane, b -> {
+                b.defaults().size(50f);
+
+                ImageButtonStyle style = Styles.clearPartiali;
+
+                b.addImageButton(Icon.floppySmall, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                b.addImageButton(Icon.cancelSmall, style, () -> {
+                    selectRequests.clear();
+                });
+                b.row();
+                b.addImageButton(Icon.flipSmall, style, () -> flipRequests(selectRequests, true));
+                b.addImageButton(Icon.flipSmall, style, () -> flipRequests(selectRequests, false)).update(i -> i.getImage().setRotationOrigin(90f, Align.center));
+                b.row();
+                b.addImageButton(Icon.rotateSmall, style, () -> rotateRequests(selectRequests, 1));
+
+            }).margin(4f);
+        });
+    }
+
+    @Override
+    protected int schemOriginX(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+    }
+
+    @Override
+    protected int schemOriginY(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
     }
 
     @Override
@@ -251,8 +306,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else{
                 request.block.drawRequest(request, allRequests(), true);
             }
-            //TODO
-            //drawRequest(request);
         }
 
         //draw list of requests
@@ -332,6 +385,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public void drawTop(){
+
+        //draw schematic selection
+        if(mode == schematicSelect){
+            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }
+    }
+
+    @Override
     protected void drawRequest(BuildRequest request){
         if(request.tile() == null) return;
         brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
@@ -367,11 +429,20 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
         //only begin selecting if the tapped block is a request
-        selecting = hasRequest(cursor) && isPlacing() && mode == placing;
+        selecting = hasRequest(cursor);
 
         //call tap events
         if(pointer == 0 && !selecting){
-            if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
+            if(schematicMode && block == null){
+                mode = schematicSelect;
+                //engage schematic selection mode
+                int tileX = tileX(screenX);
+                int tileY = tileY(screenY);
+                lineStartX = tileX;
+                lineStartY = tileY;
+                lastLineX = tileX;
+                lastLineY = tileY;
+            }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
                 player.isShooting = true;
             }
@@ -388,6 +459,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             down = false;
         }
 
+        selecting = false;
+
         //place down a line if in line mode
         if(lineMode){
             int tileX = tileX(screenX);
@@ -401,6 +474,15 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             lineMode = false;
+        }else if(mode == schematicSelect){
+            selectRequests.clear();
+            lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
+            useSchematic(lastSchematic);
+            if(selectRequests.isEmpty()){
+                lastSchematic = null;
+            }
+            schematicMode = false;
+            mode = none;
         }else{
             Tile tile = tileAt(screenX, screenY);
 
@@ -419,7 +501,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Tile cursor = tileAt(x, y);
 
         //ignore off-screen taps
-        if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+        if(cursor == null || Core.scene.hasMouse(x, y) || schematicMode) return false;
 
         //remove request if it's there
         //long pressing enables line mode otherwise
@@ -505,7 +587,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //reset state when not placing
         if(mode == none){
-            selecting = false;
             lineMode = false;
         }
 
@@ -522,6 +603,22 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = none;
         }
 
+        //stop schematic when in block mode
+        if(block != null){
+            schematicMode = false;
+        }
+
+        //stop select when not in schematic mode
+        if(!schematicMode && mode == schematicSelect){
+            mode = none;
+        }
+
+        if(mode == schematicSelect){
+            lastLineX = rawTileX();
+            lastLineY = rawTileY();
+            autoPan();
+        }
+
         //automatically switch to placing after a new recipe is selected
         if(lastBlock != block && mode == breaking && block != null){
             mode = placing;
@@ -533,32 +630,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //When in line mode, pan when near screen edges automatically
             if(Core.input.isTouched(0)){
-                float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
-
-                float panX = 0, panY = 0;
-
-                if(screenX <= edgePan){
-                    panX = -(edgePan - screenX);
-                }
-
-                if(screenX >= Core.graphics.getWidth() - edgePan){
-                    panX = (screenX - Core.graphics.getWidth()) + edgePan;
-                }
-
-                if(screenY <= edgePan){
-                    panY = -(edgePan - screenY);
-                }
-
-                if(screenY >= Core.graphics.getHeight() - edgePan){
-                    panY = (screenY - Core.graphics.getHeight()) + edgePan;
-                }
-
-                vector.set(panX, panY).scl((Core.camera.width) / Core.graphics.getWidth());
-                vector.limit(maxPanSpeed);
-
-                //pan view
-                Core.camera.position.x += vector.x;
-                Core.camera.position.y += vector.y;
+               autoPan();
             }
 
             int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
@@ -584,6 +656,35 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
     }
 
+    protected void autoPan(){
+        float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
+
+        float panX = 0, panY = 0;
+
+        if(screenX <= edgePan){
+            panX = -(edgePan - screenX);
+        }
+
+        if(screenX >= Core.graphics.getWidth() - edgePan){
+            panX = (screenX - Core.graphics.getWidth()) + edgePan;
+        }
+
+        if(screenY <= edgePan){
+            panY = -(edgePan - screenY);
+        }
+
+        if(screenY >= Core.graphics.getHeight() - edgePan){
+            panY = (screenY - Core.graphics.getHeight()) + edgePan;
+        }
+
+        vector.set(panX, panY).scl((Core.camera.width) / Core.graphics.getWidth());
+        vector.limit(maxPanSpeed);
+
+        //pan view
+        Core.camera.position.x += vector.x;
+        Core.camera.position.y += vector.y;
+    }
+
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
         if(Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
@@ -593,7 +694,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         deltaY *= scale;
 
         //can't pan in line mode with one finger or while dropping items!
-        if((lineMode && !Core.input.isTouched(1)) || droppingItem){
+        if((lineMode && !Core.input.isTouched(1)) || droppingItem || schematicMode){
             return false;
         }
 

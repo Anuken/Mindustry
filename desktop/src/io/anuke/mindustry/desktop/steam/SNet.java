@@ -64,7 +64,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                             try{
                                 //accept users on request
                                 if(con == null){
-                                    con = new SteamConnection(SteamID.createFromNativeHandle(SteamNativeHandle.getNativeHandle(from)));
+                                    con = new SteamConnection(SteamID.createFromNativeHandle(from.handle()));
                                     Connect c = new Connect();
                                     c.addressTCP = "steam:" + from.getAccountID();
 
@@ -315,7 +315,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                     SteamID lobby = smat.getLobbyByIndex(i);
                     Host out = new Host(
                         smat.getLobbyData(lobby, "name"),
-                        "steam:" + SteamNativeHandle.getNativeHandle(lobby),
+                        "steam:" + lobby.handle(),
                         smat.getLobbyData(lobby, "mapname"),
                         Strings.parseInt(smat.getLobbyData(lobby, "wave"), -1),
                         smat.getNumLobbyMembers(lobby),

@@ -142,7 +142,7 @@ public class MendProjector extends Block{
 
     class MendEntity extends TileEntity implements ProjectorTrait{
         float heat;
-        float charge;
+        float charge = Mathf.random(reload);
         float phaseHeat;
         float rangeProg;
 

@@ -62,7 +62,8 @@ public class OverlayRenderer{
             });
 
             if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
-                for(Tile mechpad: indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
+                for(Tile mechpad : indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
+                    if(!(mechpad.block() instanceof MechPad)) continue;
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                             .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.x, mechpad.y)){
 

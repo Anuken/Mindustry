@@ -137,11 +137,7 @@ public class DesktopLauncher extends ClientLauncher{
             });
 
             try{
-                try{
-                    SteamAPI.loadLibraries();
-                }catch(Throwable t){
-                    logSteamError(t);
-                }
+                SteamAPI.loadLibraries();
 
                 if(!SteamAPI.init()){
                     loadError = true;

@@ -128,7 +128,7 @@ public class SWorkshop implements SteamUGCCallback{
                         }).size(210f, 64f);
                         dialog.show();
                     }else{
-                        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(details.getPublishedFileID()));
+                        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + details.getPublishedFileID().handle());
                     }
                 }else if(details.getResult() == SteamResult.FileNotFound){
                     p.removeSteamID();
@@ -143,12 +143,12 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void viewListingID(SteamPublishedFileID id){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(id));
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + id.handle());
     }
 
     void update(Publishable p, SteamPublishedFileID id, String changelog){
-        Log.info("Calling update({0}) {1}", p.steamTitle(), SteamNativeHandle.getNativeHandle(id));
-        String sid = SteamNativeHandle.getNativeHandle(id) + "";
+        Log.info("Calling update({0}) {1}", p.steamTitle(), id.handle());
+        String sid = id.handle() + "";
 
         updateItem(id, h -> {
             if(p.steamDescription() != null){
@@ -201,7 +201,7 @@ public class SWorkshop implements SteamUGCCallback{
     void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
         try{
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
-            Log.info("begin updateItem({0})", SteamNativeHandle.getNativeHandle(publishedFileID));
+            Log.info("begin updateItem({0})", publishedFileID.handle());
 
             tagger.get(h);
             Log.info("Tagged.");
@@ -290,10 +290,10 @@ public class SWorkshop implements SteamUGCCallback{
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         ui.loadfrag.hide();
-        Log.info("onsubmititemupdate {0} {1} {2}", SteamNativeHandle.getNativeHandle(publishedFileID), needsToAcceptWLA, result);
+        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID.handle(), needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
-            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
+            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.handle());
             if(needsToAcceptWLA){
                 SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
             }

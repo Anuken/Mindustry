@@ -238,7 +238,14 @@ public class PlacementFragment extends Fragment{
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).grow().get().setStyle(Styles.smallPane);
+                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                        if(pane.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(pane)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).grow().get().setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
@@ -274,7 +281,7 @@ public class PlacementFragment extends Fragment{
                             currentCategory = cat;
                             if(control.input.block != null){
                                 if(selectedBlocks.get(currentCategory) == null){
-                                    selectFirstBlock(currentCategory);
+                                    selectedBlocks.put(currentCategory, getByCategory(currentCategory).find(this::unlocked));
                                 }
                                 control.input.block = selectedBlocks.get(currentCategory);
                             }
@@ -311,16 +318,6 @@ public class PlacementFragment extends Fragment{
             return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
         });
         return returnArray;
-    }
-
-    Block selectFirstBlock(Category cat) {
-        for(Block block : getByCategory(currentCategory)){
-            if(unlocked(block)){
-                selectedBlocks.put(currentCategory, block);
-                return block;
-            }
-        }
-        return null;
     }
 
     boolean unlocked(Block block){
