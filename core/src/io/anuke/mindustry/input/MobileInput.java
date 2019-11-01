@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -412,6 +413,12 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public boolean isBreaking(){
         return mode == breaking;
+    }
+
+    @Override
+    public void useSchematic(Schematic schem){
+        selectRequests.clear();
+        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
     }
 
     @Override

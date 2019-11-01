@@ -69,10 +69,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
         return cont.get(Geometry.d4(req.rotation)) &&
-        cont.get(Geometry.d4(req.rotation - 2)) &&
-        req.tile() != null &&
-        req.tile().block() instanceof Conduit &&
-        Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conduit &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
     }
 
     @Override
