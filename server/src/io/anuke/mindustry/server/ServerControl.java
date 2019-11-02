@@ -227,7 +227,7 @@ public class ServerControl implements ApplicationListener{
                     err("No map with name &y'{0}'&lr found.", arg[0]);
                     return;
                 }
-            } else {
+            }else{
                 Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
                 result = maps.random();
             }
