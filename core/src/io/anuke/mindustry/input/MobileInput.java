@@ -218,11 +218,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(tile != null){
                     if(!request.breaking){
                         if(validPlace(request.x, request.y, request.block, request.rotation)){
-                            BuildRequest other = getRequest(request.x, request.y);
-                            if(other != null){
+                            BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
+                            if(other == null){
+                                player.addBuildRequest(request.copy());
+                            }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
                                 player.buildQueue().remove(other);
+                                player.addBuildRequest(request.copy());
                             }
-                            player.addBuildRequest(request.copy());
                         }
 
                         rotation = request.rotation;
@@ -359,7 +361,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
-                    drawRequest(lineRequests.get(i));
+
+                    BuildRequest request = lineRequests.get(i);
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(req.x, request.y, request.block.size, null) == null);
+                    drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);

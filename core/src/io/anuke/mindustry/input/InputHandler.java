@@ -392,13 +392,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         for(BuildRequest req : selectRequests){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
             }
-        }*/
+        }
 
         for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
             Block block = content.block(req.block);
@@ -429,12 +428,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildRequest other = getRequest(req.x, req.y);
-                if(other != null){
+                BuildRequest other = getRequest(req.x, req.y, req.block.size, null);
+                if(other == null){
+                    selectRequests.add(req.copy());
+                }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
                     selectRequests.remove(other);
+                    selectRequests.add(req.copy());
                 }
-
-                selectRequests.add(req.copy());
             }
         }
     }
@@ -498,14 +498,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         it = selectRequests.iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
-        }*/
+        }
 
         //remove blocks to rebuild
         Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
