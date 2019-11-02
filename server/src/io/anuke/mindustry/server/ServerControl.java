@@ -230,6 +230,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
                 result = maps.random();
+                info("Randomized next map to be {0}.", result.name());
             }
 
             Gamemode preset = Gamemode.survival;
