@@ -91,6 +91,8 @@ public class Block extends BlockStorage{
     public boolean consumesTap;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
+    /** Whether this block uses conveyor-type placement mode.*/
+    public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.

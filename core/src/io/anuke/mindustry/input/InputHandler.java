@@ -25,7 +25,7 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.input.Placement.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
@@ -368,8 +368,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
-        NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
@@ -415,7 +415,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
 
@@ -469,7 +469,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
-        NormalizeResult result = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
                 int wx = x1 + x * Mathf.sign(x2 - x1);
@@ -526,12 +526,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             lineRequests.add(req);
         });
 
-        lineRequests.each(req -> {
-            Block replace = req.block.getReplacement(req, lineRequests);
-            if(replace.unlockedCur()){
-                req.block = replace;
-            }
-        });
+        if(Core.settings.getBool("blockreplace")){
+            lineRequests.each(req -> {
+                Block replace = req.block.getReplacement(req, lineRequests);
+                if(replace.unlockedCur()){
+                    req.block = replace;
+                }
+            });
+        }
     }
 
     protected void updateLine(int x1, int y1){
@@ -809,9 +811,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(diagonal){
-            points = PlaceUtils.pathfindLine(startX, startY, endX, endY);
+            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
-            points = PlaceUtils.normalizeLine(startX, startY, endX, endY);
+            points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

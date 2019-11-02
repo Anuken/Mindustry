@@ -42,6 +42,7 @@ public class Conveyor extends Block implements Autotiler{
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
+        conveyorPlacement = true;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
