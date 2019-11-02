@@ -217,11 +217,15 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //actually place/break all selected blocks
                 if(tile != null){
                     if(!request.breaking){
+                        if(validPlace(request.x, request.y, request.block, request.rotation)){
+                            BuildRequest other = getRequest(request.x, request.y);
+                            if(other != null){
+                                player.buildQueue().remove(other);
+                            }
+                            player.addBuildRequest(request.copy());
+                        }
+
                         rotation = request.rotation;
-                        Block before = block;
-                        block = request.block;
-                        tryPlaceBlock(tile.x, tile.y);
-                        block = before;
                     }else{
                         tryBreakBlock(tile.x, tile.y);
                     }

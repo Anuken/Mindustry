@@ -758,8 +758,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))
-            ){
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
                 return false;
             }
         }

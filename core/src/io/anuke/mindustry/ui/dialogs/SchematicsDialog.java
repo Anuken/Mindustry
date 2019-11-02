@@ -114,7 +114,7 @@ public class SchematicsDialog extends FloatingDialog{
                                 Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().maxWidth(200f - 8f).get();
                                 label.setEllipsis(true);
                                 label.setAlignment(Align.center);
-                            }).growX().margin(1).pad(4).maxWidth(200f - 8f).padBottom(0);
+                            }).growX().margin(1).pad(4).maxWidth(Scl.scl(200f - 8f)).padBottom(0);
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
