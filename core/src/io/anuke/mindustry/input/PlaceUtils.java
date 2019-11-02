@@ -16,7 +16,7 @@ public class PlaceUtils{
     private static Array<Point2> points = new Array<>();
 
     /** Normalize a diagonal line into points. */
-    public static Array<Point2> normalizeDiagonal(int startX, int startY, int endX, int endY){
+    public static Array<Point2> pathfindLine(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
         return bres.lineNoDiagonal(startX, startY, endX, endY, Pools.get(Point2.class, Point2::new), points);

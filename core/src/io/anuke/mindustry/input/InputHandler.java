@@ -804,12 +804,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
-        if(Core.settings.getBool("swapdiagonal")){
+        if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = PlaceUtils.normalizeDiagonal(startX, startY, endX, endY);
+            points = PlaceUtils.pathfindLine(startX, startY, endX, endY);
         }else{
             points = PlaceUtils.normalizeLine(startX, startY, endX, endY);
         }
