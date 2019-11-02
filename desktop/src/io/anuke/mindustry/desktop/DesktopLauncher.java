@@ -40,6 +40,7 @@ public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
     boolean useDiscord = OS.is64Bit, loadError = false;
+    Throwable steamError;
 
     static{
         if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
@@ -134,6 +135,12 @@ public class DesktopLauncher extends ClientLauncher{
                         label[0].invalidateHierarchy();
                     }
                 });
+
+                if(steamError != null){
+                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
+                        ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
+                    })));
+                }
             });
 
             try{
@@ -159,6 +166,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     void logSteamError(Throwable e){
+        steamError = e;
         loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
