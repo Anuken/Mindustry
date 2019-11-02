@@ -139,7 +139,7 @@ public class MendProjector extends Block{
 
     class MendEntity extends TileEntity{
         float heat;
-        float charge;
+        float charge = Mathf.random(reload);
         float phaseHeat;
 
         @Override

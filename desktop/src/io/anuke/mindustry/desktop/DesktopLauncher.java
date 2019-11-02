@@ -108,7 +108,7 @@ public class DesktopLauncher extends ClientLauncher{
                     t.touchable(Touchable.disabled);
                     t.top().left();
                     t.update(() -> {
-                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke"))){
+                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke") || Version.modifier.contains("beta"))){
                             visible[0] = !visible[0];
                         }
 

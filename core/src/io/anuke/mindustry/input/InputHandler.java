@@ -13,8 +13,8 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -233,8 +233,28 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
     }
 
+    protected void showSchematicSave(){
+        if(lastSchematic == null) return;
+
+        ui.showTextInput("$schematic.add", "$name", "", text -> {
+            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
+            if(replacement != null){
+                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                    schematics.overwrite(replacement, lastSchematic);
+                    ui.showInfoFade("$schematic.saved");
+                    ui.schematics.showInfo(replacement);
+                });
+            }else{
+                lastSchematic.tags.put("name", text);
+                schematics.add(lastSchematic);
+                ui.showInfoFade("$schematic.saved");
+                ui.schematics.showInfo(lastSchematic);
+            }
+        });
+    }
+
     public void rotateRequests(Array<BuildRequest> requests, int direction){
-        int ox = rawTileX(), oy = rawTileY();
+        int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
             //rotate config position
@@ -269,7 +289,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void flipRequests(Array<BuildRequest> requests, boolean x){
-        int origin = (x ? rawTileX() : rawTileY()) * tilesize;
+        int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
             float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
@@ -297,6 +317,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 req.rotation = Mathf.mod(req.rotation + 2, 4);
             }
         });
+    }
+
+    protected int schemOriginX(){
+        return rawTileX();
+    }
+
+    protected int schemOriginY(){
+        return rawTileY();
     }
 
     /** Returns the selection request that overlaps this position, or null. */
@@ -497,6 +525,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             BuildRequest req = new BuildRequest(l.x, l.y, l.rotation, block);
             req.animScale = 1f;
             lineRequests.add(req);
+        });
+
+        lineRequests.each(req -> {
+            Block replace = req.block.getReplacement(req, lineRequests);
+            if(replace.unlockedCur()){
+                req.block = replace;
+            }
         });
     }
 

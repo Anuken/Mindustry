@@ -120,7 +120,7 @@ public class ModsDialog extends FloatingDialog{
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled"))).width(270f).wrap();
+                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
                             title.add().growX();
 
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
@@ -159,7 +159,7 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
                             t.row();
                         }
-                    }).width(500f);
+                    }).width(mobile ? 430f : 500f);
                     table.row();
                 }
             });

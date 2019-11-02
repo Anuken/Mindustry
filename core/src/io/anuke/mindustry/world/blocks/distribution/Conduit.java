@@ -1,9 +1,13 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
@@ -59,6 +63,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
 
         Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), topRegions[bits[0]].getWidth() * Draw.scl * req.animScale, topRegions[bits[0]].getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+    }
+
+    @Override
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conduit &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
     }
 
     @Override

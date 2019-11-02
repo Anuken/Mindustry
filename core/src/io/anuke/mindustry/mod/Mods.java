@@ -150,10 +150,15 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        if(mod.file.isDirectory()){
-            mod.file.deleteDirectory();
-        }else{
-            mod.file.delete();
+        if(mod.root instanceof ZipFileHandle){
+            mod.root.delete();
+        }
+
+        boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
+
+        if(!deleted){
+            ui.showErrorMessage("$mod.delete.error");
+            return;
         }
         loaded.remove(mod);
         disabled.remove(mod);
