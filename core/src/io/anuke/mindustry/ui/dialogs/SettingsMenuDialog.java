@@ -221,6 +221,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
+            game.sliderPref("blockselecttimeout", 750, 0, 2000, i -> Core.bundle.format("setting.milliseconds", i));
+
             game.checkPref("crashreport", true);
         }
 

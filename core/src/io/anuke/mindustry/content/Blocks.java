@@ -47,13 +47,10 @@ public class Blocks implements ContentList{
     siliconSmelter, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
-    //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
-
     //defense
-    scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
+    scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
     conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
@@ -79,7 +76,10 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
+
+    //sandbox
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message;
 
     @Override
     public void load(){
@@ -711,67 +711,9 @@ public class Blocks implements ContentList{
         }};
 
         //endregion
-        //region sandbox
-
-        powerVoid = new PowerVoid("power-void"){{
-            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
-            alwaysUnlocked = true;
-        }};
-        powerSource = new PowerSource("power-source"){{
-            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
-            alwaysUnlocked = true;
-        }};
-        itemSource = new ItemSource("item-source"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
-            alwaysUnlocked = true;
-        }};
-        itemVoid = new ItemVoid("item-void"){{
-            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
-            alwaysUnlocked = true;
-        }};
-        liquidSource = new LiquidSource("liquid-source"){{
-            requirements(Category.liquid, BuildVisibility.sandboxOnly, ItemStack.with());
-            alwaysUnlocked = true;
-        }};
-        message = new MessageBlock("message"){{
-            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
-        }};
-
-        //endregion
         //region defense
 
         int wallHealthMultiplier = 4;
-
-        scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
-            health = 60 * wallHealthMultiplier;
-            variants = 5;
-        }};
-
-        scrapWallLarge = new Wall("scrap-wall-large"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
-            health = 60 * 4 * wallHealthMultiplier;
-            size = 2;
-            variants = 4;
-        }};
-
-        scrapWallHuge = new Wall("scrap-wall-huge"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
-            health = 60 * 9 * wallHealthMultiplier;
-            size = 3;
-            variants = 3;
-        }};
-
-        scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
-            health = 60 * 16 * wallHealthMultiplier;
-            size = 4;
-        }};
-
-        thruster = new Wall("thruster"){{
-            health = 55 * 16 * wallHealthMultiplier;
-            size = 4;
-        }};
 
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, ItemStack.with(Items.copper, 6));
@@ -852,6 +794,37 @@ public class Blocks implements ContentList{
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
+        }};
+
+        scrapWall = new Wall("scrap-wall"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
+            health = 60 * wallHealthMultiplier;
+            variants = 5;
+        }};
+
+        scrapWallLarge = new Wall("scrap-wall-large"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
+            health = 60 * 4 * wallHealthMultiplier;
+            size = 2;
+            variants = 4;
+        }};
+
+        scrapWallHuge = new Wall("scrap-wall-huge"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
+            health = 60 * 9 * wallHealthMultiplier;
+            size = 3;
+            variants = 3;
+        }};
+
+        scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.with());
+            health = 60 * 16 * wallHealthMultiplier;
+            size = 4;
+        }};
+
+        thruster = new Wall("thruster"){{
+            health = 55 * 16 * wallHealthMultiplier;
+            size = 4;
         }};
 
         mender = new MendProjector("mender"){{
@@ -1803,6 +1776,33 @@ public class Blocks implements ContentList{
             mech = Mechs.glaive;
             size = 3;
             consumes.power(1.2f);
+        }};
+
+        //endregion
+        //region sandbox
+
+        powerVoid = new PowerVoid("power-void"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        powerSource = new PowerSource("power-source"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        itemSource = new ItemSource("item-source"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        itemVoid = new ItemVoid("item-void"){{
+            requirements(Category.distribution, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        liquidSource = new LiquidSource("liquid-source"){{
+            requirements(Category.liquid, BuildVisibility.sandboxOnly, ItemStack.with());
+            alwaysUnlocked = true;
+        }};
+        message = new MessageBlock("message"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
         }};
 
         //endregion
