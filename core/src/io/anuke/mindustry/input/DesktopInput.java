@@ -254,7 +254,7 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.addImageButton(Icon.wikiSmall, Styles.clearPartiali, () -> {
+        table.addImageButton(Icon.pasteSmall, Styles.clearPartiali, () -> {
             ui.schematics.show();
         });
     }

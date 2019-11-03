@@ -11,12 +11,12 @@ import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -118,8 +118,12 @@ public class SchematicsDialog extends FloatingDialog{
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
-                        control.input.useSchematic(s);
-                        hide();
+                        if(state.is(State.menu)){
+                            showInfo(s);
+                        }else{
+                            control.input.useSchematic(s);
+                            hide();
+                        }
                     }).pad(4).style(Styles.cleari).get();
 
                     sel[0].getStyle().up = Tex.pane;
