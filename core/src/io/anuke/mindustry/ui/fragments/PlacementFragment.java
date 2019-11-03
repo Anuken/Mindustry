@@ -135,8 +135,8 @@ public class PlacementFragment extends Fragment{
                     if(input.block != null){
                         input.block = getSelectedBlock(currentCategory);
                     }
-                    blockSelectSeq = 0;
                     blockSelectEnd = false;
+                    blockSelectSeq = 0;
                     blockSelectSeqMillis = Time.millis();
                 }else{ //select block
                     if(blockSelectSeq == 0){ //2nd number of combo
