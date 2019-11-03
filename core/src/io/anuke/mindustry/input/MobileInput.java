@@ -219,11 +219,17 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(!request.breaking){
                         if(validPlace(request.x, request.y, request.block, request.rotation)){
                             BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
+                            BuildRequest copy = request.copy();
+
+                            if(copy.hasConfig && copy.block.posConfig){
+                                copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                            }
+
                             if(other == null){
-                                player.addBuildRequest(request.copy());
+                                player.addBuildRequest(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
                                 player.buildQueue().remove(other);
-                                player.addBuildRequest(request.copy());
+                                player.addBuildRequest(copy);
                             }
                         }
 
