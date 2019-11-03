@@ -125,7 +125,7 @@ public class PlacementFragment extends Fragment{
                                 case 13: //down
                                     j = (j < blocks.size - 4 ? j + 4 : j % 4);
                             }
-                            input.block = (unlocked(blocks.get(j))) ? blocks.get(j) : null;
+                            input.block = blocks.get(j);
                             selectedBlocks.put(currentCategory, input.block);
                             break;
                         }
@@ -147,7 +147,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Array<Block> blocks = getByCategory(currentCategory);
-                    input.block = (i < blocks.size && unlocked(blocks.get(i))) ? blocks.get(i) : null;
+                    input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
                 }
@@ -195,11 +195,6 @@ public class PlacementFragment extends Fragment{
                     for(Block block : getByCategory(currentCategory)){
                         if(index++ % rowWidth == 0){
                             blockTable.row();
-                        }
-
-                        if(!unlocked(block)){
-                            blockTable.add().size(46);
-                            continue;
                         }
 
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
@@ -353,7 +348,7 @@ public class PlacementFragment extends Fragment{
                     //update category empty values
                     for(Category cat : Category.all){
                         Array<Block> blocks = getByCategory(cat);
-                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !unlocked(blocks.first());
+                        categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
                     int f = 0;
