@@ -34,6 +34,7 @@ public class SchematicsDialog extends FloatingDialog{
         addCloseButton();
         buttons.addImageTextButton("$schematic.import", Icon.loadMapSmall, this::showImport);
         shown(this::setup);
+        onResize(this::setup);
     }
 
     void setup(){
@@ -113,7 +114,7 @@ public class SchematicsDialog extends FloatingDialog{
                                 Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().maxWidth(200f - 8f).get();
                                 label.setEllipsis(true);
                                 label.setAlignment(Align.center);
-                            }).growX().margin(1).pad(4).maxWidth(200f - 8f).padBottom(0);
+                            }).growX().margin(1).pad(4).maxWidth(Scl.scl(200f - 8f)).padBottom(0);
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
@@ -123,7 +124,7 @@ public class SchematicsDialog extends FloatingDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % 4 == 0){
+                    if(++i % (mobile ? Core.graphics.isPortrait() ? 2 : 3 : 4) == 0){
                         t.row();
                     }
                 }

@@ -35,7 +35,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        //IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
 
             @Override
@@ -103,7 +102,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 NSURL url = new NSURL(to.file());
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                //p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
                 //DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
@@ -135,7 +133,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
-        System.out.println("Opened URL: " + url.getPath());
         openURL(url);
         return false;
     }
@@ -145,7 +142,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
         boolean b = super.didFinishLaunching(application, options);
 
         if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getPath());
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 

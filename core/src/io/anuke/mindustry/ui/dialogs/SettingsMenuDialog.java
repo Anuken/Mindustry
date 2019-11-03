@@ -226,6 +226,8 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         game.checkPref("savecreate", true);
 
+        game.checkPref("blockreplace", true);
+
         game.checkPref("hints", true);
 
         if(steam && !Version.modifier.contains("beta")){
@@ -247,7 +249,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 400, 5, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }

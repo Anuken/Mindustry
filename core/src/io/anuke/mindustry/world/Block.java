@@ -91,6 +91,8 @@ public class Block extends BlockStorage{
     public boolean consumesTap;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
+    /** Whether this block uses conveyor-type placement mode.*/
+    public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
@@ -549,6 +551,11 @@ public class Block extends BlockStorage{
 
     public boolean canReplace(Block other){
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
+    }
+
+    /** @return a possible replacement for this block when placed in a line by the player. */
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        return this;
     }
 
     public float handleDamage(Tile tile, float amount){

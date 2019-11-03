@@ -66,23 +66,7 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.name())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
-                        ui.showTextInput("$schematic.add", "$name", "", text -> {
-                            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
-                            if(replacement != null){
-                                ui.showConfirm("$confirm", "$schematic.replace", () -> {
-                                    schematics.overwrite(replacement, lastSchematic);
-                                    ui.showInfoFade("$schematic.saved");
-                                    ui.schematics.showInfo(replacement);
-                                });
-                            }else{
-                                lastSchematic.tags.put("name", text);
-                                schematics.add(lastSchematic);
-                                ui.showInfoFade("$schematic.saved");
-                                ui.schematics.showInfo(lastSchematic);
-                            }
-                        });
-                    }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.addImageTextButton("$schematic.add", Icon.saveSmall, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -182,7 +166,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode == placing || isPlacing()){
+        if(mode != none || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -198,13 +182,14 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
-
-        if(sreq != null){
-            sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
-        }
-
         if(!Core.input.keyDown(Binding.zoom_hold) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+
+            rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+
+            if(sreq != null){
+                sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+            }
+
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
@@ -365,7 +350,6 @@ public class DesktopInput extends InputHandler{
 
             if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
-                //selectRequests.clear();
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
