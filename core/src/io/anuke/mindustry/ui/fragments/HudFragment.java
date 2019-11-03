@@ -238,7 +238,7 @@ public class HudFragment extends Fragment{
                             }
                         });
                     }
-                }).width(dsize * 4 + 4f);
+                }).width(dsize * 5 + 4f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
 
