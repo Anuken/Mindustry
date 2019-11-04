@@ -122,7 +122,7 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select)){
+        if(Core.input.keyDown(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -305,7 +305,7 @@ public class DesktopInput extends InputHandler{
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select)){
+        if(Core.input.keyRelease(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){

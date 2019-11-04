@@ -153,7 +153,7 @@ public class SchematicsDialog extends FloatingDialog{
                 t.addImageTextButton("$schematic.copy.import", Icon.copySmall, style, () -> {
                     dialog.hide();
                     try{
-                        Schematic s = schematics.readBase64(Core.app.getClipboardText());
+                        Schematic s = Schematics.readBase64(Core.app.getClipboardText());
                         schematics.add(s);
                         setup();
                         ui.showInfoFade("$schematic.saved");

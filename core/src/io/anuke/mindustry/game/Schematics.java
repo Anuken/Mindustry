@@ -20,6 +20,8 @@ import io.anuke.mindustry.input.Placement.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.production.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -28,6 +30,8 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Handles schematics.*/
 public class Schematics implements Loadable{
+    public static final String base64Header = "bXNjaAB";
+
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 0;
 
@@ -231,6 +235,27 @@ public class Schematics implements Loadable{
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
     }
 
+    public void placeLoadout(Schematic schem, int x, int y){
+        Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        int ox = x - coreTile.x, oy = y - coreTile.y;
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + ox, st.y + oy);
+            if(tile == null) return;
+
+            world.setBlock(tile, st.block, defaultTeam);
+            tile.rotation(st.rotation);
+            if(st.block.posConfig){
+                tile.configureAny(Pos.get(tile.x - st.x + Pos.x(st.config), tile.y - st.y + Pos.y(st.config)));
+            }else{
+                tile.configureAny(st.config);
+            }
+
+            if(st.block instanceof Drill){
+                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
+            }
+        });
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
@@ -328,12 +353,12 @@ public class Schematics implements Loadable{
         }
     }
 
+    //region IO methods
+
     /** Loads a schematic from base64. May throw an exception. */
-    public Schematic readBase64(String schematic) throws IOException{
+    public static Schematic readBase64(String schematic) throws IOException{
         return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
     }
-
-    //region IO methods
 
     public static Schematic read(FileHandle file) throws IOException{
         Schematic s = read(new DataInputStream(file.read(1024)));
