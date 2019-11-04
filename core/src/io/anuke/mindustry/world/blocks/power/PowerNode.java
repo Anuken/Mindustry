@@ -114,7 +114,11 @@ public class PowerNode extends PowerBlock{
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, other -> {
             if(!tile.entity.power.links.contains(other.pos())){
                 tile.configureAny(other.pos());
@@ -139,7 +143,11 @@ public class PowerNode extends PowerBlock{
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, t -> {
             graphs.add(t.entity.power.graph);
             others.get(t);
