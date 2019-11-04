@@ -10,6 +10,7 @@ import io.anuke.mindustry.*;
 import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -103,6 +104,11 @@ public class Blocks implements ContentList{
                     variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
                 }
                 return variantRegions;
+            }
+
+            @Override
+            public void drawRequestRegion(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list) {
+                //
             }
         };
 

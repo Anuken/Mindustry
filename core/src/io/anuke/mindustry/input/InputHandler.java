@@ -32,6 +32,7 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import java.util.*;
 
@@ -534,6 +535,30 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             });
         }
+
+        final int[] i = {0};
+        final Array<Tile> chain = new Array<Tile>();
+        lineRequests.each(req -> {
+            if(!(req.block instanceof PowerNode)) return;
+
+            if(i[0]++ == 0 || i[0] == lineRequests.size){
+                // beginning & end should always be placed
+            }else{
+                final boolean[] overlaps = {false};
+                chain.each(tile -> {
+                    if(((PowerNode) req.block).overlaps(req.tile(), tile)){
+                        overlaps[0] = true;
+                    };
+                });
+
+                if(overlaps[0]){
+                    req.block = Blocks.air;
+                    return;
+                }
+            }
+
+            chain.add(req.tile());
+        });
     }
 
     protected void updateLine(int x1, int y1){
@@ -806,12 +831,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+
+        // place powernodes diagonally by default
+        if((block != null && block.powernodePlacement)){
+            diagonal = !diagonal;
+        }
+
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+            points = Placement.pathfindLine(block != null && block.conveyorPlacement, block != null && block.powernodePlacement, startX, startY, endX, endY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }

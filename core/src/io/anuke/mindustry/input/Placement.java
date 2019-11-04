@@ -22,7 +22,7 @@ public class Placement{
     private static IntSet closed = new IntSet();
 
     /** Normalize a diagonal line into points. */
-    public static Array<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
+    public static Array<Point2> pathfindLine(boolean conveyors, boolean powernodes, int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
 
         points.clear();

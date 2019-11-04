@@ -32,6 +32,7 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
+        powernodePlacement = true;
     }
 
     @Override
@@ -300,6 +301,10 @@ public class PowerNode extends PowerBlock{
 
     protected boolean overlaps(Tile src, Tile other, float range){
         return overlaps(src.drawx(), src.drawy(), other, range);
+    }
+
+    public boolean overlaps(Tile src, Tile other){
+        return overlaps(src.drawx(), src.drawy(), other, laserRange * tilesize);
     }
 
     protected void drawLaser(Tile tile, Tile target){
