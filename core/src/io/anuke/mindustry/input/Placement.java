@@ -58,7 +58,7 @@ public class Placement{
     private static float tileHeuristic(Tile tile, Tile other){
         Block block = control.input.block;
 
-        if(!other.block().alwaysReplace && !(block != null && block.canReplace(other.block()))){
+        if((!other.block().alwaysReplace && !(block != null && block.canReplace(other.block()))) || other.floor().isDeep()){
             return 20;
         }else{
             if(parents.containsKey(tile.pos())){

@@ -68,7 +68,7 @@ public class HudFragment extends Fragment{
                     select.addImageButton(Icon.menuLargeSmall, style, ui.paused::show);
                     flip = select.addImageButton(Icon.arrowUpSmall, style, this::toggleMenus).get();
 
-                    select.addImageButton(Icon.wikiSmall, style, () -> {
+                    select.addImageButton(Icon.pasteSmall, style, () -> {
                         ui.schematics.show();
                     });
 
@@ -238,7 +238,7 @@ public class HudFragment extends Fragment{
                             }
                         });
                     }
-                }).width(dsize * 4 + 4f);
+                }).width(dsize * 5 + 4f);
                 editorMain.visible(() -> shown && state.isEditor());
             }
 

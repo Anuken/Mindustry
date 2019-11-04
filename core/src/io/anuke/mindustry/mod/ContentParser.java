@@ -39,7 +39,19 @@ public class ContentParser{
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
-        put(Loadout.class, (type, data) -> field(Loadouts.class, data));
+        put(Schematic.class, (type, data) -> {
+            Object result = fieldOpt(Loadouts.class, data);
+            if(result != null){
+                return result;
+            }else{
+                String str = data.asString();
+                if(str.startsWith(Schematics.base64Header)){
+                    return Schematics.readBase64(str);
+                }else{
+                    return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));
+                }
+            }
+        });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
             if(data.isString()){

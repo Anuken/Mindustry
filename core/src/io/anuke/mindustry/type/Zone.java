@@ -26,7 +26,7 @@ public class Zone extends UnlockableContent{
     public boolean alwaysUnlocked;
     public int conditionWave = Integer.MAX_VALUE;
     public int launchPeriod = 10;
-    public Loadout loadout = Loadouts.basicShard;
+    public Schematic loadout = Loadouts.basicShard;
     public TextureRegion preview;
 
     protected Array<ItemStack> baseLaunchCost = new Array<>();

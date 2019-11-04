@@ -5,6 +5,8 @@ import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.maps.generators.BasicGenerator;
 import io.anuke.mindustry.world.Tile;
 
+import static io.anuke.mindustry.Vars.schematics;
+
 public class OvergrowthGenerator extends BasicGenerator{
 
     public OvergrowthGenerator(int width, int height){
@@ -38,6 +40,6 @@ public class OvergrowthGenerator extends BasicGenerator{
         //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
         tiles[endX][endY].setOverlay(Blocks.spawn);
-        loadout.setup(spawnX, spawnY);
+        schematics.placeLoadout(loadout, spawnX, spawnY);
     }
 }

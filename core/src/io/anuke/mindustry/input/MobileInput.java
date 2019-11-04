@@ -205,7 +205,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.wikiSmall;
+            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.pasteSmall;
             i.setChecked(!arrow && schematicMode);
         });
 
@@ -219,11 +219,17 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(!request.breaking){
                         if(validPlace(request.x, request.y, request.block, request.rotation)){
                             BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
+                            BuildRequest copy = request.copy();
+
+                            if(copy.hasConfig && copy.block.posConfig){
+                                copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                            }
+
                             if(other == null){
-                                player.addBuildRequest(request.copy());
+                                player.addBuildRequest(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
                                 player.buildQueue().remove(other);
-                                player.addBuildRequest(request.copy());
+                                player.addBuildRequest(copy);
                             }
                         }
 
@@ -428,6 +434,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void useSchematic(Schematic schem){
         selectRequests.clear();
         selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        lastSchematic = schem;
     }
 
     @Override
