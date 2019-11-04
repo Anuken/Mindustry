@@ -1,15 +1,15 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Eachable;
-import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
+import io.anuke.arc.util.Eachable;
 import io.anuke.mindustry.ui.Cicon;
-import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.Block;
+import io.anuke.arc.graphics.g2d.Draw;
+import io.anuke.mindustry.graphics.Pal;
+import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 
 public class PowerDiode extends Block{
 
@@ -40,7 +40,7 @@ public class PowerDiode extends Block{
         Float backStored = backGraph.getBatteryStored() / backGraph.getTotalBatteryCapacity();
         Float frontStored = frontGraph.getBatteryStored() / frontGraph.getTotalBatteryCapacity();
 
-        // try to send if the input has more % capacity stored
+        // try to send if the back side has more % capacity stored than the front side
         if(backStored > frontStored) {
             // send half of the difference
             float amount = backGraph.getBatteryStored() * (backStored - frontStored) / 2;
@@ -58,12 +58,9 @@ public class PowerDiode extends Block{
         return tile.getNearbyLink(tile.rotation());
     }
 
+    // battery % of the graph on either side, defaults to zero
     protected float bar(Tile tile){
-        if(!tile.block().hasPower){
-            return 0f;
-        }else{
-            return tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity();
-        }
+        return tile.block().hasPower ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
     }
 
     @Override
