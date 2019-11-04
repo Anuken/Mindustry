@@ -29,14 +29,14 @@ public class PowerDiode extends Block{
 
         DiodeEntity entity = (DiodeEntity) tile.entity;
 
-        if (!entity.connected()) return;
-        if (entity.input() > entity.output()) {
+        if(!entity.connected()) return;
+        if(entity.input() > entity.output()){
             entity.transfer(entity.graph(entity.back()).getBatteryStored() * (entity.input() - entity.output()) / 2);
         }
     }
 
     @Override
-    public void setBars() {
+    public void setBars(){
         super.setBars();
 
         bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> ((DiodeEntity) entity).input()) );
