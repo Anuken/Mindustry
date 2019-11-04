@@ -5,7 +5,6 @@ import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.util.Eachable;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
-import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.Cicon;
@@ -28,11 +27,42 @@ public class PowerDiode extends Block{
     public void update(Tile tile){
         super.update(tile);
 
-        DiodeEntity entity = (DiodeEntity) tile.entity;
+        Tile back = back(tile);
+        Tile front = front(tile);
 
-        if(!entity.connected()) return;
-        if(entity.input() > entity.output()){
-            entity.transfer(entity.graph(entity.back()).getBatteryStored() * (entity.input() - entity.output()) / 2);
+        if(!back.block().hasPower || !front.block().hasPower) return;
+
+        PowerGraph backGraph = back.entity.power.graph;
+        PowerGraph frontGraph = front.entity.power.graph;
+        if(backGraph == frontGraph) return;
+
+        // 0f - 1f of battery capacity in use
+        Float backStored = backGraph.getBatteryStored() / backGraph.getTotalBatteryCapacity();
+        Float frontStored = frontGraph.getBatteryStored() / frontGraph.getTotalBatteryCapacity();
+
+        // try to send if the input has more % capacity stored
+        if(backStored > frontStored) {
+            // send half of the difference
+            float amount = backGraph.getBatteryStored() * (backStored - frontStored) / 2;
+
+            backGraph.useBatteries(amount);
+            frontGraph.chargeBatteries(amount);
+        }
+    }
+
+    protected Tile back(Tile tile){
+        return tile.getNearbyLink((tile.rotation() + 2) % 4);
+    }
+
+    protected Tile front(Tile tile){
+        return tile.getNearbyLink(tile.rotation());
+    }
+
+    protected float bar(Tile tile){
+        if(!tile.block().hasPower){
+            return 0f;
+        }else{
+            return tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity();
         }
     }
 
@@ -40,8 +70,8 @@ public class PowerDiode extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> ((DiodeEntity) entity).input()) );
-        bars.add("front", entity -> new Bar("bar.output", Pal.lighterOrange, () -> ((DiodeEntity) entity).output()) );
+        bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> bar(back(entity.tile))) );
+        bars.add("front", entity -> new Bar("bar.output", Pal.lighterOrange, () -> bar(front(entity.tile))) );
     }
 
     @Override
@@ -67,47 +97,5 @@ public class PowerDiode extends Block{
                 arrow.getWidth() * req.animScale * Draw.scl,
                 arrow.getHeight() * req.animScale * Draw.scl,
                 !rotate ? 0 : req.rotation * 90);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DiodeEntity();
-    }
-
-    public static class DiodeEntity extends TileEntity{
-
-        public Tile back(){
-            return tile.getNearbyLink(tile, (tile.rotation() + 2) % 4);
-        }
-
-        public Tile front(){
-            return tile.getNearbyLink(tile, tile.rotation());
-        }
-
-        private PowerGraph graph(Tile tile){
-            if(!tile.block().hasPower) return null;
-            return tile.entity.power.graph;
-        }
-
-        public boolean connected(){
-            return graph(back()) != null && graph(front()) != null;
-        }
-
-        public float input(){
-            return battery(graph(back()));
-        }
-
-        public float output(){
-            return battery(graph(front()));
-        }
-
-        public float battery(PowerGraph graph){
-            return graph == null ? 0f : graph.getBatteryStored() / graph.getTotalBatteryCapacity();
-        }
-
-        public void transfer(float amount){
-            graph(back()).useBatteries(amount);
-            graph(front()).chargeBatteries(amount);
-        }
     }
 }

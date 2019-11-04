@@ -318,10 +318,7 @@ public class Tile implements Position, TargetTrait{
         return null;
     }
 
-    public Tile getNearbyLink(Tile tile, int rotation){
-        int x = tile.x;
-        int y = tile.y;
-
+    public Tile getNearbyLink(int rotation){
         if(rotation == 0) return world.ltile(x + 1, y);
         if(rotation == 1) return world.ltile(x, y + 1);
         if(rotation == 2) return world.ltile(x - 1, y);
