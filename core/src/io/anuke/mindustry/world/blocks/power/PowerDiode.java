@@ -27,13 +27,10 @@ public class PowerDiode extends Block{
     public void update(Tile tile){
         super.update(tile);
 
-        Tile back = back(tile);
-        Tile front = front(tile);
+        if(!tile.back().block().hasPower || !tile.front().block().hasPower) return;
 
-        if(!back.block().hasPower || !front.block().hasPower) return;
-
-        PowerGraph backGraph = back.entity.power.graph;
-        PowerGraph frontGraph = front.entity.power.graph;
+        PowerGraph backGraph = tile.back().entity.power.graph;
+        PowerGraph frontGraph = tile.front().entity.power.graph;
         if(backGraph == frontGraph) return;
 
         // 0f - 1f of battery capacity in use
@@ -50,14 +47,6 @@ public class PowerDiode extends Block{
         }
     }
 
-    protected Tile back(Tile tile){
-        return tile.getNearbyLink((tile.rotation() + 2) % 4);
-    }
-
-    protected Tile front(Tile tile){
-        return tile.getNearbyLink(tile.rotation());
-    }
-
     // battery % of the graph on either side, defaults to zero
     protected float bar(Tile tile){
         return tile.block().hasPower ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
@@ -67,8 +56,8 @@ public class PowerDiode extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> bar(back(entity.tile))) );
-        bars.add("front", entity -> new Bar("bar.output", Pal.lighterOrange, () -> bar(front(entity.tile))) );
+        bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> bar(entity.tile.front())) );
+        bars.add("front", entity -> new Bar("bar.output", Pal.lighterOrange, () -> bar(entity.tile.back())) );
     }
 
     @Override
