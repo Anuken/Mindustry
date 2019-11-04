@@ -31,13 +31,14 @@ public class PowerDiode extends Block{
 
         if (!entity.connected()) return;
         if (entity.input() > entity.output()) {
-            entity.transfer(entity.backGraph().getBatteryStored() * (entity.input() - entity.output()) / 2);
+            entity.transfer(entity.graph(entity.back()).getBatteryStored() * (entity.input() - entity.output()) / 2);
         }
     }
 
     @Override
     public void setBars() {
         super.setBars();
+
         bars.add("back", entity -> new Bar("bar.input", Pal.lighterOrange, () -> ((DiodeEntity) entity).input()) );
         bars.add("front", entity -> new Bar("bar.output", Pal.lighterOrange, () -> ((DiodeEntity) entity).output()) );
     }
@@ -61,34 +62,38 @@ public class PowerDiode extends Block{
 
     public static class DiodeEntity extends TileEntity{
 
-        public Tile backTile(){
+        public Tile back(){
             return tile.getNearbyLink(tile, (tile.rotation() + 2) % 4);
         }
-        public Tile frontTile(){
+
+        public Tile front(){
             return tile.getNearbyLink(tile, tile.rotation());
         }
-        //
-        public PowerGraph backGraph(){
-            if (!backTile().block().hasPower) return null;
-            return backTile().entity.power.graph;
+
+        private PowerGraph graph(Tile tile){
+            if (!tile.block().hasPower) return null;
+            return tile.entity.power.graph;
         }
-        public PowerGraph frontGraph(){
-            if (!frontTile().block().hasPower) return null;
-            return frontTile().entity.power.graph;
-        }
+
         public boolean connected(){
-            return backGraph() != null && frontGraph() != null;
+            return graph(back()) != null && graph(front()) != null;
         }
-        //
+
         public float input(){
-            return backGraph() == null ? 0f : backGraph().getBatteryStored() / backGraph().getTotalBatteryCapacity();
+            return battery(graph(back()));
         }
+
         public float output(){
-            return frontGraph() == null ? 0f : frontGraph().getBatteryStored() / frontGraph().getTotalBatteryCapacity();
+            return battery(graph(front()));
         }
+
+        public float battery(PowerGraph graph){
+            return graph == null ? 0f : graph.getBatteryStored() / graph.getTotalBatteryCapacity();
+        }
+
         public void transfer(float amount){
-            backGraph().useBatteries(amount);
-            frontGraph().chargeBatteries(amount);
+            graph(back()).useBatteries(amount);
+            graph(front()).chargeBatteries(amount);
         }
     }
 }
