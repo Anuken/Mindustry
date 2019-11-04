@@ -537,27 +537,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         final int[] i = {0};
-        final Array<Tile> chain = new Array<Tile>();
         lineRequests.each(req -> {
             if(!(req.block instanceof PowerNode)) return;
 
             if(i[0]++ == 0 || i[0] == lineRequests.size){
                 // beginning & end should always be placed
             }else{
-                final boolean[] overlaps = {false};
-                chain.each(tile -> {
-                    if(((PowerNode) req.block).overlaps(req.tile(), tile)){
-                        overlaps[0] = true;
-                    };
-                });
+                int overlaps = 0;
+                for(int j = 0; j < i[0]; j++){
+                    if (((PowerNode) req.block).overlaps(lineRequests.get(i[0]).tile(), lineRequests.get(j).tile()) && lineRequests.get(j).block instanceof PowerNode){
+                        overlaps++;
+                    }
+                }
 
-                if(overlaps[0]){
+                if(overlaps > 1){
                     req.block = Blocks.air;
-                    return;
                 }
             }
-
-            chain.add(req.tile());
         });
     }
 
