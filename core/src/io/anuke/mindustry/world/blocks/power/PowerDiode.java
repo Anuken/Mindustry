@@ -55,11 +55,6 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-arrow"), Core.atlas.find(name)};
-    }
-
-    @Override
     public TileEntity newEntity(){
         return new DiodeEntity();
     }
