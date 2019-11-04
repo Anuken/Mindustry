@@ -318,6 +318,17 @@ public class Tile implements Position, TargetTrait{
         return null;
     }
 
+    public Tile getNearbyLink(Tile tile, int rotation){
+        int x = tile.x;
+        int y = tile.y;
+
+        if(rotation == 0) return world.ltile(x + 1, y);
+        if(rotation == 1) return world.ltile(x, y + 1);
+        if(rotation == 2) return world.ltile(x - 1, y);
+        if(rotation == 3) return world.ltile(x, y - 1);
+        return null;
+    }
+
     public boolean interactable(Team team){
         return getTeam() == Team.derelict || team == getTeam();
     }

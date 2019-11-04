@@ -62,10 +62,10 @@ public class PowerDiode extends Block{
     public static class DiodeEntity extends TileEntity{
 
         public Tile backTile(){
-            return getNearby(tile, (tile.rotation() + 2) % 4);
+            return tile.getNearbyLink(tile, (tile.rotation() + 2) % 4);
         }
         public Tile frontTile(){
-            return getNearby(tile, tile.rotation());
+            return tile.getNearbyLink(tile, tile.rotation());
         }
         //
         public PowerGraph backGraph(){
@@ -90,17 +90,5 @@ public class PowerDiode extends Block{
             backGraph().useBatteries(amount);
             frontGraph().chargeBatteries(amount);
         }
-        //
-        public Tile getNearby(Tile tile, int rotation){
-            int x = tile.x;
-            int y = tile.y;
-
-            if(rotation == 0) return world.ltile(x + 1, y);
-            if(rotation == 1) return world.ltile(x, y + 1);
-            if(rotation == 2) return world.ltile(x - 1, y);
-            if(rotation == 3) return world.ltile(x, y - 1);
-            return null;
-        }
-
     }
 }
