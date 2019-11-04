@@ -3,13 +3,14 @@ package io.anuke.mindustry.world.blocks.power;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
+import io.anuke.arc.util.Eachable;
+import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
-
-import static io.anuke.mindustry.Vars.world;
 
 public class PowerDiode extends Block{
 
@@ -53,6 +54,19 @@ public class PowerDiode extends Block{
     public void draw(Tile tile){
         Draw.rect(region, tile.drawx(), tile.drawy(), 0);
         Draw.rect(arrow, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
+    }
+
+    @Override
+    public void drawRequestRegion(BuilderTrait.BuildRequest req, Eachable<BuilderTrait.BuildRequest> list) {
+        TextureRegion reg = icon(Cicon.full);
+        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy(),
+                reg.getWidth() * req.animScale * Draw.scl,
+                reg.getHeight() * req.animScale * Draw.scl,
+                0);
+        Draw.rect(arrow, req.drawx(), req.drawy(),
+                arrow.getWidth() * req.animScale * Draw.scl,
+                arrow.getHeight() * req.animScale * Draw.scl,
+                !rotate ? 0 : req.rotation * 90);
     }
 
     @Override
