@@ -71,7 +71,7 @@ public class PowerDiode extends Block{
         }
 
         private PowerGraph graph(Tile tile){
-            if (!tile.block().hasPower) return null;
+            if(!tile.block().hasPower) return null;
             return tile.entity.power.graph;
         }
 
