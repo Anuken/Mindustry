@@ -253,9 +253,21 @@ public class PlacementFragment extends Fragment{
                             lastGround = false;
 
                             topTable.table(header -> {
+                                String keyCombo = new String();
+                                if(!mobile){
+                                    keyCombo = " [accent][" + Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString();
+                                    Array<Block> blocks = getByCategory(currentCategory);
+                                    for(int i = 0; i < blocks.size; i++){
+                                        if(blocks.get(i) == lastDisplay){
+                                            keyCombo += (i < 10 ? "" : "," + Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString()) + "," + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
+                                            break;
+                                        }
+                                    }
+                                }
+                                final String keyComboFinal = keyCombo;
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + (mobile ? "" : keyComboFinal))
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
