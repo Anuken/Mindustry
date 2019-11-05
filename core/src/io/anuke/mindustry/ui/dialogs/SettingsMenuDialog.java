@@ -294,6 +294,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("effects", true);
+        graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
