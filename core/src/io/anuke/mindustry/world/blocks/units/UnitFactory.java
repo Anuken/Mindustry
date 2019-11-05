@@ -155,10 +155,8 @@ public class UnitFactory extends Block{
         UnitFactoryEntity entity = tile.entity();
 
         if(entity.spawned >= maxSpawn){
-            entity.power.productivity = 0f;
             return;
         }
-        entity.power.productivity = 1f;
 
         if(entity.cons.valid() || tile.isEnemyCheat()){
             entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
