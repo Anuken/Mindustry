@@ -821,6 +821,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Array<Point2> skip = new Array<>();
+//        Array<Point2> fake = new Array<>();
         if(block instanceof PowerNode){
             final int[] i = {0};
             points.each(req -> {
@@ -836,6 +837,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 //                        // do not suggest building where you cant?
 //                        if(!validPlace(points.get(i[0]-1).x, points.get(i[0]-1).y, block, rotation)){
 //                            skip.add(points.get(i[0]-1));
+//                            fake.add(points.get(i[0]-1));
 //                            return;
 //                        }
 
@@ -854,6 +856,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             });
         }
+//        skip.removeAll(fake);
         points.removeAll(skip);
 
         float angle = Angles.angle(startX, startY, endX, endY);
