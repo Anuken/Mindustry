@@ -66,6 +66,7 @@ public class TechTreeDialog extends FloatingDialog{
         }).size(210f, 64f);
 
         //scaling/drag input
+
         addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
