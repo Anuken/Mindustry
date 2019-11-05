@@ -14,7 +14,6 @@ public class PowerModule extends BlockModule{
      * In case of buffered consumers, this is the percentage of power stored in relation to the maximum capacity.
      */
     public float satisfaction = 0.0f;
-    public float productivity = 1f;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
 
