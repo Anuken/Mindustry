@@ -186,14 +186,9 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         return entity.spawned < maxSpawn;
-    }
-
-    @Override
-    public boolean shouldConsume(Tile tile){
-        return canProduce(tile);
     }
 
     public static class UnitFactoryEntity extends TileEntity{

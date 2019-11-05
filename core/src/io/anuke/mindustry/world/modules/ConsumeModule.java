@@ -51,7 +51,7 @@ public class ConsumeModule extends BlockModule{
     }
 
     public boolean valid(){
-        return valid && entity.block.canProduce(entity.tile);
+        return valid && entity.block.shouldConsume(entity.tile);
     }
 
     public boolean optionalValid(){

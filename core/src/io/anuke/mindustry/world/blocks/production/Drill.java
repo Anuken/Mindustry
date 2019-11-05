@@ -129,7 +129,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         return tile.entity.items.total() < itemCapacity;
     }
 
