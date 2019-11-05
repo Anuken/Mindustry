@@ -198,7 +198,7 @@ public class Mods implements Loadable{
                 }else{
                     disabled.add(mod);
                 }
-                mod.addSteamID(file.parent().name());
+                mod.addSteamID(file.name());
             }catch(Exception e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
