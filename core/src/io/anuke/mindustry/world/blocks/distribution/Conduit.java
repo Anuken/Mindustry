@@ -21,6 +21,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     protected TextureRegion[] topRegions = new TextureRegion[7];
     protected TextureRegion[] botRegions = new TextureRegion[7];
 
+    protected boolean leaks = true;
+
     public Conduit(String name){
         super(name);
         rotate = true;
@@ -109,7 +111,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), true, tile.entity.liquids.current());
+            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leaks, tile.entity.liquids.current());
             entity.noSleep();
         }else{
             entity.sleep();
