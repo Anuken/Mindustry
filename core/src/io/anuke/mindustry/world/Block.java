@@ -524,7 +524,7 @@ public class Block extends BlockStorage{
                 current = entity -> entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
-                    () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+                    () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
