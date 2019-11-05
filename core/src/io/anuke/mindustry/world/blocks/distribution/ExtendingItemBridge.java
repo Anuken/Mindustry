@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
@@ -31,7 +32,11 @@ public class ExtendingItemBridge extends ItemBridge{
         ex *= uptime;
         ey *= uptime;
 
+        int opacityPercentage = Core.settings.getInt("bridgeopacity");
+        if(opacityPercentage == 0) return;
+
         Lines.stroke(8f);
+        Draw.alpha(opacityPercentage / 100f);
         Lines.line(bridgeRegion,
         tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
         tile.worldy() + Geometry.d4[i].y * tilesize / 2f,
