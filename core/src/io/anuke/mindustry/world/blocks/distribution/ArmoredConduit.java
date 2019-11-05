@@ -10,11 +10,11 @@ import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 
-public class PlatedConduit extends Conduit{
+public class ArmoredConduit extends Conduit{
 
     protected TextureRegion capRegion;
 
-    public PlatedConduit(String name) {
+    public ArmoredConduit(String name) {
         super(name);
         leakRate = 10f;
     }

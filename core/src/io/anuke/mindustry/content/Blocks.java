@@ -1013,7 +1013,7 @@ public class Blocks implements ContentList{
             health = 90;
         }};
 
-        platedConduit = new PlatedConduit("plated-conduit"){{
+        platedConduit = new ArmoredConduit("plated-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.thorium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
             health = 220;
