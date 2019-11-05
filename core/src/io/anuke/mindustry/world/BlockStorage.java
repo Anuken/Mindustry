@@ -171,7 +171,7 @@ public abstract class BlockStorage extends UnlockableContent{
                     }
                 }
             }
-        }else if(leakResistance != 100 && !next.block().solid && !next.block().hasLiquids){
+        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
             float leakAmount = tile.entity.liquids.get(liquid) / leakResistance;
             Puddle.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids.remove(liquid, leakAmount);
