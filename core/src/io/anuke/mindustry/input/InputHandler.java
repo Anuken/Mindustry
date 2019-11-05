@@ -820,68 +820,44 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
-//        Array<Point2> skip = new Array<>();
-//        if(block instanceof PowerNode){
-//            final int[] i = {0};
-//            points.each(req -> {
-//                if(i[0]++ == 0 || i[0] == points.size){
-//                    // beginning & end should always be placed
-//                }else{
-//                    // check with how many powernodes the *next* tile will overlap
-//                    int overlaps = 0;
-//                    for(int j = 0; j < i[0]; j++){
-//                        // skip powernodes we have already crossed off as air
-//                        if(skip.contains(points.get(j))) continue;
-//
-//                        Tile next = world.ltile(points.get(i[0]).x, points.get(i[0]).y);
-//                        Tile loop = world.ltile(points.get(j).x, points.get(j).y);
-//
-//                        if (((PowerNode) block).overlaps(next, loop)){
-//                            overlaps++;
-//                        }
-//                    }
-//
-//                    // if its more than one it can bridge the gap
-//                    if(overlaps > 1){
-//                        skip.add(points.get(i[0]-1));
-//                    }
-//                }
-//            });
-//        }
-//        points.removeAll(skip);
-
+        Array<Point2> skip = new Array<>();
+//        Array<Point2> fake = new Array<>();
         if(block instanceof PowerNode){
-//            while(true){
-//                Tile cursor = world.ltile(points.first().x, points.first().y);
-//            }
-
             final int[] i = {0};
-            points.each(point2 -> {
+            points.each(req -> {
+                if(i[0]++ == 0 || i[0] == points.size){
+                    // beginning & end should always be placed
+                }else{
+                    // check with how many powernodes the *next* tile will overlap
+                    int overlaps = 0;
+                    for(int j = 0; j < i[0]; j++){
+                        // skip powernodes we have already crossed off as air
+                        if(skip.contains(points.get(j))) continue;
 
-                if(i[0]++ == 0 || i[0] == points.size) return;
+//                        // do not suggest building where you cant?
+//                        if(!validPlace(points.get(i[0]-1).x, points.get(i[0]-1).y, block, rotation)){
+//                            skip.add(points.get(i[0]-1));
+//                            fake.add(points.get(i[0]-1));
+//                            return;
+//                        }
 
-                Tile from = world.ltile(points.first().x, points.first().y);
+                        Tile next = world.ltile(points.get(i[0]).x, points.get(i[0]).y);
+                        Tile loop = world.ltile(points.get(j).x, points.get(j).y);
 
-                while (true){
-                    final int[] overlaps = {0};
-                    points.each(tmp -> {
-                        Tile to = world.ltile(points.get(1).x, points.get(1).y);
-
-                        if (to == from) return;
-
-                        if(((PowerNode) block).overlaps(from, to)){
-                            overlaps[0]++;
+                        if (((PowerNode) block).overlaps(next, loop)){
+                            overlaps++;
                         }
-                    });
+                    }
 
-                    if(overlaps[0] > 1){
-                        points.remove(1);
-                    } else {
-                        break;
+                    // if its more than one it can bridge the gap
+                    if(overlaps > 1){
+                        skip.add(points.get(i[0]-1));
                     }
                 }
             });
         }
+//        skip.removeAll(fake);
+        points.removeAll(skip);
 
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = rotation;
