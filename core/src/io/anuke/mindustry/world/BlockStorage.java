@@ -138,7 +138,7 @@ public abstract class BlockStorage extends UnlockableContent{
         return tryMoveLiquid(tile, next, leak ? 1.5f : 0f, liquid);
     }
 
-    public float tryMoveLiquid(Tile tile, Tile next, float leakrate, Liquid liquid){
+    public float tryMoveLiquid(Tile tile, Tile next, float leakResistance, Liquid liquid){
         if(next == null) return 0;
 
         next = next.link();
@@ -171,8 +171,8 @@ public abstract class BlockStorage extends UnlockableContent{
                     }
                 }
             }
-        }else if(leakrate > 0f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = tile.entity.liquids.get(liquid) / leakrate;
+        }else if(leakResistance > 0f && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = tile.entity.liquids.get(liquid) / leakResistance;
             Puddle.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids.remove(liquid, leakAmount);
         }

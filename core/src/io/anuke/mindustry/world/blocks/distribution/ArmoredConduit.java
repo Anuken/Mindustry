@@ -14,7 +14,7 @@ public class ArmoredConduit extends Conduit{
 
     public ArmoredConduit(String name) {
         super(name);
-        leakRate = 10f;
+        leakResistance = 10f;
     }
 
     @Override
@@ -27,6 +27,7 @@ public class ArmoredConduit extends Conduit{
     public void draw(Tile tile) {
         super.draw(tile);
 
+        // draw the cap when a conduit would normally leak
         Tile next = tile.getNearby(tile.rotation());
         if (next.getTeam() == tile.getTeam() && next.block().hasLiquids) return;
 
