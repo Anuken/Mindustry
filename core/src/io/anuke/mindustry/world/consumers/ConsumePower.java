@@ -72,7 +72,7 @@ public class ConsumePower extends Consume{
         if(buffered){
             return (1f-entity.power.satisfaction)*capacity;
         }else{
-            return usage;
+            return usage * entity.power.productivity;
         }
     }
 
