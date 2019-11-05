@@ -833,6 +833,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         // skip powernodes we have already crossed off as air
                         if(skip.contains(points.get(j))) continue;
 
+//                        // do not suggest building where you cant?
+//                        if(!validPlace(points.get(i[0]-1).x, points.get(i[0]-1).y, block, rotation)){
+//                            skip.add(points.get(i[0]-1));
+//                            return;
+//                        }
+
                         Tile next = world.ltile(points.get(i[0]).x, points.get(i[0]).y);
                         Tile loop = world.ltile(points.get(j).x, points.get(j).y);
 
