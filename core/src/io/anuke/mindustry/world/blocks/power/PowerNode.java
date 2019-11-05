@@ -32,7 +32,7 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
-        powernodePlacement = true;
+        conveyorPlacement = true;
     }
 
     @Override

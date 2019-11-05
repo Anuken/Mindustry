@@ -535,28 +535,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             });
         }
-
-        final int[] i = {0};
-        lineRequests.each(req -> {
-            if(!(req.block instanceof PowerNode)) return;
-
-            if(i[0]++ == 0 || i[0] == lineRequests.size){
-                // beginning & end should always be placed
-            }else{
-                // check with how many powernodes the *next* tile will overlap
-                int overlaps = 0;
-                for(int j = 0; j < i[0]; j++){
-                    if (((PowerNode) req.block).overlaps(lineRequests.get(i[0]).tile(), lineRequests.get(j).tile()) && lineRequests.get(j).block instanceof PowerNode){
-                        overlaps++;
-                    }
-                }
-
-                // if its more than two it can bridge the gap
-                if(overlaps > 1){
-                    req.block = Blocks.air;
-                }
-            }
-        });
     }
 
     protected void updateLine(int x1, int y1){
@@ -830,20 +808,45 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
 
-        // place powernodes diagonally by default
-        if((block != null && block.powernodePlacement)){
-            diagonal = !diagonal;
-        }
-
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = Placement.pathfindLine(block != null && block.conveyorPlacement, block != null && block.powernodePlacement, startX, startY, endX, endY);
+            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
+
+        Array<Point2> skip = new Array<>();
+        if(block instanceof PowerNode){
+            final int[] i = {0};
+            points.each(req -> {
+                if(i[0]++ == 0 || i[0] == points.size){
+                    // beginning & end should always be placed
+                }else{
+                    // check with how many powernodes the *next* tile will overlap
+                    int overlaps = 0;
+                    for(int j = 0; j < i[0]; j++){
+                        // skip powernodes we have already crossed off as air
+                        if(skip.contains(points.get(j))) continue;
+
+                        Tile next = world.ltile(points.get(i[0]).x, points.get(i[0]).y);
+                        Tile loop = world.ltile(points.get(j).x, points.get(j).y);
+
+                        if (((PowerNode) block).overlaps(next, loop)){
+                            overlaps++;
+                        }
+                    }
+
+                    // if its more than one it can bridge the gap
+                    if(overlaps > 1){
+                        skip.add(points.get(i[0]-1));
+                    }
+                }
+            });
+        }
+        points.removeAll(skip);
 
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = rotation;

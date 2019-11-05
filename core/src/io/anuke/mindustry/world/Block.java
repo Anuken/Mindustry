@@ -93,8 +93,6 @@ public class Block extends BlockStorage{
     public boolean posConfig;
     /** Whether this block uses conveyor-type placement mode.*/
     public boolean conveyorPlacement;
-    /** Whether this block uses powernode-type placement mode.*/
-    public boolean powernodePlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
