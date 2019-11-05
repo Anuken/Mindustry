@@ -12,7 +12,6 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 
 public class PowerDiode extends Block{
-
     protected TextureRegion arrow;
 
     public PowerDiode(String name){
