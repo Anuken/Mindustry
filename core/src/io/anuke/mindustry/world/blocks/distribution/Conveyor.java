@@ -272,13 +272,9 @@ public class Conveyor extends Block implements Autotiler{
             Tile left = tile.getNearby(tile.rotation() -1);
             Tile right = tile.getNearby(tile.rotation() +1);
 
-//            if ((left.block() instanceof Conveyor || (left.block().outputsItems() && Edges.getFacingEdge(left, tile).relativeTo(tile) == tile.rotation())) && (left.block() instanceof Conveyor || (left.block().outputsItems() && Edges.getFacingEdge(left, tile).relativeTo(tile) == tile.rotation()))){
-//                return Blocks.armoredConveyor;
-//            }
-
             if(left != null){
                 if(left.block() instanceof Conveyor){
-
+                    // upgrade allowed
                 }else if(left.block().outputsItems()){
                     return null;
                 }
@@ -286,31 +282,11 @@ public class Conveyor extends Block implements Autotiler{
 
             if(right != null){
                 if(right.block() instanceof Conveyor){
-
+                    // upgrade allowed
                 }else if(right.block().outputsItems()){
                     return null;
                 }
             }
-
-//            if (left == null || left.block() instanceof Conveyor || !left.block().outputsItems()){
-//                if (right == null || right.block() instanceof Conveyor || !right.block().outputsItems()){
-//                    return Blocks.armoredConveyor;
-//                }
-//            }
-
-//            if ((left.block() instanceof Conveyor || Edges.getFacingEdge(left, tile).relativeTo(tile) == tile.rotation()) && (left.block() instanceof Conveyor || Edges.getFacingEdge(left, tile).relativeTo(tile) == tile.rotation())){
-//                return Blocks.armoredConveyor;
-//            }
-//            if (left.block() instanceof Conveyor || left.block().outputsItems())
-
-//            Point2[] nearby = Edges.getEdges(tile.block().size);
-//            for(Point2 point : nearby){
-//                Tile other = world.ltile(tile.x + point.x, tile.y + point.y);
-//
-//                if (blends(tile, tile.rotation(), other.x, other.y, other.rotation(), other.block())){
-//                    return super.getUpgrade(tile);
-//                }
-//            }
 
             return Blocks.armoredConveyor;
         }
