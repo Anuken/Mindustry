@@ -65,15 +65,20 @@ public class ConsumePower extends Consume{
 
     /**
      * Retrieves the amount of power which is requested for the given block and entity.
-     * @param block The block which needs power.
      * @param entity The entity which contains the power module.
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(TileEntity entity){
+        if(entity.tile.entity == null) return 0f;
         if(buffered){
             return (1f-entity.power.satisfaction)*capacity;
         }else{
-            return usage * Mathf.num(entity.block.shouldConsume(entity.tile));
+            try{
+                return usage * Mathf.num(entity.block.shouldConsume(entity.tile));
+            }catch(Exception e){
+                //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
+                return 0;
+            }
         }
     }
 

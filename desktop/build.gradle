@@ -142,6 +142,16 @@ PackrConfig.Platform.values().each{ platform ->
                     into "build/packr/output/"
                     rename("msvcr100.dll", "MSVCR100.dll")
                 }
+
+                if(versionModifier.contains("steam")){
+                    copy{
+                        from zipTree("build/packr/output/jre/desktop.jar").matching{
+                            include "steamworks4j${platform == PackrConfig.Platform.Windows64 ? '64' : ''}.dll"
+                            include "steam_api${platform == PackrConfig.Platform.Windows64 ? '64' : ''}.dll"
+                        }
+                        into "build/packr/output/"
+                    }
+                }
             }
 
             copy{
