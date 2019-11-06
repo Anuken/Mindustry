@@ -65,7 +65,11 @@ public class Placement{
 
         while(true){
             Tile next = tile.getNearby(tile.rotation());
-            points.add(new Point2(tile.x, tile.y));
+            Point2 add = new Point2(tile.x, tile.y);
+
+            if (points.contains(add)) break;
+            points.add(add);
+
             if (next.block() == block){
                 tile = next;
             }else{
