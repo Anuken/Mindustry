@@ -11,12 +11,12 @@ import io.anuke.arc.scene.ui.ImageButton.*;
 import io.anuke.arc.scene.ui.TextButton.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -34,6 +34,7 @@ public class SchematicsDialog extends FloatingDialog{
         addCloseButton();
         buttons.addImageTextButton("$schematic.import", Icon.loadMapSmall, this::showImport);
         shown(this::setup);
+        onResize(this::setup);
     }
 
     void setup(){
@@ -113,17 +114,21 @@ public class SchematicsDialog extends FloatingDialog{
                                 Label label = c.add(s.name()).style(Styles.outlineLabel).color(Color.white).top().growX().maxWidth(200f - 8f).get();
                                 label.setEllipsis(true);
                                 label.setAlignment(Align.center);
-                            }).growX().margin(1).pad(4).maxWidth(200f - 8f).padBottom(0);
+                            }).growX().margin(1).pad(4).maxWidth(Scl.scl(200f - 8f)).padBottom(0);
                         })).size(200f);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
-                        control.input.useSchematic(s);
-                        hide();
+                        if(state.is(State.menu)){
+                            showInfo(s);
+                        }else{
+                            control.input.useSchematic(s);
+                            hide();
+                        }
                     }).pad(4).style(Styles.cleari).get();
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % 4 == 0){
+                    if(++i % (mobile ? Core.graphics.isPortrait() ? 2 : 3 : 4) == 0){
                         t.row();
                     }
                 }
@@ -148,7 +153,7 @@ public class SchematicsDialog extends FloatingDialog{
                 t.addImageTextButton("$schematic.copy.import", Icon.copySmall, style, () -> {
                     dialog.hide();
                     try{
-                        Schematic s = schematics.readBase64(Core.app.getClipboardText());
+                        Schematic s = Schematics.readBase64(Core.app.getClipboardText());
                         schematics.add(s);
                         setup();
                         ui.showInfoFade("$schematic.saved");

@@ -7,7 +7,7 @@ import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
@@ -91,6 +91,8 @@ public class Block extends BlockStorage{
     public boolean consumesTap;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
+    /** Whether this block uses conveyor-type placement mode.*/
+    public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overriden when loading for most blocks.
@@ -233,7 +235,7 @@ public class Block extends BlockStorage{
 
     /** @return whether this block should play its idle sound.*/
     public boolean shouldIdleSound(Tile tile){
-        return canProduce(tile);
+        return shouldConsume(tile);
     }
 
     public void drawLayer(Tile tile){
@@ -514,7 +516,7 @@ public class Block extends BlockStorage{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Function<TileEntity, Liquid> current;
+            Func<TileEntity, Liquid> current;
             if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
@@ -522,7 +524,7 @@ public class Block extends BlockStorage{
                 current = entity -> entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
-                    () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+                    () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -549,6 +551,11 @@ public class Block extends BlockStorage{
 
     public boolean canReplace(Block other){
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
+    }
+
+    /** @return a possible replacement for this block when placed in a line by the player. */
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        return this;
     }
 
     public float handleDamage(Tile tile, float amount){
@@ -668,7 +675,7 @@ public class Block extends BlockStorage{
     }
 
     public void displayBars(Tile tile, Table table){
-        for(Function<TileEntity, Bar> bar : bars.list()){
+        for(Func<TileEntity, Bar> bar : bars.list()){
             table.add(bar.get(tile.entity)).growX();
             table.row();
         }
@@ -707,6 +714,11 @@ public class Block extends BlockStorage{
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.scl /= req.animScale;
         Draw.color();
+    }
+
+    /** @return a custom minimap color for this tile, or 0 to use default colors. */
+    public int minimapColor(Tile tile){
+        return 0;
     }
 
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){

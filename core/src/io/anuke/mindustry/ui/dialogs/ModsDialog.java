@@ -21,49 +21,54 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton("$mods.report", Icon.link,
-        () -> Core.net.openURI(reportIssueURL))
+        buttons.addImageTextButton(mobile ? "$mods.report" : "$mods.openfolder", Icon.link,
+        () -> {
+            if(mobile){
+                Core.net.openURI(reportIssueURL);
+            }else{
+                Core.net.openFolder(modDirectory.absolutePath());
+            }
+        })
         .size(250f, 64f);
 
         buttons.row();
 
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(android ? 210f + 250f + 10f : 210, 64f).colspan(android ? 2 : 1);
+        .size(210, 64f);
 
-        if(!android){
-            buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
-                ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
-                    ui.loadfrag.show();
-                    Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                        Core.net.httpGet(loc.getHeader("Location"), result -> {
-                            if(result.getStatus() != HttpStatus.OK){
-                                ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                ui.loadfrag.hide();
-                            }else{
-                                try{
-                                    FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                    Streams.copyStream(result.getResultAsStream(), file.write(false));
-                                    mods.importMod(file);
-                                    file.delete();
-                                    Core.app.post(() -> {
-                                        try{
-                                            mods.reloadContent();
-                                            setup();
-                                            ui.loadfrag.hide();
-                                        }catch(Throwable e){
-                                            ui.showException(e);
-                                        }
-                                    });
-                                }catch(Throwable e){
-                                    ui.showException(e);
-                                }
+        buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
+            ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
+                ui.loadfrag.show();
+                Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                        if(result.getStatus() != HttpStatus.OK){
+                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                            ui.loadfrag.hide();
+                        }else{
+                            try{
+                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                mods.importMod(file);
+                                file.delete();
+                                Core.app.post(() -> {
+                                    try{
+                                        mods.reloadContent();
+                                        setup();
+                                        ui.loadfrag.hide();
+                                    }catch(Throwable e){
+                                        ui.showException(e);
+                                    }
+                                });
+                            }catch(Throwable e){
+                                modError(e);
                             }
-                        }, t -> Core.app.post(() -> ui.showException(t)));
-                    }, t -> Core.app.post(() -> ui.showException(t)));
-                });
-            }).size(250f, 64f);
-        }
+                        }
+                    }, t -> Core.app.post(() -> modError(t)));
+                }, t -> Core.app.post(() -> modError(t)));
+            });
+        }).size(250f, 64f);
+
 
         shown(this::setup);
 
@@ -87,9 +92,19 @@ public class ModsDialog extends FloatingDialog{
         }));
     }
 
+    void modError(Throwable error){
+        ui.loadfrag.hide();
+
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && t.getMessage().contains("SSL"))){
+            ui.showErrorMessage("$feature.unsupported");
+        }else{
+            ui.showException(error);
+        }
+    }
+
     void setup(){
         cont.clear();
-        cont.defaults().width(520f).pad(4);
+        cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
         if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
@@ -111,7 +126,7 @@ public class ModsDialog extends FloatingDialog{
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled"))).width(270f).wrap();
+                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
                             title.add().growX();
 
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
@@ -150,7 +165,7 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
                             t.row();
                         }
-                    }).width(500f);
+                    }).width(mobile ? 430f : 500f);
                     table.row();
                 }
             });

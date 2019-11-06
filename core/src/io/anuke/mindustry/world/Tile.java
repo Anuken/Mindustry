@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -123,15 +123,15 @@ public class Tile implements Position, TargetTrait{
         return block().solid && !block().synthetic() && block().fillsTile;
     }
 
-    public Floor floor(){
+    public @NonNull Floor floor(){
         return floor;
     }
 
-    public Block block(){
+    public @NonNull Block block(){
         return block;
     }
 
-    public Floor overlay(){
+    public @NonNull Floor overlay(){
         return overlay;
     }
 
@@ -251,7 +251,7 @@ public class Tile implements Position, TargetTrait{
      * Returns the list of all tiles linked to this multiblock, or an empty array if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public void getLinkedTiles(Consumer<Tile> cons){
+    public void getLinkedTiles(Cons<Tile> cons){
         if(block.isMultiblock()){
             int size = block.size;
             int offsetx = -(size - 1) / 2;
@@ -259,11 +259,11 @@ public class Tile implements Position, TargetTrait{
             for(int dx = 0; dx < size; dx++){
                 for(int dy = 0; dy < size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other != null) cons.accept(other);
+                    if(other != null) cons.get(other);
                 }
             }
         }else{
-            cons.accept(this);
+            cons.get(this);
         }
     }
 

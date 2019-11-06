@@ -45,7 +45,7 @@ public class ItemTurret extends CooledTurret{
             @Override
             public void build(Tile tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
+                content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);

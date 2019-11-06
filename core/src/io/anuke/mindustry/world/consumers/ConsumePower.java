@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.consumers;
 
+import io.anuke.arc.math.Mathf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.world.Tile;
@@ -72,7 +73,7 @@ public class ConsumePower extends Consume{
         if(buffered){
             return (1f-entity.power.satisfaction)*capacity;
         }else{
-            return usage;
+            return usage * Mathf.num(entity.block.shouldConsume(entity.tile));
         }
     }
 

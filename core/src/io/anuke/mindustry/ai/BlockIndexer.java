@@ -2,7 +2,7 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
@@ -27,7 +27,7 @@ public class BlockIndexer{
     private final ObjectSet<Item> scanOres = new ObjectSet<>();
     private final ObjectSet<Item> itemSet = new ObjectSet<>();
     /** Stores all ore quadtrants on the map. */
-    private ObjectMap<Item, ObjectSet<Tile>> ores;
+    private ObjectMap<Item, ObjectSet<Tile>> ores = new ObjectMap<>();
     /** Tags all quadrants. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
@@ -163,11 +163,11 @@ public class BlockIndexer{
         set.add(entity.tile);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public TileEntity findTile(Team team, float x, float y, float range, Predicate<Tile> pred, boolean usePriority){
+    public TileEntity findTile(Team team, float x, float y, float range, Boolf<Tile> pred, boolean usePriority){
         TileEntity closest = null;
         float dst = 0;
 
@@ -182,7 +182,7 @@ public class BlockIndexer{
 
                         if(other == null) continue;
 
-                        if(other.entity == null || other.getTeam() != team || !pred.test(other) || !other.block().targetable)
+                        if(other.entity == null || other.getTeam() != team || !pred.get(other) || !other.block().targetable)
                             continue;
 
                         TileEntity e = other.entity;

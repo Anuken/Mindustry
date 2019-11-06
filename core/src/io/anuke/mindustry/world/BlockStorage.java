@@ -41,6 +41,10 @@ public abstract class BlockStorage extends UnlockableContent{
         return true;
     }
 
+    public boolean productionValid(Tile tile){
+        return true;
+    }
+
     public float getPowerProduction(Tile tile){
         return 0f;
     }
@@ -265,10 +269,5 @@ public abstract class BlockStorage extends UnlockableContent{
             return true;
         }
         return false;
-    }
-
-    /** Returns whether this block's inventory has space and is ready for production. */
-    public boolean canProduce(Tile tile){
-        return true;
     }
 }

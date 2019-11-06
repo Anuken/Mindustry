@@ -16,10 +16,12 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Schematic.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.input.Placement.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.production.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -28,16 +30,20 @@ import static io.anuke.mindustry.Vars.*;
 
 /** Handles schematics.*/
 public class Schematics implements Loadable{
+    public static final String base64Header = "bXNjaAB";
+
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 0;
 
     private static final int padding = 2;
+    private static final int maxPreviewsMobile = 32;
     private static final int resolution = 32;
 
     private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
     private Array<Schematic> all = new Array<>();
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
     private FrameBuffer shadowBuffer;
+    private long lastClearTime;
 
     public Schematics(){
         Events.on(DisposeEvent.class, e -> {
@@ -144,6 +150,19 @@ public class Schematics implements Loadable{
     }
 
     public FrameBuffer getBuffer(Schematic schematic){
+        //dispose unneeded previews to prevent memory outage errors.
+        //only runs every 2 seconds
+        if(mobile && Time.timeSinceMillis(lastClearTime) > 1000 * 2 && previews.size > maxPreviewsMobile){
+            Array<Schematic> keys = previews.orderedKeys().copy();
+            for(int i = 0; i < previews.size - maxPreviewsMobile; i++){
+                //dispose and remove unneeded previews
+                previews.get(keys.get(i)).dispose();
+                previews.remove(keys.get(i));
+            }
+            //update last clear time
+            lastClearTime = Time.millis();
+        }
+
         if(!previews.containsKey(schematic)){
             Draw.blend();
             Draw.reset();
@@ -212,7 +231,29 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Array<BuildRequest> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config)).removeAll(s -> !s.block.isVisible() || !s.block.unlocked());
+        return schem.tiles.map(t -> new BuildRequest(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
+            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
+    }
+
+    public void placeLoadout(Schematic schem, int x, int y){
+        Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        int ox = x - coreTile.x, oy = y - coreTile.y;
+        schem.tiles.each(st -> {
+            Tile tile = world.tile(st.x + ox, st.y + oy);
+            if(tile == null) return;
+
+            world.setBlock(tile, st.block, defaultTeam);
+            tile.rotation(st.rotation);
+            if(st.block.posConfig){
+                tile.configureAny(Pos.get(tile.x - st.x + Pos.x(st.config), tile.y - st.y + Pos.y(st.config)));
+            }else{
+                tile.configureAny(st.config);
+            }
+
+            if(st.block instanceof Drill){
+                tile.getLinkedTiles(t -> t.setOverlay(Blocks.oreCopper));
+            }
+        });
     }
 
     /** Adds a schematic to the list, also copying it into the files.*/
@@ -242,7 +283,7 @@ public class Schematics implements Loadable{
 
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
-        NormalizeResult result = PlaceUtils.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
         x = result.x;
         y = result.y;
         x2 = result.x2;
@@ -312,12 +353,12 @@ public class Schematics implements Loadable{
         }
     }
 
+    //region IO methods
+
     /** Loads a schematic from base64. May throw an exception. */
-    public Schematic readBase64(String schematic) throws IOException{
+    public static Schematic readBase64(String schematic) throws IOException{
         return read(new ByteArrayInputStream(Base64Coder.decode(schematic)));
     }
-
-    //region IO methods
 
     public static Schematic read(FileHandle file) throws IOException{
         Schematic s = read(new DataInputStream(file.read(1024)));

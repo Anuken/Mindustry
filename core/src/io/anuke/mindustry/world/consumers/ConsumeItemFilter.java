@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
@@ -15,9 +15,10 @@ import io.anuke.mindustry.world.meta.values.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final @NonNull Predicate<Item> filter;
+    public final @NonNull
+    Boolf<Item> filter;
 
-    public ConsumeItemFilter(Predicate<Item> item){
+    public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;
     }
 
@@ -34,7 +35,7 @@ public class ConsumeItemFilter extends Consume{
     @Override
     public void build(Tile tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
+        content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
@@ -53,7 +54,7 @@ public class ConsumeItemFilter extends Consume{
     public void trigger(TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
+            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
                 entity.items.remove(item, 1);
                 break;
             }
@@ -64,7 +65,7 @@ public class ConsumeItemFilter extends Consume{
     public boolean valid(TileEntity entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.test(item)){
+            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
                 return true;
             }
         }

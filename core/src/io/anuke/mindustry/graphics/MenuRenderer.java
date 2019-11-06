@@ -2,7 +2,7 @@ package io.anuke.mindustry.graphics;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.PositionConsumer;
+import io.anuke.arc.func.Floatc2;
 import io.anuke.arc.graphics.Camera;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
@@ -282,7 +282,7 @@ public class MenuRenderer implements Disposable{
         });
     }
 
-    private void flyers(PositionConsumer cons){
+    private void flyers(Floatc2 cons){
         float tw = width * tilesize * 1f + tilesize;
         float th = height * tilesize * 1f + tilesize;
         float range = 500f;
@@ -291,7 +291,7 @@ public class MenuRenderer implements Disposable{
         for(int i = 0; i < flyers; i++){
             Tmp.v1.trns(flyerRot, time * (2f + flyerType.speed));
 
-            cons.accept((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % (tw + Mathf.randomSeed(i + 5, 0, 500)),
+            cons.get((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % (tw + Mathf.randomSeed(i + 5, 0, 500)),
             (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3.4f) + offset) % th);
         }
     }

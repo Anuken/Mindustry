@@ -37,7 +37,7 @@ public class LoopControl{
                 }
             }else{
                 if(data.curVolume <= 0.01f){
-                    sound.stop(data.soundID);
+                    sound.stop();
                     data.soundID = -1;
                     return;
                 }

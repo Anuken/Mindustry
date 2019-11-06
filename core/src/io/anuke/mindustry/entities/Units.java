@@ -1,8 +1,8 @@
 package io.anuke.mindustry.entities;
 
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.func.Cons;
+import io.anuke.arc.func.Boolf;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Rectangle;
@@ -78,12 +78,12 @@ public class Units{
     }
 
     /** Returns the neareset ally tile in a range. */
-    public static TileEntity findAllyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static TileEntity findAllyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         return indexer.findTile(team, x, y, range, pred);
     }
 
     /** Returns the neareset enemy tile in a range. */
-    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Predicate<Tile> pred){
+    public static TileEntity findEnemyTile(Team team, float x, float y, float range, Boolf<Tile> pred){
         if(team == Team.derelict) return null;
 
         for(Team enemy : state.teams.enemiesOf(team)){
@@ -101,12 +101,12 @@ public class Units{
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred){
+    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred){
         return closestTarget(team, x, y, range, unitPred, t -> true);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
-    public static TargetTrait closestTarget(Team team, float x, float y, float range, Predicate<Unit> unitPred, Predicate<Tile> tilePred){
+    public static TargetTrait closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Tile> tilePred){
         if(team == Team.derelict) return null;
 
         Unit unit = closestEnemy(team, x, y, range, unitPred);
@@ -118,14 +118,14 @@ public class Units{
     }
 
     /** Returns the closest enemy of this team. Filter by predicate. */
-    public static Unit closestEnemy(Team team, float x, float y, float range, Predicate<Unit> predicate){
+    public static Unit closestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
         if(team == Team.derelict) return null;
 
         result = null;
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.isDead() || !predicate.test(e)) return;
+            if(e.isDead() || !predicate.get(e)) return;
 
             float dst2 = Mathf.dst2(e.x, e.y, x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
@@ -138,12 +138,12 @@ public class Units{
     }
 
     /** Returns the closest ally of this team. Filter by predicate. */
-    public static Unit closest(Team team, float x, float y, float range, Predicate<Unit> predicate){
+    public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate){
         result = null;
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.test(e)) return;
+            if(!predicate.get(e)) return;
 
             float dist = Mathf.dst2(e.x, e.y, x, y);
             if(result == null || dist < cdist){
@@ -156,32 +156,32 @@ public class Units{
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Team team, float x, float y, float width, float height, Consumer<Unit> cons){
+    public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
         unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
         playerGroup.intersect(x, y, width, height, player -> {
             if(player.getTeam() == team){
-                cons.accept(player);
+                cons.get(player);
             }
         });
     }
 
     /** Iterates over all units in a circle around this position. */
-    public static void nearby(Team team, float x, float y, float radius, Consumer<Unit> cons){
+    public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
         unitGroups[team.ordinal()].intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.withinDst(x, y, radius)){
-                cons.accept(unit);
+                cons.get(unit);
             }
         });
 
         playerGroup.intersect(x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.getTeam() == team && unit.withinDst(x, y, radius)){
-                cons.accept(unit);
+                cons.get(unit);
             }
         });
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(float x, float y, float width, float height, Consumer<Unit> cons){
+    public static void nearby(float x, float y, float width, float height, Cons<Unit> cons){
         for(Team team : Team.all){
             unitGroups[team.ordinal()].intersect(x, y, width, height, cons);
         }
@@ -190,12 +190,12 @@ public class Units{
     }
 
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Rectangle rect, Consumer<Unit> cons){
+    public static void nearby(Rectangle rect, Cons<Unit> cons){
         nearby(rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, float x, float y, float width, float height, Consumer<Unit> cons){
+    public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
         EnumSet<Team> targets = state.teams.enemiesOf(team);
 
         for(Team other : targets){
@@ -204,18 +204,18 @@ public class Units{
 
         playerGroup.intersect(x, y, width, height, player -> {
             if(targets.contains(player.getTeam())){
-                cons.accept(player);
+                cons.get(player);
             }
         });
     }
 
     /** Iterates over all units that are enemies of this team. */
-    public static void nearbyEnemies(Team team, Rectangle rect, Consumer<Unit> cons){
+    public static void nearbyEnemies(Team team, Rectangle rect, Cons<Unit> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
     /** Iterates over all units. */
-    public static void all(Consumer<Unit> cons){
+    public static void all(Cons<Unit> cons){
         for(Team team : Team.all){
             unitGroups[team.ordinal()].all().each(cons);
         }

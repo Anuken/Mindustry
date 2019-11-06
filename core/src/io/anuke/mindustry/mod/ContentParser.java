@@ -6,7 +6,7 @@ import io.anuke.arc.audio.mock.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
@@ -39,7 +39,19 @@ public class ContentParser{
     private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(StatusEffect.class, (type, data) -> field(StatusEffects.class, data));
-        put(Loadout.class, (type, data) -> field(Loadouts.class, data));
+        put(Schematic.class, (type, data) -> {
+            Object result = fieldOpt(Loadouts.class, data);
+            if(result != null){
+                return result;
+            }else{
+                String str = data.asString();
+                if(str.startsWith(Schematics.base64Header)){
+                    return Schematics.readBase64(str);
+                }else{
+                    return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));
+                }
+            }
+        });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
@@ -242,7 +254,7 @@ public class ContentParser{
         return (T)c;
     }
 
-    private <T extends Content> TypeParser<T> parser(ContentType type, Function<String, T> constructor){
+    private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
             if(Vars.content.getByName(type, name) != null){
@@ -366,7 +378,7 @@ public class ContentParser{
         }
     }
 
-    private <T> Supplier<T> supply(Class<T> type){
+    private <T> Prov<T> supply(Class<T> type){
         try{
             java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
             return () -> {

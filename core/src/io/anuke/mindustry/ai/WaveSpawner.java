@@ -2,7 +2,7 @@ package io.anuke.mindustry.ai;
 
 import io.anuke.arc.Events;
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.PositionConsumer;
+import io.anuke.arc.func.Floatc2;
 import io.anuke.arc.math.Angles;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
@@ -99,17 +99,17 @@ public class WaveSpawner{
         }
     }
 
-    private void eachFlyerSpawn(PositionConsumer cons){
+    private void eachFlyerSpawn(Floatc2 cons){
         for(FlyerSpawn spawn : flySpawns){
             float trns = (world.width() + world.height()) * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(spawn.angle, trns), -margin, world.width() * tilesize + margin);
             float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(spawn.angle, trns), -margin, world.height() * tilesize + margin);
-            cons.accept(spawnX, spawnY);
+            cons.get(spawnX, spawnY);
         }
 
         if(state.rules.attackMode && state.teams.isActive(waveTeam)){
             for(Tile core : state.teams.get(waveTeam).cores){
-                cons.accept(core.worldx(), core.worldy());
+                cons.get(core.worldx(), core.worldy());
             }
         }
     }

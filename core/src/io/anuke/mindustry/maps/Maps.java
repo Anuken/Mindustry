@@ -6,16 +6,16 @@ import io.anuke.arc.assets.loaders.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.Content;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.MapPreviewLoader.*;
 import io.anuke.mindustry.maps.filters.*;
@@ -223,10 +223,10 @@ public class Maps{
 
     /** Attempts to run the following code;
      * catches any errors and attempts to display them in a readable way.*/
-    public void tryCatchMapError(ExceptionRunnable run){
+    public void tryCatchMapError(UnsafeRunnable run){
         try{
             run.run();
-        }catch(Exception e){
+        }catch(Throwable e){
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
@@ -357,7 +357,7 @@ public class Maps{
         Core.app.post(() -> previewList.add(map));
     }
 
-    private void createNewPreview(Map map, Consumer<Exception> failed){
+    private void createNewPreview(Map map, Cons<Exception> failed){
         try{
             //if it's here, then the preview failed to load or doesn't exist, make it
             //this has to be done synchronously!
@@ -372,7 +372,7 @@ public class Maps{
                 }
             });
         }catch(Exception e){
-            failed.accept(e);
+            failed.get(e);
             Log.err("Failed to generate preview!", e);
         }
     }

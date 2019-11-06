@@ -12,7 +12,7 @@ import android.telephony.*;
 import io.anuke.arc.*;
 import io.anuke.arc.backends.android.surfaceview.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.Cons;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.serialization.*;
@@ -70,7 +70,7 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -81,7 +81,7 @@ public class AndroidLauncher extends AndroidApplication{
 
                             if(uri.getPath().contains("(invalid)")) return;
 
-                            Core.app.post(() -> Core.app.post(() -> cons.accept(new FileHandle(uri.getPath()){
+                            Core.app.post(() -> Core.app.post(() -> cons.get(new FileHandle(uri.getPath()){
                                 @Override
                                 public InputStream read(){
                                     try{
@@ -106,9 +106,9 @@ public class AndroidLauncher extends AndroidApplication{
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
                     chooser = new FileChooser(open ? "$open" : "$save", file -> file.extension().equalsIgnoreCase(extension), open, file -> {
                         if(!open){
-                            cons.accept(file.parent().child(file.nameWithoutExtension() + "." + extension));
+                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
-                            cons.accept(file);
+                            cons.get(file);
                         }
                     });
 
