@@ -88,7 +88,7 @@ public class DesktopInput extends InputHandler{
                 drawRequest(lineRequests.get(i));
             }
         }else if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, Core.input.keyDown(Binding.dash));
         }else if(isPlacing()){
             if(block.rotate){
                 drawArrow(block, cursorX, cursorY, rotation);
@@ -406,7 +406,11 @@ public class DesktopInput extends InputHandler{
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                removeSelection(selectX, selectY, cursorX, cursorY);
+                if (Core.input.keyDown(Binding.dash)){
+//                    upgradeSelection(selectX, selectY, cursorX, cursorY);
+//                } else {
+                    removeSelection(selectX, selectY, cursorX, cursorY);
+                }
             }
 
             if(selected != null){
