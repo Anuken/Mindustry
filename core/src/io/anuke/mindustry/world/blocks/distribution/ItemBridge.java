@@ -236,6 +236,10 @@ public class ItemBridge extends Block{
         Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
         Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
+        int opacityPercentage = Core.settings.getInt("bridgeopacity");
+        if(opacityPercentage == 0) return;
+
+        Draw.alpha(opacityPercentage / 100f);
         Lines.stroke(8f);
         Lines.line(bridgeRegion,
         tile.worldx(),
