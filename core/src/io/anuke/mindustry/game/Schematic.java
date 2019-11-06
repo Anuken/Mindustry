@@ -7,6 +7,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -37,6 +38,16 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         }
         stacks.sort();
         return stacks;
+    }
+
+    public boolean hasCore(){
+        return tiles.contains(s -> s.block instanceof CoreBlock);
+    }
+
+    public @NonNull CoreBlock findCore(){
+        CoreBlock block = (CoreBlock)tiles.find(s -> s.block instanceof CoreBlock).block;
+        if(block == null) throw new IllegalArgumentException("Schematic is missing a core!");
+        return block;
     }
 
     public String name(){

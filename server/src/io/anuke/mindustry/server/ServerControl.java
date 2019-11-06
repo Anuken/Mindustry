@@ -211,19 +211,26 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
             if(lastTask != null) lastTask.cancel();
+            
+            Map result;
+            if(arg.length > 0){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
-            Map result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
-
-            if(result == null){
-                err("No map with name &y'{0}'&lr found.", arg[0]);
-                return;
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", arg[0]);
+                    return;
+                }
+            }else{
+                Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
+                result = maps.random();
+                info("Randomized next map to be {0}.", result.name());
             }
 
             Gamemode preset = Gamemode.survival;

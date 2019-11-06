@@ -225,7 +225,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         game.checkPref("savecreate", true);
-
+        game.checkPref("blockreplace", true);
+        game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
 
         if(steam && !Version.modifier.contains("beta")){
@@ -292,6 +293,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("effects", true);
+        graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);

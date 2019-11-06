@@ -1,11 +1,11 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.mindustry.type.Loadout;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.world.*;
 
 public abstract class Generator{
     public int width, height;
-    protected Loadout loadout;
+    protected Schematic loadout;
 
     public Generator(int width, int height){
         this.width = width;
@@ -15,7 +15,7 @@ public abstract class Generator{
     public Generator(){
     }
 
-    public void init(Loadout loadout){
+    public void init(Schematic loadout){
         this.loadout = loadout;
     }
 

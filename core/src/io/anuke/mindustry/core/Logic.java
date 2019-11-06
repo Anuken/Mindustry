@@ -18,6 +18,8 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
 import io.anuke.mindustry.world.blocks.power.*;
 
+import java.util.*;
+
 import static io.anuke.mindustry.Vars.*;
 
 /**
@@ -79,14 +81,12 @@ public class Logic implements ApplicationListener{
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-
-                //painful O(n) iteration + copy
-                for(int i = 0; i < data.brokenBlocks.size; i++){
-                    BrokenBlock b = data.brokenBlocks.get(i);
+                Iterator<BrokenBlock> it = data.brokenBlocks.iterator();
+                while(it.hasNext()){
+                    BrokenBlock b = it.next();
                     Block block = content.block(b.block);
                     if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
-                        data.brokenBlocks.removeIndex(i);
-                        break;
+                        it.remove();
                     }
                 }
             }

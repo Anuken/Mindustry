@@ -16,7 +16,6 @@ import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import static io.anuke.mindustry.Vars.*;
 
 public class Build{
-    private static final Rectangle rect = new Rectangle();
 
     /** Returns block type that was broken, or null if unsuccesful. */
     @Remote(called = Loc.server)

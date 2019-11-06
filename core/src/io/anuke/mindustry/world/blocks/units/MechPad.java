@@ -44,11 +44,6 @@ public class MechPad extends Block{
         stats.add(BlockStat.productionTime, buildTime / 60f, StatUnit.seconds);
     }
 
-    @Override
-    public boolean shouldConsume(Tile tile){
-        return false;
-    }
-
     @Remote(targets = Loc.both, called = Loc.server)
     public static void onMechFactoryTap(Player player, Tile tile){
         if(player == null || !(tile.block() instanceof MechPad) || !checkValidTap(tile, player)) return;
