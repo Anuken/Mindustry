@@ -278,8 +278,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
         public @Nullable Block block;
         /** Whether this is a break request.*/
         public boolean breaking;
-        /** Whether this is an upgrade request.*/
-        public boolean upgrade;
         /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
         public boolean hasConfig;
         /** Config int. Not used unless hasConfig is true.*/

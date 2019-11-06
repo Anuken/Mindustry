@@ -209,9 +209,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawBreaking(BuildRequest request){
-        if(request.upgrade){
-            drawUpgrade(request.x, request.y);
-        }else if(request.breaking){
+        if(request.breaking){
             drawBreaking(request.x, request.y);
         }else{
             drawSelected(request.x, request.y, request.block, Pal.remove);
@@ -230,17 +228,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         drawSelected(x, y, block, Pal.remove);
     }
-
-    public void drawUpgrade(int x, int y){
-        Tile tile = world.ltile(x, y);
-        if(tile == null) return;
-        Block block = tile.block();
-
-        if (block.getUpgrade(tile) == null) return;
-
-        drawSelected(x, y, block, Pal.upgrade);
-    }
-
 
     public void useSchematic(Schematic schem){
         selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
@@ -380,7 +367,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    protected void drawBreakSelection(int x1, int y1, int x2, int y2, boolean upgrade){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -389,11 +376,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Tile tile = world.ltile(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
-                if (upgrade){
-                    drawUpgrade(tile.x, tile.y);
-                }else{
-                    drawBreaking(tile.x, tile.y);
-                }
+                drawBreaking(tile.x, tile.y);
             }
         }
 
@@ -409,12 +392,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-
         for(BuildRequest req : selectRequests){
             if(req.breaking) continue;
-            if(upgrade){
-                req.upgrade = true;
-            }
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
             }
@@ -429,10 +408,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Lines.stroke(2f);
 
-
-        Draw.color(upgrade ? Pal.upgradeBack : Pal.removeBack);
+        Draw.color(Pal.removeBack);
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-        Draw.color(upgrade ? Pal.upgrade : Pal.remove);
+        Draw.color(Pal.remove);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
@@ -489,11 +467,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         removeSelection(x1, y1, x2, y2, false);
     }
 
-//    /** Upgrade everything from the queue in a selection. */
-//    protected void upgradeSelection(int x1, int y1, int x2, int y2){
-//        removeSelection(x1, y1, x2, y2, false);
-//    }
-
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
         NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
@@ -521,7 +494,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         while(it.hasNext()){
             BuildRequest req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
-//                it.remove();
+                it.remove();
             }
         }
 
@@ -807,11 +780,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void breakBlock(int x, int y){
         Tile tile = world.ltile(x, y);
-        Block block = tile.block();
-
-        if (block.getUpgrade(tile) != null){
-            player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), content.block(block.getUpgrade(tile).id)).configure(tile.entity.config()));
-        }
+        player.addBuildRequest(new BuildRequest(tile.x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){
