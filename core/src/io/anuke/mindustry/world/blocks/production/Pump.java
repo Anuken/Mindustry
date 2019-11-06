@@ -56,8 +56,8 @@ public class Pump extends LiquidBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
-        super.drawPlace(x, y, rotation, valid);
         Tile tile = world.tile(x, y);
+        if(tile == null) return;
 
         float tiles = 0f;
         Liquid liquidDrop = null;
@@ -69,7 +69,7 @@ public class Pump extends LiquidBlock{
             }
         }
 
-        if (liquidDrop != null){
+        if(liquidDrop != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", tiles * pumpAmount / size / size * 60f, 0), x, y, valid);
             float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
             Draw.mixcol(Color.darkGray, 1f);

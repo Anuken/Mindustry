@@ -41,6 +41,10 @@ public abstract class BlockStorage extends UnlockableContent{
         return true;
     }
 
+    public boolean productionValid(Tile tile){
+        return true;
+    }
+
     public float getPowerProduction(Tile tile){
         return 0f;
     }
