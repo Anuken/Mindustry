@@ -775,22 +775,26 @@ public class Blocks implements ContentList{
 
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, ItemStack.with(Items.copper, 6));
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 80 * wallHealthMultiplier;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
+            flags = EnumSet.of(BlockFlag.upgradable);
             requirements(Category.defense, ItemStack.with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
         }};
@@ -809,11 +813,13 @@ public class Blocks implements ContentList{
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
+            flags = EnumSet.of(BlockFlag.upgradable);
             requirements(Category.defense, ItemStack.with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
+            flags = EnumSet.of(BlockFlag.upgradable);
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
@@ -907,12 +913,14 @@ public class Blocks implements ContentList{
 
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1), true);
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 45;
             speed = 0.03f;
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, ItemStack.with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 65;
             speed = 0.08f;
         }};
@@ -1004,6 +1012,7 @@ public class Blocks implements ContentList{
 
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.metaglass, 1));
+            flags = EnumSet.of(BlockFlag.upgradable);
             health = 45;
         }};
 
@@ -1155,6 +1164,7 @@ public class Blocks implements ContentList{
 
         mechanicalDrill = new Drill("mechanical-drill"){{
             requirements(Category.production, ItemStack.with(Items.copper, 12), true);
+            flags = EnumSet.of(BlockFlag.upgradable);
             tier = 2;
             drillTime = 600;
             size = 2;

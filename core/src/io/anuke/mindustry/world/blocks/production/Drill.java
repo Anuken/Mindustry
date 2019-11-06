@@ -303,6 +303,16 @@ public class Drill extends Block{
     }
 
     @Override
+    public Block getUpgrade(Tile tile){
+
+        if(tile.block() == Blocks.mechanicalDrill){
+            return Blocks.pneumaticDrill;
+        }
+
+        return super.getUpgrade(tile);
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new DrillEntity();
     }

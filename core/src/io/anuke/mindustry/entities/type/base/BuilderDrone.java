@@ -11,9 +11,12 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.type.ItemStack;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.modules.ItemModule;
 
 import java.io.*;
 
@@ -191,11 +194,43 @@ public class BuilderDrone extends BaseDrone implements BuilderTrait{
                         placeQueue.addFirst(new BuildRequest(block.x, block.y, block.rotation, content.block(block.block)).configure(block.config));
                         setState(build);
                     }
+                }else{
+                    for(Tile tile : indexer.getAllied(team, BlockFlag.upgradable)){
+
+                        Block upgrade = tile.block().getUpgrade(tile);
+                        if (upgrade == null || !canAfford(data, upgrade)) continue;
+
+                        placeQueue.addFirst(new BuildRequest(tile.x, tile.y, tile.rotation(), content.block(upgrade.id)).configure(tile.entity.config()));
+                        break;
+                    }
                 }
             }
         }
 
         updateBuilding();
+    }
+
+    /**
+     * Can the drone afford to fully build this?
+     *
+     * - includes 5x safety margin, to avoid draining the team dry
+     *
+     * @param team
+     * @param upgrade
+     * @return
+     */
+    protected boolean canAfford(TeamData team, Block upgrade){
+
+        if(Vars.state.rules.infiniteResources) return true;
+
+        ItemModule available = team.cores.first().entity.items;
+        for(ItemStack resource : upgrade.requirements){
+            if(available.get(resource.item) * 5 <= resource.amount){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

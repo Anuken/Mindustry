@@ -4,6 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.arc.math.Mathf;
+import io.anuke.mindustry.content.Blocks;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockGroup;
@@ -50,5 +51,35 @@ public class Wall extends Block{
     @Override
     public boolean canReplace(Block other){
         return super.canReplace(other) && health > other.health;
+    }
+
+    @Override
+    public Block getUpgrade(Tile tile){
+
+        if(tile.block() == Blocks.copperWall){
+            return Blocks.titaniumWall;
+        }
+
+        if(tile.block() == Blocks.copperWallLarge){
+            return Blocks.titaniumWallLarge;
+        }
+
+        if(tile.block() == Blocks.titaniumWall){
+            return Blocks.thoriumWall;
+        }
+
+        if(tile.block() == Blocks.titaniumWallLarge){
+            return Blocks.thoriumWallLarge;
+        }
+
+        if(tile.block() == Blocks.thoriumWall){
+            return Blocks.surgeWall;
+        }
+
+        if(tile.block() == Blocks.thoriumWallLarge){
+            return Blocks.surgeWallLarge;
+        }
+
+        return super.getUpgrade(tile);
     }
 }

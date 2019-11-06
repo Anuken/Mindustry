@@ -261,6 +261,20 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
+    public Block getUpgrade(Tile tile){
+
+        if(tile.block() == Blocks.conveyor){
+            return Blocks.titaniumConveyor;
+        }
+
+        if(tile.block() == Blocks.titaniumConveyor){
+            return Blocks.armoredConveyor;
+        }
+
+        return super.getUpgrade(tile);
+    }
+
+    @Override
     public int removeStack(Tile tile, Item item, int amount){
         ConveyorEntity entity = tile.entity();
         entity.noSleep();

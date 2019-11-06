@@ -558,6 +558,11 @@ public class Block extends BlockStorage{
         return this;
     }
 
+    /** @return a possible upgrade for this block used when a builder drone is idle. */
+    public Block getUpgrade(Tile tile){
+        return null;
+    }
+
     public float handleDamage(Tile tile, float amount){
         return amount;
     }
