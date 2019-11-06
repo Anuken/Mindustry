@@ -814,13 +814,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+        boolean follower = Core.input.keyDown(Binding.dash);
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;
         }
 
         if(diagonal){
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
-        }else if(Core.input.keyDown(Binding.dash)){
+        }else if(follower){
             points = Placement.followLine(startX, startY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
@@ -828,6 +829,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         float angle = Angles.angle(startX, startY, endX, endY);
         int baseRotation = rotation;
+        int lastRotation = baseRotation;
         if(!overrideLineRotation || diagonal){
             baseRotation = (startX == endX && startY == endY) ? rotation : ((int)((angle + 45) / 90f)) % 4;
         }
@@ -845,10 +847,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.x = point.x;
             line.y = point.y;
             if(!overrideLineRotation || diagonal){
-                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : (follower ? lastRotation : baseRotation);
             }else{
                 line.rotation = rotation;
             }
+            lastRotation = line.rotation;
             line.last = next == null;
             cons.get(line);
 
