@@ -56,6 +56,25 @@ public class Placement{
         return points;
     }
 
+    public static Array<Point2> followLine(int startX, int startY){
+        Pools.freeAll(points);
+        points.clear();
+
+        Tile tile = world.ltile(startX, startY);
+        Block block = tile.block();
+
+        while(true){
+            Tile next = tile.getNearby(tile.rotation());
+            points.add(new Point2(tile.x, tile.y));
+            if (next.block() == block){
+                tile = next;
+            }else{
+                break;
+            }
+        }
+        return points;
+    }
+
     private static float tileHeuristic(Tile tile, Tile other){
         Block block = control.input.block;
 

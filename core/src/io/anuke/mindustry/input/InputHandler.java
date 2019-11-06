@@ -789,6 +789,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
+        if(Core.input.keyDown(Binding.dash) && valid){
+            Draw.color(Pal.upgradeBack);
+        }
+
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset() - 1,
@@ -796,6 +800,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
+        if(Core.input.keyDown(Binding.dash) && valid){
+            Draw.color(Pal.upgrade);
+        }
+
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset(),
         y * tilesize + block.offset(),
@@ -812,6 +820,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(diagonal){
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+        }else if(Core.input.keyDown(Binding.dash)){
+            points = Placement.followLine(startX, startY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
