@@ -255,77 +255,41 @@ public class Block extends BlockStorage{
 
     public void drawFestive(Tile tile){
         if (size == 3){
-//            TextureRegion festive = Core.atlas.find("festive-" + size + "-" + 0);
-//            Draw.rect(festive, tile.drawx(), tile.drawy(), (id%4)*90);
-
-//            Draw.color(Pal.);
-//            Drawf.circles(tile.drawx(), tile.drawy(), 0.2f, Pal.remove);
-
-            int sidelength = tilesize * size;
-
-////            Log.info(tilesize);
-//            Draw.color(Pal.remove);
-////            Lines.circle(tile.drawx() + 10, tile.drawy() + 5, 0.5f);
-//            Lines.poly(tile.drawx(), tile.drawy(), 4, sidelength / 2, 45);
-//            Draw.reset();
-
-//            Draw.color(Pal.remove);
-            Vector2 vector = new Vector2();
-            int sides = 4;
-            int radius = sidelength / 2;
-            float x = tile.drawx();
-            float y = tile.drawy();
-
-            for(int i = 0; i < sides; ++i) {
-                vector.set(radius, 0.0F).setAngle(360.0F / (float)sides * (float)i + 45 + 90.0F);
-                float x1 = vector.x;
-                float y1 = vector.y;
-                vector.set(radius, 0.0F).setAngle(360.0F / (float)sides * (float)(i + 1) + 45 + 90.0F);
-//                Lines.line(x1 + x, y1 + y, vector.x + x, vector.y + y);
-//                Lines.dashLine(x1 + x, y1 + y, vector.x + x, vector.x + x, 10);
-                dashDot(x1 + x, y1 + y, vector.x + x, vector.y + y, 10);
-
-                //
-
-//                float a1 = x1 + x;
-//                float b1 = vector.x + x;
-//
-//                float a2 = y1 + y;
-//                float b2 = y1 + y;
-//
-//                float dx = vector.x + x - x1;
-//                float dy = vector.y + y - y1;
-//                float divisions = 10;
-//
-//                for(int j = 0; i < 10; ++i) {
-//                    if (i % 2 == 0) {
-//                        Lines.line(x1 + (float)i / (float)divisions * dx, y1 + (float)i / (float)divisions * dy, x1 + ((float)i + 1.0F) / (float)divisions * dx, y1 + ((float)i + 1.0F) / (float)divisions * dy);
-//                    }
-//                }
-            }
+            fixtures(tile);
             Draw.reset();
         }
     }
 
-    private static void dashDot(float x1, float y1, float x2, float y2, int divisions) {
-        float dx = x2 - x1;
-        float dy = y2 - y1;
+    private void fixtures(Tile tile){
+        int radius = tilesize * size / 2;
+        Vector2 vector = new Vector2();
 
-        for(int i = 0; i < divisions; ++i) {
-            if (i % 2 == 0) {
-//                Lines.line(x1 + (float)i / (float)divisions * dx, y1 + (float)i / (float)divisions * dy, x1 + ((float)i + 1.0F) / (float)divisions * dx, y1 + ((float)i + 1.0F) / (float)divisions * dy);
-//                Lines.line(x1 + (float)i / (float)divisions * dx, y1 + (float)i / (float)divisions * dy, x1 + ((float)i + 1.0F) / (float)divisions * dx, y1 + ((float)i + 1.0F) / (float)divisions * dy);
+        float x = tile.drawx();
+        float y = tile.drawy();
 
-                if (i % 4 == 0){
-                    Draw.color(Pal.remove);
-                } else {
-                    Draw.color(Pal.plastanium);
+        for(int i = 0; i < 4; ++i) {
+            vector.set(radius, 0.0F).setAngle(360.0F / (float)4 * (float)i + 45 + 90.0F);
+            float x1 = vector.x;
+            float y1 = vector.y;
+            vector.set(radius, 0.0F).setAngle(360.0F / (float)4 * (float)(i + 1) + 45 + 90.0F);
+
+            float dx = (vector.x + x) - (x1 + x);
+            float dy = (vector.y + y) - (y1 + y);
+            int divisions = 10;
+
+            for(int j = 0; j < divisions; ++j) {
+                if (j % 2 == 0) {
+
+                    if (j % 4 == 0){
+                        Draw.color(Pal.remove);
+                    } else {
+                        Draw.color(Pal.plastanium);
+                    }
+
+                    Lines.circle((x1 + x) + (float)j / (float)divisions * dx, (y1 + y) + (float)j / (float)divisions * dy, 0.5f);
                 }
-
-                Lines.circle(x1 + (float)i / (float)divisions * dx, y1 + (float)i / (float)divisions * dy, 0.5f);
             }
         }
-
     }
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
