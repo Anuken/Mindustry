@@ -31,9 +31,4 @@ public class ItemImage extends Stack{
             add(t);
         }
     }
-
-    @Override
-    public void draw() {
-        super.draw();
-    }
 }
