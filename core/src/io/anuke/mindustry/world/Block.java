@@ -676,9 +676,7 @@ public class Block extends BlockStorage{
 
     public void displayBars(Tile tile, Table table){
         for(Func<TileEntity, Bar> bar : bars.list()){
-            Bar foo = bar.get(tile.entity);
-            if (foo == null) continue;
-            table.add(foo).growX();
+            table.add(bar.get(tile.entity)).growX();
             table.row();
         }
     }
