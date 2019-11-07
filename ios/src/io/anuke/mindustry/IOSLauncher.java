@@ -58,7 +58,18 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         if(documentURLs.size() < 1) return;
 
                         cont.dismissViewController(true, () -> {});
-                        controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> cons.get(Core.files.absolute(url.getPath())));
+
+                        try{
+                            controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> {
+                                try{
+                                    cons.get(Core.files.absolute(url.getPath()));
+                                }catch(Throwable t){
+                                    ui.showException(t);
+                                }
+                            });
+                        }catch(Throwable t){
+                            ui.showException(t);
+                        }
                     }
 
                     @Override
