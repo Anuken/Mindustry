@@ -7,6 +7,8 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Scl;
 import io.anuke.mindustry.graphics.Pal;
+import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.world.modules.ItemModule;
 
 public class ReqImage extends Stack{
     private final Boolp valid;
@@ -28,6 +30,15 @@ public class ReqImage extends Stack{
                 Draw.reset();
             }
         });
+    }
+
+    public ReqImage(ItemModule module, Item item, Boolp valid){
+        this(new Element(){
+            @Override
+            public void draw(){
+                (new ItemImage(item.icon(Cicon.medium), module.get(item))).draw();
+            }
+        }, valid);
     }
 
     public ReqImage(TextureRegion region, Boolp valid){
