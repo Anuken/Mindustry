@@ -274,7 +274,7 @@ public class BlockRenderer implements Disposable{
                 if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
                     block.drawTeam(request.tile);
                 }
-                if(true){ // todo: replace with december 25th date check
+                if(request.tile.entity != null && true){ // todo: replace with december 25th date check
                     block.drawFestive(request.tile);
                 }
             }else if(request.layer == block.layer){

@@ -254,16 +254,28 @@ public class Block extends BlockStorage{
     }
 
     public void drawFestive(Tile tile){
-        if (size == 3){
+        if (size >= 2){
+            final int[] i = {0};
             fixtures(tile, fixture -> {
+                if (i[0]++ % 2 == 0){
+                    Draw.color(Pal.remove);
+                } else {
+                    Draw.color(Pal.plastanium);
+                }
                 Lines.circle(fixture.x, fixture.y, 0.5f);
             });
             Draw.reset();
         }
     }
 
+    /**
+     * Gets coordinates of dots around the edge of the block.
+     *
+     * @param tile
+     * @param cons
+     */
     private void fixtures(Tile tile, Cons<Vector2> cons){
-        int radius = tilesize * size / 2;
+        float radius = tilesize * size / 1.5f;
         Vector2 vector = new Vector2();
 
         float x = tile.drawx();
@@ -277,19 +289,10 @@ public class Block extends BlockStorage{
 
             float dx = (vector.x + x) - (x1 + x);
             float dy = (vector.y + y) - (y1 + y);
-            int divisions = 10;
+            int divisions = size * 2;
 
             for(int j = 0; j < divisions; ++j) {
-                if (j % 2 == 0) {
-
-                    if (j % 4 == 0){
-                        Draw.color(Pal.remove);
-                    } else {
-                        Draw.color(Pal.plastanium);
-                    }
-
-                    cons.get(new Vector2((x1 + x) + (float)j / (float)divisions * dx, (y1 + y) + (float)j / (float)divisions * dy));
-                }
+                cons.get(new Vector2((x1 + x) + (float)j / (float)divisions * dx, (y1 + y) + (float)j / (float)divisions * dy));
             }
         }
     }
