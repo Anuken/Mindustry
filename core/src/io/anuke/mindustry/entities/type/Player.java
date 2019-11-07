@@ -357,8 +357,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawOver(){
         if(dead) return;
 
-        if(isBuilding()){
-            if(!state.isPaused() && isBuilding){
+        if(isBuilding() && isBuilding){
+            if(!state.isPaused()){
                 drawBuilding();
             }
         }else{
@@ -458,7 +458,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         //mine only when not building
-        if(buildRequest() == null){
+        if(buildRequest() == null || !isBuilding){
             updateMining();
         }
     }

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.maps.*;
@@ -10,9 +10,9 @@ import static io.anuke.mindustry.Vars.ui;
 
 public class MapSaveDialog extends FloatingDialog{
     private TextField field;
-    private Consumer<String> listener;
+    private Cons<String> listener;
 
-    public MapSaveDialog(Consumer<String> cons){
+    public MapSaveDialog(Cons<String> cons){
         super("$editor.savemap");
         field = new TextField();
         listener = cons;
@@ -43,7 +43,7 @@ public class MapSaveDialog extends FloatingDialog{
         TextButton button = new TextButton("$save");
         button.clicked(() -> {
             if(!invalid()){
-                cons.accept(field.getText());
+                cons.get(field.getText());
                 hide();
             }
         });
@@ -53,7 +53,7 @@ public class MapSaveDialog extends FloatingDialog{
 
     public void save(){
         if(!invalid()){
-            listener.accept(field.getText());
+            listener.get(field.getText());
         }else{
             ui.showErrorMessage("$editor.failoverwrite");
         }

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
@@ -62,6 +62,11 @@ public class Sorter extends Block{
         Draw.color(entity.sortItem.color);
         Draw.rect("center", tile.worldx(), tile.worldy());
         Draw.color();
+    }
+
+    @Override
+    public int minimapColor(Tile tile){
+        return tile.<SorterEntity>entity().sortItem == null ? 0 : tile.<SorterEntity>entity().sortItem.color.rgba();
     }
 
     @Override

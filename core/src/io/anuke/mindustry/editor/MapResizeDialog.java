@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.gen.*;
@@ -10,7 +10,7 @@ public class MapResizeDialog extends FloatingDialog{
     private static final int minSize = 50, maxSize = 500, increment = 50;
     int width, height;
 
-    public MapResizeDialog(MapEditor editor, IntPositionConsumer cons){
+    public MapResizeDialog(MapEditor editor, Intc2 cons){
         super("$editor.resizemap");
         shown(() -> {
             cont.clear();
@@ -47,7 +47,7 @@ public class MapResizeDialog extends FloatingDialog{
         buttons.defaults().size(200f, 50f);
         buttons.addButton("$cancel", this::hide);
         buttons.addButton("$ok", () -> {
-            cons.accept(width, height);
+            cons.get(width, height);
             hide();
         });
     }

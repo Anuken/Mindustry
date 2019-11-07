@@ -106,9 +106,8 @@ public class MenuFragment extends Fragment{
             container.add(play);
             container.add(join);
             container.add(custom);
-            if(ios) container.row();
             container.add(maps);
-            if(!ios) container.row();
+            container.row();
 
             container.table(table -> {
                 table.defaults().set(container.defaults());
@@ -165,6 +164,7 @@ public class MenuFragment extends Fragment{
                 ),
                 new Buttoni("$editor", Icon.editorSmall, ui.maps::show), steam ? new Buttoni("$workshop", Icon.saveSmall, platform::openWorkshop) : null,
                 new Buttoni(Core.bundle.get("mods") + "\n" + Core.bundle.get("mods.alpha"), Icon.wikiSmall, ui.mods::show),
+                new Buttoni("$schematics", Icon.pasteSmall, ui.schematics::show),
                 new Buttoni("$settings", Icon.toolsSmall, ui.settings::show),
                 new Buttoni("$about.button", Icon.infoSmall, ui.about::show),
                 new Buttoni("$quit", Icon.exitSmall, Core.app::exit)

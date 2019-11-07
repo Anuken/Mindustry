@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -17,6 +17,7 @@ import io.anuke.arc.scene.utils.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -38,14 +39,8 @@ public class DeployDialog extends FloatingDialog{
     public DeployDialog(){
         super("", Styles.fullDialog);
 
-        ZoneNode root = new ZoneNode(Zones.groundZero, null);
-
-        BranchTreeLayout layout = new BranchTreeLayout();
-        layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
-        layout.gapBetweenNodes = Scl.scl(120f);
-        layout.layout(root);
-        bounds.set(layout.getBounds());
-        bounds.y += nodeSize*0.4f;
+        treeLayout();
+        Events.on(ContentReloadEvent.class, e -> treeLayout());
 
         addCloseButton();
         buttons.addImageTextButton("$techtree", Icon.tree, () -> ui.tech.show()).size(230f, 64f);
@@ -96,6 +91,18 @@ public class DeployDialog extends FloatingDialog{
             }
         });
 
+    }
+
+    void treeLayout(){
+        nodes.clear();
+        ZoneNode root = new ZoneNode(Zones.groundZero, null);
+
+        BranchTreeLayout layout = new BranchTreeLayout();
+        layout.gapBetweenLevels = layout.gapBetweenNodes = Scl.scl(60f);
+        layout.gapBetweenNodes = Scl.scl(120f);
+        layout.layout(root);
+        bounds.set(layout.getBounds());
+        bounds.y += nodeSize*0.4f;
     }
 
     public void setup(){
@@ -227,10 +234,10 @@ public class DeployDialog extends FloatingDialog{
         if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
-            Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
-            flasher.accept(button.addImage(Icon.locked).get());
+            Cons<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
+            flasher.get(button.addImage(Icon.locked).get());
             button.row();
-            flasher.accept(button.add("$locked").get());
+            flasher.get(button.add("$locked").get());
         }
     }
 

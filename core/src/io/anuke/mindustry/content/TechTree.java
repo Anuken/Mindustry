@@ -104,6 +104,11 @@ public class TechTree implements ContentList{
                         node(door, () -> {
                             node(doorLarge);
                         });
+                        node(plastaniumWall, () -> {
+                            node(plastaniumWallLarge, () -> {
+
+                            });
+                        });
                         node(titaniumWallLarge);
                         node(thoriumWall, () -> {
                             node(thoriumWallLarge);

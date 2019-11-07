@@ -139,7 +139,7 @@ public class OverdriveProjector extends Block{
 
     class OverdriveEntity extends TileEntity{
         float heat;
-        float charge;
+        float charge = Mathf.random(reload);
         float phaseHeat;
 
         @Override

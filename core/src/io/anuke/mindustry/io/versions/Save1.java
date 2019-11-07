@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.mindustry.entities.traits.*;
 
 import java.io.*;
@@ -13,7 +13,7 @@ public class Save1 extends Save2{
 
     @Override
     public void readEntities(DataInput stream) throws IOException{
-        Supplier[] table = LegacyTypeTable.getTable(lastReadBuild);
+        Prov[] table = LegacyTypeTable.getTable(lastReadBuild);
 
         byte groups = stream.readByte();
 

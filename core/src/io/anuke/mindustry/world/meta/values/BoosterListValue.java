@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.gen.*;
@@ -14,9 +14,9 @@ import static io.anuke.mindustry.Vars.content;
 public class BoosterListValue implements StatValue{
     protected float reload, maxUsed, multiplier;
     protected boolean baseReload;
-    protected Predicate<Liquid> filter;
+    protected Boolf<Liquid> filter;
 
-    public BoosterListValue(float reload, float maxUsed, float multiplier, boolean baseReload, Predicate<Liquid> filter){
+    public BoosterListValue(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){
         this.reload = reload;
         this.maxUsed = maxUsed;
         this.baseReload = baseReload;
@@ -30,7 +30,7 @@ public class BoosterListValue implements StatValue{
         table.row();
         table.table(c -> {
             for(Liquid liquid : content.liquids()){
-                if(!filter.test(liquid)) continue;
+                if(!filter.get(liquid)) continue;
 
                 c.addImage(liquid.icon(Cicon.medium)).size(3 * 8).padRight(4).right().top();
                 c.add(liquid.localizedName()).padRight(10).left().top();

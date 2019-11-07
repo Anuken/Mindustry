@@ -225,7 +225,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         game.checkPref("savecreate", true);
-
+        game.checkPref("blockreplace", true);
+        game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
 
         if(steam && !Version.modifier.contains("beta")){
@@ -247,7 +248,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.sliderPref("uiscale", 100, 25, 400, 25, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 400, 5, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
             }
@@ -292,16 +293,17 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("effects", true);
+        graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", false);
+        graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
-        graphics.checkPref("bloom", false, val -> renderer.toggleBloom(val));
+        graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);

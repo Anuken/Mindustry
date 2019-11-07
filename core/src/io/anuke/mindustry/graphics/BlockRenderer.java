@@ -124,7 +124,9 @@ public class BlockRenderer implements Disposable{
         Draw.shader();
     }
 
-    public void drawBroken(){
+    public void drawDestroyed(){
+        if(!Core.settings.getBool("destroyedblocks")) return;
+
         if(control.input.isPlacing() || control.input.isBreaking()){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{

@@ -52,7 +52,7 @@ public class Blocks implements ContentList{
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
-    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
@@ -793,6 +793,19 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+        }};
+
+        plastaniumWall = new Wall("plastanium-wall"){{
+            requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
+            health = 190 * wallHealthMultiplier;
+            insulated = true;
+        }};
+
+        plastaniumWallLarge = new Wall("plastanium-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(plastaniumWall.requirements, 4));
+            health = 190 * wallHealthMultiplier * 4;
+            size = 2;
+            insulated = true;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{

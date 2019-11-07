@@ -87,7 +87,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     @Override
-    public boolean shouldConsume(Tile tile){
+    public boolean productionValid(Tile tile){
         ItemLiquidGeneratorEntity entity = tile.entity();
         return entity.generateTime > 0;
     }

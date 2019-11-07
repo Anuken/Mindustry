@@ -22,14 +22,12 @@ public class MusicControl{
     public Array<Music> darkMusic = Array.with();
     private Music lastRandomPlayed;
     private Interval timer = new Interval();
-    private @Nullable
-    Music current;
+    private @Nullable Music current;
     private float fade;
     private boolean silenced;
 
     public MusicControl(){
         Events.on(ClientLoadEvent.class, e -> reload());
-        Events.on(ContentReloadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {

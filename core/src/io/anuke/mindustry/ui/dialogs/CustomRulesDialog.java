@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
@@ -23,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;
     private Rules rules;
-    private Supplier<Rules> resetter;
+    private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private FloatingDialog banDialog;
 
@@ -108,7 +108,7 @@ public class CustomRulesDialog extends FloatingDialog{
         }).size(300f, 64f);
     }
 
-    public void show(Rules rules, Supplier<Rules> resetter){
+    public void show(Rules rules, Prov<Rules> resetter){
         this.rules = rules;
         this.resetter = resetter;
         show();
@@ -173,16 +173,16 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
     }
 
-    void number(String text, FloatConsumer cons, FloatProvider prov){
+    void number(String text, Floatc cons, Floatp prov){
         number(text, false, cons, prov, () -> true);
     }
 
-    void number(String text, boolean integer, FloatConsumer cons, FloatProvider prov, BooleanProvider condition){
+    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
-            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
+            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(Strings::canParsePositiveFloat).width(120f).left().get());
@@ -190,11 +190,11 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
     }
 
-    void check(String text, BooleanConsumer cons, BooleanProvider prov){
+    void check(String text, Boolc cons, Boolp prov){
         check(text, cons, prov, () -> true);
     }
 
-    void check(String text, BooleanConsumer cons, BooleanProvider prov, BooleanProvider condition){
+    void check(String text, Boolc cons, Boolp prov, Boolp condition){
         main.addCheck(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
         main.row();
     }

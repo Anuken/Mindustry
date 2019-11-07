@@ -48,11 +48,11 @@ public class DesktopInput extends InputHandler{
             t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.name())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.name())).style(Styles.outlineLabel);
+                b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.name())).style(Styles.outlineLabel);
+                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
@@ -62,27 +62,11 @@ public class DesktopInput extends InputHandler{
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.add(Core.bundle.format("schematic.flip",
-                Core.keybinds.get(Binding.schematic_flip_x).key.name(),
-                Core.keybinds.get(Binding.schematic_flip_y).key.name())).style(Styles.outlineLabel);
+                Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
+                Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.addImageTextButton("$schematic.add", Icon.saveSmall, () -> {
-                        ui.showTextInput("$schematic.add", "$name", "", text -> {
-                            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
-                            if(replacement != null){
-                                ui.showConfirm("$confirm", "$schematic.replace", () -> {
-                                    schematics.overwrite(replacement, lastSchematic);
-                                    ui.showInfoFade("$schematic.saved");
-                                    ui.schematics.showInfo(replacement);
-                                });
-                            }else{
-                                lastSchematic.tags.put("name", text);
-                                schematics.add(lastSchematic);
-                                ui.showInfoFade("$schematic.saved");
-                                ui.schematics.showInfo(lastSchematic);
-                            }
-                        });
-                    }).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.addImageTextButton("$schematic.add", Icon.saveSmall, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });
@@ -138,7 +122,7 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select)){
+        if(Core.input.keyDown(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -182,7 +166,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(mode != none){
+        if(mode != none || isPlacing()){
             selectRequests.clear();
             lastSchematic = null;
         }
@@ -198,13 +182,14 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
-
-        if(sreq != null){
-            sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
-        }
-
         if(!Core.input.keyDown(Binding.zoom_hold) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+
+            rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+
+            if(sreq != null){
+                sreq.rotation = Mathf.mod(sreq.rotation + (int)Core.input.axisTap(Binding.rotate), 4);
+            }
+
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
@@ -269,7 +254,7 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.addImageButton(Icon.wikiSmall, Styles.clearPartiali, () -> {
+        table.addImageButton(Icon.pasteSmall, Styles.clearPartiali, () -> {
             ui.schematics.show();
         });
     }
@@ -302,13 +287,17 @@ public class DesktopInput extends InputHandler{
             player.clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select)){
+        if(Core.input.keyTap(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu)){
-            ui.schematics.show();
+        if(Core.input.keyTap(Binding.schematic_menu) && !ui.chatfrag.chatOpen()){
+            if(ui.schematics.isShown()){
+                ui.schematics.hide();
+            }else{
+                ui.schematics.show();
+            }
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
@@ -316,7 +305,7 @@ public class DesktopInput extends InputHandler{
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select)){
+        if(Core.input.keyRelease(Binding.schematic_select) && !ui.chatfrag.chatOpen()){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){
@@ -361,7 +350,6 @@ public class DesktopInput extends InputHandler{
 
             if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
-                //selectRequests.clear();
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -375,7 +363,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && player.buildQueue().size == 0 && !droppingItem &&
+                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
                 !tryBeginMine(selected) && player.getMineTile() == null && !ui.chatfrag.chatOpen()){
                     player.isShooting = true;
                 }

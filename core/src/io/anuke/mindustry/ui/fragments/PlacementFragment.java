@@ -26,10 +26,11 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
+    public Category currentCategory = Category.distribution;
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    Category currentCategory = Category.distribution;
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
@@ -48,6 +49,10 @@ public class PlacementFragment extends Fragment{
             if(event.content instanceof Block){
                 rebuild();
             }
+        });
+
+        Events.on(ResetEvent.class, event -> {
+            selectedBlocks.clear();
         });
     }
 
@@ -112,6 +117,7 @@ public class PlacementFragment extends Fragment{
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
+                                selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
@@ -185,7 +191,7 @@ public class PlacementFragment extends Fragment{
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
-                                        line.add(stack.item.localizedName()).color(Color.lightGray).padLeft(2).left();
+                                        line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
@@ -232,7 +238,14 @@ public class PlacementFragment extends Fragment{
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.table(blocks -> blockTable = blocks).grow();
+                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                        if(pane.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(pane)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).grow().get().setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
@@ -266,6 +279,12 @@ public class PlacementFragment extends Fragment{
 
                         categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
+                            if(control.input.block != null){
+                                if(selectedBlocks.get(currentCategory) == null){
+                                    selectedBlocks.put(currentCategory, getByCategory(currentCategory).find(this::unlocked));
+                                }
+                                control.input.block = selectedBlocks.get(currentCategory);
+                            }
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
                     }

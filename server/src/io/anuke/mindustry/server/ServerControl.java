@@ -211,19 +211,26 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
             if(lastTask != null) lastTask.cancel();
+            
+            Map result;
+            if(arg.length > 0){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
-            Map result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
-
-            if(result == null){
-                err("No map with name &y'{0}'&lr found.", arg[0]);
-                return;
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", arg[0]);
+                    return;
+                }
+            }else{
+                Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
+                result = maps.random();
+                info("Randomized next map to be {0}.", result.name());
             }
 
             Gamemode preset = Gamemode.survival;
@@ -670,28 +677,25 @@ public class ServerControl implements ApplicationListener{
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
-            }else if(!Strings.canParseInt(arg[0])){
-                err("Invalid save slot '{0}'.", arg[0]);
-                return;
             }
 
-            int slot = Strings.parseInt(arg[0]);
+            FileHandle file = saveDirectory.child(arg[0] + "." + saveExtension);
 
-            if(!SaveIO.isSaveValid(slot)){
+            if(!SaveIO.isSaveValid(file)){
                 err("No (valid) save data found for slot.");
                 return;
             }
 
             Core.app.post(() -> {
                 try{
-                    SaveIO.loadFromSlot(slot);
+                    SaveIO.load(file);
                     state.rules.zone = null;
+                    info("Save loaded.");
+                    host();
+                    state.set(State.playing);
                 }catch(Throwable t){
                     err("Failed to load save. Outdated or corrupt file.");
                 }
-                info("Save loaded.");
-                host();
-                state.set(State.playing);
             });
         });
 
@@ -699,16 +703,23 @@ public class ServerControl implements ApplicationListener{
             if(!state.is(State.playing)){
                 err("Not hosting. Host a game first.");
                 return;
-            }else if(!Strings.canParseInt(arg[0])){
-                err("Invalid save slot '{0}'.", arg[0]);
-                return;
             }
 
+            FileHandle file = saveDirectory.child(arg[0] + "." + saveExtension);
+
             Core.app.post(() -> {
-                int slot = Strings.parseInt(arg[0]);
-                SaveIO.saveToSlot(slot);
-                info("Saved to slot {0}.", slot);
+                SaveIO.save(file);
+                info("Saved to {0}.", file);
             });
+        });
+
+        handler.register("saves", "List all saves in the save directory.", arg -> {
+            info("Save files: ");
+            for(FileHandle file : saveDirectory.list()){
+                if(file.extension().equals(saveExtension)){
+                    info("| &ly{0}", file.nameWithoutExtension());
+                }
+            }
         });
 
         handler.register("gameover", "Force a game over.", arg -> {

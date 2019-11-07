@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
@@ -21,7 +21,7 @@ import static io.anuke.mindustry.Vars.net;
 
 public class CrashSender{
 
-    public static void send(Throwable exception, Consumer<File> writeListener){
+    public static void send(Throwable exception, Cons<File> writeListener){
         try{
             exception.printStackTrace();
 
@@ -54,7 +54,7 @@ public class CrashSender{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
                 new FileHandle(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
                 new FileHandle(file).writeString(parseException(exception));
-                writeListener.accept(file);
+                writeListener.get(file);
             }catch(Throwable e){
                 e.printStackTrace();
                 Log.err("Failed to save local crash report.");
@@ -130,7 +130,7 @@ public class CrashSender{
         }
     }
 
-    private static void httpPost(String url, String content, Consumer<HttpResponse> success, Consumer<Throwable> failure){
+    private static void httpPost(String url, String content, Cons<HttpResponse> success, Cons<Throwable> failure){
         new NetJavaImpl().http(new HttpRequest().method(HttpMethod.POST).content(content).url(url), success, failure);
     }
 

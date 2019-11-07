@@ -26,6 +26,7 @@ public class Liquids implements ContentList{
             flammability = 1.2f;
             explosiveness = 1.2f;
             heatCapacity = 0.7f;
+            barColor = Color.valueOf("6b675f");
             effect = StatusEffects.tarred;
         }};
 
