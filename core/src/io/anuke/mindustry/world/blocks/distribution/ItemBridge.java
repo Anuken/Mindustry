@@ -12,6 +12,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -66,6 +67,21 @@ public class ItemBridge extends Block{
         endRegion = Core.atlas.find(name + "-end");
         bridgeRegion = Core.atlas.find(name + "-bridge");
         arrowRegion = Core.atlas.find(name + "-arrow");
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+
+        if(!hasItems) return;
+
+        bars.remove("items");
+        for(Item item : content.items()){
+            bars.add("item-" + item.name, entity -> {
+                if(entity.items.get(item) == 0) return null;
+                return new Bar(() -> Core.bundle.format("item."+ item.name +".name", entity.items.get(item)), () -> item.color, () -> (float)entity.items.get(item) / itemCapacity);
+            });
+        }
     }
 
     @Override
