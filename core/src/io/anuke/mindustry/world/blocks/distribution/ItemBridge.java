@@ -75,10 +75,11 @@ public class ItemBridge extends Block{
 
         if(!hasItems) return;
 
+        bars.remove("items");
         for(Item item : content.items()){
             bars.add("item-" + item.name, entity -> {
                 if(entity.items.get(item) == 0) return null;
-                return new Bar(() -> Core.bundle.format("item."+ item.name +".name", entity.items.get(item)), () -> item.color, () -> (float)entity.items.get(item) / itemCapacity);
+                return new Bar(() -> Core.bundle.format("item."+ item.name +".name") + ": " + entity.items.get(item), () -> item.color, () -> (float)entity.items.get(item) / itemCapacity);
             });
         }
     }
