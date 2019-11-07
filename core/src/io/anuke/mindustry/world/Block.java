@@ -253,6 +253,13 @@ public class Block extends BlockStorage{
         Draw.color();
     }
 
+    public void drawFestive(Tile tile){
+        if (size == 3){
+            TextureRegion festive = Core.atlas.find("festive-" + size + "-" + 0);
+            Draw.rect(festive, tile.drawx(), tile.drawy(), (id%4)*90);
+        }
+    }
+
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(Tile tile){
     }
