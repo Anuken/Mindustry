@@ -255,12 +255,14 @@ public class Block extends BlockStorage{
 
     public void drawFestive(Tile tile){
         if (size == 3){
-            fixtures(tile);
+            fixtures(tile, fixture -> {
+                Lines.circle(fixture.x, fixture.y, 0.5f);
+            });
             Draw.reset();
         }
     }
 
-    private void fixtures(Tile tile){
+    private void fixtures(Tile tile, Cons<Vector2> cons){
         int radius = tilesize * size / 2;
         Vector2 vector = new Vector2();
 
@@ -286,7 +288,7 @@ public class Block extends BlockStorage{
                         Draw.color(Pal.plastanium);
                     }
 
-                    Lines.circle((x1 + x) + (float)j / (float)divisions * dx, (y1 + y) + (float)j / (float)divisions * dy, 0.5f);
+                    cons.get(new Vector2((x1 + x) + (float)j / (float)divisions * dx, (y1 + y) + (float)j / (float)divisions * dy));
                 }
             }
         }
