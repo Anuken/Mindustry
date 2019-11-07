@@ -13,10 +13,8 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Cicon;
-import io.anuke.mindustry.ui.ItemImage;
-import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
@@ -75,9 +73,13 @@ public class ItemBridge extends Block{
     @Override
     public void displayConsumption(Tile tile, Table table) {
         table.left();
+
+        Array<ItemStack> occupants = new Array<>();
         tile.entity.items.forEach((item, amount) -> {
-            table.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), (int) amount), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item, (int) amount))).size(8 * 4).padRight(5);
+            occupants.add(new ItemStack(item, (int) amount));
         });
+
+        (new ConsumeItems(occupants.toArray(ItemStack.class))).build(tile, table);
     }
 
     @Override
