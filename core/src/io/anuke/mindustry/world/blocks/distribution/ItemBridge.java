@@ -74,7 +74,7 @@ public class ItemBridge extends Block{
         super.setBars();
 
         if(!hasItems) return;
-        
+
         for(Item item : content.items()){
             bars.add("item-" + item.name, entity -> {
                 if(entity.items.get(item) == 0) return null;
