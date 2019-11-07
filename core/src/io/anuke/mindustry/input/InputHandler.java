@@ -812,9 +812,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             diagonal = !diagonal;
         }
 
-        if(block != null && block instanceof PowerNode){
-            points = Placement.pathfindLine(diagonal, startX, startY, endX, endY);
-        }else if(diagonal){
+        if(block instanceof PowerNode){
+            diagonal = !diagonal;
+        }
+
+        if(diagonal){
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
