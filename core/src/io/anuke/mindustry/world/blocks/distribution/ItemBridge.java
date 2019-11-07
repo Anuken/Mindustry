@@ -76,7 +76,7 @@ public class ItemBridge extends Block{
     public void displayConsumption(Tile tile, Table table) {
         table.left();
         tile.entity.items.forEach((item, amount) -> {
-            table.add(new ReqImage(new ItemImage(tile.entity.items, item), () -> true)).size(8 * 4).padRight(5);
+            table.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), (int) amount), () -> true)).size(8 * 4).padRight(5);
         });
     }
 
