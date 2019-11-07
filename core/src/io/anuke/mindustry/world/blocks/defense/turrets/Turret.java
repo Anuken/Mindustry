@@ -4,7 +4,7 @@ import io.anuke.arc.Core;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.function.BiConsumer;
+import io.anuke.arc.func.Cons2;
 import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
@@ -60,8 +60,8 @@ public abstract class Turret extends Block{
 
     protected TextureRegion baseRegion, heatRegion;
 
-    protected BiConsumer<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-    protected BiConsumer<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
+    protected Cons2<Tile, TurretEntity> drawer = (tile, entity) -> Draw.rect(region, tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
+    protected Cons2<Tile, TurretEntity> heatDrawer = (tile, entity) -> {
         if(entity.heat <= 0.00001f) return;
         Draw.color(heatColor, entity.heat);
         Draw.blend(Blending.additive);
@@ -119,10 +119,10 @@ public abstract class Turret extends Block{
 
         tr2.trns(entity.rotation, -entity.recoil);
 
-        drawer.accept(tile, entity);
+        drawer.get(tile, entity);
 
         if(heatRegion != Core.atlas.find("error")){
-            heatDrawer.accept(tile, entity);
+            heatDrawer.get(tile, entity);
         }
     }
 

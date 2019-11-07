@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -14,7 +14,7 @@ import static io.anuke.mindustry.Vars.*;
 
 public class ItemSelection{
 
-    public static void buildItemTable(Table table, Supplier<Item> holder, Consumer<Item> consumer){
+    public static void buildItemTable(Table table, Prov<Item> holder, Cons<Item> consumer){
 
         Array<Item> items = content.items();
 
@@ -29,7 +29,7 @@ public class ItemSelection{
             if(!data.isUnlocked(item) && world.isZone()) continue;
 
             ImageButton button = cont.addImageButton(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
-            button.changed(() -> consumer.accept(button.isChecked() ? item : null));
+            button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
             button.update(() -> button.setChecked(holder.get() == item));
 

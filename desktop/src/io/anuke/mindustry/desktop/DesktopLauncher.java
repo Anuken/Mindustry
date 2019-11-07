@@ -8,7 +8,7 @@ import io.anuke.arc.backends.sdl.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.event.*;
@@ -39,7 +39,8 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+    boolean useDiscord = OS.is64Bit, loadError = false;
+    Throwable steamError;
 
     static{
         if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
@@ -91,66 +92,70 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             }
 
-            if(showConsole){
-                StringBuilder base = new StringBuilder();
-                Log.setLogger(new LogHandler(){
-                      @Override
-                      public void print(String text, Object... args){
-                          String out = Log.format(text, false, args);
+            StringBuilder base = new StringBuilder();
+            Log.setLogger(new LogHandler(){
+                  @Override
+                  public void print(String text, Object... args){
+                      String out = Log.format(text, false, args);
 
-                          base.append(out).append("\n");
-                      }
-                });
+                      base.append(out).append("\n");
+                  }
+            });
 
-                Events.on(ClientLoadEvent.class, event -> {
-                    Label[] label = {null};
-                    boolean[] visible = {false};
-                    Core.scene.table(t -> {
-                        t.touchable(Touchable.disabled);
-                        t.top().left();
-                        t.update(() -> {
-                            if(Core.input.keyTap(KeyCode.BACKTICK)){
-                                visible[0] = !visible[0];
-                            }
-
-                            t.toFront();
-                        });
-                        t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
-                        label[0].getText().append(base);
-                    });
-
-                    Log.setLogger(new LogHandler(){
-                        @Override
-                        public void print(String text, Object... args){
-                            super.print(text, args);
-                            String out = Log.format(text, false, args);
-
-                            int maxlen = 2048;
-
-                            if(label[0].getText().length() > maxlen){
-                                label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
-                            }
-
-                            label[0].getText().append(out).append("\n");
-                            label[0].invalidateHierarchy();
+            Events.on(ClientLoadEvent.class, event -> {
+                Label[] label = {null};
+                boolean[] visible = {false};
+                Core.scene.table(t -> {
+                    t.touchable(Touchable.disabled);
+                    t.top().left();
+                    t.update(() -> {
+                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke") || Version.modifier.contains("beta"))){
+                            visible[0] = !visible[0];
                         }
+
+                        t.toFront();
                     });
+                    t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                    label[0].getText().append(base);
                 });
-            }
+
+                Log.setLogger(new LogHandler(){
+                    @Override
+                    public void print(String text, Object... args){
+                        super.print(text, args);
+                        String out = Log.format(text, false, args);
+
+                        int maxlen = 2048;
+
+                        if(label[0].getText().length() > maxlen){
+                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
+                        }
+
+                        label[0].getText().append(out).append("\n");
+                        label[0].invalidateHierarchy();
+                    }
+                });
+
+                if(steamError != null){
+                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
+                        ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
+                    })));
+                }
+            });
 
             try{
-                try{
-                    SteamAPI.loadLibraries();
-                }catch(Throwable t){
-                    logSteamError(t);
-                    fallbackSteam();
-                }
+                SteamAPI.loadLibraries();
 
                 if(!SteamAPI.init()){
+                    loadError = true;
                     Log.err("Steam client not running.");
                 }else{
                     initSteam(args);
                     Vars.steam = true;
+                }
+
+                if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
+                    System.exit(0);
                 }
             }catch(Throwable e){
                 steam = false;
@@ -161,6 +166,8 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     void logSteamError(Throwable e){
+        steamError = e;
+        loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
             String log = Strings.parseException(e, true);
@@ -232,12 +239,12 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = Runnable::run;
+        Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
         if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
 
-            dialog.accept(() -> message(
+            dialog.get(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
                             "Your graphics card does not support OpenGL 2.0!\n" +
                                     "Try to update your graphics drivers.\n\n" +
@@ -253,7 +260,7 @@ public class DesktopLauncher extends ClientLauncher{
             if(fc == null) fc = Strings.getFinalCause(e);
             Throwable cause = fc;
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
+                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
         });
     }

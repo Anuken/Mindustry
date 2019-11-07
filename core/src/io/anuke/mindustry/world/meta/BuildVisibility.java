@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.meta;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.mindustry.*;
 
 public enum BuildVisibility{
@@ -10,13 +10,13 @@ public enum BuildVisibility{
     sandboxOnly(() -> Vars.state.rules.infiniteResources),
     campaignOnly(() -> Vars.world.isZone());
 
-    private final BooleanProvider visible;
+    private final Boolp visible;
 
     public boolean visible(){
         return visible.get();
     }
 
-    BuildVisibility(BooleanProvider visible){
+    BuildVisibility(Boolp visible){
         this.visible = visible;
     }
 }

@@ -4,7 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.Input.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.serialization.*;
@@ -96,12 +96,12 @@ public interface Platform{
      * @param open Whether to open or save files
      * @param extension File extension to filter
      */
-    default void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+    default void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
         new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
             if(!open){
-                cons.accept(file.parent().child(file.nameWithoutExtension() + "." + extension));
+                cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
-                cons.accept(file);
+                cons.get(file);
             }
         }).show();
     }

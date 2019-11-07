@@ -12,8 +12,11 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.input.*;
+import io.anuke.mindustry.type.Category;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.units.MechPad;
+import io.anuke.mindustry.world.meta.BlockFlag;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -57,6 +60,21 @@ public class OverlayRenderer{
                     Draw.reset();
                 }
             });
+
+            if(ui.hudfrag.blockfrag.currentCategory == Category.upgrade){
+                for(Tile mechpad : indexer.getAllied(player.getTeam(), BlockFlag.mechPad)){
+                    if(!(mechpad.block() instanceof MechPad)) continue;
+                    if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
+                            .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.x, mechpad.y)){
+
+                        Tmp.v1.set(mechpad.worldx(), mechpad.worldy()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+
+                        Lines.stroke(2f, ((MechPad) mechpad.block()).mech.engineColor);
+                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 0.5f);
+                        Draw.reset();
+                    }
+                }
+            }
         }
 
         if(player.isDead()) return; //dead players don't draw

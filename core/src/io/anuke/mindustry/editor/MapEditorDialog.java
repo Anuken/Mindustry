@@ -3,7 +3,7 @@ package io.anuke.mindustry.editor;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -425,7 +425,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 Table[] lastTable = {null};
 
-                Consumer<EditorTool> addTool = tool -> {
+                Cons<EditorTool> addTool = tool -> {
 
                     ImageButton button = new ImageButton(Core.atlas.drawable("icon-" + tool.name() + "-small"), Styles.clearTogglei);
                     button.clicked(() -> {
@@ -507,14 +507,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 ImageButton grid = tools.addImageButton(Icon.gridSmall, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
 
-                addTool.accept(EditorTool.zoom);
+                addTool.get(EditorTool.zoom);
 
                 tools.row();
 
                 ImageButton undo = tools.addImageButton(Icon.undoSmall, Styles.cleari, editor::undo).get();
                 ImageButton redo = tools.addImageButton(Icon.redoSmall, Styles.cleari, editor::redo).get();
 
-                addTool.accept(EditorTool.pick);
+                addTool.get(EditorTool.pick);
 
                 tools.row();
 
@@ -525,14 +525,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 redo.update(() -> redo.getImage().setColor(redo.isDisabled() ? Color.gray : Color.white));
                 grid.update(() -> grid.setChecked(view.isGrid()));
 
-                addTool.accept(EditorTool.line);
-                addTool.accept(EditorTool.pencil);
-                addTool.accept(EditorTool.eraser);
+                addTool.get(EditorTool.line);
+                addTool.get(EditorTool.pencil);
+                addTool.get(EditorTool.eraser);
 
                 tools.row();
 
-                addTool.accept(EditorTool.fill);
-                addTool.accept(EditorTool.spray);
+                addTool.get(EditorTool.fill);
+                addTool.get(EditorTool.spray);
 
                 ImageButton rotate = tools.addImageButton(Icon.arrow16Small, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {

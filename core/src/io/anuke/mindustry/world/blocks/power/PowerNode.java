@@ -2,7 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -101,46 +101,56 @@ public class PowerNode extends PowerBlock{
     public void placed(Tile tile){
         if(net.client()) return;
 
-        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
+        Boolf<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(valid.test(other)){
-                tempTiles.add(other);
+            if(valid.get(other)){
+                if(!insulated(tile, other)){
+                    tempTiles.add(other);
+                }
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, other -> {
             if(!tile.entity.power.links.contains(other.pos())){
-                tile.configure(other.pos());
+                tile.configureAny(other.pos());
             }
         });
 
         super.placed(tile);
     }
 
-    private void getPotentialLinks(Tile tile, Consumer<Tile> others){
-        Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
+    private void getPotentialLinks(Tile tile, Cons<Tile> others){
+        Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
-        overlaps(tile.x * tilesize + offset(), tile.y *tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
+        overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
         && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
 
         tempTiles.clear();
         graphs.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(valid.test(other)){
+            if(valid.get(other) && !tempTiles.contains(other)){
                 tempTiles.add(other);
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, t -> {
             graphs.add(t.entity.power.graph);
-            others.accept(t);
+            others.get(t);
         });
     }
 
@@ -149,6 +159,7 @@ public class PowerNode extends PowerBlock{
         super.setStats();
 
         stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
+        stats.add(BlockStat.powerConnections, maxNodes, StatUnit.none);
     }
 
     @Override
@@ -161,12 +172,24 @@ public class PowerNode extends PowerBlock{
         TileEntity entity = tile.entity();
         other = other.link();
 
-        Tile result = other;
-
         if(linkValid(tile, other)){
             tile.configure(other.pos());
             return false;
         }
+
+        if(tile == other){
+            if(other.entity.power.links.size == 0){
+                getPotentialLinks(tile, link -> {
+                    tile.configure(link.pos());
+                });
+            }else{
+                while(entity.power.links.size > 0){
+                    tile.configure(entity.power.links.get(0));
+                }
+            }
+            return false;
+        }
+
         return true;
     }
 
@@ -221,7 +244,13 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place));
+        getPotentialLinks(tile, other -> {
+            Drawf.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 2f, Pal.place);
+
+            insulators(tile.x, tile.y, other.x, other.y, cause -> {
+                Drawf.square(cause.drawx(), cause.drawy(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+            });
+        });
 
         Draw.reset();
     }
@@ -291,12 +320,35 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        float fract = 1f-tile.entity.power.graph.getSatisfaction();
+        float fract = 1f - tile.entity.power.graph.getSatisfaction();
 
-        Draw.color(Color.white, Pal.powerLight, fract*0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
     }
 
+    public static boolean insulated(Tile tile, Tile other){
+        return insulated(tile.x, tile.y, other.x, other.y);
+    }
+
+    public static boolean insulated(int x, int y, int x2, int y2){
+        final Boolean[] bool = {false};
+        insulators(x, y, x2, y2, cause -> {
+            bool[0] = true;
+        });
+        return bool[0];
+    }
+
+    public static void insulators(int x, int y, int x2, int y2, Cons<Tile> iterator){
+        world.raycastEach(x, y, x2, y2, (wx, wy) -> {
+
+            Tile tile = world.ltile(wx, wy);
+            if(tile != null && tile.block() != null && tile.block().insulated){
+                iterator.get(tile);
+            }
+
+            return false;
+        });
+    }
 }

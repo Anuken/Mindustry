@@ -66,14 +66,8 @@ public class GlobalData{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
-        //purge existing data
-        for(FileHandle f : base.list()){
-            if(f.isDirectory()){
-                f.deleteDirectory();
-            }else if(!f.name().equals("zipdata.zip")){
-                f.delete();
-            }
-        }
+        //purge existing tmp data, keep everything else
+        tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();

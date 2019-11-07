@@ -299,7 +299,6 @@ public class Vars implements Loadable{
             //no external bundle found
 
             FileHandle handle = Core.files.internal("bundles/bundle");
-
             Locale locale;
             String loc = Core.settings.getString("locale");
             if(loc.equals("default")){

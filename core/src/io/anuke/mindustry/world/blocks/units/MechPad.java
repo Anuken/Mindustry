@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
+import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -24,7 +25,7 @@ import java.io.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class MechPad extends Block{
-    protected @NonNull Mech mech;
+    public @NonNull Mech mech;
     protected float buildTime = 60 * 5;
 
     public MechPad(String name){
@@ -33,6 +34,7 @@ public class MechPad extends Block{
         solid = false;
         hasPower = true;
         layer = Layer.overlay;
+        flags = EnumSet.of(BlockFlag.mechPad);
     }
 
     @Override
@@ -40,11 +42,6 @@ public class MechPad extends Block{
         super.setStats();
 
         stats.add(BlockStat.productionTime, buildTime / 60f, StatUnit.seconds);
-    }
-
-    @Override
-    public boolean shouldConsume(Tile tile){
-        return false;
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -114,7 +111,7 @@ public class MechPad extends Block{
         MechFactoryEntity entity = tile.entity();
 
         if(entity.player != null){
-            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? Mechs.starter : mech));
+            RespawnBlock.drawRespawn(tile, entity.heat, entity.progress, entity.time, entity.player, (!entity.sameMech && entity.player.mech == mech ? mech : Mechs.starter));
         }
     }
 

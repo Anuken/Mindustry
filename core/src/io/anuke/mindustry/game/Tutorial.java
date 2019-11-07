@@ -2,7 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.*;
@@ -194,16 +194,16 @@ public class Tutorial{
         },;
 
         protected String line = "";
-        protected final Function<String, String> text;
+        protected final Func<String, String> text;
         protected Array<String> sentences;
-        protected final BooleanProvider done;
+        protected final Boolp done;
 
-        TutorialStage(Function<String, String> text, BooleanProvider done){
+        TutorialStage(Func<String, String> text, Boolp done){
             this.text = text;
             this.done = done;
         }
 
-        TutorialStage(BooleanProvider done){
+        TutorialStage(Boolp done){
             this(line -> line, done);
         }
 

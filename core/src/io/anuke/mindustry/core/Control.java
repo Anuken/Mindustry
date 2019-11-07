@@ -254,7 +254,7 @@ public class Control implements ApplicationListener, Loadable{
             logic.reset();
             net.reset();
             world.loadGenerator(zone.generator);
-            zone.rules.accept(state.rules);
+            zone.rules.get(state.rules);
             state.rules.zone = zone;
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){
@@ -302,7 +302,7 @@ public class Control implements ApplicationListener, Loadable{
 
             world.endMapLoad();
 
-            zone.rules.accept(state.rules);
+            zone.rules.get(state.rules);
             state.rules.zone = zone;
             for(Tile core : state.teams.get(defaultTeam).cores){
                 for(ItemStack stack : zone.getStartingItems()){

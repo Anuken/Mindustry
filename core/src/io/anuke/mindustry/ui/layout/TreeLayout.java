@@ -12,7 +12,7 @@ public interface TreeLayout{
 
         //internal stuff
         public float mode, prelim, change, shift;
-        public int number = -1;
+        public int number = -1, leaves;
         public TreeNode thread, ancestor;
 
         public boolean isLeaf(){

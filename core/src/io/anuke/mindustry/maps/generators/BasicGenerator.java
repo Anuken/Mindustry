@@ -1,7 +1,7 @@
 package io.anuke.mindustry.maps.generators;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.IntPositionConsumer;
+import io.anuke.arc.func.Intc2;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Geometry;
 import io.anuke.arc.math.geom.Point2;
@@ -137,10 +137,10 @@ public abstract class BasicGenerator extends RandomGenerator{
         });
     }
 
-    public void each(IntPositionConsumer r){
+    public void each(Intc2 r){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                r.accept(x, y);
+                r.get(x, y);
             }
         }
     }
@@ -149,13 +149,13 @@ public abstract class BasicGenerator extends RandomGenerator{
         return (float)sim2.octaveNoise2D(1f, 0f, 1f / scl, x + 0x361266f, y + 0x251259f) * mag;
     }
 
-    public void pass(Tile[][] tiles, IntPositionConsumer r){
+    public void pass(Tile[][] tiles, Intc2 r){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 floor = tiles[x][y].floor();
                 block = tiles[x][y].block();
                 ore = tiles[x][y].overlay();
-                r.accept(x, y);
+                r.get(x, y);
                 tiles[x][y] = new Tile(x, y, floor.id, ore.id, block.id);
             }
         }

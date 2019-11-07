@@ -27,7 +27,7 @@ allprojects{
         appName = 'Mindustry'
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8-SNAPSHOT'
-        steamworksVersion = '1.8.0'
+        steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
         arcHash = null
 
         debugged = {
@@ -149,8 +149,7 @@ project(":desktop"){
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
-        compile "com.code-disaster.steamworks4j:steamworks4j:$steamworksVersion"
-        compile "com.code-disaster.steamworks4j:steamworks4j-server:$steamworksVersion"
+        compile "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         compile arcModule("backends:backend-sdl")
         compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'

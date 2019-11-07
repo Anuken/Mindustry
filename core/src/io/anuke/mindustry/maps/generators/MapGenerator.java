@@ -5,6 +5,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.type.*;
@@ -52,7 +53,7 @@ public class MapGenerator extends Generator{
     }
 
     @Override
-    public void init(Loadout loadout){
+    public void init(Schematic loadout){
         this.loadout = loadout;
         map = maps.loadInternalMap(mapName);
         width = map.width;
@@ -149,7 +150,7 @@ public class MapGenerator extends Generator{
             throw new IllegalArgumentException("All zone maps must have a core.");
         }
 
-        loadout.setup(core.x, core.y);
+        schematics.placeLoadout(loadout, core.x, core.y);
 
         world.prepareTiles(tiles);
         world.setMap(map);

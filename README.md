@@ -1,7 +1,7 @@
 ![Logo](core/assets/sprites/logo.png)
 
 [![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry) 
-[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)
+[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)  
 
 A sandbox tower defense game written in Java.
 
@@ -44,6 +44,11 @@ If the terminal returns `Permission denied` or `Command not found` on Mac/Linux,
 
 Gradle may take up to several minutes to download files. Be patient. <br>
 After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
+
+### Feature Requests
+
+[![Feature Requests](https://feathub.com/Anuken/Mindustry?format=svg)](https://feathub.com/Anuken/Mindustry)
+
 
 ### Downloads
 
