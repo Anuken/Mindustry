@@ -341,7 +341,8 @@ public class ContentParser{
         if(contentTypes.isEmpty()){
             init();
         }
-        json = json.replaceAll("#.*?\n","\n");
+        //add comments starting with #
+        json = json.replaceAll("##.*?\n","\n");
 
         JsonValue value = parser.fromJson(null, json);
         if(!parsers.containsKey(type)){
