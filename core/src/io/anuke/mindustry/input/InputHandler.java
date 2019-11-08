@@ -825,9 +825,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(block instanceof PowerNode){
             Array<Point2> skip = new Array<>();
             
-            for(int i = 0; i < points.size; i++){
-                if(i == 0) continue; // beginning should always be present
-
+            for(int i = 1; i < points.size; i++){
                 // check with how many powernodes the *next* tile will overlap
                 int overlaps = 0;
                 for(int j = 0; j < i; j++){
@@ -837,7 +835,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     Tile next = world.ltile(points.get(i).x, points.get(i).y);
                     Tile loop = world.ltile(points.get(j).x, points.get(j).y);
 
-                    if (((PowerNode) block).overlaps(next, loop)){
+                    if(((PowerNode)block).overlaps(next, loop)){
                         overlaps++;
                     }
                 }
