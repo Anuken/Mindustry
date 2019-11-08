@@ -267,6 +267,12 @@ public class DesktopInput extends InputHandler{
         int cursorY = tileY(Core.input.mouseY());
         int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
 
+        // automatically pause building if the current build queue is empty
+        if(Core.settings.getBool("buildautopause") && player.isBuilding && !player.isBuilding()){
+            player.isBuilding = false;
+            player.buildWasAutoPaused = true;
+        }
+
         if(!selectRequests.isEmpty()){
             int shiftX = rawCursorX - schematicX, shiftY = rawCursorY - schematicY;
 
@@ -337,6 +343,7 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.pause_building)){
             player.isBuilding = !player.isBuilding;
+            player.buildWasAutoPaused = false;
         }
 
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){

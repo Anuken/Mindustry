@@ -228,6 +228,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        if(!mobile){
+            game.checkPref("buildautopause", false);
+        }
 
         if(steam && !Version.modifier.contains("beta")){
             game.checkPref("publichost", false, i -> {
