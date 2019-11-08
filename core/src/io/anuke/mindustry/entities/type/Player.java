@@ -52,6 +52,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public @Nullable
     String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
