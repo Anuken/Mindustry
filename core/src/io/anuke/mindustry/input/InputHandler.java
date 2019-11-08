@@ -32,6 +32,7 @@ import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import java.util.*;
 
@@ -806,7 +807,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+
         if(Core.settings.getBool("swapdiagonal") && mobile){
+            diagonal = !diagonal;
+        }
+
+        if(block instanceof PowerNode){
             diagonal = !diagonal;
         }
 
@@ -814,6 +820,33 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+
+        if(block instanceof PowerNode){
+            Array<Point2> skip = new Array<>();
+            
+            for(int i = 1; i < points.size; i++){
+                // check with how many powernodes the *next* tile will overlap
+                int overlaps = 0;
+                for(int j = 0; j < i; j++){
+                    // skip powernodes we have already crossed off as air
+                    if(skip.contains(points.get(j))) continue;
+
+                    Tile next = world.ltile(points.get(i).x, points.get(i).y);
+                    Tile loop = world.ltile(points.get(j).x, points.get(j).y);
+
+                    if(((PowerNode)block).overlaps(next, loop)){
+                        overlaps++;
+                    }
+                }
+
+                // if its more than one it can bridge the gap
+                if(overlaps > 1){
+                    skip.add(points.get(i-1));
+                }
+            }
+            // remove the skipped points outside the each
+            points.removeAll(skip);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

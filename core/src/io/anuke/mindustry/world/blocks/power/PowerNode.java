@@ -302,6 +302,10 @@ public class PowerNode extends PowerBlock{
         return overlaps(src.drawx(), src.drawy(), other, range);
     }
 
+    public boolean overlaps(Tile src, Tile other){
+        return overlaps(src.drawx(), src.drawy(), other, laserRange * tilesize);
+    }
+
     protected void drawLaser(Tile tile, Tile target){
         int opacityPercentage = Core.settings.getInt("lasersopacity");
         if(opacityPercentage == 0) return;
