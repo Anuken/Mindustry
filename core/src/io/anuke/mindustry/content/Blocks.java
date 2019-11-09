@@ -79,7 +79,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message;
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, message;
 
     @Override
     public void load(){
@@ -1781,11 +1781,11 @@ public class Blocks implements ContentList{
         //endregion
         //region sandbox
 
-        powerVoid = new PowerVoid("power-void"){{
+        powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
-        powerSource = new PowerSource("power-source"){{
+        powerVoid = new PowerVoid("power-void"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};

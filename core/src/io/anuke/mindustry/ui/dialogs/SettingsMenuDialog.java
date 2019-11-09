@@ -298,6 +298,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
+        if(!mobile){
+            graphics.checkPref("blockselectkeys", true);
+        }
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", !mobile);
         if(Shaders.shield != null){

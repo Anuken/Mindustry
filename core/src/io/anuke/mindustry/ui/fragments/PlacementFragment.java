@@ -26,7 +26,7 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
-    public Category currentCategory = Category.turret;
+    public Category currentCategory = Category.distribution;
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
@@ -253,13 +253,14 @@ public class PlacementFragment extends Fragment{
                             lastGround = false;
 
                             topTable.table(header -> {
-                                String keyCombo = new String();
-                                if(!mobile){
-                                    keyCombo = " [accent][" + Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString();
+                                String keyCombo = "";
+                                if(!mobile && Core.settings.getBool("blockselectkeys")){
                                     Array<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == lastDisplay){
-                                            keyCombo += (i < 10 ? "" : "," + Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString()) + "," + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
+                                                + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
+                                                + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
                                             break;
                                         }
                                     }
@@ -267,7 +268,7 @@ public class PlacementFragment extends Fragment{
                                 final String keyComboFinal = keyCombo;
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + (mobile ? "" : keyComboFinal))
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
