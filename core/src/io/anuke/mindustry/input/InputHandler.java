@@ -145,12 +145,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || player == null) return;
         if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
+        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Player player, Tile tile, int value){
         if(tile == null || !Units.canInteract(player, tile)) return;
         tile.block().configured(tile, player, value);
+        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
     public Eachable<BuildRequest> allRequests(){

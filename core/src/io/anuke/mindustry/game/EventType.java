@@ -141,6 +141,30 @@ public class EventType{
             this.player = player;
         }
     }
+    
+    /** Called when the player taps a block. */
+    public static class TapEvent{
+        public final Tile tile;
+        public final Player player;
+
+        public TapEvent(Tile tile, Player player){
+            this.tile = tile;
+            this.player = player;
+        }
+    }
+    
+    /** Called when the player sets a specific block. */
+    public static class TapConfigEvent{
+        public final Tile tile;
+        public final Player player;
+        public final int value;
+
+        public TapConfigEvent(Tile tile, Player player, int value){
+            this.tile = tile;
+            this.player = player;
+            this.value = value;
+        }
+    }
 
     public static class GameOverEvent{
         public final Team winner;
