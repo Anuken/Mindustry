@@ -15,9 +15,7 @@ public enum BlockFlag{
     /** Repair point. */
     repair,
     /** Upgrade pad. */
-    mechPad,
-    /** Upgradable. */
-    upgradable;
+    mechPad;
 
     public final static BlockFlag[] all = values();
 }

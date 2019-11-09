@@ -261,40 +261,6 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public Block getUpgrade(Tile tile){
-
-        if(tile.block() == Blocks.conveyor){
-            return Blocks.titaniumConveyor;
-        }
-
-        if(tile.block() == Blocks.titaniumConveyor){
-
-            Tile left = tile.getNearby(tile.rotation() -1);
-            Tile right = tile.getNearby(tile.rotation() +1);
-
-            if(left != null){
-                if(left.block() instanceof Conveyor){
-                    // upgrade allowed
-                }else if(left.block().outputsItems()){
-                    return null;
-                }
-            }
-
-            if(right != null){
-                if(right.block() instanceof Conveyor){
-                    // upgrade allowed
-                }else if(right.block().outputsItems()){
-                    return null;
-                }
-            }
-
-            return Blocks.armoredConveyor;
-        }
-
-        return super.getUpgrade(tile);
-    }
-
-    @Override
     public int removeStack(Tile tile, Item item, int amount){
         ConveyorEntity entity = tile.entity();
         entity.noSleep();
