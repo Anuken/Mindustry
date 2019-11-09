@@ -429,6 +429,15 @@ public class DesktopInput extends InputHandler{
 
             mode = none;
         }
+
+        if(Core.input.keyTap(Binding.toggle_power_lines)){
+            if(Core.settings.getInt("lasersopacity") == 0){
+                Core.settings.put("lasersopacity", Core.settings.getInt("preferredlaseropacity", 100));
+            }else{
+                Core.settings.put("preferredlaseropacity", Core.settings.getInt("lasersopacity"));
+                Core.settings.put("lasersopacity", 0);
+            }
+        }
     }
 
     @Override
