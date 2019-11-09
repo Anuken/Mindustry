@@ -31,12 +31,12 @@ public enum Binding implements KeyBind{
     minimap(KeyCode.M),
     toggle_menus(KeyCode.C),
     screenshot(KeyCode.P),
+    toggle_power_lines(KeyCode.F7),
     player_list(KeyCode.TAB, "multiplayer"),
     chat(KeyCode.ENTER),
     chat_history_prev(KeyCode.UP),
     chat_history_next(KeyCode.DOWN),
     chat_scroll(new Axis(KeyCode.SCROLL)),
-
     ;
 
     private final KeybindValue defaultValue;
