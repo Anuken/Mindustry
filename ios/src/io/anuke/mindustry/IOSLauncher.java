@@ -61,10 +61,14 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                         try{
                             controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> {
-                                try{
-                                    cons.get(Core.files.absolute(url.getPath()));
-                                }catch(Throwable t){
-                                    ui.showException(t);
+                                if(error != null){
+                                   ui.showErrorMessage("Import error.\n" + error.getLocalizedFailureReason() + "\n" + error.getLocalizedDescription());
+                                }else{
+                                    try{
+                                        cons.get(Core.files.absolute(url.getPath()));
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
                                 }
                             });
                         }catch(Throwable t){
