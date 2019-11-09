@@ -144,6 +144,17 @@ PackrConfig.Platform.values().each{ platform ->
                 }
             }
 
+            if(versionModifier.contains("steam")){
+                copy{
+                    def lib = platform == PackrConfig.Platform.MacOS || platform == PackrConfig.Platform.Linux64 ? "lib" : ""
+                    from zipTree(platform == PackrConfig.Platform.MacOS ? "build/packr/output/${appName}.app/Contents/Resources/desktop.jar" : "build/packr/output/jre/desktop.jar").matching{
+                        include "${lib}steamworks4j${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
+                        include "${lib}steam_api${platform == PackrConfig.Platform.Windows64 ? '64.dll' : platform == PackrConfig.Platform.Windows32 ? '.dll' : platform == PackrConfig.Platform.Linux64 ? '.so' : '.dylib'}"
+                    }
+                    into "build/packr/output/"
+                }
+            }
+
             copy{
                 from "build/packr/output"
                 into "../deploy/${platform.toString()}"

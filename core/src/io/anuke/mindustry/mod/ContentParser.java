@@ -342,6 +342,9 @@ public class ContentParser{
             init();
         }
 
+        //add comments starting with ##, but ignore links
+        json = json.replace("http://", "http:~~").replace("https://", "https:~~").replaceAll("//.*?\n","\n").replace("http:~~", "http://").replace("https:~~", "https://");
+
         JsonValue value = parser.fromJson(null, json);
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
