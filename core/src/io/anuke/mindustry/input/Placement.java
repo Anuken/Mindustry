@@ -56,26 +56,28 @@ public class Placement{
         return points;
     }
 
-    public static Array<Point2> followLine(int startX, int startY){
+    public static Array<Point2> followLineUntil(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
 
-        Tile tile = world.ltile(startX, startY);
-        Block block = tile.block();
+        Tile cursor = world.ltile(startX, startY);
+        Block filter = cursor.block();
 
         while(true){
-            Tile next = tile.getNearby(tile.rotation());
-            Point2 add = new Point2(tile.x, tile.y);
-
-            if (points.contains(add)) break;
-            points.add(add);
-
-            if (next.block() == block){
-                tile = next;
-            }else{
-                break;
-            }
+            if(cursor.block() != filter) break;                        // keep looking until encountering a different block
+            if(points.contains(new Point2(cursor.x, cursor.y))) break; // avoid biting its own tail
+            points.add(new Point2(cursor.x, cursor.y));                // add cursor to points
+            if(cursor.x == endX && cursor.y == endY) break;            // do not look further than the cursor
+            cursor = cursor.getNearby(cursor.rotation());              // move cursor to next block to check
         }
+
+        // if the end is nowhere on the line, don't return anything
+        if(!points.contains(new Point2(endX, endY))){
+            Pools.freeAll(points);
+            points.clear();
+            points.add(new Point2(startX, startY));
+        }
+
         return points;
     }
 
