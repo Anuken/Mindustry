@@ -67,6 +67,11 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.power.satisfaction, color, 0.7f * tile.entity.power.satisfaction);
+    }
+
+    @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);

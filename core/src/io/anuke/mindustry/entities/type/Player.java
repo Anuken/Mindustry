@@ -19,7 +19,6 @@ import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
@@ -343,8 +342,6 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         Draw.reset();
-
-        renderer.lights.add(x, y, 100f, Pal.powerLight, 0.6f);
     }
 
     @Override
@@ -353,6 +350,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
+        drawLight();
     }
 
     @Override

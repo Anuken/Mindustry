@@ -133,6 +133,11 @@ public class MendProjector extends Block{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.power.satisfaction, color, 0.7f * tile.entity.power.satisfaction);
+    }
+
+    @Override
     public TileEntity newEntity(){
         return new MendEntity();
     }

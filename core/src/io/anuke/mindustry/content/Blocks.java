@@ -48,7 +48,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
+    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message, light,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -735,6 +735,10 @@ public class Blocks implements ContentList{
         }};
         message = new MessageBlock("message"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 5));
+        }};
+        light = new LightBlock("light"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 5));
+            consumes.power(0.05f);
         }};
 
         //endregion

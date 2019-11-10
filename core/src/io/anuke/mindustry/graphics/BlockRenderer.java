@@ -9,10 +9,9 @@ import io.anuke.arc.graphics.glutils.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;
@@ -219,6 +218,9 @@ public class BlockRenderer implements Disposable{
                         addRequest(tile, Layer.block);
                     }
 
+                    //TODO don't add at daytime / disabled lights
+                    addRequest(tile, Layer.lights);
+
                     if(block.expanded || !expanded){
 
                         if(block.layer != null){
@@ -274,43 +276,13 @@ public class BlockRenderer implements Disposable{
                 if(block.synthetic() && request.tile.getTeam() != player.getTeam()){
                     block.drawTeam(request.tile);
                 }
+
+            }else if(request.layer == Layer.lights){
+                block.drawLight(request.tile);
             }else if(request.layer == block.layer){
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
-            }
-        }
-    }
-
-    public void drawTeamBlocks(Layer layer, Team team){
-        int index = this.iterateidx;
-
-        for(; index < requestidx; index++){
-
-            if(index < requests.size && requests.get(index).layer.ordinal() > layer.ordinal()){
-                break;
-            }
-
-            BlockRequest req = requests.get(index);
-            if(req.tile.getTeam() != team) continue;
-
-            Block block = req.tile.block();
-
-            if(req.layer == Layer.block){
-                block.draw(req.tile);
-            }else if(req.layer == block.layer){
-                block.drawLayer(req.tile);
-            }else if(req.layer == block.layer2){
-                block.drawLayer2(req.tile);
-            }
-
-        }
-    }
-
-    public void skipLayer(Layer stopAt){
-        for(; iterateidx < requestidx; iterateidx++){
-            if(iterateidx < requests.size && requests.get(iterateidx).layer.ordinal() > stopAt.ordinal()){
-                break;
             }
         }
     }

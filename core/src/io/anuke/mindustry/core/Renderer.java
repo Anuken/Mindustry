@@ -257,6 +257,7 @@ public class Renderer implements ApplicationListener{
         drawFlyerShadows();
 
         blocks.drawBlocks(Layer.power);
+        blocks.drawBlocks(Layer.lights);
 
         drawAllTeams(true);
 
