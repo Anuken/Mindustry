@@ -169,6 +169,8 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            itemDrop = Items.sand;
+            playerUnmineable = true;
         }};
 
         sandWater = new Floor("sand-water"){{
@@ -179,6 +181,8 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            itemDrop = Items.sand;
+            playerUnmineable = true;
         }};
 
         darksandWater = new Floor("darksand-water"){{
@@ -189,6 +193,8 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
+            itemDrop = Items.sand;
+            playerUnmineable = true;
         }};
 
         tar = new Floor("tar"){{
