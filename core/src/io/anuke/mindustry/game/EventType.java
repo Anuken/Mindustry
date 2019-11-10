@@ -135,10 +135,14 @@ public class EventType{
     public static class DepositEvent{
         public final Tile tile;
         public final Player player;
+        public final Item item;
+        public final int amount;
         
-        public DepositEvent(Tile tile, Player player){
+        public DepositEvent(Tile tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
+            this.item = item;
+            this.amount = amount;
         }
     }
     
