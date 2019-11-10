@@ -9,8 +9,8 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.tilesize;
@@ -92,6 +92,13 @@ public class Floor extends Block{
 
         if(blendGroup != this){
             return;
+        }
+
+        if(variants > 0){
+            for(int i = 0; i < variants; i++){
+                String rname = name + (i + 1);
+                editor.pack("editor-" + rname, Core.atlas.getPixmap(rname).crop());
+            }
         }
 
         Color color = new Color();
@@ -202,10 +209,6 @@ public class Floor extends Block{
 
     protected boolean edgeOnto(Floor other){
         return true;
-    }
-
-    boolean eq(int i){
-        return (eq & (1 << Mathf.mod(i, 8))) != 0;
     }
 
     TextureRegion edge(Floor block, int x, int y){

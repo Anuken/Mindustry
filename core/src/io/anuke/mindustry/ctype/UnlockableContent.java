@@ -1,10 +1,11 @@
-package io.anuke.mindustry.game;
+package io.anuke.mindustry.ctype;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ui.Cicon;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
@@ -13,7 +14,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Localized description. May be null. */
     public String description;
     /** Icons by Cicon ID.*/
-    protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
+    protected TextureRegion[] cicons = new TextureRegion[io.anuke.mindustry.ui.Cicon.all.length];
 
     public UnlockableContent(String name){
         super(name);
@@ -31,7 +32,11 @@ public abstract class UnlockableContent extends MappableContent{
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
     public TextureRegion icon(Cicon icon){
         if(cicons[icon.ordinal()] == null){
-            cicons[icon.ordinal()] = Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(), Core.atlas.find(getContentType().name() + "-" + name + "-full", Core.atlas.find(getContentType().name() + "-" + name, Core.atlas.find(name))));
+            cicons[icon.ordinal()] = Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
+                Core.atlas.find(getContentType().name() + "-" + name + "-full",
+                Core.atlas.find(getContentType().name() + "-" + name,
+                Core.atlas.find(name,
+                Core.atlas.find(name + "1")))));
         }
         return cicons[icon.ordinal()];
     }
@@ -60,6 +65,11 @@ public abstract class UnlockableContent extends MappableContent{
 
     public final boolean unlocked(){
         return Vars.data.isUnlocked(this);
+    }
+
+    /** @return whether this content is unlocked, or the player is in a custom game. */
+    public final boolean unlockedCur(){
+        return Vars.data.isUnlocked(this) || !Vars.world.isZone();
     }
 
     public final boolean locked(){

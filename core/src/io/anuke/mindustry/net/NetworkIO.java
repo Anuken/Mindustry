@@ -2,6 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.*;
@@ -27,6 +28,7 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(stream);
 
+            SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -50,9 +52,12 @@ public class NetworkIO{
             player.resetID(id);
             player.add();
 
+            SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
         }catch(IOException e){
             throw new RuntimeException(e);
+        }finally{
+            content.setTemporaryMapper(null);
         }
     }
 

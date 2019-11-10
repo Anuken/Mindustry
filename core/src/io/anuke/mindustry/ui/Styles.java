@@ -27,7 +27,7 @@ public class Styles{
     public static ButtonStyle defaultb, waveb;
     public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
-    public static ScrollPaneStyle defaultPane, horizontalPane;
+    public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
     public static LabelStyle defaultLabel, outlineLabel;
@@ -224,6 +224,10 @@ public class Styles{
             vScrollKnob = scrollKnobVerticalBlack;
             hScroll = scrollHorizontal;
             hScrollKnob = scrollKnobHorizontalBlack;
+        }};
+        smallPane = new ScrollPaneStyle(){{
+            vScroll = clear;
+            vScrollKnob = scrollKnobVerticalThin;
         }};
 
         defaultKeybindDialog = new KeybindDialogStyle(){{

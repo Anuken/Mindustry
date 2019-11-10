@@ -16,7 +16,6 @@ import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
 import static io.anuke.mindustry.Vars.*;
 
 public class Build{
-    private static final Rectangle rect = new Rectangle();
 
     /** Returns block type that was broken, or null if unsuccesful. */
     @Remote(called = Loc.server)
@@ -69,7 +68,11 @@ public class Build{
 
     /** Returns whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Team team, int x, int y, Block type, int rotation){
-        if(!type.isVisible() || type.isHidden()){
+        if(type == null || !type.isVisible() || type.isHidden()){
+            return false;
+        }
+
+        if(state.rules.bannedBlocks.contains(type) && !(state.rules.waves && team == waveTeam)){
             return false;
         }
 

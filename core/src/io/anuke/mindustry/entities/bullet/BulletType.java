@@ -3,12 +3,12 @@ package io.anuke.mindustry.entities.bullet;
 import io.anuke.arc.audio.*;
 import io.anuke.arc.math.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.Content;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -47,7 +47,7 @@ public abstract class BulletType extends Content{
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
-    public float statusDuration = 60 * 1f;
+    public float statusDuration = 60 * 10f;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */

@@ -7,8 +7,9 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
 import io.anuke.mindustry.ImagePacker.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -68,7 +69,6 @@ public class Generators{
 
         ImagePacker.generate("block-icons", () -> {
             Image colors = new Image(content.blocks().size, 1);
-            Color outlineColor = Color.valueOf("404049");
 
             for(Block block : content.blocks()){
                 TextureRegion[] regions = block.getGeneratedIcons();
@@ -114,7 +114,7 @@ public class Generators{
                                         }
                                     }
                                     if(found){
-                                        out.draw(x, y, outlineColor);
+                                        out.draw(x, y, block.outlineColor);
                                     }
                                 }
                             }

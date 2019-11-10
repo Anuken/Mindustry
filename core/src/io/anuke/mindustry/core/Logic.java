@@ -2,10 +2,10 @@ package io.anuke.mindustry.core;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
-import io.anuke.arc.collection.ObjectSet.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -17,6 +17,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
 import io.anuke.mindustry.world.blocks.power.*;
+
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -79,13 +81,12 @@ public class Logic implements ApplicationListener{
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-
-                //painful O(n) iteration + copy
-                for(int i = 0; i < data.brokenBlocks.size; i++){
-                    BrokenBlock b = data.brokenBlocks.get(i);
-                    if(b.x == event.tile.x && b.y == event.tile.y){
-                        data.brokenBlocks.removeIndex(i);
-                        break;
+                Iterator<BrokenBlock> it = data.brokenBlocks.iterator();
+                while(it.hasNext()){
+                    BrokenBlock b = it.next();
+                    Block block = content.block(b.block);
+                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                        it.remove();
                     }
                 }
             }
@@ -136,8 +137,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = world.isZone() && world.getZone().isBossWave(state.wave) ? state.rules.waveSpacing * state.rules.bossWaveMultiplier :
-        world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
+        state.wavetime = world.isZone() && world.getZone().isLaunchWave(state.wave) ? state.rules.waveSpacing * state.rules.launchWaveMultiplier : state.rules.waveSpacing;
 
         Events.fire(new WaveEvent());
     }
@@ -176,12 +176,16 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+        for(Tile tile : state.teams.get(defaultTeam).cores){
             Effects.effect(Fx.launch, tile);
         }
 
+        if(world.getZone() != null){
+            world.getZone().setLaunched();
+        }
+
         Time.runTask(30f, () -> {
-            for(Tile tile : new ObjectSetIterator<>(state.teams.get(defaultTeam).cores)){
+            for(Tile tile : state.teams.get(defaultTeam).cores){
                 for(Item item : content.items()){
                     if(tile == null || tile.entity == null || tile.entity.items == null) continue;
                     data.addItem(item, tile.entity.items.get(item));

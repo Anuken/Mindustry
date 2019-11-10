@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.fragments;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.Group;
 import io.anuke.arc.scene.actions.*;
@@ -22,7 +22,6 @@ public class LoadingFragment extends Fragment{
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(133f).row();
-
             t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
             t.row();
             t.add("$loading").name("namelabel").pad(10f);
@@ -37,7 +36,7 @@ public class LoadingFragment extends Fragment{
         });
     }
 
-    public void setProgress(FloatProvider progress){
+    public void setProgress(Floatp progress){
         bar.reset(0f);
         bar.visible(true);
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);

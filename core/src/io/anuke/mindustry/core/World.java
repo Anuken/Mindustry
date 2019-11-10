@@ -185,6 +185,10 @@ public class World{
         Events.fire(new WorldLoadEvent());
     }
 
+    public void setGenerating(boolean gen){
+        this.generating = gen;
+    }
+
     public boolean isGenerating(){
         return generating;
     }
@@ -272,6 +276,7 @@ public class World{
     }
 
     public void removeBlock(Tile tile){
+        if(tile == null) return;
         tile.link().getLinkedTiles(other -> other.setBlock(Blocks.air));
     }
 

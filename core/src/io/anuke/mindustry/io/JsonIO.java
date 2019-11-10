@@ -4,16 +4,32 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.MappableContent;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
+import java.io.*;
+
 @SuppressWarnings("unchecked")
 public class JsonIO{
     private static CustomJson jsonBase = new CustomJson();
-    private static Json json = new Json(){{
-        apply(this);
-    }};
+    private static Json json = new Json(){
+        { apply(this); }
+
+        @Override
+        public void writeValue(Object value, Class knownType, Class elementType){
+            if(value instanceof io.anuke.mindustry.ctype.MappableContent){
+                try{
+                    getWriter().value(((MappableContent)value).name);
+                }catch(IOException e){
+                    throw new RuntimeException(e);
+                }
+            }else{
+                super.writeValue(value, knownType, elementType);
+            }
+        }
+    };
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());
@@ -66,24 +82,6 @@ public class JsonIO{
             }
         });
 
-        //TODO extremely hacky and disgusting
-        for(Block block : Vars.content.blocks()){
-            Class type = block.getClass();
-            if(type.isAnonymousClass()) type = type.getSuperclass();
-
-            json.setSerializer(type, new Serializer<Block>(){
-                @Override
-                public void write(Json json, Block object, Class knownType){
-                    json.writeValue(object.name);
-                }
-
-                @Override
-                public Block read(Json json, JsonValue jsonData, Class type){
-                    return Vars.content.getByName(ContentType.block, jsonData.asString());
-                }
-            });
-        }
-
         json.setSerializer(Block.class, new Serializer<Block>(){
             @Override
             public void write(Json json, Block object, Class knownType){
@@ -95,26 +93,6 @@ public class JsonIO{
                 return Vars.content.getByName(ContentType.block, jsonData.asString());
             }
         });
-
-        /*
-        json.setSerializer(TeamData.class, new Serializer<TeamData>(){
-            @Override
-            public void write(Json json, TeamData object, Class knownType){
-                json.writeObjectStart();
-                json.writeValue("brokenBlocks", object.brokenBlocks.toArray());
-                json.writeValue("team", object.team.ordinal());
-                json.writeObjectEnd();
-            }
-
-            @Override
-            public TeamData read(Json json, JsonValue jsonData, Class type){
-                long[] blocks = jsonData.get("brokenBlocks").asLongArray();
-                Team team = Team.all[jsonData.getInt("team", 0)];
-                TeamData out = new TeamData(team, EnumSet.of(new Team[]{}));
-                out.brokenBlocks = new LongQueue(blocks);
-                return out;
-            }
-        });*/
 
         json.setSerializer(ItemStack.class, new Serializer<ItemStack>(){
             @Override

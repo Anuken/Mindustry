@@ -23,6 +23,10 @@ public class MissileBulletType extends BasicBulletType{
         hitSound = Sounds.explosion;
     }
 
+    public MissileBulletType(){
+        this(1f, 1f, "missile");
+    }
+
     @Override
     public void update(Bullet b){
         super.update(b);
@@ -32,7 +36,7 @@ public class MissileBulletType extends BasicBulletType{
         }
 
         if(weaveMag > 0){
-            b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag));
+            b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag) * Time.delta());
         }
     }
 }

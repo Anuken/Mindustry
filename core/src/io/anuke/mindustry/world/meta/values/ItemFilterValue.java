@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.meta.values;
 
 import io.anuke.arc.collection.Array;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.func.Boolf;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.ui.ItemDisplay;
@@ -10,9 +10,9 @@ import io.anuke.mindustry.world.meta.StatValue;
 import static io.anuke.mindustry.Vars.content;
 
 public class ItemFilterValue implements StatValue{
-    private final Predicate<Item> filter;
+    private final Boolf<Item> filter;
 
-    public ItemFilterValue(Predicate<Item> filter){
+    public ItemFilterValue(Boolf<Item> filter){
         this.filter = filter;
     }
 

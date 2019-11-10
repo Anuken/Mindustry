@@ -3,7 +3,7 @@ package io.anuke.mindustry.world;
 import io.anuke.arc.collection.IntMap;
 import io.anuke.arc.graphics.Color;
 import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.world.blocks.Floor;
 
 public class LegacyColorMapper implements ContentList{

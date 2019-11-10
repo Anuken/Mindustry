@@ -3,13 +3,14 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.backends.iosrobovm.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
+import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
@@ -34,11 +35,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
+            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
                 UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
@@ -58,7 +58,22 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         if(documentURLs.size() < 1) return;
 
                         cont.dismissViewController(true, () -> {});
-                        controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> cons.accept(Core.files.absolute(url.getPath())));
+
+                        try{
+                            controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> {
+                                if(error != null){
+                                   ui.showErrorMessage("Import error.\n" + error.getLocalizedFailureReason() + "\n" + error.getLocalizedDescription());
+                                }else{
+                                    try{
+                                        cons.get(Core.files.absolute(url.getPath()));
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
+                                }
+                            });
+                        }catch(Throwable t){
+                            ui.showException(t);
+                        }
                     }
 
                     @Override
@@ -68,7 +83,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
-                        cons.accept(Core.files.absolute(destinationURL.getAbsoluteString()));
+                        cons.get(Core.files.absolute(destinationURL.getAbsoluteString()));
                     }
 
                     @Override
@@ -88,9 +103,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 }
 
                 cont.setDelegate(new ChooserDelegate());
-                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {
 
-                });
+               // DispatchQueue.getMainQueue().sync(() -> {
+                UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
+               // });
             }
 
             @Override
@@ -101,10 +117,11 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 NSURL url = new NSURL(to.file());
                 UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
 
+                //DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> io.anuke.arc.util.Log.info("Success! Presented {0}", to));
+                .presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                //});
             }
 
             @Override
@@ -118,7 +135,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, config);
+        }, new IOSApplicationConfiguration(){{
+           errorHandler = ModCrashHandler::handle;
+        }});
     }
 
     @Override
@@ -129,7 +148,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
-        System.out.println("Opened URL: " + url.getPath());
         openURL(url);
         return false;
     }
@@ -139,7 +157,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
         boolean b = super.didFinishLaunching(application, options);
 
         if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getPath());
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 

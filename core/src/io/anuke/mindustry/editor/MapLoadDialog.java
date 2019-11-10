@@ -1,6 +1,6 @@
 package io.anuke.mindustry.editor;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
@@ -13,7 +13,7 @@ import static io.anuke.mindustry.Vars.maps;
 public class MapLoadDialog extends FloatingDialog{
     private Map selected = null;
 
-    public MapLoadDialog(Consumer<Map> loader){
+    public MapLoadDialog(Cons<Map> loader){
         super("$editor.loadmap");
 
         shown(this::rebuild);
@@ -22,7 +22,7 @@ public class MapLoadDialog extends FloatingDialog{
         button.setDisabled(() -> selected == null);
         button.clicked(() -> {
             if(selected != null){
-                loader.accept(selected);
+                loader.get(selected);
                 hide();
             }
         });

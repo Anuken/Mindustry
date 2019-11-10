@@ -1,16 +1,21 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.LiquidBlock;
-import io.anuke.mindustry.world.modules.LiquidModule;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.modules.*;
 
-public class Conduit extends LiquidBlock{
+public class Conduit extends LiquidBlock implements Autotiler{
     protected final int timerFlow = timers++;
 
     protected TextureRegion[] topRegions = new TextureRegion[7];
@@ -21,6 +26,7 @@ public class Conduit extends LiquidBlock{
         rotate = true;
         solid = false;
         floating = true;
+        conveyorPlacement = true;
     }
 
     @Override
@@ -39,29 +45,45 @@ public class Conduit extends LiquidBlock{
         super.onProximityUpdate(tile);
 
         ConduitEntity entity = tile.entity();
-        entity.blendbits = 0;
-        entity.blendrot = 0;
-
-        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 3;
-        }else if(blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 6;
-        }else if(blends(tile, 1) && blends(tile, 2)){
-            entity.blendbits = 2;
-        }else if(blends(tile, 3) && blends(tile, 2)){
-            entity.blendbits = 4;
-        }else if(blends(tile, 1)){
-            entity.blendbits = 5;
-        }else if(blends(tile, 3)){
-            entity.blendbits = 1;
-        }
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
+        entity.blendbits = bits[0];
     }
 
-    private boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
-        if(other != null) other = other.link();
+    @Override
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        int[] bits = getTiling(req, list);
 
-        return other != null && other.block().hasLiquids && other.block().outputsLiquid && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
+        if(bits == null) return;
+
+        Draw.colorl(0.34f);
+        Draw.alpha(0.5f);
+        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(),
+            botRegions[bits[0]].getWidth() * Draw.scl * req.animScale, botRegions[bits[0]].getHeight() * Draw.scl * req.animScale,
+            req.rotation * 90);
+        Draw.color();
+
+
+        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), topRegions[bits[0]].getWidth() * Draw.scl * req.animScale, topRegions[bits[0]].getHeight() * Draw.scl * req.animScale, req.rotation * 90);
+    }
+
+    @Override
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conduit &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+    }
+
+    @Override
+    public void transformCase(int num, int[] bits){
+        bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 5 ? 1 : 0;
+    }
+
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -102,7 +124,8 @@ public class Conduit extends LiquidBlock{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.noSleep();
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.rotation());
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)
+            && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
     }
 
     @Override
@@ -113,7 +136,6 @@ public class Conduit extends LiquidBlock{
     public static class ConduitEntity extends TileEntity{
         public float smoothLiquid;
 
-        byte blendbits;
-        int blendrot;
+        int blendbits;
     }
 }

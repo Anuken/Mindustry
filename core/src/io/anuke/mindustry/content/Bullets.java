@@ -4,11 +4,11 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 
@@ -99,8 +99,7 @@ public class Bullets implements ContentList{
             collidesTiles = false;
             splashDamageRadius = 25f;
             splashDamage = 30f;
-            incendAmount = 4;
-            incendSpread = 11f;
+            status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             trailEffect = Fx.incendTrail;
@@ -228,8 +227,7 @@ public class Bullets implements ContentList{
             splashDamage = 10f;
             lifetime = 160f;
             hitEffect = Fx.blastExplosion;
-            incendSpread = 10f;
-            incendAmount = 3;
+            status = StatusEffects.burning;
         }};
 
         missileSurge = new MissileBulletType(4.4f, 15, "bullet"){{
@@ -342,9 +340,7 @@ public class Bullets implements ContentList{
             bulletHeight = 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
-            incendSpread = 3f;
-            incendAmount = 1;
-            incendChance = 0.3f;
+            status = StatusEffects.burning;
             inaccuracy = 3f;
             lifetime = 60f;
         }};
@@ -354,9 +350,7 @@ public class Bullets implements ContentList{
             bulletHeight = 12f;
             frontColor = Color.valueOf("feb380");
             backColor = Color.valueOf("ea8878");
-            incendSpread = 3f;
-            incendAmount = 1;
-            incendChance = 0.3f;
+            status = StatusEffects.burning;
             lifetime = 60f;
         }};
 
@@ -385,9 +379,7 @@ public class Bullets implements ContentList{
             bulletHeight = 21f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
-            incendSpread = 3f;
-            incendAmount = 2;
-            incendChance = 0.3f;
+            status = StatusEffects.burning;
             shootEffect = Fx.shootBig;
         }};
 

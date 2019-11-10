@@ -20,7 +20,7 @@ import io.anuke.mindustry.gen.*;
 import static io.anuke.mindustry.Vars.net;
 
 public class Weapon{
-    public final String name;
+    public String name;
 
     /** minimum cursor distance from player, fixes 'cross-eyed' shooting. */
     protected static float minPlayerDist = 20f;
@@ -48,7 +48,7 @@ public class Weapon{
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** whether to shoot the weapons in different arms one after another, rather than all at once */
-    public boolean roundrobin = false;
+    public boolean alternate = false;
     /** randomization of shot length */
     public float lengthRand = 0f;
     /** delay in ticks between shots */
@@ -64,7 +64,7 @@ public class Weapon{
         this.name = name;
     }
 
-    protected Weapon(){
+    public Weapon(){
         //no region
         this.name = "";
     }
@@ -124,7 +124,7 @@ public class Weapon{
     }
 
     public void load(){
-        region = Core.atlas.find(name + "-equip", Core.atlas.find("clear"));
+        region = Core.atlas.find(name + "-equip", Core.atlas.find(name, Core.atlas.find("clear")));
     }
 
     public void update(ShooterTrait shooter, float pointerX, float pointerY){
@@ -143,7 +143,7 @@ public class Weapon{
 
     public void update(ShooterTrait shooter, float mountX, float mountY, float angle, boolean left){
         if(shooter.getTimer().get(shooter.getShootTimer(left), reload)){
-            if(roundrobin){
+            if(alternate){
                 shooter.getTimer().reset(shooter.getShootTimer(!left), reload / 2f);
             }
 

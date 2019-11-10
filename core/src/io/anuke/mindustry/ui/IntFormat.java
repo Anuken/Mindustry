@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui;
 
 
 import io.anuke.arc.Core;
-import io.anuke.arc.function.Function;
+import io.anuke.arc.func.Func;
 
 /**
  * A low-garbage way to format bundle strings.
@@ -11,13 +11,13 @@ public class IntFormat{
     private final StringBuilder builder = new StringBuilder();
     private final String text;
     private int lastValue = Integer.MIN_VALUE;
-    private Function<Integer, String> converter = String::valueOf;
+    private Func<Integer, String> converter = String::valueOf;
 
     public IntFormat(String text){
         this.text = text;
     }
 
-    public IntFormat(String text, Function<Integer, String> converter){
+    public IntFormat(String text, Func<Integer, String> converter){
         this.text = text;
         this.converter = converter;
     }

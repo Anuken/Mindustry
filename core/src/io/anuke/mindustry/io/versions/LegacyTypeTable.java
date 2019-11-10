@@ -1,6 +1,6 @@
 package io.anuke.mindustry.io.versions;
 
-import io.anuke.arc.function.Supplier;
+import io.anuke.arc.func.Prov;
 import io.anuke.mindustry.entities.type.Bullet;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.Player;
@@ -62,7 +62,7 @@ Before addition of new units: [build 79 and below]
 14 = Revenant
  */
 public class LegacyTypeTable{
-    private static final Supplier[] build81Table = {
+    private static final Prov[] build81Table = {
         Player::new,
         Fire::new,
         Puddle::new,
@@ -79,7 +79,7 @@ public class LegacyTypeTable{
         Revenant::new
     };
 
-    private static final Supplier[] build80Table = {
+    private static final Prov[] build80Table = {
         Player::new,
         Fire::new,
         Puddle::new,
@@ -98,7 +98,7 @@ public class LegacyTypeTable{
         Revenant::new
     };
 
-    private static final Supplier[] build79Table = {
+    private static final Prov[] build79Table = {
         Player::new,
         Fire::new,
         Puddle::new,
@@ -116,7 +116,7 @@ public class LegacyTypeTable{
         Revenant::new
     };
 
-    public static Supplier[] getTable(int build){
+    public static Prov[] getTable(int build){
         if(build == -1 || build == 81){
             //return most recent one since that's probably it; not guaranteed
             return build81Table;

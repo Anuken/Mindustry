@@ -36,7 +36,7 @@ public class Minimap extends Table{
                 Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
                 if(renderer.minimap.getTexture() != null){
-                    renderer.minimap.drawEntities(x, y, width, height);
+                    renderer.minimap.drawEntities(x, y, width, height, false);
                 }
             }
         }).size(140f);

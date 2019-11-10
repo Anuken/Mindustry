@@ -16,6 +16,7 @@ public class Wall extends Block{
         solid = true;
         destructible = true;
         group = BlockGroup.walls;
+        buildCostMultiplier = 5f;
     }
 
     @Override
@@ -50,5 +51,4 @@ public class Wall extends Block{
     public boolean canReplace(Block other){
         return super.canReplace(other) && health > other.health;
     }
-
 }

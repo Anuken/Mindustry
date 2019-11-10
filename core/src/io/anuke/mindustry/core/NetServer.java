@@ -94,11 +94,6 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
-                con.kick(KickReason.banned);
-                return;
-            }
-
             if(admins.getPlayerLimit() > 0 && playerGroup.size() >= admins.getPlayerLimit()){
                 con.kick(KickReason.playerLimit);
                 return;
@@ -336,6 +331,8 @@ public class NetServer implements ApplicationListener{
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
                     }else if(found.isLocal){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
+                    }else if(found.getTeam() != player.getTeam()){
+                        player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteTime/60 + " minutes between votekicks.");
@@ -357,6 +354,11 @@ public class NetServer implements ApplicationListener{
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
+                if(player.isLocal){
+                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    return;
+                }
+
                 //hosts can vote all they want
                 if(player.uuid != null && (currentlyKicking[0].voted.contains(player.uuid) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid).lastIP))){
                     player.sendMessage("[scarlet]You've already voted. Sit down.");
@@ -450,7 +452,7 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean chatting,
+        boolean boosting, boolean shooting, boolean chatting, boolean building,
         BuildRequest[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -477,6 +479,7 @@ public class NetServer implements ApplicationListener{
         player.isTyping = chatting;
         player.isBoosting = boosting;
         player.isShooting = shooting;
+        player.isBuilding = building;
         player.buildQueue().clear();
         for(BuildRequest req : requests){
             if(req == null) continue;

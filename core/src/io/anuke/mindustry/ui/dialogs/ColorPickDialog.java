@@ -1,6 +1,6 @@
 package io.anuke.mindustry.ui.dialogs;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.*;
@@ -11,7 +11,7 @@ import io.anuke.mindustry.ui.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class ColorPickDialog extends Dialog{
-    private Consumer<Color> cons;
+    private Cons<Color> cons;
 
     public ColorPickDialog(){
         super("");
@@ -26,7 +26,7 @@ public class ColorPickDialog extends Dialog{
             Color color = playerColors[i];
 
             ImageButton button = table.addImageButton(Tex.whiteui, Styles.clearTogglei, 34, () -> {
-                cons.accept(color);
+                cons.get(color);
                 hide();
             }).size(48).get();
             button.setChecked(player.color.equals(color));
@@ -44,7 +44,7 @@ public class ColorPickDialog extends Dialog{
 
     }
 
-    public void show(Consumer<Color> cons){
+    public void show(Cons<Color> cons){
         this.cons = cons;
         show();
     }

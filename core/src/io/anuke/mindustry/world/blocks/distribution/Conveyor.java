@@ -2,24 +2,27 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class Conveyor extends Block{
+public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final float minmove = 1f / (Short.MAX_VALUE - 2);
     private static ItemPos drawpos = new ItemPos();
@@ -27,7 +30,6 @@ public class Conveyor extends Block{
     private static ItemPos pos2 = new ItemPos();
     private final Vector2 tr1 = new Vector2();
     private final Vector2 tr2 = new Vector2();
-
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
     protected float speed = 0f;
@@ -40,6 +42,7 @@ public class Conveyor extends Block{
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
+        conveyorPlacement = true;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -55,7 +58,7 @@ public class Conveyor extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.itemsMoved, speed * 60 * (1f / itemSpace), StatUnit.itemsSecond);
+        stats.add(BlockStat.itemsMoved, speed * 60 / itemSpace, StatUnit.itemsSecond);
     }
 
     @Override
@@ -90,55 +93,25 @@ public class Conveyor extends Block{
         super.onProximityUpdate(tile);
 
         ConveyorEntity entity = tile.entity();
-        entity.blendbits = 0;
-        entity.blendsclx = entity.blendscly = 1;
-
-        if(blends(tile, 2) && blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 3;
-        }else if(blends(tile, 1) && blends(tile, 3)){
-            entity.blendbits = 4;
-        }else if(blends(tile, 1) && blends(tile, 2)){
-            entity.blendbits = 2;
-        }else if(blends(tile, 3) && blends(tile, 2)){
-            entity.blendbits = 2;
-            entity.blendscly = -1;
-        }else if(blends(tile, 1)){
-            entity.blendbits = 1;
-            entity.blendscly = -1;
-        }else if(blends(tile, 3)){
-            entity.blendbits = 1;
-        }
+        int[] bits = buildBlending(tile, tile.rotation(), null, true);
+        entity.blendbits = bits[0];
+        entity.blendsclx = bits[1];
+        entity.blendscly = bits[2];
     }
 
     @Override
-    public void getPlaceDraw(PlaceDraw draw, int rotation, int prevX, int prevY, int prevRotation){
-        draw.rotation = rotation;
-        draw.scalex = draw.scaley = 1;
+    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+        int[] bits = getTiling(req, list);
 
-        int blendbits = 0;
+        if(bits == null) return;
 
-        if(blends(rotation, 1, prevX, prevY, prevRotation)){
-            blendbits = 1;
-            draw.scaley = -1;
-        }else if(blends(rotation, 3, prevX, prevY, prevRotation)){
-            blendbits = 1;
-        }
-
-        draw.rotation = rotation;
-        draw.region = regions[blendbits][0];
+        TextureRegion region = regions[bits[0]][0];
+        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl * req.animScale, region.getHeight() * bits[2] * Draw.scl * req.animScale, req.rotation * 90);
     }
 
-    protected boolean blends(int rotation, int offset, int prevX, int prevY, int prevRotation){
-        Point2 left = Geometry.d4(rotation - offset);
-        return left.equals(prevX, prevY) && prevRotation == Mathf.mod(rotation + offset, 4);
-    }
-
-    protected boolean blends(Tile tile, int direction){
-        Tile other = tile.getNearby(Mathf.mod(tile.rotation() - direction, 4));
-        if(other != null) other = other.link();
-
-        return other != null && other.block().outputsItems()
-        && ((tile.getNearby(tile.rotation()) == other) || (!other.block().rotate || other.getNearby(other.rotation()) == tile));
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -209,7 +182,7 @@ public class Conveyor extends Block{
         Tile next = tile.getNearby(tile.rotation());
         if(next != null) next = next.link();
 
-        float nextMax = next != null && next.block() instanceof Conveyor ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
+        float nextMax = next != null && next.block() instanceof Conveyor && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -275,6 +248,16 @@ public class Conveyor extends Block{
     @Override
     public boolean isAccessible(){
         return true;
+    }
+
+    @Override
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conveyor &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
     @Override
@@ -439,12 +422,12 @@ public class Conveyor extends Block{
         static long toLong(int value){
             byte[] values = Pack.bytes(value, writeByte);
 
-            byte itemid = values[0];
+            short itemid = content.item(values[0]).id;
             float x = values[1] / 127f;
             float y = ((int)values[2] + 128) / 255f;
 
             short[] shorts = writeShort;
-            shorts[0] = (short)itemid;
+            shorts[0] = itemid;
             shorts[1] = (short)(x * Short.MAX_VALUE);
             shorts[2] = (short)((y - 1f) * Short.MAX_VALUE);
             return Pack.longShorts(shorts);

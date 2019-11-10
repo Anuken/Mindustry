@@ -1,21 +1,25 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.scene.ui.layout.Table;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.game.*;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.ui.ReqImage;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockStat;
-import io.anuke.mindustry.world.meta.BlockStats;
+import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
 public class ConsumeLiquid extends ConsumeLiquidBase{
-    public final Liquid liquid;
+    public final @NonNull Liquid liquid;
 
     public ConsumeLiquid(Liquid liquid, float amount){
         super(amount);
         this.liquid = liquid;
+    }
+
+    protected ConsumeLiquid(){
+        this(null, 0f);
     }
 
     @Override

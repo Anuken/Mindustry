@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.blocks.defense;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -31,13 +31,12 @@ public class ForceProjector extends Block{
     protected float cooldownLiquid = 1.5f;
     protected float cooldownBrokenBase = 0.35f;
     protected float basePowerDraw = 0.2f;
-    protected float powerDamage = 0.1f;
     protected TextureRegion topRegion;
 
     private static Tile paramTile;
     private static ForceProjector paramBlock;
     private static ForceEntity paramEntity;
-    private static Consumer<AbsorbTrait> shieldConsumer = trait -> {
+    private static Cons<AbsorbTrait> shieldConsumer = trait -> {
         if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && paramBlock.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
             trait.absorb();
             Effects.effect(Fx.absorb, trait);
@@ -73,8 +72,6 @@ public class ForceProjector extends Block{
         super.setStats();
 
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
-
         stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
     }
 

@@ -8,22 +8,24 @@ import io.anuke.arc.backends.sdl.*;
 import io.anuke.arc.backends.sdl.jni.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.Log.*;
+import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.core.Version;
 import io.anuke.mindustry.desktop.steam.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Version;
-import io.anuke.mindustry.maps.Map;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.net.Net.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 
 import java.io.*;
@@ -37,7 +39,8 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, showConsole = OS.getPropertyNotNull("user.name").equals("anuke");
+    boolean useDiscord = OS.is64Bit, loadError = false;
+    Throwable steamError;
 
     static{
         if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
@@ -64,7 +67,7 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Log.setUseColors(false);
         Version.init();
-        boolean useSteam = Version.modifier.equals("steam");
+        boolean useSteam = Version.modifier.contains("steam");
         testMobile = Array.with(args).contains("-testMobile");
 
         if(useDiscord){
@@ -81,66 +84,109 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useSteam){
-            if(showConsole){
-                StringBuilder base = new StringBuilder();
-                Log.setLogger(new LogHandler(){
-                      @Override
-                      public void print(String text, Object... args){
-                          String out = Log.format(text, false, args);
-
-                          base.append(out).append("\n");
-                      }
-                });
-
-                Events.on(ClientLoadEvent.class, event -> {
-                    Label[] label = {null};
-                    boolean[] visible = {false};
-                    Core.scene.table(t -> {
-                        t.touchable(Touchable.disabled);
-                        t.top().left();
-                        t.update(() -> {
-                            if(Core.input.keyTap(KeyCode.BACKTICK)){
-                                visible[0] = !visible[0];
-                            }
-
-                            t.toFront();
-                        });
-                        t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
-                        label[0].getText().append(base);
-                    });
-
-                    Log.setLogger(new LogHandler(){
-                        @Override
-                        public void print(String text, Object... args){
-                            super.print(text, args);
-                            String out = Log.format(text, false, args);
-
-                            int maxlen = 2048;
-
-                            if(label[0].getText().length() > maxlen){
-                                label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
-                            }
-
-                            label[0].getText().append(out).append("\n");
-                            label[0].invalidateHierarchy();
-                        }
-                    });
-                });
+            //delete leftover dlls
+            FileHandle file = new FileHandle(".");
+            for(FileHandle other : file.parent().list()){
+                if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
+                    other.delete();
+                }
             }
+
+            StringBuilder base = new StringBuilder();
+            Log.setLogger(new LogHandler(){
+                  @Override
+                  public void print(String text, Object... args){
+                      String out = Log.format(text, false, args);
+
+                      base.append(out).append("\n");
+                  }
+            });
+
+            Events.on(ClientLoadEvent.class, event -> {
+                Label[] label = {null};
+                boolean[] visible = {false};
+                Core.scene.table(t -> {
+                    t.touchable(Touchable.disabled);
+                    t.top().left();
+                    t.update(() -> {
+                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke") || Version.modifier.contains("beta"))){
+                            visible[0] = !visible[0];
+                        }
+
+                        t.toFront();
+                    });
+                    t.table(Styles.black3, f -> label[0] = f.add("").get()).visible(() -> visible[0]);
+                    label[0].getText().append(base);
+                });
+
+                Log.setLogger(new LogHandler(){
+                    @Override
+                    public void print(String text, Object... args){
+                        super.print(text, args);
+                        String out = Log.format(text, false, args);
+
+                        int maxlen = 2048;
+
+                        if(label[0].getText().length() > maxlen){
+                            label[0].setText(label[0].getText().substring(label[0].getText().length() - maxlen));
+                        }
+
+                        label[0].getText().append(out).append("\n");
+                        label[0].invalidateHierarchy();
+                    }
+                });
+
+                if(steamError != null){
+                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
+                        ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
+                    })));
+                }
+            });
 
             try{
                 SteamAPI.loadLibraries();
+
                 if(!SteamAPI.init()){
+                    loadError = true;
                     Log.err("Steam client not running.");
                 }else{
                     initSteam(args);
                     Vars.steam = true;
                 }
+
+                if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
+                    System.exit(0);
+                }
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
-                Log.err(e);
+                logSteamError(e);
             }
+        }
+    }
+
+    void logSteamError(Throwable e){
+        steamError = e;
+        loadError = true;
+        Log.err(e);
+        try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
+            String log = Strings.parseException(e, true);
+            s.write(log.getBytes());
+        }catch(Exception e2){
+            Log.err(e2);
+        }
+    }
+
+    void fallbackSteam(){
+        try{
+            String name = "steam_api";
+            if(OS.isMac || OS.isLinux) name = "lib" + name;
+            if(OS.isWindows && OS.is64Bit) name += "64";
+            name += (OS.isLinux ? ".so" : OS.isMac ? ".dylib" : ".dll");
+            Streams.copyStream(getClass().getResourceAsStream(name), new FileOutputStream(name));
+            System.loadLibrary(new File(name).getAbsolutePath());
+        }catch(Throwable e){
+            logSteamError(e);
         }
     }
 
@@ -149,6 +195,7 @@ public class DesktopLauncher extends ClientLauncher{
         SVars.stats = new SStats();
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
+        boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
             player.name = SVars.net.friends.getPersonaName();
@@ -177,17 +224,27 @@ public class DesktopLauncher extends ClientLauncher{
                 }
             });
         });
+
+        Events.on(DisposeEvent.class, event -> {
+            SteamAPI.shutdown();
+            isShutdown[0] = true;
+        });
+
         //steam shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(SteamAPI::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(!isShutdown[0]){
+                SteamAPI.shutdown();
+            }
+        }));
     }
 
     static void handleCrash(Throwable e){
-        Consumer<Runnable> dialog = Runnable::run;
+        Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
-        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
+        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher") || e.getMessage().toLowerCase().contains("pixel format"))){
 
-            dialog.accept(() -> message(
+            dialog.get(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :
                             "Your graphics card does not support OpenGL 2.0!\n" +
                                     "Try to update your graphics drivers.\n\n" +
@@ -198,31 +255,29 @@ public class DesktopLauncher extends ClientLauncher{
         boolean fbgp = badGPU;
 
         CrashSender.send(e, file -> {
-            Throwable cause = Strings.getFinalCause(e);
+            Array<Throwable> causes = Strings.getCauses(e);
+            Throwable fc = causes.find(t -> t instanceof ModLoadException);
+            if(fc == null) fc = Strings.getFinalCause(e);
+            Throwable cause = fc;
             if(!fbgp){
-                dialog.accept(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
+                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + cause.getClass().getSimpleName().replace("Exception", "") + (cause.getMessage() == null ? "" : ":\n" + cause.getMessage())));
             }
         });
     }
 
     @Override
-    public Array<FileHandle> getExternalMaps(){
-        return !steam ? super.getExternalMaps() : SVars.workshop.getMapFiles();
+    public Array<FileHandle> getWorkshopContent(Class<? extends Publishable> type){
+        return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 
     @Override
-    public void viewMapListing(Map map){
-        viewMapListing(map.file.parent().name());
+    public void viewListing(Publishable pub){
+        SVars.workshop.viewListing(pub);
     }
 
     @Override
-    public void viewMapListing(String mapid){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + mapid);
-    }
-
-    @Override
-    public void viewMapListingInfo(Map map){
-        SVars.workshop.viewMapListingInfo(map);
+    public void viewListingID(String id){
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + id);
     }
 
     @Override
@@ -236,8 +291,8 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void publishMap(Map map){
-        SVars.workshop.publishMap(map);
+    public void publish(Publishable pub){
+        SVars.workshop.publish(pub);
     }
 
     @Override

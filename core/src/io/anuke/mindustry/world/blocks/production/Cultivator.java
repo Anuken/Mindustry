@@ -23,6 +23,7 @@ public class Cultivator extends GenericCrafter{
     protected TextureRegion middleRegion, topRegion;
     protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
+    protected Attribute attribute = Attribute.spores;
 
     public Cultivator(String name){
         super(name);
@@ -57,7 +58,7 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1 + sumAttribute(Attribute.spores, x, y)) * 100, 1), x, y, valid);
+        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1 + sumAttribute(attribute, x, y)) * 100, 1), x, y, valid);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class Cultivator extends GenericCrafter{
         super.onProximityAdded(tile);
 
         CultivatorEntity entity = tile.entity();
-        entity.boost = sumAttribute(Attribute.spores, tile.x, tile.y);
+        entity.boost = sumAttribute(attribute, tile.x, tile.y);
     }
 
     @Override

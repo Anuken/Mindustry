@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.core.GameState.State;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.traits.BuilderTrait;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.entities.units.*;
@@ -61,11 +62,13 @@ public class EventType{
 
     /** Called when a zone's requirements are met. */
     public static class ZoneRequireCompleteEvent{
-        public final Zone zone, required;
+        public final Zone zoneMet, zoneForMet;
+        public final Objective objective;
 
-        public ZoneRequireCompleteEvent(Zone zone, Zone required){
-            this.zone = zone;
-            this.required = required;
+        public ZoneRequireCompleteEvent(Zone zoneMet, Zone zoneForMet, Objective objective){
+            this.zoneMet = zoneMet;
+            this.zoneForMet = zoneForMet;
+            this.objective = objective;
         }
     }
 
@@ -130,7 +133,41 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
+        public final Tile tile;
+        public final Player player;
+        public final Item item;
+        public final int amount;
+        
+        public DepositEvent(Tile tile, Player player, Item item, int amount){
+            this.tile = tile;
+            this.player = player;
+            this.item = item;
+            this.amount = amount;
+        }
+    }
+    
+    /** Called when the player taps a block. */
+    public static class TapEvent{
+        public final Tile tile;
+        public final Player player;
 
+        public TapEvent(Tile tile, Player player){
+            this.tile = tile;
+            this.player = player;
+        }
+    }
+    
+    /** Called when the player sets a specific block. */
+    public static class TapConfigEvent{
+        public final Tile tile;
+        public final Player player;
+        public final int value;
+
+        public TapConfigEvent(Tile tile, Player player, int value){
+            this.tile = tile;
+            this.player = player;
+            this.value = value;
+        }
     }
 
     public static class GameOverEvent{

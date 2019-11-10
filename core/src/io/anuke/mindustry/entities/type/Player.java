@@ -21,7 +21,6 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
-import io.anuke.mindustry.input.InputHandler.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
@@ -51,7 +50,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public String name = "noname";
     public @Nullable
     String uuid, usid;
-    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping;
+    public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -359,7 +359,13 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawOver(){
         if(dead) return;
 
-        drawMechanics();
+        if(isBuilding() && isBuilding){
+            if(!state.isPaused()){
+                drawBuilding();
+            }
+        }else{
+            drawMining();
+        }
     }
 
     @Override
@@ -426,57 +432,17 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     public void drawBuildRequests(){
-        BuildRequest last = null;
+        if(!isLocal) return;
+
         for(BuildRequest request : buildQueue()){
             if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= placeDistance || state.isEditor()))) continue;
 
+            request.animScale = 1f;
             if(request.breaking){
-                Block block = world.ltile(request.x, request.y).block();
-
-                //draw removal request
-                Lines.stroke(2f, Pal.removeBack);
-
-                float rad = Mathf.absin(Time.time(), 7f, 1f) + block.size * tilesize / 2f - 1;
-                Lines.square(
-                request.x * tilesize + block.offset(),
-                request.y * tilesize + block.offset() - 1,
-                rad);
-
-                Draw.color(Pal.remove);
-
-                Lines.square(
-                request.x * tilesize + block.offset(),
-                request.y * tilesize + block.offset(), rad);
+                control.input.drawBreaking(request);
             }else{
-                Draw.color();
-                PlaceDraw draw = PlaceDraw.instance;
-
-                draw.scalex = 1;
-                draw.scaley = 1;
-                draw.rotation = request.rotation;
-
-                if(last == null){
-                    request.block.getPlaceDraw(draw, request.rotation, request.x, request.y, request.rotation);
-                }else{
-                    request.block.getPlaceDraw(draw, request.rotation, last.x - request.x, last.y - request.y, last.rotation);
-                }
-
-                TextureRegion region = draw.region;
-
-                Draw.rect(region,
-                request.x * tilesize + request.block.offset(), request.y * tilesize + request.block.offset(),
-                region.getWidth() * 1f * Draw.scl * draw.scalex,
-                region.getHeight() * 1f * Draw.scl * draw.scaley, request.block.rotate ? draw.rotation * 90 : 0);
-
-                Draw.color(Pal.accent);
-                for(int i = 0; i < 4; i++){
-                    Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(request.block.size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", request.x * tilesize + request.block.offset() + offset * p.x, request.y * tilesize + request.block.offset() + offset * p.y, i * 90);
-                }
-                Draw.color();
-
-                last = request;
+                request.block.drawRequest(request, control.input.allRequests(),
+                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -486,6 +452,18 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     //endregion
 
     //region update methods
+
+    @Override
+    public void updateMechanics(){
+        if(isBuilding){
+            updateBuilding();
+        }
+
+        //mine only when not building
+        if(buildRequest() == null || !isBuilding){
+            updateMining();
+        }
+    }
 
     @Override
     public void update(){
@@ -519,7 +497,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         BuildRequest request = buildRequest();
-        if(isBuilding() && request.tile() != null && (request.tile().withinDst(x, y, placeDistance) || state.isEditor())){
+        if(isBuilding() && isBuilding && request.tile() != null && (request.tile().withinDst(x, y, placeDistance) || state.isEditor())){
             loops.play(Sounds.build, request.tile(), 0.75f);
         }
 
@@ -611,7 +589,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
         }
@@ -819,9 +797,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         placeQueue.clear();
         dead = true;
         lastText = null;
+        isBuilding = true;
         textFadeTime = 0f;
         target = null;
         moveTarget = null;
+        isShooting = isBoosting = isTransferring = isTyping = false;
         spawner = lastSpawner = null;
         health = maxHealth();
         mining = null;
@@ -912,7 +892,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void write(DataOutput buffer) throws IOException{
         super.writeSave(buffer, !isLocal);
         TypeIO.writeStringData(buffer, name);
-        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3));
+        buffer.writeByte(Pack.byteValue(isAdmin) | (Pack.byteValue(dead) << 1) | (Pack.byteValue(isBoosting) << 2) | (Pack.byteValue(isTyping) << 3)| (Pack.byteValue(isBuilding) << 4));
         buffer.writeInt(Color.rgba8888(color));
         buffer.writeByte(mech.id);
         buffer.writeInt(mining == null ? noSpawner : mining.pos());
@@ -934,6 +914,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         dead = (bools & 2) != 0;
         boolean boosting = (bools & 4) != 0;
         isTyping = (bools & 8) != 0;
+        boolean building = (bools & 16) != 0;
         color.set(buffer.readInt());
         mech = content.getByID(ContentType.mech, buffer.readByte());
         int mine = buffer.readInt();
@@ -952,6 +933,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             velocity.y = lastvy;
         }else{
             mining = world.tile(mine);
+            isBuilding = building;
             isBoosting = boosting;
         }
 
