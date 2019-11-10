@@ -18,6 +18,7 @@ import static io.anuke.mindustry.Vars.*;
 public class Zone extends UnlockableContent{
     public @NonNull Generator generator;
     public @NonNull Objective configureObjective = new ZoneWave(this, 15);
+    public @NonNull Planet planet;
     public Array<Objective> requirements = new Array<>();
     //TODO autogenerate
     public Array<Item> resources = new Array<>();
@@ -35,13 +36,14 @@ public class Zone extends UnlockableContent{
 
     private Array<ItemStack> defaultStartingItems = new Array<>();
 
-    public Zone(String name, Generator generator){
+    public Zone(String name, Planet planet, Generator generator){
         super(name);
         this.generator = generator;
+        this.planet = planet;
     }
 
     public Zone(String name){
-        this(name, new MapGenerator(name));
+        this(name, Planets.starter, new MapGenerator(name));
     }
 
     @Override

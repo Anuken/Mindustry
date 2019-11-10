@@ -240,6 +240,7 @@ public class Logic implements ApplicationListener{
                     bulletGroup.update();
                     tileGroup.update();
                     fireGroup.update();
+                    weatherGroup.update();
                 }else{
                     for(EntityGroup<?> group : unitGroups){
                         group.updateEvents();

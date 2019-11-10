@@ -15,37 +15,20 @@ import io.anuke.mindustry.world.blocks.storage.*;
 
 import static io.anuke.mindustry.Vars.*;
 
+//TODO:
+//- limited # of enemy spawns as filter
+//- spawn loadout selection as filter
+//- configure map loadout, make 1 core the default
 public class MapGenerator extends Generator{
     private Map map;
     private String mapName;
-    private Array<Decoration> decorations = Array.with(new Decoration(Blocks.stone, Blocks.rock, 0.003f));
-    /**
-     * The amount of final enemy spawns used. -1 to use everything in the map.
-     * This amount of enemy spawns is selected randomly from the map.
-     */
-    public int enemySpawns = -1;
-    /** Whether floor is distorted along with blocks. */
-    public boolean distortFloor = false;
 
     public MapGenerator(String mapName){
         this.mapName = mapName;
     }
 
-    public MapGenerator(String mapName, int enemySpawns){
-        this.mapName = mapName;
-        this.enemySpawns = enemySpawns;
-    }
-
-    public MapGenerator decor(Decoration... decor){
-        this.decorations.addAll(decor);
-        return this;
-    }
     public void removePrefix(String name){
         this.mapName = this.mapName.substring(name.length() + 1);
-    }
-
-    {
-        decor(new Decoration(Blocks.snow, Blocks.snowrock, 0.01), new Decoration(Blocks.ignarock, Blocks.pebbles, 0.03f));
     }
 
     public Map getMap(){
@@ -154,17 +137,5 @@ public class MapGenerator extends Generator{
 
         world.prepareTiles(tiles);
         world.setMap(map);
-    }
-
-    public static class Decoration{
-        public final Block floor;
-        public final Block wall;
-        public final double chance;
-
-        public Decoration(Block floor, Block wall, double chance){
-            this.floor = floor;
-            this.wall = wall;
-            this.chance = chance;
-        }
     }
 }

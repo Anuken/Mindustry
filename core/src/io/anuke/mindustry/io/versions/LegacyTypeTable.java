@@ -66,54 +66,54 @@ public class LegacyTypeTable{
         Player::new,
         Fire::new,
         Puddle::new,
-        Draug::new,
-        Spirit::new,
-        Phantom::new,
-        Dagger::new,
-        Crawler::new,
-        Titan::new,
-        Fortress::new,
-        Eruptor::new,
-        Wraith::new,
-        Ghoul::new,
-        Revenant::new
+        MinerDrone::new,
+        RepairDrone::new,
+        BuilderDrone::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        FlyingUnit::new,
+        FlyingUnit::new,
+        HoverUnit::new
     };
 
     private static final Prov[] build80Table = {
         Player::new,
         Fire::new,
         Puddle::new,
-        Bullet::new, //TODO reading these may crash
+        Bullet::new,
         Lightning::new,
-        Draug::new,
-        Spirit::new,
-        Phantom::new,
-        Dagger::new,
-        Crawler::new,
-        Titan::new,
-        Fortress::new,
-        Eruptor::new,
-        Wraith::new,
-        Ghoul::new,
-        Revenant::new
+        MinerDrone::new,
+        RepairDrone::new,
+        BuilderDrone::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        FlyingUnit::new,
+        FlyingUnit::new,
+        HoverUnit::new
     };
 
     private static final Prov[] build79Table = {
         Player::new,
         Fire::new,
         Puddle::new,
-        Bullet::new, //TODO reading these may crash
+        Bullet::new,
         Lightning::new,
-        Spirit::new,
-        Dagger::new,
-        Crawler::new,
-        Titan::new,
-        Fortress::new,
-        Eruptor::new,
-        Wraith::new,
-        Ghoul::new,
-        Phantom::new,
-        Revenant::new
+        RepairDrone::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        GroundUnit::new,
+        FlyingUnit::new,
+        FlyingUnit::new,
+        BuilderDrone::new,
+        HoverUnit::new
     };
 
     public static Prov[] getTable(int build){

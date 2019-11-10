@@ -11,12 +11,11 @@ import io.anuke.arc.util.Time;
 public class Shaders{
     public static Shadow shadow;
     public static BlockBuild blockbuild;
-    public static @Nullable
-    Shield shield;
+    public static @Nullable Shield shield;
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;
-    public static SurfaceShader water, tar;
+    public static SurfaceShader water, tar, slag;
 
     public static void init(){
         shadow = new Shadow();
@@ -33,6 +32,7 @@ public class Shaders{
         menu = new MenuShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
+        slag = new SurfaceShader("slag");
     }
 
     public static class MenuShader extends LoadShader{

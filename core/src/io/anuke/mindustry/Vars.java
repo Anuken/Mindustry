@@ -20,12 +20,13 @@ import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.maps.*;
 import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.net.Net;
+import io.anuke.mindustry.type.Weather.*;
 import io.anuke.mindustry.world.blocks.defense.ForceProjector.*;
 
 import java.nio.charset.*;
 import java.util.*;
 
-import static io.anuke.arc.Core.*;
+import static io.anuke.arc.Core.settings;
 
 @SuppressWarnings("unchecked")
 public class Vars implements Loadable{
@@ -178,6 +179,7 @@ public class Vars implements Loadable{
     public static EntityGroup<ShieldEntity> shieldGroup;
     public static EntityGroup<Puddle> puddleGroup;
     public static EntityGroup<Fire> fireGroup;
+    public static EntityGroup<WeatherEntity> weatherGroup;
     public static EntityGroup<BaseUnit>[] unitGroups;
 
     public static Player player;
@@ -232,6 +234,7 @@ public class Vars implements Loadable{
         puddleGroup = entities.add(Puddle.class).enableMapping();
         shieldGroup = entities.add(ShieldEntity.class, false);
         fireGroup = entities.add(Fire.class).enableMapping();
+        weatherGroup = entities.add(WeatherEntity.class);
         unitGroups = new EntityGroup[Team.all.length];
 
         for(Team team : Team.all){

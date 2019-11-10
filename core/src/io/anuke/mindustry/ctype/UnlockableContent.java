@@ -42,7 +42,9 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Returns the localized name of this content. */
-    public abstract String localizedName();
+    public String localizedName(){
+        return localizedName;
+    }
 
     //public abstract TextureRegion getContentIcon();
 
@@ -53,7 +55,7 @@ public abstract class UnlockableContent extends MappableContent{
     public void onUnlock(){
     }
 
-    /** Whether this content is always hidden in the content info dialog. */
+    /** Whether this content is always hidden in the content database dialog. */
     public boolean isHidden(){
         return false;
     }
