@@ -1,6 +1,7 @@
 package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.math.Mathf;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.arc.util.Eachable;
 import io.anuke.mindustry.ui.Cicon;
@@ -40,6 +41,8 @@ public class PowerDiode extends Block{
         if(backStored > frontStored) {
             // send half of the difference
             float amount = backGraph.getBatteryStored() * (backStored - frontStored) / 2;
+            // prevent sending more than the front can handle
+            amount = Mathf.clamp(amount, 0, frontGraph.getTotalBatteryCapacity() * (1 - frontStored));
 
             backGraph.useBatteries(amount);
             frontGraph.chargeBatteries(amount);
