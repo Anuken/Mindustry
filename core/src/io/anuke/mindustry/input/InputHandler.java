@@ -15,6 +15,7 @@ import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.Timer;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -738,6 +739,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
+            if(stack.item == Items.holyHandgrenade){
+                Timer.schedule(() -> {
+                    Damage.dynamicExplosion(x, y, Items.holyHandgrenade.flammability, 2f + Items.holyHandgrenade.explosiveness, 0f, player.getSize() / 2f, Pal.darkFlame);
+                    Damage.damage(x, y, 20 * tilesize, 1253);
+                    ScorchDecal.create(x, y);
+                    Effects.effect(Fx.explosion, x, y);
+                    Effects.shake(2f, 2f, x,y);
+                    Sounds.bang.at(x, y);
+                }, 1f);
+            }
         }
     }
 

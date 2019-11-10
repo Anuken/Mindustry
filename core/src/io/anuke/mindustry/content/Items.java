@@ -7,7 +7,7 @@ import io.anuke.mindustry.type.ItemType;
 
 public class Items implements ContentList{
     public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
-    sporePod, sand, blastCompound, pyratite, metaglass;
+    sporePod, sand, blastCompound, pyratite, metaglass, holyHandgrenade;
 
     @Override
     public void load(){
@@ -96,6 +96,11 @@ public class Items implements ContentList{
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 1.4f;
             explosiveness = 0.4f;
+        }};
+
+        holyHandgrenade = new Item("holy-handgrenade", Color.valueOf("ffc65b")){{
+            flammability = blastCompound.flammability * 60;
+            explosiveness = blastCompound.flammability * 60;
         }};
     }
 }
