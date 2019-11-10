@@ -54,8 +54,12 @@ public class Predict{
     /**
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
-    public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.getTargetVelocityX() - src.getTargetVelocityX()/2f, dst.getTargetVelocityY() - src.getTargetVelocityY()/2f, v);
+    public static Vector2 intercept(TargetTrait src, TargetTrait dst, float v) {
+        // divide by delta to remove FPS multiplicator from target velocity
+        float delta = Time.delta();
+        float dstvx = dst.getTargetVelocityX() - src.getTargetVelocityX() / (2f * delta);
+        float dstvy = dst.getTargetVelocityY() - src.getTargetVelocityY() / (2f * delta);
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dstvx, dstvy, v);
     }
 
     private static Vector2 quad(float a, float b, float c){
