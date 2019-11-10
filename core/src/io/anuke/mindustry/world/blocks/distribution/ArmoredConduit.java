@@ -9,33 +9,32 @@ import io.anuke.mindustry.world.Edges;
 import io.anuke.mindustry.world.Tile;
 
 public class ArmoredConduit extends Conduit{
-
     protected TextureRegion capRegion;
 
-    public ArmoredConduit(String name) {
+    public ArmoredConduit(String name){
         super(name);
         leakResistance = 10f;
     }
 
     @Override
-    public void load() {
+    public void load(){
         super.load();
         capRegion = Core.atlas.find(name + "-cap");
     }
 
     @Override
-    public void draw(Tile tile) {
+    public void draw(Tile tile){
         super.draw(tile);
 
         // draw the cap when a conduit would normally leak
         Tile next = tile.getNearby(tile.rotation());
-        if (next.getTeam() == tile.getTeam() && next.block().hasLiquids) return;
+        if(next.getTeam() == tile.getTeam() && next.block().hasLiquids) return;
 
         Draw.rect(capRegion, tile.drawx(), tile.drawy(), tile.rotation() * 90);
     }
 
     @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount) {
+    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         return super.acceptLiquid(tile, source, liquid, amount) && (source.block() instanceof Conduit) || Edges.getFacingEdge(source, tile).relativeTo(tile) == tile.rotation();
     }
 
