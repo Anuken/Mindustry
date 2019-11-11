@@ -65,11 +65,37 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
                                 if(url.startAccessingSecurityScopedResource()){
                                     try{
-                                        cons.get(new FileHandle(url.getAbsoluteString()));
+                                        int[] tread = {0};
+
+                                        cons.get(new FileHandle(url.getPath()){
+                                            @Override
+                                            public InputStream read(){
+                                                NSInputStream stream = new NSInputStream(url);
+
+                                                return new InputStream(){
+                                                    byte[] tmp = {0};
+
+                                                    @Override
+                                                    public int read() throws IOException{
+                                                        read(tmp);
+                                                        return tmp[0];
+                                                    }
+
+                                                    @Override
+                                                    public int read(byte[] bytes, int offset, int length){
+                                                        int read = (int)stream.read(bytes, offset, length);
+                                                        tread[0] += read;
+                                                        return read;
+                                                    }
+                                                };
+                                            }
+                                        });
+                                        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showInfo("Read " + tread[0]))));
+                                        //cons.get(new FileHandle(url.getAbsoluteString()));
                                     }catch(Throwable t){
                                         ui.showException(t);
                                     }finally{
-                                        url.stopAccessingSecurityScopedResource();
+                                        //url.stopAccessingSecurityScopedResource();
                                     }
                                 }else{
                                     ui.showErrorMessage("Failed to access file.");
