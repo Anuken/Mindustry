@@ -39,7 +39,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
+
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
@@ -63,30 +64,33 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
                                 NSInputStream stream = new NSInputStream(NSData.read(url));
 
-                                cons.get(new FileHandle(url.getPath()){
-                                    @Override
-                                    public InputStream read(){
-                                        return new InputStream(){
-                                            byte[] tmp = {0};
 
-                                            @Override
-                                            public int read() throws IOException{
-                                                read(tmp);
-                                                return tmp[0];
-                                            }
 
-                                            @Override
-                                            public int read(byte[] bytes, int offset, int length){
-                                                return (int)stream.read(bytes, offset, length);
-                                            }
+                                try{
+                                    cons.get(new FileHandle(url.getAbsoluteURL().getPath()));
+                                    /*
+                                    cons.get(new FileHandle(url.getPath()){
+                                        @Override
+                                        public InputStream read(){
+                                            return new InputStream(){
+                                                byte[] tmp = {0};
 
-                                            @Override
-                                            public void close() throws IOException{
-                                                stream.close();
-                                            }
-                                        };
-                                    }
-                                });
+                                                @Override
+                                                public int read() throws IOException{
+                                                    read(tmp);
+                                                    return tmp[0];
+                                                }
+
+                                                @Override
+                                                public int read(byte[] bytes, int offset, int length){
+                                                    return (int)stream.read(bytes, offset, length);
+                                                }
+                                            };
+                                        }
+                                    });*/
+                                }catch(Throwable t){
+                                    ui.showException(t);
+                                }
                             });
                         }catch(Throwable t){
                             ui.showException(t);
@@ -138,24 +142,22 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 cont.setDelegate(new ChooserDelegate());
 
-               // DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
-               // });
             }
 
             @Override
             public void shareFile(FileHandle file){
-                Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
-                file.copyTo(to);
+                try{
+                    Log.info("Attempting to share file " + file);
+                    FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                    file.copyTo(to);
 
-                NSURL url = new NSURL(to.file());
-                UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-
-                //DispatchQueue.getMainQueue().sync(() -> {
-                UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
-                //});
+                    NSURL url = new NSURL(to.file());
+                    UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                    UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                }catch(Throwable t){
+                    ui.showException(t);
+                }
             }
 
             @Override
