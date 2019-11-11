@@ -64,8 +64,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
 
                                 try{
-                                    cons.get(new FileHandle(url.getAbsoluteURL().getPath()));
-                                    /*
+                                    NSInputStream stream = new NSInputStream(url);
+
                                     cons.get(new FileHandle(url.getPath()){
                                         @Override
                                         public InputStream read(){
@@ -80,11 +80,14 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                                                 @Override
                                                 public int read(byte[] bytes, int offset, int length){
+                                                    if(!stream.hasBytesAvailable()){
+                                                        return -1;
+                                                    }
                                                     return (int)stream.read(bytes, offset, length);
                                                 }
                                             };
                                         }
-                                    });*/
+                                    });
                                 }catch(Throwable t){
                                     ui.showException(t);
                                 }
