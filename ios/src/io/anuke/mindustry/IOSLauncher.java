@@ -60,16 +60,30 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                         cont.dismissViewController(true, () -> {});
                         NSFileCoordinator coord = new NSFileCoordinator(null);
+
                         try{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
+                                if(url.startAccessingSecurityScopedResource()){
+                                    try{
+                                        cons.get(new FileHandle(url.getAbsoluteString()));
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }finally{
+                                        url.stopAccessingSecurityScopedResource();
+                                    }
+                                }else{
+                                    ui.showErrorMessage("Failed to access file.");
+                                }
 
+                                /*
                                 try{
-                                    NSInputStream stream = new NSInputStream(url);
                                     int[] tread = {0};
 
                                     cons.get(new FileHandle(url.getPath()){
                                         @Override
                                         public InputStream read(){
+                                            NSInputStream stream = new NSInputStream(url);
+
                                             return new InputStream(){
                                                 byte[] tmp = {0};
 
@@ -83,7 +97,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                                                 public int read(byte[] bytes, int offset, int length){
                                                     int read = (int)stream.read(bytes, offset, length);
                                                     tread[0] += read;
-                                                    if(read == 0) return -1;
                                                     return read;
                                                 }
                                             };
@@ -92,7 +105,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                                     Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showInfo("Read " + tread[0]))));
                                 }catch(Throwable t){
                                     ui.showException(t);
-                                }
+                                }*/
                             });
                         }catch(Throwable t){
                             ui.showException(t);
@@ -123,7 +136,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
-                        cons.get(Core.files.absolute(destinationURL.getAbsoluteString()));
+                        //cons.get(Core.files.absolute(destinationURL.getAbsoluteString()));
                     }
 
                     @Override
