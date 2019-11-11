@@ -31,7 +31,6 @@ public class ForceProjector extends Block{
     protected float cooldownLiquid = 1.5f;
     protected float cooldownBrokenBase = 0.35f;
     protected float basePowerDraw = 0.2f;
-    protected float powerDamage = 0.1f;
     protected TextureRegion topRegion;
 
     private static Tile paramTile;
@@ -73,8 +72,6 @@ public class ForceProjector extends Block{
         super.setStats();
 
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
-
         stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
     }
 

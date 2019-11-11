@@ -144,6 +144,9 @@ public class BuildBlock extends Block{
 
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
+            if(player.buildWasAutoPaused && !player.isBuilding){
+                player.isBuilding = true;
+            }
             //player.clearBuilding();
             player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
         }

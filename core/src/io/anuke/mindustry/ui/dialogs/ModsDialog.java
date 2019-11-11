@@ -95,7 +95,7 @@ public class ModsDialog extends FloatingDialog{
     void modError(Throwable error){
         ui.loadfrag.hide();
 
-        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && t.getMessage().contains("SSL"))){
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
             ui.showErrorMessage("$feature.unsupported");
         }else{
             ui.showException(error);

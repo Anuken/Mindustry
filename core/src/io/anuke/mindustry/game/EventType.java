@@ -135,10 +135,38 @@ public class EventType{
     public static class DepositEvent{
         public final Tile tile;
         public final Player player;
+        public final Item item;
+        public final int amount;
         
-        public DepositEvent(Tile tile, Player player){
+        public DepositEvent(Tile tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
+            this.item = item;
+            this.amount = amount;
+        }
+    }
+    
+    /** Called when the player taps a block. */
+    public static class TapEvent{
+        public final Tile tile;
+        public final Player player;
+
+        public TapEvent(Tile tile, Player player){
+            this.tile = tile;
+            this.player = player;
+        }
+    }
+    
+    /** Called when the player sets a specific block. */
+    public static class TapConfigEvent{
+        public final Tile tile;
+        public final Player player;
+        public final int value;
+
+        public TapConfigEvent(Tile tile, Player player, int value){
+            this.tile = tile;
+            this.player = player;
+            this.value = value;
         }
     }
 

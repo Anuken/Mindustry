@@ -18,7 +18,7 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.platform;
 
 public class FileChooser extends FloatingDialog{
-    private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
+    private static final FileHandle homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     private static FileHandle lastDirectory = homeDirectory;
 
     private Table files;
@@ -98,10 +98,6 @@ public class FileChooser extends FloatingDialog{
             updateFiles(true);
         });
 
-        //Macs are confined to the Downloads/ directory
-        if(OS.isMac){
-            up.setDisabled(true);
-        }
 
         ImageButton back = new ImageButton(Icon.arrowLeft);
         ImageButton forward = new ImageButton(Icon.arrowRight);
@@ -171,8 +167,7 @@ public class FileChooser extends FloatingDialog{
 
     private void updateFiles(boolean push){
         if(push) stack.push(directory);
-        //if is mac, don't display extra info since you can only ever go to downloads
-        navigation.setText(OS.isMac ? directory.name() : directory.toString());
+        navigation.setText(directory.toString());
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
@@ -190,23 +185,21 @@ public class FileChooser extends FloatingDialog{
         files.top().left();
         FileHandle[] names = getFileNames();
 
-        //macs are confined to the Downloads/ directory
-        if(!OS.isMac){
-            Image upimage = new Image(Icon.folderParentSmall);
-            TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
-            upbutton.clicked(() -> {
-                directory = directory.parent();
-                lastDirectory = directory;
-                updateFiles(true);
-            });
+        Image upimage = new Image(Icon.folderParentSmall);
+        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
+        upbutton.clicked(() -> {
+            directory = directory.parent();
+            lastDirectory = directory;
+            updateFiles(true);
+        });
 
-            upbutton.left().add(upimage).padRight(4f).padLeft(4);
-            upbutton.getLabel().setAlignment(Align.left);
-            upbutton.getCells().reverse();
+        upbutton.left().add(upimage).padRight(4f).padLeft(4);
+        upbutton.getLabel().setAlignment(Align.left);
+        upbutton.getCells().reverse();
 
-            files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
-            files.row();
-        }
+        files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
+        files.row();
+
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
