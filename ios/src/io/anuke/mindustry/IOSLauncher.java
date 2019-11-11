@@ -65,6 +65,24 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
                                 if(url.startAccessingSecurityScopedResource()){
                                     try{
+                                        controller.importDocument(url, new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (result, error) -> {
+                                            if(error != null){
+                                                ui.showErrorMessage("Import error.\n" + error.getLocalizedFailureReason() + "\n" + error.getLocalizedDescription());
+                                            }else{
+                                                try{
+                                                    cons.get(Core.files.absolute(url.getPath()));
+                                                }catch(Throwable t){
+                                                    ui.showException(t);
+                                                }
+                                            }
+                                        });
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
+
+                                    /*
+
+                                    try{
                                         int[] tread = {0};
 
                                         cons.get(new FileHandle(url.getPath()){
@@ -106,7 +124,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                                                 ui.showException(t3);
                                             }
                                         }
-                                    }
+                                    }*/
                                 }else{
                                     ui.showErrorMessage("Failed to access file.");
                                 }
