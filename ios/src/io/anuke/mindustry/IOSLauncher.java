@@ -94,8 +94,18 @@ public class IOSLauncher extends IOSApplication.Delegate{
                                         //cons.get(new FileHandle(url.getAbsoluteString()));
                                     }catch(Throwable t){
                                         ui.showException(t);
-                                    }finally{
-                                        //url.stopAccessingSecurityScopedResource();
+
+                                        try{
+                                            cons.get(new FileHandle(url.getPath()));
+                                        }catch(Throwable t2){
+                                            ui.showException(t2);
+
+                                            try{
+                                                cons.get(new FileHandle(url.getAbsoluteURL().getPath()));
+                                            }catch(Throwable t3){
+                                                ui.showException(t3);
+                                            }
+                                        }
                                     }
                                 }else{
                                     ui.showErrorMessage("Failed to access file.");
