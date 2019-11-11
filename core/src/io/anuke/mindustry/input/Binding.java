@@ -9,6 +9,7 @@ import io.anuke.arc.input.KeyCode;
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.A, KeyCode.D), "general"),
     move_y(new Axis(KeyCode.S, KeyCode.W)),
+    mouse_move(KeyCode.MOUSE_BACK),
     select(KeyCode.MOUSE_LEFT),
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),
