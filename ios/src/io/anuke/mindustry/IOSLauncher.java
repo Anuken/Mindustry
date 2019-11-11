@@ -62,9 +62,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         NSFileCoordinator coord = new NSFileCoordinator(null);
                         try{
                             coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
-                                NSInputStream stream = new NSInputStream(NSData.read(url));
-
-
 
                                 try{
                                     cons.get(new FileHandle(url.getAbsoluteURL().getPath()));
