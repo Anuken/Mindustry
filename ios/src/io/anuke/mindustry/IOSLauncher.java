@@ -65,6 +65,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                                 try{
                                     NSInputStream stream = new NSInputStream(url);
+                                    int[] tread = {0};
 
                                     cons.get(new FileHandle(url.getPath()){
                                         @Override
@@ -80,14 +81,15 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                                                 @Override
                                                 public int read(byte[] bytes, int offset, int length){
-                                                    if(!stream.hasBytesAvailable()){
-                                                        return -1;
-                                                    }
-                                                    return (int)stream.read(bytes, offset, length);
+                                                    int read = (int)stream.read(bytes, offset, length);
+                                                    tread[0] += read;
+                                                    if(read == 0) return -1;
+                                                    return read;
                                                 }
                                             };
                                         }
                                     });
+                                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showInfo("Read " + tread[0]))));
                                 }catch(Throwable t){
                                     ui.showException(t);
                                 }
