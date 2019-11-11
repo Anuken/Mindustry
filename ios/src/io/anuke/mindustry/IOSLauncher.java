@@ -58,6 +58,40 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         if(documentURLs.size() < 1) return;
 
                         cont.dismissViewController(true, () -> {});
+                        NSFileCoordinator coord = new NSFileCoordinator(null);
+                        try{
+                            coord.coordinateReadingItem(documentURLs.get(0), NSFileCoordinatorReadingOptions.None, url -> {
+                                NSInputStream stream = new NSInputStream(NSData.read(url));
+
+                                cons.get(new FileHandle(url.getPath()){
+                                    @Override
+                                    public InputStream read(){
+                                        return new InputStream(){
+                                            byte[] tmp = {0};
+
+                                            @Override
+                                            public int read() throws IOException{
+                                                read(tmp);
+                                                return tmp[0];
+                                            }
+
+                                            @Override
+                                            public int read(byte[] bytes, int offset, int length){
+                                                return (int)stream.read(bytes, offset, length);
+                                            }
+
+                                            @Override
+                                            public void close() throws IOException{
+                                                stream.close();
+                                            }
+                                        };
+                                    }
+                                });
+                            });
+                        }catch(Throwable t){
+                            ui.showException(t);
+                        }
+                        /*
 
                         try{
                             controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> {
@@ -73,7 +107,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             });
                         }catch(Throwable t){
                             ui.showException(t);
-                        }
+                        }*/
                     }
 
                     @Override
