@@ -4,6 +4,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.Queue;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.input.KeyCode;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -109,6 +110,11 @@ public interface BuilderTrait extends Entity, TeamTrait{
                     Call.onTileConfig(null, tile, current.config);
                 }
             }
+        }
+
+        if(Core.input.keyDown(KeyCode.R) && current.progress == entity.progress){
+            buildQueue().removeFirst();
+            buildQueue().addLast(current);
         }
 
         current.progress = entity.progress;
