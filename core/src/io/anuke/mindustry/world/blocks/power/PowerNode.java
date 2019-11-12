@@ -305,7 +305,7 @@ public class PowerNode extends PowerBlock{
 
     public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
         if(src == null || other == null) return true;
-        return overlaps(src.drawx(), src.drawy(), other, laserRange * tilesize);
+        return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
     }
 
     protected void drawLaser(Tile tile, Tile target){
