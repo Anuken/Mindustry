@@ -3,6 +3,7 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.collection.Queue;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -153,6 +154,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || !Units.canInteract(player, tile)) return;
         tile.block().configured(tile, player, value);
         Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
+    }
+
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
+    public static void onSkipCurrentBuild(Player player){
+        Queue<BuildRequest> queue = player.buildQueue();
+        BuildRequest current = queue.removeFirst();
+        queue.addLast(current);
     }
 
     public Eachable<BuildRequest> allRequests(){

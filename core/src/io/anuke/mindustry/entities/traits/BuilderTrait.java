@@ -113,11 +113,6 @@ public interface BuilderTrait extends Entity, TeamTrait{
             }
         }
 
-        if(Core.input.keyDown(Binding.afford_building) && current.progress == entity.progress){
-            buildQueue().removeFirst();
-            buildQueue().addLast(current);
-        }
-
         current.progress = entity.progress;
     }
 

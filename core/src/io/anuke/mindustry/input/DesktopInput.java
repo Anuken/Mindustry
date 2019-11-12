@@ -50,7 +50,7 @@ public class DesktopInput extends InputHandler{
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("affordbuilding", Core.keybinds.get(Binding.afford_building).key.toString())).style(Styles.outlineLabel);
+                b.add(Core.bundle.format("skipbuilding", Core.keybinds.get(Binding.skip_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
@@ -439,6 +439,10 @@ public class DesktopInput extends InputHandler{
                 Core.settings.put("preferredlaseropacity", Core.settings.getInt("lasersopacity"));
                 Core.settings.put("lasersopacity", 0);
             }
+        }
+
+        if (Core.input.keyTap(Binding.skip_building)){
+            Call.onSkipCurrentBuild(player);
         }
     }
 
