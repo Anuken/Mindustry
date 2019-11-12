@@ -21,8 +21,14 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton("$mods.report", Icon.link,
-        () -> Core.net.openURI(reportIssueURL))
+        buttons.addImageTextButton(mobile ? "$mods.report" : "$mods.openfolder", Icon.link,
+        () -> {
+            if(mobile){
+                Core.net.openURI(reportIssueURL);
+            }else{
+                Core.net.openFolder(modDirectory.absolutePath());
+            }
+        })
         .size(250f, 64f);
 
         buttons.row();
@@ -89,7 +95,7 @@ public class ModsDialog extends FloatingDialog{
     void modError(Throwable error){
         ui.loadfrag.hide();
 
-        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && t.getMessage().contains("SSL"))){
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
             ui.showErrorMessage("$feature.unsupported");
         }else{
             ui.showException(error);

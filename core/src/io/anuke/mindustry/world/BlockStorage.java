@@ -41,6 +41,10 @@ public abstract class BlockStorage extends UnlockableContent{
         return true;
     }
 
+    public boolean productionValid(Tile tile){
+        return true;
+    }
+
     public float getPowerProduction(Tile tile){
         return 0f;
     }
@@ -111,6 +115,8 @@ public abstract class BlockStorage extends UnlockableContent{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
+            other = other.block().getLiquidDestination(other, tile);
+
             if(other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids != null){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
@@ -138,6 +144,7 @@ public abstract class BlockStorage extends UnlockableContent{
         if(next == null) return 0;
 
         next = next.link();
+        next = next.block().getLiquidDestination(next, tile);
 
         if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
@@ -173,6 +180,10 @@ public abstract class BlockStorage extends UnlockableContent{
             tile.entity.liquids.remove(liquid, leakAmount);
         }
         return 0;
+    }
+
+    public Tile getLiquidDestination(Tile tile, Tile from){
+        return tile;
     }
 
     /**
@@ -265,10 +276,5 @@ public abstract class BlockStorage extends UnlockableContent{
             return true;
         }
         return false;
-    }
-
-    /** Returns whether this block's inventory has space and is ready for production. */
-    public boolean canProduce(Tile tile){
-        return true;
     }
 }

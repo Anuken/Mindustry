@@ -6,7 +6,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockStat;
 import io.anuke.mindustry.world.meta.StatUnit;
 
-public abstract class PowerTurret extends CooledTurret{
+public class PowerTurret extends CooledTurret{
     protected @NonNull BulletType shootType;
     protected float powerUse = 1f;
 

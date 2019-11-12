@@ -83,13 +83,16 @@ public class SWorkshop implements SteamUGCCallback{
     public void viewListing(Publishable p){
         long handle = Strings.parseLong(p.getSteamID(), -1);
         SteamPublishedFileID id = new SteamPublishedFileID(handle);
+        Log.info("Handle = " + handle);
 
         ui.loadfrag.show();
         query(ugc.createQueryUGCDetailsRequest(id), (detailsList, result) -> {
             ui.loadfrag.hide();
+            Log.info("Fetch result = " + result);
 
             if(result == SteamResult.OK){
                 SteamUGCDetails details = detailsList.first();
+                Log.info("Details result = " + details.getResult());
                 if(details.getResult() == SteamResult.OK){
                     if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
 

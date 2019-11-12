@@ -52,6 +52,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public @Nullable
     String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -590,6 +591,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
         }
 
         Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());

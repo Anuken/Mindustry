@@ -1,5 +1,6 @@
 package io.anuke.mindustry.input;
 
+import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -26,7 +27,7 @@ public class Placement{
         Pools.freeAll(points);
 
         points.clear();
-        if(conveyors){
+        if(conveyors && Core.settings.getBool("conveyorpathfinding")){
             if(astar(startX, startY, endX, endY)){
                 return points;
             }else{

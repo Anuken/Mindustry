@@ -2,13 +2,18 @@ package io.anuke.mindustry.world.blocks.production;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.Array;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.Draw;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.graphics.Layer;
 import io.anuke.mindustry.type.Liquid;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.blocks.LiquidBlock;
 import io.anuke.mindustry.world.meta.*;
+
+import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.world;
 
 public class Pump extends LiquidBlock{
     protected final Array<Tile> drawTiles = new Array<>();
@@ -47,6 +52,31 @@ public class Pump extends LiquidBlock{
         Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
         Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
         Draw.color();
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        Tile tile = world.tile(x, y);
+        if(tile == null) return;
+
+        float tiles = 0f;
+        Liquid liquidDrop = null;
+
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            if(isValid(other)){
+                liquidDrop = other.floor().liquidDrop;
+                tiles++;
+            }
+        }
+
+        if(liquidDrop != null){
+            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", tiles * pumpAmount / size / size * 60f, 0), x, y, valid);
+            float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
+            Draw.mixcol(Color.darkGray, 1f);
+            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
+            Draw.reset();
+            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy);
+        }
     }
 
     @Override
