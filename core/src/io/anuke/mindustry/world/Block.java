@@ -235,7 +235,7 @@ public class Block extends BlockStorage{
 
     /** @return whether this block should play its idle sound.*/
     public boolean shouldIdleSound(Tile tile){
-        return canProduce(tile);
+        return shouldConsume(tile);
     }
 
     public void drawLayer(Tile tile){
@@ -524,7 +524,7 @@ public class Block extends BlockStorage{
                 current = entity -> entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName(),
-                    () -> current.get(entity).color, () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+                    () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -714,6 +714,11 @@ public class Block extends BlockStorage{
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.scl /= req.animScale;
         Draw.color();
+    }
+
+    /** @return a custom minimap color for this tile, or 0 to use default colors. */
+    public int minimapColor(Tile tile){
+        return 0;
     }
 
     public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){

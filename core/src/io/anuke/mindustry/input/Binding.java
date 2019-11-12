@@ -9,6 +9,7 @@ import io.anuke.arc.input.KeyCode;
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.A, KeyCode.D), "general"),
     move_y(new Axis(KeyCode.S, KeyCode.W)),
+    mouse_move(KeyCode.MOUSE_BACK),
     select(KeyCode.MOUSE_LEFT),
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),
@@ -31,12 +32,12 @@ public enum Binding implements KeyBind{
     minimap(KeyCode.M),
     toggle_menus(KeyCode.C),
     screenshot(KeyCode.P),
+    toggle_power_lines(KeyCode.F7),
     player_list(KeyCode.TAB, "multiplayer"),
     chat(KeyCode.ENTER),
     chat_history_prev(KeyCode.UP),
     chat_history_next(KeyCode.DOWN),
     chat_scroll(new Axis(KeyCode.SCROLL)),
-
     ;
 
     private final KeybindValue defaultValue;

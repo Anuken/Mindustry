@@ -65,6 +65,11 @@ public class Sorter extends Block{
     }
 
     @Override
+    public int minimapColor(Tile tile){
+        return tile.<SorterEntity>entity().sortItem == null ? 0 : tile.<SorterEntity>entity().sortItem.color.rgba();
+    }
+
+    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 

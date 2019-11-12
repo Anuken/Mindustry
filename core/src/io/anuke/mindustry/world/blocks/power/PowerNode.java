@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -300,6 +301,11 @@ public class PowerNode extends PowerBlock{
 
     protected boolean overlaps(Tile src, Tile other, float range){
         return overlaps(src.drawx(), src.drawy(), other, range);
+    }
+
+    public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
+        if(src == null || other == null) return true;
+        return overlaps(src.drawx(), src.drawy(), other, laserRange * tilesize);
     }
 
     protected void drawLaser(Tile tile, Tile target){

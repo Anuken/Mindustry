@@ -1,18 +1,15 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.LiquidBlock;
-import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.meta.*;
 
 public class LiquidJunction extends LiquidBlock{
 
     public LiquidJunction(String name){
         super(name);
-        hasLiquids = true;
     }
 
     @Override
@@ -38,23 +35,10 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){
+    public Tile getLiquidDestination(Tile tile, Tile source){
         int dir = source.relativeTo(tile.x, tile.y);
         dir = (dir + 4) % 4;
-        Tile to = tile.getNearby(dir).link();
-
-        if(to.block().hasLiquids && to.block().acceptLiquid(to, tile, liquid, amount)){
-            to.block().handleLiquid(to, tile, liquid, amount);
-        }
-    }
-
-    @Override
-    public boolean acceptLiquid(Tile dest, Tile source, Liquid liquid, float amount){
-        int dir = source.relativeTo(dest.x, dest.y);
-        dir = (dir + 4) % 4;
-        Tile to = dest.getNearby(dir);
-        if(to == null) return false;
-        to = to.link();
-        return to != null && to.entity != null && to.block().hasLiquids && to.block().acceptLiquid(to, dest, liquid, amount);
+        Tile next = tile.getNearby(dir).link();
+        return next.block().getLiquidDestination(next, tile);
     }
 }
