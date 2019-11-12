@@ -51,7 +51,7 @@ public class DesktopInput extends InputHandler{
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.label(() -> Core.bundle.format("affordbuilding", "R"));
+                b.add(Core.bundle.format("affordbuilding", Core.keybinds.get(Binding.afford_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();

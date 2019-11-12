@@ -15,6 +15,7 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.input.Binding;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
@@ -112,7 +113,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
             }
         }
 
-        if(Core.input.keyDown(KeyCode.R) && current.progress == entity.progress){
+        if(Core.input.keyDown(Binding.afford_building) && current.progress == entity.progress){
             buildQueue().removeFirst();
             buildQueue().addLast(current);
         }
