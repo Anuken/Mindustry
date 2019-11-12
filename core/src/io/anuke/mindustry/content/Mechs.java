@@ -15,6 +15,8 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 
+import static io.anuke.mindustry.Vars.indexer;
+
 public class Mechs implements ContentList{
     public static Mech vanguard, alpha, delta, tau, omega, dart, javelin, trident, glaive;
 
@@ -22,7 +24,12 @@ public class Mechs implements ContentList{
 
     @Override
     public void load(){
+
         vanguard = new Mech("vanguard-ship", true){
+            float healRange = 60f;
+            float healReload = 200f;
+            float healPercent = 10f;
+
             {
                 drillPower = 1;
                 mineSpeed = 4f;
@@ -62,6 +69,18 @@ public class Mechs implements ContentList{
             public boolean alwaysUnlocked(){
                 return true;
             }
+
+            @Override
+            public void updateAlt(Player player){
+                if(player.timer.get(Player.timerAbility, healReload)){
+                    if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
+                        other.entity.healBy(other.entity.maxHealth() * healPercent);
+                        Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
+                    })){
+                        Effects.effect(Fx.healWave, player);
+                    }
+                }
+            }
         };
 
         alpha = new Mech("alpha-mech", false){
@@ -79,19 +98,20 @@ public class Mechs implements ContentList{
 
                 weapon = new Weapon("shockgun"){{
                     shake = 2f;
-                    length = 1f;
+                    length = 0.5f;
                     reload = 70f;
                     alternate = true;
-                    bullet = Bullets.lancerLaser;
                     recoil = 4f;
-                    shootSound = Sounds.spark;
+                    width = 5f;
+                    shootSound = Sounds.laser;
 
-                    bullet = new LaserBulletType(20f){{
+                    bullet = new LaserBulletType(){{
+                        damage = 20f;
                         recoil = 1f;
                         sideAngle = 45f;
                         sideWidth = 1f;
                         sideLength = 70f;
-                        colors = new Color[]{Pal.heal.cpy().mul(1, 1, 1, 0.4f), Pal.heal, Color.white};
+                        colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                     }};
                 }};
             }

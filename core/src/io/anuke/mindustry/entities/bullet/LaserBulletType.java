@@ -30,6 +30,10 @@ public class LaserBulletType extends BulletType{
         pierce = true;
     }
 
+    public LaserBulletType(){
+        this(1f);
+    }
+
     @Override
     public float range(){
         return length;

@@ -1,12 +1,12 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
@@ -83,27 +83,10 @@ public class OverdriveProjector extends Block{
             float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.power.satisfaction;
 
             entity.charge = 0f;
-
-            int tileRange = (int)(realRange / tilesize + 1);
-            healed.clear();
-
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null){
-                        if(other.entity.timeScale <= realBoost){
-                            other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
-                            other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
-                        }
-                        healed.add(other.pos());
-                    }
-                }
-            }
+            indexer.eachBlock(entity, realRange, other -> other.entity.timeScale <= realBoost, other -> {
+                other.entity.timeScaleDuration = Math.max(other.entity.timeScaleDuration, reload + 1f);
+                other.entity.timeScale = Math.max(other.entity.timeScale, realBoost);
+            });
         }
     }
 

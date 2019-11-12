@@ -1,14 +1,13 @@
 package io.anuke.mindustry.world.blocks.defense;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.IntSet;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects;
-import io.anuke.mindustry.entities.type.TileEntity;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
@@ -20,7 +19,6 @@ import static io.anuke.mindustry.Vars.*;
 public class MendProjector extends Block{
     private static Color color = Color.valueOf("84f491");
     private static Color phase = Color.valueOf("ffd59e");
-    private static IntSet healed = new IntSet();
 
     protected int timerUse = timers++;
 
@@ -78,24 +76,10 @@ public class MendProjector extends Block{
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
             entity.charge = 0f;
 
-            int tileRange = (int)(realRange / tilesize + 1);
-            healed.clear();
-
-            for(int x = -tileRange + tile.x; x <= tileRange + tile.x; x++){
-                for(int y = -tileRange + tile.y; y <= tileRange + tile.y; y++){
-                    if(!Mathf.within(x * tilesize, y * tilesize, tile.drawx(), tile.drawy(), realRange)) continue;
-
-                    Tile other = world.ltile(x, y);
-
-                    if(other == null) continue;
-
-                    if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
-                        Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
-                        healed.add(other.pos());
-                    }
-                }
-            }
+            indexer.eachBlock(entity, realRange, other -> other.entity.damaged(), other -> {
+                other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
+                Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
+            });
         }
     }
 

@@ -1252,6 +1252,7 @@ public class Blocks implements ContentList{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+            mech = Mechs.vanguard;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -1260,6 +1261,7 @@ public class Blocks implements ContentList{
             health = 2000;
             itemCapacity = 9000;
             size = 4;
+            mech = Mechs.vanguard;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1268,6 +1270,7 @@ public class Blocks implements ContentList{
             health = 4000;
             itemCapacity = 13000;
             size = 5;
+            mech = Mechs.vanguard;
         }};
 
         vault = new Vault("vault"){{

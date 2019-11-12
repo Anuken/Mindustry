@@ -9,8 +9,7 @@ import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.EntityGroup;
-import io.anuke.mindustry.entities.traits.HealthTrait;
-import io.anuke.mindustry.entities.traits.TargetTrait;
+import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.BlockDestroyEvent;
 import io.anuke.mindustry.gen.*;
@@ -21,7 +20,7 @@ import java.io.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
+public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait, TeamTrait{
     public static final float timeToSleep = 60f * 4; //4 seconds to fall asleep
     private static final ObjectSet<Tile> tmpTiles = new ObjectSet<>();
     /** This value is only used for debugging. */
