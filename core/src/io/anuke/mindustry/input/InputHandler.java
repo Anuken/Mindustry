@@ -159,6 +159,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onSkipCurrentBuild(Player player){
         Queue<BuildRequest> queue = player.buildQueue();
+        if(queue.size < 1) return;
         BuildRequest current = queue.removeFirst();
         queue.addLast(current);
     }
