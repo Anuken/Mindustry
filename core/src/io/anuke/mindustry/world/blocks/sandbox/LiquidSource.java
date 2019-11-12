@@ -2,18 +2,18 @@ package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import java.io.*;
@@ -113,7 +113,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        tile.<LiquidSourceEntity>entity().source = content.liquid(value);
+        tile.<LiquidSourceEntity>entity().source = value == -1 ? null : content.liquid(value);
     }
 
     class LiquidSourceEntity extends TileEntity{

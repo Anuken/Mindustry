@@ -3,6 +3,9 @@ package io.anuke.mindustry.io;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
@@ -164,6 +167,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 short floorid = stream.readShort();
                 short oreid = stream.readShort();
                 int consecutives = stream.readUnsignedByte();
+                if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
 
                 context.create(x, y, floorid, oreid, (short)0);
 
@@ -180,6 +184,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 int x = i % width, y = i / width;
                 Block block = content.block(stream.readShort());
                 Tile tile = context.tile(x, y);
+                if(block == null) block = Blocks.air;
                 tile.setBlock(block);
 
                 if(tile.entity != null){

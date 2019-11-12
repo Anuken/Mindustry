@@ -13,7 +13,9 @@ public enum BlockFlag{
     /** Only the command center block.*/
     comandCenter,
     /** Repair point. */
-    repair;
+    repair,
+    /** Upgrade pad. */
+    mechPad;
 
     public final static BlockFlag[] all = values();
 }

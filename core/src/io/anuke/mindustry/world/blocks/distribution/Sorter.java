@@ -1,10 +1,9 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
@@ -39,7 +38,7 @@ public class Sorter extends Block{
     @Override
     public void playerPlaced(Tile tile){
         if(lastItem != null){
-            Core.app.post(() -> tile.configure(lastItem.id));
+            tile.configure(lastItem.id);
         }
     }
 
@@ -66,6 +65,11 @@ public class Sorter extends Block{
     }
 
     @Override
+    public int minimapColor(Tile tile){
+        return tile.<SorterEntity>entity().sortItem == null ? 0 : tile.<SorterEntity>entity().sortItem.color.rgba();
+    }
+
+    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         Tile to = getTileTarget(item, tile, source, false);
 
@@ -80,7 +84,7 @@ public class Sorter extends Block{
     }
 
     boolean isSame(Tile tile, Tile other){
-        return other != null && other.block() == this && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
+        return other != null && other.block() instanceof Sorter && other.<SorterEntity>entity().sortItem == tile.<SorterEntity>entity().sortItem;
     }
 
     Tile getTileTarget(Item item, Tile dest, Tile source, boolean flip){

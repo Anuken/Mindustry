@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.mindustry.core.GameState.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 

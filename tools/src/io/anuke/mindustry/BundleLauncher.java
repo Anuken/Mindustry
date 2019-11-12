@@ -2,7 +2,7 @@ package io.anuke.mindustry;
 
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.OrderedMap;
-import io.anuke.arc.function.BiFunction;
+import io.anuke.arc.func.Func2;
 import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Strings;
 import io.anuke.arc.util.io.PropertiesUtils;
@@ -50,7 +50,7 @@ public class BundleLauncher{
                     }
                 }
 
-                BiFunction<String, String, String> processor = (key, value) -> (key + " = " + value).replace("\\", "\\\\").replace("\n", "\\n") + "\n";
+                Func2<String, String, String> processor = (key, value) -> (key + " = " + value).replace("\\", "\\\\").replace("\n", "\\n") + "\n";
 
                 Path output = child.resolveSibling("output/" + child.getFileName());
 

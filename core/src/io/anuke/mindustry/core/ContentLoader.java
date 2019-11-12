@@ -1,12 +1,13 @@
 package io.anuke.mindustry.core;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.bullet.*;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 
@@ -23,7 +24,7 @@ public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
     private Array<Content>[] contentMap = new Array[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
-    private ObjectSet<Consumer<Content>> initialization = new ObjectSet<>();
+    private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
         new Fx(),
         new Items(),
@@ -104,13 +105,20 @@ public class ContentLoader{
     }
 
     /** Initializes all content with the specified function. */
-    private void initialize(Consumer<Content> callable){
+    private void initialize(Cons<Content> callable){
         if(initialization.contains(callable)) return;
 
         for(ContentType type : ContentType.values()){
             for(Content content : contentMap[type.ordinal()]){
-                //TODO catch error and display it per mod
-                callable.accept(content);
+                try{
+                    callable.get(content);
+                }catch(Throwable e){
+                    if(content.mod != null){
+                        mods.handleError(new ModLoadException(content, e), content.mod);
+                    }else{
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
 

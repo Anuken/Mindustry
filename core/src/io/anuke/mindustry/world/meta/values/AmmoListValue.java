@@ -7,9 +7,10 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.bullet.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.tilesize;

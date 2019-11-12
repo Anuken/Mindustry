@@ -2,8 +2,8 @@ package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.StringMap;
 import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.function.Consumer;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.func.Cons;
+import io.anuke.arc.func.Boolf;
 import io.anuke.arc.graphics.Pixmap;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Structs;
@@ -144,11 +144,11 @@ public class MapEditor{
         drawBlocks(x, y, false, tile -> true);
     }
 
-    public void drawBlocks(int x, int y, Predicate<Tile> tester){
+    public void drawBlocks(int x, int y, Boolf<Tile> tester){
         drawBlocks(x, y, false, tester);
     }
 
-    public void drawBlocks(int x, int y, boolean square, Predicate<Tile> tester){
+    public void drawBlocks(int x, int y, boolean square, Boolf<Tile> tester){
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
@@ -180,8 +180,8 @@ public class MapEditor{
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
 
-            Consumer<Tile> drawer = tile -> {
-                if(!tester.test(tile)) return;
+            Cons<Tile> drawer = tile -> {
+                if(!tester.get(tile)) return;
 
                 //remove linked tiles blocking the way
                 if(!isFloor && (tile.isLinked() || tile.block().isMultiblock())){
@@ -209,7 +209,7 @@ public class MapEditor{
         }
     }
 
-    public void drawCircle(int x, int y, Consumer<Tile> drawer){
+    public void drawCircle(int x, int y, Cons<Tile> drawer){
         for(int rx = -brushSize; rx <= brushSize; rx++){
             for(int ry = -brushSize; ry <= brushSize; ry++){
                 if(Mathf.dst2(rx, ry) <= (brushSize - 0.5f) * (brushSize - 0.5f)){
@@ -219,13 +219,13 @@ public class MapEditor{
                         continue;
                     }
 
-                    drawer.accept(tile(wx, wy));
+                    drawer.get(tile(wx, wy));
                 }
             }
         }
     }
 
-    public void drawSquare(int x, int y, Consumer<Tile> drawer){
+    public void drawSquare(int x, int y, Cons<Tile> drawer){
         for(int rx = -brushSize; rx <= brushSize; rx++){
             for(int ry = -brushSize; ry <= brushSize; ry++){
                 int wx = x + rx, wy = y + ry;
@@ -234,7 +234,7 @@ public class MapEditor{
                     continue;
                 }
 
-                drawer.accept(tile(wx, wy));
+                drawer.get(tile(wx, wy));
             }
         }
     }

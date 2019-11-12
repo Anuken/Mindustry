@@ -6,7 +6,7 @@ import com.codedisaster.steamworks.SteamUGC.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.game.*;
@@ -22,8 +22,8 @@ public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
     private ObjectMap<Class<? extends Publishable>, Array<FileHandle>> workshopFiles = new ObjectMap<>();
-    private ObjectMap<SteamUGCQuery, BiConsumer<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
-    private Array<Consumer<SteamPublishedFileID>> itemHandlers = new Array<>();
+    private ObjectMap<SteamUGCQuery, Cons2<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Array<Cons<SteamPublishedFileID>> itemHandlers = new Array<>();
     private ObjectMap<SteamPublishedFileID, Runnable> updatedHandlers = new ObjectMap<>();
 
     public SWorkshop(){
@@ -57,6 +57,7 @@ public class SWorkshop implements SteamUGCCallback{
     /** Publish a new item and submit an update for it.
      * If it is already published, redirects to its page.*/
     public void publish(Publishable p){
+        Log.info("publish(): " + p.steamTitle());
         if(p.hasSteamID()){
             Log.info("Content already published, redirecting to ID.");
             viewListing(p);
@@ -64,6 +65,7 @@ public class SWorkshop implements SteamUGCCallback{
         }
 
         if(!p.prePublish()){
+            Log.info("Rejecting due to pre-publish.");
             return;
         }
 
@@ -74,27 +76,29 @@ public class SWorkshop implements SteamUGCCallback{
     public void updateItem(Publishable p, String changelog){
         String id = p.getSteamID();
         long handle = Strings.parseLong(id, -1);
-        SteamPublishedFileID fid = new SteamPublishedFileID(handle);
-        update(p, fid, changelog);
+        update(p, new SteamPublishedFileID(handle), changelog);
     }
 
     /** Fetches info for an item, checking to make sure that it exists.*/
     public void viewListing(Publishable p){
         long handle = Strings.parseLong(p.getSteamID(), -1);
         SteamPublishedFileID id = new SteamPublishedFileID(handle);
+        Log.info("Handle = " + handle);
 
         ui.loadfrag.show();
         query(ugc.createQueryUGCDetailsRequest(id), (detailsList, result) -> {
             ui.loadfrag.hide();
+            Log.info("Fetch result = " + result);
 
             if(result == SteamResult.OK){
                 SteamUGCDetails details = detailsList.first();
+                Log.info("Details result = " + details.getResult());
                 if(details.getResult() == SteamResult.OK){
                     if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
 
-                        FloatingDialog dialog = new FloatingDialog("$editor.mapinfo");
+                        FloatingDialog dialog = new FloatingDialog("$workshop.info");
                         dialog.setFillParent(false);
-                        dialog.cont.add("$map.menu").pad(20f);
+                        dialog.cont.add("$workshop.menu").pad(20f);
                         dialog.addCloseButton();
 
                         dialog.buttons.addImageTextButton("$view.workshop", Icon.linkSmall, () -> {
@@ -111,6 +115,11 @@ public class SWorkshop implements SteamUGCCallback{
                                 field.setMaxLength(400);
                                 buttons.defaults().size(120, 54).pad(4);
                                 buttons.addButton("$ok", () -> {
+                                    if(!p.prePublish()){
+                                        Log.info("Rejecting due to pre-publish.");
+                                        return;
+                                    }
+
                                     ui.loadfrag.show("$publishing");
                                     updateItem(p, field.getText().replace("\r", "\n"));
                                     dialog.hide();
@@ -122,13 +131,13 @@ public class SWorkshop implements SteamUGCCallback{
                         }).size(210f, 64f);
                         dialog.show();
                     }else{
-                        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(details.getPublishedFileID()));
+                        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + details.getPublishedFileID().handle());
                     }
                 }else if(details.getResult() == SteamResult.FileNotFound){
                     p.removeSteamID();
                     ui.showErrorMessage("$missing");
                 }else{
-                    ui.showErrorMessage(Core.bundle.format("workshop.error", result.name()));
+                    ui.showErrorMessage(Core.bundle.format("workshop.error", details.getResult().name()));
                 }
             }else{
                 ui.showErrorMessage(Core.bundle.format("workshop.error", result.name()));
@@ -137,11 +146,12 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void viewListingID(SteamPublishedFileID id){
-        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(id));
+        SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + id.handle());
     }
 
     void update(Publishable p, SteamPublishedFileID id, String changelog){
-        String sid = SteamNativeHandle.getNativeHandle(id) + "";
+        Log.info("Calling update({0}) {1}", p.steamTitle(), id.handle());
+        String sid = id.handle() + "";
 
         updateItem(id, h -> {
             if(p.steamDescription() != null){
@@ -159,10 +169,14 @@ public class SWorkshop implements SteamUGCCallback{
                 ugc.setItemVisibility(h, PublishedFileVisibility.Private);
             }
             ugc.submitItemUpdate(h, changelog == null ? "<Created>" : changelog);
+
+            if(p instanceof Map){
+                SAchievement.publishMap.complete();
+            }
         }, () -> p.addSteamID(sid));
     }
 
-    void showPublish(Consumer<SteamPublishedFileID> published){
+    void showPublish(Cons<SteamPublishedFileID> published){
         FloatingDialog dialog = new FloatingDialog("$confirm");
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
@@ -172,38 +186,46 @@ public class SWorkshop implements SteamUGCCallback{
             .size(210f, 64f);
 
         dialog.buttons.addImageTextButton("$ok", Icon.checkSmall, () -> {
+            Log.info("Accepted, publishing item...");
+            itemHandlers.add(published);
             ugc.createItem(SVars.steamID, WorkshopFileType.Community);
             ui.loadfrag.show("$publishing");
             dialog.hide();
-            itemHandlers.add(published);
         }).size(170f, 64f);
         dialog.show();
     }
 
-    void query(SteamUGCQuery query, BiConsumer<Array<SteamUGCDetails>, SteamResult> handler){
+    void query(SteamUGCQuery query, Cons2<Array<SteamUGCDetails>, SteamResult> handler){
         Log.info("POST QUERY " + query);
         detailHandlers.put(query, handler);
         ugc.sendQueryUGCRequest(query);
     }
 
-    void updateItem(SteamPublishedFileID publishedFileID, Consumer<SteamUGCUpdateHandle> tagger, Runnable updated){
-        SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
+    void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
+        try{
+            SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
+            Log.info("begin updateItem({0})", publishedFileID.handle());
 
-        tagger.accept(h);
+            tagger.get(h);
+            Log.info("Tagged.");
 
-        ItemUpdateInfo info = new ItemUpdateInfo();
+            ItemUpdateInfo info = new ItemUpdateInfo();
 
-        ui.loadfrag.setProgress(() -> {
-            ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
-            ui.loadfrag.setText("$" + status.name().toLowerCase());
-            if(status == ItemUpdateStatus.Invalid){
-                ui.loadfrag.setText("$done");
-                return 1f;
-            }
-            return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;
-        });
+            ui.loadfrag.setProgress(() -> {
+                ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
+                ui.loadfrag.setText("$" + status.name().toLowerCase());
+                if(status == ItemUpdateStatus.Invalid){
+                    ui.loadfrag.setText("$done");
+                    return 1f;
+                }
+                return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;
+            });
 
-        updatedHandlers.put(publishedFileID, updated);
+            updatedHandlers.put(publishedFileID, updated);
+        }catch(Throwable t){
+            ui.loadfrag.hide();
+            Log.err(t);
+        }
     }
 
     @Override
@@ -216,18 +238,23 @@ public class SWorkshop implements SteamUGCCallback{
         Log.info("GET QUERY " + query);
 
         if(detailHandlers.containsKey(query)){
+            Log.info("Query being handled...");
             if(numResultsReturned > 0){
+                Log.info("{0} q results", numResultsReturned);
                 Array<SteamUGCDetails> details = new Array<>();
                 for(int i = 0; i < numResultsReturned; i++){
-                    details.set(i, new SteamUGCDetails());
+                    details.add(new SteamUGCDetails());
                     ugc.getQueryUGCResult(query, i, details.get(i));
                 }
-                detailHandlers.get(query).accept(details, result);
+                detailHandlers.get(query).get(details, result);
             }else{
-                detailHandlers.get(query).accept(new Array<>(), SteamResult.FileNotFound);
+                Log.info("Nothing found.");
+                detailHandlers.get(query).get(new Array<>(), SteamResult.FileNotFound);
             }
 
             detailHandlers.remove(query);
+        }else{
+            Log.info("Query not handled.");
         }
     }
 
@@ -248,24 +275,28 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
+        Log.info("onCreateItem(" + result + ")");
         if(!itemHandlers.isEmpty()){
             if(result == SteamResult.OK){
-                itemHandlers.first().accept(publishedFileID);
+                Log.info("Passing to first handler.");
+                itemHandlers.first().get(publishedFileID);
             }else{
-                ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
+                ui.showErrorMessage(Core.bundle.format("publish.error", result.name()));
             }
 
             itemHandlers.remove(0);
+        }else{
+            Log.err("No handlers for createItem()");
         }
     }
 
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         ui.loadfrag.hide();
-        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID, needsToAcceptWLA, result);
+        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID.handle(), needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
-            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + SteamNativeHandle.getNativeHandle(publishedFileID));
+            SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.handle());
             if(needsToAcceptWLA){
                 SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement");
             }
@@ -274,9 +305,8 @@ public class SWorkshop implements SteamUGCCallback{
                 updatedHandlers.get(publishedFileID).run();
             }
         }else{
-            ui.showErrorMessage(Core.bundle.format("publish.error ", result.name()));
+            ui.showErrorMessage(Core.bundle.format("publish.error", result.name()));
         }
-
     }
 
     @Override

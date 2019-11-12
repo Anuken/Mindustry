@@ -24,7 +24,9 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -50,6 +52,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public @Nullable
     String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -359,8 +362,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public void drawOver(){
         if(dead) return;
 
-        if(isBuilding()){
-            if(!state.isPaused() && isBuilding){
+        if(isBuilding() && isBuilding){
+            if(!state.isPaused()){
                 drawBuilding();
             }
         }else{
@@ -442,7 +445,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation));
+                    Build.validPlace(getTeam(), request.x, request.y, request.block, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -460,7 +463,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         }
 
         //mine only when not building
-        if(buildRequest() == null){
+        if(buildRequest() == null || !isBuilding){
             updateMining();
         }
     }
@@ -589,9 +592,14 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
-        if(!Core.input.keyDown(Binding.gridMode) && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
         }
 
         Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());

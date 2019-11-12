@@ -5,7 +5,6 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -49,7 +48,7 @@ public class ContentDisplay{
             for(BlockStat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ");
+                    inset.add("[LIGHT_GRAY]" + stat.localized() + ":[] ").left();
                     Array<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);

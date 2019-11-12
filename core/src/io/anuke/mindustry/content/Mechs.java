@@ -6,11 +6,11 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -38,7 +38,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("vanguard-blaster"){{
                     length = 1.5f;
                     reload = 30f;
-                    roundrobin = true;
+                    alternate = true;
                     inaccuracy = 6f;
                     velocityRnd = 0.1f;
                     ejectEffect = Fx.none;
@@ -81,7 +81,7 @@ public class Mechs implements ContentList{
                     shake = 2f;
                     length = 1f;
                     reload = 70f;
-                    roundrobin = true;
+                    alternate = true;
                     bullet = Bullets.lancerLaser;
                     recoil = 4f;
                     shootSound = Sounds.spark;
@@ -120,7 +120,7 @@ public class Mechs implements ContentList{
                     length = 1.5f;
                     reload = 10f;
                     width = 4f;
-                    roundrobin = true;
+                    alternate = true;
                     bullet = Bullets.basicFlame;
                 }};
             }
@@ -150,7 +150,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("heal-blaster"){{
                     length = 1.5f;
                     reload = 24f;
-                    roundrobin = false;
+                    alternate = false;
                     ejectEffect = Fx.none;
                     recoil = 2f;
                     bullet = Bullets.healBullet;
@@ -202,7 +202,7 @@ public class Mechs implements ContentList{
                     shots = 4;
                     spacing = 8f;
                     inaccuracy = 8f;
-                    roundrobin = true;
+                    alternate = true;
                     ejectEffect = Fx.none;
                     shake = 3f;
                     bullet = Bullets.missileSwarm;
@@ -228,7 +228,7 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                float scl = 1f - player.shootHeat / 2f;
+                float scl = 1f - player.shootHeat / 2f*Time.delta();
                 player.velocity().scl(scl);
             }
 
@@ -266,7 +266,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("blaster"){{
                     length = 1.5f;
                     reload = 15f;
-                    roundrobin = true;
+                    alternate = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardCopper;
                 }};
@@ -291,7 +291,7 @@ public class Mechs implements ContentList{
                     reload = 70f;
                     shots = 4;
                     inaccuracy = 2f;
-                    roundrobin = true;
+                    alternate = true;
                     ejectEffect = Fx.none;
                     velocityRnd = 0.2f;
                     spacing = 1f;
@@ -356,7 +356,7 @@ public class Mechs implements ContentList{
                     shots = 2;
                     shotDelay = 1f;
                     shots = 8;
-                    roundrobin = true;
+                    alternate = true;
                     ejectEffect = Fx.none;
                     velocityRnd = 1f;
                     inaccuracy = 20f;
@@ -394,7 +394,7 @@ public class Mechs implements ContentList{
                 weapon = new Weapon("bomber"){{
                     length = 1.5f;
                     reload = 13f;
-                    roundrobin = true;
+                    alternate = true;
                     ejectEffect = Fx.shellEjectSmall;
                     bullet = Bullets.standardGlaive;
                     shootSound = Sounds.shootSnap;

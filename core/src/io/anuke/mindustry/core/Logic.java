@@ -5,6 +5,7 @@ import io.anuke.arc.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.core.GameState.*;
+import io.anuke.mindustry.ctype.UnlockableContent;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -16,6 +17,8 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
 import io.anuke.mindustry.world.blocks.power.*;
+
+import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -78,13 +81,12 @@ public class Logic implements ApplicationListener{
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
                 TeamData data = state.teams.get(event.team);
-
-                //painful O(n) iteration + copy
-                for(int i = 0; i < data.brokenBlocks.size; i++){
-                    BrokenBlock b = data.brokenBlocks.get(i);
-                    if(b.x == event.tile.x && b.y == event.tile.y){
-                        data.brokenBlocks.removeIndex(i);
-                        break;
+                Iterator<BrokenBlock> it = data.brokenBlocks.iterator();
+                while(it.hasNext()){
+                    BrokenBlock b = it.next();
+                    Block block = content.block(b.block);
+                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                        it.remove();
                     }
                 }
             }

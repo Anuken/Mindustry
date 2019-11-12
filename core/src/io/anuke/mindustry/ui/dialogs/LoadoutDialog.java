@@ -5,21 +5,19 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.input.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 
 import static io.anuke.mindustry.Vars.*;
 
 public class LoadoutDialog extends FloatingDialog{
     private Runnable hider;
-    //private Supplier<Array<ItemStack>> supplier;
     private Runnable resetter;
     private Runnable updater;
     private Array<ItemStack> stacks = new Array<>();
     private Array<ItemStack> originalStacks = new Array<>();
-    //private Predicate<Item> filter;
     private Table items;
     private int capacity;
 

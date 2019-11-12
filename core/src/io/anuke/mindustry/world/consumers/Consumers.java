@@ -1,7 +1,7 @@
 package io.anuke.mindustry.world.consumers;
 
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.Predicate;
+import io.anuke.arc.func.Boolf;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.entities.type.TileEntity;
@@ -48,7 +48,7 @@ public class Consumers{
     }
 
     /** Creates a consumer which only consumes power when the condition is met. */
-    public ConsumePower powerCond(float usage, Predicate<TileEntity> cons){
+    public ConsumePower powerCond(float usage, Boolf<TileEntity> cons){
         return add(new ConditionalConsumePower(usage, cons));
     }
 

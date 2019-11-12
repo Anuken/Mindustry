@@ -1,6 +1,6 @@
 package io.anuke.mindustry.entities.traits;
 
-import io.anuke.mindustry.game.TypeID;
+import io.anuke.mindustry.type.TypeID;
 
 public interface TypeTrait{
 

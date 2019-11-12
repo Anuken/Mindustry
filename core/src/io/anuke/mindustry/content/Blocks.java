@@ -7,10 +7,10 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
@@ -52,7 +52,7 @@ public class Blocks implements ContentList{
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
-    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, forceProjector, shockMine,
 
     //transport
@@ -793,6 +793,19 @@ public class Blocks implements ContentList{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+        }};
+
+        plastaniumWall = new Wall("plastanium-wall"){{
+            requirements(Category.defense, ItemStack.with(Items.plastanium, 5, Items.metaglass, 2));
+            health = 190 * wallHealthMultiplier;
+            insulated = true;
+        }};
+
+        plastaniumWallLarge = new Wall("plastanium-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(plastaniumWall.requirements, 4));
+            health = 190 * wallHealthMultiplier * 4;
+            size = 2;
+            insulated = true;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -1616,7 +1629,7 @@ public class Blocks implements ContentList{
             size = 4;
             shootShake = 2f;
             range = 190f;
-            reload = 50f;
+            reload = 80f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
             powerUse = 14f;
@@ -1633,7 +1646,7 @@ public class Blocks implements ContentList{
 
         draugFactory = new UnitFactory("draug-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
-            type = UnitTypes.draug;
+            unitType = UnitTypes.draug;
             produceTime = 2500;
             size = 2;
             maxSpawn = 1;
@@ -1643,7 +1656,7 @@ public class Blocks implements ContentList{
 
         spiritFactory = new UnitFactory("spirit-factory"){{
             requirements(Category.units, ItemStack.with(Items.metaglass, 45, Items.lead, 55, Items.silicon, 45));
-            type = UnitTypes.spirit;
+            unitType = UnitTypes.spirit;
             produceTime = 4000;
             size = 2;
             maxSpawn = 1;
@@ -1653,7 +1666,7 @@ public class Blocks implements ContentList{
 
         phantomFactory = new UnitFactory("phantom-factory"){{
             requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.thorium, 60, Items.lead, 65, Items.silicon, 105));
-            type = UnitTypes.phantom;
+            unitType = UnitTypes.phantom;
             produceTime = 4400;
             size = 2;
             maxSpawn = 1;
@@ -1670,7 +1683,7 @@ public class Blocks implements ContentList{
 
         wraithFactory = new UnitFactory("wraith-factory"){{
             requirements(Category.units, ItemStack.with(Items.titanium, 30, Items.lead, 40, Items.silicon, 45));
-            type = UnitTypes.wraith;
+            unitType = UnitTypes.wraith;
             produceTime = 700;
             size = 2;
             consumes.power(0.5f);
@@ -1679,7 +1692,7 @@ public class Blocks implements ContentList{
 
         ghoulFactory = new UnitFactory("ghoul-factory"){{
             requirements(Category.units, ItemStack.with(Items.titanium, 75, Items.lead, 65, Items.silicon, 110));
-            type = UnitTypes.ghoul;
+            unitType = UnitTypes.ghoul;
             produceTime = 1150;
             size = 3;
             maxSpawn = 2;
@@ -1689,7 +1702,7 @@ public class Blocks implements ContentList{
 
         revenantFactory = new UnitFactory("revenant-factory"){{
             requirements(Category.units, ItemStack.with(Items.plastanium, 50, Items.titanium, 150, Items.lead, 150, Items.silicon, 200));
-            type = UnitTypes.revenant;
+            unitType = UnitTypes.revenant;
             produceTime = 2000;
             size = 4;
             maxSpawn = 2;
@@ -1699,7 +1712,7 @@ public class Blocks implements ContentList{
 
         daggerFactory = new UnitFactory("dagger-factory"){{
             requirements(Category.units, ItemStack.with(Items.lead, 55, Items.silicon, 35));
-            type = UnitTypes.dagger;
+            unitType = UnitTypes.dagger;
             produceTime = 850;
             size = 2;
             consumes.power(0.5f);
@@ -1708,7 +1721,7 @@ public class Blocks implements ContentList{
 
         crawlerFactory = new UnitFactory("crawler-factory"){{
             requirements(Category.units, ItemStack.with(Items.lead, 45, Items.silicon, 30));
-            type = UnitTypes.crawler;
+            unitType = UnitTypes.crawler;
             produceTime = 300;
             size = 2;
             maxSpawn = 6;
@@ -1718,7 +1731,7 @@ public class Blocks implements ContentList{
 
         titanFactory = new UnitFactory("titan-factory"){{
             requirements(Category.units, ItemStack.with(Items.graphite, 50, Items.lead, 50, Items.silicon, 45));
-            type = UnitTypes.titan;
+            unitType = UnitTypes.titan;
             produceTime = 1050;
             size = 3;
             consumes.power(0.60f);
@@ -1727,7 +1740,7 @@ public class Blocks implements ContentList{
 
         fortressFactory = new UnitFactory("fortress-factory"){{
             requirements(Category.units, ItemStack.with(Items.thorium, 40, Items.lead, 110, Items.silicon, 75));
-            type = UnitTypes.fortress;
+            unitType = UnitTypes.fortress;
             produceTime = 2000;
             size = 3;
             maxSpawn = 3;

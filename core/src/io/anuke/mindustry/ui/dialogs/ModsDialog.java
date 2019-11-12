@@ -1,7 +1,9 @@
 package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
+import io.anuke.arc.Net.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.mindustry.gen.*;
@@ -19,45 +21,65 @@ public class ModsDialog extends FloatingDialog{
         super("$mods");
         addCloseButton();
 
-        buttons.addImageTextButton("$mods.report", Icon.link,
-        () -> Core.net.openURI(reportIssueURL))
+        buttons.addImageTextButton(mobile ? "$mods.report" : "$mods.openfolder", Icon.link,
+        () -> {
+            if(mobile){
+                Core.net.openURI(reportIssueURL);
+            }else{
+                Core.net.openFolder(modDirectory.absolutePath());
+            }
+        })
         .size(250f, 64f);
 
         buttons.row();
 
         buttons.addImageTextButton("$mods.guide", Icon.wiki,
         () -> Core.net.openURI(modGuideURL))
-        .size(210f, 64f);
+        .size(210, 64f);
 
         buttons.addImageTextButton("$mod.import.github", Icon.github, () -> {
             ui.showTextInput("$mod.import.github", "", 64, "Anuken/ExampleMod", text -> {
                 ui.loadfrag.show();
                 Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
                     Core.net.httpGet(loc.getHeader("Location"), result -> {
-                        try{
-                            Streams.copyStream(result.getResultAsStream(), modDirectory.child(text.replace("/", "") + ".zip").write(false));
-                            Core.app.post(() -> {
-                                try{
-                                    mods.reloadContent();
-                                    setup();
-                                    ui.loadfrag.hide();
-                                }catch(Throwable e){
-                                    ui.showException(e);
-                                }
-                            });
-                        }catch(Throwable e){
-                            ui.showException(e);
+                        if(result.getStatus() != HttpStatus.OK){
+                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                            ui.loadfrag.hide();
+                        }else{
+                            try{
+                                FileHandle file = tmpDirectory.child(text.replace("/", "") + ".zip");
+                                Streams.copyStream(result.getResultAsStream(), file.write(false));
+                                mods.importMod(file);
+                                file.delete();
+                                Core.app.post(() -> {
+                                    try{
+                                        mods.reloadContent();
+                                        setup();
+                                        ui.loadfrag.hide();
+                                    }catch(Throwable e){
+                                        ui.showException(e);
+                                    }
+                                });
+                            }catch(Throwable e){
+                                modError(e);
+                            }
                         }
-                    }, t -> Core.app.post(() -> ui.showException(t)));
-                }, t -> Core.app.post(() -> ui.showException(t)));
+                    }, t -> Core.app.post(() -> modError(t)));
+                }, t -> Core.app.post(() -> modError(t)));
             });
         }).size(250f, 64f);
+
 
         shown(this::setup);
 
         hidden(() -> {
             if(mods.requiresReload()){
                 ui.loadAnd("$reloading", () -> {
+                    mods.all().each(mod -> {
+                        if(mod.hasUnmetDependencies()){
+                            ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
+                        }
+                    });
                     mods.reloadContent();
                 });
             }
@@ -70,9 +92,19 @@ public class ModsDialog extends FloatingDialog{
         }));
     }
 
+    void modError(Throwable error){
+        ui.loadfrag.hide();
+
+        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
+            ui.showErrorMessage("$feature.unsupported");
+        }else{
+            ui.showException(error);
+        }
+    }
+
     void setup(){
         cont.clear();
-        cont.defaults().width(520f).pad(4);
+        cont.defaults().width(mobile ? 500 : 560f).pad(4);
         cont.add("$mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
         if(!(mods.all().isEmpty() && mods.disabled().isEmpty())){
@@ -86,6 +118,7 @@ public class ModsDialog extends FloatingDialog{
                         anyDisabled = true;
                         table.row();
                         table.addImage().growX().height(4f).pad(6f).color(Pal.gray);
+                        table.row();
                     }
 
                     table.table(Styles.black6, t -> {
@@ -93,7 +126,7 @@ public class ModsDialog extends FloatingDialog{
                         t.margin(14f).left();
                         t.table(title -> {
                             title.left();
-                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (" | " + Core.bundle.get(mod.enabled() ? "mod.enabled" : "mod.disabled")));
+                            title.add("[accent]" + mod.meta.name + "[lightgray] v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).width(200f).wrap();
                             title.add().growX();
 
                             title.addImageTextButton(mod.enabled() ? "$mod.disable" : "$mod.enable", mod.enabled() ? Icon.arrowDownSmall : Icon.arrowUpSmall, Styles.cleart, () -> {
@@ -128,8 +161,11 @@ public class ModsDialog extends FloatingDialog{
                             t.labelWrap("[lightgray]" + mod.meta.description).growX();
                             t.row();
                         }
-
-                    }).width(500f);
+                        if(mod.hasUnmetDependencies()){
+                            t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
+                            t.row();
+                        }
+                    }).width(mobile ? 430f : 500f);
                     table.row();
                 }
             });
@@ -150,6 +186,6 @@ public class ModsDialog extends FloatingDialog{
                     e.printStackTrace();
                 }
             });
-        }).margin(12f).width(500f);
+        }).margin(12f).width(400f);
     }
 }

@@ -3,7 +3,7 @@ package io.anuke.mindustry.input;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -13,8 +13,8 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -25,11 +25,14 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.input.Placement.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import java.util.*;
 
@@ -108,7 +111,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
-        Core.app.post(() -> Events.fire(new DepositEvent(tile, player)));
+        Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
             boolean end = i == sent - 1;
@@ -142,19 +145,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || player == null) return;
         if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
+        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Player player, Tile tile, int value){
         if(tile == null || !Units.canInteract(player, tile)) return;
         tile.block().configured(tile, player, value);
+        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
     public Eachable<BuildRequest> allRequests(){
         return cons -> {
-            for(BuildRequest request : player.buildQueue()) cons.accept(request);
-            for(BuildRequest request : selectRequests) cons.accept(request);
-            for(BuildRequest request : lineRequests) cons.accept(request);
+            for(BuildRequest request : player.buildQueue()) cons.get(request);
+            for(BuildRequest request : selectRequests) cons.get(request);
+            for(BuildRequest request : lineRequests) cons.get(request);
         };
     }
 
@@ -214,6 +219,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    public boolean requestMatches(BuildRequest request){
+        Tile tile = world.tile(request.x, request.y);
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>entity().cblock == request.block;
+    }
+
     public void drawBreaking(int x, int y){
         Tile tile = world.ltile(x, y);
         if(tile == null) return;
@@ -226,8 +236,28 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
     }
 
+    protected void showSchematicSave(){
+        if(lastSchematic == null) return;
+
+        ui.showTextInput("$schematic.add", "$name", "", text -> {
+            Schematic replacement = schematics.all().find(s -> s.name().equals(text));
+            if(replacement != null){
+                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                    schematics.overwrite(replacement, lastSchematic);
+                    ui.showInfoFade("$schematic.saved");
+                    ui.schematics.showInfo(replacement);
+                });
+            }else{
+                lastSchematic.tags.put("name", text);
+                schematics.add(lastSchematic);
+                ui.showInfoFade("$schematic.saved");
+                ui.schematics.showInfo(lastSchematic);
+            }
+        });
+    }
+
     public void rotateRequests(Array<BuildRequest> requests, int direction){
-        int ox = rawTileX(), oy = rawTileY();
+        int ox = schemOriginX(), oy = schemOriginY();
 
         requests.each(req -> {
             //rotate config position
@@ -262,15 +292,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void flipRequests(Array<BuildRequest> requests, boolean x){
-        int origin = x ? rawTileX() : rawTileY();
+        int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
-            int value = -((x ? req.x : req.y) - origin) + origin;
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
 
             if(x){
-                req.x = value;
+                req.x = (int)((value - req.block.offset()) / tilesize);
             }else{
-                req.y = value;
+                req.y = (int)((value - req.block.offset()) / tilesize);
             }
 
             if(req.block.posConfig){
@@ -292,6 +322,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
+    protected int schemOriginX(){
+        return rawTileX();
+    }
+
+    protected int schemOriginY(){
+        return rawTileY();
+    }
+
     /** Returns the selection request that overlaps this position, or null. */
     protected BuildRequest getRequest(int x, int y){
         return getRequest(x, y, 1, null);
@@ -304,7 +342,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         r2.setCenter(x * tilesize + offset, y * tilesize + offset);
         resultreq = null;
 
-        Predicate<BuildRequest> test = req -> {
+        Boolf<BuildRequest> test = req -> {
             if(req == skip) return false;
             Tile other = req.tile();
 
@@ -322,19 +360,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         };
 
         for(BuildRequest req : player.buildQueue()){
-            if(test.test(req)) return req;
+            if(test.get(req)) return req;
         }
 
         for(BuildRequest req : selectRequests){
-            if(test.test(req)) return req;
+            if(test.get(req)) return req;
         }
 
         return null;
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
-        NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
@@ -357,13 +395,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         for(BuildRequest req : selectRequests){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
             }
-        }*/
+        }
 
         for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
             Block block = content.block(req.block);
@@ -381,7 +418,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
 
@@ -394,7 +431,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                selectRequests.add(req.copy());
+                BuildRequest other = getRequest(req.x, req.y, req.block.size, null);
+                if(other == null){
+                    selectRequests.add(req.copy());
+                }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
+                    selectRequests.remove(other);
+                    selectRequests.add(req.copy());
+                }
             }
         }
     }
@@ -429,7 +472,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
-        NormalizeResult result = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
                 int wx = x1 + x * Mathf.sign(x2 - x1);
@@ -458,14 +501,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         it = selectRequests.iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
-        }*/
+        }
 
         //remove blocks to rebuild
         Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
@@ -486,6 +528,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             req.animScale = 1f;
             lineRequests.add(req);
         });
+
+        if(Core.settings.getBool("blockreplace")){
+            lineRequests.each(req -> {
+                Block replace = req.block.getReplacement(req, lineRequests);
+                if(replace.unlockedCur()){
+                    req.block = replace;
+                }
+            });
+        }
     }
 
     protected void updateLine(int x1, int y1){
@@ -708,7 +759,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildRequest ignore){
         for(BuildRequest req : player.buildQueue()){
-            if(req != ignore && !req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))){
+            if(req != ignore
+                    && !req.breaking
+                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
                 return false;
             }
         }
@@ -720,6 +774,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void placeBlock(int x, int y, Block block, int rotation){
+        BuildRequest req = getRequest(x, y);
+        if(req != null){
+            player.buildQueue().remove(req);
+        }
         player.addBuildRequest(new BuildRequest(x, y, rotation, block));
     }
 
@@ -748,17 +806,45 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
     }
 
-    void iterateLine(int startX, int startY, int endX, int endY, Consumer<PlaceLine> cons){
+    void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
-        if(Core.settings.getBool("swapdiagonal")){
+
+        if(Core.settings.getBool("swapdiagonal") && mobile){
+            diagonal = !diagonal;
+        }
+
+        if(block instanceof PowerNode){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = PlaceUtils.normalizeDiagonal(startX, startY, endX, endY);
+            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
-            points = PlaceUtils.normalizeLine(startX, startY, endX, endY);
+            points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+
+        if(block instanceof PowerNode){
+            Array<Point2> skip = new Array<>();
+            
+            for(int i = 1; i < points.size; i++){
+                int overlaps = 0;
+                Point2 point = points.get(i);
+
+                //check with how many powernodes the *next* tile will overlap
+                for(int j = 0; j < i; j++){
+                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.ltile(point.x, point.y), world.ltile(points.get(j).x, points.get(j).y))){
+                        overlaps++;
+                    }
+                }
+
+                //if it's more than one, it can bridge the gap
+                if(overlaps > 1){
+                    skip.add(points.get(i-1));
+                }
+            }
+            //remove skipped points
+            points.removeAll(skip);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);
@@ -785,7 +871,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 line.rotation = rotation;
             }
             line.last = next == null;
-            cons.accept(line);
+            cons.get(line);
 
             Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
         }

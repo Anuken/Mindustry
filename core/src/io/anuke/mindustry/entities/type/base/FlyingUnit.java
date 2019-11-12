@@ -151,7 +151,13 @@ public class FlyingUnit extends BaseUnit{
     }
 
     public void drawWeapons(){
-
+        for(int i : Mathf.signs){
+            float tra = rotation - 90, trY = -type.weapon.getRecoil(this, i > 0) + type.weaponOffsetY;
+            float w = -i * type.weapon.region.getWidth() * Draw.scl;
+            Draw.rect(type.weapon.region,
+            x + Angles.trnsx(tra, getWeapon().width * i, trY),
+            y + Angles.trnsy(tra, getWeapon().width * i, trY), w, type.weapon.region.getHeight() * Draw.scl, rotation - 90);
+        }
     }
 
     public void drawEngine(){

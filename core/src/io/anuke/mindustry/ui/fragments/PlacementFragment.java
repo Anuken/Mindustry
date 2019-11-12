@@ -3,7 +3,6 @@ package io.anuke.mindustry.ui.fragments;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.graphics.*;
-import io.anuke.arc.input.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
@@ -13,13 +12,13 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.input.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -27,28 +26,16 @@ import static io.anuke.mindustry.Vars.*;
 public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
+    public Category currentCategory = Category.distribution;
     Array<Block> returnArray = new Array<>();
     Array<Category> returnCatArray = new Array<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
-    Category currentCategory = Category.distribution;
+    ObjectMap<Category,Block> selectedBlocks = new ObjectMap<Category,Block>();
     Block hovered, lastDisplay;
     Tile lastHover;
     Tile hoverTile;
     Table blockTable, toggler, topTable;
     boolean lastGround;
-
-    //not configurable, no plans to make it configurable
-    final KeyCode[] inputGrid = {
-        KeyCode.NUM_1, KeyCode.NUM_2, KeyCode.NUM_3, KeyCode.NUM_4,
-        KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R,
-        KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
-        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
-    }, inputCatGrid = {
-        KeyCode.NUM_1, KeyCode.NUM_2,
-        KeyCode.Q, KeyCode.W,
-        KeyCode.A, KeyCode.S,
-        KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V
-    };
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -62,6 +49,10 @@ public class PlacementFragment extends Fragment{
             if(event.content instanceof Block){
                 rebuild();
             }
+        });
+
+        Events.on(ResetEvent.class, event -> {
+            selectedBlocks.clear();
         });
     }
 
@@ -90,27 +81,6 @@ public class PlacementFragment extends Fragment{
                 input.block = tryRecipe;
                 currentCategory = input.block.category;
                 return true;
-            }
-        }
-
-        if(!Core.input.keyDown(Binding.gridMode) || ui.chatfrag.chatOpen()) return false;
-        if(Core.input.keyDown(Binding.gridModeShift)){ //select category
-            int i = 0;
-            for(KeyCode key : inputCatGrid){
-                if(Core.input.keyDown(key)){
-                    input.block = getByCategory(Category.all[i]).first();
-                    currentCategory = input.block.category;
-                }
-                i++;
-            }
-            return true;
-        }else{ //select block
-            int i = 0;
-            Array<Block> recipes = getByCategory(currentCategory);
-            for(KeyCode key : inputGrid){
-                if(Core.input.keyDown(key))
-                    input.block = (i < recipes.size && unlocked(recipes.get(i))) ? recipes.get(i) : null;
-                i++;
             }
         }
         return false;
@@ -147,6 +117,7 @@ public class PlacementFragment extends Fragment{
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
                             if(unlocked(block)){
                                 control.input.block = control.input.block == block ? null : block;
+                                selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
 
@@ -220,7 +191,7 @@ public class PlacementFragment extends Fragment{
                                     req.table(line -> {
                                         line.left();
                                         line.addImage(stack.item.icon(Cicon.small)).size(8 * 2);
-                                        line.add(stack.item.localizedName).color(Color.lightGray).padLeft(2).left();
+                                        line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             TileEntity core = player.getClosestCore();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
@@ -267,11 +238,26 @@ public class PlacementFragment extends Fragment{
                 frame.row();
                 frame.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
-                    blocksSelect.table(blocks -> blockTable = blocks).grow();
+                    blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                        if(pane.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(pane)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).grow().get().setStyle(Styles.smallPane);
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fillY().bottom().touchable(Touchable.enabled);
                 frame.table(categories -> {
+                    categories.bottom();
+                    categories.add(new Image(Styles.black6){
+                        @Override
+                        public void draw(){
+                            if(height <= Scl.scl(3f)) return;
+                            getDrawable().draw(x, y, width, height - Scl.scl(3f));
+                        }
+                    }).colspan(2).growX().growY().padTop(-3f).row();
                     categories.defaults().size(50f);
 
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
@@ -293,10 +279,16 @@ public class PlacementFragment extends Fragment{
 
                         categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
+                            if(control.input.block != null){
+                                if(selectedBlocks.get(currentCategory) == null){
+                                    selectedBlocks.put(currentCategory, getByCategory(currentCategory).find(this::unlocked));
+                                }
+                                control.input.block = selectedBlocks.get(currentCategory);
+                            }
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
                     }
-                }).touchable(Touchable.enabled);
+                }).fillY().bottom().touchable(Touchable.enabled);
 
                 rebuildCategory.run();
                 frame.update(() -> {

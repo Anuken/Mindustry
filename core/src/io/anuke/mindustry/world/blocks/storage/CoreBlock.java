@@ -3,7 +3,7 @@ package io.anuke.mindustry.world.blocks.storage;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
@@ -111,7 +111,7 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void drawSelect(Tile tile){
         Lines.stroke(1f, Pal.accent);
-        Consumer<Tile> outline = t -> {
+        Cons<Tile> outline = t -> {
             for(int i = 0; i < 4; i++){
                 Point2 p = Geometry.d8edge[i];
                 float offset = -Math.max(t.block().size - 1, 0) / 2f * tilesize;
@@ -119,7 +119,7 @@ public class CoreBlock extends StorageBlock{
             }
         };
         if(tile.entity.proximity().contains(e -> isContainer(e) && e.entity.items == tile.entity.items)){
-            outline.accept(tile);
+            outline.get(tile);
         }
         tile.entity.proximity().each(e -> isContainer(e) && e.entity.items == tile.entity.items, outline);
         Draw.reset();

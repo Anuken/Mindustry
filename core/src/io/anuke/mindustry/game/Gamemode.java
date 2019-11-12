@@ -1,7 +1,7 @@
 package io.anuke.mindustry.game;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.mindustry.maps.*;
 
 import static io.anuke.mindustry.Vars.waveTeam;
@@ -44,25 +44,25 @@ public enum Gamemode{
         rules.respawnTime = 0f;
     });
 
-    private final Consumer<Rules> rules;
-    private final Predicate<Map> validator;
+    private final Cons<Rules> rules;
+    private final Boolf<Map> validator;
 
     public final boolean hidden;
     public final static Gamemode[] all = values();
 
-    Gamemode(Consumer<Rules> rules){
+    Gamemode(Cons<Rules> rules){
         this(false, rules);
     }
 
-    Gamemode(boolean hidden, Consumer<Rules> rules){
+    Gamemode(boolean hidden, Cons<Rules> rules){
          this(hidden, rules, m -> true);
     }
 
-    Gamemode(Consumer<Rules> rules, Predicate<Map> validator){
+    Gamemode(Cons<Rules> rules, Boolf<Map> validator){
         this(false, rules, validator);
     }
 
-    Gamemode(boolean hidden, Consumer<Rules> rules, Predicate<Map> validator){
+    Gamemode(boolean hidden, Cons<Rules> rules, Boolf<Map> validator){
         this.rules = rules;
         this.hidden = hidden;
         this.validator = validator;
@@ -84,13 +84,13 @@ public enum Gamemode{
 
     /** Applies this preset to this ruleset. */
     public Rules apply(Rules in){
-        rules.accept(in);
+        rules.get(in);
         return in;
     }
 
     /** @return whether this mode can be played on the specified map. */
     public boolean valid(Map map){
-        return validator.test(map);
+        return validator.get(map);
     }
 
     public String description(){

@@ -9,8 +9,8 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.tilesize;

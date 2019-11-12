@@ -5,7 +5,6 @@ import io.anuke.arc.scene.ui.Image;
 import io.anuke.arc.scene.ui.layout.Stack;
 import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.Liquid;
 import io.anuke.mindustry.world.meta.StatUnit;
 

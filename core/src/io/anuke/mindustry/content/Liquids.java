@@ -1,7 +1,7 @@
 package io.anuke.mindustry.content;
 
 import io.anuke.arc.graphics.Color;
-import io.anuke.mindustry.game.ContentList;
+import io.anuke.mindustry.ctype.ContentList;
 import io.anuke.mindustry.type.Liquid;
 
 public class Liquids implements ContentList{
@@ -26,6 +26,7 @@ public class Liquids implements ContentList{
             flammability = 1.2f;
             explosiveness = 1.2f;
             heatCapacity = 0.7f;
+            barColor = Color.valueOf("6b675f");
             effect = StatusEffects.tarred;
         }};
 

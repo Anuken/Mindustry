@@ -12,6 +12,7 @@ import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
+import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.arc.Core.camera;
@@ -123,7 +124,9 @@ public class BlockRenderer implements Disposable{
         Draw.shader();
     }
 
-    public void drawBroken(){
+    public void drawDestroyed(){
+        if(!Core.settings.getBool("destroyedblocks")) return;
+
         if(control.input.isPlacing() || control.input.isBreaking()){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
