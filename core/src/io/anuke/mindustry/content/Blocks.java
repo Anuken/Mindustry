@@ -1066,7 +1066,7 @@ public class Blocks implements ContentList{
         }};
 
         diode = new PowerDiode("diode"){{
-            requirements(Category.power, ItemStack.with(Items.silicon, 10, Items.phasefabric, 5, Items.plastanium, 2, Items.metaglass, 1));
+            requirements(Category.power, ItemStack.with(Items.silicon, 10, Items.plastanium, 5, Items.metaglass, 10));
         }};
 
         battery = new Battery("battery"){{
