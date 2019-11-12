@@ -19,7 +19,6 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
-import javafx.scene.input.KeyCode;
 
 import static io.anuke.arc.Core.scene;
 import static io.anuke.mindustry.Vars.*;
