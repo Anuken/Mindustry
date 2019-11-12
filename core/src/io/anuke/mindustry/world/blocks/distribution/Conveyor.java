@@ -349,7 +349,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public static class ConveyorEntity extends TileEntity{
 
-        LongArray convey = new LongArray();
+        public LongArray convey = new LongArray();
         byte lastInserted;
         float minitem = 1;
 

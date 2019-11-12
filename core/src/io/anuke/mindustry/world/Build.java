@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.Loc;
 import io.anuke.annotations.Annotations.Remote;
 import io.anuke.arc.Core;
 import io.anuke.arc.Events;
+import io.anuke.arc.collection.LongArray;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.content.Blocks;
@@ -12,6 +13,7 @@ import io.anuke.mindustry.game.EventType.BlockBuildBeginEvent;
 import io.anuke.mindustry.game.Team;
 import io.anuke.mindustry.world.blocks.BuildBlock;
 import io.anuke.mindustry.world.blocks.BuildBlock.BuildEntity;
+import io.anuke.mindustry.world.blocks.distribution.Conveyor;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -60,8 +62,15 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
-        world.setBlock(tile, sub, team, rotation);
-        tile.<BuildEntity>entity().setConstruct(previous, result);
+        if(previous instanceof Conveyor && result instanceof Conveyor){
+            LongArray convey = ((Conveyor.ConveyorEntity) tile.entity).convey;
+
+            world.setBlock(tile, sub, team, rotation);
+            tile.<BuildEntity>entity().setConstruct(previous, result, after -> ((Conveyor.ConveyorEntity) tile.entity).convey = convey);
+        }else {
+            world.setBlock(tile, sub, team, rotation);
+            tile.<BuildEntity>entity().setConstruct(previous, result);
+        }
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }

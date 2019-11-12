@@ -4,6 +4,7 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.Graphics.*;
 import io.anuke.arc.Graphics.Cursor.*;
+import io.anuke.arc.func.Cons;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -219,6 +220,8 @@ public class BuildBlock extends Block{
         public Block previous;
         public int builderID = -1;
 
+        public Cons<Tile> after = (tile) -> {};
+
         private float[] accumulator;
         private float[] totalAccumulator;
 
@@ -246,6 +249,7 @@ public class BuildBlock extends Block{
 
             if(progress >= 1f || state.rules.infiniteResources){
                 constructed(tile, cblock, builderID, tile.rotation(), builder.getTeam(), configured);
+                this.after.get(tile);
                 return true;
             }
             return false;
@@ -322,6 +326,11 @@ public class BuildBlock extends Block{
 
         public float progress(){
             return progress;
+        }
+
+        public void setConstruct(Block previous, Block block, Cons<Tile> cons){
+            setConstruct(previous, block);
+            this.after = cons;
         }
 
         public void setConstruct(Block previous, Block block){
