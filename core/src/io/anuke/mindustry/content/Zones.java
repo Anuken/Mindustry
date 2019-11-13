@@ -127,7 +127,7 @@ public class Zones implements ContentList{
             startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
             launchPeriod = 20;
-            resources = with(copper, scrap, lead, coal, sand);
+            resources = with(copper, scrap, lead, coal, sand, water);
             requirements = with(
             new ZoneWave(desertWastes, 20),
             new ZoneWave(craters, 15),
@@ -155,7 +155,7 @@ public class Zones implements ContentList{
 
         fungalPass = new Zone("fungalPass", new MapGenerator("fungalPass")){{
             startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
-            resources = with(copper, lead, coal, titanium, sand);
+            resources = with(copper, lead, coal, titanium, sand, water);
             configureObjective = new Launched(this);
             requirements = with(
             new ZoneWave(stainedMountains, 15),
@@ -190,7 +190,7 @@ public class Zones implements ContentList{
             conditionWave = 15;
             launchPeriod = 10;
             requirements = with(new ZoneWave(ruinousShores, 20));
-            resources = with(copper, scrap, lead, coal, titanium, thorium, sand);
+            resources = with(copper, scrap, lead, coal, titanium, thorium, sand, oil);
             requirements = with(
             new ZoneWave(ruinousShores, 20),
             new Unlock(Blocks.coalCentrifuge),
@@ -230,7 +230,7 @@ public class Zones implements ContentList{
             startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;
             launchPeriod = 15;
-            resources = with(copper, scrap, lead, coal, titanium, thorium, sand);
+            resources = with(copper, scrap, lead, coal, titanium, thorium, sand, water);
             requirements = with(
             new Launched(fungalPass),
             new Unlock(Blocks.thermalGenerator),
