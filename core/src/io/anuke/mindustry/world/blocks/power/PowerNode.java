@@ -14,6 +14,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.sandbox.PowerSource;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -23,7 +24,7 @@ public class PowerNode extends PowerBlock{
 
     protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
-    protected TextureRegion laser, laserEnd;
+    protected TextureRegion laser, laserEnd, led;
 
     protected float laserRange = 6;
     protected int maxNodes = 3;
@@ -82,6 +83,7 @@ public class PowerNode extends PowerBlock{
 
         laser = Core.atlas.find("laser");
         laserEnd = Core.atlas.find("laser-end");
+        led = Core.atlas.find(name + "-led");
     }
 
     @Override
@@ -259,6 +261,15 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
+    public void draw(Tile tile) {
+        super.draw(tile);
+        if(tile.entity.power.graph.getPowerNodeColor() == null || tile.block() instanceof PowerSource) return;
+        Draw.color(tile.entity.power.graph.getPowerNodeColor());
+        Draw.rect(led, tile.drawx(), tile.drawy(), (id%4)*90);
+        Draw.color();
+    }
+
+    @Override
     public void drawLayer(Tile tile){
         if(Core.settings.getInt("lasersopacity") == 0) return;
 
@@ -328,9 +339,7 @@ public class PowerNode extends PowerBlock{
         x2 += t2.x;
         y2 += t2.y;
 
-        float fract = 1f - tile.entity.power.graph.getSatisfaction();
-
-        Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(Color.white, Pal.powerLight, Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
         Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();

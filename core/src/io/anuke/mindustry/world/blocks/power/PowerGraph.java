@@ -2,9 +2,11 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.WindowedMean;
 import io.anuke.arc.util.Time;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.consumers.*;
 
@@ -26,6 +28,8 @@ public class PowerGraph{
     private final int graphID;
     private static int lastGraphID;
 
+    private Color led = null;
+
     {
         graphID = lastGraphID++;
     }
@@ -44,6 +48,10 @@ public class PowerGraph{
 
     public float getLastPowerProduced(){
         return lastPowerProduced;
+    }
+
+    public Color getPowerNodeColor(){
+        return led;
     }
 
     public float getSatisfaction(){
@@ -112,7 +120,10 @@ public class PowerGraph{
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
-        if(Mathf.equal(stored, 0f)) return 0f;
+        if(Mathf.equal(stored, 0f)){
+            led = Pal.remove;
+            return 0f;
+        }
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
@@ -195,13 +206,16 @@ public class PowerGraph{
         powerBalance.addValue((powerProduced - powerNeeded) / Time.delta());
 
         if(consumers.size == 0 && producers.size == 0 && batteries.size == 0){
+            led = null;
             return;
         }
 
         if(!Mathf.equal(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
+                led = Color.orange;
                 powerProduced += useBatteries(powerNeeded - powerProduced);
             }else if(powerProduced > powerNeeded){
+                led = Color.green;
                 powerProduced -= chargeBatteries(powerProduced - powerNeeded);
             }
         }
