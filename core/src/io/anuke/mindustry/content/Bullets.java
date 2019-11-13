@@ -590,22 +590,10 @@ public class Bullets implements ContentList{
             }
         };
 
-        arc = new BulletType(0.001f, 21){
-            {
-                lifetime = 1;
-                despawnEffect = Fx.none;
-                hitEffect = Fx.hitLancer;
-            }
-
-            @Override
-            public void draw(Bullet b){
-            }
-
-            @Override
-            public void init(Bullet b){
-                Lightning.create(b.getTeam(), Pal.lancerLaser, damage, b.x, b.y, b.rot(), 25);
-            }
-        };
+        arc = new LightningBulletType(){{
+            damage = 21;
+            lightningLength = 25;
+        }};
 
         driverBolt = new MassDriverBolt();
 

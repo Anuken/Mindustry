@@ -51,16 +51,15 @@ public class Mechs implements ContentList{
                     ejectEffect = Fx.none;
                     bullet = new HealBulletType(){{
                         healPercent = 3f;
-                        //TODO decide on color or remove healing properties
-                        //backColor = engineColor;
+                        backColor = engineColor;
                         homingPower = 20f;
                         bulletHeight = 4f;
                         bulletWidth = 1.5f;
                         damage = 3f;
                         speed = 4f;
                         lifetime = 40f;
-                        //shootEffect = Fx.shootHealYellow;
-                        //smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
+                        shootEffect = Fx.shootHealYellow;
+                        smokeEffect = hitEffect = despawnEffect = Fx.hitYellowLaser;
                     }};
                 }};
             }
@@ -74,7 +73,7 @@ public class Mechs implements ContentList{
             public void updateAlt(Player player){
                 if(player.timer.get(Player.timerAbility, healReload)){
                     if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
-                        other.entity.healBy(other.entity.maxHealth() * healPercent);
+                        other.entity.healBy(other.entity.maxHealth() * healPercent / 100f);
                         Effects.effect(Fx.healBlockFull, Pal.heal, other.drawx(), other.drawy(), other.block().size);
                     })){
                         Effects.effect(Fx.healWave, player);
@@ -138,10 +137,17 @@ public class Mechs implements ContentList{
 
                 weapon = new Weapon("flamethrower"){{
                     length = 1.5f;
-                    reload = 10f;
+                    reload = 30f;
                     width = 4f;
                     alternate = true;
-                    bullet = Bullets.basicFlame;
+                    shots = 3;
+                    inaccuracy = 40f;
+                    shootSound = Sounds.spark;
+                    bullet = new LightningBulletType(){{
+                        damage = 5;
+                        lightningLength = 10;
+                        lightningColor = Pal.lightFlame;
+                    }};
                 }};
             }
         };
