@@ -7,15 +7,11 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
-import io.anuke.arc.scene.ui.layout.Table;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Cicon;
-import io.anuke.mindustry.ui.ItemImage;
-import io.anuke.mindustry.ui.ReqImage;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -70,14 +66,6 @@ public class ItemBridge extends Block{
         endRegion = Core.atlas.find(name + "-end");
         bridgeRegion = Core.atlas.find(name + "-bridge");
         arrowRegion = Core.atlas.find(name + "-arrow");
-    }
-
-    @Override
-    public void displayConsumption(Tile tile, Table table) {
-        table.left();
-        tile.entity.items.forEach((item, amount) -> {
-            table.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), (int) amount), () -> true)).size(8 * 4).padRight(5);
-        });
     }
 
     @Override

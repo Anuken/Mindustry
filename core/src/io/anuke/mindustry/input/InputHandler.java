@@ -576,7 +576,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //consume tap event if necessary
         if(tile.interactable(player.getTeam()) && tile.block().consumesTap){
             consumed = true;
-        }else if(tile.interactable(player.getTeam()) && tile.block().synthetic() && !consumed){
+        }else if(tile.interactable(player.getTeam()) && tile.block().synthetic()){
             if(tile.block().hasItems && tile.entity.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
