@@ -47,9 +47,9 @@ public class PowerGraph{
     }
 
     public float getSatisfaction(){
-        if(Mathf.isZero(lastPowerProduced)){
+        if(Mathf.zero(lastPowerProduced)){
             return 0f;
-        }else if(Mathf.isZero(lastPowerNeeded)){
+        }else if(Mathf.zero(lastPowerNeeded)){
             return 1f;
         }
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
@@ -112,7 +112,7 @@ public class PowerGraph{
 
     public float useBatteries(float needed){
         float stored = getBatteryStored();
-        if(Mathf.isEqual(stored, 0f)) return 0f;
+        if(Mathf.equal(stored, 0f)) return 0f;
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
@@ -129,7 +129,7 @@ public class PowerGraph{
         float capacity = getBatteryCapacity();
         //how much of the missing in each battery % is charged
         float chargedPercent = Math.min(excess/capacity, 1f);
-        if(Mathf.isEqual(capacity, 0f)) return 0f;
+        if(Mathf.equal(capacity, 0f)) return 0f;
 
         for(Tile battery : batteries){
             Consumers consumes = battery.block().consumes;
@@ -145,13 +145,13 @@ public class PowerGraph{
 
     public void distributePower(float needed, float produced){
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
-        float coverage = Mathf.isZero(needed) && Mathf.isZero(produced) ? 0f : Mathf.isZero(needed) ? 1f : Math.min(1, produced / needed);
+        float coverage = Mathf.zero(needed) && Mathf.zero(produced) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
         for(Tile consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
                 if(consumePower.buffered){
-                    if(!Mathf.isZero(consumePower.capacity)){
+                    if(!Mathf.zero(consumePower.capacity)){
                         // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
                         float maximumRate = consumePower.requestedPower(consumer.entity) * coverage * consumer.entity.delta();
                         consumer.entity.power.satisfaction = Mathf.clamp(consumer.entity.power.satisfaction + maximumRate / consumePower.capacity);
@@ -198,7 +198,7 @@ public class PowerGraph{
             return;
         }
 
-        if(!Mathf.isEqual(powerNeeded, powerProduced)){
+        if(!Mathf.equal(powerNeeded, powerProduced)){
             if(powerNeeded > powerProduced){
                 powerProduced += useBatteries(powerNeeded - powerProduced);
             }else if(powerProduced > powerNeeded){

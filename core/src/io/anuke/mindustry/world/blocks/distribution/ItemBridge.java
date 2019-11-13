@@ -196,7 +196,7 @@ public class ItemBridge extends Block{
             entity.uptime = 0f;
         }else{
 
-            if(entity.cons.valid() && (!hasPower || Mathf.isZero(1f - entity.power.satisfaction))){
+            if(entity.cons.valid() && (!hasPower || Mathf.zero(1f - entity.power.satisfaction))){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
