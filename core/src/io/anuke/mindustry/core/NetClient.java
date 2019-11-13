@@ -49,6 +49,8 @@ public class NetClient implements ApplicationListener{
     private float timeoutTime = 0f;
     /** Last sent client snapshot ID. */
     private int lastSent;
+    /** Chat show/hide setting */
+    public static boolean visual = true;
 
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
@@ -168,7 +170,7 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id, player.name), player);
+            if(visual) Call.sendMessage(message, colorizeName(player.id, player.name), player);
         }else{
             //log command to console but with brackets
             Log.info("<&y{0}: &lm{1}&lg>", player.name, message);
