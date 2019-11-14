@@ -207,7 +207,8 @@ public class Block extends BlockStorage{
         if(tile == null || tile.entity == null || tile.entity.power == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+            if(other != null && other.entity != null && other.entity.power != null
+            && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
             && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
@@ -221,11 +222,7 @@ public class Block extends BlockStorage{
     }
 
     protected float getProgressIncrease(TileEntity entity, float baseTime){
-        float progressIncrease = 1f / baseTime * entity.delta();
-        if(hasPower){
-            progressIncrease *= entity.power.status; // Reduced increase in case of low power
-        }
-        return progressIncrease;
+        return 1f / baseTime * entity.delta() * entity.efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
