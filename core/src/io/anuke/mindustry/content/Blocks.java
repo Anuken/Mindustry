@@ -1250,7 +1250,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreSeed = new CoreSeed("core-seed"){{
-            requirements(Category.effect, ItemStack.with(Items.copper, 50, Items.lead, 75, Items.graphite, 25));
+            requirements(Category.effect, ItemStack.with(Items.copper, 300, Items.lead, 500, Items.graphite, 125));
 
             health = 250;
             itemCapacity = 100;
