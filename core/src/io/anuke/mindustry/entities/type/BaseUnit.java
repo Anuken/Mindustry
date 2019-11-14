@@ -21,6 +21,7 @@ import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.DeflectorWall.*;
+import io.anuke.mindustry.world.blocks.storage.CoreSeed;
 import io.anuke.mindustry.world.blocks.units.CommandCenter.*;
 import io.anuke.mindustry.world.blocks.units.UnitFactory.*;
 import io.anuke.mindustry.world.meta.*;
@@ -189,7 +190,7 @@ public abstract class BaseUnit extends Unit implements ShooterTrait{
 
     public TileEntity getClosestEnemyCore(){
         for(Team enemy : Vars.state.teams.enemiesOf(team)){
-            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores);
+            Tile tile = Geometry.findClosest(x, y, Vars.state.teams.get(enemy).cores.select(core -> !(core.block() instanceof CoreSeed)));
             if(tile != null){
                 return tile.entity;
             }

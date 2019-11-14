@@ -12,6 +12,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.storage.CoreSeed;
 import io.anuke.mindustry.world.meta.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -298,7 +299,7 @@ public class Pathfinder implements Runnable{
     /** A path target defines a set of targets for a path.*/
     public enum PathTarget{
         enemyCores((team, out) -> {
-            for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
+            for(Tile other : indexer.getEnemy(team, BlockFlag.core).select(core -> !(core.block() instanceof CoreSeed))){
                 out.add(other.pos());
             }
 

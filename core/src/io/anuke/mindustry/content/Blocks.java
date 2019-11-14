@@ -1249,11 +1249,11 @@ public class Blocks implements ContentList{
         //endregion
         //region storage
 
-        coreSeed = new CoreBlock("core-seed"){{
+        coreSeed = new CoreSeed("core-seed"){{
             requirements(Category.effect, ItemStack.with(Items.copper, 50, Items.lead, 75, Items.graphite, 25));
 
             health = 250;
-            itemCapacity = 0;
+            itemCapacity = 100;
             size = 1;
         }};
 

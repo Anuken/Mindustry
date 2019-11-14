@@ -26,6 +26,8 @@ import static io.anuke.mindustry.Vars.*;
 public class CoreBlock extends StorageBlock{
     protected Mech mech = Mechs.starter;
 
+    protected boolean linksToContainers = true;
+
     public CoreBlock(String name){
         super(name);
 
@@ -87,6 +89,7 @@ public class CoreBlock extends StorageBlock{
 
         entity.storageCapacity = itemCapacity + entity.proximity().sum(e -> isContainer(e) ? e.block().itemCapacity : 0);
         entity.proximity().each(this::isContainer, t -> {
+            if(!linksToContainers && !(t.block() instanceof CoreBlock)) return;
             t.entity.items = entity.items;
             t.<StorageBlockEntity>entity().linkedCore = tile;
         });

@@ -17,6 +17,7 @@ import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
 import io.anuke.mindustry.world.blocks.power.*;
+import io.anuke.mindustry.world.blocks.storage.CoreSeed;
 
 import java.util.*;
 
@@ -143,7 +144,7 @@ public class Logic implements ApplicationListener{
     }
 
     private void checkGameOver(){
-        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.size == 0 && !state.gameOver){
+        if(!state.rules.attackMode && state.teams.get(defaultTeam).cores.select(core -> !(core.block() instanceof CoreSeed)).size == 0 && !state.gameOver){
             state.gameOver = true;
             Events.fire(new GameOverEvent(waveTeam));
         }else if(state.rules.attackMode){
