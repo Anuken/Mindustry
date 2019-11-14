@@ -200,7 +200,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(maxmove > minmove){
                 pos.y += maxmove;
-                if(Mathf.isEqual(pos.x, 0, 0.1f)){
+                if(Mathf.equal(pos.x, 0, 0.1f)){
                     pos.x = 0f;
                 }
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);

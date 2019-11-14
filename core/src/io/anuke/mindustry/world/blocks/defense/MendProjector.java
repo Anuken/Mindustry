@@ -70,7 +70,7 @@ public class MendProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
+        if(entity.cons.optionalValid() && entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
@@ -90,7 +90,7 @@ public class MendProjector extends Block{
                     if(other == null) continue;
 
                     if(other.getTeamID() == tile.getTeamID() && !healed.contains(other.pos()) && other.entity != null && other.entity.health < other.entity.maxHealth()){
-                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.power.satisfaction);
+                        other.entity.healBy(other.entity.maxHealth() * (healPercent + entity.phaseHeat * phaseBoost) / 100f * entity.efficiency());
                         Effects.effect(Fx.healBlockFull, Tmp.c1.set(color).lerp(phase, entity.phaseHeat), other.drawx(), other.drawy(), other.block().size);
                         healed.add(other.pos());
                     }

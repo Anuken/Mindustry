@@ -74,13 +74,13 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
+        if(entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.power.satisfaction;
+            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
 

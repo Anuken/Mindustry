@@ -32,7 +32,7 @@ public class LiquidBridge extends ItemBridge{
             if(entity.cons.valid()){
                 float alpha = 0.04f;
                 if(hasPower){
-                    alpha *= entity.power.satisfaction; // Exceed boot time unless power is at max.
+                    alpha *= entity.efficiency(); // Exceed boot time unless power is at max.
                 }
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, alpha);
             }else{
