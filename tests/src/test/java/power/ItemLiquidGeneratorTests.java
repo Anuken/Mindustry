@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * All tests are run with a fixed delta of 0.5 so delta considerations can be tested as well.
  * Additionally, each PowerGraph::update() call will have its own thread frame, i.e. the method will never be called twice within the same frame.
  * Both of these constraints are handled by FakeThreadHandler within PowerTestFixture.
- * Any expected power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but satisfaction should not!
+ * Any expected power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but status should not!
  */
 public class ItemLiquidGeneratorTests extends PowerTestFixture{
 

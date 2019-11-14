@@ -47,6 +47,6 @@ public class PowerTurret extends CooledTurret{
 
     @Override
     protected float baseReloadSpeed(Tile tile){
-        return tile.isEnemyCheat() ? 1f : tile.entity.power.satisfaction;
+        return tile.isEnemyCheat() ? 1f : tile.entity.power.status;
     }
 }

@@ -108,12 +108,12 @@ public class ForceProjector extends Block{
             Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
         }
 
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.power.satisfaction, 0.1f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
 
 /*
-        if(entity.power.satisfaction < relativePowerDraw){
+        if(entity.power.status < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
-            entity.power.satisfaction = 0f;
+            entity.power.status = 0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }
