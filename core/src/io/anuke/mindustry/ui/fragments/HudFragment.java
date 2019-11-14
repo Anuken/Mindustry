@@ -30,6 +30,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.ui.dialogs.*;
+import io.anuke.mindustry.world.Tile;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -43,7 +44,7 @@ public class HudFragment extends Fragment{
     private float dsize = 47.2f;
 
     private float coreAttackTime;
-    private float lastCoreHP;
+    private float lastTotalCoreHP;
     private Team lastTeam;
     private float coreAttackOpacity = 0f;
     private long lastToast;
@@ -288,7 +289,7 @@ public class HudFragment extends Fragment{
             Events.on(StateChangeEvent.class, event -> {
                 if(event.to == State.menu || event.from == State.menu){
                     coreAttackTime = 0f;
-                    lastCoreHP = Float.NaN;
+                    lastTotalCoreHP = Float.NaN;
                 }
             });
 
@@ -298,18 +299,21 @@ public class HudFragment extends Fragment{
                     return false;
                 }
 
-                float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
+                float curr = 0f;
+                for(Tile core : state.teams.get(waveTeam).cores){
+                    curr += core.entity.health;
+                }
 
                 if(lastTeam != player.getTeam()){
-                    lastCoreHP = curr;
+                    lastTotalCoreHP = curr;
                     lastTeam = player.getTeam();
                     return false;
                 }
 
-                if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
+                if(!Float.isNaN(lastTotalCoreHP) && curr < lastTotalCoreHP){
                     coreAttackTime = notifDuration;
                 }
-                lastCoreHP = curr;
+                lastTotalCoreHP = curr;
 
                 t.getColor().a = coreAttackOpacity;
                 if(coreAttackTime > 0){
