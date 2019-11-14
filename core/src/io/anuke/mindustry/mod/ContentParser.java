@@ -14,6 +14,7 @@ import io.anuke.arc.util.reflect.Field;
 import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
+import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
@@ -182,7 +183,7 @@ public class ContentParser{
                         }else if(child.name.equals("liquid")){
                             block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
                         }else if(child.name.equals("power")){
-                            if(child.isDouble()){
+                            if(child.isNumber()){
                                 block.consumes.power(child.asFloat());
                             }else{
                                 block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
@@ -342,10 +343,7 @@ public class ContentParser{
             init();
         }
 
-        //add comments starting with //, but ignore links
-        json = json.replace("http://", "http:~~").replace("https://", "https:~~").replaceAll("//.*?\n","\n").replace("http:~~", "http://").replace("https:~~", "https://");
-
-        JsonValue value = parser.fromJson(null, json);
+        JsonValue value = parser.fromJson(null, Jval.read(json).toString(JsonFormat.plain));
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
