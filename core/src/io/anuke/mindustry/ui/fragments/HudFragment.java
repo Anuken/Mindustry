@@ -300,7 +300,7 @@ public class HudFragment extends Fragment{
                 }
 
                 float curr = 0f;
-                for(Tile core : state.teams.get(waveTeam).cores){
+                for(Tile core : state.teams.get(player.getTeam()).cores){
                     curr += core.entity.health;
                 }
 
