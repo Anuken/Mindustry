@@ -38,7 +38,8 @@ import static io.anuke.mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
-    boolean useDiscord = OS.is64Bit, loadError = false;
+    //TODO discord disabled until further notice
+    boolean useDiscord = false, loadError = false;
     Throwable steamError;
 
     static{

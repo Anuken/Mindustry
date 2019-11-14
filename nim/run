@@ -1,0 +1,4 @@
+cd ..
+./gradlew nimDist
+cd nim
+nim c -r -o:build/ desktop.nim

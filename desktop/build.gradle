@@ -47,6 +47,13 @@ task dist(type: Jar, dependsOn: classes){
     }
 }
 
+task nimDist(type: Jar, dependsOn: [classes, dist]){
+    copy{
+        from "build/libs/${appName}.jar"
+        into file("../nim/build")
+    }
+}
+
 task steamtest(dependsOn: dist){
     doLast{
         copy{
