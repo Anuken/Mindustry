@@ -1,0 +1,26 @@
+{
+
+  "name": "oro",
+
+  "author": "Tomás",
+
+  "description": "this mod adds gold with other materials",
+
+  "version": "1.0"
+
+}
+<mod root folder>
+
+bundles/bundles.properties
+
+content
+
+blocks/ goldenblock.json
+
+items/ goldeningot.json
+
+sprites/
+
+environment/ "type": "floor" 
+             "name": "gold"
+             "description": "It is a metallic yellow mineral that has a moderate hardness is removed with the pneumatic drill"
