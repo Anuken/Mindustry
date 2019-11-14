@@ -343,7 +343,7 @@ public class ContentParser{
             init();
         }
 
-        JsonValue value = parser.fromJson(null, Jval.read(json).toString(JsonFormat.plain));
+        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
