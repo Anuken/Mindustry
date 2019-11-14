@@ -32,14 +32,14 @@ public class JoinDialog extends FloatingDialog{
 
         loadServers();
 
-        buttons.add().width(60f);
-        buttons.add().growX();
+        if(!steam) buttons.add().width(60f);
+        buttons.add().growX().width(-1);
 
         addCloseButton();
 
-        buttons.add().growX();
+        buttons.add().growX().width(-1);
         if(!steam){
-            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
         add = new FloatingDialog("$joingame.title");

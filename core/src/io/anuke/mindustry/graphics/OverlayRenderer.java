@@ -67,7 +67,7 @@ public class OverlayRenderer{
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                             .setCenter(Core.camera.position.x, Core.camera.position.y).contains(mechpad.x, mechpad.y)){
 
-                        Tmp.v1.set(mechpad.worldx(), mechpad.worldy()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                        Tmp.v1.set(mechpad.drawx(), mechpad.drawy()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
                         Lines.stroke(2f, ((MechPad) mechpad.block()).mech.engineColor);
                         Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 0.5f);
