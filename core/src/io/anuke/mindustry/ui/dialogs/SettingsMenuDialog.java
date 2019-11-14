@@ -360,7 +360,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
-                hide();
+                if(prefs.getChildren().first() != menu){
+                    back();
+                }else{
+                    hide();
+                }
             }
         });
     }
