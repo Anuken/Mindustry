@@ -18,6 +18,10 @@ public class TechTree implements ContentList{
 
         root = node(coreShard, () -> {
 
+            node(coreSeed, () -> {
+
+            });
+
             node(conveyor, () -> {
 
                 node(junction, () -> {
