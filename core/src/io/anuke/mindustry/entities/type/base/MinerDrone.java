@@ -1,16 +1,20 @@
 package io.anuke.mindustry.entities.type.base;
 
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Structs;
 import io.anuke.mindustry.content.Blocks;
+import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.entities.traits.MinerTrait;
 import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.entities.units.UnitState;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.type.Item;
 import io.anuke.mindustry.type.ItemType;
+import io.anuke.mindustry.type.UnitType;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
 import java.io.*;
 
@@ -29,7 +33,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         }
 
         public void update(){
-            TileEntity entity = getClosestCore();
+            TileEntity entity = dropOffPoint();
 
             if(entity == null) return;
 
@@ -87,7 +91,7 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
                 return;
             }
 
-            target = getClosestCore();
+            target = dropOffPoint();
 
             if(target == null) return;
 
@@ -170,10 +174,40 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
     }
 
     protected void findItem(){
-        TileEntity entity = getClosestCore();
+        TileEntity entity = dropOffPoint();
         if(entity == null){
             return;
         }
         targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
+    }
+
+    @Override
+    public TileEntity getClosestCore() {
+
+        
+
+        return super.getClosestCore();
+    }
+
+    protected TileEntity dropOffPoint(){
+        TileEntity entity = getClosestCore();
+
+        // it works, but obviously in need of a cleanup
+        if(type == UnitTypes.draug){
+            if(spawner != Pos.invalid){
+                Tile factory = world.tile(spawner);
+                if(factory != null){
+                    UnitFactory.UnitFactoryEntity e = (UnitFactory.UnitFactoryEntity) factory.entity;
+                    if(e != null){
+                        if(e.link != Pos.invalid){
+                            entity = world.tile(e.link).entity;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return entity;
     }
 }
