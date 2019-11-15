@@ -11,9 +11,7 @@ import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.Call;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.units.UnitFactory;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -100,28 +98,5 @@ public interface MinerTrait extends Entity{
         }
 
         Draw.color();
-    }
-
-    protected TileEntity dropOffPoint(){
-        Unit unit = (Unit)this;
-        TileEntity entity = unit.getClosestCore();
-
-        // it works, but obviously in need of a cleanup
-        if(unit.type == UnitTypes.draug){
-            if(unit.spawner != Pos.invalid){
-                Tile factory = world.tile(spawner);
-                if(factory != null){
-                    UnitFactory.UnitFactoryEntity e = (UnitFactory.UnitFactoryEntity) factory.entity;
-                    if(e != null){
-                        if(e.link != Pos.invalid){
-                            entity = world.tile(e.link).entity;
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return entity;
     }
 }
