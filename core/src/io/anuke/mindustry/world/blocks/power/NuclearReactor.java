@@ -33,7 +33,7 @@ public class NuclearReactor extends PowerGenerator{
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected float itemDuration = 120; //time to consume 1 fuel
-    protected float heating = 0.01f; //heating per frame * fullness
+    protected float heating = 0.005f; //heating per frame * fullness
     protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
     protected int explosionRadius = 40;
     protected int explosionDamage = 1350;
