@@ -6,8 +6,12 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.math.geom.Geometry;
+import io.anuke.arc.util.Log;
+import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
+import io.anuke.mindustry.content.UnitTypes;
 import io.anuke.mindustry.entities.Effects;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -18,7 +22,9 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.Block;
+import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.blocks.distribution.ItemBridge;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.*;
@@ -84,7 +90,97 @@ public class UnitFactory extends Block{
         super.load();
 
         topRegion = Core.atlas.find(name + "-top");
+
+        if(unitType == UnitTypes.draug){
+            configurable = true;
+        }
     }
+
+    @Override
+    public boolean onConfigureTileTapped(Tile tile, Tile other) {
+        UnitFactoryEntity entity = (UnitFactoryEntity) tile.entity;
+
+        if(linkValid(tile, other)){
+            if(entity.link == other.pos()){
+                tile.configure(Pos.invalid);
+            }else{
+                tile.configure(other.pos());
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.<UnitFactoryEntity>entity().link = value;
+    }
+
+    @Override
+    public void drawConfigure(Tile tile){
+        UnitFactoryEntity entity = tile.entity();
+        Tile other = world.tile(entity.link);
+
+        Draw.color(Pal.accent);
+        Lines.stroke(1f);
+        Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
+
+//        Tile hover = world.ltile(Core.input.mouseX() / tilesize, Core.input.mouseY() / tilesize);
+//
+//        tileA
+//
+//        Log.info(hover);
+//        if(hover != null && hover.block().hasItems){
+//            Draw.color(Pal.breakInvalid);
+//            Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 1f + 0f);
+//        }
+
+        Draw.color(Pal.breakInvalid);
+        for(int x = 0; x < world.width(); x++){
+            for(int y = 0; y < world.height(); y++){
+                Tile chesspiece = world.ltile(x, y);
+
+                if(linkValid(tile, chesspiece)){
+                    Lines.square(chesspiece.drawx(), chesspiece.drawy(), chesspiece.block().size * tilesize / 2f + 1f + 0f);
+                }
+            }
+        }
+
+       if(entity.link != Pos.invalid){
+           Draw.color(Pal.place);
+           Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 1f + 0f);
+       }
+
+//        Draw.color(Pal.accent);
+//        Lines.stroke(1f);
+//        Lines.square(tile.drawx(), tile.drawy(),
+//                tile.block().size * tilesize / 2f + 1f);
+//
+//        for(int i = 1; i <= range; i++){
+//            for(int j = 0; j < 4; j++){
+//                Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+//                if(linkValid(tile, other)){
+//                    boolean linked = other.pos() == entity.link;
+//                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
+//
+//                    Lines.square(other.drawx(), other.drawy(),
+//                            other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
+//                }
+//            }
+//        }
+//
+        Draw.reset();
+    }
+
+    public boolean linkValid(Tile tile, Tile other){
+        if(other == null) return false;
+        if(other == tile) return false;
+        if(!other.block().hasItems) return false;
+
+        return true;
+    }
+
 
     @Override
     public void setBars(){
@@ -196,12 +292,14 @@ public class UnitFactory extends Block{
         float time;
         float speedScl;
         int spawned;
+        public int link = Pos.invalid;
 
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeFloat(buildTime);
             stream.writeInt(spawned);
+            stream.writeInt(link);
         }
 
         @Override
@@ -209,6 +307,7 @@ public class UnitFactory extends Block{
             super.read(stream, revision);
             buildTime = stream.readFloat();
             spawned = stream.readInt();
+            link = stream.readInt();
         }
     }
 }
