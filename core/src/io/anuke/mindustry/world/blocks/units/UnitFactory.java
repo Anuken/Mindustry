@@ -6,9 +6,6 @@ import io.anuke.arc.*;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Geometry;
-import io.anuke.arc.util.Log;
-import io.anuke.arc.util.Time;
 import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.content.Fx;
 import io.anuke.mindustry.content.UnitTypes;
@@ -24,7 +21,6 @@ import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.Block;
 import io.anuke.mindustry.world.Pos;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.distribution.ItemBridge;
 import io.anuke.mindustry.world.consumers.ConsumeItems;
 import io.anuke.mindustry.world.consumers.ConsumeType;
 import io.anuke.mindustry.world.meta.*;
@@ -120,25 +116,17 @@ public class UnitFactory extends Block{
     @Override
     public void drawConfigure(Tile tile){
         UnitFactoryEntity entity = tile.entity();
-        Tile other = world.tile(entity.link);
 
+        // yellow around factory itself
         Draw.color(Pal.accent);
         Lines.stroke(1f);
         Lines.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 1f);
 
-//        Tile hover = world.ltile(Core.input.mouseX() / tilesize, Core.input.mouseY() / tilesize);
-//
-//        tileA
-//
-//        Log.info(hover);
-//        if(hover != null && hover.block().hasItems){
-//            Draw.color(Pal.breakInvalid);
-//            Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 1f + 0f);
-//        }
-
+        // red for each possible dropoff point
         Draw.color(Pal.breakInvalid);
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
+                // yes yes, i know this should probably use a range or indexer, but this is a draft <3
                 Tile chesspiece = world.ltile(x, y);
 
                 if(linkValid(tile, chesspiece)){
@@ -147,36 +135,22 @@ public class UnitFactory extends Block{
             }
         }
 
-       if(entity.link != Pos.invalid){
-           Draw.color(Pal.place);
-           Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 1f + 0f);
-       }
+        // overline one of the reds with blue when linked
+        if(entity.link != Pos.invalid){
+            Draw.color(Pal.place);
+            Tile other = world.tile(entity.link);
+            Lines.square(other.drawx(), other.drawy(), other.block().size * tilesize / 2f + 1f + 0f);
+        }
 
-//        Draw.color(Pal.accent);
-//        Lines.stroke(1f);
-//        Lines.square(tile.drawx(), tile.drawy(),
-//                tile.block().size * tilesize / 2f + 1f);
-//
-//        for(int i = 1; i <= range; i++){
-//            for(int j = 0; j < 4; j++){
-//                Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
-//                if(linkValid(tile, other)){
-//                    boolean linked = other.pos() == entity.link;
-//                    Draw.color(linked ? Pal.place : Pal.breakInvalid);
-//
-//                    Lines.square(other.drawx(), other.drawy(),
-//                            other.block().size * tilesize / 2f + 1f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)));
-//                }
-//            }
-//        }
-//
         Draw.reset();
     }
 
+    // order of these checks subject to change, this just visually looks somewhat orderly
     public boolean linkValid(Tile tile, Tile other){
         if(other == null) return false;
         if(other == tile) return false;
         if(!other.block().hasItems) return false;
+        if(other.getTeam() != tile.getTeam()) return false;
 
         return true;
     }
