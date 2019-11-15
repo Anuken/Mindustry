@@ -176,6 +176,8 @@ public class MinerDrone extends BaseDrone implements MinerTrait{
         if(entity == null){
             return;
         }
+
+        // looks like this would need a check/filter for wether or not the target even can accept that item
         targetItem = Structs.findMin(type.toMine, indexer::hasOre, (a, b) -> -Integer.compare(entity.items.get(a), entity.items.get(b)));
     }
 

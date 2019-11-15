@@ -151,6 +151,8 @@ public class UnitFactory extends Block{
         if(other == tile) return false;
         if(!other.block().hasItems) return false;
         if(other.getTeam() != tile.getTeam()) return false;
+        if(other.block() instanceof UnitFactory) return false;
+        // add check for if what this drone mines can go in that block
 
         return true;
     }
