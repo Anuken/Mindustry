@@ -113,7 +113,7 @@ public interface BuilderTrait extends Entity, TeamTrait{
     /** @return whether this request should be skipped, in favor of the next one. */
     default boolean shouldSkip(BuildRequest request, @Nullable TileEntity core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || request.breaking || !request.initialized) return false;
+        if(state.rules.infiniteResources || request.breaking || !request.initialized || core == null) return false;
         return request.stuck && !core.items.has(request.block.requirements);
     }
 
