@@ -34,6 +34,8 @@ public abstract class FilterOption{
         final Floatc setter;
         final float min, max, step;
 
+        boolean display;
+
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
         }
@@ -47,9 +49,18 @@ public abstract class FilterOption{
             this.step = step;
         }
 
+        public SliderOption display(){
+            display = true;
+            return this;
+        }
+
         @Override
         public void build(Table table){
-            table.add("$filter.option." + name);
+            if(!display){
+                table.add("$filter.option." + name);
+            }else{
+                table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
+            }
             table.row();
             Slider slider = table.addSlider(min, max, step, setter).growX().get();
             slider.setValue(getter.get());

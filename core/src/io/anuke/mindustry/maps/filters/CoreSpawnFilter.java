@@ -15,7 +15,7 @@ public class CoreSpawnFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return Structs.arr(
-        new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10)
+        new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
         );
     }
 
