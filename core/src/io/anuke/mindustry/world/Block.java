@@ -363,6 +363,16 @@ public class Block extends BlockStorage{
         return sum;
     }
 
+    public float percentSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += !other.floor.isLiquid ? 1f : 0f;
+        }
+        return sum / size / size;
+    }
+
     @Override
     public String localizedName(){
         return localizedName;
