@@ -34,7 +34,7 @@ public class NuclearReactor extends PowerGenerator{
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected float itemDuration = 120; //time to consume 1 fuel
     protected float heating = 0.005f; //heating per frame * fullness
-    protected float smokeThreshold = 0.3f; //threshold at which block starts smoking
+    protected float smokeThreshold = 0.4f; //threshold at which block starts smoking
     protected int explosionRadius = 40;
     protected int explosionDamage = 1350;
     protected float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
@@ -103,6 +103,7 @@ public class NuclearReactor extends PowerGenerator{
 
         if(entity.heat > smokeThreshold){
             float smoke = 1.0f + (entity.heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
+            float heating = 0.013f //increases heating per frame
             if(Mathf.chance(smoke / 20.0 * entity.delta())){
                 Effects.effect(Fx.reactorsmoke, tile.worldx() + Mathf.range(size * tilesize / 2f),
                 tile.worldy() + Mathf.random(size * tilesize / 2f));
