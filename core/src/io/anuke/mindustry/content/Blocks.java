@@ -76,7 +76,7 @@ public class Blocks implements ContentList{
 
     //units
     commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
-    fortressFactory, repairPoint,
+    fortressFactory, repairPoint, tractorBeam,
 
     //upgrades
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
@@ -1755,6 +1755,13 @@ public class Blocks implements ContentList{
             requirements(Category.units, ItemStack.with(Items.lead, 15, Items.copper, 15, Items.silicon, 15));
             repairSpeed = 0.5f;
             repairRadius = 65f;
+            powerUse = 1f;
+        }};
+
+        tractorBeam = new RepairPoint("tractor-beam"){{
+            requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.silicon, 25, Items.metaglass, 10));
+            repairSpeed = 0.5f;
+            repairRadius = 200f;
             powerUse = 1f;
         }};
 
