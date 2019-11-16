@@ -131,6 +131,14 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public float handleDamage(Tile tile, float amount){
+        if(player != null && tile.getTeam() == player.getTeam()){
+            Events.fire(Trigger.teamCoreDamage);
+        }
+        return amount;
+    }
+
+    @Override
     public boolean canBreak(Tile tile){
         return false;
     }

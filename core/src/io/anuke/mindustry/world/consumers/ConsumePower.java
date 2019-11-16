@@ -42,7 +42,7 @@ public class ConsumePower extends Consume{
 
     @Override
     public void update(TileEntity entity){
-        // Nothing to do since PowerGraph directly updates entity.power.satisfaction
+        // Nothing to do since PowerGraph directly updates entity.power.status
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ConsumePower extends Consume{
         if(buffered){
             return true;
         }else{
-            return entity.power.satisfaction > 0f;
+            return entity.power.status > 0f;
         }
     }
 
@@ -71,7 +71,7 @@ public class ConsumePower extends Consume{
     public float requestedPower(TileEntity entity){
         if(entity.tile.entity == null) return 0f;
         if(buffered){
-            return (1f-entity.power.satisfaction)*capacity;
+            return (1f-entity.power.status)*capacity;
         }else{
             try{
                 return usage * Mathf.num(entity.block.shouldConsume(entity.tile));

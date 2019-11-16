@@ -19,6 +19,8 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
+    protected static boolean returnValue = false;
+
     protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
@@ -305,7 +307,7 @@ public class PowerNode extends PowerBlock{
 
     public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
         if(src == null || other == null) return true;
-        return overlaps(src.drawx(), src.drawy(), other, laserRange * tilesize);
+        return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
     }
 
     protected void drawLaser(Tile tile, Tile target){
@@ -339,11 +341,9 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        final Boolean[] bool = {false};
-        insulators(x, y, x2, y2, cause -> {
-            bool[0] = true;
-        });
-        return bool[0];
+        returnValue = false;
+        insulators(x, y, x2, y2, cause -> returnValue = true);
+        return returnValue;
     }
 
     public static void insulators(int x, int y, int x2, int y2, Cons<Tile> iterator){

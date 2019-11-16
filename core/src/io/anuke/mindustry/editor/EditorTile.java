@@ -103,6 +103,7 @@ public class EditorTile extends Tile{
             return;
         }
 
+        if(floor.isLiquid) return;
         if(overlayID() == overlay) return;
         op(OpType.overlay, this.overlay.id);
         super.setOverlayID(overlay);

@@ -207,7 +207,8 @@ public class Block extends BlockStorage{
         if(tile == null || tile.entity == null || tile.entity.power == null) return out;
 
         for(Tile other : tile.entity.proximity()){
-            if(other != null && other.entity != null && other.entity.power != null && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
+            if(other != null && other.entity != null && other.entity.power != null
+            && !(consumesPower && other.block().consumesPower && !outputsPower && !other.block().outputsPower)
             && !tile.entity.power.links.contains(other.pos())){
                 out.add(other);
             }
@@ -221,11 +222,7 @@ public class Block extends BlockStorage{
     }
 
     protected float getProgressIncrease(TileEntity entity, float baseTime){
-        float progressIncrease = 1f / baseTime * entity.delta();
-        if(hasPower){
-            progressIncrease *= entity.power.satisfaction; // Reduced increase in case of low power
-        }
-        return progressIncrease;
+        return 1f / baseTime * entity.delta() * entity.efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
@@ -532,8 +529,8 @@ public class Block extends BlockStorage{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.satisfaction * capacity) ? "<ERROR>" : (int)(entity.power.satisfaction * capacity)) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.isZero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.satisfaction));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){
@@ -594,7 +591,7 @@ public class Block extends BlockStorage{
         }
 
         if(consumes.hasPower() && consumes.getPower().buffered){
-            power += tile.entity.power.satisfaction * consumes.getPower().capacity;
+            power += tile.entity.power.status * consumes.getPower().capacity;
         }
 
         if(hasLiquids){

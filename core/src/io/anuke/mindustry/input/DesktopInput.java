@@ -50,9 +50,9 @@ public class DesktopInput extends InputHandler{
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.add(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
@@ -61,7 +61,7 @@ public class DesktopInput extends InputHandler{
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.add(Core.bundle.format("schematic.flip",
+                b.label( () -> Core.bundle.format("schematic.flip",
                 Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
