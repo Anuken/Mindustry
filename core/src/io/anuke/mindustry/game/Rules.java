@@ -25,6 +25,8 @@ public class Rules{
     public boolean pvp;
     /** Whether enemy units drop random items on death. */
     public boolean unitDrops = true;
+    /** Whether reactors can explode and damage other blocks. */
+    public boolean reactorExplosions = true;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */

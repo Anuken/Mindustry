@@ -23,7 +23,7 @@ import io.anuke.mindustry.world.meta.StatUnit;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
     protected final int timerFuel = timers++;
@@ -127,7 +127,7 @@ public class NuclearReactor extends PowerGenerator{
 
         int fuel = entity.items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
-        if(fuel < 5 && entity.heat < 0.5f) return;
+        if((fuel < 5 && entity.heat < 0.5f) || !state.rules.reactorExplosions) return;
 
         Effects.shake(6f, 16f, tile.worldx(), tile.worldy());
         Effects.effect(Fx.nuclearShockwave, tile.worldx(), tile.worldy());
