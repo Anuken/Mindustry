@@ -62,7 +62,7 @@ public class ServerControl implements ApplicationListener{
             "port", port,
             "logging", true,
             "socket", false,
-            "globalrules", "{}"
+            "globalrules", "{reactorExplosions: false}"
         );
 
         Log.setLogger(new LogHandler(){
