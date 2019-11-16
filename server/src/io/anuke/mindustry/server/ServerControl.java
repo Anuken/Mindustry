@@ -142,6 +142,7 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             info("Game over!");
+            displayStatus();
 
             if(Core.settings.getBool("shuffle")){
                 if(maps.all().size > 0){
@@ -299,29 +300,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("status", "Display server status.", arg -> {
-            if(state.is(State.menu)){
-                info("Status: &rserver closed");
-            }else{
-                info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
-
-                if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
-                }else{
-                    info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
-                }
-
-                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
-
-                if(playerGroup.size() > 0){
-                    info("  &lyPlayers: {0}", playerGroup.size());
-                    for(Player p : playerGroup.all()){
-                        info("    &y{0} / {1}", p.name, p.uuid);
-                    }
-                }else{
-                    info("  &lyNo players connected.");
-                }
-            }
+            displayStatus();
         });
 
         handler.register("mods", "Display all loaded mods.", arg -> {
@@ -763,6 +742,32 @@ public class ServerControl implements ApplicationListener{
 
         mods.each(p -> p.registerServerCommands(handler));
         mods.each(p -> p.registerClientCommands(netServer.clientCommands));
+    }
+
+    private void displayStatus() {
+        if(state.is(State.menu)){
+            info("Status: &rserver closed");
+        }else{
+            info("Status:");
+            info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
+
+            if(state.rules.waves){
+                info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
+            }else{
+                info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
+            }
+
+            info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
+
+            if(playerGroup.size() > 0){
+                info("  &lyPlayers: {0}", playerGroup.size());
+                for(Player p : playerGroup.all()){
+                    info("    &y{0} / {1}", p.name, p.uuid);
+                }
+            }else{
+                info("  &lyNo players connected.");
+            }
+        }
     }
 
     private void readCommands(){
