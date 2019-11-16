@@ -1,24 +1,20 @@
 package io.anuke.mindustry.graphics;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.func.Floatc2;
-import io.anuke.arc.graphics.Camera;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.graphics.glutils.FrameBuffer;
+import io.anuke.arc.graphics.glutils.*;
 import io.anuke.arc.math.*;
-import io.anuke.arc.scene.ui.layout.Scl;
+import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.noise.RidgedPerlin;
-import io.anuke.arc.util.noise.Simplex;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.content.UnitTypes;
-import io.anuke.mindustry.type.UnitType;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.Floor;
-import io.anuke.mindustry.world.blocks.OreBlock;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -158,7 +154,7 @@ public class MenuRenderer implements Disposable{
                 tiles.set(x, y, (tile = new CachedTile()));
                 tile.x = (short)x;
                 tile.y = (short)y;
-                tile.setFloor((Floor) floor);
+                tile.setFloor(floor.asFloor());
                 tile.setBlock(wall);
                 tile.setOverlay(ore);
             }

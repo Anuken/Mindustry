@@ -30,7 +30,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new, EnemySpawnFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -292,7 +292,7 @@ public class MapGenerateDialog extends FloatingDialog{
         for(Prov<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
 
-            if(!applied && filter.isBuffered()) continue;
+            if((!applied && filter.isBuffered()) || (filter.isPost() && applied)) continue;
 
             selection.cont.addButton(filter.name(), () -> {
                 filters.add(filter);

@@ -5,6 +5,7 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.noise.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.world.*;
 
 public abstract class GenerateFilter{
@@ -19,7 +20,7 @@ public abstract class GenerateFilter{
             apply();
 
             tile.setFloor(in.floor.asFloor());
-            tile.setOverlay(in.ore);
+            tile.setOverlay(in.floor.asFloor().isLiquid ? Blocks.air : in.ore);
 
             if(!tile.block().synthetic() && !in.block.synthetic()){
                 tile.setBlock(in.block);
