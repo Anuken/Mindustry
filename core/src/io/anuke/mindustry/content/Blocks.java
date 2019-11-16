@@ -48,7 +48,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, message,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -537,7 +537,7 @@ public class Blocks implements ContentList{
             hasPower = true;
 
             consumes.power(4f);
-            consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
+            consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
         }};
 
         cryofluidMixer = new LiquidConverter("cryofluidmixer"){{
@@ -713,11 +713,11 @@ public class Blocks implements ContentList{
         //endregion
         //region sandbox
 
-        powerVoid = new PowerVoid("power-void"){{
+        powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
-        powerSource = new PowerSource("power-source"){{
+        powerVoid = new PowerVoid("power-void"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
