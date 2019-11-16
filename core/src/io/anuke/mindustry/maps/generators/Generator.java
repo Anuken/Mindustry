@@ -19,5 +19,5 @@ public abstract class Generator{
         this.loadout = loadout;
     }
 
-    public abstract void generate(Tile[][] tiles);
+    public abstract void generate(Tiles tiles);
 }

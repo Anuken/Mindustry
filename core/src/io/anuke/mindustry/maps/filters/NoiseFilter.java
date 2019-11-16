@@ -1,19 +1,19 @@
 package io.anuke.mindustry.maps.filters;
 
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
-import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
+import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.maps.filters.FilterOption.floorsOnly;
-import static io.anuke.mindustry.maps.filters.FilterOption.wallsOnly;
+import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
 public class NoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0.5f, octaves = 3f, falloff = 0.5f;
     Block floor = Blocks.stone, block = Blocks.rocks;
 
-    {
-        options(
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
         new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
         new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
         new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),

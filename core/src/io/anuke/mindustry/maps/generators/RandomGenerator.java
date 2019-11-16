@@ -1,10 +1,9 @@
 package io.anuke.mindustry.maps.generators;
 
-import io.anuke.arc.collection.StringMap;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.collection.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.world;
 
@@ -18,14 +17,14 @@ public abstract class RandomGenerator extends Generator{
     }
 
     @Override
-    public void generate(Tile[][] tiles){
+    public void generate(Tiles tiles){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 floor = Blocks.air;
                 block = Blocks.air;
                 ore = Blocks.air;
                 generate(x, y);
-                tiles[x][y] = new Tile(x, y, floor.id, ore.id, block.id);
+                tiles.set(x, y, new Tile(x, y, floor.id, ore.id, block.id));
             }
         }
 
@@ -34,7 +33,7 @@ public abstract class RandomGenerator extends Generator{
         world.setMap(new Map(new StringMap()));
     }
 
-    public abstract void decorate(Tile[][] tiles);
+    public abstract void decorate(Tiles tiles);
 
     /**
      * Sets {@link #floor} and {@link #block} to the correct values as output.

@@ -22,7 +22,7 @@ public class Zones implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new Zone("groundZero", starter, new MapGenerator("groundZero", 1)){{
+        groundZero = new Zone("groundZero", starter, new MapGenerator("groundZero")){{
             baseLaunchCost = list(copper, -60);
             startingItems = list(copper, 60);
             alwaysUnlocked = true;
@@ -98,8 +98,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        frozenForest = new Zone("frozenForest", starter, new MapGenerator("frozenForest", 1)
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.02))){{
+        frozenForest = new Zone("frozenForest", starter, new MapGenerator("frozenForest")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250);
             conditionWave = 10;
@@ -111,7 +110,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        craters = new Zone("craters", starter, new MapGenerator("craters", 1).decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.004))){{
+        craters = new Zone("craters", starter, new MapGenerator("craters")){{
             startingItems = list(copper, 100);
             conditionWave = 10;
             resources = with(copper, lead, coal, sand, scrap);
@@ -122,7 +121,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        ruinousShores = new Zone("ruinousShores", starter, new MapGenerator("ruinousShores", 1)){{
+        ruinousShores = new Zone("ruinousShores", starter, new MapGenerator("ruinousShores")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
@@ -138,8 +137,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        stainedMountains = new Zone("stainedMountains", starter, new MapGenerator("stainedMountains", 2)
-        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
+        stainedMountains = new Zone("stainedMountains", starter, new MapGenerator("stainedMountains")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 200, lead, 50);
             conditionWave = 10;
@@ -183,8 +181,7 @@ public class Zones implements ContentList{
             );
         }};
 
-        tarFields = new Zone("tarFields", starter, new MapGenerator("tarFields")
-        .decor(new Decoration(Blocks.shale, Blocks.shaleBoulder, 0.02))){{
+        tarFields = new Zone("tarFields", starter, new MapGenerator("tarFields")){{
             loadout = Loadouts.basicFoundation;
             startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
@@ -223,8 +220,7 @@ public class Zones implements ContentList{
             resources = Array.with(Items.copper, Items.scrap, Items.lead, Items.coal, Items.sand};
         }};*/
 
-        nuclearComplex = new Zone("nuclearComplex", starter, new MapGenerator("nuclearProductionComplex", 1)
-        .decor(new Decoration(Blocks.snow, Blocks.sporeCluster, 0.01))){{
+        nuclearComplex = new Zone("nuclearComplex", starter, new MapGenerator("nuclearProductionComplex")){{
             loadout = Loadouts.basicNucleus;
             startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;

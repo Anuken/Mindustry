@@ -111,7 +111,7 @@ public class ApplicationTests{
 
     @Test
     void createMap(){
-        Tile[][] tiles = world.createTiles(8, 8);
+        Tile[][] tiles = world.resize(8, 8);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){
@@ -329,7 +329,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tile[][] tiles = world.createTiles(256*2 + 20, 10);
+        Tile[][] tiles = world.resize(256*2 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.length; x++){

@@ -9,6 +9,8 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
+        starter = new Planet("//TODO"){{
 
+        }};
     }
 }

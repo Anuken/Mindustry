@@ -25,26 +25,6 @@ public class LegacyMapIO{
     private static final ObjectMap<String, String> fallback = ObjectMap.of("alpha-dart-mech-pad", "dart-mech-pad");
     private static final Json json = new Json();
 
-    /* Convert a map from the old format to the new format. */
-    public static void convertMap(FileHandle in, FileHandle out) throws IOException{
-        Map map = readMap(in, true);
-
-        String waves = map.tags.get("waves", "[]");
-        Array<SpawnGroup> groups = new Array<>(json.fromJson(SpawnGroup[].class, waves));
-
-        Tile[][] tiles = world.createTiles(map.width, map.height);
-        for(int x = 0; x < map.width; x++){
-            for(int y = 0; y < map.height; y++){
-                tiles[x][y] = new CachedTile();
-                tiles[x][y].x = (short)x;
-                tiles[x][y].y = (short)y;
-            }
-        }
-        state.rules.spawns = groups;
-        readTiles(map, tiles);
-        MapIO.writeMap(out, map);
-    }
-
     public static Map readMap(FileHandle file, boolean custom) throws IOException{
         try(DataInputStream stream = new DataInputStream(file.read(1024))){
             StringMap tags = new StringMap();
@@ -191,12 +171,12 @@ public class LegacyMapIO{
     }
 
     /** Reads a pixmap in the 3.5 pixmap format. */
-    public static void readPixmap(Pixmap pixmap, Tile[][] tiles){
+    public static void readPixmap(Pixmap pixmap, Tiles tiles){
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 int color = pixmap.getPixel(x, pixmap.getHeight() - 1 - y);
                 LegacyBlock block = LegacyColorMapper.get(color);
-                Tile tile = tiles[x][y];
+                Tile tile = tiles.getn(x, y);
 
                 tile.setFloor(block.floor);
                 tile.setBlock(block.wall);

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.filters;
 
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
-import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
@@ -11,8 +11,9 @@ public class ScatterFilter extends GenerateFilter{
     protected float chance = 0.014f;
     protected Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
 
-    {
-        options(
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
         new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
         new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOptional),
         new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),

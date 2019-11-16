@@ -36,6 +36,8 @@ public class ContentLoader{
         new Blocks(),
         new Loadouts(),
         new TechTree(),
+        new Weathers(),
+        new Planets(),
         new Zones(),
         new TypeIDs(),
 

@@ -44,7 +44,7 @@ public class MenuRenderer implements Disposable{
     }
 
     private void generate(){
-        Tile[][] tiles = world.createTiles(width, height);
+        Tiles tiles = world.resize(width, height);
         Array<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
@@ -155,7 +155,7 @@ public class MenuRenderer implements Disposable{
                 }
 
                 Tile tile;
-                tiles[x][y] = (tile = new CachedTile());
+                tiles.set(x, y, (tile = new CachedTile()));
                 tile.x = (short)x;
                 tile.y = (short)y;
                 tile.setFloor((Floor) floor);

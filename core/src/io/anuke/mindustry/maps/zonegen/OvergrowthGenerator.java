@@ -1,9 +1,9 @@
 package io.anuke.mindustry.maps.zonegen;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.maps.generators.BasicGenerator;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.maps.generators.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.schematics;
 
@@ -19,7 +19,7 @@ public class OvergrowthGenerator extends BasicGenerator{
     }
 
     @Override
-    public void decorate(Tile[][] tiles){
+    public void decorate(Tiles tiles){
         ores(tiles);
         terrain(tiles, Blocks.sporePine, 70f, 1.4f, 1f);
 
@@ -34,12 +34,12 @@ public class OvergrowthGenerator extends BasicGenerator{
         erase(tiles, endX, endY, 10);
         erase(tiles, spawnX, spawnY, 20);
         distort(tiles, 20f, 4f);
-        inverseFloodFill(tiles, tiles[spawnX][spawnY], Blocks.sporerocks);
+        inverseFloodFill(tiles, tiles.getn(spawnX, spawnY), Blocks.sporerocks);
 
         noise(tiles, Blocks.darksandTaintedWater, Blocks.duneRocks, 4, 0.7f, 120f, 0.64f);
         //scatter(tiles, Blocks.sporePine, Blocks.whiteTreeDead, 1f);
 
-        tiles[endX][endY].setOverlay(Blocks.spawn);
+        tiles.getn(endX, endY).setOverlay(Blocks.spawn);
         schematics.placeLoadout(loadout, spawnX, spawnY);
     }
 }

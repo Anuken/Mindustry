@@ -1,20 +1,20 @@
 package io.anuke.mindustry.maps.filters;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.mindustry.content.Blocks;
-import io.anuke.mindustry.maps.filters.FilterOption.BlockOption;
-import io.anuke.mindustry.maps.filters.FilterOption.SliderOption;
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.maps.filters.FilterOption.*;
+import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.maps.filters.FilterOption.floorsOnly;
-import static io.anuke.mindustry.maps.filters.FilterOption.wallsOnly;
+import static io.anuke.mindustry.maps.filters.FilterOption.*;
 
 public class TerrainFilter extends GenerateFilter{
     float scl = 40, threshold = 0.9f, octaves = 3f, falloff = 0.5f, magnitude = 1f, circleScl = 2.1f;
     Block floor = Blocks.stone, block = Blocks.rocks;
 
-    {
-        options(
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
         new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
         new SliderOption("mag", () -> magnitude, f -> magnitude = f, 0f, 2f),
         new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),

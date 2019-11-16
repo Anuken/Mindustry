@@ -276,8 +276,8 @@ public class Control implements ApplicationListener, Loadable{
 
             world.beginMapLoad();
 
-            world.createTiles(zone.generator.width, zone.generator.height);
-            zone.generator.generate(world.getTiles());
+            world.resize(zone.generator.width, zone.generator.height);
+            zone.generator.generate(world.tiles);
 
             Tile coreb = null;
 

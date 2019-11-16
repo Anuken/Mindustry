@@ -1,5 +1,6 @@
 package io.anuke.mindustry.maps.filters;
 
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.maps.filters.FilterOption.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
@@ -7,12 +8,17 @@ import io.anuke.mindustry.world.blocks.*;
 public class DistortFilter extends GenerateFilter{
     float scl = 40, mag = 5;
 
-    {
-        buffered = true;
-        options(
-            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 200f),
-            new SliderOption("mag", () -> mag, f -> mag = f, 0.5f, 100f)
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
+        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 200f),
+        new SliderOption("mag", () -> mag, f -> mag = f, 0.5f, 100f)
         );
+    }
+
+    @Override
+    public boolean isBuffered(){
+        return true;
     }
 
     @Override

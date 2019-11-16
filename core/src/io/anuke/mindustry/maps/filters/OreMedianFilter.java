@@ -2,6 +2,7 @@ package io.anuke.mindustry.maps.filters;
 
 import io.anuke.arc.collection.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.maps.filters.FilterOption.*;
@@ -13,12 +14,17 @@ public class OreMedianFilter extends GenerateFilter{
 
     private IntArray blocks = new IntArray();
 
-    {
-        buffered = true;
-        options(
-            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
-            new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
+        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
+        new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
         );
+    }
+
+    @Override
+    public boolean isBuffered(){
+        return true;
     }
 
     @Override

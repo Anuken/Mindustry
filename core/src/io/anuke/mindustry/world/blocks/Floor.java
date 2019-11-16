@@ -7,6 +7,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.g2d.TextureAtlas.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.Effects.*;
 import io.anuke.mindustry.type.*;
@@ -33,13 +34,13 @@ public class Floor extends Block{
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
-    public StatusEffect status = StatusEffects.none;
+    public @NonNull StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
-    public Liquid liquidDrop = null;
+    public @Nullable Liquid liquidDrop = null;
     /** item that drops from this block, used for drills */
-    public Item itemDrop = null;
+    public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
