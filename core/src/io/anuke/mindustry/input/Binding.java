@@ -9,6 +9,8 @@ import io.anuke.arc.input.KeyCode;
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.A, KeyCode.D), "general"),
     move_y(new Axis(KeyCode.S, KeyCode.W)),
+    mouse_move(KeyCode.MOUSE_BACK),
+    dash(KeyCode.SHIFT_LEFT),
     select(KeyCode.MOUSE_LEFT),
     deselect(KeyCode.MOUSE_RIGHT),
     break_block(KeyCode.MOUSE_RIGHT),
@@ -22,7 +24,6 @@ public enum Binding implements KeyBind{
     schematic_flip_x(KeyCode.Z),
     schematic_flip_y(KeyCode.X),
     schematic_menu(KeyCode.T),
-    dash(KeyCode.SHIFT_LEFT),
     zoom_hold(KeyCode.CONTROL_LEFT, "view"),
     zoom(new Axis(KeyCode.SCROLL)),
     menu(Core.app.getType() == ApplicationType.Android ? KeyCode.BACK : KeyCode.ESCAPE),

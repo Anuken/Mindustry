@@ -1,10 +1,9 @@
 package io.anuke.mindustry.content;
 
-import io.anuke.mindustry.ctype.ContentList;
-import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.Objectives.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.maps.generators.*;
-import io.anuke.mindustry.maps.generators.MapGenerator.*;
 import io.anuke.mindustry.maps.zonegen.*;
 import io.anuke.mindustry.type.*;
 
@@ -190,7 +189,6 @@ public class Zones implements ContentList{
             startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
             launchPeriod = 10;
-            requirements = with(new ZoneWave(ruinousShores, 20));
             resources = with(copper, scrap, lead, coal, titanium, thorium, sand);
             requirements = with(
             new ZoneWave(ruinousShores, 20),

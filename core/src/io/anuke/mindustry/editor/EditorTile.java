@@ -13,7 +13,6 @@ import io.anuke.mindustry.world.modules.*;
 import static io.anuke.mindustry.Vars.state;
 import static io.anuke.mindustry.Vars.ui;
 
-//TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
     public EditorTile(int x, int y, int floor, int overlay, int wall){
@@ -103,6 +102,7 @@ public class EditorTile extends Tile{
             return;
         }
 
+        if(floor.isLiquid) return;
         if(overlayID() == overlay) return;
         op(OpType.overlay, this.overlay.id);
         super.setOverlayID(overlay);

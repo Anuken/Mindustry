@@ -79,7 +79,7 @@ public class Fracker extends SolidPump{
             }
 
             super.update(tile);
-            entity.accumulator += entity.delta() * entity.power.satisfaction;
+            entity.accumulator += entity.delta() * entity.efficiency();
         }else{
             tryDumpLiquid(tile, result);
         }

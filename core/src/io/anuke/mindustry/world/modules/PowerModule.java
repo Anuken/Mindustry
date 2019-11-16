@@ -13,7 +13,7 @@ public class PowerModule extends BlockModule{
      * Blocks will work at a reduced efficiency if this is not equal to 1.0f.
      * In case of buffered consumers, this is the percentage of power stored in relation to the maximum capacity.
      */
-    public float satisfaction = 0.0f;
+    public float status = 0.0f;
     public PowerGraph graph = new PowerGraph();
     public IntArray links = new IntArray();
 
@@ -23,7 +23,7 @@ public class PowerModule extends BlockModule{
         for(int i = 0; i < links.size; i++){
             stream.writeInt(links.get(i));
         }
-        stream.writeFloat(satisfaction);
+        stream.writeFloat(status);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class PowerModule extends BlockModule{
         for(int i = 0; i < amount; i++){
             links.add(stream.readInt());
         }
-        satisfaction = stream.readFloat();
-        if(Float.isNaN(satisfaction) || Float.isInfinite(satisfaction)) satisfaction = 0f;
+        status = stream.readFloat();
+        if(Float.isNaN(status) || Float.isInfinite(status)) status = 0f;
     }
 }

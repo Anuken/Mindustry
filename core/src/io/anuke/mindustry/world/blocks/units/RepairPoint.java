@@ -100,7 +100,7 @@ public class RepairPoint extends Block{
         if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
             entity.target = null;
         }else if(entity.target != null && entity.cons.valid()){
-            entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.power.satisfaction;
+            entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.efficiency();
             entity.target.clampHealth();
             entity.rotation = Mathf.slerpDelta(entity.rotation, entity.angleTo(entity.target), 0.5f);
             targetIsBeingRepaired = true;

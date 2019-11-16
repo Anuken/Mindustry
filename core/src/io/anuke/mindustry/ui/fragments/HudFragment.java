@@ -42,10 +42,6 @@ public class HudFragment extends Fragment{
     private boolean shown = true;
     private float dsize = 47.2f;
 
-    private float coreAttackTime;
-    private float lastCoreHP;
-    private Team lastTeam;
-    private float coreAttackOpacity = 0f;
     private long lastToast;
 
     public void build(Group parent){
@@ -284,44 +280,29 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
             float notifDuration = 240f;
+            float[] coreAttackTime = {0};
+            float[] coreAttackOpacity = {0};
 
-            Events.on(StateChangeEvent.class, event -> {
-                if(event.to == State.menu || event.from == State.menu){
-                    coreAttackTime = 0f;
-                    lastCoreHP = Float.NaN;
-                }
+            Events.on(Trigger.teamCoreDamage, () -> {
+                coreAttackTime[0] = notifDuration;
             });
 
             t.top().visible(() -> {
                 if(state.is(State.menu) || state.teams.get(player.getTeam()).cores.size == 0 || state.teams.get(player.getTeam()).cores.first().entity == null){
-                    coreAttackTime = 0f;
+                    coreAttackTime[0] = 0f;
                     return false;
                 }
 
-                float curr = state.teams.get(player.getTeam()).cores.first().entity.health;
-
-                if(lastTeam != player.getTeam()){
-                    lastCoreHP = curr;
-                    lastTeam = player.getTeam();
-                    return false;
-                }
-
-                if(!Float.isNaN(lastCoreHP) && curr < lastCoreHP){
-                    coreAttackTime = notifDuration;
-                }
-                lastCoreHP = curr;
-
-                t.getColor().a = coreAttackOpacity;
-                if(coreAttackTime > 0){
-                    coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 1f, 0.1f);
+                t.getColor().a = coreAttackOpacity[0];
+                if(coreAttackTime[0] > 0){
+                    coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 1f, 0.1f);
                 }else{
-                    coreAttackOpacity = Mathf.lerpDelta(coreAttackOpacity, 0f, 0.1f);
+                    coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 0f, 0.1f);
                 }
 
-                coreAttackTime -= Time.delta();
-                lastTeam = player.getTeam();
+                coreAttackTime[0] -= Time.delta();
 
-                return coreAttackOpacity > 0;
+                return coreAttackOpacity[0] > 0;
             });
             t.table(Tex.button, top -> top.add("$coreattack").pad(2)
             .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
