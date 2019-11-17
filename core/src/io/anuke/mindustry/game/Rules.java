@@ -75,7 +75,7 @@ public class Rules{
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Whether everything is dark. Enables lights. Experimental. */
-    public boolean lighting = true;
+    public boolean lighting = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
 

@@ -720,10 +720,12 @@ public class Block extends BlockStorage{
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
+        float prev = Draw.scl;
+
         Draw.color(color);
         Draw.scl *= req.animScale;
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.scl /= req.animScale;
+        Draw.scl = prev;
         Draw.color();
     }
 
