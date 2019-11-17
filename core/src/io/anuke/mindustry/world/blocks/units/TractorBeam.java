@@ -1,16 +1,20 @@
 package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.arc.Core;
+import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
+import io.anuke.arc.util.Tmp;
 import io.anuke.mindustry.entities.Units;
 import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.world.meta.BlockFlag;
 
 public class TractorBeam extends RepairPoint {
 
     public TractorBeam(String name) {
         super(name);
+        flags = EnumSet.of(BlockFlag.tractor);
         laserColor = Color.white;
     }
 
@@ -46,6 +50,10 @@ public class TractorBeam extends RepairPoint {
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
             entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
                     unit -> true);
+        }
+
+        if(entity.target != null){
+            // velocity interaction
         }
     }
 }

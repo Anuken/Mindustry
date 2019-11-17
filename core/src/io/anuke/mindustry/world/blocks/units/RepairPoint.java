@@ -21,7 +21,7 @@ public class RepairPoint extends Block{
 
     protected int timerTarget = timers++;
 
-    protected float repairRadius = 50f;
+    public float repairRadius = 50f;
     protected float repairSpeed = 0.3f;
     protected float powerUse;
     protected TextureRegion baseRegion;
