@@ -1766,11 +1766,11 @@ public class Blocks implements ContentList{
             powerUse = 1f;
         }};
 
-        tractorBeam = new RepairPoint("tractor-beam"){{
+        tractorBeam = new TractorBeam("tractor-beam"){{
             requirements(Category.units, ItemStack.with(Items.titanium, 50, Items.silicon, 25, Items.metaglass, 10));
             repairSpeed = 0.5f;
             repairRadius = 200f;
-            powerUse = 1f;
+            powerUse = 5f;
         }};
 
         //endregion

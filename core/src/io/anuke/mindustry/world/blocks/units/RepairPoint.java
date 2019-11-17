@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
+import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
@@ -17,7 +18,7 @@ import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
 public class RepairPoint extends Block{
-    private static Rectangle rect = new Rectangle();
+    protected static Rectangle rect = new Rectangle();
 
     protected int timerTarget = timers++;
 
@@ -26,6 +27,7 @@ public class RepairPoint extends Block{
     protected float powerUse;
     protected TextureRegion baseRegion;
     protected TextureRegion laser, laserEnd;
+    protected Color laserColor;
 
     public RepairPoint(String name){
         super(name);
@@ -36,6 +38,7 @@ public class RepairPoint extends Block{
         layer2 = Layer.power;
         hasPower = true;
         outlineIcon = true;
+        laserColor = Color.valueOf("e8ffd7");
     }
 
     @Override
@@ -79,10 +82,12 @@ public class RepairPoint extends Block{
             float ang = entity.angleTo(entity.target);
             float len = 5f;
 
-            Draw.color(Color.valueOf("e8ffd7"));
+            Draw.color(laserColor);
+//            Draw.blend(Blending.additive);
             Drawf.laser(laser, laserEnd,
                 tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
                 entity.target.x, entity.target.y, entity.strength);
+            Draw.blend();
             Draw.color();
         }
     }
@@ -97,7 +102,7 @@ public class RepairPoint extends Block{
         RepairPointEntity entity = tile.entity();
 
         boolean targetIsBeingRepaired = false;
-        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius || entity.target.health >= entity.target.maxHealth())){
+        if(entity.target != null && (entity.target.isDead() || entity.target.dst(tile) > repairRadius)){
             entity.target = null;
         }else if(entity.target != null && entity.cons.valid()){
             entity.target.health += repairSpeed * Time.delta() * entity.strength * entity.efficiency();
@@ -115,7 +120,7 @@ public class RepairPoint extends Block{
         if(entity.timer.get(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
             entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
-            unit -> unit.health < unit.maxHealth());
+                    unit -> true);
         }
     }
 
