@@ -291,7 +291,7 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         if(isFlying()){
             for(Tile tractor : indexer.getAllied(team, BlockFlag.tractor)){
                 RepairPoint.RepairPointEntity entity = (RepairPoint.RepairPointEntity) tractor.entity;
-                if(entity.target != this) return;
+                if(entity.target != this) break;
                 velocity.sub(Tmp.v1.set(this).sub(tractor.worldx(), tractor.worldy()).setLength(0.1f * entity.efficiency()).scl(0.45f * Time.delta()));
             }
         }
