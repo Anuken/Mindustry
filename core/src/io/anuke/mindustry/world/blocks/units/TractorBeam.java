@@ -4,10 +4,17 @@ import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
+import io.anuke.arc.util.Log;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.graphics.Drawf;
+import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
+import io.anuke.mindustry.world.meta.BlockStat;
+import io.anuke.mindustry.world.meta.StatUnit;
+
+import static io.anuke.mindustry.Vars.tilesize;
 
 public class TractorBeam extends RepairPoint {
 
@@ -26,6 +33,21 @@ public class TractorBeam extends RepairPoint {
     }
 
     @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.add(BlockStat.range, repairRadius / tilesize, StatUnit.blocks);
+
+        stats.add(BlockStat.boostEffect, repairRadius * 2 / tilesize, StatUnit.blocks);
+    }
+
+    @Override
+    public void drawSelect(Tile tile){
+        Log.info(tile.entity.cons.optionalValid());
+        Drawf.dashCircle(tile.drawx(), tile.drawy(), tile.entity.cons.optionalValid() ? repairRadius * 2 : repairRadius, Pal.accent);
+    }
+
+    @Override
     public void update(Tile tile){
         RepairPointEntity entity = tile.entity();
 
@@ -38,7 +60,7 @@ public class TractorBeam extends RepairPoint {
 
         if(entity.timer.get(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
-            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius, unit -> true);
+            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), entity.cons.optionalValid() ? repairRadius * 2 : repairRadius, unit -> true);
         }
     }
 }

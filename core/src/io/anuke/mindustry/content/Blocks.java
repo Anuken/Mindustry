@@ -1780,6 +1780,7 @@ public class Blocks implements ContentList{
             repairSpeed = 0.5f;
             repairRadius = 200f;
             powerUse = 5f;
+            consumes.liquid(Liquids.cryofluid, 0.1f).boost();
         }};
 
         //endregion
