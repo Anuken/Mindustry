@@ -300,7 +300,9 @@ public class Renderer implements ApplicationListener{
 
         playerGroup.draw(p -> !p.isDead(), Player::drawName);
 
-        lights.draw();
+        if(state.rules.darkness){
+            lights.draw();
+        }
 
         drawLanding();
 

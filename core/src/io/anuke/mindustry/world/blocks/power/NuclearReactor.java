@@ -27,7 +27,7 @@ public class NuclearReactor extends PowerGenerator{
 
     protected final Vector2 tr = new Vector2();
 
-    protected Color lightColor = Color.valueOf("b174f1");
+    protected Color lightColor = Color.valueOf("7f19ea");
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected float itemDuration = 120; //time to consume 1 fuel

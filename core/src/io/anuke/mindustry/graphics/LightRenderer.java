@@ -9,6 +9,9 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 
+import static io.anuke.mindustry.Vars.state;
+
+/** Renders overlay lights. Client only. */
 public class LightRenderer{
     private static final int scaling = 4;
     private float[] vertices = new float[24];
@@ -16,10 +19,14 @@ public class LightRenderer{
     private Array<Runnable> lights = new Array<>();
 
     public void add(Runnable run){
+        if(!enabled()) return;
+
         lights.add(run);
     }
 
     public void add(float x, float y, float radius, Color color, float opacity){
+        if(!enabled()) return;
+
         float res = color.toFloatBits();
         add(() -> {
             Draw.color(res);
@@ -29,6 +36,8 @@ public class LightRenderer{
     }
 
     public void add(float x, float y, TextureRegion region, Color color, float opacity){
+        if(!enabled()) return;
+
         float res = color.toFloatBits();
         add(() -> {
             Draw.color(res);
@@ -38,6 +47,8 @@ public class LightRenderer{
     }
 
     public void line(float x, float y, float x2, float y2){
+        if(!enabled()) return;
+
         add(() -> {
             Draw.color(Color.orange, 0.5f);
 
@@ -158,6 +169,10 @@ public class LightRenderer{
         });
     }
 
+    public boolean enabled(){
+        return state.rules.darkness;
+    }
+
     public void draw(){
         if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
             buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
@@ -174,6 +189,7 @@ public class LightRenderer{
         buffer.endDraw();
 
         Draw.color();
+        Shaders.light.ambient.set(state.rules.ambientLight);
         Draw.shader(Shaders.light);
         Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
         Draw.shader();
