@@ -51,9 +51,5 @@ public class TractorBeam extends RepairPoint {
             entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius,
                     unit -> true);
         }
-
-        if(entity.target != null){
-            // velocity interaction
-        }
     }
 }
