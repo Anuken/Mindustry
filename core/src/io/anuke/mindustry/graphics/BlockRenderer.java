@@ -218,7 +218,7 @@ public class BlockRenderer implements Disposable{
                         addRequest(tile, Layer.block);
                     }
 
-                    if(state.rules.darkness){
+                    if(state.rules.lighting){
                         addRequest(tile, Layer.lights);
                     }
 

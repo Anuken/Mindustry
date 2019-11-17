@@ -74,9 +74,9 @@ public class Rules{
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
-    /** Whether everything is dark. Enables lights. Exeperimental. */
-    public boolean darkness = true;
-    /** Ambient light color, used when darkness is enabled. */
+    /** Whether everything is dark. Enables lights. Experimental. */
+    public boolean lighting = false;
+    /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */

@@ -170,7 +170,7 @@ public class LightRenderer{
     }
 
     public boolean enabled(){
-        return state.rules.darkness;
+        return state.rules.lighting;
     }
 
     public void draw(){
