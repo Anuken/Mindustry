@@ -311,13 +311,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        Block previous = block;
         block.update(tile);
-        if(block == previous && cons != null){
+
+        if(liquids != null){
+            liquids.update();
+        }
+
+        if(cons != null){
             cons.update();
         }
 
-        if(block == previous && power != null){
+        if(power != null){
             power.graph.update();
         }
     }

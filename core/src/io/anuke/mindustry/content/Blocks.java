@@ -19,6 +19,8 @@ import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.defense.*;
 import io.anuke.mindustry.world.blocks.defense.turrets.*;
 import io.anuke.mindustry.world.blocks.distribution.*;
+import io.anuke.mindustry.world.blocks.liquid.Conduit;
+import io.anuke.mindustry.world.blocks.liquid.LiquidTank;
 import io.anuke.mindustry.world.blocks.logic.*;
 import io.anuke.mindustry.world.blocks.power.*;
 import io.anuke.mindustry.world.blocks.production.*;
@@ -59,7 +61,7 @@ public class Blocks implements ContentList{
     conveyor, titaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router, overflowGate, massDriver,
 
     //liquids
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -926,7 +928,7 @@ public class Blocks implements ContentList{
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
-            requirements(Category.distribution, ItemStack.with(Items.metaglass, 1, Items.thorium, 1));
+            requirements(Category.distribution, ItemStack.with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
             speed = 0.08f;
         }};
@@ -1010,7 +1012,7 @@ public class Blocks implements ContentList{
             size = 3;
         }};
 
-        conduit = new Conduit("conduit"){{
+        conduit = new io.anuke.mindustry.world.blocks.liquid.Conduit("conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.metaglass, 1));
             health = 45;
         }};
@@ -1022,7 +1024,14 @@ public class Blocks implements ContentList{
             health = 90;
         }};
 
-        liquidRouter = new LiquidRouter("liquid-router"){{
+        platedConduit = new io.anuke.mindustry.world.blocks.liquid.ArmoredConduit("plated-conduit"){{
+            requirements(Category.liquid, ItemStack.with(Items.thorium, 2, Items.metaglass, 1));
+            liquidCapacity = 16f;
+            liquidPressure = 1.025f;
+            health = 220;
+        }};
+
+        liquidRouter = new io.anuke.mindustry.world.blocks.liquid.LiquidRouter("liquid-router"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
         }};
@@ -1034,17 +1043,17 @@ public class Blocks implements ContentList{
             health = 500;
         }};
 
-        liquidJunction = new LiquidJunction("liquid-junction"){{
+        liquidJunction = new io.anuke.mindustry.world.blocks.liquid.LiquidJunction("liquid-junction"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
-        bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
+        bridgeConduit = new io.anuke.mindustry.world.blocks.liquid.LiquidExtendingBridge("bridge-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.graphite, 4, Items.metaglass, 8));
             range = 4;
             hasPower = false;
         }};
 
-        phaseConduit = new LiquidBridge("phase-conduit"){{
+        phaseConduit = new io.anuke.mindustry.world.blocks.liquid.LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.phasefabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
             hasPower = true;

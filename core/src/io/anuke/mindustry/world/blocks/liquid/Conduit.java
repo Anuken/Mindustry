@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
@@ -20,6 +20,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     protected TextureRegion[] topRegions = new TextureRegion[7];
     protected TextureRegion[] botRegions = new TextureRegion[7];
+
+    protected float leakResistance = 1.5f;
 
     public Conduit(String name){
         super(name);
@@ -109,7 +111,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), true, tile.entity.liquids.current());
+            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids.current());
             entity.noSleep();
         }else{
             entity.sleep();

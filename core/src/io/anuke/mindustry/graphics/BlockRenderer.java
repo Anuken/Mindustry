@@ -13,6 +13,7 @@ import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.*;
 
 import static io.anuke.arc.Core.camera;
 import static io.anuke.mindustry.Vars.*;
@@ -218,7 +219,7 @@ public class BlockRenderer implements Disposable{
                         addRequest(tile, Layer.block);
                     }
 
-                    if(state.rules.lighting){
+                    if(state.rules.lighting && tile.block().synthetic() && !(tile.block() instanceof BlockPart)){
                         addRequest(tile, Layer.lights);
                     }
 

@@ -327,19 +327,19 @@ public class Tile implements Position, TargetTrait{
     }
 
     // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
-    public Tile front(){
+    public @Nullable Tile front(){
         return getNearbyLink((rotation + 4) % 4);
     }
 
-    public Tile right(){
+    public @Nullable Tile right(){
         return getNearbyLink((rotation + 3) % 4);
     }
 
-    public Tile back(){
+    public @Nullable Tile back(){
         return getNearbyLink((rotation + 2) % 4);
     }
 
-    public Tile left(){
+    public @Nullable Tile left(){
         return getNearbyLink((rotation + 1) % 4);
     }
 

@@ -150,6 +150,7 @@ public class ContentParser{
                 "io.anuke.mindustry.world.blocks.defense",
                 "io.anuke.mindustry.world.blocks.defense.turrets",
                 "io.anuke.mindustry.world.blocks.distribution",
+                "io.anuke.mindustry.world.blocks.liquid",
                 "io.anuke.mindustry.world.blocks.logic",
                 "io.anuke.mindustry.world.blocks.power",
                 "io.anuke.mindustry.world.blocks.production",
