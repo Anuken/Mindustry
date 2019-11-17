@@ -292,6 +292,10 @@ public class Block extends BlockStorage{
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }
 
+    public void drawLight(Tile tile){
+
+    }
+
     public void drawTeam(Tile tile){
         Draw.color(tile.getTeam().color);
         Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);

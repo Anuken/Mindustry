@@ -2,6 +2,7 @@ package io.anuke.mindustry.game;
 
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.type.*;
@@ -73,6 +74,10 @@ public class Rules{
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Whether everything is dark. Enables lights. Experimental. */
+    public boolean lighting = false;
+    /** Ambient light color, used when lighting is enabled. */
+    public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
 
     /** Copies this ruleset exactly. Not very efficient at all, do not use often. */
     public Rules copy(){

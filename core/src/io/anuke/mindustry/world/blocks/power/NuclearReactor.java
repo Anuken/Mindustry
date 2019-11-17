@@ -27,6 +27,7 @@ public class NuclearReactor extends PowerGenerator{
 
     protected final Vector2 tr = new Vector2();
 
+    protected Color lightColor = Color.valueOf("7f19ea");
     protected Color coolColor = new Color(1, 1, 1, 0f);
     protected Color hotColor = Color.valueOf("ff9575a3");
     protected float itemDuration = 120; //time to consume 1 fuel
@@ -147,6 +148,13 @@ public class NuclearReactor extends PowerGenerator{
                 Effects.effect(Fx.nuclearsmoke, tr.x + tile.worldx(), tr.y + tile.worldy());
             });
         }
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        NuclearReactorEntity entity = tile.entity();
+        float fract = entity.productionEfficiency;
+        renderer.lights.add(tile.drawx(), tile.drawy(), (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, entity.heat), 0.6f * fract);
     }
 
     @Override

@@ -16,6 +16,7 @@ public class Shaders{
     public static UnitBuild build;
     public static FogShader fog;
     public static MenuShader menu;
+    public static LightShader light;
     public static SurfaceShader water, tar;
 
     public static void init(){
@@ -31,8 +32,23 @@ public class Shaders{
         build = new UnitBuild();
         fog = new FogShader();
         menu = new MenuShader();
+        light = new LightShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
+    }
+
+    public static class LightShader extends LoadShader{
+        public Color ambient = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+
+        public LightShader(){
+            super("light", "default");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_ambient", ambient);
+        }
+
     }
 
     public static class MenuShader extends LoadShader{

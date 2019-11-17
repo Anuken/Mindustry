@@ -174,6 +174,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
     }
 
+    @Override
+    public void drawLight(Tile tile){
+        ItemLiquidGeneratorEntity entity = tile.entity();
+
+        renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.orange, 0.5f);
+    }
+
     protected float getItemEfficiency(Item item){
         return 0.0f;
     }

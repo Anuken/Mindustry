@@ -247,7 +247,7 @@ public class JoinDialog extends FloatingDialog{
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
-                new ColorPickDialog().show(color -> {
+                new PaletteDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();

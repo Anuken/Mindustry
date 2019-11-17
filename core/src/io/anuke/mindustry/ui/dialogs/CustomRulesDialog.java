@@ -116,7 +116,7 @@ public class CustomRulesDialog extends FloatingDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m);
+        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
             rules = resetter.get();
@@ -169,6 +169,20 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+
+        title("$rules.title.experimental");
+        check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+
+        main.addButton(b -> {
+            b.left();
+            b.table(Tex.pane, in -> {
+                in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(rules.ambientLight));
+                }}).grow();
+            }).margin(4).size(50f).padRight(10);
+            b.add("$rules.ambientlight");
+        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
+        main.row();
     }
 
     void number(String text, Floatc cons, Floatp prov){
@@ -198,7 +212,9 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     void title(String text){
-        main.add(text).color(Pal.accent).padTop(20).padBottom(20).padRight(100f);
+        main.add(text).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3);
+        main.row();
+        main.addImage().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
     }
 }
