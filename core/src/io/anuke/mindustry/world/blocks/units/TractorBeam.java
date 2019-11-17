@@ -6,6 +6,7 @@ import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
 import io.anuke.mindustry.entities.Units;
+import io.anuke.mindustry.entities.type.Unit;
 import io.anuke.mindustry.world.Tile;
 import io.anuke.mindustry.world.meta.BlockFlag;
 
@@ -38,7 +39,7 @@ public class TractorBeam extends RepairPoint {
 
         if(entity.timer.get(timerTarget, 20)){
             rect.setSize(repairRadius * 2).setCenter(tile.drawx(), tile.drawy());
-            entity.target = Units.closest(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius, unit -> true);
+            entity.target = Units.closestEnemy(tile.getTeam(), tile.drawx(), tile.drawy(), repairRadius, Unit::isFlying);
         }
     }
 }
