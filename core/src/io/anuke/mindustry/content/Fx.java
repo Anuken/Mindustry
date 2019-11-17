@@ -13,7 +13,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.Cicon;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class Fx implements ContentList{
     public static Effect
@@ -456,6 +456,8 @@ public class Fx implements ContentList{
             });
 
             Draw.color();
+
+            renderer.lights.add(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
         });
 
         fireSmoke = new Effect(35f, e -> {

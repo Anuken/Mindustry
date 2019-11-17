@@ -11,6 +11,7 @@ import io.anuke.mindustry.entities.bullet.*;
 import io.anuke.mindustry.entities.effect.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -294,6 +295,7 @@ public class Bullet extends SolidEntity implements DamageTrait, ScaleTrait, Pool
     @Override
     public void draw(){
         type.draw(this);
+        renderer.lights.add(x, y, 16f, Pal.powerLight, 0.3f);
     }
 
     @Override

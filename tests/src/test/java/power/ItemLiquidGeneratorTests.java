@@ -1,18 +1,18 @@
 package power;
 
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.content.Items;
-import io.anuke.mindustry.content.Liquids;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.type.Liquid;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.blocks.power.ItemLiquidGenerator;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.*;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.core.*;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.blocks.power.*;
 import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 /**
@@ -31,6 +31,8 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     private final float maximumLiquidUsage = 0.5f;
 
     public void createGenerator(InputType inputType){
+        Vars.state = new GameState();
+        Vars.state.rules = new Rules();
         generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
             {
                 powerProduction = 0.1f;

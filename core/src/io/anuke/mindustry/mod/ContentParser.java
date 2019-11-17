@@ -10,8 +10,6 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.reflect.Field;
-import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.arc.util.serialization.Jval.*;
@@ -361,7 +359,7 @@ public class ContentParser{
 
     private <T> T make(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
             return cons.newInstance();
         }catch(Exception e){
@@ -371,7 +369,7 @@ public class ContentParser{
 
     private <T> T make(Class<T> type, String name){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor(String.class);
+            Constructor<T> cons = type.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
             return cons.newInstance(name);
         }catch(Exception e){
@@ -381,7 +379,7 @@ public class ContentParser{
 
     private <T> Prov<T> supply(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             return () -> {
                 try{
                     return cons.newInstance();
@@ -457,7 +455,7 @@ public class ContentParser{
             Field field = metadata.field;
             try{
                 field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
-            }catch(ReflectionException ex){
+            }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");

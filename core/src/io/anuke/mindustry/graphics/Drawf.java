@@ -6,6 +6,8 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 
+import static io.anuke.mindustry.Vars.renderer;
+
 public class Drawf{
 
     public static void dashCircle(float x, float y, float rad, Color color){
@@ -40,15 +42,6 @@ public class Drawf{
         square(x, y, radius, Pal.accent);
     }
 
-    /*
-    public static void square(float x, float y, float radius){
-        Lines.stroke(1f, Pal.gray);
-        Lines.square(x, y - 1f, radius + 1f, 45);
-        Lines.stroke(1f, Pal.accent);
-        Lines.square(x, y, radius + 1f, 45);
-        Draw.reset();
-    }*/
-
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){
         float angle = Angles.angle(x, y, x2, y2);
         float space = 2f;
@@ -81,6 +74,8 @@ public class Drawf{
         Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
         Lines.precise(false);
         Lines.stroke(1f);
+
+        renderer.lights.line(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
