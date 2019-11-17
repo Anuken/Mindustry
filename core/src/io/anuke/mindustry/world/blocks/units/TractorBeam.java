@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.blocks.units;
 
+import io.anuke.arc.Core;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.util.Time;
@@ -10,7 +11,15 @@ public class TractorBeam extends RepairPoint {
 
     public TractorBeam(String name) {
         super(name);
-        laserColor = Color.valueOf("00a2ff");
+        laserColor = Color.white;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        laser = Core.atlas.find("coldfusion-laser");
+        laserEnd = Core.atlas.find("coldfusion-laser-end");
     }
 
     @Override

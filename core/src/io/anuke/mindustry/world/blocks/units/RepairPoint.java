@@ -2,7 +2,6 @@ package io.anuke.mindustry.world.blocks.units;
 
 import io.anuke.arc.Core;
 import io.anuke.arc.collection.EnumSet;
-import io.anuke.arc.graphics.Blending;
 import io.anuke.arc.graphics.Color;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.Angles;
@@ -83,11 +82,9 @@ public class RepairPoint extends Block{
             float len = 5f;
 
             Draw.color(laserColor);
-//            Draw.blend(Blending.additive);
             Drawf.laser(laser, laserEnd,
                 tile.drawx() + Angles.trnsx(ang, len), tile.drawy() + Angles.trnsy(ang, len),
                 entity.target.x, entity.target.y, entity.strength);
-            Draw.blend();
             Draw.color();
         }
     }
