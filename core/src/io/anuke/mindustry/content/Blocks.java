@@ -1141,7 +1141,7 @@ public class Blocks implements ContentList{
             powerProduction = 14f;
             consumes.item(Items.thorium);
             heating = 0.02f;
-            consumes.liquid(Liquids.cryofluid, 0.1f).update(false);
+            consumes.liquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
         impactReactor = new ImpactReactor("impact-reactor"){{
