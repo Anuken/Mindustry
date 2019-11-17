@@ -25,6 +25,8 @@ public class Rules{
     public boolean pvp;
     /** Whether enemy units drop random items on death. */
     public boolean unitDrops = true;
+    /** Whether reactors can explode and damage other blocks. */
+    public boolean reactorExplosions = true;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
@@ -65,7 +67,7 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Whether the tutorial is enabled. False by default.*/
+    /** Whether the tutorial is enabled. False by default. */
     public boolean tutorial = false;
     /** Starting items put in cores */
     public Array<ItemStack> loadout = Array.with(ItemStack.with(Items.copper, 100));

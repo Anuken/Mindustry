@@ -27,7 +27,8 @@ public class EventType{
         drown,
         exclusionDeath,
         suicideBomb,
-        openWiki
+        openWiki,
+        teamCoreDamage
     }
 
     public static class WinEvent{}

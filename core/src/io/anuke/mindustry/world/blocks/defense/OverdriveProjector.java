@@ -68,7 +68,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawLight(Tile tile){
-        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.power.satisfaction, color, 0.7f * tile.entity.power.satisfaction);
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
     }
 
     @Override
@@ -79,13 +79,13 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
+        if(entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.power.satisfaction;
+            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
 

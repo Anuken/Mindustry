@@ -10,10 +10,9 @@ import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
-import io.anuke.arc.util.reflect.Field;
-import io.anuke.arc.util.reflect.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
+import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.content.TechTree.*;
@@ -182,7 +181,7 @@ public class ContentParser{
                         }else if(child.name.equals("liquid")){
                             block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
                         }else if(child.name.equals("power")){
-                            if(child.isDouble()){
+                            if(child.isNumber()){
                                 block.consumes.power(child.asFloat());
                             }else{
                                 block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
@@ -342,10 +341,7 @@ public class ContentParser{
             init();
         }
 
-        //add comments starting with //, but ignore links
-        json = json.replace("http://", "http:~~").replace("https://", "https:~~").replaceAll("//.*?\n","\n").replace("http:~~", "http://").replace("https:~~", "https://");
-
-        JsonValue value = parser.fromJson(null, json);
+        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
@@ -363,7 +359,7 @@ public class ContentParser{
 
     private <T> T make(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
             return cons.newInstance();
         }catch(Exception e){
@@ -373,7 +369,7 @@ public class ContentParser{
 
     private <T> T make(Class<T> type, String name){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor(String.class);
+            Constructor<T> cons = type.getDeclaredConstructor(String.class);
             cons.setAccessible(true);
             return cons.newInstance(name);
         }catch(Exception e){
@@ -383,7 +379,7 @@ public class ContentParser{
 
     private <T> Prov<T> supply(Class<T> type){
         try{
-            java.lang.reflect.Constructor<T> cons = type.getDeclaredConstructor();
+            Constructor<T> cons = type.getDeclaredConstructor();
             return () -> {
                 try{
                     return cons.newInstance();
@@ -459,7 +455,7 @@ public class ContentParser{
             Field field = metadata.field;
             try{
                 field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
-            }catch(ReflectionException ex){
+            }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");

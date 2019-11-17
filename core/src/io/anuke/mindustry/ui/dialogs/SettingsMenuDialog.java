@@ -218,7 +218,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 control.setInput(new MobileInput());
             }
         }*/
-        game.sliderPref("saveinterval", 60, 10, 5 * 120, i -> Core.bundle.format("setting.seconds", i));
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);
@@ -360,7 +360,11 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         keyDown(key -> {
             if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
-                hide();
+                if(prefs.getChildren().first() != menu){
+                    back();
+                }else{
+                    hide();
+                }
             }
         });
     }

@@ -35,7 +35,6 @@ import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 

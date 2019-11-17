@@ -48,7 +48,7 @@ public class Blocks implements ContentList{
     melter, separator, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerVoid, powerSource, itemSource, liquidSource, itemVoid, message, light,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, message, illuminator,
 
     //defense
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -63,7 +63,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower,
+    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -537,7 +537,7 @@ public class Blocks implements ContentList{
             hasPower = true;
 
             consumes.power(4f);
-            consumes.items(new ItemStack(Items.titanium, 2), new ItemStack(Items.lead, 4), new ItemStack(Items.silicon, 3), new ItemStack(Items.copper, 3));
+            consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
         }};
 
         cryofluidMixer = new LiquidConverter("cryofluidmixer"){{
@@ -713,11 +713,11 @@ public class Blocks implements ContentList{
         //endregion
         //region sandbox
 
-        powerVoid = new PowerVoid("power-void"){{
+        powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
-        powerSource = new PowerSource("power-source"){{
+        powerVoid = new PowerVoid("power-void"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, ItemStack.with());
             alwaysUnlocked = true;
         }};
@@ -736,8 +736,11 @@ public class Blocks implements ContentList{
         message = new MessageBlock("message"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 5));
         }};
-        light = new LightBlock("light"){{
+        illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 5));
+            color = Color.valueOf("7d93ff");
+            brightness = 0.6f;
+            radius = 80f;
             consumes.power(0.05f);
         }};
 
@@ -1014,6 +1017,7 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, ItemStack.with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
+            liquidPressure = 1.025f;
             health = 90;
         }};
 
@@ -1067,6 +1071,10 @@ public class Blocks implements ContentList{
             size = 2;
             maxNodes = 2;
             laserRange = 30f;
+        }};
+
+        diode = new PowerDiode("diode"){{
+            requirements(Category.power, ItemStack.with(Items.silicon, 10, Items.plastanium, 5, Items.metaglass, 10));
         }};
 
         battery = new Battery("battery"){{
