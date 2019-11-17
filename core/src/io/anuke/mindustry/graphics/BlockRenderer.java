@@ -218,8 +218,9 @@ public class BlockRenderer implements Disposable{
                         addRequest(tile, Layer.block);
                     }
 
-                    //TODO don't add at daytime / disabled lights
-                    addRequest(tile, Layer.lights);
+                    if(state.rules.darkness){
+                        addRequest(tile, Layer.lights);
+                    }
 
                     if(block.expanded || !expanded){
 
