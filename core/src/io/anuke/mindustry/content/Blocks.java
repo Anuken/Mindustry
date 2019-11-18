@@ -742,8 +742,8 @@ public class Blocks implements ContentList{
             //disabled until implemented properly
             requirements(Category.effect, BuildVisibility.lightingOnly, ItemStack.with(Items.graphite, 5));
             color = Color.valueOf("7d93ff");
-            brightness = 0.6f;
-            radius = 80f;
+            brightness = 0.67f;
+            radius = 120f;
             consumes.power(0.05f);
         }};
 

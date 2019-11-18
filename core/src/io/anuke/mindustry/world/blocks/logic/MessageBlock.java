@@ -98,7 +98,7 @@ public class MessageBlock extends Block{
     public void buildTable(Tile tile, Table table){
         MessageBlockEntity entity = tile.entity();
 
-        table.addImageButton(io.anuke.mindustry.gen.Icon.pencilSmall, () -> {
+        table.addImageButton(Icon.pencilSmall, () -> {
             if(mobile){
                 Core.input.getTextInput(new TextInput(){{
                     text = entity.message;
