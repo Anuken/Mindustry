@@ -42,7 +42,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100, 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (sumAttribute(attribute, x, y) + 1f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }
     }
 
@@ -51,7 +51,7 @@ public class SolidPump extends Pump{
         super.setBars();
         bars.add("efficiency", entity -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100, 1),
+        ((((SolidPumpEntity)entity).boost + 1f) * ((SolidPumpEntity)entity).warmup) * 100  * percentSolid(entity.tile.x, entity.tile.y), 1),
         () -> Pal.ammo,
         () -> ((SolidPumpEntity)entity).warmup));
     }
@@ -101,7 +101,7 @@ public class SolidPump extends Pump{
         fraction += entity.boost;
 
         if(tile.entity.cons.valid() && typeLiquid(tile) < liquidCapacity - 0.001f){
-            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.power.satisfaction);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(tile), pumpAmount * entity.delta() * fraction * entity.efficiency());
             tile.entity.liquids.add(result, maxPump);
             entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
             if(Mathf.chance(entity.delta() * updateEffectChance))

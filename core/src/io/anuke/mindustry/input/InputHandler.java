@@ -13,8 +13,8 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.layout.*;
-import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -25,13 +25,14 @@ import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.game.Teams.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
-import io.anuke.mindustry.input.PlaceUtils.*;
+import io.anuke.mindustry.input.Placement.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.fragments.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.blocks.BuildBlock.*;
+import io.anuke.mindustry.world.blocks.power.PowerNode;
 
 import java.util.*;
 
@@ -110,7 +111,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int[] remaining = {accepted, accepted};
         Block block = tile.block();
 
-        Core.app.post(() -> Events.fire(new DepositEvent(tile, player)));
+        Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         for(int i = 0; i < sent; i++){
             boolean end = i == sent - 1;
@@ -144,12 +145,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile == null || player == null) return;
         if(!Units.canInteract(player, tile)) return;
         tile.block().tapped(tile, player);
+        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void onTileConfig(Player player, Tile tile, int value){
         if(tile == null || !Units.canInteract(player, tile)) return;
         tile.block().configured(tile, player, value);
+        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
     }
 
     public Eachable<BuildRequest> allRequests(){
@@ -368,8 +371,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
-        NormalizeResult dresult = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
@@ -392,13 +395,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         for(BuildRequest req : selectRequests){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
             }
-        }*/
+        }
 
         for(BrokenBlock req : state.teams.get(player.getTeam()).brokenBlocks){
             Block block = content.block(req.block);
@@ -416,7 +418,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
-        NormalizeDrawResult result = PlaceUtils.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
 
@@ -429,12 +431,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void flushSelectRequests(Array<BuildRequest> requests){
         for(BuildRequest req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildRequest other = getRequest(req.x, req.y);
-                if(other != null){
+                BuildRequest other = getRequest(req.x, req.y, req.block.size, null);
+                if(other == null){
+                    selectRequests.add(req.copy());
+                }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
                     selectRequests.remove(other);
+                    selectRequests.add(req.copy());
                 }
-
-                selectRequests.add(req.copy());
             }
         }
     }
@@ -452,7 +455,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawRequest(BuildRequest request){
-        drawRequest(request.x, request.y, request.block, request.rotation);
+        request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
@@ -469,7 +472,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
-        NormalizeResult result = PlaceUtils.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
+        NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
                 int wx = x1 + x * Mathf.sign(x2 - x1);
@@ -498,14 +501,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        /*
         it = selectRequests.iterator();
         while(it.hasNext()){
             BuildRequest req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
-        }*/
+        }
 
         //remove blocks to rebuild
         Iterator<BrokenBlock> broken = state.teams.get(player.getTeam()).brokenBlocks.iterator();
@@ -526,6 +528,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             req.animScale = 1f;
             lineRequests.add(req);
         });
+
+        if(Core.settings.getBool("blockreplace")){
+            lineRequests.each(req -> {
+                Block replace = req.block.getReplacement(req, lineRequests);
+                if(replace.unlockedCur()){
+                    req.block = replace;
+                }
+            });
+        }
     }
 
     protected void updateLine(int x1, int y1){
@@ -751,8 +762,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))
-            ){
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
                 return false;
             }
         }
@@ -799,14 +809,42 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Array<Point2> points;
         boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
-        if(Core.settings.getBool("swapdiagonal")){
+
+        if(Core.settings.getBool("swapdiagonal") && mobile){
+            diagonal = !diagonal;
+        }
+
+        if(block instanceof PowerNode){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = PlaceUtils.normalizeDiagonal(startX, startY, endX, endY);
+            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
         }else{
-            points = PlaceUtils.normalizeLine(startX, startY, endX, endY);
+            points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+
+        if(block instanceof PowerNode){
+            Array<Point2> skip = new Array<>();
+            
+            for(int i = 1; i < points.size; i++){
+                int overlaps = 0;
+                Point2 point = points.get(i);
+
+                //check with how many powernodes the *next* tile will overlap
+                for(int j = 0; j < i; j++){
+                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.ltile(point.x, point.y), world.ltile(points.get(j).x, points.get(j).y))){
+                        overlaps++;
+                    }
+                }
+
+                //if it's more than one, it can bridge the gap
+                if(overlaps > 1){
+                    skip.add(points.get(i-1));
+                }
+            }
+            //remove skipped points
+            points.removeAll(skip);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

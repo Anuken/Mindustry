@@ -71,7 +71,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public FileHandle cacheFile(){
-        return Vars.mapPreviewDirectory.child(file.nameWithoutExtension() + "-cache.dat");
+        return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache.dat");
     }
 
     public void setHighScore(int score){

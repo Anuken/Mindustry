@@ -159,8 +159,8 @@ public class UnitFactory extends Block{
         }
 
         if(entity.cons.valid() || tile.isEnemyCheat()){
-            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.power.satisfaction;
-            entity.buildTime += entity.delta() * entity.power.satisfaction * Vars.state.rules.unitBuildSpeedMultiplier;
+            entity.time += entity.delta() * entity.speedScl * Vars.state.rules.unitBuildSpeedMultiplier * entity.efficiency();
+            entity.buildTime += entity.delta() * entity.efficiency() * Vars.state.rules.unitBuildSpeedMultiplier;
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 1f, 0.05f);
         }else{
             entity.speedScl = Mathf.lerpDelta(entity.speedScl, 0f, 0.05f);
@@ -186,14 +186,9 @@ public class UnitFactory extends Block{
     }
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         UnitFactoryEntity entity = tile.entity();
         return entity.spawned < maxSpawn;
-    }
-
-    @Override
-    public boolean shouldConsume(Tile tile){
-        return canProduce(tile);
     }
 
     public static class UnitFactoryEntity extends TileEntity{

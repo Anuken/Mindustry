@@ -35,11 +35,11 @@ import java.util.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
 
     boolean useDiscord = OS.is64Bit, loadError = false;
+    Throwable steamError;
 
     static{
         if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
@@ -108,7 +108,7 @@ public class DesktopLauncher extends ClientLauncher{
                     t.touchable(Touchable.disabled);
                     t.top().left();
                     t.update(() -> {
-                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke"))){
+                        if(Core.input.keyTap(KeyCode.BACKTICK) && (loadError || System.getProperty("user.name").equals("anuke") || Version.modifier.contains("beta"))){
                             visible[0] = !visible[0];
                         }
 
@@ -134,6 +134,12 @@ public class DesktopLauncher extends ClientLauncher{
                         label[0].invalidateHierarchy();
                     }
                 });
+
+                if(steamError != null){
+                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
+                        ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
+                    })));
+                }
             });
 
             try{
@@ -159,6 +165,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     void logSteamError(Throwable e){
+        steamError = e;
         loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
@@ -234,7 +241,7 @@ public class DesktopLauncher extends ClientLauncher{
         Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
 
-        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher"))){
+        if(e.getMessage() != null && (e.getMessage().contains("Couldn't create window") || e.getMessage().contains("OpenGL 2.0 or higher") || e.getMessage().toLowerCase().contains("pixel format"))){
 
             dialog.get(() -> message(
                     e.getMessage().contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + e.getMessage() :

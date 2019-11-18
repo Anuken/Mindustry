@@ -199,6 +199,10 @@ public class TechTree implements ContentList{
                                     node(phaseConduit, () -> {
 
                                     });
+
+                                    node(platedConduit, () -> {
+
+                                    });
                                 });
 
                                 node(rotaryPump, () -> {
@@ -215,8 +219,10 @@ public class TechTree implements ContentList{
                 node(combustionGenerator, () -> {
                     node(powerNode, () -> {
                         node(powerNodeLarge, () -> {
-                            node(surgeTower, () -> {
+                            node(diode, () -> {
+                                node(surgeTower, () -> {
 
+                                });
                             });
                         });
 

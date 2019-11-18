@@ -7,6 +7,7 @@ import io.anuke.arc.Graphics.Cursor.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -28,6 +29,10 @@ import static io.anuke.mindustry.Vars.*;
 public class BuildBlock extends Block{
     public static final int maxSize = 9;
     private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
+
+    private static long lastTime = 0;
+    private static int pitchSeq = 0;
+    private static long lastPlayed;
 
     public BuildBlock(int size){
         super("build" + size);
@@ -53,7 +58,7 @@ public class BuildBlock extends Block{
         Effects.effect(Fx.breakBlock, tile.drawx(), tile.drawy(), block.size);
         world.removeBlock(tile);
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, true));
-        Sounds.breaks.at(tile, Mathf.random(0.7f, 1.4f));
+        if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
@@ -73,12 +78,36 @@ public class BuildBlock extends Block{
         Effects.effect(Fx.placeBlock, tile.drawx(), tile.drawy(), block.size);
     }
 
+    static boolean shouldPlay(){
+        if(Time.timeSinceMillis(lastPlayed) >= 32){
+            lastPlayed = Time.millis();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    static float calcPitch(boolean up){
+        if(Time.timeSinceMillis(lastTime) < 16 * 30){
+            lastTime = Time.millis();
+            pitchSeq ++;
+            if(pitchSeq > 30){
+                pitchSeq = 0;
+            }
+            return 1f + Mathf.clamp(pitchSeq / 30f) * (up ? 1.9f : -0.4f);
+        }else{
+            pitchSeq = 0;
+            lastTime = Time.millis();
+            return Mathf.random(0.7f, 1.3f);
+        }
+    }
+
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.block().placed(tile);
 
         Events.fire(new BlockBuildEndEvent(tile, playerGroup.getByID(builderID), team, false));
-        Sounds.place.at(tile, Mathf.random(0.7f, 1.4f));
+        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
     @Override
@@ -115,6 +144,9 @@ public class BuildBlock extends Block{
 
         //if the target is constructible, begin constructing
         if(entity.cblock != null){
+            if(player.buildWasAutoPaused && !player.isBuilding){
+                player.isBuilding = true;
+            }
             //player.clearBuilding();
             player.addBuildRequest(new BuildRequest(tile.x, tile.y, tile.rotation(), entity.cblock), false);
         }

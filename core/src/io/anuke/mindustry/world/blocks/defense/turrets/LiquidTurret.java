@@ -14,7 +14,7 @@ import io.anuke.mindustry.world.meta.values.*;
 
 import static io.anuke.mindustry.Vars.*;
 
-public abstract class LiquidTurret extends Turret{
+public class LiquidTurret extends Turret{
     protected ObjectMap<Liquid, BulletType> ammo = new ObjectMap<>();
 
     public LiquidTurret(String name){

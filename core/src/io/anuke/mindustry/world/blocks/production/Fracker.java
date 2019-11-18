@@ -43,7 +43,7 @@ public class Fracker extends SolidPump{
     public void drawCracks(Tile tile){}
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         return tile.entity.liquids.get(result) < liquidCapacity - 0.01f;
     }
 
@@ -79,7 +79,7 @@ public class Fracker extends SolidPump{
             }
 
             super.update(tile);
-            entity.accumulator += entity.delta() * entity.power.satisfaction;
+            entity.accumulator += entity.delta() * entity.efficiency();
         }else{
             tryDumpLiquid(tile, result);
         }

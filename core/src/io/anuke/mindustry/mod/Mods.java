@@ -150,10 +150,15 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        if(mod.file.isDirectory()){
-            mod.file.deleteDirectory();
-        }else{
-            mod.file.delete();
+        if(mod.root instanceof ZipFileHandle){
+            mod.root.delete();
+        }
+
+        boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
+
+        if(!deleted){
+            ui.showErrorMessage("$mod.delete.error");
+            return;
         }
         loaded.remove(mod);
         disabled.remove(mod);
@@ -193,7 +198,7 @@ public class Mods implements Loadable{
                 }else{
                     disabled.add(mod);
                 }
-                mod.addSteamID(file.parent().name());
+                mod.addSteamID(file.name());
             }catch(Exception e){
                 Log.err("Failed to load mod workshop file {0}. Skipping.", file);
                 Log.err(e);
@@ -349,7 +354,7 @@ public class Mods implements Loadable{
                     FileHandle folder = contentRoot.child(type.name().toLowerCase() + "s");
                     if(folder.exists()){
                         for(FileHandle file : folder.list()){
-                            if(file.extension().equals("json")){
+                            if(file.extension().equals("json") || file.extension().equals("hjson") || file.extension().equals("js")){
                                 runs.add(new LoadRun(type, file, mod));
                             }
                         }

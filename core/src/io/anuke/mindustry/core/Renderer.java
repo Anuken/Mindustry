@@ -34,6 +34,7 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
+    public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
@@ -241,7 +242,7 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 
-        blocks.drawBroken();
+        blocks.drawDestroyed();
 
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
@@ -258,6 +259,7 @@ public class Renderer implements ApplicationListener{
         drawFlyerShadows();
 
         blocks.drawBlocks(Layer.power);
+        blocks.drawBlocks(Layer.lights);
 
         drawAllTeams(true);
 
@@ -288,6 +290,10 @@ public class Renderer implements ApplicationListener{
         overlays.drawTop();
 
         playerGroup.draw(p -> !p.isDead(), Player::drawName);
+
+        if(state.rules.lighting){
+            lights.draw();
+        }
 
         drawLanding();
 

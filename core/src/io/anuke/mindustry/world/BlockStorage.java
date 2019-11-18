@@ -28,6 +28,7 @@ public abstract class BlockStorage extends UnlockableContent{
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
+    public float liquidPressure = 1f;
 
     public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
@@ -38,6 +39,10 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public boolean shouldConsume(Tile tile){
+        return true;
+    }
+
+    public boolean productionValid(Tile tile){
         return true;
     }
 
@@ -111,7 +116,9 @@ public abstract class BlockStorage extends UnlockableContent{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            if(other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids != null){
+            other = other.block().getLiquidDestination(other, in, liquid);
+
+            if(other != null && other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids != null){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -135,15 +142,20 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public float tryMoveLiquid(Tile tile, Tile next, boolean leak, Liquid liquid){
+        return tryMoveLiquid(tile, next, leak ? 1.5f : 100, liquid);
+    }
+
+    public float tryMoveLiquid(Tile tile, Tile next, float leakResistance, Liquid liquid){
         if(next == null) return 0;
 
         next = next.link();
+        next = next.block().getLiquidDestination(next, tile, liquid);
 
         if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
             if(next.block().acceptLiquid(next, tile, liquid, 0f)){
                 float ofract = next.entity.liquids.get(liquid) / next.block().liquidCapacity;
-                float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
+                float fract = tile.entity.liquids.get(liquid) / liquidCapacity * liquidPressure;
                 float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (liquidCapacity), tile.entity.liquids.get(liquid));
                 flow = Math.min(flow, next.block().liquidCapacity - next.entity.liquids.get(liquid) - 0.001f);
 
@@ -167,12 +179,16 @@ public abstract class BlockStorage extends UnlockableContent{
                     }
                 }
             }
-        }else if(leak && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = tile.entity.liquids.get(liquid) / 1.5f;
+        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = tile.entity.liquids.get(liquid) / leakResistance;
             Puddle.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids.remove(liquid, leakAmount);
         }
         return 0;
+    }
+
+    public Tile getLiquidDestination(Tile tile, Tile from, Liquid liquid){
+        return tile;
     }
 
     /**
@@ -265,10 +281,5 @@ public abstract class BlockStorage extends UnlockableContent{
             return true;
         }
         return false;
-    }
-
-    /** Returns whether this block's inventory has space and is ready for production. */
-    public boolean canProduce(Tile tile){
-        return true;
     }
 }

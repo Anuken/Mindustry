@@ -8,6 +8,8 @@ import io.anuke.arc.util.*;
 import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.JsonValue.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
@@ -59,7 +61,8 @@ public class ServerControl implements ApplicationListener{
             "crashreport", false,
             "port", port,
             "logging", true,
-            "socket", false
+            "socket", false,
+            "globalrules", "{reactorExplosions: false}"
         );
 
         Log.setLogger(new LogHandler(){
@@ -142,6 +145,7 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             info("Game over!");
+            displayStatus();
 
             if(Core.settings.getBool("shuffle")){
                 if(maps.all().size > 0){
@@ -211,19 +215,26 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "<mapname> [mode]", "Open the server with a specific map.", arg -> {
+        handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
             if(lastTask != null) lastTask.cancel();
+            
+            Map result;
+            if(arg.length > 0){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
 
-            Map result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
-
-            if(result == null){
-                err("No map with name &y'{0}'&lr found.", arg[0]);
-                return;
+                if(result == null){
+                    err("No map with name &y'{0}'&lr found.", arg[0]);
+                    return;
+                }
+            }else{
+                Array<Map> maps = Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps();
+                result = maps.random();
+                info("Randomized next map to be {0}.", result.name());
             }
 
             Gamemode preset = Gamemode.survival;
@@ -242,8 +253,9 @@ public class ServerControl implements ApplicationListener{
             logic.reset();
             lastMode = preset;
             try{
-                world.loadMap(result,  result.applyRules(lastMode));
+                world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
+                applyRules();
                 logic.play();
 
                 info("Map loaded.");
@@ -292,29 +304,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("status", "Display server status.", arg -> {
-            if(state.is(State.menu)){
-                info("Status: &rserver closed");
-            }else{
-                info("Status:");
-                info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
-
-                if(state.rules.waves){
-                    info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
-                }else{
-                    info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
-                }
-
-                info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
-
-                if(playerGroup.size() > 0){
-                    info("  &lyPlayers: {0}", playerGroup.size());
-                    for(Player p : playerGroup.all()){
-                        info("    &y{0} / {1}", p.name, p.uuid);
-                    }
-                }else{
-                    info("  &lyNo players connected.");
-                }
-            }
+            displayStatus();
         });
 
         handler.register("mods", "Display all loaded mods.", arg -> {
@@ -359,6 +349,58 @@ public class ServerControl implements ApplicationListener{
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
+            String rules = Core.settings.getString("globalrules");
+            JsonValue base = JsonIO.json().fromJson(null, rules);
+
+            if(arg.length == 0){
+                Log.info("&lyRules:\n{0}", JsonIO.print(rules));
+            }else if(arg.length == 1){
+                Log.err("Invalid usage. Specify which rule to remove or add.");
+            }else{
+                if(!(arg[0].equals("remove") || arg[0].equals("add"))){
+                    Log.err("Invalid usage. Either add or remove rules.");
+                    return;
+                }
+
+                boolean remove = arg[0].equals("remove");
+                if(remove){
+                    if(base.has(arg[1])){
+                        Log.info("Rule &lc'{0}'&lg removed.", arg[1]);
+                        base.remove(arg[1]);
+                    }else{
+                        Log.err("Rule not defined, so not removed.");
+                        return;
+                    }
+                }else{
+                    if(arg.length < 3){
+                        Log.err("Missing last argument. Specify which value to set the rule to.");
+                        return;
+                    }
+
+                    try{
+                        JsonValue value = new JsonReader().parse(arg[2]);
+                        value.name = arg[1];
+
+                        JsonValue parent = new JsonValue(ValueType.object);
+                        parent.addChild(value);
+
+                        JsonIO.json().readField(state.rules, value.name, parent);
+                        if(base.has(value.name)){
+                            base.remove(value.name);
+                        }
+                        base.addChild(arg[1], value);
+                        Log.info("Changed rule: &ly{0}", value.toString().replace("\n", " "));
+                    }catch(Throwable e){
+                        Log.err("Error parsing rule JSON", e);
+                    }
+                }
+
+                Core.settings.putSave("globalrules", base.toString());
+                Call.onSetRules(state.rules);
             }
         });
 
@@ -758,6 +800,41 @@ public class ServerControl implements ApplicationListener{
         mods.each(p -> p.registerClientCommands(netServer.clientCommands));
     }
 
+    private void applyRules(){
+        try{
+            JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
+            JsonIO.json().readFields(state.rules, value);
+        }catch(Throwable t){
+            Log.err("Error applying custom rules, proceeding without them.", t);
+        }
+    }
+
+    private void displayStatus() {
+        if(state.is(State.menu)){
+            info("Status: &rserver closed");
+        }else{
+            info("Status:");
+            info("  &lyPlaying on map &fi{0}&fb &lb/&ly Wave {1}", Strings.capitalize(world.getMap().name()), state.wave);
+
+            if(state.rules.waves){
+                info("&ly  {0} enemies.", unitGroups[Team.crux.ordinal()].size());
+            }else{
+                info("&ly  {0} seconds until next wave.", (int)(state.wavetime / 60));
+            }
+
+            info("  &ly{0} FPS, {1} MB used.", (int)(60f / Time.delta()), Core.app.getJavaHeap() / 1024 / 1024);
+
+            if(playerGroup.size() > 0){
+                info("  &lyPlayers: {0}", playerGroup.size());
+                for(Player p : playerGroup.all()){
+                    info("    &y{0} / {1}", p.name, p.uuid);
+                }
+            }else{
+                info("  &lyNo players connected.");
+            }
+        }
+    }
+
     private void readCommands(){
 
         Scanner scan = new Scanner(System.in);
@@ -812,6 +889,7 @@ public class ServerControl implements ApplicationListener{
             run.run();
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
+            applyRules();
 
             for(Player p : players){
                 if(p.con == null) continue;

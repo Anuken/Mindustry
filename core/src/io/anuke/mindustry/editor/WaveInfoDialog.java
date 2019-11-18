@@ -186,7 +186,7 @@ public class WaveInfoDialog extends FloatingDialog{
                         }).width(80f);
 
                         a.add(" + ");
-                        a.addField(Strings.fixed(Math.max((Mathf.isZero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
+                        a.addField(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
                             if(Strings.canParsePositiveFloat(text)){
                                 group.unitScaling = 1f / Strings.parseFloat(text);
                                 updateWaves();
@@ -217,21 +217,23 @@ public class WaveInfoDialog extends FloatingDialog{
 
     void showUpdate(SpawnGroup group){
         FloatingDialog dialog = new FloatingDialog("");
-        dialog.setFillParent(false);
-        int i = 0;
-        for(UnitType type : content.units()){
-            dialog.cont.addButton(t -> {
-                t.left();
-                t.addImage(type.icon(io.anuke.mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
-                t.add(type.localizedName);
-            }, () -> {
-                lastType = type;
-                group.type = type;
-                dialog.hide();
-                buildGroups();
-            }).pad(2).margin(12f).fillX();
-            if(++i % 3 == 0) dialog.cont.row();
-        }
+        dialog.setFillParent(true);
+        dialog.cont.pane(p -> {
+            int i = 0;
+            for(UnitType type : content.units()){
+                p.addButton(t -> {
+                    t.left();
+                    t.addImage(type.icon(io.anuke.mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
+                    t.add(type.localizedName);
+                }, () -> {
+                    lastType = type;
+                    group.type = type;
+                    dialog.hide();
+                    buildGroups();
+                }).pad(2).margin(12f).fillX();
+                if(++i % 3 == 0) p.row();
+            }
+        });
         dialog.show();
     }
 

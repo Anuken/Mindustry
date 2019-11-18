@@ -8,6 +8,7 @@ import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -18,6 +19,8 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
+    protected static boolean returnValue = false;
+
     protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
@@ -114,7 +117,11 @@ public class PowerNode extends PowerBlock{
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, other -> {
             if(!tile.entity.power.links.contains(other.pos())){
                 tile.configureAny(other.pos());
@@ -139,7 +146,11 @@ public class PowerNode extends PowerBlock{
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, t -> {
             graphs.add(t.entity.power.graph);
             others.get(t);
@@ -151,6 +162,7 @@ public class PowerNode extends PowerBlock{
         super.setStats();
 
         stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
+        stats.add(BlockStat.powerConnections, maxNodes, StatUnit.none);
     }
 
     @Override
@@ -293,6 +305,11 @@ public class PowerNode extends PowerBlock{
         return overlaps(src.drawx(), src.drawy(), other, range);
     }
 
+    public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
+        if(src == null || other == null) return true;
+        return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
+    }
+
     protected void drawLaser(Tile tile, Tile target){
         int opacityPercentage = Core.settings.getInt("lasersopacity");
         if(opacityPercentage == 0) return;
@@ -324,11 +341,9 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        final Boolean[] bool = {false};
-        insulators(x, y, x2, y2, cause -> {
-            bool[0] = true;
-        });
-        return bool[0];
+        returnValue = false;
+        insulators(x, y, x2, y2, cause -> returnValue = true);
+        return returnValue;
     }
 
     public static void insulators(int x, int y, int x2, int y2, Cons<Tile> iterator){

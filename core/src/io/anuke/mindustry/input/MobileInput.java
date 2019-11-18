@@ -20,6 +20,7 @@ import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -204,7 +205,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.wikiSmall;
+            i.getStyle().imageUp = arrow ? Icon.arrowSmall : Icon.pasteSmall;
             i.setChecked(!arrow && schematicMode);
         });
 
@@ -216,11 +217,23 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //actually place/break all selected blocks
                 if(tile != null){
                     if(!request.breaking){
+                        if(validPlace(request.x, request.y, request.block, request.rotation)){
+                            BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
+                            BuildRequest copy = request.copy();
+
+                            if(copy.hasConfig && copy.block.posConfig){
+                                copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
+                            }
+
+                            if(other == null){
+                                player.addBuildRequest(copy);
+                            }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
+                                player.buildQueue().remove(other);
+                                player.addBuildRequest(copy);
+                            }
+                        }
+
                         rotation = request.rotation;
-                        Block before = block;
-                        block = request.block;
-                        tryPlaceBlock(tile.x, tile.y);
-                        block = before;
                     }else{
                         tryBreakBlock(tile.x, tile.y);
                     }
@@ -354,7 +367,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
-                    drawRequest(lineRequests.get(i));
+
+                    BuildRequest request = lineRequests.get(i);
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(req.x, request.y, request.block.size, null) == null);
+                    drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
@@ -412,6 +428,13 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public boolean isBreaking(){
         return mode == breaking;
+    }
+
+    @Override
+    public void useSchematic(Schematic schem){
+        selectRequests.clear();
+        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        lastSchematic = schem;
     }
 
     @Override

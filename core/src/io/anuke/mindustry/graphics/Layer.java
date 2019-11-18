@@ -10,5 +10,7 @@ public enum Layer{
     /** "High" blocks, like turrets. */
     turret,
     /** Power lasers. */
-    power
+    power,
+    /** Extra layer that's always on top.*/
+    lights
 }

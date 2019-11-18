@@ -31,7 +31,6 @@ public class ForceProjector extends Block{
     protected float cooldownLiquid = 1.5f;
     protected float cooldownBrokenBase = 0.35f;
     protected float basePowerDraw = 0.2f;
-    protected float powerDamage = 0.1f;
     protected TextureRegion topRegion;
 
     private static Tile paramTile;
@@ -73,8 +72,6 @@ public class ForceProjector extends Block{
         super.setStats();
 
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.powerDamage, powerDamage, StatUnit.powerUnits);
-
         stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
     }
 
@@ -111,12 +108,12 @@ public class ForceProjector extends Block{
             Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
         }
 
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.power.satisfaction, 0.1f);
+        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
 
 /*
-        if(entity.power.satisfaction < relativePowerDraw){
+        if(entity.power.status < relativePowerDraw){
             entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.15f);
-            entity.power.satisfaction = 0f;
+            entity.power.status = 0f;
             if(entity.warmup <= 0.09f){
                 entity.broken = true;
             }

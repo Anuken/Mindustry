@@ -28,6 +28,7 @@ Create elaborate supply chains of conveyor belts to feed ammo into your turrets,
 
 [h2][h2]Gamemodes[/h2][/h2]
 
+[list]
 [*] [b]Survival[/b]: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
 [*] [b]Attack[/b]: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals.
 [*] [b]PvP[/b]: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.

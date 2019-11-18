@@ -1,3 +1,4 @@
+import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.io.TypeIO;
 import org.junit.jupiter.api.Test;
 
@@ -31,5 +32,22 @@ public class IOTests{
         buffer.position(0);
         assertNull(TypeIO.readString(buffer));
     }
+
+    @Test
+    void writeRules(){
+        ByteBuffer buffer = ByteBuffer.allocate(500);
+
+        Rules rules = new Rules();
+        rules.attackMode = true;
+        rules.buildSpeedMultiplier = 99f;
+
+        TypeIO.writeRules(buffer, rules);
+        buffer.position(0);
+        Rules res = TypeIO.readRules(buffer);
+
+        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.attackMode, res.attackMode);
+    }
+
 
 }
