@@ -12,7 +12,7 @@ Do not submit something without at least running the game to see if it compiles.
 If you are submitting a new block, make sure it has a name and description, and that it works correctly in-game. If you are changing existing block mechanics, test them out first.
 
 
-#### Do not make large changes before discussing it first.
+#### Do not make large changes before discussing them first.
 If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) (preferred method) or via e-mail (*anukendev@gmail.com*).  
 For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
 
