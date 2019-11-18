@@ -371,7 +371,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         int direction = 0;
 
         float angle = rotation + 22.5f;
-        if (angle > 0){
+         if (angle > 45 * 0){
             direction = 2;
         }if (angle > 45 * 1){
             direction = 1;
@@ -387,6 +387,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             direction = 4;
         }if (angle > 45 * 7){
             direction = 3;
+        }if (angle > 45 * 8){
+            direction = 2;
         }
 
         Draw.rect(Monk.idle[direction][(int) (Monk.idle[direction].length * f)], x, y);
