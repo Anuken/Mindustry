@@ -20,26 +20,27 @@ For most changes, this should not be necessary. I just want to know if you're do
 ## Style Guidelines
 
 
-#### Do not use incompatible Java features (java.awt.function, java.awt).
-Android [does not support](https://developer.android.com/studio/write/java8-support#supported_features) many of Java 8's features, like anything out of `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
+#### Do not use incompatible Java features (java.util.function, java.awt).
+Android [does not support](https://developer.android.com/studio/write/java8-support#supported_features) many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
 If you need to use functional interfaces, use the ones in `io.anuke.arc.func`, which are more or less the same with different naming schemes.
   
-The same applies to anything outside of the standard `java.[n]io` / `java.net` / `java.util` packages: Most of it is not supported.  
+The same applies to any class *outside* of the standard `java.[n]io` / `java.net` / `java.util` packages: Most of them are not supported.  
 `java.awt` is one of these packages: do not use it, ever. It is not supported on any platform, even desktop - the entire package is removed during JRE minimization.
 In general, if you are using IntelliJ, you should be warned about platform incompatiblities.
 
 
 #### Use `arc` collections and classes when possible.
-Instead of using `java.util.List`, `java.util.HashMap`, and etc, use `Array`, `ObjectMap` and other equivalents from `io.anuke.arc.collection`. 
-Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.
+Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Array`, `ObjectMap` and other equivalents from `io.anuke.arc.collection`. 
+Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.  
+In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).
 
 #### Avoid bloated code and unnecessary getters/setters.
-This one is situational, but in essence what this means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
-If something needs to be made encapsulated in the future, IntelliJ can handle it with a few clicks.
+This is situational, but in essence what it means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
+If something needs to be encapsulated in the future, IntelliJ can handle it with a few clicks.
 
 
 #### Do not create methods unless necessary.
-Unless some code is very large or is used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
+Unless a block of code is very large or used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
 
 
 #### Follow the formatting guidelines.
@@ -48,4 +49,4 @@ This means:
 - Same-line braces.
 - 4 spaces indentation
 - `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more.
-- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day.)
+- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
