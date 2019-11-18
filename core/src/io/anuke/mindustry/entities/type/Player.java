@@ -395,8 +395,10 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             Draw.rect(Monk.fly[direction], x, y);
         }else{
             if(isShooting()){
+                mech.speed = 0f;
                 Draw.rect(Monk.attack[direction][(int) (Monk.attack[direction].length * f)], x, y);
             }else{
+                mech.speed = 0.5f;
                 Draw.rect(Monk.idle[direction][(int) (Monk.idle[direction].length * f)], x, y);
             }
         }
