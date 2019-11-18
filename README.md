@@ -8,6 +8,10 @@ A sandbox tower defense game written in Java.
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](https://mindustrygame.github.io/wiki)_ 
 
+### Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md).
+
 ### Building
 
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).

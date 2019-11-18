@@ -167,6 +167,8 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
     }
 
     public void writeSave(DataOutput stream, boolean net) throws IOException{
+        if(item.item == null) item.item = Items.copper;
+
         stream.writeByte(team.ordinal());
         stream.writeBoolean(isDead());
         stream.writeFloat(net ? interpolator.target.x : x);
@@ -399,6 +401,12 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         Draw.color();
 
         drawBackItems(item.amount > 0 ? 1f : 0f, false);
+
+        drawLight();
+    }
+
+    public void drawLight(){
+        renderer.lights.add(x, y, 50f, Pal.powerLight, 0.6f);
     }
 
     public void drawBackItems(float itemtime, boolean number){

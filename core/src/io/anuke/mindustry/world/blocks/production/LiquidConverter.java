@@ -33,6 +33,13 @@ public class LiquidConverter extends GenericCrafter{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        if(hasLiquids && drawLiquidLight && outputLiquid.liquid.lightColor.a > 0.001f){
+            drawLiquidLight(tile, outputLiquid.liquid, tile.entity.liquids.get(outputLiquid.liquid));
+        }
+    }
+
+    @Override
     public void update(Tile tile){
         GenericCrafterEntity entity = tile.entity();
         ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);

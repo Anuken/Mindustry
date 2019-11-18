@@ -64,6 +64,11 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
+    }
+
+    @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return tile.entity.items.get(item) < getMaximumAccepted(tile, item);
     }

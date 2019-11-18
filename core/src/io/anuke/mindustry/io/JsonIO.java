@@ -4,7 +4,7 @@ import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.Json.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.ctype.MappableContent;
+import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
@@ -30,6 +30,10 @@ public class JsonIO{
             }
         }
     };
+
+    public static Json json(){
+        return json;
+    }
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());

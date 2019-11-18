@@ -484,7 +484,7 @@ public class NetServer implements ApplicationListener{
         for(BuildRequest req : requests){
             if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
-            if(tile == null) continue;
+            if(tile == null || (!req.breaking && req.block == null)) continue;
             //auto-skip done requests
             if(req.breaking && tile.block() == Blocks.air){
                 continue;

@@ -116,9 +116,9 @@ public abstract class BlockStorage extends UnlockableContent{
             Tile other = proximity.get((i + dump) % proximity.size);
             Tile in = Edges.getFacingEdge(tile, other);
 
-            other = other.block().getLiquidDestination(other, tile);
+            other = other.block().getLiquidDestination(other, in, liquid);
 
-            if(other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids != null){
+            if(other != null && other.getTeam() == tile.getTeam() && other.block().hasLiquids && canDumpLiquid(tile, other, liquid) && other.entity.liquids != null){
                 float ofract = other.entity.liquids.get(liquid) / other.block().liquidCapacity;
                 float fract = tile.entity.liquids.get(liquid) / liquidCapacity;
 
@@ -142,10 +142,14 @@ public abstract class BlockStorage extends UnlockableContent{
     }
 
     public float tryMoveLiquid(Tile tile, Tile next, boolean leak, Liquid liquid){
+        return tryMoveLiquid(tile, next, leak ? 1.5f : 100, liquid);
+    }
+
+    public float tryMoveLiquid(Tile tile, Tile next, float leakResistance, Liquid liquid){
         if(next == null) return 0;
 
         next = next.link();
-        next = next.block().getLiquidDestination(next, tile);
+        next = next.block().getLiquidDestination(next, tile, liquid);
 
         if(next.getTeam() == tile.getTeam() && next.block().hasLiquids && tile.entity.liquids.get(liquid) > 0f){
 
@@ -175,15 +179,15 @@ public abstract class BlockStorage extends UnlockableContent{
                     }
                 }
             }
-        }else if(leak && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = tile.entity.liquids.get(liquid) / 1.5f;
+        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = tile.entity.liquids.get(liquid) / leakResistance;
             Puddle.deposit(next, tile, liquid, leakAmount);
             tile.entity.liquids.remove(liquid, leakAmount);
         }
         return 0;
     }
 
-    public Tile getLiquidDestination(Tile tile, Tile from){
+    public Tile getLiquidDestination(Tile tile, Tile from, Liquid liquid){
         return tile;
     }
 

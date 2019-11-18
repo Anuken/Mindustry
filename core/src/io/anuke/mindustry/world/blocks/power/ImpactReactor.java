@@ -17,7 +17,7 @@ import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import static io.anuke.mindustry.Vars.*;
 
 public class ImpactReactor extends PowerGenerator{
     protected int timerUse = timers++;
@@ -114,6 +114,12 @@ public class ImpactReactor extends PowerGenerator{
         Draw.rect(region, tile.drawx(), tile.drawy());
 
         Draw.color();
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        float fract = tile.<FusionReactorEntity>entity().warmup;
+        renderer.lights.add(tile.drawx(), tile.drawy(), (110f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * fract);
     }
 
     @Override

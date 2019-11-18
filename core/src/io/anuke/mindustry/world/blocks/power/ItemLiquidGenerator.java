@@ -140,7 +140,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             if(entity.generateTime > 0f){
                 entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
-                if(randomlyExplode && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
+                if(randomlyExplode && state.rules.reactorExplosions && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
                     Core.app.post(() -> {
                         entity.damage(Mathf.random(11f));
@@ -172,6 +172,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
             Draw.rect(liquidRegion, tile.drawx(), tile.drawy());
             Draw.color();
         }
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        ItemLiquidGeneratorEntity entity = tile.entity();
+
+        renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.orange, 0.5f);
     }
 
     protected float getItemEfficiency(Item item){

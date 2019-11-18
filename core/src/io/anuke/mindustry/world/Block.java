@@ -89,6 +89,8 @@ public class Block extends BlockStorage{
     public boolean configurable;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
+    /** Whether to draw the glow of the liquid for this block, if it has one. */
+    public boolean drawLiquidLight = true;
     /** Whether the config is positional and needs to be shifted. */
     public boolean posConfig;
     /** Whether this block uses conveyor-type placement mode.*/
@@ -292,6 +294,23 @@ public class Block extends BlockStorage{
         Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation() * 90 : 0);
     }
 
+    public void drawLight(Tile tile){
+        if(hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+            drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
+        }
+    }
+
+    public void drawLiquidLight(Tile tile, Liquid liquid, float amount){
+        if(amount > 0.01f){
+            Color color = liquid.lightColor;
+            float fract = 1f;
+            float opacity = color.a * fract;
+            if(opacity > 0.001f){
+                renderer.lights.add(tile.drawx(), tile.drawy(), size * 30f * fract, color, opacity);
+            }
+        }
+    }
+
     public void drawTeam(Tile tile){
         Draw.color(tile.getTeam().color);
         Draw.rect("block-border", tile.drawx() - size * tilesize / 2f + 4, tile.drawy() - size * tilesize / 2f + 4);
@@ -361,6 +380,16 @@ public class Block extends BlockStorage{
             sum += other.floor().attributes.get(attr);
         }
         return sum;
+    }
+
+    public float percentSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return 0;
+        float sum = 0;
+        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+            sum += !other.floor.isLiquid ? 1f : 0f;
+        }
+        return sum / size / size;
     }
 
     @Override
@@ -596,7 +625,7 @@ public class Block extends BlockStorage{
 
         if(hasLiquids){
 
-            tile.entity.liquids.forEach((liquid, amount) -> {
+            tile.entity.liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
@@ -706,10 +735,12 @@ public class Block extends BlockStorage{
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
+        float prev = Draw.scl;
+
         Draw.color(color);
         Draw.scl *= req.animScale;
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.scl /= req.animScale;
+        Draw.scl = prev;
         Draw.color();
     }
 
