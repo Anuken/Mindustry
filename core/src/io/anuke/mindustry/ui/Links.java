@@ -17,6 +17,7 @@ public class Links{
             new LinkEntry("reddit", "https://www.reddit.com/r/Mindustry/", Color.valueOf("ee593b")),
             new LinkEntry("itch.io", "https://anuke.itch.io/mindustry", Color.valueOf("fa5c5c")),
             new LinkEntry("google-play", "https://play.google.com/store/apps/details?id=io.anuke.mindustry", Color.valueOf("689f38")),
+            new LinkEntry("f-droid", "https://f-droid.org/packages/io.anuke.mindustry/", Color.valueOf("026aa7")),
             new LinkEntry("github", "https://github.com/Anuken/Mindustry/", Color.valueOf("24292e")),
             new LinkEntry("dev-builds", "https://github.com/Anuken/MindustryBuilds", Color.valueOf("fafbfc"))
         };
