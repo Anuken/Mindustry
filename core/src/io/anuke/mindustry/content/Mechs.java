@@ -373,7 +373,7 @@ public class Mechs implements ContentList{
             }
         };
 
-        monk = new Monk("monk-mech", true);
+        monk = new Monk("monk-mech", false);
 
         starter = dart;
     }
