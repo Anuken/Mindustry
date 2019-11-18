@@ -5,7 +5,7 @@ import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Bullets;
 
 public class Monk extends Mech{
-    public static TextureRegion[] idle;
+    public static TextureRegion[][] idle;
 
     public Monk(String name, boolean flying){
         super(name, flying);
@@ -31,9 +31,14 @@ public class Monk extends Mech{
     public void load(){
         weapon.load();
 
-        idle = new TextureRegion[6];
-        for(int i = 0; i < 6; i++){
-            idle[i] = Core.atlas.find("monk-idle-0-" + i);
+        legRegion = Core.atlas.find("white");
+        baseRegion = Core.atlas.find("white");
+
+        idle = new TextureRegion[8][6];
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 6; j++){
+                idle[i][j] = Core.atlas.find("monk-idle-"+ i +"-"+ j);
+            }
         }
 
         region = Core.atlas.find("monk-idle-0-0");
