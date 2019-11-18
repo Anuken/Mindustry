@@ -34,6 +34,16 @@ Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java 
 Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.  
 In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).
 
+
+#### Avoid boxed types (Integer, Boolean)
+Never create variables or collections with boxed types `Array<Integer>` or `ObjectMap<Integer, ...>`. Use the collections specialized for this task, e.g. `IntArray` and `IntMap`.
+
+
+#### Do not allocate anything if possible.
+Never allocate `new` objects in the main loop. If you absolutely require new objects, use `Pools` to obtain and free object instances. 
+Otherwise, use the `Tmp` variables for things like vector/shape operations, or create `static` variables for re-use.
+If using a list, make it a static variable and clear it every time it is used. Re-use as much as possible.
+
 #### Avoid bloated code and unnecessary getters/setters.
 This is situational, but in essence what it means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
 If something needs to be encapsulated in the future, IntelliJ can handle it with a few clicks.
