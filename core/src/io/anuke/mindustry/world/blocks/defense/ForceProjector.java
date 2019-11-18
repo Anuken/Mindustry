@@ -54,6 +54,7 @@ public class ForceProjector extends Block{
         hasLiquids = true;
         hasItems = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
+        entityType = ForceEntity::new;
     }
 
     @Override
@@ -177,11 +178,6 @@ public class ForceProjector extends Block{
         Draw.rect(topRegion, tile.drawx(), tile.drawy());
         Draw.blend();
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ForceEntity();
     }
 
     class ForceEntity extends TileEntity{

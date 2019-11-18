@@ -8,7 +8,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
@@ -37,15 +36,15 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
-        super(name);
+        this(name);
         this.hasItems = hasItems;
         this.hasLiquids = hasLiquids;
-
         setDefaults();
     }
 
     public ItemLiquidGenerator(String name){
         super(name);
+        this.entityType = ItemLiquidGeneratorEntity::new;
     }
 
     protected void setDefaults(){
@@ -187,11 +186,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     protected float getLiquidEfficiency(Liquid liquid){
         return 0.0f;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemLiquidGeneratorEntity();
     }
 
     public static class ItemLiquidGeneratorEntity extends GeneratorEntity{

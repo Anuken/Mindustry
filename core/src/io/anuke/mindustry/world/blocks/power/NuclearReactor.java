@@ -8,7 +8,6 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -46,6 +45,7 @@ public class NuclearReactor extends PowerGenerator{
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
+        entityType = NuclearReactorEntity::new;
     }
 
     @Override
@@ -179,11 +179,6 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new NuclearReactorEntity();
     }
 
     public static class NuclearReactorEntity extends GeneratorEntity{

@@ -41,6 +41,7 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
+        entityType = ItemBridgeEntity::new;
     }
 
     @Override
@@ -338,11 +339,6 @@ public class ItemBridge extends Block{
         int rel2 = tile.relativeTo(to.x, to.y);
 
         return rel != rel2;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemBridgeEntity();
     }
 
     public boolean linkValid(Tile tile, Tile other){

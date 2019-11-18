@@ -28,6 +28,7 @@ public class ItemTurret extends CooledTurret{
     public ItemTurret(String name){
         super(name);
         hasItems = true;
+        entityType = ItemTurretEntity::new;
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
@@ -146,11 +147,6 @@ public class ItemTurret extends CooledTurret{
         TurretEntity entity = tile.entity();
 
         return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemTurretEntity();
     }
 
     public class ItemTurretEntity extends TurretEntity{

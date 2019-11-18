@@ -36,6 +36,7 @@ public class CoreBlock extends StorageBlock{
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
         layer = Layer.overlay;
+        entityType = CoreEntity::new;
     }
 
     @Remote(called = Loc.server)
@@ -227,11 +228,6 @@ public class CoreBlock extends StorageBlock{
         CoreEntity entity = tile.entity();
 
         return entity.spawnPlayer != null;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new CoreEntity();
     }
 
     public class CoreEntity extends TileEntity implements SpawnerTrait{

@@ -139,6 +139,7 @@ public class Block extends BlockStorage{
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
+    protected Prov<TileEntity> entityType = TileEntity::new;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -856,8 +857,8 @@ public class Block extends BlockStorage{
         return destructible || update;
     }
 
-    public TileEntity newEntity(){
-        return new TileEntity();
+    public final TileEntity newEntity(){
+        return entityType.get();
     }
 
     /** Offset for placing and drawing multiblocks. */

@@ -2,6 +2,7 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.renderer;
@@ -17,6 +18,8 @@ public class LightBlock extends Block{
         hasPower = true;
         update = true;
         topRegion = reg("-top");
+        configurable = true;
+        entityType = LightEntity::new;
     }
 
     @Override
@@ -30,7 +33,16 @@ public class LightBlock extends Block{
     }
 
     @Override
+    public void configured(Tile tile, Player player, int value){
+        tile.<LightEntity>entity().color = value;
+    }
+
+    @Override
     public void drawLight(Tile tile){
         renderer.lights.add(tile.drawx(), tile.drawy(), radius, color, brightness * tile.entity.efficiency());
+    }
+
+    public class LightEntity extends TileEntity{
+        public int color;
     }
 }

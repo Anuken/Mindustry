@@ -20,6 +20,7 @@ public class PowerGenerator extends PowerDistributor{
         super(name);
         baseExplosiveness = 5f;
         flags = EnumSet.of(BlockFlag.producer);
+        entityType = GeneratorEntity::new;
     }
 
     @Override
@@ -49,11 +50,6 @@ public class PowerGenerator extends PowerDistributor{
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new GeneratorEntity();
     }
 
     public static class GeneratorEntity extends TileEntity{

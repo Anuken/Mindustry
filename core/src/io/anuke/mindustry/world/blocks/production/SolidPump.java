@@ -30,6 +30,7 @@ public class SolidPump extends Pump{
     public SolidPump(String name){
         super(name);
         hasPower = true;
+        entityType = SolidPumpEntity::new;
     }
 
     @Override
@@ -132,11 +133,6 @@ public class SolidPump extends Pump{
     @Override
     protected boolean isValid(Tile tile){
         return tile != null && !tile.floor().isLiquid;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new SolidPumpEntity();
     }
 
     @Override

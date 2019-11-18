@@ -42,6 +42,7 @@ public class BuildBlock extends Block{
         layer = Layer.placement;
         consumesTap = true;
         solidifes = true;
+        entityType = BuildEntity::new;
 
         buildBlocks[size - 1] = this;
     }
@@ -195,11 +196,6 @@ public class BuildBlock extends Block{
             Draw.rect(region, tile.drawx(), tile.drawy(), target.rotate ? tile.rotation() * 90 : 0);
             Draw.flush();
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new BuildEntity();
     }
 
     public class BuildEntity extends TileEntity{

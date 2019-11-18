@@ -7,7 +7,6 @@ import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
@@ -39,6 +38,7 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+        entityType = FusionReactorEntity::new;
 
         bottomRegion = reg("-bottom");
         plasmaRegions = new int[plasmas];
@@ -125,11 +125,6 @@ public class ImpactReactor extends PowerGenerator{
     @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name)};
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new FusionReactorEntity();
     }
 
     @Override
