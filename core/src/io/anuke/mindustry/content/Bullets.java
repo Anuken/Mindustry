@@ -40,7 +40,10 @@ public class Bullets implements ContentList{
     fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag, eruptorShot,
 
     //bombs
-    bombExplosive, bombIncendiary, bombOil;
+    bombExplosive, bombIncendiary, bombOil,
+
+    //jokes
+    convert;
 
     @Override
     public void load(){
@@ -687,5 +690,7 @@ public class Bullets implements ContentList{
                 }
             }
         };
+
+        convert = new ConvertBulletType();
     }
 }

@@ -27,7 +27,7 @@ public class Monk extends Mech{
             length = 1.5f;
             reload = 150f;
             alternate = true;
-            bullet = Bullets.waterShot;
+            bullet = Bullets.convert;
             shootSound = Sounds.wololoo;
         }};
     }
