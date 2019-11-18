@@ -366,12 +366,29 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
             Draw.color(Color.white);
         }
 
-        int direction = Math.abs(((int) ((rotation - 22.5f - 90f) / 45) - 1) % Monk.idle.length);
-
         float f = (Time.time() / 60f) % 1f;
 
+        int direction = 0;
 
-        Log.info(direction);
+        float angle = rotation + 22.5f;
+        if (angle > 0){
+            direction = 2;
+        }if (angle > 45 * 1){
+            direction = 1;
+        }if (angle > 45 * 2){
+            direction = 0;
+        }if (angle > 45 * 3){
+            direction = 7;
+        }if (angle > 45 * 4){
+            direction = 6;
+        }if (angle > 45 * 5){
+            direction = 5;
+        }if (angle > 45 * 6){
+            direction = 4;
+        }if (angle > 45 * 7){
+            direction = 3;
+        }
+
         Draw.rect(Monk.idle[direction][(int) (Monk.idle[direction].length * f)], x, y);
 
         mech.draw(this);
