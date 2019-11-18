@@ -101,6 +101,10 @@ public abstract class BulletType extends Content{
         hit(b);
     }
 
+    public void hitUnit(Bullet b, Unit unit){
+        //
+    }
+
     public void hit(Bullet b){
         hit(b, b.x, b.y);
     }
