@@ -3,6 +3,7 @@ package io.anuke.mindustry.type;
 import io.anuke.arc.Core;
 import io.anuke.arc.graphics.g2d.TextureRegion;
 import io.anuke.mindustry.content.Bullets;
+import io.anuke.mindustry.gen.Sounds;
 
 public class Monk extends Mech{
     public static TextureRegion[][] idle;
@@ -22,11 +23,12 @@ public class Monk extends Mech{
         buildPower = 1.2f;
         health = 250f;
 
-        weapon = new Weapon("blaster"){{
+        weapon = new Weapon("staff"){{
             length = 1.5f;
-            reload = 14f;
+            reload = 150f;
             alternate = true;
             bullet = Bullets.waterShot;
+            shootSound = Sounds.wololoo;
         }};
     }
 
