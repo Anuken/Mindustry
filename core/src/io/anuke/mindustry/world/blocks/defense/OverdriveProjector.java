@@ -78,7 +78,7 @@ public class OverdriveProjector extends Block{
         OverdriveEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * Time.delta();
-        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.satisfaction > 0 ? 1f : 0f, 0.05f);
+        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.status > 0 ? 1f : 0f, 0.05f);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
@@ -164,11 +164,11 @@ public class OverdriveProjector extends Block{
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }
-    
+
         float realRadius(){
             return (range + phaseHeat * phaseRangeBoost) * rangeProg;
         }
-        
+
         @Override
         public void draw(){
             if(Core.settings.getBool("overdriveprojection")){
@@ -177,20 +177,20 @@ public class OverdriveProjector extends Block{
                 Draw.color();
             }
         }
-    
+
         public void drawOver(){
             if(Core.settings.getBool("overdriveprojection")){
                 Draw.color(Color.white);
-                Draw.alpha(1f - power.satisfaction);
+                Draw.alpha(1f - power.status);
                 Fill.circle(x, y, realRadius());
                 Draw.color();
             }
         }
-    
+
         public void drawSimple(){
             if(Core.settings.getBool("overdriveprojection")){
                 float rad = realRadius();
-    
+
                 Draw.color(color);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.17f);
@@ -200,15 +200,17 @@ public class OverdriveProjector extends Block{
                 Draw.reset();
             }
         }
-    
-        @Override public Color accent(){
+
+        @Override
+        public Color accent(){
             return color;
         }
-    
-        @Override public String projectorSet(){
+
+        @Override
+        public String projectorSet(){
             return "OverdriveSet";
         }
-    
+
         @Override
         public EntityGroup targetGroup(){
             return projectorGroup;

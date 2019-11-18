@@ -69,7 +69,7 @@ public class MendProjector extends Block{
         MendEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
         entity.charge += entity.heat * entity.delta();
-        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.satisfaction > 0 ? 1f : 0f, 0.05f);
+        entity.rangeProg = Mathf.lerpDelta(entity.rangeProg, entity.power.status > 0 ? 1f : 0f, 0.05f);
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
@@ -164,24 +164,25 @@ public class MendProjector extends Block{
             heat = stream.readFloat();
             phaseHeat = stream.readFloat();
         }
-        
+
         float realRadius(){
             return (range + phaseHeat * phaseRangeBoost) * rangeProg;
         }
-        
-        @Override public void drawOver(){
+
+        @Override
+        public void drawOver(){
             if(Core.settings.getBool("mendprojection")){
                 Draw.color(Color.white);
-                Draw.alpha(1f - power.satisfaction);
+                Draw.alpha(1f - power.status);
                 Fill.circle(x, y, realRadius());
                 Draw.color();
             }
         }
-    
-        @Override public void drawSimple(){
+
+        @Override
+        public void drawSimple(){
             if(Core.settings.getBool("mendprojection")){
                 float rad = realRadius();
-                // power.satisfaction
                 Draw.color(color);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.17f);
@@ -191,23 +192,26 @@ public class MendProjector extends Block{
                 Draw.reset();
             }
         }
-    
-        @Override public Color accent(){
+
+        @Override
+        public Color accent(){
             return color;
         }
-    
-        @Override public String projectorSet(){
+
+        @Override
+        public String projectorSet(){
             return "MenderSet";
         }
-    
-        @Override public void draw(){
+
+        @Override
+        public void draw(){
             if(Core.settings.getBool("mendprojection")){
                 Draw.color(color);
                 Fill.circle(x, y, realRadius());
                 Draw.color();
             }
         }
-    
+
         @Override
         public EntityGroup targetGroup(){
             return projectorGroup;

@@ -263,15 +263,17 @@ public class ForceProjector extends Block{
             Lines.poly(x, y, 6, rad);
             Draw.reset();
         }
-    
-        @Override public Color accent(){
+
+        @Override
+        public Color accent(){
             return Pal.accent;
         }
-    
-        @Override public String projectorSet(){
+
+        @Override
+        public String projectorSet(){
             return "ForcefieldSet";
         }
-    
+
         @Override
         public EntityGroup targetGroup(){
             return projectorGroup;
