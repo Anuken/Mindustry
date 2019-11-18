@@ -19,6 +19,15 @@ For most changes, this should not be necessary. I just want to know if you're do
 
 ## Style Guidelines
 
+#### Follow the formatting guidelines.
+This means:
+- No spaces around parentheses: `if(condition){`, `SomeType s = (SomeType)object`
+- Same-line braces.
+- 4 spaces indentation
+- `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more.
+- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
+
+Import [this style file](.github/Mindustry-CodeStyle-IJ.xml) into IntelliJ to get correct formatting when developing Mindustry.
 
 #### Do not use incompatible Java features (java.util.function, java.awt).
 Android [does not support](https://developer.android.com/studio/write/java8-support#supported_features) many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
@@ -51,12 +60,3 @@ If something needs to be encapsulated in the future, IntelliJ can handle it with
 
 #### Do not create methods unless necessary.
 Unless a block of code is very large or used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
-
-
-#### Follow the formatting guidelines.
-This means:
-- No spaces around parentheses: `if(condition){`, `SomeType s = (SomeType)object`
-- Same-line braces.
-- 4 spaces indentation
-- `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more.
-- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
