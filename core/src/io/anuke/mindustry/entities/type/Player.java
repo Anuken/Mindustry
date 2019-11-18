@@ -278,6 +278,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
     @Override
     public void drawShadow(float offsetX, float offsetY){
+        if(mech instanceof Monk) return;
         float scl = mech.flying ? 1f : boostHeat / 2f;
 
         Draw.rect(getIconRegion(), x + offsetX * scl, y + offsetY * scl, rotation - 90);
@@ -286,6 +287,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void draw(){
         if(dead) return;
+
+        if(mech instanceof Monk){
+            drawMonk();
+            return;
+        }
 
         if(!movement.isZero() && moved && !state.isPaused()){
             walktime += movement.len() * getFloorOn().speedMultiplier * 2f;
@@ -344,8 +350,42 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.reset();
     }
 
+    public void drawMonk(){
+        if(!movement.isZero() && moved && !state.isPaused()){
+            walktime += movement.len() * getFloorOn().speedMultiplier * 2f;
+            baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
+        }
+
+        Floor floor = getFloorOn();
+
+        if(!mech.flying){
+            if(floor.isLiquid){
+                Draw.color(Color.white, floor.color, 0.5f);
+            }
+
+            float boostTrnsY = -boostHeat * 3f;
+            float boostTrnsX = boostHeat * 3f;
+            float boostAng = boostHeat * 40f;
+        }
+
+        if(floor.isLiquid){
+            Draw.color(Color.white, floor.color, drownTime);
+        }else{
+            Draw.color(Color.white);
+        }
+
+        Draw.rect(mech.region, x, y);
+
+        mech.draw(this);
+
+
+        Draw.reset();
+    }
+
     @Override
     public void drawStats(){
+        if(mech instanceof Monk) return;
+
         Draw.color(Color.black, team.color, healthf() + Mathf.absin(Time.time(), healthf() * 5f, 1f - healthf()));
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
@@ -369,6 +409,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     @Override
     public void drawUnder(){
         if(dead) return;
+        if(mech instanceof Monk) return;
 
         float size = mech.engineSize * (mech.flying ? 1f : boostHeat);
         Draw.color(mech.engineColor);
