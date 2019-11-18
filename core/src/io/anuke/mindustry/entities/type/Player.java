@@ -351,6 +351,8 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     }
 
     public void drawMonk(){
+        Monk monk = (Monk) mech;
+
         if(!movement.isZero() && moved && !state.isPaused()){
             walktime += movement.len() * getFloorOn().speedMultiplier * 2f;
             baseRotation = Mathf.slerpDelta(baseRotation, movement.angle(), 0.13f);
@@ -358,23 +360,28 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
 
         Floor floor = getFloorOn();
 
-        if(!mech.flying){
-            if(floor.isLiquid){
-                Draw.color(Color.white, floor.color, 0.5f);
-            }
-
-            float boostTrnsY = -boostHeat * 3f;
-            float boostTrnsX = boostHeat * 3f;
-            float boostAng = boostHeat * 40f;
-        }
-
         if(floor.isLiquid){
             Draw.color(Color.white, floor.color, drownTime);
         }else{
             Draw.color(Color.white);
         }
 
-        Draw.rect(mech.region, x, y);
+//        int frame = (int)Mathf.absin(Time.time(), 5f, 2.999f);
+//        int frame = (int)Mathf.absin(Time.time(), 1f, 5f);
+
+//        int firstDigit = Integer.parseInt(Integer.toString((int)Time.time() % 60).substring(0, 1));
+//
+//        Log.info(firstDigit);
+
+//        int i = (int)Time.time() % 100;
+//        float j = 100 / i;
+
+        float f = (Time.time() / 100f) % 1f;
+
+        Log.info((int) (monk.idle.length * f));
+//        Log.info(j);
+
+        Draw.rect(monk.idle[(int) (monk.idle.length * f)], x, y);
 
         mech.draw(this);
 
