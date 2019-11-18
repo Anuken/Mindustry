@@ -60,6 +60,10 @@ public abstract class Unit extends DestructibleEntity implements SaveTrait, Targ
         return team;
     }
 
+    public void setTeam(Team team){
+        this.team = team;
+    }
+
     @Override
     public void interpolate(){
         interpolator.update();
