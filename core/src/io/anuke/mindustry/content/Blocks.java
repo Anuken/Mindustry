@@ -1801,7 +1801,7 @@ public class Blocks implements ContentList{
 
         omegaPad = new MechPad("omega-mech-pad"){{
             requirements(Category.upgrade, ItemStack.with(Items.lead, 225, Items.graphite, 275, Items.silicon, 325, Items.thorium, 300, Items.surgealloy, 120));
-            mech = Mechs.omega;
+            mech = Mechs.monk;
             size = 3;
             consumes.power(1.2f);
         }};

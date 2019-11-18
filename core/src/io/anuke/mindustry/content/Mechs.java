@@ -16,7 +16,7 @@ import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
 
 public class Mechs implements ContentList{
-    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive;
+    public static Mech alpha, delta, tau, omega, dart, javelin, trident, glaive, monk;
 
     public static Mech starter;
 
@@ -372,6 +372,8 @@ public class Mechs implements ContentList{
                 }};
             }
         };
+
+        monk = new Monk("monk-mech", true);
 
         starter = dart;
     }
