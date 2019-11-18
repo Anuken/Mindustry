@@ -8,6 +8,7 @@ public class Monk extends Mech{
     public static TextureRegion[][] idle;
     public static TextureRegion[] fly;
     public static TextureRegion[][] attack;
+    public static TextureRegion[][] walk;
 
     public Monk(String name, boolean flying){
         super(name, flying);
@@ -15,7 +16,7 @@ public class Monk extends Mech{
         drillPower = 1;
         mineSpeed = 1.5f;
         mass = 1.2f;
-        speed = 0.5f;
+        speed = 0.25f;
         itemCapacity = 40;
         boostSpeed = 0.95f;
         buildPower = 1.2f;
@@ -52,6 +53,13 @@ public class Monk extends Mech{
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 10; j++){
                 attack[i][j] = Core.atlas.find("monk-attack-"+ i +"-"+ j);
+            }
+        }
+
+        walk = new TextureRegion[8][10];
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 10; j++){
+                walk[i][j] = Core.atlas.find("monk-walk-"+ i +"-"+ j);
             }
         }
 
