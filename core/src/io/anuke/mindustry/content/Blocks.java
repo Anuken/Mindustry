@@ -740,7 +740,7 @@ public class Blocks implements ContentList{
         }};
         illuminator = new LightBlock("illuminator"){{
             //disabled until implemented properly
-            //requirements(Category.effect, ItemStack.with(Items.graphite, 5));
+            requirements(Category.effect, BuildVisibility.lightingOnly, ItemStack.with(Items.graphite, 5));
             color = Color.valueOf("7d93ff");
             brightness = 0.6f;
             radius = 80f;
