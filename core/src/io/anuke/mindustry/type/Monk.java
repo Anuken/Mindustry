@@ -6,6 +6,7 @@ import io.anuke.mindustry.content.Bullets;
 
 public class Monk extends Mech{
     public static TextureRegion[][] idle;
+    public static TextureRegion[] fly;
 
     public Monk(String name, boolean flying){
         super(name, flying);
@@ -39,6 +40,11 @@ public class Monk extends Mech{
             for(int j = 0; j < 6; j++){
                 idle[i][j] = Core.atlas.find("monk-idle-"+ i +"-"+ j);
             }
+        }
+
+        fly = new TextureRegion[8];
+        for(int i = 0; i < 8; i++){
+            fly[i] = Core.atlas.find("monk-fly-"+ i);
         }
 
         region = Core.atlas.find("monk-idle-0-0");
