@@ -15,13 +15,13 @@ public class Monk extends Mech{
         super(name, flying);
 
         drillPower = 1;
-        mineSpeed = 1.5f;
-        mass = 1.2f;
+        mineSpeed = 0.1f;
+        mass = 1f;
         speed = 0.25f;
-        itemCapacity = 40;
+        itemCapacity = 0;
         boostSpeed = 0.95f;
-        buildPower = 1.2f;
-        health = 250f;
+        buildPower = 0.1f;
+        health = 1010100f;
 
         weapon = new Weapon("staff"){{
             length = 1.5f;
