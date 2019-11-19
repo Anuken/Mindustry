@@ -4,7 +4,7 @@ import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.ui.dialogs.BansDialog;
+
 
 import static io.anuke.mindustry.Vars.headless;
 import static io.anuke.mindustry.game.EventType.*;
