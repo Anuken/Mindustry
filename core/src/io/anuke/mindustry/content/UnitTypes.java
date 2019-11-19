@@ -11,7 +11,7 @@ import io.anuke.mindustry.type.*;
 
 public class UnitTypes implements ContentList{
     public static UnitType
-    draug, spirit, phantom,
+    draug, hori, spirit, phantom,
     wraith, ghoul, revenant, lich, reaper,
     dagger, crawler, titan, fortress, eruptor, chaosArray, eradicator;
 
@@ -28,6 +28,22 @@ public class UnitTypes implements ContentList{
             engineSize = 1.8f;
             engineOffset = 5.7f;
             weapon = new Weapon("you have incurred my wrath. prepare to die."){{
+                bullet = Bullets.lancerLaser;
+            }};
+        }};
+        
+        draug = new UnitType("hori", Hori::new){{
+            flying = true;
+            drag = 0.01f;
+            speed = 0.4f;
+            maxVelocity = 1.2f;
+            range = 60f;
+            health = 120;
+            minePower = 4f;
+            engineSize = 1.8f;
+            engineOffset = 5.7f;
+            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium, Items.thorium);
+            weapon = new Weapon("Your destruction is assured. Do not hide."){{
                 bullet = Bullets.lancerLaser;
             }};
         }};
