@@ -31,19 +31,20 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.lancerLaser;
             }};
         }};
-        
-        draug = new UnitType("hori", Hori::new){{
+	
+	hori = new UnitType("hori", Hori::new){{
             flying = true;
             drag = 0.01f;
-            speed = 0.4f;
+            speed = 0.3f;
             maxVelocity = 1.2f;
-            range = 60f;
+            range = 50f;
             health = 120;
             minePower = 4f;
+	    itemCapacity = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium, Items.thorium);
-            weapon = new Weapon("Your destruction is assured. Do not hide."){{
+	    toMine = ObjectSet.with(Items.lead, Items.copper, Items.titanium, Items.thorium);
+            weapon = new Weapon("Your destruction is guaranteed. Do not run."){{
                 bullet = Bullets.lancerLaser;
             }};
         }};
