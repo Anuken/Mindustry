@@ -79,6 +79,7 @@ public abstract class Turret extends Block{
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
         outlineIcon = true;
+        entityType = TurretEntity::new;
     }
 
     @Override
@@ -303,11 +304,6 @@ public abstract class Turret extends Block{
 
     protected boolean isTurret(Tile tile){
         return (tile.entity instanceof TurretEntity);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new TurretEntity();
     }
 
     public static abstract class AmmoEntry{

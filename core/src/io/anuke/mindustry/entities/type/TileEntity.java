@@ -87,6 +87,11 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return Time.delta() * timeScale;
     }
 
+    /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
+    public float efficiency(){
+        return power != null && !block.consumes.getPower().buffered ? power.status : 1f;
+    }
+
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
         sleepTime += Time.delta();
@@ -306,13 +311,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        Block previous = block;
         block.update(tile);
-        if(block == previous && cons != null){
+
+        if(liquids != null){
+            liquids.update();
+        }
+
+        if(cons != null){
             cons.update();
         }
 
-        if(block == previous && power != null){
+        if(power != null){
             power.graph.update();
         }
     }

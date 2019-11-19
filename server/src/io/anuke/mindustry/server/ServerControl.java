@@ -5,9 +5,12 @@ import io.anuke.arc.collection.*;
 import io.anuke.arc.collection.Array.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.Timer;
 import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
+import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.JsonValue.*;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
@@ -19,6 +22,7 @@ import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.maps.Map;
 import io.anuke.mindustry.maps.*;
+import io.anuke.mindustry.maps.Maps.*;
 import io.anuke.mindustry.mod.Mods.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.Packets.*;
@@ -46,6 +50,7 @@ public class ServerControl implements ApplicationListener{
     private boolean inExtraRound;
     private Task lastTask;
     private Gamemode lastMode = Gamemode.survival;
+    private @Nullable Map nextMapOverride;
 
     private Thread socketThread;
     private PrintWriter socketOutput;
@@ -55,11 +60,12 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "normal",
             "bans", "",
             "admins", "",
-            "shuffle", true,
+            "shufflemode", "all",
             "crashreport", false,
             "port", port,
             "logging", true,
-            "socket", false
+            "socket", false,
+            "globalrules", "{reactorExplosions: false}"
         );
 
         Log.setLogger(new LogHandler(){
@@ -139,33 +145,34 @@ public class ServerControl implements ApplicationListener{
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lc-Pbuildversion=&lm<build>&ly.");
         }
 
+        //set up default shuffle mode
+        try{
+            maps.setShuffleMode(ShuffleMode.valueOf(Core.settings.getString("shufflemode")));
+        }catch(Exception e){
+            maps.setShuffleMode(ShuffleMode.all);
+        }
+
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
-            info("Game over!");
+            if(state.rules.waves){
+                info("&lcGame over! Reached wave &ly{0}&lc with &ly{1}&lc players online on map &ly{2}&lc.", state.wave, playerGroup.size(), Strings.capitalize(world.getMap().name()));
+            }else{
+                info("&lcGame over! Team &ly{0}&lc is victorious with &ly{1}&lc players online on map &ly{2}&lc.", event.winner.name(), playerGroup.size(), Strings.capitalize(world.getMap().name()));
+            }
 
-            if(Core.settings.getBool("shuffle")){
-                if(maps.all().size > 0){
-                    Array<Map> maps = Array.with(Vars.maps.customMaps().size == 0 ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
-                    maps.shuffle();
+            //set next map to be played
+            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(world.getMap());
+            nextMapOverride = null;
+            if(map != null){
+                Call.onInfoMessage((state.rules.pvp
+                ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
+                + "\nNext selected map:[accent] " + map.name() + "[]"
+                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
+                "\nNew game begins in " + roundExtraTime + "[] seconds.");
 
-                    Map previous = world.getMap();
-                    Map map = maps.find(m -> m != previous || maps.size == 1);
+                info("Selected next map to be {0}.", map.name());
 
-                    if(map != null){
-
-                        Call.onInfoMessage((state.rules.pvp
-                        ? "[YELLOW]The " + event.winner.name() + " team is victorious![]" : "[SCARLET]Game over![]")
-                        + "\nNext selected map:[accent] " + map.name() + "[]"
-                        + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[]" : "") + "." +
-                        "\nNew game begins in " + roundExtraTime + "[] seconds.");
-
-                        info("Selected next map to be {0}.", map.name());
-
-                        play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
-                    }else{
-                        Log.err("No suitable map found.");
-                    }
-                }
+                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
@@ -249,8 +256,9 @@ public class ServerControl implements ApplicationListener{
             logic.reset();
             lastMode = preset;
             try{
-                world.loadMap(result,  result.applyRules(lastMode));
+                world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
+                applyRules();
                 logic.play();
 
                 info("Map loaded.");
@@ -366,6 +374,58 @@ public class ServerControl implements ApplicationListener{
                 info("Difficulty set to '{0}'.", arg[0]);
             }catch(IllegalArgumentException e){
                 err("No difficulty with name '{0}' found.", arg[0]);
+            }
+        });
+
+        handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
+            String rules = Core.settings.getString("globalrules");
+            JsonValue base = JsonIO.json().fromJson(null, rules);
+
+            if(arg.length == 0){
+                Log.info("&lyRules:\n{0}", JsonIO.print(rules));
+            }else if(arg.length == 1){
+                Log.err("Invalid usage. Specify which rule to remove or add.");
+            }else{
+                if(!(arg[0].equals("remove") || arg[0].equals("add"))){
+                    Log.err("Invalid usage. Either add or remove rules.");
+                    return;
+                }
+
+                boolean remove = arg[0].equals("remove");
+                if(remove){
+                    if(base.has(arg[1])){
+                        Log.info("Rule &lc'{0}'&lg removed.", arg[1]);
+                        base.remove(arg[1]);
+                    }else{
+                        Log.err("Rule not defined, so not removed.");
+                        return;
+                    }
+                }else{
+                    if(arg.length < 3){
+                        Log.err("Missing last argument. Specify which value to set the rule to.");
+                        return;
+                    }
+
+                    try{
+                        JsonValue value = new JsonReader().parse(arg[2]);
+                        value.name = arg[1];
+
+                        JsonValue parent = new JsonValue(ValueType.object);
+                        parent.addChild(value);
+
+                        JsonIO.json().readField(state.rules, value.name, parent);
+                        if(base.has(value.name)){
+                            base.remove(value.name);
+                        }
+                        base.addChild(arg[1], value);
+                        Log.info("Changed rule: &ly{0}", value.toString().replace("\n", " "));
+                    }catch(Throwable e){
+                        Log.err("Error parsing rule JSON", e);
+                    }
+                }
+
+                Core.settings.putSave("globalrules", base.toString());
+                Call.onSetRules(state.rules);
             }
         });
 
@@ -518,14 +578,29 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("shuffle", "<on/off>", "Set map shuffling.", arg -> {
-            if(!arg[0].equals("on") && !arg[0].equals("off")){
-                err("Invalid shuffle mode.");
-                return;
+        handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
+            if(arg.length == 0){
+                info("Shuffle mode current set to &ly'{0}'&lg.", maps.getShuffleMode());
+            }else{
+                try{
+                    ShuffleMode mode = ShuffleMode.valueOf(arg[0]);
+                    Core.settings.putSave("shufflemode", mode.name());
+                    maps.setShuffleMode(mode);
+                    info("Shuffle mode set to &ly'{0}'&lg.", arg[0]);
+                }catch(Exception e){
+                    err("Invalid shuffle mode.");
+                }
             }
-            Core.settings.put("shuffle", arg[0].equals("on"));
-            Core.settings.save();
-            info("Shuffle mode set to '{0}'.", arg[0]);
+        });
+
+        handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
+            Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            if(res != null){
+                nextMapOverride = res;
+                Log.info("Next map set to &ly'{0}'.", res.name());
+            }else{
+                Log.err("No map '{0}' found.", arg[0]);
+            }
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
@@ -724,7 +799,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("gameover", "Force a game over.", arg -> {
             if(state.is(State.menu)){
-                info("Not playing a map.");
+                err("Not playing a map.");
                 return;
             }
 
@@ -763,6 +838,15 @@ public class ServerControl implements ApplicationListener{
 
         mods.each(p -> p.registerServerCommands(handler));
         mods.each(p -> p.registerClientCommands(netServer.clientCommands));
+    }
+
+    private void applyRules(){
+        try{
+            JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
+            JsonIO.json().readFields(state.rules, value);
+        }catch(Throwable t){
+            Log.err("Error applying custom rules, proceeding without them.", t);
+        }
     }
 
     private void readCommands(){
@@ -819,6 +903,7 @@ public class ServerControl implements ApplicationListener{
             run.run();
             logic.play();
             state.rules = world.getMap().applyRules(lastMode);
+            applyRules();
 
             for(Player p : players){
                 if(p.con == null) continue;

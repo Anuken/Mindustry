@@ -28,6 +28,7 @@ public class Cultivator extends GenericCrafter{
     public Cultivator(String name){
         super(name);
         craftEffect = Fx.none;
+        entityType = CultivatorEntity::new;
     }
 
     @Override
@@ -92,11 +93,6 @@ public class Cultivator extends GenericCrafter{
     @Override
     public TextureRegion[] generateIcons(){
         return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new CultivatorEntity();
     }
 
     @Override

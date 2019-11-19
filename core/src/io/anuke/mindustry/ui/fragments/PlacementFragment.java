@@ -36,6 +36,25 @@ public class PlacementFragment extends Fragment{
     Tile hoverTile;
     Table blockTable, toggler, topTable;
     boolean lastGround;
+    boolean blockSelectEnd;
+    int blockSelectSeq;
+    long blockSelectSeqMillis;
+    Binding[] blockSelect = {
+        Binding.block_select_01,
+        Binding.block_select_02,
+        Binding.block_select_03,
+        Binding.block_select_04,
+        Binding.block_select_05,
+        Binding.block_select_06,
+        Binding.block_select_07,
+        Binding.block_select_08,
+        Binding.block_select_09,
+        Binding.block_select_10,
+        Binding.block_select_left,
+        Binding.block_select_right,
+        Binding.block_select_up,
+        Binding.block_select_down
+    };
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -83,6 +102,78 @@ public class PlacementFragment extends Fragment{
                 return true;
             }
         }
+
+        if(ui.chatfrag.chatOpen()) return false;
+        for(int i = 0; i < blockSelect.length; i++){
+            if(Core.input.keyTap(blockSelect[i])){
+                if(i > 9) { //select block directionally
+                    Array<Block> blocks = getByCategory(currentCategory);
+                    Block currentBlock = getSelectedBlock(currentCategory);
+                    for(int j = 0; j < blocks.size; j++){
+                        if(blocks.get(j) == currentBlock){
+                            switch(i){
+                                case 10: //left
+                                    j = (j - 1 + blocks.size) % blocks.size;
+                                    break;
+                                case 11: //right
+                                    j = (j + 1) % blocks.size;
+                                    break;
+                                case 12: //up
+                                    j = (j > 3 ? j - 4 : blocks.size - blocks.size % 4 + j);
+                                    j -= (j < blocks.size ? 0 : 4);
+                                    break;
+                                case 13: //down
+                                    j = (j < blocks.size - 4 ? j + 4 : j % 4);
+                            }
+                            input.block = blocks.get(j);
+                            selectedBlocks.put(currentCategory, input.block);
+                            break;
+                        }
+                    }
+                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
+                    //select only visible categories
+                    if(!getByCategory(Category.all[i]).isEmpty()){
+                        currentCategory = Category.all[i];
+                        if(input.block != null){
+                            input.block = getSelectedBlock(currentCategory);
+                        }
+                        blockSelectEnd = false;
+                        blockSelectSeq = 0;
+                        blockSelectSeqMillis = Time.millis();
+                    }
+                }else{ //select block
+                    if(blockSelectSeq == 0){ //2nd number of combo
+                        blockSelectSeq = i + 1;
+                    }else{ //3rd number of combo
+                        //entering "X,1,0" selects the same block as "X,0"
+                        i += (blockSelectSeq - (i != 9 ? 0 : 1)) * 10;
+                        blockSelectEnd = true;
+                    }
+                    Array<Block> blocks = getByCategory(currentCategory);
+                    input.block = (i < blocks.size) ? blocks.get(i) : null;
+                    selectedBlocks.put(currentCategory, input.block);
+                    blockSelectSeqMillis = Time.millis();
+                }
+                return true;
+            }
+        }
+
+        if(Core.input.keyTap(Binding.category_prev)){
+            do{
+                currentCategory = currentCategory.prev();
+            }while(categoryEmpty[currentCategory.ordinal()]);
+            input.block = getSelectedBlock(currentCategory);
+            return true;
+        }
+
+        if(Core.input.keyTap(Binding.category_next)){
+            do{
+                currentCategory = currentCategory.next();
+            }while(categoryEmpty[currentCategory.ordinal()]);
+            input.block = getSelectedBlock(currentCategory);
+            return true;
+        }
+
         return false;
     }
 
@@ -107,11 +198,6 @@ public class PlacementFragment extends Fragment{
                     for(Block block : getByCategory(currentCategory)){
                         if(index++ % rowWidth == 0){
                             blockTable.row();
-                        }
-
-                        if(!unlocked(block)){
-                            blockTable.add().size(46);
-                            continue;
                         }
 
                         ImageButton button = blockTable.addImageButton(Icon.lockedSmall, Styles.selecti, () -> {
@@ -170,9 +256,22 @@ public class PlacementFragment extends Fragment{
                             lastGround = false;
 
                             topTable.table(header -> {
+                                String keyCombo = "";
+                                if(!mobile && Core.settings.getBool("blockselectkeys")){
+                                    Array<Block> blocks = getByCategory(currentCategory);
+                                    for(int i = 0; i < blocks.size; i++){
+                                        if(blocks.get(i) == lastDisplay){
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
+                                                + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
+                                                + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
+                                            break;
+                                        }
+                                    }
+                                }
+                                final String keyComboFinal = keyCombo;
                                 header.left();
                                 header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName)
+                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(lastDisplay)){
@@ -265,7 +364,7 @@ public class PlacementFragment extends Fragment{
                     //update category empty values
                     for(Category cat : Category.all){
                         Array<Block> blocks = getByCategory(cat);
-                        categoryEmpty[cat.ordinal()] = blocks.isEmpty() || !unlocked(blocks.first());
+                        categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
                     int f = 0;
@@ -280,10 +379,7 @@ public class PlacementFragment extends Fragment{
                         categories.addImageButton(Core.atlas.drawable("icon-" + cat.name() + "-smaller"), Styles.clearToggleTransi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
-                                if(selectedBlocks.get(currentCategory) == null){
-                                    selectedBlocks.put(currentCategory, getByCategory(currentCategory).find(this::unlocked));
-                                }
-                                control.input.block = selectedBlocks.get(currentCategory);
+                                control.input.block = getSelectedBlock(currentCategory);
                             }
                             rebuildCategory.run();
                         }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
@@ -308,7 +404,7 @@ public class PlacementFragment extends Fragment{
     Array<Block> getByCategory(Category cat){
         returnArray.clear();
         for(Block block : content.blocks()){
-            if(block.category == cat && block.isVisible()){
+            if(block.category == cat && block.isVisible() && unlocked(block)){
                 returnArray.add(block);
             }
         }
@@ -318,6 +414,13 @@ public class PlacementFragment extends Fragment{
             return Boolean.compare(state.rules.bannedBlocks.contains(b1), state.rules.bannedBlocks.contains(b2));
         });
         return returnArray;
+    }
+
+    Block getSelectedBlock(Category cat){
+        if(selectedBlocks.get(cat) == null){
+            selectedBlocks.put(cat, getByCategory(cat).find(this::unlocked));
+        }
+        return selectedBlocks.get(cat);
     }
 
     boolean unlocked(Block block){

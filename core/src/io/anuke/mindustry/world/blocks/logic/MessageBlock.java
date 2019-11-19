@@ -7,14 +7,12 @@ import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.*;
-import io.anuke.arc.scene.ui.TextField.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
-import io.anuke.mindustry.net.Net;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.ui.dialogs.*;
@@ -33,6 +31,7 @@ public class MessageBlock extends Block{
         configurable = true;
         solid = true;
         destructible = true;
+        entityType = MessageBlockEntity::new;
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -99,7 +98,7 @@ public class MessageBlock extends Block{
     public void buildTable(Tile tile, Table table){
         MessageBlockEntity entity = tile.entity();
 
-        table.addImageButton(io.anuke.mindustry.gen.Icon.pencilSmall, () -> {
+        table.addImageButton(Icon.pencilSmall, () -> {
             if(mobile){
                 Core.input.getTextInput(new TextInput(){{
                     text = entity.message;
@@ -145,11 +144,6 @@ public class MessageBlock extends Block{
     public void updateTableAlign(Tile tile, Table table){
         Vector2 pos = Core.input.mouseScreen(tile.drawx(), tile.drawy() + tile.block().size * tilesize / 2f + 1);
         table.setPosition(pos.x, pos.y, Align.bottom);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new MessageBlockEntity();
     }
 
     public class MessageBlockEntity extends TileEntity{

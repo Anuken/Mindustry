@@ -35,6 +35,7 @@ public class MechPad extends Block{
         hasPower = true;
         layer = Layer.overlay;
         flags = EnumSet.of(BlockFlag.mechPad);
+        entityType = MechFactoryEntity::new;
     }
 
     @Override
@@ -132,11 +133,6 @@ public class MechPad extends Block{
         }else{
             entity.heat = Mathf.lerpDelta(entity.heat, 0f, 0.1f);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new MechFactoryEntity();
     }
 
     public class MechFactoryEntity extends TileEntity implements SpawnerTrait{

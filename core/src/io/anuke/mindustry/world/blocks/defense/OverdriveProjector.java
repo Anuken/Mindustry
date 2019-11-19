@@ -37,6 +37,7 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
+        entityType = OverdriveEntity::new;
     }
 
     @Override
@@ -67,6 +68,11 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
+    public void drawLight(Tile tile){
+        renderer.lights.add(tile.drawx(), tile.drawy(), 50f * tile.entity.efficiency(), color, 0.7f * tile.entity.efficiency());
+    }
+
+    @Override
     public void update(Tile tile){
         OverdriveEntity entity = tile.entity();
         entity.heat = Mathf.lerpDelta(entity.heat, entity.cons.valid() ? 1f : 0f, 0.08f);
@@ -74,13 +80,13 @@ public class OverdriveProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(entity.cons.optionalValid()), 0.1f);
 
-        if(entity.timer.get(timerUse, useTime) && entity.power.satisfaction > 0){
+        if(entity.timer.get(timerUse, useTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
         if(entity.charge >= reload){
             float realRange = range + entity.phaseHeat * phaseRangeBoost;
-            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.power.satisfaction;
+            float realBoost = (speedBoost + entity.phaseHeat * speedBoostPhase) * entity.efficiency();
 
             entity.charge = 0f;
 
@@ -130,11 +136,6 @@ public class OverdriveProjector extends Block{
         Lines.square(tile.drawx(), tile.drawy(), (1f - f) * 8f);
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new OverdriveEntity();
     }
 
     class OverdriveEntity extends TileEntity{
