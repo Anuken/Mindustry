@@ -75,7 +75,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown,
 
     //units
-    commandCenter, draugFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
+    commandCenter, draugFactory, horiFactory, spiritFactory, phantomFactory, wraithFactory, ghoulFactory, revenantFactory, daggerFactory, crawlerFactory, titanFactory,
     fortressFactory, repairPoint,
 
     //upgrades
@@ -1657,6 +1657,15 @@ public class Blocks implements ContentList{
             maxSpawn = 1;
             consumes.power(1.2f);
             consumes.items();
+        }};
+        horiFactory = new UnitFactory("hori-factory"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
+            unitType = UnitTypes.hori;
+            produceTime = 3500;
+            size = 2;
+            maxSpawn = 1;
+            consumes.power(1.8f);
+            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.plastanium, 15));
         }};
 
         spiritFactory = new UnitFactory("spirit-factory"){{
