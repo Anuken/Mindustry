@@ -1,7 +1,8 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 import io.anuke.arc.*;
 import io.anuke.arc.graphics.g2d.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -35,10 +36,13 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public Tile getLiquidDestination(Tile tile, Tile source){
+    public Tile getLiquidDestination(Tile tile, Tile source, Liquid liquid){
         int dir = source.relativeTo(tile.x, tile.y);
         dir = (dir + 4) % 4;
         Tile next = tile.getNearby(dir).link();
-        return next.block().getLiquidDestination(next, tile);
+        if(!next.block().acceptLiquid(next, tile, liquid, 0f) && !(next.block() instanceof LiquidJunction)){
+            return tile;
+        }
+        return next.block().getLiquidDestination(next, tile, liquid);
     }
 }

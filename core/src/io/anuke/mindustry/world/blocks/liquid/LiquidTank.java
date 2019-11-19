@@ -1,4 +1,4 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 public class LiquidTank extends LiquidRouter{
 

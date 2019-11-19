@@ -41,22 +41,12 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
+        entityType = ItemBridgeEntity::new;
     }
 
     @Override
     public void configured(Tile tile, Player player, int value){
-        ItemBridgeEntity entity = tile.entity();
-
-        if(world.tile(entity.link) != null && world.tile(entity.link).entity instanceof ItemBridgeEntity){
-            ItemBridgeEntity oe = world.tile(entity.link).entity();
-            oe.incoming.remove(tile.pos());
-        }
-
-        entity.link = value;
-
-        if(world.tile(value) != null && world.tile(value).entity instanceof ItemBridgeEntity){
-            ((ItemBridgeEntity)world.tile(value).entity).incoming.add(tile.pos());
-        }
+        tile.<ItemBridgeEntity>entity().link = value;
     }
 
     @Override
@@ -195,8 +185,9 @@ public class ItemBridge extends Block{
             tryDump(tile);
             entity.uptime = 0f;
         }else{
+            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
 
-            if(entity.cons.valid() && (!hasPower || Mathf.isZero(1f - entity.power.satisfaction))){
+            if(entity.cons.valid() && Mathf.zero(1f - entity.efficiency())){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 0f, 0.02f);
@@ -348,11 +339,6 @@ public class ItemBridge extends Block{
         int rel2 = tile.relativeTo(to.x, to.y);
 
         return rel != rel2;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemBridgeEntity();
     }
 
     public boolean linkValid(Tile tile, Tile other){

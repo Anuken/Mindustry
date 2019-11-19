@@ -116,7 +116,7 @@ public class CustomRulesDialog extends FloatingDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m);
+        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
             rules = resetter.get();
@@ -135,13 +135,11 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("$rules.title.respawns");
-        //limited respawns don't work on PvP, commented out until they're fixed
-        //check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns);
-        //number("$rules.respawns", true, f -> rules.respawns = (int)f, () -> rules.respawns, () -> rules.limitedRespawns);
         number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
 
         title("$rules.title.resourcesbuilding");
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("$rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         number("$rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
 
@@ -171,6 +169,20 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+
+        title("$rules.title.experimental");
+        check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+
+        main.addButton(b -> {
+            b.left();
+            b.table(Tex.pane, in -> {
+                in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(rules.ambientLight));
+                }}).grow();
+            }).margin(4).size(50f).padRight(10);
+            b.add("$rules.ambientlight");
+        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
+        main.row();
     }
 
     void number(String text, Floatc cons, Floatp prov){
@@ -200,7 +212,9 @@ public class CustomRulesDialog extends FloatingDialog{
     }
 
     void title(String text){
-        main.add(text).color(Pal.accent).padTop(20).padBottom(20).padRight(100f);
+        main.add(text).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3);
+        main.row();
+        main.addImage().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
     }
 }

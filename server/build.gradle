@@ -51,8 +51,8 @@ task dist(type: Jar){
 
 task dzip(type: Zip){
     from getServerFolder()
-    archiveName "${generateDeployName('server')}.zip"
-    destinationDir(file("../deploy/"))
+    archiveFileName = "${generateDeployName('server')}.zip"
+    destinationDirectory = file("../deploy/")
 
     finalizedBy 'cleanup'
 }

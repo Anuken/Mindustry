@@ -40,7 +40,7 @@ task dist(type: Jar, dependsOn: classes){
     from {configurations.compile.collect {zipTree(it)}}
     from files(project.assetsDir)
 
-    archiveName = "${appName}.jar"
+    archiveFileName = "${appName}.jar"
 
     manifest{
         attributes 'Main-Class': project.mainClassName
@@ -163,8 +163,8 @@ PackrConfig.Platform.values().each{ platform ->
 
         task "zip${platform.toString()}"(type: Zip){
             from "build/packr/output"
-            archiveName "${generateDeployName(platform.toString())}.zip"
-            destinationDir(file("../deploy"))
+            archiveFileName = "${generateDeployName(platform.toString())}.zip"
+            destinationDirectory = (file("../deploy"))
 
             doLast{
                 delete{

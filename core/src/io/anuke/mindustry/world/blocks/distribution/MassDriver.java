@@ -42,15 +42,8 @@ public class MassDriver extends Block{
         layer = Layer.turret;
         hasPower = true;
         outlineIcon = true;
+        entityType = MassDriverEntity::new;
     }
-
-    /*
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void linkMassDriver(Player player, Tile tile, int position){
-        if(!Units.canInteract(player, tile)) return;
-        MassDriverEntity entity = tile.entity();
-        entity.link = position;
-    }*/
 
     @Override
     public void configured(Tile tile, Player player, int value){
@@ -77,7 +70,7 @@ public class MassDriver extends Block{
 
         //reload regardless of state
         if(entity.reload > 0f){
-            entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime * entity.power.satisfaction);
+            entity.reload = Mathf.clamp(entity.reload - entity.delta() / reloadTime * entity.efficiency());
         }
 
         //cleanup waiting shooters that are not valid
@@ -113,7 +106,7 @@ public class MassDriver extends Block{
             }
 
             //align to shooter rotation
-            entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.power.satisfaction);
+            entity.rotation = Mathf.slerpDelta(entity.rotation, tile.angleTo(entity.currentShooter()), rotateSpeed * entity.efficiency());
         }else if(entity.state == DriverState.shooting){
             //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
             if(!hasLink || (!entity.waitingShooters.isEmpty() && (itemCapacity - entity.items.total() >= minDistribute))){
@@ -133,7 +126,7 @@ public class MassDriver extends Block{
                 if(entity.reload <= 0.0001f){
 
                     //align to target location
-                    entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.power.satisfaction);
+                    entity.rotation = Mathf.slerpDelta(entity.rotation, targetRotation, rotateSpeed * entity.efficiency());
 
                     //fire when it's the first in the queue and angles are ready.
                     if(other.currentShooter() == tile &&
@@ -211,11 +204,6 @@ public class MassDriver extends Block{
     public boolean acceptItem(Item item, Tile tile, Tile source){
         //mass drivers that ouput only cannot accept items
         return tile.entity.items.total() < itemCapacity && linkValid(tile);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new MassDriverEntity();
     }
 
     protected void fire(Tile tile, Tile target){

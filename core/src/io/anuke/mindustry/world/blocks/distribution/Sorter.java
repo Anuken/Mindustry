@@ -28,6 +28,7 @@ public class Sorter extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
+        entityType = SorterEntity::new;
     }
 
     @Override
@@ -136,12 +137,6 @@ public class Sorter extends Block{
             tile.configure(item == null ? -1 : item.id);
         });
     }
-
-    @Override
-    public TileEntity newEntity(){
-        return new SorterEntity();
-    }
-
 
     public class SorterEntity extends TileEntity{
         @Nullable Item sortItem;

@@ -292,7 +292,7 @@ public class NetServer implements ApplicationListener{
         }
 
         //cooldown between votes
-        int voteTime = 60 * 5;
+        int voteTime = 60 * 3;
         Timekeeper vtime = new Timekeeper(voteTime);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
@@ -484,7 +484,7 @@ public class NetServer implements ApplicationListener{
         for(BuildRequest req : requests){
             if(req == null) continue;
             Tile tile = world.tile(req.x, req.y);
-            if(tile == null) continue;
+            if(tile == null || (!req.breaking && req.block == null)) continue;
             //auto-skip done requests
             if(req.breaking && tile.block() == Blocks.air){
                 continue;
