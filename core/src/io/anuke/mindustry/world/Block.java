@@ -540,13 +540,11 @@ public class Block extends BlockStorage{
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
 
-        if(this.attribute != null) { // fixme: there is probably a better way for this v
-            for (Content block : Vars.content.getContentMap()[ContentType.block.ordinal()]) {
-                if (!(block instanceof Floor)) continue;
-                Floor floor = (Floor) block;
-                float modifier = floor.attributes.get(this.attribute);
-                if (modifier == 0f) continue;
-                stats.add(BlockStat.attributes, new FloorAttributeValue(floor));
+        if(this.attribute != null){
+            for(Block block : Vars.content.blocks()){
+                if(!block.isFloor()) continue;
+                if(Mathf.zero(block.asFloor().attributes.get(this.attribute))) continue;
+                stats.add(BlockStat.attributes, new FloorAttributeValue(block.asFloor()));
             }
         }
     }
