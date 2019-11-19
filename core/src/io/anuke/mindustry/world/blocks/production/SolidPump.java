@@ -24,8 +24,6 @@ public class SolidPump extends Pump{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.02f;
     protected float rotateSpeed = 1f;
-    /** Attribute that is checked when calculating output. */
-    protected Attribute attribute;
 
     public SolidPump(String name){
         super(name);

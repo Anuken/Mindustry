@@ -45,7 +45,9 @@ public enum BlockStat{
     ammo(StatCategory.shooting),
 
     booster(StatCategory.optional),
-    boostEffect(StatCategory.optional);
+    boostEffect(StatCategory.optional),
+
+    attributes(StatCategory.optional);
 
     public final StatCategory category;
 

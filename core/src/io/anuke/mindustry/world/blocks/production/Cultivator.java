@@ -11,7 +11,6 @@ import io.anuke.mindustry.entities.type.TileEntity;
 import io.anuke.mindustry.graphics.Pal;
 import io.anuke.mindustry.ui.Bar;
 import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.Attribute;
 
 import java.io.*;
 
@@ -23,7 +22,6 @@ public class Cultivator extends GenericCrafter{
     protected TextureRegion middleRegion, topRegion;
     protected RandomXS128 random = new RandomXS128(0);
     protected float recurrence = 6f;
-    protected Attribute attribute = Attribute.spores;
 
     public Cultivator(String name){
         super(name);

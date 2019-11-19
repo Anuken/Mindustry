@@ -1073,6 +1073,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.copper, 40, Items.graphite, 35, Items.lead, 50, Items.silicon, 35, Items.metaglass, 40));
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
+            attribute = Attribute.heat;
             size = 2;
         }};
 
@@ -1208,6 +1209,7 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
+            attribute = Attribute.spores;
 
             consumes.power(0.80f);
             consumes.liquid(Liquids.water, 0.18f);

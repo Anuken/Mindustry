@@ -17,6 +17,7 @@ import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.Vars;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.effect.*;
@@ -145,6 +146,7 @@ public class Block extends BlockStorage{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
     protected TextureRegion region, editorIcon;
+    protected Attribute attribute; // fixme: probably not the best place, but acceptable enough for a draft pull
 
     protected static TextureRegion[][] cracks;
 
@@ -537,6 +539,16 @@ public class Block extends BlockStorage{
         // Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
+
+        if(this.attribute != null) { // fixme: there is probably a better way for this v
+            for (Content block : Vars.content.getContentMap()[ContentType.block.ordinal()]) {
+                if (!(block instanceof Floor)) continue;
+                Floor floor = (Floor) block;
+                float modifier = floor.attributes.get(this.attribute);
+                if (modifier == 0f) continue;
+                stats.add(BlockStat.attributes, new FloorAttributeValue(floor));
+            }
+        }
     }
 
     public void setBars(){
