@@ -241,6 +241,10 @@ public class BlockRenderer implements Disposable{
                             }
                         }
                     }
+
+                    if (Core.settings.getBool("debug_overlay")) {
+                        addRequest(tile, Layer.debug);
+                    }
                 }
             }
         }
@@ -285,6 +289,8 @@ public class BlockRenderer implements Disposable{
                 block.drawLayer(request.tile);
             }else if(request.layer == block.layer2){
                 block.drawLayer2(request.tile);
+            }else if(request.layer == Layer.debug){
+                block.drawDebug(request.tile);
             }
         }
     }

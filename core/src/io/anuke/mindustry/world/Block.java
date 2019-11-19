@@ -318,6 +318,9 @@ public class Block extends BlockStorage{
         Draw.color();
     }
 
+    public void drawDebug(Tile tile){
+    }
+
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(Tile tile){

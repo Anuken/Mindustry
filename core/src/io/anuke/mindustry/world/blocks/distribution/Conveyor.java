@@ -16,6 +16,7 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
+import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
@@ -31,6 +32,7 @@ public class Conveyor extends Block implements Autotiler{
     private final Vector2 tr1 = new Vector2();
     private final Vector2 tr2 = new Vector2();
     private TextureRegion[][] regions = new TextureRegion[7][4];
+    private TextureRegion overlayArrowRegion, overlayArrowBodyRegion, overlayArrowShadeRegion;
 
     protected float speed = 0f;
 
@@ -71,6 +73,76 @@ public class Conveyor extends Block implements Autotiler{
                 regions[i][j] = Core.atlas.find(name + "-" + i + "-" + j);
             }
         }
+
+        overlayArrowRegion = Core.atlas.find("overlay-arrow");
+        overlayArrowBodyRegion = Core.atlas.find("overlay-arrow-body");
+        overlayArrowShadeRegion = Core.atlas.find("overlay-arrow-shade");
+    }
+
+    @Override
+    public void drawDebug(Tile tile){
+        super.drawDebug(tile);
+
+        int selfRotation = tile.rotation() * 90 - 90;
+        boolean selfShadow = false;
+
+        for(Tile proximityTile : tile.entity.proximity()){
+            byte relativeDirection = tile.relativeTo(proximityTile);
+
+            if (relativeDirection == -1) {
+                continue;
+            }
+
+            int drawRotation = relativeDirection * 90 - 90;
+
+            if(proximityTile.block().outputsItems()){
+                if(drawRotation != selfRotation){
+                    Draw.color(1, 1, 1, 0.8f);
+
+                    if(proximityTile.block() instanceof Conveyor){
+                        if(proximityTile.rotation() == proximityTile.relativeTo(tile)){
+                            Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), drawRotation);
+                        }
+                    }else{
+                        Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), drawRotation);
+                    }
+                }
+
+                if(proximityTile.block() instanceof Junction){
+                    if (drawRotation == selfRotation) {
+                        selfShadow = true;
+                    } else {
+                        if(drawRotation % 180 != 0){
+                            Draw.color(0.2f, 0.8f, 0.2f, 0.3f);
+                        }else{
+                            Draw.color(0.2f, 0.2f, 0.8f, 0.3f);
+                        }
+
+                        Draw.rect(overlayArrowShadeRegion, tile.drawx(), tile.drawy(), drawRotation);
+                    }
+                }
+            }
+        }
+
+        Draw.color(1, 1, 1, 0.8f);
+        Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), selfRotation);
+
+        if(!tile.front().block().outputsItems()
+        || (tile.front().block() instanceof Conveyor && tile.front().rotation() == tile.front().relativeTo(tile))){
+            Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), selfRotation);
+        }
+
+        if (selfShadow) {
+            if(selfRotation % 180 != 0){
+                Draw.color(0.2f, 0.8f, 0.2f, 0.3f);
+            }else{
+                Draw.color(0.2f, 0.2f, 0.8f, 0.3f);
+            }
+
+            Draw.rect(overlayArrowShadeRegion, tile.drawx(), tile.drawy(), selfRotation);
+        }
+
+        Draw.color();
     }
 
     @Override

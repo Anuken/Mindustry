@@ -1,16 +1,19 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
 
 public class OverflowGate extends Block{
     protected float speed = 1f;
+    private TextureRegion overlayArrowRegion, overlayArrowBodyRegion, overlayArrowShadeRegion;
 
     public OverflowGate(String name){
         super(name);
@@ -20,6 +23,59 @@ public class OverflowGate extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = OverflowGateEntity::new;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        overlayArrowRegion = Core.atlas.find("overlay-arrow");
+        overlayArrowBodyRegion = Core.atlas.find("overlay-arrow-body");
+        overlayArrowShadeRegion = Core.atlas.find("overlay-arrow-shade");
+    }
+
+    @Override
+    public void drawDebug(Tile tile){
+        super.drawDebug(tile);
+
+        // Calculate proximity tiles
+        for(Tile proximityTile : tile.entity.proximity()){
+            byte relativeDirection = proximityTile.relativeTo(tile);
+            if(proximityTile.block().outputsItems()){
+                if(!(proximityTile.block() instanceof Conveyor) || proximityTile.rotation() == relativeDirection){
+                    Draw.color(1, 1, 1, 0.8f);
+
+                    Tile forward = tile.getNearby(relativeDirection);
+                    if(!forward.block().outputsItems()
+                    || (forward.block() instanceof Conveyor && forward.rotation() == forward.relativeTo(tile))){
+                        Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), relativeDirection * 90 - 90);
+                    }
+
+                    Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), relativeDirection * 90 - 90);
+                    Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), (relativeDirection + 2) * 90 - 90);
+
+                    Draw.color(0.8f, 0.2f, 0.2f, 0.8f);
+
+                    Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), (relativeDirection + 1) * 90 - 90);
+                    Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), (relativeDirection + 3) * 90 - 90);
+
+                    Tile right = tile.getNearby((relativeDirection + 1) % 4);
+                    if(!right.block().outputsItems()
+                    || (right.block() instanceof Conveyor && right.rotation() == right.relativeTo(tile))){
+                        Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), (relativeDirection + 1) * 90 - 90);
+                    }
+
+                    Tile left = tile.getNearby((relativeDirection + 3) % 4);
+                    if(!left.block().outputsItems()
+                    || (left.block() instanceof Conveyor && left.rotation() == left.relativeTo(tile))){
+                        Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), (relativeDirection + 3) * 90 - 90);
+                    }
+
+                    // TODO Handle cases where multiple belts point into overflow gate
+                    break;
+                }
+            }
+        }
     }
 
     @Override
