@@ -51,8 +51,7 @@ public class PowerDiode extends Block{
 
     // battery % of the graph on either side, defaults to zero
     protected float bar(Tile tile){
-        if(tile == null) return 0f;
-        return tile.block().hasPower ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
+        return (tile != null && tile.block().hasPower) ? tile.entity.power.graph.getBatteryStored() / tile.entity.power.graph.getTotalBatteryCapacity() : 0f;
     }
 
     @Override
