@@ -332,33 +332,37 @@ public class EventType{
             this.player = player;
         }
     }
+    
     public static class PlayerBanEvent{
         public final Player player;
 
-        public PlayerBanEvent(Player player) {
+        public PlayerBanEvent(Player player){
             this.player = player;
         }
     }
+    
     public static class PlayerUnbanEvent{
         public final Player player;
 
-        public PlayerUnbanEvent(Player player) {
+        public PlayerUnbanEvent(Player player){
             this.player = player;
         }
     }
+    
     public static class PlayerIpBanEvent{
         public final String ip;
 
 
-        public PlayerIpBanEvent(String ip) {
+        public PlayerIpBanEvent(String ip) 
             this.ip = ip;
         }
     }
+    
     public static class PlayerIpUnbanEvent{
         public final String ip;
 
 
-        public PlayerIpUnbanEvent(String ip) {
+        public PlayerIpUnbanEvent(String ip){
             this.ip = ip;
         }
     }
