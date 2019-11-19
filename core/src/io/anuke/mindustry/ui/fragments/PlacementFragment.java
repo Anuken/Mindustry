@@ -131,13 +131,16 @@ public class PlacementFragment extends Fragment{
                         }
                     }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
-                    currentCategory = Category.all[i];
-                    if(input.block != null){
-                        input.block = getSelectedBlock(currentCategory);
+                    //select only visible categories
+                    if(!getByCategory(Category.all[i]).isEmpty()){
+                        currentCategory = Category.all[i];
+                        if(input.block != null){
+                            input.block = getSelectedBlock(currentCategory);
+                        }
+                        blockSelectEnd = false;
+                        blockSelectSeq = 0;
+                        blockSelectSeqMillis = Time.millis();
                     }
-                    blockSelectEnd = false;
-                    blockSelectSeq = 0;
-                    blockSelectSeqMillis = Time.millis();
                 }else{ //select block
                     if(blockSelectSeq == 0){ //2nd number of combo
                         blockSelectSeq = i + 1;
