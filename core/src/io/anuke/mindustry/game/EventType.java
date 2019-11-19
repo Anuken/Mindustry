@@ -353,7 +353,7 @@ public class EventType{
         public final String ip;
 
 
-        public PlayerIpBanEvent(String ip) 
+        public PlayerIpBanEvent(String ip){
             this.ip = ip;
         }
     }
