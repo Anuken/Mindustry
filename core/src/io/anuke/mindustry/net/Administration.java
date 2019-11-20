@@ -91,7 +91,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-        Events.fire(new PlayerBanEvent(Vars.playerGroup.find(p -> p.uuid.equals(id))));
+        Events.fire(new PlayerBanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
         return true;
     }
 
@@ -131,7 +131,7 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-        Events.fire(new PlayerUnbanEvent(Vars.playerGroup.find(p -> p.uuid.equals(id))));
+        Events.fire(new PlayerUnbanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
         return true;
     }
 
