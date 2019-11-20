@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.input.*;
@@ -234,10 +234,10 @@ public class DeployDialog extends FloatingDialog{
         if(zone.unlocked() && !hidden(zone)){
             button.labelWrap(zone.localizedName()).style(Styles.outlineLabel).width(140).growX().get().setAlignment(Align.center);
         }else{
-            Consumer<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
-            flasher.accept(button.addImage(Icon.locked).get());
+            Cons<Element> flasher = zone.canUnlock() && !hidden(zone) ? e -> e.update(() -> e.getColor().set(Color.white).lerp(Pal.accent, Mathf.absin(3f, 1f))) : e -> {};
+            flasher.get(button.addImage(Icon.locked).get());
             button.row();
-            flasher.accept(button.add("$locked").get());
+            flasher.get(button.add("$locked").get());
         }
     }
 

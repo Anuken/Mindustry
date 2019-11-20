@@ -2,12 +2,13 @@ package io.anuke.mindustry.world.blocks.power;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.ui.*;
@@ -18,6 +19,8 @@ import io.anuke.mindustry.world.meta.*;
 import static io.anuke.mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
+    protected static boolean returnValue = false;
+
     protected ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected Vector2 t1 = new Vector2(), t2 = new Vector2();
     protected TextureRegion laser, laserEnd;
@@ -88,7 +91,7 @@ public class PowerNode extends PowerBlock{
         Core.bundle.format("bar.powerbalance",
         ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance() * 60, 1))),
         () -> Pal.powerBar,
-        () -> Mathf.clamp(entity.power.graph.getPowerProduced() / entity.power.graph.getPowerNeeded())));
+        () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
@@ -101,20 +104,24 @@ public class PowerNode extends PowerBlock{
     public void placed(Tile tile){
         if(net.client()) return;
 
-        Predicate<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
+        Boolf<Tile> valid = other -> other != null && other != tile && ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(tile, other)
         && !other.entity.proximity().contains(tile) && other.entity.power.graph != tile.entity.power.graph;
 
         tempTiles.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(valid.test(other)){
+            if(valid.get(other)){
                 if(!insulated(tile, other)){
                     tempTiles.add(other);
                 }
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, other -> {
             if(!tile.entity.power.links.contains(other.pos())){
                 tile.configureAny(other.pos());
@@ -124,8 +131,8 @@ public class PowerNode extends PowerBlock{
         super.placed(tile);
     }
 
-    private void getPotentialLinks(Tile tile, Consumer<Tile> others){
-        Predicate<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
+    private void getPotentialLinks(Tile tile, Cons<Tile> others){
+        Boolf<Tile> valid = other -> other != null && other != tile && other.entity != null && other.entity.power != null &&
         ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
         overlaps(tile.x * tilesize + offset(), tile.y * tilesize + offset(), other, laserRange * tilesize) && other.getTeam() == player.getTeam()
         && !other.entity.proximity().contains(tile) && !graphs.contains(other.entity.power.graph);
@@ -134,15 +141,19 @@ public class PowerNode extends PowerBlock{
         graphs.clear();
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 1), (x, y) -> {
             Tile other = world.ltile(x, y);
-            if(valid.test(other) && !tempTiles.contains(other)){
+            if(valid.get(other) && !tempTiles.contains(other)){
                 tempTiles.add(other);
             }
         });
 
-        tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
+        tempTiles.sort((a, b) -> {
+            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
         tempTiles.each(valid, t -> {
             graphs.add(t.entity.power.graph);
-            others.accept(t);
+            others.get(t);
         });
     }
 
@@ -151,6 +162,7 @@ public class PowerNode extends PowerBlock{
         super.setStats();
 
         stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
+        stats.add(BlockStat.powerConnections, maxNodes, StatUnit.none);
     }
 
     @Override
@@ -293,6 +305,11 @@ public class PowerNode extends PowerBlock{
         return overlaps(src.drawx(), src.drawy(), other, range);
     }
 
+    public boolean overlaps(@Nullable Tile src, @Nullable Tile other){
+        if(src == null || other == null) return true;
+        return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset(), src.worldy() + offset(), laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset(), other.worldy() + offset()));
+    }
+
     protected void drawLaser(Tile tile, Tile target){
         int opacityPercentage = Core.settings.getInt("lasersopacity");
         if(opacityPercentage == 0) return;
@@ -324,19 +341,17 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        final Boolean[] bool = {false};
-        insulators(x, y, x2, y2, cause -> {
-            bool[0] = true;
-        });
-        return bool[0];
+        returnValue = false;
+        insulators(x, y, x2, y2, cause -> returnValue = true);
+        return returnValue;
     }
 
-    public static void insulators(int x, int y, int x2, int y2, Consumer<Tile> iterator){
+    public static void insulators(int x, int y, int x2, int y2, Cons<Tile> iterator){
         world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
             Tile tile = world.ltile(wx, wy);
             if(tile != null && tile.block() != null && tile.block().insulated){
-                iterator.accept(tile);
+                iterator.get(tile);
             }
 
             return false;

@@ -1,25 +1,41 @@
 package io.anuke.mindustry.input;
 
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.math.geom.Bresenham2;
-import io.anuke.arc.math.geom.Point2;
-import io.anuke.arc.util.pooling.Pools;
-import io.anuke.mindustry.world.Block;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.pooling.*;
+import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.tilesize;
+import java.util.*;
 
-public class PlaceUtils{
+import static io.anuke.mindustry.Vars.*;
+
+public class Placement{
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
     private static Bresenham2 bres = new Bresenham2();
     private static Array<Point2> points = new Array<>();
 
+    //for pathfinding
+    private static IntFloatMap costs = new IntFloatMap();
+    private static IntIntMap parents = new IntIntMap();
+    private static IntSet closed = new IntSet();
+
     /** Normalize a diagonal line into points. */
-    public static Array<Point2> normalizeDiagonal(int startX, int startY, int endX, int endY){
+    public static Array<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
+
         points.clear();
-        return bres.lineNoDiagonal(startX, startY, endX, endY, Pools.get(Point2.class, Point2::new), points);
+        if(conveyors && Core.settings.getBool("conveyorpathfinding")){
+            if(astar(startX, startY, endX, endY)){
+                return points;
+            }else{
+                return normalizeLine(startX, startY, endX, endY);
+            }
+        }else{
+            return bres.lineNoDiagonal(startX, startY, endX, endY, Pools.get(Point2.class, Point2::new), points);
+        }
     }
 
     /** Normalize two points into one straight line, no diagonals. */
@@ -38,6 +54,92 @@ public class PlaceUtils{
             }
         }
         return points;
+    }
+
+    private static float tileHeuristic(Tile tile, Tile other){
+        Block block = control.input.block;
+
+        if((!other.block().alwaysReplace && !(block != null && block.canReplace(other.block()))) || other.floor().isDeep()){
+            return 20;
+        }else{
+            if(parents.containsKey(tile.pos())){
+                Tile prev = world.tile(parents.get(tile.pos(), 0));
+                if(tile.relativeTo(prev) != other.relativeTo(tile)){
+                    return 8;
+                }
+            }
+        }
+        return 1;
+    }
+
+    private static float distanceHeuristic(int x1, int y1, int x2, int y2){
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    private static boolean validNode(Tile tile, Tile other){
+        Block block = control.input.block;
+        if(block != null && block.canReplace(other.block())){
+            return true;
+        }else{
+            return other.block().alwaysReplace;
+        }
+    }
+
+    private static boolean astar(int startX, int startY, int endX, int endY){
+        Tile start = world.tile(startX, startY);
+        Tile end = world.tile(endX, endY);
+        if(start == end || start == null || end == null) return false;
+
+        costs.clear();
+        closed.clear();
+        parents.clear();
+
+        int nodeLimit = 1000;
+        int totalNodes = 0;
+
+        PriorityQueue<Tile> queue = new PriorityQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
+        queue.add(start);
+        boolean found = false;
+        while(!queue.isEmpty() && totalNodes++ < nodeLimit){
+            Tile next = queue.poll();
+            float baseCost = costs.get(next.pos(), 0f);
+            if(next == end){
+                found = true;
+                break;
+            }
+            closed.add(Pos.get(next.x, next.y));
+            for(Point2 point : Geometry.d4){
+                int newx = next.x + point.x, newy = next.y + point.y;
+                Tile child = world.tile(newx, newy);
+                if(child != null && validNode(next, child)){
+                    if(closed.add(child.pos())){
+                        parents.put(child.pos(), next.pos());
+                        costs.put(child.pos(), tileHeuristic(next, child) + baseCost);
+                        queue.add(child);
+                    }
+                }
+            }
+        }
+
+        if(!found) return false;
+        int total = 0;
+
+        points.add(Pools.obtain(Point2.class, Point2::new).set(endX, endY));
+
+        Tile current = end;
+        while(current != start && total++ < nodeLimit){
+            if(current == null) return false;
+            int newPos = parents.get(current.pos(), Pos.invalid);
+
+            if(newPos == Pos.invalid) return false;
+
+            points.add(Pools.obtain(Point2.class, Point2::new).set(Pos.x(newPos),  Pos.y(newPos)));
+            current = world.tile(newPos);
+        }
+
+        points.reverse();
+
+        return true;
     }
 
     /**
@@ -172,5 +274,13 @@ public class PlaceUtils{
         int getScaledY(int i){
             return y + (x2 - x > y2 - y ? 0 : i);
         }
+    }
+
+    public interface DistanceHeuristic{
+        float cost(int x1, int y1, int x2, int y2);
+    }
+
+    public interface TileHueristic{
+        float cost(Tile tile, Tile other);
     }
 }

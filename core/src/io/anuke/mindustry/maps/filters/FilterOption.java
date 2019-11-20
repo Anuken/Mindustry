@@ -2,7 +2,7 @@ package io.anuke.mindustry.maps.filters;
 
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
 import io.anuke.arc.scene.ui.layout.*;
@@ -16,13 +16,13 @@ import io.anuke.mindustry.world.blocks.*;
 import static io.anuke.mindustry.Vars.updateEditorOnChange;
 
 public abstract class FilterOption{
-    public static final Predicate<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
-    public static final Predicate<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
-    public static final Predicate<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Predicate<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Predicate<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
-    public static final Predicate<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
-    public static final Predicate<Block> anyOptional = b -> floorsOnly.test(b) || wallsOnly.test(b) || oresOnly.test(b) || b == Blocks.air;
+    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && Core.atlas.isFound(b.icon(io.anuke.mindustry.ui.Cicon.full));
+    public static final Boolf<Block> anyOptional = b -> floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air;
 
     public abstract void build(Table table);
 
@@ -30,15 +30,15 @@ public abstract class FilterOption{
 
     static class SliderOption extends FilterOption{
         final String name;
-        final FloatProvider getter;
-        final FloatConsumer setter;
+        final Floatp getter;
+        final Floatc setter;
         final float min, max, step;
 
-        SliderOption(String name, FloatProvider getter, FloatConsumer setter, float min, float max){
+        SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
         }
 
-        SliderOption(String name, FloatProvider getter, FloatConsumer setter, float min, float max, float step){
+        SliderOption(String name, Floatp getter, Floatc setter, float min, float max, float step){
             this.name = name;
             this.getter = getter;
             this.setter = setter;
@@ -63,11 +63,11 @@ public abstract class FilterOption{
 
     static class BlockOption extends FilterOption{
         final String name;
-        final Supplier<Block> supplier;
-        final Consumer<Block> consumer;
-        final Predicate<Block> filter;
+        final Prov<Block> supplier;
+        final Cons<Block> consumer;
+        final Boolf<Block> filter;
 
-        BlockOption(String name, Supplier<Block> supplier, Consumer<Block> consumer, Predicate<Block> filter){
+        BlockOption(String name, Prov<Block> supplier, Cons<Block> consumer, Boolf<Block> filter){
             this.name = name;
             this.supplier = supplier;
             this.consumer = consumer;
@@ -82,10 +82,10 @@ public abstract class FilterOption{
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
-                    if(!filter.test(block)) continue;
+                    if(!filter.get(block)) continue;
 
                     dialog.cont.addImage(block == Blocks.air ? Core.atlas.find("icon-none-small") : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
-                        consumer.accept(block);
+                        consumer.get(block);
                         dialog.hide();
                         changed.run();
                     });

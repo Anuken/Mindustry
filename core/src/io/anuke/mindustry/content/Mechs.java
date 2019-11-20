@@ -194,7 +194,7 @@ public class Mechs implements ContentList{
 
             @Override
             public void updateAlt(Player player){
-                float scl = 1f - player.shootHeat / 2f;
+                float scl = 1f - player.shootHeat / 2f*Time.delta();
                 player.velocity().scl(scl);
             }
 

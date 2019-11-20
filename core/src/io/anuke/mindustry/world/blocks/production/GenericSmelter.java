@@ -1,11 +1,13 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.Color;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
-import io.anuke.arc.math.Mathf;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.arc.math.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.world.*;
+
+import static io.anuke.mindustry.Vars.renderer;
 
 /** A GenericCrafter with a new glowing region drawn on top. */
 public class GenericSmelter extends GenericCrafter{
@@ -44,5 +46,12 @@ public class GenericSmelter extends GenericCrafter{
 
             Draw.color();
         }
+    }
+
+    @Override
+    public void drawLight(Tile tile){
+        GenericCrafterEntity entity = tile.entity();
+
+        renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.warmup * size, flameColor, 0.65f);
     }
 }

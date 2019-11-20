@@ -10,13 +10,11 @@ import io.anuke.arc.math.geom.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.pooling.*;
-import io.anuke.mindustry.content.TypeIDs;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.dialogs.*;
 import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
@@ -151,6 +149,10 @@ public class MinimapRenderer implements Disposable{
     private int colorFor(Tile tile){
         if(tile == null) return 0;
         tile = tile.link();
+        int bc = tile.block().minimapColor(tile);
+        if(bc != 0){
+            return bc;
+        }
         return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
     }
 

@@ -28,6 +28,7 @@ public class ItemTurret extends CooledTurret{
     public ItemTurret(String name){
         super(name);
         hasItems = true;
+        entityType = ItemTurretEntity::new;
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
@@ -45,7 +46,7 @@ public class ItemTurret extends CooledTurret{
             @Override
             public void build(Tile tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.test(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
+                content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile.entity != null && !((ItemTurretEntity)tile.entity).ammo.isEmpty() && ((ItemEntry)tile.<ItemTurretEntity>entity().ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
@@ -146,11 +147,6 @@ public class ItemTurret extends CooledTurret{
         TurretEntity entity = tile.entity();
 
         return ammo != null && ammo.get(item) != null && entity.totalAmmo + ammo.get(item).ammoMultiplier <= maxAmmo;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemTurretEntity();
     }
 
     public class ItemTurretEntity extends TurretEntity{

@@ -12,7 +12,7 @@ import io.anuke.arc.files.*;
 import io.anuke.arc.freetype.*;
 import io.anuke.arc.freetype.FreeTypeFontGenerator.*;
 import io.anuke.arc.freetype.FreetypeFontLoader.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.Texture.*;
 import io.anuke.arc.graphics.g2d.*;
@@ -70,6 +70,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapDialog minimap;
     public SchematicsDialog schematics;
     public ModsDialog mods;
+    public ColorPicker picker;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -211,6 +212,7 @@ public class UI implements ApplicationListener, Loadable{
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
 
+        picker = new ColorPicker();
         editor = new MapEditorDialog();
         controls = new ControlsDialog();
         restart = new GameOverDialog();
@@ -279,7 +281,7 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Consumer<String> confirmed){
+    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("$") ? Core.bundle.get(titleText.substring(1)) : titleText);
@@ -296,7 +298,7 @@ public class UI implements ApplicationListener, Loadable{
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.addButton("$ok", () -> {
-                    confirmed.accept(field.getText());
+                    confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
                 buttons.addButton("$cancel", this::hide);
@@ -304,11 +306,11 @@ public class UI implements ApplicationListener, Loadable{
         }
     }
 
-    public void showTextInput(String title, String text, String def, Consumer<String> confirmed){
+    public void showTextInput(String title, String text, String def, Cons<String> confirmed){
         showTextInput(title, text, 32, def, confirmed);
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, Consumer<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, Cons<String> confirmed){
         showTextInput(titleText, text, textLength, def, false, confirmed);
     }
 
@@ -404,7 +406,7 @@ public class UI implements ApplicationListener, Loadable{
         showConfirm(title, text, null, confirmed);
     }
 
-    public void showConfirm(String title, String text, BooleanProvider hide, Runnable confirmed){
+    public void showConfirm(String title, String text, Boolp hide, Runnable confirmed){
         FloatingDialog dialog = new FloatingDialog(title);
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);

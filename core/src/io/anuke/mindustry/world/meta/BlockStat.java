@@ -21,6 +21,7 @@ public enum BlockStat{
     powerUse(StatCategory.power),
     powerDamage(StatCategory.power),
     powerRange(StatCategory.power),
+    powerConnections(StatCategory.power),
     basePowerGeneration(StatCategory.power),
 
     input(StatCategory.crafting),

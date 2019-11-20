@@ -1,7 +1,7 @@
 package io.anuke.mindustry.ui;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
@@ -14,12 +14,12 @@ import io.anuke.mindustry.gen.*;
 public class Bar extends Element{
     private static Rectangle scissor = new Rectangle();
 
-    private FloatProvider fraction;
+    private Floatp fraction;
     private String name = "";
     private float value, lastValue, blink;
     private Color blinkColor = new Color();
 
-    public Bar(String name, Color color, FloatProvider fraction){
+    public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
         this.name = Core.bundle.get(name);
         this.blinkColor.set(color);
@@ -27,7 +27,7 @@ public class Bar extends Element{
         setColor(color);
     }
 
-    public Bar(Supplier<String> name, Supplier<Color> color, FloatProvider fraction){
+    public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
         lastValue = value = Mathf.clamp(fraction.get());
         update(() -> {
@@ -45,7 +45,7 @@ public class Bar extends Element{
         this.value = lastValue = blink = value;
     }
 
-    public void set(Supplier<String> name, FloatProvider fraction, Color color){
+    public void set(Prov<String> name, Floatp fraction, Color color){
         this.fraction = fraction;
         this.lastValue = fraction.get();
         this.blinkColor.set(color);
@@ -63,7 +63,7 @@ public class Bar extends Element{
         if(fraction == null) return;
 
         float computed = Mathf.clamp(fraction.get());
-        if(!Mathf.isEqual(lastValue, computed)){
+        if(!Mathf.equal(lastValue, computed)){
             blink = 1f;
             lastValue = computed;
         }

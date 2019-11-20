@@ -24,9 +24,7 @@ import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.net.Administration.*;
 import io.anuke.mindustry.net.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.type.TypeID;
 import io.anuke.mindustry.ui.*;
-import io.anuke.mindustry.ui.Cicon;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 
@@ -52,6 +50,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
     public @Nullable
     String uuid, usid;
     public boolean isAdmin, isTransferring, isShooting, isBoosting, isMobile, isTyping, isBuilding = true;
+    public boolean buildWasAutoPaused = false;
     public float boostHeat, shootHeat, destructTime;
     public boolean achievedFlight;
     public Color color = new Color();
@@ -351,6 +350,7 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         Draw.rect(getPowerCellRegion(), x + Angles.trnsx(rotation, mech.cellTrnsY, 0f), y + Angles.trnsy(rotation, mech.cellTrnsY, 0f), rotation - 90);
         Draw.reset();
         drawBackItems(itemtime, isLocal);
+        drawLight();
     }
 
     @Override
@@ -590,6 +590,11 @@ public class Player extends Unit implements BuilderMinerTrait, ShooterTrait{
         if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
             movement.y += ya * speed;
             movement.x += xa * speed;
+        }
+
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2) * 0.005f, -1, 1) * speed;
+            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2) * 0.005f, -1, 1) * speed;
         }
 
         Vector2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());

@@ -2,7 +2,7 @@ package io.anuke.mindustry.core;
 
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.graphics.glutils.*;
@@ -32,6 +32,7 @@ public class Renderer implements ApplicationListener{
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
+    public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
 
     public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
@@ -239,7 +240,7 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks(Layer.block);
         blocks.drawFog();
 
-        blocks.drawBroken();
+        blocks.drawDestroyed();
 
         Draw.shader(Shaders.blockbuild, true);
         blocks.drawBlocks(Layer.placement);
@@ -256,6 +257,7 @@ public class Renderer implements ApplicationListener{
         drawFlyerShadows();
 
         blocks.drawBlocks(Layer.power);
+        blocks.drawBlocks(Layer.lights);
 
         drawAllTeams(true);
 
@@ -298,6 +300,10 @@ public class Renderer implements ApplicationListener{
 
         playerGroup.draw(p -> !p.isDead(), Player::drawName);
 
+        if(state.rules.lighting){
+            lights.draw();
+        }
+
         drawLanding();
 
         Draw.color();
@@ -333,19 +339,19 @@ public class Renderer implements ApplicationListener{
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
 
-        Consumer<Unit> draw = u -> {
+        Cons<Unit> draw = u -> {
             float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
             Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
         };
 
         for(EntityGroup<? extends BaseUnit> group : unitGroups){
             if(!group.isEmpty()){
-                group.draw(unit -> !unit.isDead(), draw::accept);
+                group.draw(unit -> !unit.isDead(), draw::get);
             }
         }
 
         if(!playerGroup.isEmpty()){
-            playerGroup.draw(unit -> !unit.isDead(), draw::accept);
+            playerGroup.draw(unit -> !unit.isDead(), draw::get);
         }
 
         Draw.color();

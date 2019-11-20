@@ -1,26 +1,22 @@
 package io.anuke.mindustry.entities;
 
-import io.anuke.annotations.Annotations.Struct;
+import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
-import io.anuke.arc.graphics.Color;
-import io.anuke.arc.math.Mathf;
+import io.anuke.arc.func.*;
+import io.anuke.arc.graphics.*;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
-import io.anuke.mindustry.content.Bullets;
-import io.anuke.mindustry.content.Fx;
-import io.anuke.mindustry.entities.Effects.Effect;
-import io.anuke.mindustry.entities.type.Bullet;
-import io.anuke.mindustry.entities.effect.Fire;
-import io.anuke.mindustry.entities.effect.Lightning;
-import io.anuke.mindustry.entities.type.Unit;
+import io.anuke.mindustry.content.*;
+import io.anuke.mindustry.entities.Effects.*;
+import io.anuke.mindustry.entities.effect.*;
+import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.gen.PropCell;
-import io.anuke.mindustry.graphics.Pal;
-import io.anuke.mindustry.world.Tile;
+import io.anuke.mindustry.game.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.world.*;
 
 import static io.anuke.mindustry.Vars.*;
 
@@ -90,7 +86,7 @@ public class Damage{
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         collidedBlocks.clear();
         tr.trns(angle, length);
-        IntPositionConsumer collider = (cx, cy) -> {
+        Intc2 collider = (cx, cy) -> {
             Tile tile = world.ltile(cx, cy);
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.ordinal() && tile.entity.collide(hitter)){
                 tile.entity.collision(hitter);
@@ -100,10 +96,10 @@ public class Damage{
         };
 
         world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
-            collider.accept(cx, cy);
+            collider.get(cx, cy);
             if(large){
                 for(Point2 p : Geometry.d4){
-                    collider.accept(cx + p.x, cy + p.y);
+                    collider.get(cx + p.x, cy + p.y);
                 }
             }
             return false;
@@ -129,7 +125,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Consumer<Unit> cons = e -> {
+        Cons<Unit> cons = e -> {
             e.hitbox(hitrect);
             Rectangle other = hitrect;
             other.y -= expand;
@@ -150,16 +146,16 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Predicate<Unit> predicate, Consumer<Unit> acceptor){
-        Consumer<Unit> cons = entity -> {
-            if(!predicate.test(entity)) return;
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
+        Cons<Unit> cons = entity -> {
+            if(!predicate.get(entity)) return;
 
             entity.hitbox(hitrect);
             if(!hitrect.overlaps(rect)){
                 return;
             }
             entity.damage(damage);
-            acceptor.accept(entity);
+            acceptor.get(entity);
         };
 
         rect.setSize(size * 2).setCenter(x, y);
@@ -182,7 +178,7 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
-        Consumer<Unit> cons = entity -> {
+        Cons<Unit> cons = entity -> {
             if(entity.getTeam() == team || entity.dst(x, y) > radius){
                 return;
             }

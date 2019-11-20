@@ -1,9 +1,13 @@
-package io.anuke.mindustry.world.blocks.distribution;
+package io.anuke.mindustry.world.blocks.liquid;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
@@ -17,11 +21,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
     protected TextureRegion[] topRegions = new TextureRegion[7];
     protected TextureRegion[] botRegions = new TextureRegion[7];
 
+    protected float leakResistance = 1.5f;
+
     public Conduit(String name){
         super(name);
         rotate = true;
         solid = false;
         floating = true;
+        conveyorPlacement = true;
+        entityType = ConduitEntity::new;
     }
 
     @Override
@@ -62,6 +70,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conduit &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+    }
+
+    @Override
     public void transformCase(int num, int[] bits){
         bits[0] = num == 0 ? 3 : num == 1 ? 6 : num == 2 ? 2 : num == 3 ? 4 : num == 4 ? 5 : num == 5 ? 1 : 0;
     }
@@ -94,7 +112,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         entity.smoothLiquid = Mathf.lerpDelta(entity.smoothLiquid, entity.liquids.total() / liquidCapacity, 0.05f);
 
         if(tile.entity.liquids.total() > 0.001f && tile.entity.timer.get(timerFlow, 1)){
-            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), true, tile.entity.liquids.current());
+            tryMoveLiquid(tile, tile.getNearby(tile.rotation()), leakResistance, tile.entity.liquids.current());
             entity.noSleep();
         }else{
             entity.sleep();
@@ -109,12 +127,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
         tile.entity.noSleep();
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f) && ((2 + source.relativeTo(tile.x, tile.y)) % 4 != tile.rotation());
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ConduitEntity();
+        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)
+            && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
     }
 
     public static class ConduitEntity extends TileEntity{

@@ -1,8 +1,8 @@
 package io.anuke.mindustry.world.blocks;
 
-import io.anuke.arc.function.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
+import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.world.*;
@@ -85,6 +85,12 @@ public interface Autotiler{
         Tile other = tile.getNearby(Mathf.mod(rotation - direction, 4));
         if(other != null) other = other.link();
         return other != null && blends(tile, rotation, other.x, other.y, other.rotation(), other.block());
+    }
+
+    default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+                || ((!otherblock.rotate && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotate && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y))));
     }
 
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){

@@ -2,7 +2,7 @@ package io.anuke.mindustry.ui.dialogs;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.scene.style.*;
 import io.anuke.arc.scene.ui.*;
@@ -23,7 +23,7 @@ import static io.anuke.mindustry.Vars.*;
 public class CustomRulesDialog extends FloatingDialog{
     private Table main;
     private Rules rules;
-    private Supplier<Rules> resetter;
+    private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private FloatingDialog banDialog;
 
@@ -108,7 +108,7 @@ public class CustomRulesDialog extends FloatingDialog{
         }).size(300f, 64f);
     }
 
-    public void show(Rules rules, Supplier<Rules> resetter){
+    public void show(Rules rules, Prov<Rules> resetter){
         this.rules = rules;
         this.resetter = resetter;
         show();
@@ -116,7 +116,7 @@ public class CustomRulesDialog extends FloatingDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m);
+        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
         main.margin(10f);
         main.addButton("$settings.reset", () -> {
             rules = resetter.get();
@@ -135,13 +135,11 @@ public class CustomRulesDialog extends FloatingDialog{
         number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("$rules.title.respawns");
-        //limited respawns don't work on PvP, commented out until they're fixed
-        //check("$rules.limitedRespawns", b -> rules.limitedRespawns = b, () -> rules.limitedRespawns);
-        //number("$rules.respawns", true, f -> rules.respawns = (int)f, () -> rules.respawns, () -> rules.limitedRespawns);
         number("$rules.respawntime", f -> rules.respawnTime = f * 60f, () -> rules.respawnTime / 60f);
 
         title("$rules.title.resourcesbuilding");
         check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("$rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         number("$rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
 
@@ -171,18 +169,32 @@ public class CustomRulesDialog extends FloatingDialog{
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+
+        title("$rules.title.experimental");
+        check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+
+        main.addButton(b -> {
+            b.left();
+            b.table(Tex.pane, in -> {
+                in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(rules.ambientLight));
+                }}).grow();
+            }).margin(4).size(50f).padRight(10);
+            b.add("$rules.ambientlight");
+        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
+        main.row();
     }
 
-    void number(String text, FloatConsumer cons, FloatProvider prov){
+    void number(String text, Floatc cons, Floatp prov){
         number(text, false, cons, prov, () -> true);
     }
 
-    void number(String text, boolean integer, FloatConsumer cons, FloatProvider prov, BooleanProvider condition){
+    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
-            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.accept(Strings.parseFloat(s)))
+            Vars.platform.addDialog(t.addField((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(Strings::canParsePositiveFloat).width(120f).left().get());
@@ -190,17 +202,19 @@ public class CustomRulesDialog extends FloatingDialog{
         main.row();
     }
 
-    void check(String text, BooleanConsumer cons, BooleanProvider prov){
+    void check(String text, Boolc cons, Boolp prov){
         check(text, cons, prov, () -> true);
     }
 
-    void check(String text, BooleanConsumer cons, BooleanProvider prov, BooleanProvider condition){
+    void check(String text, Boolc cons, Boolp prov, Boolp condition){
         main.addCheck(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
         main.row();
     }
 
     void title(String text){
-        main.add(text).color(Pal.accent).padTop(20).padBottom(20).padRight(100f);
+        main.add(text).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3);
+        main.row();
+        main.addImage().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
     }
 }

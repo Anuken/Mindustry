@@ -2,17 +2,18 @@ package io.anuke.mindustry.world.blocks.distribution;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.gen.*;
 import io.anuke.mindustry.graphics.*;
 import io.anuke.mindustry.type.*;
-import io.anuke.mindustry.ui.Cicon;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
 import io.anuke.mindustry.world.meta.*;
@@ -29,9 +30,6 @@ public class Conveyor extends Block implements Autotiler{
     private static ItemPos pos2 = new ItemPos();
     private final Vector2 tr1 = new Vector2();
     private final Vector2 tr2 = new Vector2();
-    private final int[] blendresult = new int[3];
-    private final BuildRequest[] directionals = new BuildRequest[4];
-
     private TextureRegion[][] regions = new TextureRegion[7][4];
 
     protected float speed = 0f;
@@ -44,6 +42,8 @@ public class Conveyor extends Block implements Autotiler{
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = 4;
+        conveyorPlacement = true;
+        entityType = ConveyorEntity::new;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -59,7 +59,7 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.itemsMoved, speed * 60 * (1f / itemSpace), StatUnit.itemsSecond);
+        stats.add(BlockStat.itemsMoved, speed * 60 / itemSpace, StatUnit.itemsSecond);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class Conveyor extends Block implements Autotiler{
         Tile next = tile.getNearby(tile.rotation());
         if(next != null) next = next.link();
 
-        float nextMax = next != null && next.block() instanceof Conveyor ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
+        float nextMax = next != null && next.block() instanceof Conveyor && next.block().acceptItem(null, next, tile) ? 1f - Math.max(itemSpace - next.<ConveyorEntity>entity().minitem, 0) : 1f;
         int minremove = Integer.MAX_VALUE;
 
         for(int i = entity.convey.size - 1; i >= 0; i--){
@@ -201,7 +201,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(maxmove > minmove){
                 pos.y += maxmove;
-                if(Mathf.isEqual(pos.x, 0, 0.1f)){
+                if(Mathf.equal(pos.x, 0, 0.1f)){
                     pos.x = 0f;
                 }
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
@@ -249,6 +249,16 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public boolean isAccessible(){
         return true;
+    }
+
+    @Override
+    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Conveyor &&
+            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
     @Override
@@ -331,11 +341,6 @@ public class Conveyor extends Block implements Autotiler{
         //this item must be greater than anything there...
         entity.convey.add(result);
         entity.lastInserted = (byte)(entity.convey.size - 1);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ConveyorEntity();
     }
 
     public static class ConveyorEntity extends TileEntity{

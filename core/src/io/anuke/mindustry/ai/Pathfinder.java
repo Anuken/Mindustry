@@ -3,7 +3,7 @@ package io.anuke.mindustry.ai;
 import io.anuke.annotations.Annotations.*;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
@@ -317,15 +317,15 @@ public class Pathfinder implements Runnable{
 
         public static final PathTarget[] all = values();
 
-        private final BiConsumer<Team, IntArray> targeter;
+        private final Cons2<Team, IntArray> targeter;
 
-        PathTarget(BiConsumer<Team, IntArray> targeter){
+        PathTarget(Cons2<Team, IntArray> targeter){
             this.targeter = targeter;
         }
 
         /** Get targets. This must run on the main thread.*/
         public IntArray getTargets(Team team, IntArray out){
-            targeter.accept(team, out);
+            targeter.get(team, out);
             return out;
         }
     }

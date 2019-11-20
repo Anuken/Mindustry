@@ -13,6 +13,7 @@
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:isGame="true"
+            android:usesCleartextTraffic="true"
             android:appCategory="game"
             android:label="@string/app_name"
             android:theme="@style/GdxTheme" android:fullBackupContent="@xml/backup_rules">

@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.sandbox;
 
 import io.anuke.arc.*;
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
@@ -25,6 +25,7 @@ public class ItemSource extends Block{
         solid = true;
         group = BlockGroup.transportation;
         configurable = true;
+        entityType = ItemSourceEntity::new;
     }
 
     @Override
@@ -89,11 +90,6 @@ public class ItemSource extends Block{
     @Override
     public boolean acceptItem(Item item, Tile tile, Tile source){
         return false;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemSourceEntity();
     }
 
     public class ItemSourceEntity extends TileEntity{

@@ -1,6 +1,6 @@
 package io.anuke.mindustry.world.blocks.production;
 
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
 import io.anuke.arc.util.*;
@@ -25,8 +25,8 @@ public class GenericCrafter extends Block{
     protected Effect updateEffect = Fx.none;
     protected float updateEffectChance = 0.04f;
 
-    protected Consumer<Tile> drawer = null;
-    protected Supplier<TextureRegion[]> drawIcons = null;
+    protected Cons<Tile> drawer = null;
+    protected Prov<TextureRegion[]> drawIcons = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -36,6 +36,7 @@ public class GenericCrafter extends Block{
         health = 60;
         idleSound = Sounds.machine;
         idleSoundVolume = 0.03f;
+        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class GenericCrafter extends Block{
         if(drawer == null){
             super.draw(tile);
         }else{
-            drawer.accept(tile);
+            drawer.get(tile);
         }
     }
 
@@ -135,16 +136,11 @@ public class GenericCrafter extends Block{
 
 
     @Override
-    public boolean canProduce(Tile tile){
+    public boolean shouldConsume(Tile tile){
         if(outputItem != null && tile.entity.items.get(outputItem.item) >= itemCapacity){
             return false;
         }
         return outputLiquid == null || !(tile.entity.liquids.get(outputLiquid.liquid) >= liquidCapacity);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new GenericCrafterEntity();
     }
 
     @Override

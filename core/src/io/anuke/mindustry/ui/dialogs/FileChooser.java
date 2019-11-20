@@ -3,7 +3,7 @@ package io.anuke.mindustry.ui.dialogs;
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.event.*;
 import io.anuke.arc.scene.ui.*;
@@ -18,7 +18,7 @@ import java.util.*;
 import static io.anuke.mindustry.Vars.platform;
 
 public class FileChooser extends FloatingDialog{
-    private static final FileHandle homeDirectory = Core.files.absolute(OS.isMac ? OS.getProperty("user.home") + "/Downloads/" : Core.files.getExternalStoragePath());
+    private static final FileHandle homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     private static FileHandle lastDirectory = homeDirectory;
 
     private Table files;
@@ -27,11 +27,11 @@ public class FileChooser extends FloatingDialog{
     private TextField navigation, filefield;
     private TextButton ok;
     private FileHistory stack = new FileHistory();
-    private Predicate<FileHandle> filter;
-    private Consumer<FileHandle> selectListener;
+    private Boolf<FileHandle> filter;
+    private Cons<FileHandle> selectListener;
     private boolean open;
 
-    public FileChooser(String title, Predicate<FileHandle> filter, boolean open, Consumer<FileHandle> result){
+    public FileChooser(String title, Boolf<FileHandle> filter, boolean open, Cons<FileHandle> result){
         super(title);
         setFillParent(true);
         this.open = open;
@@ -64,7 +64,7 @@ public class FileChooser extends FloatingDialog{
         ok.clicked(() -> {
             if(ok.isDisabled()) return;
             if(selectListener != null)
-                selectListener.accept(directory.child(filefield.getText()));
+                selectListener.get(directory.child(filefield.getText()));
             hide();
         });
 
@@ -98,10 +98,6 @@ public class FileChooser extends FloatingDialog{
             updateFiles(true);
         });
 
-        //Macs are confined to the Downloads/ directory
-        if(OS.isMac){
-            up.setDisabled(true);
-        }
 
         ImageButton back = new ImageButton(Icon.arrowLeft);
         ImageButton forward = new ImageButton(Icon.arrowRight);
@@ -171,8 +167,7 @@ public class FileChooser extends FloatingDialog{
 
     private void updateFiles(boolean push){
         if(push) stack.push(directory);
-        //if is mac, don't display extra info since you can only ever go to downloads
-        navigation.setText(OS.isMac ? directory.name() : directory.toString());
+        navigation.setText(directory.toString());
 
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
 
@@ -190,29 +185,27 @@ public class FileChooser extends FloatingDialog{
         files.top().left();
         FileHandle[] names = getFileNames();
 
-        //macs are confined to the Downloads/ directory
-        if(!OS.isMac){
-            Image upimage = new Image(Icon.folderParentSmall);
-            TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
-            upbutton.clicked(() -> {
-                directory = directory.parent();
-                lastDirectory = directory;
-                updateFiles(true);
-            });
+        Image upimage = new Image(Icon.folderParentSmall);
+        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
+        upbutton.clicked(() -> {
+            directory = directory.parent();
+            lastDirectory = directory;
+            updateFiles(true);
+        });
 
-            upbutton.left().add(upimage).padRight(4f).padLeft(4);
-            upbutton.getLabel().setAlignment(Align.left);
-            upbutton.getCells().reverse();
+        upbutton.left().add(upimage).padRight(4f).padLeft(4);
+        upbutton.getLabel().setAlignment(Align.left);
+        upbutton.getCells().reverse();
 
-            files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
-            files.row();
-        }
+        files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
+        files.row();
+
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
 
         for(FileHandle file : names){
-            if(!file.isDirectory() && !filter.test(file)) continue; //skip non-filtered files
+            if(!file.isDirectory() && !filter.get(file)) continue; //skip non-filtered files
 
             String filename = file.name();
 

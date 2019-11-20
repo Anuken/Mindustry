@@ -2,7 +2,7 @@ package io.anuke.mindustry.entities;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.math.geom.*;
 import io.anuke.mindustry.entities.traits.*;
@@ -22,8 +22,8 @@ public class EntityGroup<T extends Entity>{
     private final Rectangle intersectRect = new Rectangle();
     private IntMap<T> map;
     private QuadTree tree;
-    private Consumer<T> removeListener;
-    private Consumer<T> addListener;
+    private Cons<T> removeListener;
+    private Cons<T> addListener;
 
     private final Rectangle viewport = new Rectangle();
     private int count = 0;
@@ -60,20 +60,20 @@ public class EntityGroup<T extends Entity>{
         draw(e -> true);
     }
 
-    public void draw(Predicate<T> toDraw){
+    public void draw(Boolf<T> toDraw){
         draw(toDraw, t -> ((DrawTrait)t).draw());
     }
 
-    public void draw(Predicate<T> toDraw, Consumer<T> cons){
+    public void draw(Boolf<T> toDraw, Cons<T> cons){
         Camera cam = Core.camera;
         viewport.set(cam.position.x - cam.width / 2, cam.position.y - cam.height / 2, cam.width, cam.height);
 
         for(Entity e : all()){
-            if(!(e instanceof DrawTrait) || !toDraw.test((T)e) || !e.isAdded()) continue;
+            if(!(e instanceof DrawTrait) || !toDraw.get((T)e) || !e.isAdded()) continue;
             DrawTrait draw = (DrawTrait)e;
 
             if(viewport.overlaps(draw.getX() - draw.drawSize()/2f, draw.getY() - draw.drawSize()/2f, draw.drawSize(), draw.drawSize())){
-                cons.accept((T)e);
+                cons.get((T)e);
             }
         }
     }
@@ -82,11 +82,11 @@ public class EntityGroup<T extends Entity>{
         return useTree;
     }
 
-    public void setRemoveListener(Consumer<T> removeListener){
+    public void setRemoveListener(Cons<T> removeListener){
         this.removeListener = removeListener;
     }
 
-    public void setAddListener(Consumer<T> addListener){
+    public void setAddListener(Cons<T> addListener){
         this.addListener = addListener;
     }
 
@@ -148,7 +148,7 @@ public class EntityGroup<T extends Entity>{
                 if(check.getID() == id){ //if it is indeed queued, remove it
                     entitiesToAdd.removeValue(check, true);
                     if(removeListener != null){
-                        removeListener.accept(check);
+                        removeListener.get(check);
                     }
                     break;
                 }
@@ -157,7 +157,7 @@ public class EntityGroup<T extends Entity>{
     }
 
     @SuppressWarnings("unchecked")
-    public void intersect(float x, float y, float width, float height, Consumer<? super T> out){
+    public void intersect(float x, float y, float width, float height, Cons<? super T> out){
         //don't waste time for empty groups
         if(isEmpty()) return;
         tree().getIntersect(out, x, y, width, height);
@@ -192,10 +192,10 @@ public class EntityGroup<T extends Entity>{
         return entityArray.size;
     }
 
-    public int count(Predicate<T> pred){
+    public int count(Boolf<T> pred){
         int count = 0;
         for(int i = 0; i < entityArray.size; i++){
-            if(pred.test(entityArray.get(i))) count++;
+            if(pred.get(entityArray.get(i))) count++;
         }
         return count;
     }
@@ -211,7 +211,7 @@ public class EntityGroup<T extends Entity>{
         }
 
         if(addListener != null){
-            addListener.accept(type);
+            addListener.get(type);
         }
     }
 
@@ -221,7 +221,7 @@ public class EntityGroup<T extends Entity>{
         entitiesToRemove.add(type);
 
         if(removeListener != null){
-            removeListener.accept(type);
+            removeListener.get(type);
         }
     }
 
@@ -244,10 +244,10 @@ public class EntityGroup<T extends Entity>{
             map.clear();
     }
 
-    public T find(Predicate<T> pred){
+    public T find(Boolf<T> pred){
 
         for(int i = 0; i < entityArray.size; i++){
-            if(pred.test(entityArray.get(i))) return entityArray.get(i);
+            if(pred.get(entityArray.get(i))) return entityArray.get(i);
         }
 
         return null;

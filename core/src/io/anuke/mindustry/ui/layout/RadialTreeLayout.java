@@ -15,27 +15,29 @@ public class RadialTreeLayout implements TreeLayout{
         delta = root.height * 2.4f;
 
         bfs(root, true);
-        radialize(root, 0, 360);
+
+        ObjectSet<TreeNode> all = new ObjectSet<>(visited);
+        for(TreeNode node : all){
+            node.leaves = bfs(node, false);
+        }
+
+        radialize(root, startRadius, 0, 360);
     }
 
-    void radialize(TreeNode root, float from, float to){
-        int depthOfVertex = root.number;
-        float theta = from;
-        float radius = startRadius + (delta * depthOfVertex);
+    void radialize(TreeNode root, float radius, float from, float to){
+        float angle = from;
 
-        int leavesNumber = bfs(root, false);
         for(TreeNode child : root.children){
-            int lambda = bfs(child, false);
-            float mi = theta + ((float)lambda / leavesNumber * (to - from));
+            float nextAngle = angle + ((float)child.leaves / root.leaves * (to - from));
 
-            float x = radius * Mathf.cos((theta + mi) / 2f * Mathf.degRad);
-            float y = radius * Mathf.sin((theta + mi) / 2f * Mathf.degRad);
+            float x = radius * Mathf.cos((angle + nextAngle) / 2f * Mathf.degRad);
+            float y = radius * Mathf.sin((angle + nextAngle) / 2f * Mathf.degRad);
 
             child.x = x;
             child.y = y;
 
-            if(child.children.length > 0) radialize(child, theta, mi);
-            theta = mi;
+            if(child.children.length > 0) radialize(child, radius + delta, angle, nextAngle);
+            angle = nextAngle;
         }
     }
 
@@ -54,8 +56,7 @@ public class RadialTreeLayout implements TreeLayout{
 
             for(TreeNode child : current.children){
                 if(assign) child.number = current.number + 1;
-                if(!visited.contains(child)){
-                    visited.add(child);
+                if(visited.add(child)){
                     queue.addLast(child);
                 }
             }

@@ -1,0 +1,9 @@
+- Added experimental lighting system - can be enabled in custom game rules
+- Added power diode block (Contributed by Quezler)
+- Added plated conduit block (Contributed by Quezler)
+- Added light block for dark maps only
+- Improved pulse conduit speed (Contributed by Quezler)
+- Improved building priority
+- New permissive mod parsing format (HJSON)
+- Fixed a few incorrect consumption displays in blocks
+- Fixed 'underwater' ores in editor

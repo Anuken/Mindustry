@@ -180,15 +180,13 @@ public class TypeIO{
         byte[] bytes = string.getBytes(charset);
         buffer.putInt(bytes.length);
         buffer.put(bytes);
-
-        writeString(buffer, JsonIO.write(rules));
     }
 
     @ReadClass(Rules.class)
     public static Rules readRules(ByteBuffer buffer){
         int length = buffer.getInt();
         byte[] bytes = new byte[length];
-        buffer.get(length);
+        buffer.get(bytes);
         String string = new String(bytes, charset);
         return JsonIO.read(Rules.class, string);
     }

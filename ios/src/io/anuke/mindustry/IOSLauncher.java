@@ -3,7 +3,7 @@ package io.anuke.mindustry;
 import com.badlogic.gdx.backends.iosrobovm.*;
 import io.anuke.arc.*;
 import io.anuke.arc.files.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.scene.ui.layout.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
@@ -12,7 +12,6 @@ import io.anuke.mindustry.game.Saves.*;
 import io.anuke.mindustry.io.*;
 import io.anuke.mindustry.mod.*;
 import io.anuke.mindustry.ui.*;
-import org.robovm.apple.dispatch.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
@@ -36,12 +35,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        //IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String extension, Consumer<FileHandle> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray)null);
+            public void showFileChooser(boolean open, String extension, Cons<FileHandle> cons){
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
+
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
@@ -59,8 +58,31 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
                         if(documentURLs.size() < 1) return;
 
+                        NSURL url = documentURLs.first();
+                        NSFileCoordinator coord = new NSFileCoordinator(null);
+                        url.startAccessingSecurityScopedResource();
+                        try{
+                            coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
+
+                                FileHandle src = Core.files.absolute(result.getAbsoluteURL().getPath());
+                                FileHandle dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
+                                src.copyTo(dst);
+
+                                Core.app.post(() -> {
+                                    try{
+                                        cons.get(dst);
+                                    }catch(Throwable t){
+                                        ui.showException(t);
+                                    }
+                                });
+                            });
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
+
+                        url.stopAccessingSecurityScopedResource();
+
                         cont.dismissViewController(true, () -> {});
-                        controller.importDocument(documentURLs.get(0), new NSURL(getDocumentsDirectory() + "/document"), UIDocumentBrowserImportMode.Copy, (url, error) -> cons.accept(Core.files.absolute(url.getPath())));
                     }
 
                     @Override
@@ -70,7 +92,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didImportDocument(UIDocumentBrowserViewController controller, NSURL sourceURL, NSURL destinationURL){
-                        cons.accept(Core.files.absolute(destinationURL.getAbsoluteString()));
                     }
 
                     @Override
@@ -91,25 +112,22 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 cont.setDelegate(new ChooserDelegate());
 
-               // DispatchQueue.getMainQueue().sync(() -> {
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
-               // });
             }
 
             @Override
             public void shareFile(FileHandle file){
-                Log.info("Attempting to share file " + file);
-                FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
-                file.copyTo(to);
+                try{
+                    Log.info("Attempting to share file " + file);
+                    FileHandle to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
+                    file.copyTo(to);
 
-                NSURL url = new NSURL(to.file());
-                UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
-                //p.getPopoverPresentationController().setSourceView(UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView());
-
-                //DispatchQueue.getMainQueue().sync(() -> {
-                UIApplication.getSharedApplication().getKeyWindow().getRootViewController()
-                .presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
-                //});
+                    NSURL url = new NSURL(to.file());
+                    UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                    UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                }catch(Throwable t){
+                    ui.showException(t);
+                }
             }
 
             @Override
@@ -136,7 +154,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
-        System.out.println("Opened URL: " + url.getPath());
         openURL(url);
         return false;
     }
@@ -146,7 +163,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
         boolean b = super.didFinishLaunching(application, options);
 
         if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            System.out.println("Opened URL at launch: " + ((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())).getPath());
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 

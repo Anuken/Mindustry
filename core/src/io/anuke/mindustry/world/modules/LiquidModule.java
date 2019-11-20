@@ -1,5 +1,6 @@
 package io.anuke.mindustry.world.modules;
 
+import io.anuke.arc.math.*;
 import io.anuke.mindustry.type.Liquid;
 
 import java.io.*;
@@ -11,6 +12,15 @@ public class LiquidModule extends BlockModule{
     private float[] liquids = new float[content.liquids().size];
     private float total;
     private Liquid current = content.liquid(0);
+    private float smoothLiquid;
+
+    public void update(){
+        smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
+    }
+
+    public float smoothAmount(){
+        return smoothLiquid;
+    }
 
     /** Returns total amount of liquids. */
     public float total(){
@@ -54,7 +64,7 @@ public class LiquidModule extends BlockModule{
         add(liquid, -amount);
     }
 
-    public void forEach(LiquidConsumer cons){
+    public void each(LiquidConsumer cons){
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
                 cons.accept(content.liquid(i), liquids[i]);

@@ -2,7 +2,7 @@ package io.anuke.mindustry.net;
 
 import io.anuke.arc.*;
 import io.anuke.arc.collection.*;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.pooling.*;
@@ -25,8 +25,8 @@ public class Net{
     StreamBuilder currentStream;
 
     private final Array<Object> packetQueue = new Array<>();
-    private final ObjectMap<Class<?>, Consumer> clientListeners = new ObjectMap<>();
-    private final ObjectMap<Class<?>, BiConsumer<NetConnection, Object>> serverListeners = new ObjectMap<>();
+    private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
+    private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
 
     private final NetProvider provider;
@@ -170,7 +170,7 @@ public class Net{
      * Starts discovering servers on a different thread.
      * Callback is run on the main libGDX thread.
      */
-    public void discoverServers(Consumer<Host> cons, Runnable done){
+    public void discoverServers(Cons<Host> cons, Runnable done){
         provider.discoverServers(cons, done);
     }
 
@@ -208,15 +208,15 @@ public class Net{
     /**
      * Registers a client listener for when an object is recieved.
      */
-    public <T> void handleClient(Class<T> type, Consumer<T> listener){
+    public <T> void handleClient(Class<T> type, Cons<T> listener){
         clientListeners.put(type, listener);
     }
 
     /**
      * Registers a server listener for when an object is recieved.
      */
-    public <T> void handleServer(Class<T> type, BiConsumer<NetConnection, T> listener){
-        serverListeners.put(type, (BiConsumer<NetConnection, Object>)listener);
+    public <T> void handleServer(Class<T> type, Cons2<NetConnection, T> listener){
+        serverListeners.put(type, (Cons2<NetConnection, Object>)listener);
     }
 
     /**
@@ -244,7 +244,7 @@ public class Net{
 
             if(clientLoaded || ((object instanceof Packet) && ((Packet)object).isImportant())){
                 if(clientListeners.get(object.getClass()) != null)
-                    clientListeners.get(object.getClass()).accept(object);
+                    clientListeners.get(object.getClass()).get(object);
                 Pools.free(object);
             }else if(!((object instanceof Packet) && ((Packet)object).isUnimportant())){
                 packetQueue.add(object);
@@ -263,7 +263,7 @@ public class Net{
 
         if(serverListeners.get(object.getClass()) != null){
             if(serverListeners.get(object.getClass()) != null)
-                serverListeners.get(object.getClass()).accept(connection, object);
+                serverListeners.get(object.getClass()).get(connection, object);
             Pools.free(object);
         }else{
             Log.err("Unhandled packet type: '{0}'!", object.getClass());
@@ -273,7 +273,7 @@ public class Net{
     /**
      * Pings a host in an new thread. If an error occured, failed() should be called with the exception.
      */
-    public void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed){
+    public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
         provider.pingHost(address, port, valid, failed);
     }
 
@@ -324,10 +324,10 @@ public class Net{
          * Callback should be run on the main thread.
          * @param done is the callback that should run after discovery.
          */
-        void discoverServers(Consumer<Host> callback, Runnable done);
+        void discoverServers(Cons<Host> callback, Runnable done);
 
         /** Ping a host. If an error occured, failed() should be called with the exception. */
-        void pingHost(String address, int port, Consumer<Host> valid, Consumer<Exception> failed);
+        void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed);
 
         /** Host a server at specified port. */
         void hostServer(int port) throws IOException;

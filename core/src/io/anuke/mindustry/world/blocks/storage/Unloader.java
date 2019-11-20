@@ -1,9 +1,9 @@
 package io.anuke.mindustry.world.blocks.storage;
 
-import io.anuke.arc.function.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.scene.ui.layout.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
@@ -27,6 +27,7 @@ public class Unloader extends Block{
         health = 70;
         hasItems = true;
         configurable = true;
+        entityType = UnloaderEntity::new;
     }
 
     @Override
@@ -126,11 +127,6 @@ public class Unloader extends Block{
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new UnloaderEntity();
     }
 
     public static class UnloaderEntity extends TileEntity{

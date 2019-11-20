@@ -1,7 +1,7 @@
 package io.anuke.mindustry.editor;
 
 import io.anuke.arc.collection.IntArray;
-import io.anuke.arc.function.*;
+import io.anuke.arc.func.*;
 import io.anuke.arc.math.Mathf;
 import io.anuke.arc.math.geom.Bresenham2;
 import io.anuke.arc.util.Structs;
@@ -113,8 +113,8 @@ public enum EditorTool{
                     return;
                 }
 
-                Predicate<Tile> tester;
-                Consumer<Tile> setter;
+                Boolf<Tile> tester;
+                Cons<Tile> setter;
 
                 if(editor.drawBlock.isOverlay()){
                     Block dest = tile.overlay();
@@ -146,7 +146,7 @@ public enum EditorTool{
             }
         }
 
-        void fill(MapEditor editor, int x, int y, boolean replace, Predicate<Tile> tester, Consumer<Tile> filler){
+        void fill(MapEditor editor, int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
             int width = editor.width(), height = editor.height();
 
             if(replace){
@@ -154,8 +154,8 @@ public enum EditorTool{
                 for(int cx = 0; cx < width; cx++){
                     for(int cy = 0; cy < height; cy++){
                         Tile tile = editor.tile(cx, cy);
-                        if(tester.test(tile)){
-                            filler.accept(tile);
+                        if(tester.get(tile)){
+                            filler.get(tile);
                         }
                     }
                 }
@@ -173,23 +173,23 @@ public enum EditorTool{
                     y = Pos.y(popped);
 
                     x1 = x;
-                    while(x1 >= 0 && tester.test(editor.tile(x1, y))) x1--;
+                    while(x1 >= 0 && tester.get(editor.tile(x1, y))) x1--;
                     x1++;
                     boolean spanAbove = false, spanBelow = false;
-                    while(x1 < width && tester.test(editor.tile(x1, y))){
-                        filler.accept(editor.tile(x1, y));
+                    while(x1 < width && tester.get(editor.tile(x1, y))){
+                        filler.get(editor.tile(x1, y));
 
-                        if(!spanAbove && y > 0 && tester.test(editor.tile(x1, y - 1))){
+                        if(!spanAbove && y > 0 && tester.get(editor.tile(x1, y - 1))){
                             stack.add(Pos.get(x1, y - 1));
                             spanAbove = true;
-                        }else if(spanAbove && !tester.test(editor.tile(x1, y - 1))){
+                        }else if(spanAbove && !tester.get(editor.tile(x1, y - 1))){
                             spanAbove = false;
                         }
 
-                        if(!spanBelow && y < height - 1 && tester.test(editor.tile(x1, y + 1))){
+                        if(!spanBelow && y < height - 1 && tester.get(editor.tile(x1, y + 1))){
                             stack.add(Pos.get(x1, y + 1));
                             spanBelow = true;
-                        }else if(spanBelow && y < height - 1 && !tester.test(editor.tile(x1, y + 1))){
+                        }else if(spanBelow && y < height - 1 && !tester.get(editor.tile(x1, y + 1))){
                             spanBelow = false;
                         }
                         x1++;
