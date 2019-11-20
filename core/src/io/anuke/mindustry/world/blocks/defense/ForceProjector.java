@@ -99,7 +99,7 @@ public class ForceProjector extends Block{
 
         entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime)){
+        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.efficiency() > 0){
             entity.cons.trigger();
         }
 
