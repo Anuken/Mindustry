@@ -30,6 +30,8 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
+            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
+
             if(entity.cons.valid()){
                 entity.uptime = Mathf.lerpDelta(entity.uptime, 1f, 0.04f);
             }else{

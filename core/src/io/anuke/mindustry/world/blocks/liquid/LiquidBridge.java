@@ -30,6 +30,8 @@ public class LiquidBridge extends ItemBridge{
         if(!linkValid(tile, other)){
             tryDumpLiquid(tile, entity.liquids.current());
         }else{
+            ((ItemBridgeEntity)world.tile(entity.link).entity).incoming.add(tile.pos());
+
             if(entity.cons.valid()){
                 float alpha = 0.04f;
                 if(hasPower){
