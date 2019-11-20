@@ -366,5 +366,6 @@ public class EventType{
             this.ip = ip;
         }
     }
+    
 }
 
