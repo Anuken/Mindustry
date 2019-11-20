@@ -12,16 +12,17 @@ public class ColorPicker extends FloatingDialog{
 
     public ColorPicker(){
         super("$pickcolor");
-        shown(this::setup);
     }
 
     public void show(Color color, Cons<Color> consumer){
+        show(color, true, consumer);
+    }
+
+    public void show(Color color, boolean alpha, Cons<Color> consumer){
         this.current.set(color);
         this.cons = consumer;
         show();
-    }
 
-    void setup(){
         cont.clear();
         cont.pane(t -> {
             t.table(Tex.pane, i -> {
@@ -45,12 +46,12 @@ public class ColorPicker extends FloatingDialog{
             t.add("B").color(Color.royal);
             t.addSlider(0f, 1f, 0.01f, current.b, current::b).width(w);
             t.row();
-            t.add("A");
-            t.addSlider(0f, 1f, 0.01f, current.a, current::a).width(w);
-            t.row();
+            if(alpha){
+                t.add("A");
+                t.addSlider(0f, 1f, 0.01f, current.a, current::a).width(w);
+                t.row();
+            }
         });
-
-
 
         buttons.clear();
         addCloseButton();

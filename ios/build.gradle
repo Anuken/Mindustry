@@ -41,9 +41,6 @@ task deploy{
     dependsOn createIPA
 }
 
-
-build.dependsOn copyAssets
-
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build

@@ -62,6 +62,8 @@ public interface BuilderTrait extends Entity, TeamTrait{
 
         BuildRequest current = buildRequest();
 
+        if(dst(current.tile()) > finalPlaceDst) return;
+
         Tile tile = world.tile(current.x, current.y);
 
         if(!(tile.block() instanceof BuildBlock)){

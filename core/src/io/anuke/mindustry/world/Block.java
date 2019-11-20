@@ -139,6 +139,7 @@ public class Block extends BlockStorage{
 
     protected TextureRegion[] cacheRegions = {};
     protected Array<String> cacheRegionStrings = new Array<>();
+    protected Prov<TileEntity> entityType = TileEntity::new;
 
     protected Array<Tile> tempTiles = new Array<>();
     protected TextureRegion[] generatedIcons;
@@ -295,7 +296,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawLight(Tile tile){
-        if(hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
             drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
         }
     }
@@ -856,8 +857,8 @@ public class Block extends BlockStorage{
         return destructible || update;
     }
 
-    public TileEntity newEntity(){
-        return new TileEntity();
+    public final TileEntity newEntity(){
+        return entityType.get();
     }
 
     /** Offset for placing and drawing multiblocks. */

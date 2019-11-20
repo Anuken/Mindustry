@@ -66,6 +66,7 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
+        entityType = DrillEntity::new;
 
         idleSound = Sounds.drill;
         idleSoundVolume = 0.003f;
@@ -298,11 +299,6 @@ public class Drill extends Block{
         }else{
             return isValid(tile);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new DrillEntity();
     }
 
     public int tier(){

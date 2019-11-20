@@ -292,7 +292,7 @@ public class NetServer implements ApplicationListener{
         }
 
         //cooldown between votes
-        int voteTime = 60 * 5;
+        int voteTime = 60 * 3;
         Timekeeper vtime = new Timekeeper(voteTime);
         //current kick sessions
         VoteSession[] currentlyKicking = {null};

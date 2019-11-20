@@ -37,6 +37,7 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
+        entityType = OverdriveEntity::new;
     }
 
     @Override
@@ -135,11 +136,6 @@ public class OverdriveProjector extends Block{
         Lines.square(tile.drawx(), tile.drawy(), (1f - f) * 8f);
 
         Draw.reset();
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new OverdriveEntity();
     }
 
     class OverdriveEntity extends TileEntity{

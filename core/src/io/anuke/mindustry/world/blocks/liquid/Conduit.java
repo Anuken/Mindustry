@@ -29,6 +29,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
+        entityType = ConduitEntity::new;
     }
 
     @Override
@@ -128,11 +129,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         tile.entity.noSleep();
         return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f)
             && ((source.absoluteRelativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ConduitEntity();
     }
 
     public static class ConduitEntity extends TileEntity{
