@@ -1,9 +1,10 @@
 package io.anuke.mindustry.entities.type;
 
 import io.anuke.annotations.Annotations.*;
-import io.anuke.arc.Events;
+import io.anuke.arc.*;
 import io.anuke.arc.collection.Array;
 import io.anuke.arc.collection.ObjectSet;
+import io.anuke.arc.math.*;
 import io.anuke.arc.math.geom.Point2;
 import io.anuke.arc.math.geom.Vector2;
 import io.anuke.arc.util.*;
@@ -41,9 +42,13 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
     /** List of (cached) tiles with entities in proximity, used for outputting to */
     private Array<Tile> proximity = new Array<>(8);
     private boolean dead = false;
+    private @Nullable SoundLoop sound;
+
     private boolean sleeping;
     private float sleepTime;
-    private @Nullable SoundLoop sound;
+
+    private long controlFrame = -1;
+    private boolean controlActive;
 
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
@@ -82,6 +87,18 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
         return this;
     }
 
+    public void control(boolean active){
+        if(active){
+            controlActive = true;
+        }else{
+            if(controlFrame < Core.graphics.getFrameId()){
+                controlActive = false;
+            }
+        }
+
+        controlFrame = Core.graphics.getFrameId();
+    }
+
     /** Scaled delta. */
     public float delta(){
         return Time.delta() * timeScale;
@@ -89,7 +106,17 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
+        if(Core.graphics.getFrameId() <= controlFrame + 1 && !controlActive) return 0f;
         return power != null && !block.consumes.getPower().buffered ? power.status : 1f;
+    }
+
+    /** @return whether this block is functioning at all, e.g. whether efficiency is > 0. */
+    public boolean enabled(){
+        return !Mathf.zero(efficiency());
+    }
+
+    public boolean disabled(){
+        return !enabled();
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */

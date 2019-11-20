@@ -4,11 +4,25 @@ import io.anuke.arc.*;
 import io.anuke.arc.graphics.*;
 import io.anuke.arc.graphics.g2d.*;
 import io.anuke.arc.math.*;
+import io.anuke.arc.math.geom.*;
 import io.anuke.arc.util.*;
+import io.anuke.mindustry.world.*;
 
-import static io.anuke.mindustry.Vars.renderer;
+import static io.anuke.mindustry.Vars.*;
 
 public class Drawf{
+
+    public static void selected(int x, int y, Block block, Color color){
+        Draw.color(color);
+        for(int i = 0; i < 4; i++){
+            Point2 p = Geometry.d8edge[i];
+            float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
+            Draw.rect("block-select",
+            x*tilesize + block.offset() + offset * p.x,
+            y*tilesize + block.offset() + offset * p.y, i * 90);
+        }
+        Draw.reset();
+    }
 
     public static void dashCircle(float x, float y, float rad, Color color){
         Lines.stroke(3f, Pal.gray);

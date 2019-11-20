@@ -8,6 +8,7 @@ import io.anuke.mindustry.entities.traits.*;
 import io.anuke.mindustry.entities.traits.BuilderTrait.*;
 import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.graphics.*;
+import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.meta.*;
 
@@ -27,6 +28,15 @@ public abstract class LogicBlock extends Block{
     public void update(Tile tile){
         LogicEntity entity = tile.entity();
         entity.signal = signal(tile);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("signal", entity -> new Bar(
+        () -> Core.bundle.format("block.signal", Integer.toBinaryString(((LogicEntity)entity).signal).replace("1", "[accent]1").replace("0", "[lightgray]0")),
+        () -> Color.clear,
+        () -> 0));
     }
 
     @Override
@@ -87,7 +97,7 @@ public abstract class LogicBlock extends Block{
         @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
-            stream.write(signal);
+            stream.writeInt(signal);
         }
 
         @Override

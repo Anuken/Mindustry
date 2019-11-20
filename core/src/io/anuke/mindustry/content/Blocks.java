@@ -84,7 +84,7 @@ public class Blocks implements ContentList{
     dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
 
     //logic
-    switchBlock, relay, notGate, andGate, orGate, xorGate;
+    switchBlock, signalBlock, analyzer, controller, relay, notGate, andGate, orGate, xorGate, adder, subtractor, divider, multiplier;
 
     @Override
     public void load(){
@@ -1842,6 +1842,18 @@ public class Blocks implements ContentList{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
         }};
 
+        signalBlock = new SignalBlock("signal-block"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+        }};
+
+        analyzer = new AnalyzerBlock("analyzer"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+        }};
+
+        controller = new ControllerBlock("controller"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+        }};
+
         relay = new UnaryLogicBlock("relay"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
 
@@ -1871,6 +1883,32 @@ public class Blocks implements ContentList{
 
             processor = (left, right) -> left ^ right;
         }};
+
+        adder = new BinaryLogicBlock("adder"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left + right;
+        }};
+
+        subtractor = new BinaryLogicBlock("subtractor"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> Math.max(left - right, 0);
+        }};
+
+        divider = new BinaryLogicBlock("divider"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> right == 0 ? 0 : left / right;
+        }};
+
+        multiplier = new BinaryLogicBlock("multiplier"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left * right;
+        }};
+
+
 
         //endregion
     }
