@@ -484,7 +484,7 @@ public class Mods implements Loadable{
 
         FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.js").exists() ? zip.child("mod.js") : zip.child("plugin.json");
         if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json' file, skipping.", sourceFile);
+            Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json'/'mod.js' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 
