@@ -1,21 +1,15 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Time;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.entities.type.Unit;
-import io.anuke.mindustry.gen.BufferItem;
-import io.anuke.mindustry.type.Item;
-import io.anuke.mindustry.world.Block;
-import io.anuke.mindustry.world.DirectionalItemBuffer;
-import io.anuke.mindustry.world.Tile;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.arc.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.util.*;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.gen.*;
+import io.anuke.mindustry.type.*;
+import io.anuke.mindustry.world.*;
+import io.anuke.mindustry.world.meta.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import static io.anuke.mindustry.Vars.content;
 
@@ -50,34 +44,34 @@ public class Junction extends Block{
         // Calculate proximity tiles
         int proximityTiles = 0;
         int proximityFade = 0;
-        for (Tile proximityTile : tile.entity.proximity()) {
+        for(Tile proximityTile : tile.entity.proximity()){
             byte relativePosition = tile.relativeTo(proximityTile);
-            if (proximityTile.block().outputsItems()) {
+            if(proximityTile.block().outputsItems()){
                 proximityTiles |= 1 << relativePosition;
             }
 
             // TODO Generic Check
-            if (proximityTile.block() instanceof Router || proximityTile.block() instanceof Conveyor) {
+            if(proximityTile.block() instanceof Router || proximityTile.block() instanceof Conveyor){
                 proximityFade |= 1 << relativePosition;
             }
         }
 
         // Loop over 4 cardinal directions
-        for (int i = 0; i < 4; i++) {
-            if (i % 2 == 0) {
+        for(int i = 0; i < 4; i++){
+            if(i % 2 == 0){
                 Draw.color(0.2f, 0.8f, 0.2f, 0.8f);
-            } else {
+            }else{
                 Draw.color(0.2f, 0.2f, 0.8f, 0.8f);
             }
 
             // Always draw horizontal and vertical arrow bodies
             Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), 90 * i - 90);
 
-            if ((proximityTiles & 1 << i) == 0) {
+            if((proximityTiles & 1 << i) == 0){
                 Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), 90 * i - 90);
             }
 
-            if ((proximityFade & 1 << i) > 0) {
+            if((proximityFade & 1 << i) > 0){
                 Draw.color(1, 1, 1, 0.5f);
                 Draw.rect(overlayArrowShadeRegion, tile.drawx(), tile.drawy(), 90 * i - 90);
             }

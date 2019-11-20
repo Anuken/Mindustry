@@ -242,7 +242,7 @@ public class BlockRenderer implements Disposable{
                         }
                     }
 
-                    if (Core.settings.getBool("debug_overlay")) {
+                    if(Core.settings.getBool("debug_overlay")){
                         addRequest(tile, Layer.debug);
                     }
                 }

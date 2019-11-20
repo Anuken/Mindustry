@@ -1,15 +1,14 @@
 package io.anuke.mindustry.world.blocks.distribution;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.graphics.g2d.Draw;
-import io.anuke.arc.graphics.g2d.TextureRegion;
-import io.anuke.arc.util.Time;
+import io.anuke.arc.*;
+import io.anuke.arc.collection.*;
+import io.anuke.arc.graphics.g2d.*;
+import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.entities.type.TileEntity;
-import io.anuke.mindustry.type.Item;
+import io.anuke.mindustry.entities.type.*;
+import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.meta.BlockGroup;
+import io.anuke.mindustry.world.meta.*;
 
 public class Router extends Block{
     protected float speed = 8f;
@@ -41,33 +40,33 @@ public class Router extends Block{
 
         int proximityTiles = 0;
         int proximityAlternatives = 0;
-        for (Tile proximityTile : tile.entity.proximity()) {
+        for(Tile proximityTile : tile.entity.proximity()){
             byte relativePosition = tile.relativeTo(proximityTile);
-            if (relativePosition >= 0) {
-                if (proximityTile.block().outputsItems()) {
+            if(relativePosition >= 0){
+                if(proximityTile.block().outputsItems()){
                     proximityTiles |= 1 << relativePosition;
                 }
 
-                if (proximityTile.block() instanceof Junction) {
+                if(proximityTile.block() instanceof Junction){
                     proximityAlternatives |= 1 << relativePosition;
                 }
             }
         }
 
-        for (int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; i++){
             // Always has horizontal and vertical bodies
             Draw.color(1, 1, 1, 0.8f);
             Draw.rect(overlayArrowBodyRegion, tile.drawx(), tile.drawy(), 90 * i - 90);
 
-            if ((proximityTiles & 1 << i) == 0) {
+            if((proximityTiles & 1 << i) == 0){
                 Draw.color(1, 1, 1, 0.8f);
                 Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), 90 * i - 90);
             }
 
-            if ((proximityAlternatives & 1 << i) > 0) {
-                if (i % 2 == 0) {
+            if((proximityAlternatives & 1 << i) > 0){
+                if(i % 2 == 0){
                     Draw.color(0.2f, 0.8f, 0.2f, 0.5f);
-                } else {
+                }else{
                     Draw.color(0.2f, 0.2f, 0.8f, 0.5f);
                 }
 

@@ -14,5 +14,5 @@ public enum Layer{
     /** Extra layer that's always on top.*/
     lights,
     /** Debug layer with directional arrows and other informative indicators. */
-    debug
+    debug,
 }

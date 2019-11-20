@@ -16,7 +16,6 @@ import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.ui.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.production.*;
 import io.anuke.mindustry.world.meta.*;
 
 import java.io.*;
@@ -89,7 +88,7 @@ public class Conveyor extends Block implements Autotiler{
         for(Tile proximityTile : tile.entity.proximity()){
             byte relativeDirection = tile.relativeTo(proximityTile);
 
-            if (relativeDirection == -1) {
+            if(relativeDirection == -1){
                 continue;
             }
 
@@ -109,9 +108,9 @@ public class Conveyor extends Block implements Autotiler{
                 }
 
                 if(proximityTile.block() instanceof Junction){
-                    if (drawRotation == selfRotation) {
+                    if(drawRotation == selfRotation){
                         selfShadow = true;
-                    } else {
+                    }else{
                         if(drawRotation % 180 != 0){
                             Draw.color(0.2f, 0.8f, 0.2f, 0.3f);
                         }else{
@@ -132,7 +131,7 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(overlayArrowRegion, tile.drawx(), tile.drawy(), selfRotation);
         }
 
-        if (selfShadow) {
+        if(selfShadow){
             if(selfRotation % 180 != 0){
                 Draw.color(0.2f, 0.8f, 0.2f, 0.3f);
             }else{
