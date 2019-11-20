@@ -17,7 +17,7 @@ buildscript{
 
 allprojects{
     version = 'release'
-    apply plugin: 'maven-publish'
+    apply plugin: 'maven'
     group = 'com.github.Anuken'
 
     ext{
