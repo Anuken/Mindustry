@@ -837,17 +837,17 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
         
-        double percentage = 0.5;
-        HashSet<Player> votes = new HashSet<>();
-        boolean allow = true;
         handler.<Player>register("rtv", "[off]", "Change the map", (args, player) -> {
+            boolean allow = true;
+            HashSet<Player> votes = new HashSet<>();
+            double percentage = 0.5;
             if(player.isAdmin) {
                 if(args.length == 1 && args[0].equals("off") || args.length == 1 && args[0].equals("false")){
-                    this.allow = false;
+                    allow = false;
                 } else if(args.length == 1 && args[0].equals("on") || args.length == 1 && args[0].equals("true")){
-                    this.allow = true;
+                    allow = true;
                 } else {
-                    this.allow = false;
+                    allow = false;
                 }
             }
             if(!this.allow){
