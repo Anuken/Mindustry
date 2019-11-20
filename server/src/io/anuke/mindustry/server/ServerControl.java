@@ -33,6 +33,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.HashSet;
 
 import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
@@ -834,6 +835,37 @@ public class ServerControl implements ApplicationListener{
             System.gc();
             int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
+        });
+        
+        static private double percentage = 0.5;
+        private HashSet<Player> votes = new HashSet<>();
+        private boolean allow = true;
+        handler.<Player>register("rtv", "[off]", "Change the map", (args, player) -> {
+            if(player.isAdmin) {
+                if(args.length == 1 && args[0].equals("off") || args.length == 1 && args[0].equals("false")){
+                    this.allow = false;
+                } else if(args.length == 1 && args[0].equals("on") || args.length == 1 && args[0].equals("true")){
+                    this.allow = true;
+                } else {
+                    this.allow = false;
+                }
+            }
+            if(!this.allow){
+                player.sendMessage("RTV is disabled.");
+                return;
+            }
+            this.votes.add(player);
+            int currentVotes = this.votes.size();
+            int requiredVotes = (int) Math.floor(percentage * Vars.playerGroup.size());
+            Call.sendMessage("RockTheVote: [accent]" + player.name + "[] is lobbying to change the map, [accent]" + currentVotes + " []votes, [accent]" + requiredVotes + " []required");
+            
+            if(currentVotes < requiredVotes){
+                return;
+            } else {
+                this.votes.clear();
+                Call.sendMessage("RockTheVote: lobby has won, switching map.");
+                Events.fire(new GameOverEvent(Team.crux));
+            }
         });
 
         mods.each(p -> p.registerServerCommands(handler));
