@@ -22,6 +22,7 @@ public abstract class LogicBlock extends Block{
         group = BlockGroup.logic;
         update = true;
         entityType = LogicEntity::new;
+        controllable = false;
     }
 
     @Override

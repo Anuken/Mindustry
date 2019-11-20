@@ -20,6 +20,7 @@ public class Router extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = RouterEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

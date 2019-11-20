@@ -28,6 +28,7 @@ public class Junction extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         entityType = JunctionEntity::new;
+        stopOnDisabled = true;
     }
 
     @Override

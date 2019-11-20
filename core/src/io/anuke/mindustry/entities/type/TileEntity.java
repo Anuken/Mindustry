@@ -338,7 +338,9 @@ public class TileEntity extends BaseEntity implements TargetTrait, HealthTrait{
             loops.play(block.idleSound, this, block.idleSoundVolume);
         }
 
-        block.update(tile);
+        if(!block.stopOnDisabled || enabled()){
+            block.update(tile);
+        }
 
         if(liquids != null){
             liquids.update();
