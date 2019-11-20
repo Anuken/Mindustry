@@ -104,7 +104,7 @@ public class ContentParser{
             return t;
         }
 
-        private <T> T  internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        private <T> T internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             if(type != null){
                 if(classParsers.containsKey(type)){
                     try{
@@ -112,6 +112,29 @@ public class ContentParser{
                     }catch(Exception e){
                         throw new RuntimeException(e);
                     }
+                }
+
+                //try to parse "item/amount" syntax
+                try{
+                    if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                        String[] split = jsonData.asString().split("/");
+
+                        return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
+                    }
+                }catch(Throwable ignored){
+                }
+
+                //try to parse "liquid/amount" syntax
+                try{
+                    if(jsonData.isString() && jsonData.asString().contains("/")){
+                        String[] split = jsonData.asString().split("/");
+                        if(type == LiquidStack.class){
+                            return (T)fromJson(LiquidStack.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                        }else if(type == ConsumeLiquid.class){
+                            return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
+                        }
+                    }
+                }catch(Throwable ignored){
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -342,7 +365,22 @@ public class ContentParser{
             init();
         }
 
-        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        JsonValue value;
+        try{
+            //try to read hjson, bail out if it doesn't work
+            value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        }catch(Throwable t){
+            try{
+                value = parser.fromJson(null, json);
+            }catch(Throwable extra){
+                if(t instanceof RuntimeException){
+                    throw t;
+                }else{
+                    throw new RuntimeException(t);
+                }
+            }
+        }
+
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }

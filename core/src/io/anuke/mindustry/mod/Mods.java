@@ -14,6 +14,7 @@ import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.arc.util.serialization.Jval.*;
 import io.anuke.mindustry.core.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -172,8 +173,7 @@ public class Mods implements Loadable{
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
         for(FileHandle file : modDirectory.list()){
-            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && file.child("mod.json").exists())) continue;
-
+            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.js").exists()))) continue;
 
             Log.debug("[Mods] Loading mod {0}", file);
             try{
@@ -482,13 +482,22 @@ public class Mods implements Loadable{
             zip = zip.list()[0];
         }
 
-        FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("plugin.json");
+        FileHandle metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.js").exists() ? zip.child("mod.js") : zip.child("plugin.json");
         if(!metaf.exists()){
             Log.warn("Mod {0} doesn't have a 'mod.json'/'plugin.json' file, skipping.", sourceFile);
             throw new IllegalArgumentException("No mod.json found.");
         }
 
-        ModMeta meta = json.fromJson(ModMeta.class, metaf.readString());
+        //try to read as hjson if possible
+        String readString = metaf.readString();
+        try{
+            readString = Jval.read(readString).toString(Jformat.plain);
+        }catch(Throwable e){
+            e.printStackTrace();
+            readString = metaf.readString();
+        }
+
+        ModMeta meta = json.fromJson(ModMeta.class, readString);
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");
