@@ -91,10 +91,9 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         Liquid liquid = cliquid.liquid;
-        float liquidAmount = cliquid.amount;
 
         if(entity.heat > 0){
-            float maxUsed = Math.min(Math.min(entity.liquids.get(liquid), entity.heat / coolantPower), liquidAmount * entity.delta());
+            float maxUsed = Math.min(entity.liquids.get(liquid), entity.heat / coolantPower);
             entity.heat -= maxUsed * coolantPower;
             entity.liquids.remove(liquid, maxUsed);
         }

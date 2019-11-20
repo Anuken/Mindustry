@@ -296,7 +296,7 @@ public class Block extends BlockStorage{
     }
 
     public void drawLight(Tile tile){
-        if(hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
+        if(tile.entity != null && hasLiquids && drawLiquidLight && tile.entity.liquids.current().lightColor.a > 0.001f){
             drawLiquidLight(tile, tile.entity.liquids.current(), tile.entity.liquids.smoothAmount());
         }
     }
