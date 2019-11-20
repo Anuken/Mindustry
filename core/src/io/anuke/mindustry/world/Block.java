@@ -106,7 +106,7 @@ public class Block extends BlockStorage{
     public boolean canOverdrive = true;
     /** Whether this block can be influenced by logic blocks to change its efficiency to 0 or 1. */
     public boolean controllable = true;
-    /** Whether this block stops updating completely when 'disabled' by logic. TODO IMPLEMENT*/
+    /** Whether this block stops updating completely when 'disabled' by logic. */
     public boolean stopOnDisabled = false;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
