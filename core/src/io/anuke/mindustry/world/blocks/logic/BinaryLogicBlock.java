@@ -1,10 +1,21 @@
 package io.anuke.mindustry.world.blocks.logic;
 
+import io.anuke.arc.util.ArcAnnotate.*;
+import io.anuke.mindustry.world.*;
+
 public abstract class BinaryLogicBlock extends LogicBlock{
+    protected @NonNull BinaryProcessor processor;
 
     public BinaryLogicBlock(String name){
         super(name);
     }
 
-    public abstract byte process(byte left, byte right);
+    @Override
+    public byte signal(Tile tile){
+        return (byte)processor.process(sleft(tile), sright(tile));
+    }
+
+    public interface BinaryProcessor{
+        int process(byte left, byte right);
+    }
 }

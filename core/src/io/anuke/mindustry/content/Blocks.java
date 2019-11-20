@@ -81,7 +81,10 @@ public class Blocks implements ContentList{
     fortressFactory, repairPoint,
 
     //upgrades
-    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad;
+    dartPad, deltaPad, tauPad, omegaPad, javelinPad, tridentPad, glaivePad,
+
+    //logic
+    switchBlock, relay, notGate, andGate, orGate, xorGate;
 
     @Override
     public void load(){
@@ -1829,6 +1832,44 @@ public class Blocks implements ContentList{
             brightness = 0.67f;
             radius = 120f;
             consumes.power(0.05f);
+        }};
+
+        //endregion
+
+        //region logic
+
+        switchBlock = new SwitchBlock("switch-block"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+        }};
+
+        relay = new UnaryLogicBlock("relay"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = input -> input;
+        }};
+
+        notGate = new UnaryLogicBlock("not-gate"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = input -> ~input;
+        }};
+
+        andGate = new BinaryLogicBlock("and-gate"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left & right;
+        }};
+
+        orGate = new BinaryLogicBlock("or-gate"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left | right;
+        }};
+
+        xorGate = new BinaryLogicBlock("xor-gate"){{
+            requirements(Category.effect, ItemStack.with(Items.lead, 4));
+
+            processor = (left, right) -> left ^ right;
         }};
 
         //endregion
