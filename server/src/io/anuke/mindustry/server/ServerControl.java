@@ -837,9 +837,9 @@ public class ServerControl implements ApplicationListener{
             info("&ly{0}&lg MB collected. Memory usage now at &ly{1}&lg MB.", pre - post, post);
         });
         
-        static private double percentage = 0.5;
-        private HashSet<Player> votes = new HashSet<>();
-        private boolean allow = true;
+        static double percentage = 0.5;
+        HashSet<Player> votes = new HashSet<>();
+        boolean allow = true;
         handler.<Player>register("rtv", "[off]", "Change the map", (args, player) -> {
             if(player.isAdmin) {
                 if(args.length == 1 && args[0].equals("off") || args.length == 1 && args[0].equals("false")){
