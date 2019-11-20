@@ -76,6 +76,11 @@ public class LightBlock extends Block{
         public int color = Pal.accent.rgba();
 
         @Override
+        public int config(){
+            return color;
+        }
+
+        @Override
         public void write(DataOutput stream) throws IOException{
             super.write(stream);
             stream.writeInt(color);
