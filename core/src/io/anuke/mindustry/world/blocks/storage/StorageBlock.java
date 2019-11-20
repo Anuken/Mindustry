@@ -11,6 +11,7 @@ public abstract class StorageBlock extends Block{
     public StorageBlock(String name){
         super(name);
         hasItems = true;
+        entityType = StorageBlockEntity::new;
     }
 
     @Override
@@ -67,11 +68,6 @@ public abstract class StorageBlock extends Block{
         }else{
             return entity.items.has(item);
         }
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new StorageBlockEntity();
     }
 
     public class StorageBlockEntity extends TileEntity{

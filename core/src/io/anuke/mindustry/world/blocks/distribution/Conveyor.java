@@ -43,6 +43,7 @@ public class Conveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 4;
         conveyorPlacement = true;
+        entityType = ConveyorEntity::new;
 
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
@@ -200,7 +201,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(maxmove > minmove){
                 pos.y += maxmove;
-                if(Mathf.isEqual(pos.x, 0, 0.1f)){
+                if(Mathf.equal(pos.x, 0, 0.1f)){
                     pos.x = 0f;
                 }
                 pos.x = Mathf.lerpDelta(pos.x, 0, 0.1f);
@@ -340,11 +341,6 @@ public class Conveyor extends Block implements Autotiler{
         //this item must be greater than anything there...
         entity.convey.add(result);
         entity.lastInserted = (byte)(entity.convey.size - 1);
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ConveyorEntity();
     }
 
     public static class ConveyorEntity extends TileEntity{

@@ -8,7 +8,6 @@ import io.anuke.arc.util.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.entities.*;
 import io.anuke.mindustry.entities.Effects.*;
-import io.anuke.mindustry.entities.type.*;
 import io.anuke.mindustry.type.*;
 import io.anuke.mindustry.world.*;
 import io.anuke.mindustry.world.consumers.*;
@@ -37,15 +36,15 @@ public class ItemLiquidGenerator extends PowerGenerator{
     protected boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
-        super(name);
+        this(name);
         this.hasItems = hasItems;
         this.hasLiquids = hasLiquids;
-
         setDefaults();
     }
 
     public ItemLiquidGenerator(String name){
         super(name);
+        this.entityType = ItemLiquidGeneratorEntity::new;
     }
 
     protected void setDefaults(){
@@ -140,7 +139,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             if(entity.generateTime > 0f){
                 entity.generateTime -= Math.min(1f / itemDuration * entity.delta(), entity.generateTime);
 
-                if(randomlyExplode && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
+                if(randomlyExplode && state.rules.reactorExplosions && Mathf.chance(entity.delta() * 0.06 * Mathf.clamp(entity.explosiveness - 0.5f))){
                     //this block is run last so that in the event of a block destruction, no code relies on the block type
                     Core.app.post(() -> {
                         entity.damage(Mathf.random(11f));
@@ -174,17 +173,19 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
     }
 
+    @Override
+    public void drawLight(Tile tile){
+        ItemLiquidGeneratorEntity entity = tile.entity();
+
+        renderer.lights.add(tile.drawx(), tile.drawy(), (60f + Mathf.absin(10f, 5f)) * entity.productionEfficiency * size, Color.orange, 0.5f);
+    }
+
     protected float getItemEfficiency(Item item){
         return 0.0f;
     }
 
     protected float getLiquidEfficiency(Liquid liquid){
         return 0.0f;
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new ItemLiquidGeneratorEntity();
     }
 
     public static class ItemLiquidGeneratorEntity extends GeneratorEntity{

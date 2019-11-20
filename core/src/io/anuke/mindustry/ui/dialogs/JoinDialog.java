@@ -32,14 +32,14 @@ public class JoinDialog extends FloatingDialog{
 
         loadServers();
 
-        buttons.add().width(60f);
-        buttons.add().growX();
+        if(!steam) buttons.add().width(60f);
+        buttons.add().growX().width(-1);
 
         addCloseButton();
 
-        buttons.add().growX();
+        buttons.add().growX().width(-1);
         if(!steam){
-            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f);
+            buttons.addButton("?", () -> ui.showInfo("$join.info")).size(60f, 64f).width(-1);
         }
 
         add = new FloatingDialog("$joingame.title");
@@ -247,7 +247,7 @@ public class JoinDialog extends FloatingDialog{
             }
 
             ImageButton button = t.addImageButton(Tex.whiteui, Styles.clearFulli, 40, () -> {
-                new ColorPickDialog().show(color -> {
+                new PaletteDialog().show(color -> {
                     player.color.set(color);
                     Core.settings.put("color-0", Color.rgba8888(color));
                     Core.settings.save();
@@ -271,7 +271,7 @@ public class JoinDialog extends FloatingDialog{
 
             Cell cell = ((Table)pane.getParent()).getCell(button);
 
-            if(!Mathf.isEqual(cell.minWidth(), pw)){
+            if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);
                 cell.padLeft(pad);
                 pane.getParent().invalidateHierarchy();

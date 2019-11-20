@@ -27,6 +27,7 @@ public class Unloader extends Block{
         health = 70;
         hasItems = true;
         configurable = true;
+        entityType = UnloaderEntity::new;
     }
 
     @Override
@@ -126,11 +127,6 @@ public class Unloader extends Block{
             lastItem = item;
             tile.configure(item == null ? -1 : item.id);
         });
-    }
-
-    @Override
-    public TileEntity newEntity(){
-        return new UnloaderEntity();
     }
 
     public static class UnloaderEntity extends TileEntity{

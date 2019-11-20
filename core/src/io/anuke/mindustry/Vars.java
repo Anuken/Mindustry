@@ -48,7 +48,7 @@ public class Vars implements Loadable{
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
-    public static final String crashReportURL = "http://mins.us.to/report";
+    public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
     /** URL the links to the wiki's modding guide.*/

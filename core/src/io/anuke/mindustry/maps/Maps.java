@@ -8,10 +8,12 @@ import io.anuke.arc.collection.IntSet.*;
 import io.anuke.arc.files.*;
 import io.anuke.arc.func.*;
 import io.anuke.arc.graphics.*;
+import io.anuke.arc.util.ArcAnnotate.*;
 import io.anuke.arc.util.*;
 import io.anuke.arc.util.async.*;
 import io.anuke.arc.util.io.*;
 import io.anuke.arc.util.serialization.*;
+import io.anuke.mindustry.*;
 import io.anuke.mindustry.content.*;
 import io.anuke.mindustry.ctype.*;
 import io.anuke.mindustry.game.EventType.*;
@@ -34,8 +36,29 @@ public class Maps{
     /** Serializer for meta. */
     private Json json = new Json();
 
+    private ShuffleMode shuffleMode = ShuffleMode.all;
+    private @Nullable MapProvider shuffler;
+
     private AsyncExecutor executor = new AsyncExecutor(2);
     private ObjectSet<Map> previewList = new ObjectSet<>();
+
+    public ShuffleMode getShuffleMode(){
+        return shuffleMode;
+    }
+
+    public void setShuffleMode(ShuffleMode mode){
+        this.shuffleMode = mode;
+    }
+
+    /** Set the provider for the map(s) to be played on. Will override the default shuffle mode setting.*/
+    public void setMapProvider(MapProvider provider){
+        this.shuffler = provider;
+    }
+
+    /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
+    public @Nullable Map getNextMap(@Nullable Map previous){
+        return shuffler != null ? shuffler.next(previous) : shuffleMode.next(previous);
+    }
 
     /** Returns a list of all maps, including custom ones. */
     public Array<Map> all(){
@@ -422,4 +445,37 @@ public class Maps{
         return map;
     }
 
+    public interface MapProvider{
+        @Nullable Map next(@Nullable Map previous);
+    }
+
+    public enum ShuffleMode implements MapProvider{
+        none(map -> null),
+        all(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        }),
+        custom(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.customMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        }),
+        builtin(prev -> {
+            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps());
+            maps.shuffle();
+            return maps.find(m -> m != prev || maps.size == 1);
+        });
+
+        private final MapProvider provider;
+
+        ShuffleMode(MapProvider provider){
+            this.provider = provider;
+        }
+
+        @Override
+        public Map next(@Nullable Map previous){
+            return provider.next(previous);
+        }
+    }
 }

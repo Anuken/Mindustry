@@ -30,7 +30,7 @@ public class LoopControl{
             data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.2f);
 
             boolean play = data.curVolume > 0.01f;
-            float pan = Mathf.isZero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
+            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
             if(data.soundID <= 0){
                 if(play){
                     data.soundID = sound.loop(data.curVolume, 1f, pan);

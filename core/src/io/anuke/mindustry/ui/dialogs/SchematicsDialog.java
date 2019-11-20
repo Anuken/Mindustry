@@ -62,12 +62,12 @@ public class SchematicsDialog extends FloatingDialog{
                 t.clear();
                 int i = 0;
 
-                if(!schematics.all().contains(s -> search.isEmpty() || s.name().contains(search))){
+                if(!schematics.all().contains(s -> search.isEmpty() || s.name().toLowerCase().contains(search.toLowerCase()))){
                     t.add("$none");
                 }
 
                 for(Schematic s : schematics.all()){
-                    if(!search.isEmpty() && !s.name().contains(search)) continue;
+                    if(!search.isEmpty() && !s.name().toLowerCase().contains(search.toLowerCase())) continue;
 
                     Button[] sel = {null};
                     sel[0] = t.addButton(b -> {
