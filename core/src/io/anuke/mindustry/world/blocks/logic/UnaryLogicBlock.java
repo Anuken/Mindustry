@@ -11,11 +11,11 @@ public abstract class UnaryLogicBlock extends LogicBlock{
     }
 
     @Override
-    public byte signal(Tile tile){
-        return (byte)processor.process(sback(tile));
+    public int signal(Tile tile){
+        return processor.process(sback(tile));
     }
 
     public interface UnaryProcessor{
-        int process(byte signal);
+        int process(int signal);
     }
 }

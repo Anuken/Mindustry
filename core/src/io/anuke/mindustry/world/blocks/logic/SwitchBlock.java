@@ -25,7 +25,7 @@ public class SwitchBlock extends LogicBlock{
     }
 
     @Override
-    public byte signal(Tile tile){
+    public int signal(Tile tile){
         return tile.<LogicEntity>entity().signal;
     }
 }

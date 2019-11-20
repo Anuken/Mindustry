@@ -11,11 +11,11 @@ public abstract class BinaryLogicBlock extends LogicBlock{
     }
 
     @Override
-    public byte signal(Tile tile){
-        return (byte)processor.process(sleft(tile), sright(tile));
+    public int signal(Tile tile){
+        return processor.process(sleft(tile), sright(tile));
     }
 
     public interface BinaryProcessor{
-        int process(byte left, byte right);
+        int process(int left, int right);
     }
 }

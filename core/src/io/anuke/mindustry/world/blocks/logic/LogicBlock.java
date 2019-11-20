@@ -57,32 +57,32 @@ public abstract class LogicBlock extends Block{
         !rotate ? 0 : req.rotation * 90);
     }
 
-    public byte getSignal(Tile tile){
+    public int getSignal(Tile tile){
         if(tile == null || !(tile.block() instanceof LogicBlock)) return 0;
         return tile.<LogicEntity>entity().signal;
     }
 
-    public byte sfront(Tile tile){
+    public int sfront(Tile tile){
         return getSignal(tile.front());
     }
 
-    public byte sback(Tile tile){
+    public int sback(Tile tile){
         return getSignal(tile.back());
     }
 
-    public byte sleft(Tile tile){
+    public int sleft(Tile tile){
         return getSignal(tile.left());
     }
 
-    public byte sright(Tile tile){
+    public int sright(Tile tile){
         return getSignal(tile.right());
     }
 
     /** @return signal to send next frame. */
-    public abstract byte signal(Tile tile);
+    public abstract int signal(Tile tile);
 
     public class LogicEntity extends TileEntity{
-        public byte signal;
+        public int signal;
 
         @Override
         public void write(DataOutput stream) throws IOException{
@@ -93,7 +93,7 @@ public abstract class LogicBlock extends Block{
         @Override
         public void read(DataInput stream, byte revision) throws IOException{
             super.read(stream, revision);
-            signal = stream.readByte();
+            signal = stream.readInt();
         }
     }
 }

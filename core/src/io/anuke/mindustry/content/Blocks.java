@@ -1851,7 +1851,7 @@ public class Blocks implements ContentList{
         notGate = new UnaryLogicBlock("not-gate"){{
             requirements(Category.effect, ItemStack.with(Items.lead, 4));
 
-            processor = input -> ~input;
+            processor = input -> input != 0 ? 0 : 1;
         }};
 
         andGate = new BinaryLogicBlock("and-gate"){{
