@@ -41,7 +41,14 @@ In general, if you are using IntelliJ, you should be warned about platform incom
 #### Use `arc` collections and classes when possible.
 Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Array`, `ObjectMap` and other equivalents from `io.anuke.arc.collection`. 
 Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.  
-In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).
+In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).  
+
+What you'll usually need to change:
+- `HashSet` -> `ObjectSet`
+- `HashMap` -> `ObjectMap`
+- `List` / `ArrayList` / `Stack` -> `Array`
+- `java.util.Queue` -> `io.anuke.arc.collection.Queue`
+- *Many others*
 
 
 #### Avoid boxed types (Integer, Boolean)
