@@ -33,7 +33,6 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
-import java.util.HashSet;
 
 import static io.anuke.arc.util.Log.*;
 import static io.anuke.mindustry.Vars.*;
@@ -839,7 +838,7 @@ public class ServerControl implements ApplicationListener{
         
         handler.<Player>register("rtv", "[off]", "Change the map", (args, player) -> {
             boolean allow = true;
-            HashSet<Player> votes = new HashSet<>();
+            ObjectSet<Player> votes = new ObjectSet<>();
             double percentage = 0.5;
             if(player.isAdmin) {
                 if(args.length == 1 && args[0].equals("off") || args.length == 1 && args[0].equals("false")){
@@ -856,7 +855,7 @@ public class ServerControl implements ApplicationListener{
             }
             votes.add(player);
             int currentVotes = votes.size();
-            int requiredVotes = (int) Math.floor(percentage * Vars.playerGroup.size());
+            int requiredVotes = (int)Math.floor(percentage * Vars.playerGroup.size());
             Call.sendMessage("RockTheVote: [accent]" + player.name + "[] is lobbying to change the map, [accent]" + currentVotes + " []votes, [accent]" + requiredVotes + " []required");
             
             if(currentVotes < requiredVotes){
