@@ -11,7 +11,7 @@ import io.anuke.arc.util.CommandHandler.*;
 import io.anuke.arc.util.Timer.*;
 import io.anuke.arc.util.serialization.*;
 import io.anuke.arc.util.serialization.JsonValue.*;
-import io.anuke.arc.util.ObjectSet;
+import io.anuke.arc.collection.ObjectSet;
 import io.anuke.mindustry.*;
 import io.anuke.mindustry.core.GameState.*;
 import io.anuke.mindustry.core.*;
