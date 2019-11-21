@@ -844,26 +844,26 @@ public class ServerControl implements ApplicationListener{
             double percentage = 0.5;
             if(player.isAdmin) {
                 if(args.length == 1 && args[0].equals("off") || args.length == 1 && args[0].equals("false")){
-                    this.allow = false;
+                    allow = false;
                 } else if(args.length == 1 && args[0].equals("on") || args.length == 1 && args[0].equals("true")){
-                    this.allow = true;
+                    allow = true;
                 } else {
-                    this.allow = false;
+                    allow = false;
                 }
             }
             if(!allow){
                 player.sendMessage("RTV is disabled.");
                 return;
             }
-            this.votes.add(player);
-            int currentVotes = this.votes.size;
+            votes.add(player);
+            int currentVotes = votes.size;
             int requiredVotes = (int)Math.floor(percentage * Vars.playerGroup.size());
             Call.sendMessage("RockTheVote: [accent]" + player.name + "[] is lobbying to change the map, [accent]" + currentVotes + " []votes, [accent]" + requiredVotes + " []required");
             
             if(currentVotes < requiredVotes){
                 return;
             } else {
-                this.votes.clear();
+                votes.clear();
                 Call.sendMessage("RockTheVote: lobby has won, switching map.");
                 Events.fire(new GameOverEvent(Team.crux));
             }
