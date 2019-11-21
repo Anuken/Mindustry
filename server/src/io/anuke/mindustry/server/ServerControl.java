@@ -855,7 +855,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
             votes.add(player);
-            int currentVotes = votes.size();
+            int currentVotes = votes.size;
             int requiredVotes = (int)Math.floor(percentage * Vars.playerGroup.size());
             Call.sendMessage("RockTheVote: [accent]" + player.name + "[] is lobbying to change the map, [accent]" + currentVotes + " []votes, [accent]" + requiredVotes + " []required");
             
