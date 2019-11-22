@@ -54,7 +54,7 @@ public class Vars implements Loadable{
     /** URL the links to the wiki's modding guide.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Array<String> defaultServers = Array.with(/*"mins.us.to"*/);
+    public static final Array<String> defaultServers = Array.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** team of the player by default */
