@@ -493,16 +493,7 @@ public class Mods implements Loadable{
             throw new IllegalArgumentException("No mod.json found.");
         }
 
-        //try to read as hjson if possible
-        String readString = metaf.readString();
-        try{
-            readString = Jval.read(readString).toString(Jformat.plain);
-        }catch(Throwable e){
-            e.printStackTrace();
-            readString = metaf.readString();
-        }
-
-        ModMeta meta = json.fromJson(ModMeta.class, readString);
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");

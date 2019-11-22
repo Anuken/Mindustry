@@ -365,21 +365,12 @@ public class ContentParser{
             init();
         }
 
-        JsonValue value;
-        try{
-            //try to read hjson, bail out if it doesn't work
-            value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
-        }catch(Throwable t){
-            try{
-                value = parser.fromJson(null, json);
-            }catch(Throwable extra){
-                if(t instanceof RuntimeException){
-                    throw t;
-                }else{
-                    throw new RuntimeException(t);
-                }
-            }
+        //remove extra # characters to make it valid json... apparently some people have *unquoted* # characters in their json
+        if(file.extension().equals("json")){
+            json = json.replace("#", "\\#");
         }
+
+        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
